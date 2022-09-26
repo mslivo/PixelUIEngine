@@ -165,9 +165,12 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
         newInputState.viewport_screen = switch (viewportMode) {
-            case FIT -> new FitViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
-            case PIXEL_PERFECT -> new PixelPerfectViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen, 1);
-            case STRETCH -> new StretchViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
+            case FIT ->
+                    new FitViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
+            case PIXEL_PERFECT ->
+                    new PixelPerfectViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen, 1);
+            case STRETCH ->
+                    new StretchViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
         };
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // -----  Input
@@ -1018,7 +1021,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                 } else {
-                    if(inputState.inventoryDrag_Inventory.inventoryAction != null) {
+                    if (inputState.inventoryDrag_Inventory.inventoryAction != null) {
                         inputState.inventoryDrag_Inventory.inventoryAction.onDragIntoScreen(
                                 inputState.inventoryDrag_Item,
                                 inputState.inventoryDrag_from_x, inputState.inventoryDrag_from_y,
@@ -1053,8 +1056,8 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                     }
-                }else{
-                    if(inputState.listDrag_List.listAction != null) {
+                } else {
+                    if (inputState.listDrag_List.listAction != null) {
                         inputState.listDrag_List.listAction.onDragIntoScreen(
                                 inputState.listDrag_Item,
                                 inputState.listDrag_from_index,
@@ -2085,8 +2088,8 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Images
-        for(ToolTipImage toolTipImage : tooltip.images){
-            render_drawCMediaImage(toolTipImage.image, tooltip_x+toolTipImage.offset_x,tooltip_y+toolTipImage.offset_y);
+        for (ToolTipImage toolTipImage : tooltip.images) {
+            render_drawCMediaImage(toolTipImage.image, tooltip_x + toolTipImage.offset_x, tooltip_y + toolTipImage.offset_y);
 
         }
 
@@ -2460,14 +2463,16 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
 
-                        int index = inventory.doubleSized ?  render_getComponent16TilesCMediaIndex(x, y, inventory.width/2, inventory.height/2) :  render_getComponent16TilesCMediaIndex(x, y, inventory.width, inventory.height);
+                        int index = inventory.doubleSized ? render_getComponent16TilesCMediaIndex(x, y, inventory.width / 2, inventory.height / 2) : render_getComponent16TilesCMediaIndex(x, y, inventory.width, inventory.height);
                         render_drawCMediaImage(cellMedia, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize), index);
 
                         render_batch_setColorWhite();
 
                         CMediaGFX icon = (inventory.items[x][y] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[x][y]) : null;
+
                         if (icon != null) {
-                            render_drawCMediaImage(icon, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize));
+                            int iconIndex = inventory.inventoryAction != null ? inventory.inventoryAction.iconArrayIndex(inventory.items[x][y]) : 0;
+                            render_drawCMediaImage(icon, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize), iconIndex);
                         }
                         render_batch_loadColor();
 
