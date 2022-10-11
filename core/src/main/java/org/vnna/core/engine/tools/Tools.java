@@ -138,6 +138,42 @@ public class Tools {
             return color;
         }
 
+        public static CColor createDarker(CColor color, float amount) {
+            return create(
+                    Tools.Calc.lowerBounds(color.r - amount, 0f),
+                    Tools.Calc.lowerBounds(color.g - amount, 0f),
+                    Tools.Calc.lowerBounds(color.b - amount, 0f),
+                    color.a
+            );
+        }
+
+        public static CColor createBrighter(CColor color, float amount) {
+            return create(
+                    Tools.Calc.upperBounds(color.r + amount, 1f),
+                    Tools.Calc.upperBounds(color.g + amount, 1f),
+                    Tools.Calc.upperBounds(color.b + amount, 1f),
+                    color.a
+            );
+        }
+
+        public static FColor createFixedDarker(FColor color, float amount) {
+            return createFixed(
+                    Tools.Calc.lowerBounds(color.r - amount, 0f),
+                    Tools.Calc.lowerBounds(color.g - amount, 0f),
+                    Tools.Calc.lowerBounds(color.b - amount, 0f),
+                    color.a
+            );
+        }
+
+        public static FColor createFixedBrighter(FColor color, float amount) {
+            return createFixed(
+                    Tools.Calc.upperBounds(color.r + amount, 1f),
+                    Tools.Calc.upperBounds(color.g + amount, 1f),
+                    Tools.Calc.upperBounds(color.b + amount, 1f),
+                    color.a
+            );
+        }
+
         public static CColor createFromString(String colorString) {
             String[] colors = colorString.split(",");
             if (colors.length != 4) return Colors.create(Colors.WHITE);
