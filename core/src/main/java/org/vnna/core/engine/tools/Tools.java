@@ -139,37 +139,41 @@ public class Tools {
         }
 
         public static CColor createDarker(CColor color, float amount) {
+            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
             return create(
-                    Tools.Calc.lowerBounds(color.r - amount, 0f),
-                    Tools.Calc.lowerBounds(color.g - amount, 0f),
-                    Tools.Calc.lowerBounds(color.b - amount, 0f),
+                    color.r * amount,
+                    color.g * amount,
+                    color.b * amount,
                     color.a
             );
         }
 
         public static CColor createBrighter(CColor color, float amount) {
+            amount = Tools.Calc.inBounds(amount, 0f, 1f);
             return create(
-                    Tools.Calc.upperBounds(color.r + amount, 1f),
-                    Tools.Calc.upperBounds(color.g + amount, 1f),
-                    Tools.Calc.upperBounds(color.b + amount, 1f),
+                    Tools.Calc.upperBounds(color.r + (color.r*amount), 1f),
+                    Tools.Calc.upperBounds(color.g + (color.g*amount), 1f),
+                    Tools.Calc.upperBounds(color.b + (color.b*amount), 1f),
                     color.a
             );
         }
 
         public static FColor createFixedDarker(FColor color, float amount) {
+            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
             return createFixed(
-                    Tools.Calc.lowerBounds(color.r - amount, 0f),
-                    Tools.Calc.lowerBounds(color.g - amount, 0f),
-                    Tools.Calc.lowerBounds(color.b - amount, 0f),
+                    color.r * amount,
+                    color.g * amount,
+                    color.b * amount,
                     color.a
             );
         }
 
         public static FColor createFixedBrighter(FColor color, float amount) {
+            amount = Tools.Calc.inBounds(amount, 0f, 1f);
             return createFixed(
-                    Tools.Calc.upperBounds(color.r + amount, 1f),
-                    Tools.Calc.upperBounds(color.g + amount, 1f),
-                    Tools.Calc.upperBounds(color.b + amount, 1f),
+                    Tools.Calc.upperBounds(color.r + (color.r*amount), 1f),
+                    Tools.Calc.upperBounds(color.g + (color.g*amount), 1f),
+                    Tools.Calc.upperBounds(color.b + (color.b*amount), 1f),
                     color.a
             );
         }
