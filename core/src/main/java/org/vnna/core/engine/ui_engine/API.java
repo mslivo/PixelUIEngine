@@ -342,8 +342,8 @@ public class API {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
-            final int colorTextureWidthTiles = colorTexture.getRegionWidth()/8;
-            final int colorTextureHeightTiles = colorTexture.getRegionHeight()/8;
+            final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
+            final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
             Window modal = windows.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
             ImageButton closeButton = presets.button_CreateWindowCloseButton(modal);
@@ -374,7 +374,8 @@ public class API {
             components.map.addOverlay(colorMap, cursorOverlay);
 
 
-            if (!colorTexture.getTexture().getTextureData().isPrepared()) colorTexture.getTexture().getTextureData().prepare();
+            if (!colorTexture.getTexture().getTextureData().isPrepared())
+                colorTexture.getTexture().getTextureData().prepare();
             Pixmap pixmap = colorTexture.getTexture().getTextureData().consumePixmap();
 
             Color pixelColor = new Color();
@@ -383,7 +384,7 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     components.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        components.map.mapOverlay.setPosition(cursorOverlay, x , colorTexture.getRegionHeight() - y );
+                        components.map.mapOverlay.setPosition(cursorOverlay, x, colorTexture.getRegionHeight() - y);
                     }
 
                 }
@@ -2299,6 +2300,12 @@ public class API {
             if (component == null) return;
             component.width = Tools.Calc.lowerBounds(width, 1);
             component.height = Tools.Calc.lowerBounds(height, 1);
+        }
+
+        public void setDimensions(Component component, int x, int y, int width, int height) {
+            if (component == null) return;
+            setPosition(component, x, y);
+            setSize(component, width, height);
         }
 
         public void setColor(Component component, FColor fColor) {
