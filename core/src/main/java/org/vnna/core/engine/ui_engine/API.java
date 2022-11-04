@@ -197,6 +197,50 @@ public class API {
             return ret;
         }
 
+        public ArrayList<Component> text_scrollAbleText(int x, int y, int width, int height, String[] text){
+            ArrayList<Component> result = new ArrayList<>();
+
+            String[] textAll = text == null ? new String[]{} : Arrays.copyOf(text, text.length);
+            String[] textDisplayedLines = new String[height];
+
+            Text textField = components.text.create(x,y+height-1, null);
+            components.setSize(textField,width-1, height);
+
+            ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x+width-1,y, height);
+
+            components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
+                @Override
+                public void onScrolled(float scrolledPct) {
+                    float scrolled = 1f-scrolledPct;
+
+                    int scrolledTextIndex;
+                    if(textAll.length > height) {
+                        scrolledTextIndex =MathUtils.round((textAll.length - height) * scrolled);
+                    }else{
+                        scrolledTextIndex = 0;
+                    }
+
+                    for(int iy = 0;iy < height;iy++){
+                        int textIndex = scrolledTextIndex+iy;
+                        if(textIndex < textAll.length) {
+                            textDisplayedLines[iy] = textAll[textIndex];
+                        }else{
+                            textDisplayedLines[iy] = "";
+                        }
+                    }
+                }
+            });
+
+            components.scrollBar.setScrolled(scrollBarVertical, 1f);
+            scrollBarVertical.scrollBarAction.onScrolled(1f);
+
+            components.text.setLines(textField, textDisplayedLines);
+
+            result.add(scrollBarVertical);
+            result.add(textField);
+            return result;
+        }
+
         public Text text_CreateClickableText(int x, int y, String[] text, Function<Integer, Boolean> onClick) {
             return text_CreateClickableText(x, y, text, onClick, null);
         }
@@ -447,7 +491,6 @@ public class API {
             return modal_CreateTextInput(caption, text, originalText, function, maxInputLength, 0);
 
         }
-
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Function<String, Object> function, int maxInputLength, int wndMinWidth) {
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, Tools.Calc.lowerBounds(wndMinWidth, 8));
