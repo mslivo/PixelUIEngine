@@ -377,11 +377,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Image image1 = api.components.image.create(3, 4, ExampleBaseMedia.GUI_ICON_EXAMPLE_ANIMATION_2);
 
-        Text text = api.components.text.create(12, 11, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
+        Text text = api.components.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
         ArrayList separatorHorizontal = api.presets.image_CreateSeparatorHorizontal(12, 9, 13);
 
-        Text text2 = api.components.text.create(12, 8, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
+        Text text2 = api.components.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
 
         api.windows.addComponents(window, new Component[]{image1, text, text2});
         api.windows.addComponents(window, separatorHorizontal);
