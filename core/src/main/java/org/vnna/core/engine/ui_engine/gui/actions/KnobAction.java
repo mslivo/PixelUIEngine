@@ -22,13 +22,5 @@ public interface KnobAction {
         return;
     }
 
-    default void onKeyDown(int keyCodeUp){
-        return;
-    }
-
-    default void onKeyUp(int keyCodeDown){
-        return;
-    }
-
     default void onMouseScroll(float scrolled){return;}
 }

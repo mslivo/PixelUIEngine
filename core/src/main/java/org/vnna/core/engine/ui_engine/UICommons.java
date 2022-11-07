@@ -139,6 +139,8 @@ class UICommons {
             inputState.windows.remove(window);
             inputState.windows.add(index, window);
         }
+
+        inputState.lastActiveWindow = window;
     }
 
 }

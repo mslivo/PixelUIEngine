@@ -54,14 +54,6 @@ public interface ListAction<T extends Object> {
         return;
     }
 
-    default void onKeyDown(int keyCodeUp){
-        return;
-    }
-
-    default void onKeyUp(int keyCodeDown){
-        return;
-    }
-
     default void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
         return;
     }

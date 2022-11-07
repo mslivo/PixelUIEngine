@@ -199,6 +199,7 @@ public class InputState {
 
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
 
+    public Window lastActiveWindow;
     public CMediaCursor cursor_setNext;
 
     public CMediaCursor cursor_current;

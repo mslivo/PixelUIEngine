@@ -52,14 +52,6 @@ public interface InventoryAction<T extends Object> {
         return;
     }
 
-    default void onKeyDown(int keyCodeUp) {
-        return;
-    }
-
-    default void onKeyUp(int keyCodeDown) {
-        return;
-    }
-
     default void onDragIntoScreen(T listItem, int x, int y, int screenX, int screenY) {
         return;
     }

@@ -346,12 +346,10 @@ public class UIEngine<T extends UIAdapter> {
                         } else if (keyCode == Input.Keys.END) {
                             UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, 0);
                         }
-
                     }
-                }
-                if (inputState.focusedTextField == null) {
+                }else {
+                    // Hotkeys
                     for (int keyCode : inputState.inputEvents.keyCodesDown) {
-
                         inputState.hotKeyPressedKeys[keyCode] = true;
                         hkLoop:
                         for (HotKey hotKey : inputState.hotKeys) {
@@ -367,95 +365,21 @@ public class UIEngine<T extends UIAdapter> {
                                 inputState.pressedHotKey = hotKey;
                                 if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
                             }
-
-
                         }
+                    }
 
+                    // WindowAction OnKeyDown
+                    if(inputState.lastActiveWindow != null){
+                        if(inputState.lastActiveWindow.windowAction != null){
+                            for (int keyCode : inputState.inputEvents.keyCodesDown) {
+                                inputState.lastActiveWindow.windowAction.onKeyDown(keyCode);
+                            }
+                        }
                     }
                 }
             }
 
-            // KeyDown Events
-            if (inputState.lastGUIMouseHover != null) {
-                if (inputState.lastGUIMouseHover instanceof Button) {
-                    Button button = (Button) inputState.lastGUIMouseHover;
-                    if (button.buttonAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) button.buttonAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
-                    CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                    if (checkBox.checkBoxAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            checkBox.checkBoxAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
-                    ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                    if (comboBox.comboBoxAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            comboBox.comboBoxAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == GameViewPort.class) {
-                    GameViewPort gameViewPort = (GameViewPort) inputState.lastGUIMouseHover;
-                    if (gameViewPort.gameViewPortAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            gameViewPort.gameViewPortAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                    Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                    if (inventory.inventoryAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            inventory.inventoryAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
-                    Knob knob = (Knob) inputState.lastGUIMouseHover;
-                    if (knob.knobAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) knob.knobAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                    List list = (List) inputState.lastGUIMouseHover;
-                    if (list.listAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) list.listAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
-                    Map map = (Map) inputState.lastGUIMouseHover;
-                    if (map.mapAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) map.mapAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
-                    ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    if (scrollBarHorizontal.scrollBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            scrollBarHorizontal.scrollBarAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
-                    ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    if (scrollBarVertical.scrollBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown)
-                            scrollBarVertical.scrollBarAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
-                    TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-                    if (tabBar.tabBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) tabBar.tabBarAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Image.class) {
-                    Image image = (Image) inputState.lastGUIMouseHover;
-                    if (image.imageAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) image.imageAction.onKeyDown(keyCode);
-                    }
 
-                } else if (inputState.lastGUIMouseHover.getClass() == Text.class) {
-                    Text text = (Text) inputState.lastGUIMouseHover;
-                    if (text.textAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) text.textAction.onKeyDown(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                    Window window = (Window) inputState.lastGUIMouseHover;
-                    if (window.windowAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesDown) window.windowAction.onKeyDown(keyCode);
-                    }
-                }
-            }
 
         }
 
@@ -469,82 +393,12 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.pressedHotKey = null;
             }
 
-            // KeyUp Events
-            if (inputState.lastGUIMouseHover != null) {
-                if (inputState.lastGUIMouseHover instanceof Button) {
-                    Button button = (Button) inputState.lastGUIMouseHover;
-                    if (button.buttonAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) button.buttonAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
-                    CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                    if (checkBox.checkBoxAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) checkBox.checkBoxAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
-                    ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                    if (comboBox.comboBoxAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) comboBox.comboBoxAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == GameViewPort.class) {
-                    GameViewPort gameViewPort = (GameViewPort) inputState.lastGUIMouseHover;
-                    if (gameViewPort.gameViewPortAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp)
-                            gameViewPort.gameViewPortAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                    Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                    if (inventory.inventoryAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp)
-                            inventory.inventoryAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
-                    Knob knob = (Knob) inputState.lastGUIMouseHover;
-                    if (knob.knobAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) knob.knobAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                    List list = (List) inputState.lastGUIMouseHover;
-                    if (list.listAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) list.listAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
-                    Map map = (Map) inputState.lastGUIMouseHover;
-                    if (map.mapAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) map.mapAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
-                    ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    if (scrollBarHorizontal.scrollBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp)
-                            scrollBarHorizontal.scrollBarAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
-                    ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    if (scrollBarVertical.scrollBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp)
-                            scrollBarVertical.scrollBarAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
-                    TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-                    if (tabBar.tabBarAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) tabBar.tabBarAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Image.class) {
-                    Image image = (Image) inputState.lastGUIMouseHover;
-                    if (image.imageAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) image.imageAction.onKeyUp(keyCode);
-                    }
 
-                } else if (inputState.lastGUIMouseHover.getClass() == Text.class) {
-                    Text text = (Text) inputState.lastGUIMouseHover;
-                    if (text.textAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) text.textAction.onKeyUp(keyCode);
-                    }
-                } else if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                    Window window = (Window) inputState.lastGUIMouseHover;
-                    if (window.windowAction != null) {
-                        for (int keyCode : inputState.inputEvents.keyCodesUp) window.windowAction.onKeyUp(keyCode);
+            // WindowAction OnKeyUp
+            if(inputState.lastActiveWindow != null){
+                if(inputState.lastActiveWindow.windowAction != null){
+                    for (int keyCode : inputState.inputEvents.keyCodesUp) {
+                        inputState.lastActiveWindow.windowAction.onKeyUp(keyCode);
                     }
                 }
             }
@@ -1421,6 +1275,9 @@ public class UIEngine<T extends UIAdapter> {
 
             // Remove if the window was the current modal
             if (inputState.modalWindow != null && inputState.modalWindow == windowTmp) inputState.modalWindow = null;
+
+            // Reset if it was last active
+            if(inputState.lastActiveWindow == windowTmp) inputState.lastActiveWindow = null;
         }
 
         while ((componentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
