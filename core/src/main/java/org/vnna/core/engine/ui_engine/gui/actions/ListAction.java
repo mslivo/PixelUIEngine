@@ -32,6 +32,9 @@ public interface ListAction<T extends Object> {
         return;
     }; // Multiselect
 
+    default void onScrolled(float scrolled, float amount){
+        return;
+    };
     /* Drag */
 
     default void onDragFromList(List fromList, int fromIndex, int toIndex){ return; }

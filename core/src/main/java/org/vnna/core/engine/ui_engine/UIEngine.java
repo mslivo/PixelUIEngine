@@ -984,6 +984,7 @@ public class UIEngine<T extends UIAdapter> {
                     float amount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
                     list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
                     if(list.listAction != null) {
+                        list.listAction.onScrolled(list.scrolled, amount);
                         list.listAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover instanceof Button) {
@@ -1013,7 +1014,6 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
                     Knob knob = (Knob) inputState.lastGUIMouseHover;
-
                     float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
                     float newValue = knob.turned+amount;
                     knob_turnKnob(knob, newValue, amount);
