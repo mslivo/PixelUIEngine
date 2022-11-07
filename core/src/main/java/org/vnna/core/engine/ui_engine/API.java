@@ -208,15 +208,16 @@ public class API {
 
             ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
 
-
             components.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
                     float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * inputState.inputEvents.mouseScrolledAmount;
 
-                    components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
-                            scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
-                    scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                    if(!scrollBarVertical.disabled) {
+                        components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
+                                scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
+                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                    }
                 }
             });
             components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
@@ -243,9 +244,14 @@ public class API {
             });
 
             components.scrollBar.setScrolled(scrollBarVertical, 1f);
+            if(text.length <= height){
+                components.setDisabled(scrollBarVertical, true);
+            }
+
             scrollBarVertical.scrollBarAction.onScrolled(1f);
 
             components.text.setLines(textField, textDisplayedLines);
+
 
             result.add(scrollBarVertical);
             result.add(textField);
