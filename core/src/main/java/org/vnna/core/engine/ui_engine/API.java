@@ -197,17 +197,28 @@ public class API {
             return ret;
         }
 
-        public ArrayList<Component> text_scrollAbleText(int x, int y, int width, int height, String[] text){
+        public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text){
             ArrayList<Component> result = new ArrayList<>();
 
             String[] textAll = text == null ? new String[]{} : Arrays.copyOf(text, text.length);
             String[] textDisplayedLines = new String[height];
 
-            Text textField = components.text.create(x,y+height-1, null);
+            Text textField = components.text.create(x,y, null);
             components.setSize(textField,width-1, height);
 
             ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x+width-1,y, height);
 
+
+            components.text.setTextAction(textField, new TextAction() {
+                @Override
+                public void onMouseScroll(float scrolled) {
+                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * inputState.inputEvents.mouseScrolledAmount;
+
+                    components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
+                            scrollBarVertical.scrolled+scrollAmount, 0f,1f));
+                    scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                }
+            });
             components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolledPct) {
@@ -240,6 +251,7 @@ public class API {
             result.add(textField);
             return result;
         }
+
 
         public Text text_CreateClickableText(int x, int y, String[] text, Function<Integer, Boolean> onClick) {
             return text_CreateClickableText(x, y, text, onClick, null);

@@ -1107,19 +1107,8 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.turnedKnob != null) {
                 Knob knob = inputState.turnedKnob;
                 float amount = -(inputState.mouse_y_delta / (500 - (400 * api.config.getKnobSensitivity())));
-                float newTurned = knob.turned + amount;
-                if (!knob.endless) {
-                    knob.turned = Tools.Calc.inBounds(newTurned, 0f, 1f);
-                    if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
-                } else {
-                    if (newTurned > 1) {
-                        newTurned = newTurned - 1f;
-                    } else if (newTurned < 0) {
-                        newTurned = 1f - Math.abs(newTurned);
-                    }
-                    knob.turned = Tools.Calc.inBounds(newTurned, 0f, 1f);
-                    if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
-                }
+                float newValue = knob.turned + amount;
+                knob_turnKnob(knob, newValue, amount);
 
             }
             if (inputState.pressedMouseTool != null) {
@@ -1138,8 +1127,8 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.lastGUIMouseHover != null) {
                 if (inputState.lastGUIMouseHover.getClass() == List.class) {
                     List list = (List) inputState.lastGUIMouseHover;
-                    float scrollAmount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
-                    list.scrolled = Tools.Calc.inBounds(list.scrolled + scrollAmount, 0f, 1f);
+                    float amount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
+                    list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
                     if(list.listAction != null) {
                         list.listAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
@@ -1170,6 +1159,11 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
                     Knob knob = (Knob) inputState.lastGUIMouseHover;
+
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
+                    float newValue = knob.turned+amount;
+                    knob_turnKnob(knob, newValue, amount);
+
                     if (knob.knobAction != null) {
                         knob.knobAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
@@ -1203,6 +1197,11 @@ public class UIEngine<T extends UIAdapter> {
                     Text text = (Text) inputState.lastGUIMouseHover;
                     if (text.textAction != null) {
                         text.textAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
+                    TextField textField = (TextField) inputState.lastGUIMouseHover;
+                    if (textField.textFieldAction != null) {
+                        textField.textFieldAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == Window.class) {
                     Window window = (Window) inputState.lastGUIMouseHover;
@@ -1842,6 +1841,21 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
+    }
+
+    private void knob_turnKnob(Knob knob, float newValue, float amount){
+        if (!knob.endless) {
+            knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
+            if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
+        } else {
+            if (newValue > 1) {
+                newValue = newValue - 1f;
+            } else if (newValue < 0) {
+                newValue = 1f - Math.abs(newValue);
+            }
+            knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
+            if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
+        }
     }
 
     private boolean list_canDragIntoList(List list) {

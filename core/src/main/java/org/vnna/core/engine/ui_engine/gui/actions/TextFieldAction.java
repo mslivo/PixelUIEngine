@@ -21,4 +21,6 @@ public interface TextFieldAction {
     default void onMouseClick(int button){
         return;
     }
+
+    default void onMouseScroll(float scrolled){return;}
 }
