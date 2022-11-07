@@ -984,7 +984,7 @@ public class UIEngine<T extends UIAdapter> {
                     float amount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
                     list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
                     if(list.listAction != null) {
-                        list.listAction.onScrolled(list.scrolled, amount);
+                        list.listAction.onScrolled(list.scrolled);
                         list.listAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover instanceof Button) {
@@ -1028,12 +1028,18 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                     ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
+                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled+amount,0f,1f);
                     if (scrollBarHorizontal.scrollBarAction != null) {
+                        scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
                         scrollBarHorizontal.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                     ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
+                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled+amount,0f,1f);
                     if (scrollBarVertical.scrollBarAction != null) {
+                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
                         scrollBarVertical.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
@@ -2337,12 +2343,12 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 if (textField.content != null) {
-                    render_drawFont(textField.font, textField.content.substring(textField.scrolled), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 2, 2, (textField.width * TILE_SIZE) - 4);
+                    render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 2, 2, (textField.width * TILE_SIZE) - 4);
                 }
                 if (textField.focused) {
-                    int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.scrolled, textField.markerPosition)) + 2;
+                    int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                     if (xOffset < textField.width * TILE_SIZE) {
-                        render_drawCMediaImage(GUIBaseMedia.GUI_TEXTFIELD_MARKER, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
+                        render_drawCMediaImage(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
                     }
                 }
             }

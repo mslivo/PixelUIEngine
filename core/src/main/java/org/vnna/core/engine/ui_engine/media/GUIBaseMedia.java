@@ -63,7 +63,7 @@ public class GUIBaseMedia {
     public static CMediaArray GUI_TEXTFIELD_VALIDATION_OVERLAY = MediaManager.create_CMediaArray(guiDirectory + "textfield_validation_overlay.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
 
     public static CMediaArray GUI_TEXTFIELD_FOCUSED = MediaManager.create_CMediaArray(guiDirectory + "textfield_focused.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static CMediaAnimation GUI_TEXTFIELD_MARKER = MediaManager.create_CMediaAnimation(guiDirectory + "textfield_marker.png", 1, UIEngine.TILE_SIZE, 0.4f);
+    public static CMediaAnimation GUI_TEXTFIELD_CARET = MediaManager.create_CMediaAnimation(guiDirectory + "textfield_caret.png", 1, UIEngine.TILE_SIZE, 0.4f);
 
     public static CMediaArray GUI_INVENTORY = MediaManager.create_CMediaArray(guiDirectory + "inventory.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static CMediaArray GUI_INVENTORY_DRAGGED = MediaManager.create_CMediaArray(guiDirectory + "inventory_dragged.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);

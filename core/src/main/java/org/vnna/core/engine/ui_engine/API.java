@@ -197,16 +197,16 @@ public class API {
             return ret;
         }
 
-        public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text){
+        public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text) {
             ArrayList<Component> result = new ArrayList<>();
 
             String[] textAll = text == null ? new String[]{} : Arrays.copyOf(text, text.length);
             String[] textDisplayedLines = new String[height];
 
-            Text textField = components.text.create(x,y, null);
-            components.setSize(textField,width-1, height);
+            Text textField = components.text.create(x, y, null);
+            components.setSize(textField, width - 1, height);
 
-            ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x+width-1,y, height);
+            ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
 
 
             components.text.setTextAction(textField, new TextAction() {
@@ -215,27 +215,27 @@ public class API {
                     float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * inputState.inputEvents.mouseScrolledAmount;
 
                     components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
-                            scrollBarVertical.scrolled+scrollAmount, 0f,1f));
+                            scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
                     scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
                 }
             });
             components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolledPct) {
-                    float scrolled = 1f-scrolledPct;
+                    float scrolled = 1f - scrolledPct;
 
                     int scrolledTextIndex;
-                    if(textAll.length > height) {
-                        scrolledTextIndex =MathUtils.round((textAll.length - height) * scrolled);
-                    }else{
+                    if (textAll.length > height) {
+                        scrolledTextIndex = MathUtils.round((textAll.length - height) * scrolled);
+                    } else {
                         scrolledTextIndex = 0;
                     }
 
-                    for(int iy = 0;iy < height;iy++){
-                        int textIndex = scrolledTextIndex+iy;
-                        if(textIndex < textAll.length) {
+                    for (int iy = 0; iy < height; iy++) {
+                        int textIndex = scrolledTextIndex + iy;
+                        if (textIndex < textAll.length) {
                             textDisplayedLines[iy] = textAll[textIndex];
-                        }else{
+                        } else {
                             textDisplayedLines[iy] = "";
                         }
                     }
@@ -342,11 +342,12 @@ public class API {
             ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(list.x + list.width, list.y, list.height, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolled) {
-                    list.scrolled = 1 - scrolled;
+                    components.list.setScrolled(list, 1f - scrolled);
                 }
             });
 
             components.setOffset(scrollBarVertical, list.offset_x, list.offset_y);
+
             components.setUpdateAction(scrollBarVertical, new UpdateAction() {
                 float scrolledLast = -1;
 
@@ -3342,7 +3343,7 @@ public class API {
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, HashSet<Character> allowedCharacters, CMediaFont font) {
                 TextField textField = new TextField();
                 textField.allowedCharacters = new HashSet<>();
-                textField.scrolled = 0;
+                textField.offset = 0;
 
                 setComponentInitValues(textField);
                 setColor(textField, Tools.Colors.WHITE);

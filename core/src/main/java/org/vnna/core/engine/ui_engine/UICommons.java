@@ -72,17 +72,17 @@ class UICommons {
     static void textfield_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
         textField.markerPosition = Tools.Calc.inBounds(position, 0, textField.content.length());
 
-        if (textField.markerPosition < textField.scrolled) {
-            while (textField.markerPosition < textField.scrolled) {
-                textField.scrolled--;
+        if (textField.markerPosition < textField.offset) {
+            while (textField.markerPosition < textField.offset) {
+                textField.offset--;
             }
         } else {
-            String subContent = textField.content.substring(textField.scrolled, textField.markerPosition);
+            String subContent = textField.content.substring(textField.offset, textField.markerPosition);
             int width = (textField.width * UIEngine.TILE_SIZE) - 4;
             if (mediaManager.textWidth(textField.font, subContent) > width) {
                 while (mediaManager.textWidth(textField.font, subContent) > width) {
-                    textField.scrolled++;
-                    subContent = textField.content.substring(textField.scrolled, textField.markerPosition);
+                    textField.offset++;
+                    subContent = textField.content.substring(textField.offset, textField.markerPosition);
                 }
             }
         }

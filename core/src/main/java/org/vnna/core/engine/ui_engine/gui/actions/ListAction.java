@@ -32,7 +32,7 @@ public interface ListAction<T extends Object> {
         return;
     }; // Multiselect
 
-    default void onScrolled(float scrolled, float amount){
+    default void onScrolled(float scrolled){
         return;
     };
     /* Drag */

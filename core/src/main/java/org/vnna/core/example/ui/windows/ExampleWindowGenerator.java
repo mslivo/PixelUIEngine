@@ -102,8 +102,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ScrollBarVertical scrollBarVertical = api.components.scrollBar.verticalScrollbar.create(2, 2, 12, new ScrollBarAction() {
             @Override
-            public void onScrolled(float scrolledPct) {
-                Tools.Colors.setAlpha(window.color, 0.2f + (scrolledPct * 0.8f));
+            public void onScrolled(float scrolled) {
+                Tools.Colors.setAlpha(window.color, 0.2f + (scrolled * 0.8f));
             }
         }, window.color.a);
 
@@ -130,20 +130,20 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ScrollBarHorizontal scrollBarHorizontal1 = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
-            public void onScrolled(float scrolledPct) {
-                Tools.Colors.setRed(oval.color, scrolledPct);
+            public void onScrolled(float scrolled) {
+                Tools.Colors.setRed(oval.color, scrolled);
             }
         }, oval.color.r);
         ScrollBarHorizontal scrollBarHorizontal2 = api.components.scrollBar.horizontalScrollbar.create(4, 10, 6, new ScrollBarAction() {
             @Override
-            public void onScrolled(float scrolledPct) {
-                Tools.Colors.setGreen(oval.color, scrolledPct);
+            public void onScrolled(float scrolled) {
+                Tools.Colors.setGreen(oval.color, scrolled);
             }
         }, oval.color.g);
         ScrollBarHorizontal scrollBarHorizontal3 = api.components.scrollBar.horizontalScrollbar.create(4, 12, 6, new ScrollBarAction() {
             @Override
-            public void onScrolled(float scrolledPct) {
-                Tools.Colors.setBlue(oval.color, scrolledPct);
+            public void onScrolled(float scrolled) {
+                Tools.Colors.setBlue(oval.color, scrolled);
             }
         }, oval.color.b);
 
@@ -181,8 +181,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ScrollBarHorizontal pgScrollbar = api.components.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {
             @Override
-            public void onScrolled(float scrolledPct) {
-                api.components.progressBar.setProgress(progressBar, scrolledPct);
+            public void onScrolled(float scrolled) {
+                api.components.progressBar.setProgress(progressBar, scrolled);
             }
         });
 

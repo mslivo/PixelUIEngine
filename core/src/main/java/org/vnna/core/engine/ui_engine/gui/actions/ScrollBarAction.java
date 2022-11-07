@@ -2,7 +2,7 @@ package org.vnna.core.engine.ui_engine.gui.actions;
 
 public interface ScrollBarAction {
 
-    default void onScrolled(float scrolledPct){
+    default void onScrolled(float scrolled){
         return;
     };
 

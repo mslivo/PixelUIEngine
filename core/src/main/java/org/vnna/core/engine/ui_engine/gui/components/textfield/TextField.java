@@ -18,7 +18,7 @@ public class TextField extends Component {
 
     public int contentMaxLength;
 
-    public int scrolled;
+    public int offset;
 
     public HashSet<Character> allowedCharacters;
 
