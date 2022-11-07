@@ -12,8 +12,6 @@ public interface InventoryAction<T extends Object> {
         return null;
     }
 
-    ;
-
     default ToolTip toolTip(T listItem) {
         return null;
     }
@@ -21,8 +19,6 @@ public interface InventoryAction<T extends Object> {
     default int iconArrayIndex(T listItem) {
         return 0;
     }
-
-    ;
 
     default void onItemSelected(T listItem, int x, int y) {
         return;
@@ -65,6 +61,10 @@ public interface InventoryAction<T extends Object> {
     }
 
     default void onDragIntoScreen(T listItem, int x, int y, int screenX, int screenY) {
+        return;
+    }
+
+    default void onMouseScroll(float scrolled) {
         return;
     }
 

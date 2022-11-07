@@ -20,4 +20,5 @@ public interface CheckBoxAction {
         return;
     }
 
+    default void onMouseScroll(float scrolled){return;}
 }

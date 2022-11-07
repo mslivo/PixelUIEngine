@@ -1140,6 +1140,75 @@ public class UIEngine<T extends UIAdapter> {
                     List list = (List) inputState.lastGUIMouseHover;
                     float scrollAmount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
                     list.scrolled = Tools.Calc.inBounds(list.scrolled + scrollAmount, 0f, 1f);
+                    if(list.listAction != null) {
+                        list.listAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover instanceof Button) {
+                    Button button = (Button) inputState.lastGUIMouseHover;
+                    if(button.buttonAction != null) {
+                        button.buttonAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
+                    CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
+                    if(checkBox.checkBoxAction != null) {
+                        checkBox.checkBoxAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
+                    ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
+                    if (comboBox.comboBoxAction != null) {
+                        comboBox.comboBoxAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == GameViewPort.class) {
+                    GameViewPort gameViewPort = (GameViewPort) inputState.lastGUIMouseHover;
+                    if (gameViewPort.gameViewPortAction != null) {
+                        gameViewPort.gameViewPortAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
+                    Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
+                    if (inventory.inventoryAction != null) {
+                        inventory.inventoryAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
+                    Knob knob = (Knob) inputState.lastGUIMouseHover;
+                    if (knob.knobAction != null) {
+                        knob.knobAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                }  else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
+                    Map map = (Map) inputState.lastGUIMouseHover;
+                    if (map.mapAction != null) {
+                        map.mapAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
+                    ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
+                    if (scrollBarHorizontal.scrollBarAction != null) {
+                        scrollBarHorizontal.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
+                    ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
+                    if (scrollBarVertical.scrollBarAction != null) {
+                        scrollBarVertical.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
+                    TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
+                    if (tabBar.tabBarAction != null) {
+                        tabBar.tabBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == Image.class) {
+                    Image image = (Image) inputState.lastGUIMouseHover;
+                    if (image.imageAction != null) {
+                        image.imageAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+
+                } else if (inputState.lastGUIMouseHover.getClass() == Text.class) {
+                    Text text = (Text) inputState.lastGUIMouseHover;
+                    if (text.textAction != null) {
+                        text.textAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
+                } else if (inputState.lastGUIMouseHover.getClass() == Window.class) {
+                    Window window = (Window) inputState.lastGUIMouseHover;
+                    if (window.windowAction != null) {
+                        window.windowAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
+                    }
                 }
 
             }

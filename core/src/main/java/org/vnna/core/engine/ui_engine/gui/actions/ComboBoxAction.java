@@ -39,4 +39,6 @@ public interface ComboBoxAction<T extends Object> {
     default void onKeyUp(int keyCodeDown){
         return;
     }
+
+    default void onMouseScroll(float scrolled){return;}
 }

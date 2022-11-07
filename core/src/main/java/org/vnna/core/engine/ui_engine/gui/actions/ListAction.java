@@ -65,4 +65,6 @@ public interface ListAction<T extends Object> {
     default void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
         return;
     }
+
+    default void onMouseScroll(float scrolled){return;}
 }

@@ -18,4 +18,5 @@ public interface TextAction {
         return;
     }
 
+    default void onMouseScroll(float scrolled){return;}
 }

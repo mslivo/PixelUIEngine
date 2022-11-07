@@ -30,5 +30,5 @@ public interface KnobAction {
         return;
     }
 
-
+    default void onMouseScroll(float scrolled){return;}
 }

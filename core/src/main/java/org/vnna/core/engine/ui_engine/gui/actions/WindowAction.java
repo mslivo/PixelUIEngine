@@ -21,4 +21,6 @@ public interface WindowAction {
     default void onKeyUp(int keyCodeDown){
         return;
     }
+
+    default void onMouseScroll(float scrolled){return;}
 }

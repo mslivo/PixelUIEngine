@@ -18,4 +18,5 @@ public interface ImageAction {
         return;
     }
 
+    default void onMouseScroll(float scrolled){return;}
 }
