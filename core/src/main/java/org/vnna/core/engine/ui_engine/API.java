@@ -200,20 +200,50 @@ public class API {
         public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text) {
             ArrayList<Component> result = new ArrayList<>();
 
-            String[] textAll = text == null ? new String[]{} : Arrays.copyOf(text, text.length);
-            String[] textDisplayedLines = new String[height];
-
+            // Cut text to fit
             Text textField = components.text.create(x, y, null);
             components.setSize(textField, width - 1, height);
-
             ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
+            String[] textAll;
+            String[] textDisplayedLines = new String[height];
+
+            // Cut Text to Fit
+            if(text != null) {
+                ArrayList<String> textList = new ArrayList<>(Arrays.asList(text));
+                boolean anyTooLong = true;
+                int pixelWidth = ((width-1) * UIEngine.TILE_SIZE);
+                while (anyTooLong) {
+                    anyTooLong = false;
+                    for (int i = 0; i < textList.size(); i++) {
+                        String line = textList.get(i);
+                        if (mediaManager.textWidth(config.getDefaultFont(), line) > pixelWidth) {
+                            cutLoop:
+                            for (int i2 = line.length(); i2 > 0; i2--) {
+                                String cut = line.substring(0, i2)+"-";
+                                if (mediaManager.textWidth(config.getDefaultFont(), cut) < pixelWidth) {
+                                    textList.set(i, cut);
+                                    textList.add(i + 1, line.substring(i2));
+                                    break cutLoop;
+                                }
+                            }
+                            anyTooLong = true;
+                        }
+                    }
+                }
+
+                textAll = textList.toArray(new String[]{});
+            }else{
+                textAll = new String[]{};
+            }
+
+            // Actions
 
             components.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * inputState.inputEvents.mouseScrolledAmount;
+                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * input.mouseScrolledAmount();
 
-                    if(!scrollBarVertical.disabled) {
+                    if (!scrollBarVertical.disabled) {
                         components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
                                 scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
@@ -243,13 +273,13 @@ public class API {
                 }
             });
 
+            // Init
             components.scrollBar.setScrolled(scrollBarVertical, 1f);
-            if(text.length <= height){
+            if (textAll.length <= height) {
                 components.setDisabled(scrollBarVertical, true);
             }
 
             scrollBarVertical.scrollBarAction.onScrolled(1f);
-
             components.text.setLines(textField, textDisplayedLines);
 
 
