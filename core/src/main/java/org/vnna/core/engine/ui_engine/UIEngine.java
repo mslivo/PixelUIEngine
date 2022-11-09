@@ -226,7 +226,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.hotKeyPressedKeys = new boolean[256];
         newInputState.pressedHotKey = null;
         newInputState.pressedMouseTool = null;
-        newInputState.lastOpenedComboBox = null;
+        newInputState.openComboBox = null;
 
         // ----- Mouse
         newInputState.mouse_x_gui = newInputState.mouse_y_gui = 0;
@@ -347,7 +347,7 @@ public class UIEngine<T extends UIAdapter> {
                             UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, 0);
                         }
                     }
-                }else {
+                } else {
                     // Hotkeys
                     for (int keyCode : inputState.inputEvents.keyCodesDown) {
                         inputState.hotKeyPressedKeys[keyCode] = true;
@@ -369,8 +369,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
 
                     // WindowAction OnKeyDown
-                    if(inputState.lastActiveWindow != null){
-                        if(inputState.lastActiveWindow.windowAction != null){
+                    if (inputState.lastActiveWindow != null) {
+                        if (inputState.lastActiveWindow.windowAction != null) {
                             for (int keyCode : inputState.inputEvents.keyCodesDown) {
                                 inputState.lastActiveWindow.windowAction.onKeyDown(keyCode);
                             }
@@ -378,7 +378,6 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             }
-
 
 
         }
@@ -395,8 +394,8 @@ public class UIEngine<T extends UIAdapter> {
 
 
             // WindowAction OnKeyUp
-            if(inputState.lastActiveWindow != null){
-                if(inputState.lastActiveWindow.windowAction != null){
+            if (inputState.lastActiveWindow != null) {
+                if (inputState.lastActiveWindow.windowAction != null) {
                     for (int keyCode : inputState.inputEvents.keyCodesUp) {
                         inputState.lastActiveWindow.windowAction.onKeyUp(keyCode);
                     }
@@ -664,12 +663,12 @@ public class UIEngine<T extends UIAdapter> {
                             combobox.menuOpen = false;
                             if (combobox.comboBoxAction != null) combobox.comboBoxAction.onClose();
                         } else {
-                            if (inputState.lastOpenedComboBox != null) {
-                                inputState.lastOpenedComboBox.menuOpen = false;
-                                inputState.lastOpenedComboBox = null;
+                            if (inputState.openComboBox != null) {
+                                inputState.openComboBox.menuOpen = false;
+                                inputState.openComboBox = null;
                             }
                             combobox.menuOpen = true;
-                            inputState.lastOpenedComboBox = combobox;
+                            inputState.openComboBox = combobox;
                             if (combobox.comboBoxAction != null) combobox.comboBoxAction.onOpen();
                         }
                     }
@@ -983,18 +982,18 @@ public class UIEngine<T extends UIAdapter> {
                     List list = (List) inputState.lastGUIMouseHover;
                     float amount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
                     list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
-                    if(list.listAction != null) {
+                    if (list.listAction != null) {
                         list.listAction.onScrolled(list.scrolled);
                         list.listAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover instanceof Button) {
                     Button button = (Button) inputState.lastGUIMouseHover;
-                    if(button.buttonAction != null) {
+                    if (button.buttonAction != null) {
                         button.buttonAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
                     CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                    if(checkBox.checkBoxAction != null) {
+                    if (checkBox.checkBoxAction != null) {
                         checkBox.checkBoxAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
@@ -1014,30 +1013,30 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
                     Knob knob = (Knob) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
-                    float newValue = knob.turned+amount;
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                    float newValue = knob.turned + amount;
                     knob_turnKnob(knob, newValue, amount);
 
                     if (knob.knobAction != null) {
                         knob.knobAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
-                }  else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
+                } else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
                     Map map = (Map) inputState.lastGUIMouseHover;
                     if (map.mapAction != null) {
                         map.mapAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                     ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
-                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled+amount,0f,1f);
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
                     if (scrollBarHorizontal.scrollBarAction != null) {
                         scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
                         scrollBarHorizontal.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                     ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount)*api.config.getKnobSensitivity();
-                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled+amount,0f,1f);
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
                     if (scrollBarVertical.scrollBarAction != null) {
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
                         scrollBarVertical.scrollBarAction.onMouseScroll(inputState.inputEvents.mouseScrolledAmount);
@@ -1283,7 +1282,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.modalWindow != null && inputState.modalWindow == windowTmp) inputState.modalWindow = null;
 
             // Reset if it was last active
-            if(inputState.lastActiveWindow == windowTmp) inputState.lastActiveWindow = null;
+            if (inputState.lastActiveWindow == windowTmp) inputState.lastActiveWindow = null;
         }
 
         while ((componentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
@@ -1442,6 +1441,12 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
         }
+        // Combobox Open Menu collision
+        if (inputState.openComboBox != null && inputState.openComboBox.menuOpen) {
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * TILE_SIZE), inputState.openComboBox.width * TILE_SIZE, (inputState.openComboBox.items.size() * TILE_SIZE))) {
+                return inputState.openComboBox;
+            }
+        }
 
         // Window / WindowComponent collision
         windowLoop:
@@ -1455,7 +1460,8 @@ public class UIEngine<T extends UIAdapter> {
             int wndHeight = UICommons.window_getRealHeight(window);
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, wndX, wndY, wndWidth, wndHeight);
-            for (Component component : window.components) {
+            for (int ic = window.components.size() - 1; ic >= 0; ic--) {
+                Component component = window.components.get(ic);
                 if (window.folded ? (component.y == window.height - 1) : true) {
                     if (mouseCollidesWithWindowComponent(component, collidesWithWindow)) {
                         return component;
@@ -1510,14 +1516,6 @@ public class UIEngine<T extends UIAdapter> {
         if (isHiddenByTab(component)) return false;
 
 
-        if (component.getClass() == ComboBox.class) {
-            ComboBox combobox = (ComboBox) component;
-            if (combobox.menuOpen) {
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (combobox.items.size() * TILE_SIZE), component.width * TILE_SIZE, (combobox.items.size() * TILE_SIZE))) {
-                    return true;
-                }
-            }
-        }
         if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
             inputState.lastGUIMouseHover = component;
             return true;
@@ -1706,7 +1704,7 @@ public class UIEngine<T extends UIAdapter> {
 
     }
 
-    private void knob_turnKnob(Knob knob, float newValue, float amount){
+    private void knob_turnKnob(Knob knob, float newValue, float amount) {
         if (!knob.endless) {
             knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
             if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
@@ -2183,7 +2181,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         } else if (component.getClass() == Text.class) {
             Text text = (Text) component;
-            int textHeight =  ((text.height-1)*TILE_SIZE);
+            int textHeight = ((text.height - 1) * TILE_SIZE);
             if (text.lines != null && text.lines.length > 0) {
                 for (int i = 0; i < text.lines.length; i++) {
                     render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 1);

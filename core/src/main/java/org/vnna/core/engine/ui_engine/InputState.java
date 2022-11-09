@@ -181,7 +181,7 @@ public class InputState {
 
     public MouseTool pressedMouseTool;
 
-    public ComboBox lastOpenedComboBox;
+    public ComboBox openComboBox;
 
     /* Mouse */
 
