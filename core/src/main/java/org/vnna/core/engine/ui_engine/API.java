@@ -219,7 +219,7 @@ public class API {
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 if (mediaManager.textWidth(config.getDefaultFont(), currentLine + split[i2] + " ") >= pixelWidth) {
                                     textList.add(currentLine);
-                                    currentLine = "";
+                                    currentLine = split[i2]+ " ";
                                 } else {
                                     currentLine += split[i2] + " ";
                                 }
