@@ -367,15 +367,6 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                     }
-
-                    // WindowAction OnKeyDown
-                    if (inputState.lastActiveWindow != null) {
-                        if (inputState.lastActiveWindow.windowAction != null) {
-                            for (int keyCode : inputState.inputEvents.keyCodesDown) {
-                                inputState.lastActiveWindow.windowAction.onKeyDown(keyCode);
-                            }
-                        }
-                    }
                 }
             }
 
@@ -392,15 +383,6 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.pressedHotKey = null;
             }
 
-
-            // WindowAction OnKeyUp
-            if (inputState.lastActiveWindow != null) {
-                if (inputState.lastActiveWindow.windowAction != null) {
-                    for (int keyCode : inputState.inputEvents.keyCodesUp) {
-                        inputState.lastActiveWindow.windowAction.onKeyUp(keyCode);
-                    }
-                }
-            }
 
         }
 

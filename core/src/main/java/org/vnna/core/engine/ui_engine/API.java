@@ -1176,6 +1176,10 @@ public class API {
         return result;
     }
 
+    public Window getLastActiveWindow(){
+        return inputState.lastActiveWindow;
+    }
+
     public class _Config {
 
         private boolean windowsEnforceScreenBounds = false; // Forces windows stay inside screen
