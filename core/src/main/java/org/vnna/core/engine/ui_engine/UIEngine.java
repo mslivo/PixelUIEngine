@@ -1460,23 +1460,20 @@ public class UIEngine<T extends UIAdapter> {
             int wndHeight = UICommons.window_getRealHeight(window);
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, wndX, wndY, wndWidth, wndHeight);
-            for (int ic = window.components.size() - 1; ic >= 0; ic--) {
-                Component component = window.components.get(ic);
-                if (window.folded ? (component.y == window.height - 1) : true) {
-                    if (mouseCollidesWithWindowComponent(component, collidesWithWindow)) {
+            if (collidesWithWindow) {
+                for (int ic = window.components.size() - 1; ic >= 0; ic--) {
+                    Component component = window.components.get(ic);
+                    if (mouseCollidesWithComponent(component)) {
                         return component;
                     }
                 }
-            }
-            if (collidesWithWindow) {
                 return window;
             }
-
         }
 
         // Screen component collision
         for (Component component : inputState.screenComponents) {
-            if (mouseCollidesWithScreenComponent(component)) {
+            if (mouseCollidesWithComponent(component)) {
                 return component;
             }
         }
@@ -1503,18 +1500,11 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private boolean mouseCollidesWithScreenComponent(Component component) {
-        return mouseCollidesWithWindowComponent(component, true);
-    }
 
-    private boolean mouseCollidesWithWindowComponent(Component component, boolean collidesWithWindow) {
+    private boolean mouseCollidesWithComponent(Component component) {
         if (!component.visible) return false;
         if (component.disabled) return false;
-        if (!collidesWithWindow && component.getClass() != ComboBox.class) {
-            return false; // allowed for combobox because it can get outside of window
-        }
         if (isHiddenByTab(component)) return false;
-
 
         if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
             inputState.lastGUIMouseHover = component;
