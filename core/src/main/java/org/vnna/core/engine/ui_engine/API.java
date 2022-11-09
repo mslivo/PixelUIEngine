@@ -208,31 +208,32 @@ public class API {
             String[] textDisplayedLines = new String[height];
 
             // Cut Text to Fit
-            if(text != null) {
-                ArrayList<String> textList = new ArrayList<>(Arrays.asList(text));
-                boolean anyTooLong = true;
-                int pixelWidth = ((width-1) * UIEngine.TILE_SIZE);
-                while (anyTooLong) {
-                    anyTooLong = false;
-                    for (int i = 0; i < textList.size(); i++) {
-                        String line = textList.get(i);
-                        if (mediaManager.textWidth(config.getDefaultFont(), line) > pixelWidth) {
-                            cutLoop:
-                            for (int i2 = line.length(); i2 > 0; i2--) {
-                                String cut = line.substring(0, i2)+"-";
-                                if (mediaManager.textWidth(config.getDefaultFont(), cut) < pixelWidth) {
-                                    textList.set(i, cut);
-                                    textList.add(i + 1, line.substring(i2));
-                                    break cutLoop;
+            if (text != null) {
+                ArrayList<String> textList = new ArrayList<>();
+                int pixelWidth = ((width - 1) * UIEngine.TILE_SIZE);
+                for (int i = 0; i < text.length; i++) {
+                    if (text[i].trim().length() > 0) {
+                        String[] split = text[i].split(" ");
+                        if(split.length > 0) {
+                            String currentLine = "";
+                            for (int i2 = 0; i2 < split.length; i2++) {
+                                if (mediaManager.textWidth(config.getDefaultFont(), currentLine + split[i2] + " ") >= pixelWidth) {
+                                    textList.add(currentLine);
+                                    currentLine = "";
+                                } else {
+                                    currentLine += split[i2] + " ";
                                 }
                             }
-                            anyTooLong = true;
+                            if (currentLine.trim().length() > 0) {
+                                textList.add(currentLine);
+                            }
                         }
+                    }else {
+                        textList.add("");
                     }
                 }
-
                 textAll = textList.toArray(new String[]{});
-            }else{
+            } else {
                 textAll = new String[]{};
             }
 
