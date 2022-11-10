@@ -10,6 +10,8 @@ public interface WindowAction {
 
     default void onRemove(){ return;};
 
+    default void onAdd(){return;}
+
     default void onMouseClick(int button){ return; }
 
     default void onMouseDoubleClick(int button){ return; }

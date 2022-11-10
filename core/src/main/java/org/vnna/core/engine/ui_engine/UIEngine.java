@@ -1265,6 +1265,7 @@ public class UIEngine<T extends UIAdapter> {
         HotKey hotkeyTmp;
         while ((windowTmp = inputState.addWindowQueue.pollFirst()) != null) {
             inputState.windows.add(0, windowTmp);
+            if(windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
             UICommons.window_bringToFront(inputState, windowTmp);
         }
         while ((windowTmp = inputState.removeWindowQueue.pollFirst()) != null) {
@@ -1274,8 +1275,8 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.gameViewPorts.remove(windowTmpComponent);
             }
             windowTmp.components.clear();
-            if (windowTmp.windowAction != null) windowTmp.windowAction.onRemove();
             inputState.windows.remove(windowTmp);
+            if (windowTmp.windowAction != null) windowTmp.windowAction.onRemove();
 
             // Remove if the window was the current modal
             if (inputState.modalWindow != null && inputState.modalWindow == windowTmp) inputState.modalWindow = null;
