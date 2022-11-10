@@ -35,10 +35,7 @@ import org.vnna.core.engine.ui_engine.gui.components.map.Map;
 import org.vnna.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Oval;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Rect;
 import org.vnna.core.engine.ui_engine.gui.components.shape.Shape;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Triangle;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.vnna.core.engine.ui_engine.gui.components.text.Text;
@@ -696,6 +693,26 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.focusedTextField = textField;
                         inputState.focusedTextField.focused = true;
                         if (textField.textFieldAction != null) textField.textFieldAction.onFocus();
+
+                        // Set Marker to mouse position
+                        int mouseX = inputState.mouse_x_gui-UICommons.component_getAbsoluteX(inputState.focusedTextField);
+                        char[] fieldContent = inputState.focusedTextField.content.substring(inputState.focusedTextField.offset).toCharArray();
+                        String testString = "";
+                        boolean found = false;
+                        charLoop:for(int i=0;i<fieldContent.length;i++){
+                            testString += fieldContent[i];
+                            if(mediaManager.textWidth(inputState.focusedTextField.font,testString) > mouseX){
+                                UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
+                                        inputState.focusedTextField.offset+i);
+                                found = true;
+                                break charLoop;
+                            }
+                        }
+                        if(!found){
+                            // Set to end
+                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
+                                    inputState.focusedTextField.offset+fieldContent.length);
+                        }
                     }
                     if (textField.textFieldAction != null)
                         textField.textFieldAction.onMouseClick(inputState.inputEvents.mouseButton);
@@ -2440,20 +2457,20 @@ public class UIEngine<T extends UIAdapter> {
             }
 
         } else if (component instanceof Shape) {
-
-
             Shape shape = (Shape) component;
-            CMediaArray shapeImage = null;
-            if (shape.getClass() == Oval.class) {
-                shapeImage = GUIBaseMedia.GUI_SHAPE_OVAL;
-            } else if (shape.getClass() == Triangle.class) {
-                shapeImage = GUIBaseMedia.GUI_SHAPE_TRIANGLE;
-            } else if (shape.getClass() == Rect.class) {
-                shapeImage = GUIBaseMedia.GUI_SHAPE_RECT;
+            if(shape.shapeType != null) {
+                CMediaImage shapeImage = switch (shape.shapeType) {
+                    case OVAL -> GUIBaseMedia.GUI_SHAPE_OVAL;
+                    case RECT -> GUIBaseMedia.GUI_SHAPE_RECT;
+                    case DIAMOND -> GUIBaseMedia.GUI_SHAPE_DIAMOND;
+                    case TRIANGLE_LEFT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_DOWN;
+                    case TRIANGLE_RIGHT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_DOWN;
+                    case TRIANGLE_LEFT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_UP;
+                    case TRIANGLE_RIGHT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_UP;
+                };
+                mediaManager.drawCMediaImage(inputState.spriteBatch_gui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
+                        0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
             }
-
-            mediaManager.drawCMediaArray(inputState.spriteBatch_gui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
-                    shape.filled ? 1 : 0, 0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
         } else if (component instanceof ProgressBar) {
             ProgressBar progressBar = (ProgressBar) component;
             // Bar Background

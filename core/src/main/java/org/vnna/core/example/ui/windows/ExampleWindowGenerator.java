@@ -28,9 +28,8 @@ import org.vnna.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Oval;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Rect;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Triangle;
+import org.vnna.core.engine.ui_engine.gui.components.shape.Shape;
+import org.vnna.core.engine.ui_engine.gui.components.shape.ShapeType;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.vnna.core.engine.ui_engine.gui.components.text.Text;
@@ -122,11 +121,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setColor(knobe, Tools.Colors.RED_BRIGHT);
 
         // Shape
-        Oval oval = api.components.shape.oval.create(11, 3, 4, 4, Tools.Colors.GREEN_BRIGHT, true);
+        Shape oval = api.components.shape.create(11, 3, 4, 4, ShapeType.OVAL, Tools.Colors.GREEN_BRIGHT);
 
-        Rect rect = api.components.shape.rect.create(11, 8, 2, 2, Tools.Colors.YELLOW_DARK, true);
+        Shape rect = api.components.shape.create(11, 8, 2, 2, ShapeType.RECT, Tools.Colors.YELLOW_DARK);
 
-        Triangle triangle = api.components.shape.triangle.create(14, 8, 2, 2, Tools.Colors.NAVY_BLUE_DARK);
+        Shape triangle = api.components.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN, Tools.Colors.NAVY_BLUE_DARK);
 
         ScrollBarHorizontal scrollBarHorizontal1 = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override

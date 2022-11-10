@@ -101,9 +101,14 @@ public class GUIBaseMedia {
     public static CMediaImage GUI_ICON_QUESTION = MediaManager.create_CMediaImage(guiDirectory + "icons/question.png");
     public static CMediaImage GUI_ICON_EXTEND = MediaManager.create_CMediaImage(guiDirectory + "icons/extend.png");
 
-    public static CMediaArray GUI_SHAPE_RECT = MediaManager.create_CMediaArray(guiDirectory + "shape_rect.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8);
-    public static CMediaArray GUI_SHAPE_OVAL = MediaManager.create_CMediaArray(guiDirectory + "shape_oval.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8);
-    public static CMediaArray GUI_SHAPE_TRIANGLE = MediaManager.create_CMediaArray(guiDirectory + "shape_triangle.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8);
+    public static CMediaImage GUI_SHAPE_RECT = MediaManager.create_CMediaImage(guiDirectory + "shape_rect.png");
+    public static CMediaImage GUI_SHAPE_DIAMOND = MediaManager.create_CMediaImage(guiDirectory + "shape_diamond.png");
+    public static CMediaImage GUI_SHAPE_OVAL = MediaManager.create_CMediaImage(guiDirectory + "shape_oval.png");
+    public static CMediaImage GUI_SHAPE_TRIANGLE_LEFT_DOWN = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_ld.png");
+    public static CMediaImage GUI_SHAPE_TRIANGLE_RIGHT_DOWN = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_rd.png");
+    public static CMediaImage GUI_SHAPE_TRIANGLE_LEFT_UP = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_lu.png");
+    public static CMediaImage GUI_SHAPE_TRIANGLE_RIGHT_UP = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_ru.png");
+
 
     public static CMediaImage GUI_COLOR_SELECTOR = MediaManager.create_CMediaImage(guiDirectory + "colors.png");
     public static CMediaImage GUI_COLOR_SELECTOR_OVERLAY = MediaManager.create_CMediaImage(guiDirectory + "colors_overlay.png");

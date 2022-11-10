@@ -36,14 +36,12 @@ import org.vnna.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
 import org.vnna.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Oval;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Rect;
 import org.vnna.core.engine.ui_engine.gui.components.shape.Shape;
-import org.vnna.core.engine.ui_engine.gui.components.shape.Triangle;
+import org.vnna.core.engine.ui_engine.gui.components.shape.ShapeType;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.vnna.core.engine.ui_engine.gui.components.text.Text;
 import org.vnna.core.engine.ui_engine.gui.components.textfield.TextField;
+import org.vnna.core.engine.ui_engine.gui.components.text.Text;
 import org.vnna.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
@@ -2618,77 +2616,23 @@ public class API {
 
         public class _Shape {
 
-            public final _Oval oval = new _Oval();
+            public Shape create(int x, int y, int width, int height, ShapeType shapeType) {
+                return create(x,y, width, height, shapeType, config.getComponentsDefaultColor());
+            }
 
-            public final _Rect rect = new _Rect();
+            public Shape create(int x, int y, int width, int height, ShapeType shapeType, FColor color) {
+                Shape shape = new Shape();
+                setComponentInitValues(shape);
+                setPosition(shape, x, y);
+                setSize(shape, width, height);
+                setColor(shape, color);
+                setShapeType(shape, shapeType);
+                return shape;
+            }
 
-            public final _Triangle triangle = new _Triangle();
-
-            public void setFilled(Shape shape, boolean filled) {
+            public void setShapeType(Shape shape, ShapeType shapeType) {
                 if (shape == null) return;
-                shape.filled = filled;
-            }
-
-            public class _Oval {
-
-                public Oval create(int x, int y, int width, int height) {
-                    return create(x, y, width, height, null, false);
-                }
-
-                public Oval create(int x, int y, int width, int height, FColor color) {
-                    return create(x, y, width, height, color, false);
-                }
-
-                public Oval create(int x, int y, int width, int height, FColor color, boolean filled) {
-                    Oval oval = new Oval();
-                    setComponentInitValues(oval);
-                    setPosition(oval, x, y);
-                    setSize(oval, width, height);
-                    setColor(oval, color);
-                    setFilled(oval, filled);
-                    return oval;
-                }
-            }
-
-            public class _Rect {
-                public Rect create(int x, int y, int width, int height) {
-                    return create(x, y, width, height, null, false);
-                }
-
-                public Rect create(int x, int y, int width, int height, FColor color) {
-                    return create(x, y, width, height, color, false);
-                }
-
-                public Rect create(int x, int y, int width, int height, FColor color, boolean filled) {
-                    Rect rect = new Rect();
-                    setComponentInitValues(rect);
-                    setPosition(rect, x, y);
-                    setSize(rect, width, height);
-                    setColor(rect, color);
-                    setFilled(rect, filled);
-                    return rect;
-                }
-            }
-
-            public class _Triangle {
-
-                public Triangle create(int x, int y, int width, int height) {
-                    return create(x, y, width, height, null, false);
-                }
-
-                public Triangle create(int x, int y, int width, int height, FColor color) {
-                    return create(x, y, width, height, color, false);
-                }
-
-                public Triangle create(int x, int y, int width, int height, FColor color, boolean filled) {
-                    Triangle triangle = new Triangle();
-                    setComponentInitValues(triangle);
-                    setPosition(triangle, x, y);
-                    setSize(triangle, width, height);
-                    setColor(triangle, color);
-                    return triangle;
-                }
-
+                shape.shapeType = shapeType;
             }
 
         }
