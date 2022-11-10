@@ -177,7 +177,6 @@ public class InputState {
 
     public boolean[] hotKeyPressedKeys;
 
-    public HotKey pressedHotKey;
 
     public MouseTool pressedMouseTool;
 

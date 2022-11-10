@@ -6,6 +6,8 @@ public class HotKey {
 
     public int[] keyCodes;
 
+    public boolean pressed;
+
     public HotKeyAction hotKeyAction;
 
 }

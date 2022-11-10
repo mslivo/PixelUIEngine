@@ -221,7 +221,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.tooltip_lastHoverObject = null;
         newInputState.pressedMap = null;
         newInputState.hotKeyPressedKeys = new boolean[256];
-        newInputState.pressedHotKey = null;
         newInputState.pressedMouseTool = null;
         newInputState.openComboBox = null;
 
@@ -348,20 +347,20 @@ public class UIEngine<T extends UIAdapter> {
                     // Hotkeys
                     for (int keyCode : inputState.inputEvents.keyCodesDown) {
                         inputState.hotKeyPressedKeys[keyCode] = true;
-                        hkLoop:
-                        for (HotKey hotKey : inputState.hotKeys) {
-                            boolean hotkeyPressed = true;
-                            kkLoop:
-                            for (int hotKeyCode : hotKey.keyCodes) {
-                                if (!inputState.hotKeyPressedKeys[hotKeyCode]) {
-                                    hotkeyPressed = false;
-                                    break kkLoop;
-                                }
+                    }
+                    hkLoop:
+                    for (HotKey hotKey : inputState.hotKeys) {
+                        boolean hotkeyPressed = true;
+                        kcLoop:
+                        for (int hotKeyCode : hotKey.keyCodes) {
+                            if (!inputState.hotKeyPressedKeys[hotKeyCode]) {
+                                hotkeyPressed = false;
+                                break kcLoop;
                             }
-                            if (hotkeyPressed) {
-                                inputState.pressedHotKey = hotKey;
-                                if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
-                            }
+                        }
+                        if (hotkeyPressed) {
+                            hotKey.pressed = true;
+                            if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
                         }
                     }
                 }
@@ -375,12 +374,18 @@ public class UIEngine<T extends UIAdapter> {
             for (int keyCode : inputState.inputEvents.keyCodesUp) {
                 inputState.hotKeyPressedKeys[keyCode] = false;
             }
-            if (inputState.pressedHotKey != null) {
-                if (inputState.pressedHotKey.hotKeyAction != null) inputState.pressedHotKey.hotKeyAction.onRelease();
-                inputState.pressedHotKey = null;
+            hkLoop:
+            for (HotKey hotKey : inputState.hotKeys) {
+                if(hotKey.pressed){
+                    kcLoop:for(int keyCode : hotKey.keyCodes){
+                        if(inputState.hotKeyPressedKeys[keyCode] == false){
+                            hotKey.pressed  = false;
+                            if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+                            break kcLoop;
+                        }
+                    }
+                }
             }
-
-
         }
 
         /* Mouse Action */

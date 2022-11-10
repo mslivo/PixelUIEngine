@@ -1131,21 +1131,9 @@ public class API {
     public HotKey addHotKey(int[] keyCodes, HotKeyAction hotKeyAction) {
         if (keyCodes == null || keyCodes.length == 0) return null;
         if (hotKeyAction == null) return null;
-        for (HotKey hotKey : inputState.hotKeys) {
-            if (hotKey.keyCodes.length == keyCodes.length) {
-                boolean match = true;
-                matchLoop:
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (hotKey.keyCodes[i] != keyCodes[i]) {
-                        match = false;
-                        break matchLoop;
-                    }
-                }
-                if (match) return null;
-            }
-        }
         HotKey hotKey = new HotKey();
-        hotKey.keyCodes = keyCodes;
+        hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
+        hotKey.pressed = false;
         hotKey.hotKeyAction = hotKeyAction;
         inputState.addHotKeyQueue.add(hotKey);
         return hotKey;
