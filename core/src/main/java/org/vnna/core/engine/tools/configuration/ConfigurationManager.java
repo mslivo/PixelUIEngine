@@ -33,7 +33,7 @@ public class ConfigurationManager {
             } catch (IOException e) {
                 Tools.logError(e);
             }
-        }else{
+        } else {
             Tools.File.makeSureDirectoryExists(file.getParent());
         }
 
@@ -56,7 +56,15 @@ public class ConfigurationManager {
 
     public boolean deviatesFromBackup(String option) {
         if (this.backUp != null) {
-            return !this.properties.get(option).equals(this.backUp.get(option));
+            if(this.properties.get(option) == null && this.backUp.get(option) == null){
+                return false;
+            }else if(this.properties.get(option) == null && this.backUp.get(option) != null){
+                return true;
+            }else if(this.properties.get(option) != null && this.backUp.get(option) == null){
+                return true;
+            }else{
+                return !this.properties.get(option).equals(this.backUp.get(option));
+            }
         } else {
             return false;
         }
@@ -70,8 +78,8 @@ public class ConfigurationManager {
         }
     }
 
-    public void discardBackup(){
-        if(this.backUp != null){
+    public void discardBackup() {
+        if (this.backUp != null) {
             this.backUp.clear();
             this.backUp = null;
         }
@@ -224,7 +232,6 @@ public class ConfigurationManager {
     }
 
 
-
     private void validateAllProperties() {
         for (String name : configurations.keySet()) {
             validateProperty(name);
@@ -256,7 +263,7 @@ public class ConfigurationManager {
     public void setStringList(String name, String[] values) {
         Configuration configuration = configurations.get(name);
         if (configuration != null) {
-            set(name, String.join(";",values));
+            set(name, String.join(";", values));
         }
         return;
     }

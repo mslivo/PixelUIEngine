@@ -596,7 +596,9 @@ public class API {
             Button okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(true);
+                    if(function != null) {
+                        function.apply(true);
+                    }
                     removeCurrentModalWindow();
                 }
             });
