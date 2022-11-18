@@ -242,19 +242,32 @@ public class MediaManager {
     }
 
     public int imageWidth(CMediaGFX cMedia) {
-        if (cMedia.getClass() == CMediaArray.class) {
-            return ((CMediaArray) cMedia).tile_width;
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            return ((CMediaAnimation) cMedia).tile_width;
+        return imageWidth(cMedia, true);
+    }
+
+    public int imageWidth(CMediaGFX cMedia, boolean tileWidth) {
+        if(tileWidth) {
+            if (cMedia.getClass() == CMediaArray.class) {
+                return ((CMediaArray) cMedia).tile_width;
+            } else if (cMedia.getClass() == CMediaAnimation.class) {
+                return ((CMediaAnimation) cMedia).tile_width;
+            }
         }
         return textureAtlas.findRegion(cMedia.file).getRegionWidth();
     }
 
     public int imageHeight(CMediaGFX cMedia) {
-        if (cMedia.getClass() == CMediaArray.class) {
-            return ((CMediaArray) cMedia).tile_height;
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            return ((CMediaAnimation) cMedia).tile_height;
+        return imageHeight(cMedia, true);
+    }
+
+
+    public int imageHeight(CMediaGFX cMedia,boolean tileHeight) {
+        if(tileHeight) {
+            if (cMedia.getClass() == CMediaArray.class) {
+                return ((CMediaArray) cMedia).tile_height;
+            } else if (cMedia.getClass() == CMediaAnimation.class) {
+                return ((CMediaAnimation) cMedia).tile_height;
+            }
         }
         return textureAtlas.findRegion(cMedia.file).getRegionHeight();
     }
