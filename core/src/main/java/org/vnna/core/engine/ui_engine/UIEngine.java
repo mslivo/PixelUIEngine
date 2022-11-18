@@ -1134,12 +1134,22 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateToolTip() {
-        if (inputState.listDrag_Item != null || inputState.inventoryDrag_Item != null || !(inputState.lastGUIMouseHover instanceof Component)) {
-            inputState.tooltip = null;
-            inputState.tooltip_lastHoverObject = null;
-        } else if (inputState.lastGUIMouseHover instanceof Component) {
-            Component hoverComponent = (Component) inputState.lastGUIMouseHover;
+        boolean showToolTip = true;
+        // Anything dragged ?
+        if(showToolTip){
+            showToolTip = inputState.listDrag_Item == null && inputState.inventoryDrag_Item == null;
+        }
+        // hovering over a component ?
+        if(showToolTip){
+            showToolTip = (inputState.lastGUIMouseHover instanceof Component);
+        }
+         // modal active and component does not belong to modal ?
+        if(showToolTip){
+            showToolTip = inputState.modalWindow != null ? ((Component)inputState.lastGUIMouseHover).addedToWindow == inputState.modalWindow : true;
+        }
 
+        if(showToolTip){
+            Component hoverComponent = (Component) inputState.lastGUIMouseHover;
             Object toolTipSubItem = null;
             if (hoverComponent.getClass() == List.class) {
                 List list = (List) inputState.lastGUIMouseHover;
@@ -1164,20 +1174,22 @@ public class UIEngine<T extends UIAdapter> {
             }
 
 
-            boolean updateTT;
+            boolean updateToolTip;
 
             if (hoverComponent.updateToolTip) {
-                updateTT = true;
+                updateToolTip = true;
                 hoverComponent.updateToolTip = false;
             } else {
                 if (hoverComponent.getClass() == List.class || hoverComponent.getClass() == Inventory.class) {
-                    updateTT = inputState.tooltip_lastHoverObject != toolTipSubItem;
+                    // Check on subitem change
+                    updateToolTip = inputState.tooltip_lastHoverObject != toolTipSubItem;
                 } else {
-                    updateTT = inputState.tooltip_lastHoverObject != hoverComponent;
+                    // Check on component change
+                    updateToolTip = inputState.tooltip_lastHoverObject != hoverComponent;
                 }
             }
 
-            if (updateTT) {
+            if (updateToolTip) {
                 inputState.tooltip_wait_delay = true;
                 inputState.tooltip_delay_timer = System.currentTimeMillis();
                 if (hoverComponent.getClass() == List.class && toolTipSubItem != null) {
@@ -1196,7 +1208,12 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.tooltip_lastHoverObject = hoverComponent;
                 }
             }
+        }else{
+            inputState.tooltip = null;
+            inputState.tooltip_lastHoverObject = null;
         }
+
+        // Fade In/Out
 
         if (inputState.tooltip != null) {
             if (inputState.tooltip_wait_delay) {
