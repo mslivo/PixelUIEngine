@@ -545,7 +545,7 @@ public class Tools {
 
     public static class Calc {
 
-        public static Object randomEntry(ArrayList arrayList) {
+        public static Object selectRandom(ArrayList arrayList) {
             if (arrayList.size() > 0) {
                 return arrayList.get(MathUtils.random(0, arrayList.size() - 1));
             } else {
@@ -553,7 +553,7 @@ public class Tools {
             }
         }
 
-        public static int randomProbability(int... values){
+        public static int selectRandomProbabilities(int... values){
             int sum = 0;
             for(int i=0;i<values.length;i++){
                 sum += values[i];
@@ -568,10 +568,10 @@ public class Tools {
                 }
             }
 
-            return randomProbability(probabilities);
+            return selectRandomProbabilitiesPercent(probabilities);
         }
 
-        public static int randomProbability(float... probabilities) {
+        public static int selectRandomProbabilitiesPercent(float... probabilities) {
             if (probabilities.length == 0) return -1;
             float random = MathUtils.random();
             float cumulativeProbability = 0f;
