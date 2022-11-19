@@ -553,6 +553,23 @@ public class Tools {
             }
         }
 
+        public static int randomProbability(int... values){
+            int sum = 0;
+            for(int i=0;i<values.length;i++){
+                sum += values[i];
+            }
+            float[] probabilities = new float[values.length];
+
+            for(int i=0;i<values.length;i++){
+                if(sum == 0){
+                    probabilities[i] = 1f/(float)values.length;
+                }else{
+                    probabilities[i] = values[i]/(float) sum;
+                }
+            }
+
+            return randomProbability(probabilities);
+        }
 
         public static int randomProbability(float... probabilities) {
             if (probabilities.length == 0) return -1;
