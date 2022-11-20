@@ -9,6 +9,8 @@ import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.vnna.core.engine.ui_engine.gui.components.textfield.TextField;
 
+import static java.awt.SystemColor.window;
+
 class UICommons {
 
     static int component_getParentWindowX(Component component) {
@@ -50,13 +52,11 @@ class UICommons {
         }
     }
 
-    static void windows_enforceScreenBounds(InputState inputState) {
-        inputState.windows.forEach(window -> {
-            int wndWidth = window_getRealWidth(window);
-            int wndheight =  window_getRealHeight(window);
-            window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
-            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - wndheight);
-        });
+    static void window_enforceScreenBounds(InputState inputState, Window window) {
+        int wndWidth = window_getRealWidth(window);
+        int wndheight =  window_getRealHeight(window);
+        window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
+        window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - wndheight);
     }
 
 

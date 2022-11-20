@@ -115,7 +115,9 @@ public class API {
     }
 
     public void windowsEnforceScreenBounds() {
-        UICommons.windows_enforceScreenBounds(inputState);
+        inputState.windows.forEach(window -> {
+            UICommons.window_enforceScreenBounds(inputState, window);
+        });
     }
 
     public class _Presets {
@@ -212,12 +214,12 @@ public class API {
                 for (int i = 0; i < text.length; i++) {
                     if (text[i].trim().length() > 0) {
                         String[] split = text[i].split(" ");
-                        if(split.length > 0) {
+                        if (split.length > 0) {
                             String currentLine = "";
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 if (mediaManager.textWidth(config.getDefaultFont(), currentLine + split[i2] + " ") >= pixelWidth) {
                                     textList.add(currentLine);
-                                    currentLine = split[i2]+ " ";
+                                    currentLine = split[i2] + " ";
                                 } else {
                                     currentLine += split[i2] + " ";
                                 }
@@ -226,7 +228,7 @@ public class API {
                                 textList.add(currentLine);
                             }
                         }
-                    }else {
+                    } else {
                         textList.add("");
                     }
                 }
@@ -596,7 +598,7 @@ public class API {
             Button okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    if(function != null) {
+                    if (function != null) {
                         function.apply(true);
                     }
                     removeCurrentModalWindow();
@@ -1164,7 +1166,7 @@ public class API {
         return result;
     }
 
-    public Window getLastActiveWindow(){
+    public Window getLastActiveWindow() {
         return inputState.lastActiveWindow;
     }
 
@@ -2607,7 +2609,7 @@ public class API {
         public class _Shape {
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType) {
-                return create(x,y, width, height, shapeType, config.getComponentsDefaultColor());
+                return create(x, y, width, height, shapeType, config.getComponentsDefaultColor());
             }
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType, FColor color) {

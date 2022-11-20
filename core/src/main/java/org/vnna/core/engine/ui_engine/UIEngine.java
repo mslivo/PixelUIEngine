@@ -1127,10 +1127,11 @@ public class UIEngine<T extends UIAdapter> {
         updateToolTip();
 
         /* Enforce Screen bounds */
-        if (api.config.isWindowsEnforceScreenBounds()) {
-            UICommons.windows_enforceScreenBounds(inputState);
-        }
-
+        inputState.windows.forEach(window -> {
+            if(api.config.isWindowsEnforceScreenBounds() || inputState.modalWindow == window) {
+                UICommons.window_enforceScreenBounds(inputState, window);
+            }
+        });
     }
 
     private void updateToolTip() {
