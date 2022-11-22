@@ -44,6 +44,7 @@ import org.vnna.core.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ExampleWindowGenerator extends WindowGenerator {
@@ -186,11 +187,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        TextField number = api.presets.textField_createIntegerInputField(18, 7, 4, 0, 100, new Function<Integer, Object>() {
+        TextField number = api.presets.textField_createIntegerInputField(18, 7, 4, 0, 100, new Consumer<Integer>() {
             @Override
-            public Object apply(Integer integer) {
+            public void accept(Integer integer) {
                 api.addNotification(api.notifications.create("Input: " + integer));
-                return null;
             }
         });
 
@@ -202,12 +202,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal1 = api.components.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", "Yes", "No", new Function<Boolean, Object>() {
-                    @Override
-                    public Object apply(Boolean aBoolean) {
-                        return null;
-                    }
-                }));
+                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", "Yes", "No", null));
             }
         });
 
@@ -215,22 +210,17 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal2 = api.components.button.textButton.create(28, 4, 5, 1, "Modal 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateMessageRequester("Caption", new String[]{"Modal 2 Example Text"}, new Function<Boolean, Object>() {
-                    @Override
-                    public Object apply(Boolean aBoolean) {
-                        return null;
-                    }
-                }));
+                api.addWindowAsModal(api.presets.modal_CreateMessageRequester("Caption", new String[]{"Modal 2 Example Text"}, null));
             }
         });
 
         Button modal3 = api.components.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateColorRequester("Caption", new Function<FColor, Object>() {
+                api.addWindowAsModal(api.presets.modal_CreateColorRequester("Caption", new Consumer<FColor>() {
                     @Override
-                    public Object apply(FColor color) {
-                        return null;
+                    public void accept(FColor fColor) {
+                        return;
                     }
                 }, null));
             }
@@ -270,12 +260,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn3 = api.components.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateTextInput("Enter Text", "Please Enter some Text", "", new Function<String, Object>() {
-
+                api.addWindowAsModal(api.presets.modal_CreateTextInput("Enter Text", "Please Enter some Text", "", new Consumer<String>() {
                     @Override
-                    public Object apply(String s) {
+                    public void accept(String s) {
                         api.addNotification(api.notifications.create(s));
-                        return null;
                     }
                 }));
             }

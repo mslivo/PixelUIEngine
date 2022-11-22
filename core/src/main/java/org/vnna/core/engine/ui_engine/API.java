@@ -55,6 +55,7 @@ import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
 import org.vnna.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class API {
@@ -290,16 +291,16 @@ public class API {
         }
 
 
-        public Text text_CreateClickableText(int x, int y, String[] text, Function<Integer, Boolean> onClick) {
+        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick) {
             return text_CreateClickableText(x, y, text, onClick, null);
         }
 
-        public Text text_CreateClickableText(int x, int y, String[] text, Function<Integer, Boolean> onClick, CMediaCursor cursorOverride) {
+        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick, CMediaCursor cursorOverride) {
             Text hlText = components.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
             components.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
-                    onClick.apply(button);
+                    onClick.accept(button);
                 }
             });
             components.setUpdateAction(hlText, new UpdateAction(0) {
@@ -356,7 +357,7 @@ public class API {
             return hotKeyAction;
         }
 
-        public void checkbox_MakeExclusive(CheckBox[] checkboxes, Function<CheckBox, Object> function) {
+        public void checkbox_MakeExclusive(CheckBox[] checkboxes, Consumer<CheckBox> checkedFunction) {
             for (CheckBox checkbox : checkboxes) {
                 components.checkBox.setCheckBoxAction(checkbox, new CheckBoxAction() {
                     @Override
@@ -365,7 +366,7 @@ public class API {
                             for (CheckBox checkbox2 : checkboxes) {
                                 if (checkbox2 != checkbox) components.checkBox.setChecked(checkbox2, false);
                             }
-                            function.apply(checkbox);
+                            checkedFunction.accept(checkbox);
                         } else {
                             components.checkBox.setChecked(checkbox, true);
                         }
@@ -428,11 +429,11 @@ public class API {
             return returnComponents;
         }
 
-        public Window modal_CreateColorRequester(String caption, Function<FColor, Object> function, FColor initColor) {
-            return modal_CreateColorRequester(caption, function, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
+        public Window modal_CreateColorRequester(String caption, Consumer<FColor> selectColorFunction, FColor initColor) {
+            return modal_CreateColorRequester(caption, selectColorFunction, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
         }
 
-        public Window modal_CreateColorRequester(String caption, Function<FColor, Object> function, FColor initColor, CMediaImage colors) {
+        public Window modal_CreateColorRequester(String caption, Consumer<FColor> selectColorFunction, FColor initColor, CMediaImage colors) {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
@@ -444,7 +445,7 @@ public class API {
             components.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(null);
+                    selectColorFunction.accept(null);
                     removeCurrentModalWindow();
                 }
             });
@@ -454,7 +455,7 @@ public class API {
             components.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(Tools.Colors.createFixed(ok.color));
+                    selectColorFunction.accept(Tools.Colors.createFixed(ok.color));
                     removeCurrentModalWindow();
                 }
             });
@@ -533,16 +534,16 @@ public class API {
             return modal;
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Function<String, Object> function) {
-            return modal_CreateTextInput(caption, text, originalText, function, Integer.MAX_VALUE, 0);
+        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, Integer.MAX_VALUE, 0);
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Function<String, Object> function, int maxInputLength) {
-            return modal_CreateTextInput(caption, text, originalText, function, maxInputLength, 0);
+        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int maxInputLength) {
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, maxInputLength, 0);
 
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Function<String, Object> function, int maxInputLength, int wndMinWidth) {
+        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int maxInputLength, int wndMinWidth) {
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, Tools.Calc.lowerBounds(wndMinWidth, 8));
             final int HEIGHT = 6;
             Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
@@ -554,7 +555,7 @@ public class API {
                 @Override
                 public void onTyped(char character) {
                     if (character == '\n') {
-                        function.apply(input.content);
+                        inputResultFunction.accept(input.content);
                         removeCurrentModalWindow();
                     }
                 }
@@ -563,7 +564,7 @@ public class API {
             Button okC = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(input.content);
+                    inputResultFunction.accept(input.content);
                     removeCurrentModalWindow();
                 }
             });
@@ -578,7 +579,7 @@ public class API {
             return modal;
         }
 
-        public Window modal_CreateMessageRequester(String caption, String[] lines, Function<Boolean, Object> function) {
+        public Window modal_CreateMessageRequester(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (String line : lines) {
                 int len = mediaManager.textWidth(config.defaultFont, line);
@@ -598,8 +599,8 @@ public class API {
             Button okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    if (function != null) {
-                        function.apply(true);
+                    if (closeFunction != null) {
+                        closeFunction.run();
                     }
                     removeCurrentModalWindow();
                 }
@@ -615,11 +616,11 @@ public class API {
             return modal;
         }
 
-        public GraphInfo map_drawGraph(Map map, ArrayList items, Function<Integer, Long> getValue) {
-            return map_drawGraph(map, items, 1, 1, getValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null);
+        public GraphInfo map_drawGraph(Map map, ArrayList items, Function<Integer, Long> getIndexValue) {
+            return map_drawGraph(map, items, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null);
         }
 
-        public GraphInfo map_drawGraph(Map map, ArrayList items, int steps, int stepSize, Function<Integer, Long> getValue, FColor color_bg, FColor color_rising, FColor color_level, FColor color_falling, int[] customHighLowReference) {
+        public GraphInfo map_drawGraph(Map map, ArrayList items, int steps, int stepSize, Function<Integer, Long> getIndexValue, FColor color_bg, FColor color_rising, FColor color_level, FColor color_falling, int[] customHighLowReference) {
             HashMap<Integer, Long> value_at_position = new HashMap<>();
             HashMap<Integer, Integer> index_at_position = new HashMap<>();
 
@@ -654,7 +655,7 @@ public class API {
             // Get Highest & Lowest Value
             for (int i = startIndex; i < items.size(); i = i + stepSize) {
                 if (i >= 0) {
-                    Long value = getValue.apply(i);
+                    Long value = getIndexValue.apply(i);
                     if (customHighLowReference == null) {
                         if (value > reference_high) reference_high = value;
                         if (value < reference_low) reference_low = value;
@@ -736,7 +737,11 @@ public class API {
             return new GraphInfo(highest_value, lowest_value, steps, value_at_position, index_at_position);
         }
 
-        public Window modal_CreateYesNoRequester(String caption, String text, String yes, String no, Function<Boolean, Object> function) {
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> function) {
+            return modal_CreateYesNoRequester(caption, text, "Yes", "No", function);
+        }
+
+        public Window modal_CreateYesNoRequester(String caption, String text, String yes, String no, Consumer<Boolean> choiceFunction) {
 
             int textWidthMin = Math.max(
                     (mediaManager.textWidth(config.defaultFont, caption) + 8),
@@ -755,7 +760,7 @@ public class API {
             Button yesC = components.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(true);
+                    if (choiceFunction != null) choiceFunction.accept(true);
                     removeCurrentModalWindow();
                 }
             });
@@ -764,7 +769,7 @@ public class API {
             Button noC = components.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    function.apply(false);
+                    if (choiceFunction != null) choiceFunction.accept(false);
                     removeCurrentModalWindow();
                 }
             });
@@ -780,7 +785,7 @@ public class API {
             return button_CreateWindowCloseButton(window, null);
         }
 
-        public ImageButton button_CreateWindowCloseButton(Window window, Function<Window, Boolean> closeFunction) {
+        public ImageButton button_CreateWindowCloseButton(Window window, Runnable closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
             components.setCustomFlag(closeButton, "WndCloseBtn");
             components.button.setButtonAction(closeButton, new ButtonAction() {
@@ -788,13 +793,13 @@ public class API {
                 @Override
                 public void onRelease() {
                     removeWindow(window);
-                    if (closeFunction != null) closeFunction.apply(window);
+                    if (closeFunction != null) closeFunction.run();
                 }
             });
             return closeButton;
         }
 
-        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, Function<Float, Object> onChange) {
+        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, Consumer<Float> onChange) {
             TextField textField = components.textField.create(x, y, width);
             HashSet<Character> numbers = new HashSet<>();
             numbers.addAll(Arrays.asList(new Character[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
@@ -815,13 +820,13 @@ public class API {
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (textField.contentValid) onChange.apply(Float.parseFloat(content));
+                    if (textField.contentValid) onChange.accept(Float.parseFloat(content));
                 }
             });
             return textField;
         }
 
-        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, Function<Integer, Object> onChange) {
+        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, Consumer<Integer> onChange) {
             TextField textField = components.textField.create(x, y, width);
             HashSet<Character> numbers = new HashSet<>();
             numbers.addAll(Arrays.asList(new Character[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
@@ -842,7 +847,7 @@ public class API {
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (textField.contentValid) onChange.apply(Integer.parseInt(content));
+                    if (textField.contentValid) onChange.accept(Integer.parseInt(content));
                 }
             });
             return textField;
@@ -1047,6 +1052,7 @@ public class API {
             windows.setVisible(modalWindow, true);
             windows.setFolded(modalWindow, false);
             windows.center(modalWindow);
+            windows.setEnforceScreenBounds(modalWindow, true);
             inputState.modalWindow = modalWindow;
             addWindow(modalWindow);
         } else {
@@ -1172,7 +1178,7 @@ public class API {
 
     public class _Config {
 
-        private boolean windowsEnforceScreenBounds = false; // Forces windows stay inside screen
+        private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
@@ -1195,12 +1201,12 @@ public class API {
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
 
-        public boolean isWindowsEnforceScreenBounds() {
-            return windowsEnforceScreenBounds;
+        public boolean getWindowsDefaultEnforceScreenBounds() {
+            return windowsDefaultEnforceScreenBounds;
         }
 
-        public void setWindowsEnforceScreenBounds(boolean windowsEnforceScreenBounds) {
-            this.windowsEnforceScreenBounds = windowsEnforceScreenBounds;
+        public void setWindowsDefaultEnforceScreenBounds(boolean windowsDefaultEnforceScreenBounds) {
+            this.windowsDefaultEnforceScreenBounds = windowsDefaultEnforceScreenBounds;
         }
 
         public FColor getWindowsDefaultColor() {
@@ -1392,7 +1398,7 @@ public class API {
         }
 
         public void loadConfig(_Config config) {
-            setWindowsEnforceScreenBounds(config.isWindowsEnforceScreenBounds());
+            setWindowsDefaultEnforceScreenBounds(config.getWindowsDefaultEnforceScreenBounds());
             setWindowsDefaultColor(config.getWindowsDefaultColor());
             setComponentsDefaultColor(config.getComponentsDefaultColor());
             setTooltipDefaultColor(config.getTooltipDefaultColor());
@@ -1742,6 +1748,7 @@ public class API {
             setIconIndex(window, 0);
             setCustomFlag(window, "");
             setCustomData(window, null);
+            setEnforceScreenBounds(window, config.getWindowsDefaultEnforceScreenBounds());
             window.components = new ArrayList<>();
             window.font = config.defaultFont;
             window.addComponentsQueue = new ArrayDeque<>();
@@ -1757,6 +1764,11 @@ public class API {
 
         public void addMessageReceiver(Window window, MessageReceiver messageReceiver) {
             window.messageReceivers.add(messageReceiver);
+        }
+
+        public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
+            if (window == null) return;
+            window.enforceScreenBounds = enforceScreenBounds;
         }
 
         public void setIcon(Window window, CMediaGFX icon) {

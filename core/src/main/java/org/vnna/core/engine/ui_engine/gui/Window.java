@@ -46,6 +46,8 @@ public class Window {
 
     public boolean visible;
 
+    public boolean enforceScreenBounds;
+
     public WindowAction windowAction;
 
     public CMediaGFX icon;
