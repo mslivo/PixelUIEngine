@@ -45,7 +45,6 @@ import org.vnna.core.example.ui.media.ExampleBaseMedia;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class ExampleWindowGenerator extends WindowGenerator {
 
@@ -202,7 +201,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal1 = api.components.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text",  null));
+                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", null));
             }
         });
 
@@ -341,8 +340,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("Button 1\n\n\n\nThese"));
 
-        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0,8));
-        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 8,16));
+        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 8));
+        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 8, 16));
 
         api.components.setToolTip(imageButton3, imageToolTip);
         api.components.setToolTip(imageButton4, api.toolTip.create(Tools.Text.toArray("Button 2\nAre")));

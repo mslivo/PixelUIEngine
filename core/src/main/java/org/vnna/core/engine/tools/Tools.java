@@ -43,6 +43,10 @@ public class Tools {
         System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + msg);
     }
 
+    public static void log(String msg, Object values) {
+        System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + String.format(msg, values));
+    }
+
     public static void logError(String msg) {
         System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
     }

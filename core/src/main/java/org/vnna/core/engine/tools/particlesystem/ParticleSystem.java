@@ -36,15 +36,15 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     }
 
     public ParticleSystem(MediaManager mediaManager, int particleLimit) {
-        this(mediaManager,  particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
+        this(mediaManager, particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
     public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread) {
-        this(mediaManager,  particleLimit, objectsPerThread, ThreadPoolAlgorithm.WORKSTEALING, 0);
+        this(mediaManager, particleLimit, objectsPerThread, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
     public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm) {
-        this(mediaManager,  particleLimit, objectsPerThread, threadPoolAlgorithm, 5);
+        this(mediaManager, particleLimit, objectsPerThread, threadPoolAlgorithm, 5);
     }
 
     public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
@@ -66,8 +66,7 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
         // remove sorted indexes in reverse order
         if (deleteQueue.size() > 0) {
             if (deleteQueue.size() == particles.size()) {
-                particles.clear();
-                deleteQueue.clear();
+                removeAllParticles();
             } else {
                 for (int i = deleteQueue.size() - 1; i >= 0; i--) {
                     particles.remove((int) deleteQueue.get(i));
@@ -85,13 +84,10 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
         return;
     }
 
-    public void forEveryParticleMarkForDelete(Function<T, Boolean> forFunction) {
-        for (int i = 0; i < particles.size(); i++) {
-            if (forFunction.apply(particles.get(i))) markForDelete(i);
-        }
-        return;
+    public void removeAllParticles() {
+        particles.clear();
+        deleteQueue.clear();
     }
-
 
     private void markForDelete(int index) {
         synchronized (deleteQueue) {
@@ -118,7 +114,7 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     }
 
     public int canAddParticleCount() {
-        return particleLimit-this.particles.size();
+        return particleLimit - this.particles.size();
     }
 
     public void render(SpriteBatch batch) {
@@ -129,24 +125,24 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
         if (particles.size() == 0) return;
 
         for (T particle : this.particles) {
-            if(!particle.visible){
+            if (!particle.visible) {
                 continue;
             }
             batch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case TEXT -> {
                     if (particle.text != null && particle.font != null) {
-                        mediaManager.drawCMediaFont(batch,particle.font,particle.x , particle.y , particle.text);
+                        mediaManager.drawCMediaFont(batch, particle.font, particle.x, particle.y, particle.text);
                     }
                 }
                 case IMAGE -> {
-                    mediaManager.drawCMediaImageScale(batch, (CMediaImage) particle.appearance, particle.x , particle.y ,particle.origin_x,particle.origin_y,particle.scaleX, particle.scaleY,particle.rotation);
+                    mediaManager.drawCMediaImageScale(batch, (CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
                 }
                 case ARRAY -> {
-                    mediaManager.drawCMediaArrayScale(batch, (CMediaArray) particle.appearance, particle.x, particle.y , particle.array_index,particle.origin_x,particle.origin_y,particle.scaleX, particle.scaleY, particle.rotation);
+                    mediaManager.drawCMediaArrayScale(batch, (CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
                 }
                 case ANIMATION -> {
-                    mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, animation_timer,particle.origin_x,particle.origin_y,particle.scaleX, particle.scaleY);
+                    mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, animation_timer, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
                 }
             }
         }
@@ -155,8 +151,14 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
     @Override
     public void updateFromThread(T particle, int index) {
-        if(!particle.update(this, particle, index)){
+        if (!particle.update(this, particle, index)) {
             markForDelete(index);
         }
+    }
+
+    public void shutdown() {
+        this.deleteQueue.clear();
+        this.particles.clear();
+        this.threadPool.shutdown();
     }
 }
