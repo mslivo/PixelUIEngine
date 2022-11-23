@@ -19,7 +19,7 @@ import java.util.function.Function;
 /*
  * Particle System for Managing Classes that Extend Particle
  */
-public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater {
+public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T> {
 
     private LThreadPool threadPool;
 
@@ -156,10 +156,9 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater {
         batch.setColor(Color.WHITE);
     }
 
-
     @Override
-    public void updateFromThread(Object object, int index) {
-        if (updateFunction.apply((T) object)) {
+    public void updateFromThread(T object, int index) {
+        if (updateFunction.apply(object)) {
             markForDelete(index);
         }
     }
