@@ -27,30 +27,27 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
     private ArrayList<Integer> deleteQueue;
 
-    private Function<T, Boolean> updateFunction;
-
     private MediaManager mediaManager;
 
     private int particleLimit;
 
-    public ParticleSystem(MediaManager mediaManager, Function<T, Boolean> updateFunction) {
-        this(mediaManager,  updateFunction, Integer.MAX_VALUE, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
+    public ParticleSystem(MediaManager mediaManager) {
+        this(mediaManager, Integer.MAX_VALUE, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
-    public ParticleSystem(MediaManager mediaManager, Function<T, Boolean> updateFunction, int particleLimit) {
-        this(mediaManager,  updateFunction, particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
+    public ParticleSystem(MediaManager mediaManager, int particleLimit) {
+        this(mediaManager,  particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
-    public ParticleSystem(MediaManager mediaManager, Function<T, Boolean> updateFunction, int particleLimit, int objectsPerThread) {
-        this(mediaManager,  updateFunction, particleLimit, objectsPerThread, ThreadPoolAlgorithm.WORKSTEALING, 0);
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread) {
+        this(mediaManager,  particleLimit, objectsPerThread, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
-    public ParticleSystem(MediaManager mediaManager, Function<T, Boolean> updateFunction, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm) {
-        this(mediaManager,  updateFunction, particleLimit, objectsPerThread, threadPoolAlgorithm, 5);
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm) {
+        this(mediaManager,  particleLimit, objectsPerThread, threadPoolAlgorithm, 5);
     }
 
-    public ParticleSystem(MediaManager mediaManager, Function<T, Boolean> updateFunction, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
-        this.updateFunction = updateFunction;
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
         this.mediaManager = mediaManager;
         this.particles = new ArrayList<>();
         this.deleteQueue = new ArrayList<>();
@@ -157,8 +154,8 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     }
 
     @Override
-    public void updateFromThread(T object, int index) {
-        if (updateFunction.apply(object)) {
+    public void updateFromThread(T particle, int index) {
+        if(!particle.update(this, particle, index)){
             markForDelete(index);
         }
     }

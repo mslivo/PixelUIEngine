@@ -1,6 +1,7 @@
 package org.vnna.core.engine.tools.particlesystem.particle;
 
 import org.vnna.core.engine.media_manager.media.*;
+import org.vnna.core.engine.tools.particlesystem.ParticleSystem;
 
 public abstract class Particle {
 
@@ -105,5 +106,11 @@ public abstract class Particle {
         this.appearance = array;
         this.array_index = array_index;
     }
+
+    /**
+     * Update Particle
+     * Return false if particle should be deleted
+     */
+    public abstract boolean update(ParticleSystem particleSystem, Particle particle, int index);
 
 }
