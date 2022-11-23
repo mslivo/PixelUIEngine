@@ -20,72 +20,52 @@ public class ConfigurationManager {
 
     private HashMap<String, Configuration> configurations;
 
-    public ConfigurationManager(Path file) {
-        this.file = file;
+    private boolean initialized;
+
+    public ConfigurationManager() throws ConfigurationException {
         this.configurations = new HashMap<>();
-
-
         this.properties = new Properties();
+        this.initialized = false;
+    }
 
-        if (Files.exists(file) && Files.isRegularFile(file)) {
-            try {
-                properties.load(Files.newInputStream(file));
-            } catch (IOException e) {
-                Tools.logError(e);
+    public void init(Path file) {
+        if (!this.initialized) {
+            this.file = file;
+            if (Files.exists(file) && Files.isRegularFile(file)) {
+                try {
+                    properties.load(Files.newInputStream(file));
+                } catch (IOException e) {
+                    Tools.logError(e.getMessage());
+                    throw new ConfigurationException(e);
+                }
+            } else {
+                if (!Tools.File.makeSureDirectoryExists(file.getParent())) {
+                    throw new ConfigurationException("Can't create directory " + file.getParent().toString());
+                }
             }
-        } else {
-            Tools.File.makeSureDirectoryExists(file.getParent());
+            validateAllProperties();
+            saveToFile();
+            this.initialized = true;
         }
-
-        validateAllProperties();
-        syncToFile();
+        return;
     }
 
 
-    public void loadTemporaryBackup() {
-        if (this.backUp != null) {
+    public void restoreBackup() {
+        this.checkInitialized();
+        if (isBackupActive()) {
             this.properties = new Properties();
             backUp.forEach((key, value) -> {
                 this.properties.setProperty((String) key, (String) value);
             });
             validateAllProperties();
-            syncToFile();
+            saveToFile();
             discardBackup();
         }
     }
 
-    public boolean deviatesFromBackup(String option) {
-        if (this.backUp != null) {
-            if(this.properties.get(option) == null && this.backUp.get(option) == null){
-                return false;
-            }else if(this.properties.get(option) == null && this.backUp.get(option) != null){
-                return true;
-            }else if(this.properties.get(option) != null && this.backUp.get(option) == null){
-                return true;
-            }else{
-                return !this.properties.get(option).equals(this.backUp.get(option));
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean anyDeviateFromBackup() {
-        if (this.backUp != null) {
-            return !this.properties.equals(this.backUp);
-        } else {
-            return false;
-        }
-    }
-
-    public void discardBackup() {
-        if (this.backUp != null) {
-            this.backUp.clear();
-            this.backUp = null;
-        }
-    }
-
-    public void createTemporaryBackup() {
+    public void createBackup() {
+        this.checkInitialized();
         this.backUp = new Properties();
         for (Object propertyO : this.properties.keySet()) {
             String property = (String) propertyO;
@@ -93,10 +73,44 @@ public class ConfigurationManager {
         }
     }
 
+    public boolean doesOptionDeviateFromBackup(String option) {
+        this.checkInitialized();
+        if (isBackupActive()) {
+            if (this.properties.get(option) != null && this.backUp.get(option) != null) {
+                return !this.properties.get(option).equals(this.backUp.get(option));
+            } else if (this.properties.get(option) == null && this.backUp.get(option) == null) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public void addOption(String name, String defaultValue, Function<String, Boolean> function) {
+    public boolean doesAnyOptionDeviateFromBackup() {
+        this.checkInitialized();
+        if (this.backUp != null) {
+            return !this.properties.equals(this.backUp);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isBackupActive() {
+        checkInitialized();
+        return this.backUp != null;
+    }
+
+    public void discardBackup() {
+        checkInitialized();
+        this.backUp.clear();
+        this.backUp = null;
+    }
+
+    public void addOption(String name, String defaultValue, Function<String, Boolean> evaluationFunction) {
+        checkInitialized();
         if (configurations.get(name) == null) {
-            Configuration configuration = new Configuration(name, defaultValue, function);
+            Configuration configuration = new Configuration(name, defaultValue, evaluationFunction);
             this.configurations.put(configuration.name, configuration);
             if (this.properties.getProperty(configuration.name) == null) {
                 this.properties.setProperty(configuration.name, configuration.defaultValue);
@@ -104,20 +118,22 @@ public class ConfigurationManager {
                 // already loaded
                 validateProperty(configuration.name);
             }
-            syncToFile();
+            saveToFile();
         }
     }
 
     public void removeOption(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         if (configuration != null) {
             this.properties.remove(configuration.name);
             this.configurations.remove(configuration.name);
-            syncToFile();
+            saveToFile();
         }
     }
 
     public void setToDefault(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         if (configuration != null) {
             set(configuration.name, configuration.defaultValue);
@@ -125,24 +141,29 @@ public class ConfigurationManager {
     }
 
     public void setAllToDefault() {
+        checkInitialized();
         for (String optionsName : configurations.keySet()) {
             setToDefault(optionsName);
         }
     }
 
     public void setFloat(String name, float intValue) {
+        checkInitialized();
         set(name, String.valueOf(intValue));
     }
 
     public void setInt(String name, int intValue) {
+        checkInitialized();
         set(name, String.valueOf(intValue));
     }
 
-    public void setBool(String name, boolean boolValue) {
+    public void setBoolean(String name, boolean boolValue) {
+        checkInitialized();
         set(name, boolValue ? "true" : "false");
     }
 
     public boolean getBoolean(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         int value = 0;
         if (configuration != null) {
@@ -154,6 +175,7 @@ public class ConfigurationManager {
     }
 
     public float getFloat(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         float value = 0;
         if (configuration != null) {
@@ -166,6 +188,7 @@ public class ConfigurationManager {
     }
 
     public int getInt(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         int value = 0;
         if (configuration != null) {
@@ -178,11 +201,13 @@ public class ConfigurationManager {
     }
 
     public String checkString(String value) {
+        checkInitialized();
         if (value == null) return null;
         return value;
     }
 
     public Boolean checkBoolean(String value) {
+        checkInitialized();
         if (value == null) return null;
         Boolean boolValue;
         try {
@@ -194,6 +219,7 @@ public class ConfigurationManager {
     }
 
     public Float checkFloat(String value) {
+        checkInitialized();
         if (value == null) return null;
         Float floatValue;
         try {
@@ -205,6 +231,7 @@ public class ConfigurationManager {
     }
 
     public Integer checkInt(String value) {
+        checkInitialized();
         if (value == null) return null;
         Integer intValue;
         try {
@@ -216,6 +243,7 @@ public class ConfigurationManager {
     }
 
     public String get(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         if (configuration != null) {
             return this.properties.getProperty(configuration.name);
@@ -224,6 +252,7 @@ public class ConfigurationManager {
     }
 
     public String[] getStringList(String name) {
+        checkInitialized();
         Configuration configuration = configurations.get(name);
         if (configuration != null) {
             return get(name).split(";");
@@ -231,6 +260,25 @@ public class ConfigurationManager {
         return null;
     }
 
+    public String checkStringList(String value) {
+        checkInitialized();
+        if (value == null) return null;
+        return value;
+    }
+
+    public void setStringList(String name, String[] values) {
+        checkInitialized();
+        Configuration configuration = configurations.get(name);
+        if (configuration != null) {
+            set(name, String.join(";", values));
+        }
+        return;
+    }
+
+    private void checkInitialized() {
+        if (!this.initialized)
+            throw new ConfigurationException(ConfigurationManager.class.getSimpleName() + "not initialized.");
+    }
 
     private void validateAllProperties() {
         for (String name : configurations.keySet()) {
@@ -255,26 +303,20 @@ public class ConfigurationManager {
             this.properties.setProperty(configuration.name, value);
             validateProperty(configuration.name);
             if (oldValue != null && !oldValue.equals(value)) {
-                syncToFile();
+                saveToFile();
             }
         }
     }
 
-    public void setStringList(String name, String[] values) {
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            set(name, String.join(";", values));
-        }
-        return;
-    }
-
-
-    private void syncToFile() {
+    private void saveToFile() {
         try {
             this.properties.store(Files.newOutputStream(file), null);
-        } catch (Exception e) {
+        } catch (IOException e) {
             Tools.logError(e);
+            throw new ConfigurationException(e);
         }
+
+        return;
     }
 
 }

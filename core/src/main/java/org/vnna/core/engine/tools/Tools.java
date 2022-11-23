@@ -49,9 +49,7 @@ public class Tools {
 
     public static void logError(Exception e) {
         System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + e.getLocalizedMessage());
-        e.printStackTrace();
     }
-
 
     public static void enableDebugLog(boolean enabled) {
         debugEnabled = enabled;
@@ -151,9 +149,9 @@ public class Tools {
         public static CColor createBrighter(CColor color, float amount) {
             amount = Tools.Calc.inBounds(amount, 0f, 1f);
             return create(
-                    Tools.Calc.upperBounds(color.r + (color.r*amount), 1f),
-                    Tools.Calc.upperBounds(color.g + (color.g*amount), 1f),
-                    Tools.Calc.upperBounds(color.b + (color.b*amount), 1f),
+                    Tools.Calc.upperBounds(color.r + (color.r * amount), 1f),
+                    Tools.Calc.upperBounds(color.g + (color.g * amount), 1f),
+                    Tools.Calc.upperBounds(color.b + (color.b * amount), 1f),
                     color.a
             );
         }
@@ -171,9 +169,9 @@ public class Tools {
         public static FColor createFixedBrighter(FColor color, float amount) {
             amount = Tools.Calc.inBounds(amount, 0f, 1f);
             return createFixed(
-                    Tools.Calc.upperBounds(color.r + (color.r*amount), 1f),
-                    Tools.Calc.upperBounds(color.g + (color.g*amount), 1f),
-                    Tools.Calc.upperBounds(color.b + (color.b*amount), 1f),
+                    Tools.Calc.upperBounds(color.r + (color.r * amount), 1f),
+                    Tools.Calc.upperBounds(color.g + (color.g * amount), 1f),
+                    Tools.Calc.upperBounds(color.b + (color.b * amount), 1f),
                     color.a
             );
         }
@@ -486,14 +484,16 @@ public class Tools {
         }
 
 
-        public static void makeSureDirectoryExists(Path file) {
+        public static boolean makeSureDirectoryExists(Path file) {
             try {
                 if (Files.isRegularFile(file)) {
                     Files.delete(file);
                 }
                 Files.createDirectories(file);
+                return true;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Tools.logError(e);
+                return false;
             }
         }
 
@@ -553,18 +553,18 @@ public class Tools {
             }
         }
 
-        public static int selectRandomProbabilities(int... values){
+        public static int selectRandomProbabilities(int... values) {
             int sum = 0;
-            for(int i=0;i<values.length;i++){
+            for (int i = 0; i < values.length; i++) {
                 sum += values[i];
             }
             float[] probabilities = new float[values.length];
 
-            for(int i=0;i<values.length;i++){
-                if(sum == 0){
-                    probabilities[i] = 1f/(float)values.length;
-                }else{
-                    probabilities[i] = values[i]/(float) sum;
+            for (int i = 0; i < values.length; i++) {
+                if (sum == 0) {
+                    probabilities[i] = 1f / (float) values.length;
+                } else {
+                    probabilities[i] = values[i] / (float) sum;
                 }
             }
 
@@ -778,20 +778,6 @@ public class Tools {
             }
         }
 
-
-        public static ArrayList<Integer> splitIntoRandomParts(int value, int max) {
-            ArrayList<Integer> ret = new ArrayList<>();
-            if (value <= 0) return ret;
-            max = Calc.lowerBounds(max, 1);
-            while (value > 0) {
-                int batch = MathUtils.random(1, Math.min(value, max));
-                value -= batch;
-                ret.add(batch);
-            }
-
-            return ret;
-        }
-
         public static long applyRandomness(long value, float randomness) {
             if (randomness == 0) return value;
             randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
@@ -799,15 +785,7 @@ public class Tools {
         }
 
         public static int applyRandomness(int value, float randomness) {
-            if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
-            return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
-        }
-
-        public static float applyRandomness(float value, float randomness) {
-            if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
-            return value * MathUtils.random((1 - randomness), (1 + randomness));
+            return (int) applyRandomness((long) value, randomness);
         }
 
         public static double applyRandomness(double value, float randomness) {
@@ -816,16 +794,29 @@ public class Tools {
             return value * MathUtils.random((1 - randomness), (1 + randomness));
         }
 
-        public static int applyPercent(int value, float percent) {
+        public static float applyRandomness(float value, float randomness) {
+            return (float) applyRandomness((double) value, randomness);
+        }
+
+        public static long applyPercent(long value, float percent) {
             if (percent == 0) return value;
             value += MathUtils.round(value * percent);
             return value;
         }
 
-        public static float applyPercent(float value, float percent) {
+        public static int applyPercent(int value, float percent) {
+            return (int) applyPercent((long) value, percent);
+        }
+
+
+        public static double applyPercent(double value, float percent) {
             if (percent == 0) return value;
             value += (value * percent);
             return value;
+        }
+
+        public static float applyPercent(float value, float percent) {
+            return (float) applyPercent((double) value, percent);
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
