@@ -792,6 +792,12 @@ public class Tools {
             return ret;
         }
 
+        public static long applyRandomness(long value, float randomness) {
+            if (randomness == 0) return value;
+            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
+        }
+
         public static int applyRandomness(int value, float randomness) {
             if (randomness == 0) return value;
             randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
@@ -799,6 +805,12 @@ public class Tools {
         }
 
         public static float applyRandomness(float value, float randomness) {
+            if (randomness == 0) return value;
+            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            return value * MathUtils.random((1 - randomness), (1 + randomness));
+        }
+
+        public static double applyRandomness(double value, float randomness) {
             if (randomness == 0) return value;
             randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
             return value * MathUtils.random((1 - randomness), (1 + randomness));

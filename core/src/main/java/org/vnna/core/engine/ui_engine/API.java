@@ -737,11 +737,11 @@ public class API {
             return new GraphInfo(highest_value, lowest_value, steps, value_at_position, index_at_position);
         }
 
-        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> function) {
-            return modal_CreateYesNoRequester(caption, text, "Yes", "No", function);
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
+            return modal_CreateYesNoRequester(caption, text,  choiceFunction, "Yes", "No");
         }
 
-        public Window modal_CreateYesNoRequester(String caption, String text, String yes, String no, Consumer<Boolean> choiceFunction) {
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
                     (mediaManager.textWidth(config.defaultFont, caption) + 8),
@@ -785,7 +785,7 @@ public class API {
             return button_CreateWindowCloseButton(window, null);
         }
 
-        public ImageButton button_CreateWindowCloseButton(Window window, Runnable closeFunction) {
+        public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
             components.setCustomFlag(closeButton, "WndCloseBtn");
             components.button.setButtonAction(closeButton, new ButtonAction() {
@@ -793,7 +793,7 @@ public class API {
                 @Override
                 public void onRelease() {
                     removeWindow(window);
-                    if (closeFunction != null) closeFunction.run();
+                    if (closeFunction != null) closeFunction.accept(window);
                 }
             });
             return closeButton;

@@ -202,7 +202,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal1 = api.components.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", "Yes", "No", null));
+                api.addWindowAsModal(api.presets.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text",  null));
             }
         });
 
