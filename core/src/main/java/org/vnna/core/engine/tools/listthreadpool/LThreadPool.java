@@ -17,21 +17,21 @@ public class LThreadPool {
 
     private LThreadPoolUpdater lThreadPoolUpdater;
 
-    private int objectsPerThread;
+    private int objectsPerWorker;
 
     private ArrayDeque<Worker> tasks;
 
     private List updateObjects;
 
-    public LThreadPool(List updateObjects, LThreadPoolUpdater lThreadPoolUpdater, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm) {
-        this(updateObjects, lThreadPoolUpdater, objectsPerThread, threadPoolAlgorithm, 5);
+    public LThreadPool(List updateObjects, LThreadPoolUpdater lThreadPoolUpdater, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm) {
+        this(updateObjects, lThreadPoolUpdater, objectsPerWorker, threadPoolAlgorithm, 5);
 
     }
 
-    public LThreadPool(List updateObjects, LThreadPoolUpdater lThreadPoolUpdater, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
+    public LThreadPool(List updateObjects, LThreadPoolUpdater lThreadPoolUpdater, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
         this.lThreadPoolUpdater = lThreadPoolUpdater;
         this.updateObjects = updateObjects;
-        this.objectsPerThread = Tools.Calc.lowerBounds(objectsPerThread, 1);
+        this.objectsPerWorker = Tools.Calc.lowerBounds(objectsPerWorker, 1);
         switch (threadPoolAlgorithm) {
             case FIXED -> {
                 this.threadPool = Executors.newFixedThreadPool(Tools.Calc.lowerBounds(fixedThreadCount, 1));
@@ -47,16 +47,16 @@ public class LThreadPool {
     public void update() {
         if(updateObjects.size() == 0) return;
 
-        if (updateObjects.size() <= objectsPerThread) { // dont use threadpool if objects would fit into one thread
+        if (updateObjects.size() <= objectsPerWorker) { // dont use threadpool if objects would fit into one thread
             try {
-                new Worker(this.updateObjects, 0, (objectsPerThread - 1)).call();
+                new Worker(this.updateObjects, 0, (objectsPerWorker - 1)).call();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             tasks.clear();
-            for (int i = 0; i < updateObjects.size(); i = i + objectsPerThread) {
-                tasks.add(new Worker(updateObjects, i, i + (objectsPerThread - 1)));
+            for (int i = 0; i < updateObjects.size(); i = i + objectsPerWorker) {
+                tasks.add(new Worker(updateObjects, i, i + (objectsPerWorker - 1)));
             }
             try {
                 threadPool.invokeAll(tasks);

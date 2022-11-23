@@ -6,15 +6,14 @@ import org.vnna.core.engine.media_manager.MediaManager;
 import org.vnna.core.engine.media_manager.media.CMediaAnimation;
 import org.vnna.core.engine.media_manager.media.CMediaArray;
 import org.vnna.core.engine.media_manager.media.CMediaImage;
-import org.vnna.core.engine.tools.particlesystem.particle.Particle;
 import org.vnna.core.engine.tools.listthreadpool.LThreadPool;
 import org.vnna.core.engine.tools.listthreadpool.LThreadPoolUpdater;
 import org.vnna.core.engine.tools.listthreadpool.ThreadPoolAlgorithm;
+import org.vnna.core.engine.tools.particlesystem.particle.Particle;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /*
  * Particle System for Managing Classes that Extend Particle
@@ -25,11 +24,12 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
     private ArrayList<T> particles;
 
-    private ArrayList<Integer> deleteQueue;
+    private ArrayDeque<T> deleteQueue;
 
     private MediaManager mediaManager;
 
     private int particleLimit;
+
 
     public ParticleSystem(MediaManager mediaManager) {
         this(mediaManager, Integer.MAX_VALUE, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
@@ -39,22 +39,21 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
         this(mediaManager, particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread) {
-        this(mediaManager, particleLimit, objectsPerThread, ThreadPoolAlgorithm.WORKSTEALING, 0);
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker) {
+        this(mediaManager, particleLimit, objectsPerWorker, ThreadPoolAlgorithm.WORKSTEALING, 0);
     }
 
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm) {
-        this(mediaManager, particleLimit, objectsPerThread, threadPoolAlgorithm, 5);
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm) {
+        this(mediaManager, particleLimit, objectsPerWorker, threadPoolAlgorithm, 5);
     }
 
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerThread, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
+    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
         this.mediaManager = mediaManager;
         this.particles = new ArrayList<>();
-        this.deleteQueue = new ArrayList<>();
+        this.deleteQueue = new ArrayDeque<>();
         this.particleLimit = particleLimit;
-        this.threadPool = new LThreadPool(particles, this, objectsPerThread, threadPoolAlgorithm, fixedThreadCount);
+        this.threadPool = new LThreadPool(particles, this, objectsPerWorker, threadPoolAlgorithm, fixedThreadCount);
     }
-
     public void setParticleLimit(int particleLimit) {
         this.particleLimit = particleLimit;
     }
@@ -64,15 +63,9 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
         this.threadPool.update();
         // remove sorted indexes in reverse order
-        if (deleteQueue.size() > 0) {
-            if (deleteQueue.size() == particles.size()) {
-                removeAllParticles();
-            } else {
-                for (int i = deleteQueue.size() - 1; i >= 0; i--) {
-                    particles.remove((int) deleteQueue.get(i));
-                }
-                deleteQueue.clear();
-            }
+        T particle;
+        while ((particle = deleteQueue.poll()) != null) {
+            particles.remove(particle);
         }
     }
 
@@ -89,12 +82,9 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
         deleteQueue.clear();
     }
 
-    private void markForDelete(int index) {
+    private void markForDelete(T particle) {
         synchronized (deleteQueue) {
-            int insert = Collections.binarySearch(deleteQueue, index);
-            if (insert < 0) {
-                deleteQueue.add(-(insert + 1), index);
-            }
+            deleteQueue.add(particle);
         }
     }
 
@@ -152,7 +142,7 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     @Override
     public void updateFromThread(T particle, int index) {
         if (!particle.update(this, particle, index)) {
-            markForDelete(index);
+            markForDelete(particle);
         }
     }
 
