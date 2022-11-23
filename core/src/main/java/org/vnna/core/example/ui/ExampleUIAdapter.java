@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import org.vnna.core.engine.game_engine.GameEngine;
 import org.vnna.core.engine.media_manager.MediaManager;
 import org.vnna.core.engine.tools.Tools;
-import org.vnna.core.engine.tools.listthreadpool.ThreadPoolAlgorithm;
 import org.vnna.core.engine.tools.particlesystem.ParticleSystem;
 import org.vnna.core.engine.ui_engine.API;
 import org.vnna.core.engine.ui_engine.UIAdapter;
@@ -75,7 +74,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
         api.setMouseTool(new PointerMouseTool());
 
-        this.particleSystem = new ParticleSystem<>(mediaManager,Integer.MAX_VALUE);
+        this.particleSystem = new ParticleSystem<>(mediaManager, Integer.MAX_VALUE);
     }
 
     @Override

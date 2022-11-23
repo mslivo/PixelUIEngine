@@ -20,8 +20,6 @@ import java.util.function.Consumer;
  */
 public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T> {
 
-    private LThreadPool threadPool;
-
     private ArrayList<T> particles;
 
     private ArrayDeque<T> deleteQueue;
@@ -32,27 +30,14 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
 
     public ParticleSystem(MediaManager mediaManager) {
-        this(mediaManager, Integer.MAX_VALUE, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
+        this(mediaManager, Integer.MAX_VALUE);
     }
 
     public ParticleSystem(MediaManager mediaManager, int particleLimit) {
-        this(mediaManager, particleLimit, Integer.MAX_VALUE, ThreadPoolAlgorithm.WORKSTEALING, 0);
-    }
-
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker) {
-        this(mediaManager, particleLimit, objectsPerWorker, ThreadPoolAlgorithm.WORKSTEALING, 0);
-    }
-
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm) {
-        this(mediaManager, particleLimit, objectsPerWorker, threadPoolAlgorithm, 5);
-    }
-
-    public ParticleSystem(MediaManager mediaManager, int particleLimit, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm, int fixedThreadCount) {
         this.mediaManager = mediaManager;
         this.particles = new ArrayList<>();
         this.deleteQueue = new ArrayDeque<>();
         this.particleLimit = particleLimit;
-        this.threadPool = new LThreadPool(particles, this, objectsPerWorker, threadPoolAlgorithm, fixedThreadCount);
     }
     public void setParticleLimit(int particleLimit) {
         this.particleLimit = particleLimit;
@@ -60,8 +45,10 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
 
     public void update() {
         if (particles.size() == 0) return;
-
-        this.threadPool.update();
+        for(int i=0;i<particles.size();i++){
+            Particle particle = particles.get(i);
+            particle.update(this, particle, i);
+        }
         // remove sorted indexes in reverse order
         T particle;
         while ((particle = deleteQueue.poll()) != null) {
@@ -149,6 +136,5 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     public void shutdown() {
         this.deleteQueue.clear();
         this.particles.clear();
-        this.threadPool.shutdown();
     }
 }
