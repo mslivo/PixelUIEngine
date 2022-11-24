@@ -1,26 +1,22 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface ScrollBarAction {
+public abstract class ScrollBarAction {
 
-    default void onScrolled(float scrolled){
-        return;
-    };
-
-    default void onPress(){
-        return;
-    };
-
-    default void onRelease(){
-        return;
-    };
-
-    default void onMouseClick(int button){
-        return;
-    };
-
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onScrolled(float scrolled) {
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onPress() {
+    }
+
+    public void onRelease() {
+    }
+
+    public void onMouseClick(int button) {
+    }
+
+    public void onMouseDoubleClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

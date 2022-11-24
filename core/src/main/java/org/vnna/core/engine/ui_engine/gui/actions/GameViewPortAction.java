@@ -1,21 +1,23 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface GameViewPortAction {
+public abstract class GameViewPortAction {
 
-    default void onPress(int x, int y){
-        return;
-    };
+    public void onPress(int x, int y) {
 
-    default void onRelease(){
-        return;
-    };
-
-    default void onMouseClick(int button){
-        return;
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onRelease() {
+
     }
-    default void onMouseScroll(float scrolled){return;}
+
+    public void onMouseClick(int button) {
+
+    }
+
+    public void onMouseDoubleClick(int button) {
+
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

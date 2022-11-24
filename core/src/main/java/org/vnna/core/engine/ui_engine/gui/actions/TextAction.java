@@ -1,14 +1,12 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface TextAction {
+public abstract class TextAction {
 
-    default void onMouseClick(int button){
-        return;
+    public void onMouseClick(int button){
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onMouseDoubleClick(int button){
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onMouseScroll(float scrolled){}
 }

@@ -1,20 +1,32 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface WindowAction {
+public abstract class WindowAction {
 
-    default void onMove(int x, int y){ return;};
+    public WindowAction() {
+    }
 
-    default void onFold(){ return;};
+    public void onMove(int x, int y) {
+    }
 
-    default void onUnfold(){ return;};
+    public void onFold() {
+    }
 
-    default void onRemove(){ return;};
+    public void onUnfold() {
+    }
 
-    default void onAdd(){return;}
+    public void onRemove() {
+    }
 
-    default void onMouseClick(int button){ return; }
+    public void onAdd() {
+    }
 
-    default void onMouseDoubleClick(int button){ return; }
+    public void onMouseClick(int button) {
+    }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onMouseDoubleClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
+
 }

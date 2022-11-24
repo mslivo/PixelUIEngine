@@ -46,6 +46,7 @@ import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.vnna.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.vnna.core.engine.ui_engine.gui.notification.Notification;
 import org.vnna.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
+import org.vnna.core.engine.ui_engine.gui.tool.MouseTool;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.vnna.core.engine.ui_engine.input_processor.InputEvents;
@@ -376,11 +377,12 @@ public class UIEngine<T extends UIAdapter> {
             }
             hkLoop:
             for (HotKey hotKey : inputState.hotKeys) {
-                if(hotKey.pressed){
-                    kcLoop:for(int keyCode : hotKey.keyCodes){
-                        if(inputState.hotKeyPressedKeys[keyCode] == false){
-                            hotKey.pressed  = false;
-                            if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+                if (hotKey.pressed) {
+                    kcLoop:
+                    for (int keyCode : hotKey.keyCodes) {
+                        if (inputState.hotKeyPressedKeys[keyCode] == false) {
+                            hotKey.pressed = false;
+                            if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
                             break kcLoop;
                         }
                     }
@@ -397,8 +399,8 @@ public class UIEngine<T extends UIAdapter> {
                 }
             } else {
                 // Tool
-                if (inputState.mouseTool != null && inputState.mouseTool.toolAction != null) {
-                    inputState.mouseTool.toolAction.onDoubleClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
+                    inputState.mouseTool.mouseToolAction.onDoubleClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
                 }
                 processMouseClick = false;
             }
@@ -524,8 +526,8 @@ public class UIEngine<T extends UIAdapter> {
 
             } else {
                 // Tool
-                if (inputState.mouseTool != null && inputState.mouseTool.toolAction != null) {
-                    inputState.mouseTool.toolAction.onClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
+                    inputState.mouseTool.mouseToolAction.onClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
                     inputState.pressedMouseTool = inputState.mouseTool;
                 }
                 processMouseClick = false;
@@ -700,23 +702,24 @@ public class UIEngine<T extends UIAdapter> {
                         if (textField.textFieldAction != null) textField.textFieldAction.onFocus();
 
                         // Set Marker to mouse position
-                        int mouseX = inputState.mouse_x_gui-UICommons.component_getAbsoluteX(inputState.focusedTextField);
+                        int mouseX = inputState.mouse_x_gui - UICommons.component_getAbsoluteX(inputState.focusedTextField);
                         char[] fieldContent = inputState.focusedTextField.content.substring(inputState.focusedTextField.offset).toCharArray();
                         String testString = "";
                         boolean found = false;
-                        charLoop:for(int i=0;i<fieldContent.length;i++){
+                        charLoop:
+                        for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
-                            if(mediaManager.textWidth(inputState.focusedTextField.font,testString) > mouseX){
+                            if (mediaManager.textWidth(inputState.focusedTextField.font, testString) > mouseX) {
                                 UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
-                                        inputState.focusedTextField.offset+i);
+                                        inputState.focusedTextField.offset + i);
                                 found = true;
                                 break charLoop;
                             }
                         }
-                        if(!found){
+                        if (!found) {
                             // Set to end
                             UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
-                                    inputState.focusedTextField.offset+fieldContent.length);
+                                    inputState.focusedTextField.offset + fieldContent.length);
                         }
                     }
                     if (textField.textFieldAction != null)
@@ -931,8 +934,8 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             if (inputState.pressedMouseTool != null) {
-                if (inputState.pressedMouseTool.toolAction != null)
-                    inputState.pressedMouseTool.toolAction.onRelease(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
+                if (inputState.pressedMouseTool.mouseToolAction != null)
+                    inputState.pressedMouseTool.mouseToolAction.onRelease(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
                 inputState.pressedMouseTool = null;
             }
 
@@ -969,8 +972,8 @@ public class UIEngine<T extends UIAdapter> {
 
             }
             if (inputState.pressedMouseTool != null) {
-                if (inputState.pressedMouseTool.toolAction != null)
-                    inputState.pressedMouseTool.toolAction.onDrag(inputState.mouse_x, inputState.mouse_y);
+                if (inputState.pressedMouseTool.mouseToolAction != null)
+                    inputState.pressedMouseTool.mouseToolAction.onDrag(inputState.mouse_x, inputState.mouse_y);
             }
 
 
@@ -1081,14 +1084,16 @@ public class UIEngine<T extends UIAdapter> {
         {
             long currentTimeMillis = System.currentTimeMillis();
             inputState.screenComponents.forEach(component -> {
-                if (component.updateAction != null) this.executeUpdateAction(component.updateAction, currentTimeMillis);
+                for (UpdateAction updateAction : component.updateActions)
+                    this.executeUpdateAction(updateAction, currentTimeMillis);
             });
 
             inputState.windows.forEach(window -> {
-                if (window.updateAction != null) this.executeUpdateAction(window.updateAction, currentTimeMillis);
+                for (UpdateAction updateAction : window.updateActions)
+                    this.executeUpdateAction(updateAction, currentTimeMillis);
                 window.components.forEach(component -> {
-                    if (component.updateAction != null)
-                        this.executeUpdateAction(component.updateAction, currentTimeMillis);
+                    for (UpdateAction updateAction : component.updateActions)
+                        this.executeUpdateAction(updateAction, currentTimeMillis);
                 });
             });
 
@@ -1128,7 +1133,7 @@ public class UIEngine<T extends UIAdapter> {
 
         /* Enforce Screen bounds */
         inputState.windows.forEach(window -> {
-            if(window.enforceScreenBounds) {
+            if (window.enforceScreenBounds) {
                 UICommons.window_enforceScreenBounds(inputState, window);
             }
         });
@@ -1138,19 +1143,19 @@ public class UIEngine<T extends UIAdapter> {
     private void updateToolTip() {
         boolean showToolTip = true;
         // Anything dragged ?
-        if(showToolTip){
+        if (showToolTip) {
             showToolTip = inputState.listDrag_Item == null && inputState.inventoryDrag_Item == null;
         }
         // hovering over a component ?
-        if(showToolTip){
+        if (showToolTip) {
             showToolTip = (inputState.lastGUIMouseHover instanceof Component);
         }
-         // modal active and component does not belong to modal ?
-        if(showToolTip){
-            showToolTip = inputState.modalWindow != null ? ((Component)inputState.lastGUIMouseHover).addedToWindow == inputState.modalWindow : true;
+        // modal active and component does not belong to modal ?
+        if (showToolTip) {
+            showToolTip = inputState.modalWindow != null ? ((Component) inputState.lastGUIMouseHover).addedToWindow == inputState.modalWindow : true;
         }
 
-        if(showToolTip){
+        if (showToolTip) {
             Component hoverComponent = (Component) inputState.lastGUIMouseHover;
             Object toolTipSubItem = null;
             if (hoverComponent.getClass() == List.class) {
@@ -1210,7 +1215,7 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.tooltip_lastHoverObject = hoverComponent;
                 }
             }
-        }else{
+        } else {
             inputState.tooltip = null;
             inputState.tooltip_lastHoverObject = null;
         }
@@ -1289,7 +1294,7 @@ public class UIEngine<T extends UIAdapter> {
         HotKey hotkeyTmp;
         while ((windowTmp = inputState.addWindowQueue.pollFirst()) != null) {
             inputState.windows.add(0, windowTmp);
-            if(windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
+            if (windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
             UICommons.window_bringToFront(inputState, windowTmp);
         }
         while ((windowTmp = inputState.removeWindowQueue.pollFirst()) != null) {
@@ -1396,33 +1401,31 @@ public class UIEngine<T extends UIAdapter> {
     private void updateMouseCursor() {
         /* Update Cursor*/
         if (inputState.lastGUIMouseHover != null) {
-            // set to gui default cursor if over a GUI window/component
+            // 1. GUI Cursor
             inputState.cursor_setNext = api.config.getCursorGuiDefault();
         } else {
-            // Otherwise set tool cursor
-            if (inputState.mouseTool != null) {
-                if (inputState.mouseTool.isCursorOverride()) {
-                    // override tool-cursor has higher priority
-                    inputState.cursor_setNext = inputState.mouseTool.getOverrideCursor();
-                    inputState.mouseTool.resetCursorOverride();
-                } else {
-                    // other left/right button tool-cursor
+            // 2. Temporary Cursor
+            if (inputState.displayTemporaryCursor) {
+                inputState.cursor_setNext = inputState.temporaryCursor;
+                inputState.displayTemporaryCursor = false;
+            }else{
+                if (inputState.mouseTool != null) {
+                    // 3. Mouse Tool cursor
                     if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
-                        inputState.cursor_setNext = inputState.mouseTool.cursor_down;
+                        inputState.cursor_setNext = inputState.mouseTool.cursorDown;
                     } else {
                         inputState.cursor_setNext = inputState.mouseTool.cursor;
                     }
+                } else {
+                    // no mouse tool set - display gui cursor
+                    inputState.cursor_setNext = api.config.getCursorGuiDefault();
                 }
-            } else {
-                // no tool set - gui default cursor
-                inputState.cursor_setNext = api.config.getCursorGuiDefault();
             }
         }
 
 
         // Set Cursor
         if (inputState.cursor_current != inputState.cursor_setNext) {
-            ;
             inputState.cursor_current = inputState.cursor_setNext;
             if (inputState.cursor_current.getClass() == CMediaImageCursor.class) {
                 Gdx.graphics.setCursor(mediaManager.getCMediaImageCursor((CMediaImageCursor) inputState.cursor_current));
@@ -2483,7 +2486,7 @@ public class UIEngine<T extends UIAdapter> {
 
         } else if (component instanceof Shape) {
             Shape shape = (Shape) component;
-            if(shape.shapeType != null) {
+            if (shape.shapeType != null) {
                 CMediaImage shapeImage = switch (shape.shapeType) {
                     case OVAL -> GUIBaseMedia.GUI_SHAPE_OVAL;
                     case RECT -> GUIBaseMedia.GUI_SHAPE_RECT;

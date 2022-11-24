@@ -205,6 +205,10 @@ public class InputState {
 
     public MouseTool mouseTool;
 
+    public CMediaCursor temporaryCursor;
+
+    public boolean displayTemporaryCursor;
+
     public Vector3 vector_fboCursor;
 
     public Vector2 vector2_unproject, vector_worldCurosr;

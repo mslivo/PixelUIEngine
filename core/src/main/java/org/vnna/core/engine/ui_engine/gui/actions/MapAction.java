@@ -1,22 +1,18 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface MapAction {
+public abstract class MapAction {
 
-    default void onPress(int x, int y){
-        return;
-    };
-
-    default void onRelease(){
-        return;
-    };
-
-    default void onMouseClick(int button){
-        return;
+    public void onPress(int x, int y){
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onRelease(){
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onMouseClick(int button){
+    }
+
+    public void onMouseDoubleClick(int button){
+    }
+
+    public void onMouseScroll(float scrolled){}
 }

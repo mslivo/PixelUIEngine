@@ -1,26 +1,29 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface TextFieldAction {
+public abstract class TextFieldAction {
 
-    default boolean isContentValid(String newContent){return true;};
-
-    default void onContentChange(String newContent, boolean valid){return;};
-
-    default void onTyped(char character){return;};
-
-    default void onEnter(String content, boolean valid){return;};
-
-    default void onFocus(){
-        return;
-    };
-
-    default void onUnFocus(){
-        return;
-    };
-
-    default void onMouseClick(int button){
-        return;
+    public boolean isContentValid(String newContent) {
+        return true;
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onContentChange(String newContent, boolean valid) {
+    }
+
+    public void onTyped(char character) {
+    }
+
+    public void onEnter(String content, boolean valid) {
+    }
+
+    public void onFocus() {
+    }
+
+    public void onUnFocus() {
+    }
+
+    public void onMouseClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

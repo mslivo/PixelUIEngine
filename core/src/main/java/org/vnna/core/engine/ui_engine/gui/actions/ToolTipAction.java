@@ -1,9 +1,11 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface ToolTipAction {
+public abstract class ToolTipAction {
 
-    default void onDisplay(){return;}
+    public void onDisplay() {
+    }
 
-    default void onUpdate(){return;}
+    public void onUpdate() {
+    }
 
 }

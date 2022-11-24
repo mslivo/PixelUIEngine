@@ -1,8 +1,7 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface ContextMenuItemAction {
+public abstract class ContextMenuItemAction {
 
-    default void onSelect(){
-        return;
+    public void onSelect() {
     }
 }

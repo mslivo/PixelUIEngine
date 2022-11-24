@@ -20,5 +20,4 @@ public class ComboBox extends Component {
 
     public boolean menuOpen;
 
-
 }

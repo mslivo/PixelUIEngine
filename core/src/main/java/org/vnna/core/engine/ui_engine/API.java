@@ -25,7 +25,6 @@ import org.vnna.core.engine.ui_engine.gui.components.button.TextButton;
 import org.vnna.core.engine.ui_engine.gui.components.checkbox.CheckBox;
 import org.vnna.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
 import org.vnna.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.vnna.core.engine.ui_engine.gui.components.dataholder.DataHolder;
 import org.vnna.core.engine.ui_engine.gui.components.image.Image;
 import org.vnna.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.vnna.core.engine.ui_engine.gui.components.knob.Knob;
@@ -40,8 +39,8 @@ import org.vnna.core.engine.ui_engine.gui.components.shape.Shape;
 import org.vnna.core.engine.ui_engine.gui.components.shape.ShapeType;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.vnna.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.vnna.core.engine.ui_engine.gui.components.text.Text;
+import org.vnna.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.vnna.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
@@ -76,6 +75,8 @@ public class API {
 
     public final _Input input = new _Input();
 
+    public final _MouseTool mouseTool = new _MouseTool();
+
     private InputState inputState;
 
     private MediaManager mediaManager;
@@ -105,13 +106,12 @@ public class API {
 
     public void sendMessageToWindows(String message_type, Object... p) {
         for (Window window : inputState.windows) {
-            if (window.messageReceivers != null) {
-                for (MessageReceiver messageReceiver : window.messageReceivers) {
-                    if (messageReceiver.message_type.equals(message_type)) {
-                        messageReceiver.onMessageReceived(p);
-                    }
+            for (MessageReceiverAction messageReceiver : window.messageReceiverActions) {
+                if (messageReceiver.messageType.equals(message_type)) {
+                    messageReceiver.onMessageReceived(p);
                 }
             }
+
         }
     }
 
@@ -119,6 +119,58 @@ public class API {
         inputState.windows.forEach(window -> {
             UICommons.window_enforceScreenBounds(inputState, window);
         });
+    }
+
+
+    public class _MouseTool {
+
+        public MouseTool create(String flag, Object data, CMediaCursor cursor) {
+            return create(flag, data, cursor, cursor, null);
+        }
+
+        public MouseTool create(String flag, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
+            return create(flag, data, cursor, cursorDown, null);
+        }
+
+        public MouseTool create(String flag, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
+            return create(flag, data, cursor, cursor, mouseToolAction);
+        }
+
+        public MouseTool create(String flag, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
+            MouseTool mouseTool = new MouseTool();
+            setFlag(mouseTool, flag);
+            setData(mouseTool, data);
+            setCursor(mouseTool, cursor);
+            setCursorDown(mouseTool, cursorDown);
+            setMouseToolAction(mouseTool, mouseToolAction);
+            return mouseTool;
+        }
+
+        public void setFlag(MouseTool mouseTool, String flag) {
+            if (mouseTool == null) return;
+            mouseTool.flag = Tools.Text.validString(flag);
+        }
+
+        public void setData(MouseTool mouseTool, Object data) {
+            if (mouseTool == null) return;
+            mouseTool.data = data;
+        }
+
+        public void setCursor(MouseTool mouseTool, CMediaCursor cursor) {
+            if (mouseTool == null) return;
+            mouseTool.cursor = cursor;
+        }
+
+        public void setCursorDown(MouseTool mouseTool, CMediaCursor cursorDown) {
+            if (mouseTool == null) return;
+            mouseTool.cursorDown = cursorDown;
+        }
+
+        public void setMouseToolAction(MouseTool mouseTool, MouseToolAction mouseToolAction) {
+            if (mouseTool == null) return;
+            mouseTool.mouseToolAction = mouseToolAction;
+        }
+
     }
 
     public class _Presets {
@@ -290,12 +342,7 @@ public class API {
             return result;
         }
 
-
         public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick) {
-            return text_CreateClickableText(x, y, text, onClick, null);
-        }
-
-        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick, CMediaCursor cursorOverride) {
             Text hlText = components.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
             components.text.setTextAction(hlText, new TextAction() {
                 @Override
@@ -303,7 +350,7 @@ public class API {
                     onClick.accept(button);
                 }
             });
-            components.setUpdateAction(hlText, new UpdateAction(0) {
+            components.addUpdateAction(hlText, new UpdateAction(0) {
                 @Override
                 public void onUpdate() {
                     if (Tools.Calc.pointRectsCollide(
@@ -315,10 +362,6 @@ public class API {
                             hlText.height * UIEngine.TILE_SIZE
                     )) {
                         components.text.setFont(hlText, GUIBaseMedia.FONT_WHITE);
-                        if (cursorOverride != null) {
-                            getMouseTool().overrideCursor(cursorOverride);
-                        }
-
                     } else {
                         components.text.setFont(hlText, GUIBaseMedia.FONT_BLACK);
                     }
@@ -386,7 +429,7 @@ public class API {
 
             components.setOffset(scrollBarVertical, list.offset_x, list.offset_y);
 
-            components.setUpdateAction(scrollBarVertical, new UpdateAction() {
+            components.addUpdateAction(scrollBarVertical, new UpdateAction() {
                 float scrolledLast = -1;
 
                 @Override
@@ -500,7 +543,7 @@ public class API {
                     drag[0] = false;
                 }
             });
-            components.setUpdateAction(colorMap, new UpdateAction(10, true) {
+            components.addUpdateAction(colorMap, new UpdateAction(10, true) {
                 int xLast = 0, yLast = 0;
 
                 @Override
@@ -738,7 +781,7 @@ public class API {
         }
 
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
-            return modal_CreateYesNoRequester(caption, text,  choiceFunction, "Yes", "No");
+            return modal_CreateYesNoRequester(caption, text, choiceFunction, "Yes", "No");
         }
 
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
@@ -787,7 +830,7 @@ public class API {
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
-            components.setCustomFlag(closeButton, "WndCloseBtn");
+            components.setFlag(closeButton, "WndCloseBtn");
             components.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override
@@ -1126,12 +1169,19 @@ public class API {
         inputState.mouseTool = mouseTool;
     }
 
+    public void displayTemporaryCursor(CMediaCursor temporaryCursor) {
+        if (temporaryCursor == null) return;
+        inputState.temporaryCursor = temporaryCursor;
+        inputState.displayTemporaryCursor = true;
+    }
+
     public MouseTool getMouseTool() {
         return inputState.mouseTool;
     }
 
-    public boolean mouseToolMatches(Class toolClass) {
-        return inputState.mouseTool != null ? (inputState.mouseTool.getClass() == toolClass ? true : false) : false;
+    public boolean isMouseTool(String flag) {
+        if(flag == null) return false;
+        return inputState.mouseTool != null ? flag.equals(inputState.mouseTool.flag) : false;
     }
 
     public ArrayList<HotKey> getHotKeys() {
@@ -1165,7 +1215,7 @@ public class API {
     public ArrayList<Window> findWindowsByFlag(String flag) {
         ArrayList<Window> result = new ArrayList<>();
         for (Window window : inputState.windows) {
-            if (window.customFlag != null && window.customFlag.equals(flag)) {
+            if (window.flag != null && window.flag.equals(flag)) {
                 result.add(window);
             }
         }
@@ -1549,6 +1599,8 @@ public class API {
             setColor(notification, color);
             setFont(notification, font);
             setNotificationAction(notification, notificationAction);
+            setFlag(notification, "");
+            setData(notification, null);
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
             if (textWidth > inputState.internalResolutionWidth) {
@@ -1561,6 +1613,16 @@ public class API {
                 notification.scroll = notification.scrollMax = 0;
             }
             return notification;
+        }
+
+        public void setFlag(Notification notification, String flag) {
+            if (notification == null) return;
+            notification.flag = Tools.Text.validString(flag);
+        }
+
+        public void setData(Notification notification, Object data) {
+            if (notification == null) return;
+            notification.data = data;
         }
 
         public void setNotificationAction(Notification notification, NotificationAction notificationAction) {
@@ -1592,7 +1654,7 @@ public class API {
 
     public class _ContextMenu {
 
-        public final _Item item = new _Item();
+        public final _ContextMenuItem item = new _ContextMenuItem();
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems) {
             return create(contextMenuItems, null);
@@ -1617,7 +1679,7 @@ public class API {
             contextMenu.items.addAll(Arrays.asList(contextMenuItems));
         }
 
-        public class _Item {
+        public class _ContextMenuItem {
 
             private ContextMenuItemAction defaultContextMenuItemAction() {
                 return new ContextMenuItemAction() {
@@ -1643,12 +1705,25 @@ public class API {
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, FColor color, CMediaFont font) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
                 setText(contextMenuItem, text);
-                setContextMenuItemAction(contextMenuItem, contextMenuItemAction);
                 setFont(contextMenuItem, font);
                 setColor(contextMenuItem, color);
                 setIcon(contextMenuItem, icon);
                 setIconIndex(contextMenuItem, 0);
+                setFlag(contextMenuItem, "");
+                setData(contextMenuItem, null);
+                setContextMenuItemAction(contextMenuItem, contextMenuItemAction);
                 return contextMenuItem;
+            }
+
+            public void setFlag(ContextMenuItem contextMenuItem, String flag) {
+                if (contextMenuItem == null) return;
+                contextMenuItem.flag = Tools.Text.validString(flag);
+
+            }
+
+            public void setData(ContextMenuItem contextMenuItem, Object data) {
+                if (contextMenuItem == null) return;
+                contextMenuItem.data = data;
             }
 
             public void setColor(ContextMenuItem contextMenuItem, FColor color) {
@@ -1746,24 +1821,25 @@ public class API {
             setWindowAction(window, windowAction);
             setIcon(window, icon);
             setIconIndex(window, 0);
-            setCustomFlag(window, "");
-            setCustomData(window, null);
+            setFlag(window, "");
+            setData(window, null);
             setEnforceScreenBounds(window, config.getWindowsDefaultEnforceScreenBounds());
             window.components = new ArrayList<>();
             window.font = config.defaultFont;
             window.addComponentsQueue = new ArrayDeque<>();
             window.removeComponentsQueue = new ArrayDeque<>();
-            window.messageReceivers = new ArrayList<>();
+            window.messageReceiverActions = new ArrayList<>();
+            window.updateActions = new ArrayList<>();
             addComponents(window, components);
             return window;
         }
 
-        public void removeMessageReceiver(Window window, MessageReceiver messageReceiver) {
-            window.messageReceivers.remove(messageReceiver);
+        public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiver) {
+            window.messageReceiverActions.remove(messageReceiver);
         }
 
-        public void addMessageReceiver(Window window, MessageReceiver messageReceiver) {
-            window.messageReceivers.add(messageReceiver);
+        public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiver) {
+            window.messageReceiverActions.add(messageReceiver);
         }
 
         public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
@@ -1920,20 +1996,20 @@ public class API {
         public void removeComponentsByFlag(Window window, String flag) {
             if (window == null) return;
             for (Component component : window.components) {
-                if (component.customFlag.equals(flag)) removeComponent(window, component);
+                if (component.flag != null && component.flag.equals(flag)) removeComponent(window, component);
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.customFlag.equals(flag)) removeComponent(window, component);
+                if (component.flag != null && component.flag.equals(flag)) removeComponent(window, component);
             }
         }
 
         public Component findComponentByFlag(Window window, String flag) {
             if (window == null) return null;
             for (Component component : window.components) {
-                if (component.customFlag.equals(flag)) return component;
+                if (component.flag != null && component.flag.equals(flag)) return component;
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.customFlag.equals(flag)) return component;
+                if (component.flag != null && component.flag.equals(flag)) return component;
             }
             return null;
         }
@@ -1942,13 +2018,10 @@ public class API {
             ArrayList<Component> result = new ArrayList<>();
             if (window == null) return result;
             for (Component component : window.components) {
-                if (component.customFlag.equals(flag)) result.add(component);
-
+                if (component.flag != null && component.flag.equals(flag)) result.add(component);
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.customFlag.equals(flag)) {
-                    if (component.customFlag.equals(flag)) result.add(component);
-                }
+                if (component.flag != null && component.flag.equals(flag)) result.add(component);
             }
             return result;
         }
@@ -1969,19 +2042,25 @@ public class API {
             window.font = font == null ? config.defaultFont : font;
         }
 
-        public void setUpdateAction(Window window, UpdateAction updateAction) {
-            if (window == null) return;
-            window.updateAction = updateAction;
+        public void addUpdateAction(Window window, UpdateAction updateAction) {
+            if (window == null || updateAction == null) return;
+            window.updateActions.add(updateAction);
         }
 
-        public void setCustomFlag(Window window, String customFlag) {
-            if (window == null) return;
-            window.customFlag = customFlag;
+        public void removeUpdateAction(Window window, UpdateAction updateAction) {
+            if (window == null || updateAction == null) return;
+            window.updateActions.remove(updateAction);
         }
 
-        public void setCustomData(Window window, Object customData) {
+
+        public void setFlag(Window window, String flag) {
             if (window == null) return;
-            window.customData = customData;
+            window.flag = Tools.Text.validString(flag);
+        }
+
+        public void setData(Window window, Object data) {
+            if (window == null) return;
+            window.data = data;
         }
 
         public void setColor(Window window, CColor color) {
@@ -2328,8 +2407,6 @@ public class API {
 
         public final _CheckBox checkBox = new _CheckBox();
 
-        public final _DataHolder dataHolder = new _DataHolder();
-
         public final _GameViewPort gameViewPort = new _GameViewPort();
 
         public void setToolTip(Component component, ToolTip tooltip) {
@@ -2380,19 +2457,24 @@ public class API {
             }
         }
 
-        public void setUpdateAction(Component component, UpdateAction updateAction) {
-            if (component == null) return;
-            component.updateAction = updateAction;
+        public void addUpdateAction(Component component, UpdateAction updateAction) {
+            if (component == null || updateAction == null) return;
+            component.updateActions.add(updateAction);
         }
 
-        public void setCustomFlag(Component component, String customFlag) {
+        public void removeUpdateAction(Component component, UpdateAction updateAction) {
+            if (component == null || updateAction == null) return;
+            component.updateActions.remove(updateAction);
+        }
+
+        public void setFlag(Component component, String customFlag) {
             if (component == null) return;
-            component.customFlag = Tools.Text.validString(customFlag);
+            component.flag = Tools.Text.validString(customFlag);
         }
 
         public void setCustomData(Component component, Object customData) {
             if (component == null) return;
-            component.customData = customData;
+            component.data = customData;
         }
 
         public void setSize(Component component, int width, int height) {
@@ -2458,9 +2540,9 @@ public class API {
             component.color = Tools.Colors.create(config.componentsDefaultColor);
             component.color2 = Tools.Colors.create(config.componentsDefaultColor);
             component.disabled = false;
-            component.updateAction = null;
-            component.customData = null;
-            component.customFlag = "";
+            component.updateActions = new ArrayList<>();
+            component.data = null;
+            component.flag = "";
             component.offset_x = component.offset_y = 0;
             component.visible = true;
             component.updateToolTip = false;
@@ -2863,26 +2945,6 @@ public class API {
 
         }
 
-        public class _DataHolder {
-
-            public DataHolder create(Object... data) {
-                DataHolder dataHolder = new DataHolder();
-                dataHolder.data = data;
-                setComponentInitValues(dataHolder);
-                return dataHolder;
-            }
-
-            public void setData(DataHolder dataHolder, int index, Object object) {
-                if (dataHolder == null) return;
-                dataHolder.data[index] = object;
-            }
-
-            public Object getData(DataHolder dataHolder, int index) {
-                if (dataHolder == null) return null;
-                return dataHolder.data[index];
-            }
-        }
-
         public class _CheckBox {
 
             public CheckBox create(int x, int y, String text) {
@@ -2979,6 +3041,8 @@ public class API {
                     setFont(tab, font);
                     setContentOffset(tab, 0);
                     removeAllTabComponents(tab);
+                    setFlag(tab, "");
+                    setData(tab, null);
                     addTabComponents(tab, components);
                     if (width == 0) {
                         setWidthAuto(tab);
@@ -2986,6 +3050,16 @@ public class API {
                         setWidth(tab, width);
                     }
                     return tab;
+                }
+
+                public void setFlag(Tab tab, String flag) {
+                    if (tab == null) return;
+                    tab.flag = Tools.Text.validString(flag);
+                }
+
+                public void setData(Tab tab, Object data) {
+                    if (tab == null) return;
+                    tab.data = data;
                 }
 
                 public void setContentOffset(Tab tab, int content_offset_x) {
@@ -3477,7 +3551,7 @@ public class API {
                 ArrayList<MapOverlay> result = new ArrayList<>();
                 if (map == null || mapOverlay == null) return result;
                 for (MapOverlay mapOverlay : map.overlays) {
-                    if (mapOverlay.customFlag.equals(flag)) result.add(mapOverlay);
+                    if (mapOverlay.flag.equals(flag)) result.add(mapOverlay);
                 }
                 return result;
             }
@@ -3508,8 +3582,8 @@ public class API {
                     setFadeOut(mapOverlay, fadeOut);
                     setColor(mapOverlay, color);
                     setArrayIndex(mapOverlay, arrayIndex);
-                    setCustomFlag(mapOverlay, "");
-                    setCustomData(mapOverlay, null);
+                    setFlag(mapOverlay, "");
+                    setData(mapOverlay, null);
                     mapOverlay.timer = fadeOut ? System.currentTimeMillis() : 0;
                     return mapOverlay;
                 }
@@ -3545,14 +3619,14 @@ public class API {
                     mapOverlay.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                 }
 
-                public void setCustomFlag(MapOverlay mapOverlay, String customFlag) {
+                public void setFlag(MapOverlay mapOverlay, String flag) {
                     if (mapOverlay == null) return;
-                    mapOverlay.customFlag = Tools.Text.validString(customFlag);
+                    mapOverlay.flag = Tools.Text.validString(flag);
                 }
 
-                public void setCustomData(MapOverlay mapOverlay, Object customData) {
+                public void setData(MapOverlay mapOverlay, Object data) {
                     if (mapOverlay == null) return;
-                    mapOverlay.customData = customData;
+                    mapOverlay.data = data;
                 }
             }
 
@@ -3633,10 +3707,12 @@ public class API {
             }
 
             public void setTextAction(Text text, TextAction textAction) {
+                if (text == null) return;
                 text.textAction = textAction;
             }
 
             public void setLines(Text text, String[] lines) {
+                if (text == null) return;
                 text.lines = Tools.Text.validString(lines);
             }
 

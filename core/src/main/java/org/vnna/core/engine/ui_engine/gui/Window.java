@@ -3,7 +3,7 @@ package org.vnna.core.engine.ui_engine.gui;
 import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.media.CMediaFont;
 import org.vnna.core.engine.media_manager.media.CMediaGFX;
-import org.vnna.core.engine.ui_engine.gui.actions.MessageReceiver;
+import org.vnna.core.engine.ui_engine.gui.actions.MessageReceiverAction;
 import org.vnna.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.vnna.core.engine.ui_engine.gui.actions.WindowAction;
 import org.vnna.core.engine.ui_engine.gui.components.Component;
@@ -28,11 +28,11 @@ public class Window {
 
     public Deque<Component> removeComponentsQueue;
 
-    public UpdateAction updateAction;
+    public ArrayList<UpdateAction> updateActions;
 
-    public String customFlag;
+    public String flag;
 
-    public Object customData;
+    public Object data;
 
     public CColor color;
 
@@ -54,6 +54,6 @@ public class Window {
 
     public int iconIndex;
 
-    public ArrayList<MessageReceiver> messageReceivers;
+    public ArrayList<MessageReceiverAction> messageReceiverActions;
 
 }

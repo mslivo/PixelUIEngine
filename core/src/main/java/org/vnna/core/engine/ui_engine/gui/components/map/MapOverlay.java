@@ -11,9 +11,9 @@ public class MapOverlay {
 
     public int y;
 
-    public String customFlag;
+    public String flag;
 
-    public Object customData;
+    public Object data;
 
     public CColor color;
 

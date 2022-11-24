@@ -9,19 +9,20 @@ public abstract class UpdateAction {
 
     public long lastUpdate;
 
-    public UpdateAction(int interval, boolean updateOnInit){
-        this.interval = interval;
-        this.lastUpdate = updateOnInit ? 0 : System.currentTimeMillis();;
-    }
-
-    public UpdateAction(int interval){
-        this(interval, false);
-    }
-
-    public UpdateAction(){
+    public UpdateAction() {
         this(0, false);
     }
 
-    public abstract void onUpdate();
+    public UpdateAction(int interval) {
+        this(interval, false);
+    }
+
+    public UpdateAction(int interval, boolean updateOnInit) {
+        this.interval = interval;
+        this.lastUpdate = updateOnInit ? 0 : System.currentTimeMillis();
+    }
+
+    public void onUpdate() {
+    }
 
 }

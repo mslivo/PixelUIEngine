@@ -14,7 +14,7 @@ import org.vnna.core.engine.ui_engine.UIAdapter;
 import org.vnna.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.vnna.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.vnna.core.engine.ui_engine.gui.components.button.TextButton;
-import org.vnna.core.engine.ui_engine.gui.tool.PointerMouseTool;
+import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
 import org.vnna.core.example.ui.media.ExampleBaseMedia;
 import org.vnna.core.example.ui.particle.TestParticle;
 import org.vnna.core.example.ui.windows.ExampleWindowGenerator;
@@ -72,7 +72,7 @@ public class ExampleUIAdapter implements UIAdapter {
             }
         });
 
-        api.setMouseTool(new PointerMouseTool());
+        api.setMouseTool(api.mouseTool.create("Pointer", null,GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW));
 
         this.particleSystem = new ParticleSystem<>(mediaManager, Integer.MAX_VALUE);
     }

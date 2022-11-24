@@ -150,7 +150,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextField textField = api.components.textField.create(18, 12, 10, "", null, 128);
         Button notiBtn = api.components.button.textButton.create(18, 9, 10, 2, "Notification");
         api.components.button.centerContent(notiBtn);
-        api.components.setUpdateAction(notiBtn, new UpdateAction() {
+        api.components.addUpdateAction(notiBtn, new UpdateAction() {
             @Override
             public void onUpdate() {
                 api.components.setDisabled(notiBtn, textField.content.length() == 0);

@@ -2,35 +2,38 @@ package org.vnna.core.engine.ui_engine.gui.actions;
 
 import org.vnna.core.engine.media_manager.media.CMediaGFX;
 
-public interface ComboBoxAction<T extends Object> {
+public abstract class ComboBoxAction<T extends Object> {
 
-    default CMediaGFX icon(T listItem){
+    public CMediaGFX icon(T listItem) {
         return null;
-    };
+    }
 
-    default int iconArrayIndex(T listItem){ // if CMedia is CMediaArray
+
+    public int iconArrayIndex(T listItem) { // if CMedia is CMediaArray
         return 0;
-    };
+    }
 
-    default String text(T listItem){
+    public String text(T listItem) {
         return listItem.toString();
-    };
-
-    default void onItemSelected(T selectedItem){
-        return;
-    };
-
-    default void onOpen(){return;}
-
-    default void onClose(){return;}
-
-    default void onMouseClick(int button){
-        return;
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+
+    public void onItemSelected(T selectedItem) {
     }
 
-    default void onMouseScroll(float scrolled){return;}
+
+    public void onOpen() {
+    }
+
+    public void onClose() {
+    }
+
+    public void onMouseClick(int button) {
+    }
+
+    public void onMouseDoubleClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

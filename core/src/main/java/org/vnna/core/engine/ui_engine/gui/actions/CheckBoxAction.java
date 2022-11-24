@@ -1,16 +1,16 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface CheckBoxAction {
+public abstract class CheckBoxAction {
 
-    default void onCheck(boolean checked){return;};
-
-    default void onMouseClick(int mouseButton){
-        return;
+    public void onCheck(boolean checked) {
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onMouseClick(int mouseButton) {
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onMouseDoubleClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

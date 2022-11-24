@@ -6,6 +6,8 @@ import org.vnna.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 
+import java.util.ArrayList;
+
 public abstract class Component {
 
     public int x,y,width,height;
@@ -26,11 +28,11 @@ public abstract class Component {
 
     public Tab addedToTab;
 
-    public UpdateAction updateAction;
+    public ArrayList<UpdateAction> updateActions;
 
-    public String customFlag;
+    public String flag;
 
-    public Object customData;
+    public Object data;
 
     public Window addedToWindow; // set by engine
 

@@ -4,6 +4,8 @@ import org.vnna.core.engine.media_manager.media.CMediaFont;
 import org.vnna.core.engine.ui_engine.gui.actions.CheckBoxAction;
 import org.vnna.core.engine.ui_engine.gui.components.Component;
 
+import java.util.ArrayList;
+
 public class CheckBox extends Component {
 
     public CheckBoxStyle checkBoxStyle;

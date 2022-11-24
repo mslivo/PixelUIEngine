@@ -8,58 +8,62 @@ import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 
 import java.util.HashSet;
 
-public interface ListAction<T extends Object> {
+public abstract class ListAction<T extends Object> {
 
-    default CMediaGFX icon(T listItem){
+    public CMediaGFX icon(T listItem) {
         return null;
-    };
+    }
 
-    default ToolTip toolTip(T listItem){ return null;}
+    public ToolTip toolTip(T listItem) {
+        return null;
+    }
 
-    default int iconArrayIndex(T listItem){ // if CMedia is CMediaArray
+    public int iconArrayIndex(T listItem) { // if CMedia is CMediaArray
         return 0;
-    };
+    }
 
-    default String text(T listItem){
+    public String text(T listItem) {
         return listItem.toString();
-    };
+    }
 
-    default void onItemSelected(T listItem){
-        return;
-    };
+    public void onItemSelected(T listItem) {
+    }
 
-    default void onItemsSelected(HashSet<T> listItems){
-        return;
-    }; // Multiselect
+    public void onItemsSelected(HashSet<T> listItems) {
+    }
 
-    default void onScrolled(float scrolled){
-        return;
-    };
+    public void onScrolled(float scrolled) {
+
+    }
     /* Drag */
 
-    default void onDragFromList(List fromList, int fromIndex, int toIndex){ return; }
+    public void onDragFromList(List fromList, int fromIndex, int toIndex) {
+    }
 
-    default void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int toIndex){ return; }
+    public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int toIndex) {
+    }
 
-    default boolean canDragFromList(List list){ return false;}
+    public boolean canDragFromList(List list) {
+        return false;
+    }
 
-    default boolean canDragFromInventory(Inventory fromInventory){ return false;}
+    public boolean canDragFromInventory(Inventory fromInventory) {
+        return false;
+    }
 
-    default FColor cellColor(T listItem){
+    public FColor cellColor(T listItem) {
         return null;
     }
 
-    default void onMouseClick(int button){
-        return;
+    public void onMouseClick(int button) {
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onMouseDoubleClick(int button) {
     }
 
-    default void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
-        return;
+    public void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onMouseScroll(float scrolled) {
+    }
 }

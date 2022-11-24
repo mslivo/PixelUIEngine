@@ -1,9 +1,9 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface HotKeyAction {
+public abstract class HotKeyAction {
 
-    default void onPress(){return;}
+    public void onPress(){}
 
-    default void onRelease(){return;}
+    public void onRelease(){}
 
 }

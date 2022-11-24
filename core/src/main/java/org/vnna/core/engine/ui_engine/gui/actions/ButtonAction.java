@@ -3,31 +3,26 @@ package org.vnna.core.engine.ui_engine.gui.actions;
 /**
  * Created by Admin on 10.03.2019.
  */
-public interface ButtonAction {
+public abstract class ButtonAction {
 
-    default void onPress(){
-        return;
-    };
-
-    default void onRelease(){
-        return;
-    };
-
-    default void onHold(){
-        return;
-    };
-
-    default void onToggle(boolean value){
-        return;
+    public void onPress() {
     }
 
-    default void onMouseClick(int button){
-        return;
+    public void onRelease() {
     }
 
-    default void onMouseDoubleClick(int button){
-        return;
+    public void onHold() {
     }
 
-    default void onMouseScroll(float scrolled){return;}
+    public void onToggle(boolean value) {
+    }
+
+    public void onMouseClick(int button) {
+    }
+
+    public void onMouseDoubleClick(int button) {
+    }
+
+    public void onMouseScroll(float scrolled) {
+    }
 }

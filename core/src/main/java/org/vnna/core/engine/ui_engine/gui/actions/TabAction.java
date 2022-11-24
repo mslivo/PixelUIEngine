@@ -1,9 +1,8 @@
 package org.vnna.core.engine.ui_engine.gui.actions;
 
-public interface TabAction {
+public abstract class TabAction {
 
-    default void onSelect(){
-        return;
-    };
+    public void onSelect(){
+    }
 
 }
