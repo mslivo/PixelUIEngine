@@ -48,7 +48,7 @@ public class ParticleSystem<T extends Particle> {
         for(int i=0;i<particles.size();i++){
             T particle = particles.get(i);
             if(!particle.update(this, particle, i)){
-                markForDelete(particle);
+                deleteQueue.add(particle);
             }
         }
         // remove sorted indexes in reverse order
@@ -69,12 +69,6 @@ public class ParticleSystem<T extends Particle> {
     public void removeAllParticles() {
         particles.clear();
         deleteQueue.clear();
-    }
-
-    private void markForDelete(T particle) {
-        synchronized (deleteQueue) {
-            deleteQueue.add(particle);
-        }
     }
 
     public int getParticleCount() {
