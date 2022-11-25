@@ -1,2 +1,1 @@
 [ ] dont render components outside of windows - to make scrolling within windows possible
-[ ] multiple update/window-component actions - actions as list - actions can have custom flag

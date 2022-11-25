@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /*
  * Particle System for Managing Classes that Extend Particle
  */
-public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T> {
+public class ParticleSystem<T extends Particle> {
 
     private ArrayList<T> particles;
 
@@ -46,8 +46,10 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
     public void update() {
         if (particles.size() == 0) return;
         for(int i=0;i<particles.size();i++){
-            Particle particle = particles.get(i);
-            particle.update(this, particle, i);
+            T particle = particles.get(i);
+            if(!particle.update(this, particle, i)){
+                markForDelete(particle);
+            }
         }
         // remove sorted indexes in reverse order
         T particle;
@@ -124,13 +126,6 @@ public class ParticleSystem<T extends Particle> implements LThreadPoolUpdater<T>
             }
         }
         batch.setColor(Color.WHITE);
-    }
-
-    @Override
-    public void updateFromThread(T particle, int index) {
-        if (!particle.update(this, particle, index)) {
-            markForDelete(particle);
-        }
     }
 
     public void shutdown() {
