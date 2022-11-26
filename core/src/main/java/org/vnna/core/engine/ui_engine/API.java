@@ -2052,6 +2052,10 @@ public class API {
             window.updateActions.remove(updateAction);
         }
 
+        public void clearUpdateActions(Window window) {
+            if (window == null) return;
+            window.updateActions.clear();
+        }
 
         public void setFlag(Window window, String flag) {
             if (window == null) return;
@@ -2465,6 +2469,11 @@ public class API {
         public void removeUpdateAction(Component component, UpdateAction updateAction) {
             if (component == null || updateAction == null) return;
             component.updateActions.remove(updateAction);
+        }
+
+        public void clearUpdateActions(Component component) {
+            if (component == null) return;
+            component.updateActions.clear();
         }
 
         public void setFlag(Component component, String customFlag) {
