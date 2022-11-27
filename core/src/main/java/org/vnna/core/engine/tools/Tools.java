@@ -142,49 +142,20 @@ public class Tools {
 
         public static CColor createDarker(CColor color, float amount) {
             CColor darker = create(color);
-            setDarker(darker, amount);
-            return darker;
-        }
-
-        public static void setDarker(CColor color, float amount) {
             amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.g = Tools.Calc.inBounds(color.g*amount,0f,1f);
-            color.b = Tools.Calc.inBounds(color.b*amount,0f,1f);
-            return;
+            darker.r = Tools.Calc.inBounds(darker.r*amount,0f,1f);
+            darker.g = Tools.Calc.inBounds(darker.g*amount,0f,1f);
+            darker.b = Tools.Calc.inBounds(darker.b*amount,0f,1f);
+            return darker;
         }
 
         public static CColor createBrighter(CColor color, float amount) {
             CColor brighter = create(color);
-            setBrighter(brighter, amount);
+            amount = 1f + Tools.Calc.lowerBounds(amount, 1f);
+            brighter.r = Tools.Calc.inBounds(brighter.r*amount,0f,1f);
+            brighter.g = Tools.Calc.inBounds(brighter.g*amount,0f,1f);
+            brighter.b = Tools.Calc.inBounds(brighter.b*amount,0f,1f);
             return brighter;
-        }
-
-        public static void setBrighter(CColor color, float amount) {
-            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.g = Tools.Calc.inBounds(color.g*amount,0f,1f);
-            color.b = Tools.Calc.inBounds(color.b*amount,0f,1f);
-        }
-
-        public static FColor createFixedDarker(FColor color, float amount) {
-            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            return createFixed(
-                    color.r * amount,
-                    color.g * amount,
-                    color.b * amount,
-                    color.a
-            );
-        }
-
-        public static FColor createFixedBrighter(FColor color, float amount) {
-            amount = Tools.Calc.inBounds(amount, 0f, 1f);
-            return createFixed(
-                    Tools.Calc.upperBounds(color.r + (color.r * amount), 1f),
-                    Tools.Calc.upperBounds(color.g + (color.g * amount), 1f),
-                    Tools.Calc.upperBounds(color.b + (color.b * amount), 1f),
-                    color.a
-            );
         }
 
         public static CColor createFromString(String colorString) {
