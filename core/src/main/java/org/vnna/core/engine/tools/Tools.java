@@ -141,23 +141,30 @@ public class Tools {
         }
 
         public static CColor createDarker(CColor color, float amount) {
+            CColor darker = create(color);
+            setDarker(darker, amount);
+            return darker;
+        }
+
+        public static void setDarker(CColor color, float amount) {
             amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            return create(
-                    color.r * amount,
-                    color.g * amount,
-                    color.b * amount,
-                    color.a
-            );
+            color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.g = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.b = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            return;
         }
 
         public static CColor createBrighter(CColor color, float amount) {
-            amount = Tools.Calc.inBounds(amount, 0f, 1f);
-            return create(
-                    Tools.Calc.upperBounds(color.r + (color.r * amount), 1f),
-                    Tools.Calc.upperBounds(color.g + (color.g * amount), 1f),
-                    Tools.Calc.upperBounds(color.b + (color.b * amount), 1f),
-                    color.a
-            );
+            CColor brigter = create(color);
+            setBrighter(brigter, amount);
+            return brigter;
+        }
+
+        public static void setBrighter(CColor color, float amount) {
+            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
+            color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.g = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.b = Tools.Calc.inBounds(color.r*amount,0f,1f);
         }
 
         public static FColor createFixedDarker(FColor color, float amount) {
