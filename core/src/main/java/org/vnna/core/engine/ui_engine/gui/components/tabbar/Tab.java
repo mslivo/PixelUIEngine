@@ -27,7 +27,7 @@ public class Tab {
 
     public int content_offset_x;
 
-    public String flag;
+    public String name;
 
     public Object data;
 

@@ -11,7 +11,7 @@ public class MapOverlay {
 
     public int y;
 
-    public String flag;
+    public String name;
 
     public Object data;
 

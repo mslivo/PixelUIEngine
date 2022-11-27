@@ -30,7 +30,7 @@ public abstract class Component {
 
     public ArrayList<UpdateAction> updateActions;
 
-    public String flag;
+    public String name;
 
     public Object data;
 

@@ -4,8 +4,6 @@ import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.media.CMediaFont;
 import org.vnna.core.engine.ui_engine.gui.actions.NotificationAction;
 
-import java.util.ArrayList;
-
 public class Notification {
 
     public STATE_NOTIFICATION state;
@@ -26,7 +24,7 @@ public class Notification {
 
     public NotificationAction notificationAction;
 
-    public String flag;
+    public String name;
 
     public Object data;
 

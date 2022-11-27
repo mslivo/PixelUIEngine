@@ -124,21 +124,21 @@ public class API {
 
     public class _MouseTool {
 
-        public MouseTool create(String flag, Object data, CMediaCursor cursor) {
-            return create(flag, data, cursor, cursor, null);
+        public MouseTool create(String name, Object data, CMediaCursor cursor) {
+            return create(name, data, cursor, cursor, null);
         }
 
-        public MouseTool create(String flag, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
-            return create(flag, data, cursor, cursorDown, null);
+        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
+            return create(name, data, cursor, cursorDown, null);
         }
 
-        public MouseTool create(String flag, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
-            return create(flag, data, cursor, cursor, mouseToolAction);
+        public MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
+            return create(name, data, cursor, cursor, mouseToolAction);
         }
 
-        public MouseTool create(String flag, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
+        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
             MouseTool mouseTool = new MouseTool();
-            setFlag(mouseTool, flag);
+            setName(mouseTool, name);
             setData(mouseTool, data);
             setCursor(mouseTool, cursor);
             setCursorDown(mouseTool, cursorDown);
@@ -146,9 +146,9 @@ public class API {
             return mouseTool;
         }
 
-        public void setFlag(MouseTool mouseTool, String flag) {
+        public void setName(MouseTool mouseTool, String name) {
             if (mouseTool == null) return;
-            mouseTool.flag = Tools.Text.validString(flag);
+            mouseTool.name = Tools.Text.validString(name);
         }
 
         public void setData(MouseTool mouseTool, Object data) {
@@ -830,7 +830,7 @@ public class API {
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
-            components.setFlag(closeButton, "WndCloseBtn");
+            components.setName(closeButton, "WndCloseBtn");
             components.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override
@@ -1061,7 +1061,7 @@ public class API {
 
     public boolean closeWindow(Window window) {
         if (window == null) return false;
-        ArrayList<Component> result = windows.findComponentsByFlag(window, "WndCloseBtn");
+        ArrayList<Component> result = windows.findComponentsByName(window, "WndCloseBtn");
         if (result.size() == 1) {
             if (result.get(0) instanceof Button) {
                 Button button = (Button) result.get(0);
@@ -1179,9 +1179,9 @@ public class API {
         return inputState.mouseTool;
     }
 
-    public boolean isMouseTool(String flag) {
-        if(flag == null) return false;
-        return inputState.mouseTool != null ? flag.equals(inputState.mouseTool.flag) : false;
+    public boolean isMouseTool(String name) {
+        if(name == null) return false;
+        return inputState.mouseTool != null ? name.equals(inputState.mouseTool.name) : false;
     }
 
     public ArrayList<HotKey> getHotKeys() {
@@ -1212,10 +1212,10 @@ public class API {
         for (HotKey hotKey : inputState.hotKeys) removeHotKey(hotKey);
     }
 
-    public ArrayList<Window> findWindowsByFlag(String flag) {
+    public ArrayList<Window> findWindowsByName(String name) {
         ArrayList<Window> result = new ArrayList<>();
         for (Window window : inputState.windows) {
-            if (window.flag != null && window.flag.equals(flag)) {
+            if (window.name != null && window.name.equals(name)) {
                 result.add(window);
             }
         }
@@ -1232,7 +1232,7 @@ public class API {
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
-        private CMediaCursor cursorGuiDefault = GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW;
+        private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW;
         private int gameviewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
@@ -1286,14 +1286,14 @@ public class API {
             this.tooltipDefaultColor = Tools.Colors.createFixed(tooltipDefaultColor);
         }
 
-        public CMediaCursor getCursorGuiDefault() {
-            return cursorGuiDefault;
+        public CMediaCursor getCursorGui() {
+            return cursorGui;
         }
 
-        public void setCursorGuiDefault(CMediaCursor cursorGuiDefault) {
-            if (cursorGuiDefault == null) return;
+        public void setCursorGui(CMediaCursor cursorGui) {
+            if (cursorGui == null) return;
             ;
-            this.cursorGuiDefault = cursorGuiDefault;
+            this.cursorGui = cursorGui;
         }
 
         public int getGameviewportDefaultUpdateTime() {
@@ -1599,7 +1599,7 @@ public class API {
             setColor(notification, color);
             setFont(notification, font);
             setNotificationAction(notification, notificationAction);
-            setFlag(notification, "");
+            setName(notification, "");
             setData(notification, null);
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
@@ -1615,9 +1615,9 @@ public class API {
             return notification;
         }
 
-        public void setFlag(Notification notification, String flag) {
+        public void setName(Notification notification, String name) {
             if (notification == null) return;
-            notification.flag = Tools.Text.validString(flag);
+            notification.name = Tools.Text.validString(name);
         }
 
         public void setData(Notification notification, Object data) {
@@ -1709,15 +1709,15 @@ public class API {
                 setColor(contextMenuItem, color);
                 setIcon(contextMenuItem, icon);
                 setIconIndex(contextMenuItem, 0);
-                setFlag(contextMenuItem, "");
+                setName(contextMenuItem, "");
                 setData(contextMenuItem, null);
                 setContextMenuItemAction(contextMenuItem, contextMenuItemAction);
                 return contextMenuItem;
             }
 
-            public void setFlag(ContextMenuItem contextMenuItem, String flag) {
+            public void setName(ContextMenuItem contextMenuItem, String name) {
                 if (contextMenuItem == null) return;
-                contextMenuItem.flag = Tools.Text.validString(flag);
+                contextMenuItem.name = Tools.Text.validString(name);
 
             }
 
@@ -1821,7 +1821,7 @@ public class API {
             setWindowAction(window, windowAction);
             setIcon(window, icon);
             setIconIndex(window, 0);
-            setFlag(window, "");
+            setName(window, "");
             setData(window, null);
             setEnforceScreenBounds(window, config.getWindowsDefaultEnforceScreenBounds());
             window.components = new ArrayList<>();
@@ -1993,35 +1993,35 @@ public class API {
             for (Component component : components) removeComponent(window, component);
         }
 
-        public void removeComponentsByFlag(Window window, String flag) {
+        public void removeComponentsByName(Window window, String name) {
             if (window == null) return;
             for (Component component : window.components) {
-                if (component.flag != null && component.flag.equals(flag)) removeComponent(window, component);
+                if (component.name != null && component.name.equals(name)) removeComponent(window, component);
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.flag != null && component.flag.equals(flag)) removeComponent(window, component);
+                if (component.name != null && component.name.equals(name)) removeComponent(window, component);
             }
         }
 
-        public Component findComponentByFlag(Window window, String flag) {
+        public Component findComponentByName(Window window, String name) {
             if (window == null) return null;
             for (Component component : window.components) {
-                if (component.flag != null && component.flag.equals(flag)) return component;
+                if (component.name != null && component.name.equals(name)) return component;
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.flag != null && component.flag.equals(flag)) return component;
+                if (component.name != null && component.name.equals(name)) return component;
             }
             return null;
         }
 
-        public ArrayList<Component> findComponentsByFlag(Window window, String flag) {
+        public ArrayList<Component> findComponentsByName(Window window, String name) {
             ArrayList<Component> result = new ArrayList<>();
             if (window == null) return result;
             for (Component component : window.components) {
-                if (component.flag != null && component.flag.equals(flag)) result.add(component);
+                if (component.name != null && component.name.equals(name)) result.add(component);
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.flag != null && component.flag.equals(flag)) result.add(component);
+                if (component.name != null && component.name.equals(name)) result.add(component);
             }
             return result;
         }
@@ -2057,9 +2057,9 @@ public class API {
             window.updateActions.clear();
         }
 
-        public void setFlag(Window window, String flag) {
+        public void setName(Window window, String name) {
             if (window == null) return;
-            window.flag = Tools.Text.validString(flag);
+            window.name = Tools.Text.validString(name);
         }
 
         public void setData(Window window, Object data) {
@@ -2476,9 +2476,9 @@ public class API {
             component.updateActions.clear();
         }
 
-        public void setFlag(Component component, String customFlag) {
+        public void setName(Component component, String name) {
             if (component == null) return;
-            component.flag = Tools.Text.validString(customFlag);
+            component.name = Tools.Text.validString(name);
         }
 
         public void setCustomData(Component component, Object customData) {
@@ -2551,7 +2551,7 @@ public class API {
             component.disabled = false;
             component.updateActions = new ArrayList<>();
             component.data = null;
-            component.flag = "";
+            component.name = "";
             component.offset_x = component.offset_y = 0;
             component.visible = true;
             component.updateToolTip = false;
@@ -3050,7 +3050,7 @@ public class API {
                     setFont(tab, font);
                     setContentOffset(tab, 0);
                     removeAllTabComponents(tab);
-                    setFlag(tab, "");
+                    setName(tab, "");
                     setData(tab, null);
                     addTabComponents(tab, components);
                     if (width == 0) {
@@ -3061,9 +3061,9 @@ public class API {
                     return tab;
                 }
 
-                public void setFlag(Tab tab, String flag) {
+                public void setName(Tab tab, String name) {
                     if (tab == null) return;
-                    tab.flag = Tools.Text.validString(flag);
+                    tab.name = Tools.Text.validString(name);
                 }
 
                 public void setData(Tab tab, Object data) {
@@ -3556,11 +3556,11 @@ public class API {
                 map.overlays.remove(mapOverlay);
             }
 
-            public ArrayList<MapOverlay> findMapOverlaysByFlag(Map map, String flag) {
+            public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
                 ArrayList<MapOverlay> result = new ArrayList<>();
                 if (map == null || mapOverlay == null) return result;
                 for (MapOverlay mapOverlay : map.overlays) {
-                    if (mapOverlay.flag.equals(flag)) result.add(mapOverlay);
+                    if (mapOverlay.name.equals(name)) result.add(mapOverlay);
                 }
                 return result;
             }
@@ -3591,7 +3591,7 @@ public class API {
                     setFadeOut(mapOverlay, fadeOut);
                     setColor(mapOverlay, color);
                     setArrayIndex(mapOverlay, arrayIndex);
-                    setFlag(mapOverlay, "");
+                    setName(mapOverlay, "");
                     setData(mapOverlay, null);
                     mapOverlay.timer = fadeOut ? System.currentTimeMillis() : 0;
                     return mapOverlay;
@@ -3628,9 +3628,9 @@ public class API {
                     mapOverlay.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                 }
 
-                public void setFlag(MapOverlay mapOverlay, String flag) {
+                public void setName(MapOverlay mapOverlay, String name) {
                     if (mapOverlay == null) return;
-                    mapOverlay.flag = Tools.Text.validString(flag);
+                    mapOverlay.name = Tools.Text.validString(name);
                 }
 
                 public void setData(MapOverlay mapOverlay, Object data) {

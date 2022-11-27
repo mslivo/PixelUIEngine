@@ -5,8 +5,6 @@ import org.vnna.core.engine.media_manager.media.CMediaFont;
 import org.vnna.core.engine.media_manager.media.CMediaGFX;
 import org.vnna.core.engine.ui_engine.gui.actions.ContextMenuItemAction;
 
-import java.util.ArrayList;
-
 public class ContextMenuItem {
 
     public String text;
@@ -21,7 +19,7 @@ public class ContextMenuItem {
 
     public ContextMenuItemAction contextMenuItemAction;
 
-    public String flag;
+    public String name;
 
     public Object data;
 

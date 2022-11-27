@@ -5,7 +5,7 @@ import org.vnna.core.engine.ui_engine.gui.actions.MouseToolAction;
 
 public class MouseTool {
 
-    public String flag;
+    public String name;
 
     public Object data;
     public MouseToolAction mouseToolAction;

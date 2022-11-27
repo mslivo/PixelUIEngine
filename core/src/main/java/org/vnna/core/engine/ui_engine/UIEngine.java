@@ -1401,7 +1401,7 @@ public class UIEngine<T extends UIAdapter> {
         /* Update Cursor*/
         if (inputState.lastGUIMouseHover != null) {
             // 1. GUI Cursor
-            inputState.cursor_setNext = api.config.getCursorGuiDefault();
+            inputState.cursor_setNext = api.config.getCursorGui();
         } else {
             // 2. Temporary Cursor
             if (inputState.displayTemporaryCursor) {
@@ -1417,7 +1417,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else {
                     // no mouse tool set - display gui cursor
-                    inputState.cursor_setNext = api.config.getCursorGuiDefault();
+                    inputState.cursor_setNext = api.config.getCursorGui();
                 }
             }
         }
