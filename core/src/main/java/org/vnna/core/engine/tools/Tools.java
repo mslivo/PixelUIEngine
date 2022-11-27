@@ -155,9 +155,9 @@ public class Tools {
         }
 
         public static CColor createBrighter(CColor color, float amount) {
-            CColor brigter = create(color);
-            setBrighter(brigter, amount);
-            return brigter;
+            CColor brighter = create(color);
+            setBrighter(brighter, amount);
+            return brighter;
         }
 
         public static void setBrighter(CColor color, float amount) {
