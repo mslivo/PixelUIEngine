@@ -1891,7 +1891,7 @@ public class UIEngine<T extends UIAdapter> {
             int height = contextMenu.items.size();
 
             render_batchSaveColor();
-            render_batch_setColor(contextMenu.color.r, contextMenu.color.g, contextMenu.color.b, contextMenu.color.a);
+            render_batchSetColor(contextMenu.color.r, contextMenu.color.g, contextMenu.color.b, contextMenu.color.a);
 
             /* Menu */
             for (int x = 0; x < width; x++) {
@@ -1905,7 +1905,7 @@ public class UIEngine<T extends UIAdapter> {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU;
                     }
                     render_batchSaveColor();
-                    render_batch_setColor(item.color.r, item.color.g, item.color.b, item.color.a);
+                    render_batchSetColor(item.color.r, item.color.g, item.color.b, item.color.a);
                     render_drawCMediaImage(cMenuTexture, contextMenu.x + x * TILE_SIZE, contextMenu.y - (y * TILE_SIZE) - TILE_SIZE, index);
                     render_batchLoadColor();
                 }
@@ -2001,7 +2001,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
         // Draw
-        render_batch_setColor(tooltip.cColor.r, tooltip.cColor.g, tooltip.cColor.b, tooltip.cColor.a * inputState.tooltip_fadeIn_pct);
+        render_batchSetColor(tooltip.cColor.r, tooltip.cColor.g, tooltip.cColor.b, tooltip.cColor.a * inputState.tooltip_fadeIn_pct);
 
         // Lines
         switch (direction) {
@@ -2071,7 +2071,7 @@ public class UIEngine<T extends UIAdapter> {
                 float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) api.config.getNotificationsFadeoutTime());
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TILE_SIZE * (fadeoutProgress));
             }
-            render_batch_setColor(notification.color.r, notification.color.g, notification.color.b, notification.color.a);
+            render_batchSetColor(notification.color.r, notification.color.g, notification.color.b, notification.color.a);
             for (int x = 0; x < width; x++) {
                 render_drawCMediaImage(GUIBaseMedia.GUI_NOTIFICATION_BAR, (x * TILE_SIZE), inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
             }
@@ -2087,7 +2087,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
         render_batchSaveColor();
-        render_batch_setColor(window.color.r, window.color.g, window.color.b, window.color.a);
+        render_batchSetColor(window.color.r, window.color.g, window.color.b, window.color.a);
         for (int wx = 0; wx < window.width; wx++) {
             if (!window.folded) {
                 for (int wy = 0; wy < window.height; wy++) {
@@ -2126,7 +2126,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawComponentTopLayer(Window window, Component component) {
         if (!render_isComponentRendered(component)) ;
         float alpha = (window != null ? (component.color.a * window.color.a) : component.color.a);
-        render_batch_setColor(component.color.r, component.color.g, component.color.b, alpha);
+        render_batchSetColor(component.color.r, component.color.g, component.color.b, alpha);
         if (component.getClass() == ComboBox.class) {
             ComboBox combobox = (ComboBox) component;
             // Menu
@@ -2166,7 +2166,7 @@ public class UIEngine<T extends UIAdapter> {
         boolean disableShaderState = render_GrayScaleShaderEnabled();
         if (component.disabled) render_enableGrayScaleShader(true);
 
-        render_batch_setColor(component.color.r, component.color.g, component.color.b, alpha);
+        render_batchSetColor(component.color.r, component.color.g, component.color.b, alpha);
 
         if (component instanceof Button) {
             Button button = (Button) component;
@@ -2186,7 +2186,7 @@ public class UIEngine<T extends UIAdapter> {
             } else if (button.getClass() == ImageButton.class) {
                 ImageButton imageButton = (ImageButton) button;
                 render_batchSaveColor();
-                render_batch_setColor(imageButton.color2.r, imageButton.color2.g, imageButton.color2.b, alpha2);
+                render_batchSetColor(imageButton.color2.r, imageButton.color2.g, imageButton.color2.b, alpha2);
                 render_drawCMediaImage(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.offset_content_y - pressed_offset, imageButton.arrayIndex);
                 render_batchLoadColor();
             }
@@ -2210,7 +2210,7 @@ public class UIEngine<T extends UIAdapter> {
                 render_drawCMediaImage(GUIBaseMedia.GUI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
                 int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
                 render_batchSaveColor();
-                render_batch_setColor(scrollBarVertical.color2.r, scrollBarVertical.color2.g, scrollBarVertical.color2.b, alpha2);
+                render_batchSetColor(scrollBarVertical.color2.r, scrollBarVertical.color2.g, scrollBarVertical.color2.b, alpha2);
                 render_drawCMediaImage(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
                 render_batchLoadColor();
             }
@@ -2221,7 +2221,7 @@ public class UIEngine<T extends UIAdapter> {
                 render_drawCMediaImage(GUIBaseMedia.GUI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
                 int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
                 render_batchSaveColor();
-                render_batch_setColor(scrollBarHorizontal.color2.r, scrollBarHorizontal.color2.g, scrollBarHorizontal.color2.b, alpha2);
+                render_batchSetColor(scrollBarHorizontal.color2.r, scrollBarHorizontal.color2.g, scrollBarHorizontal.color2.b, alpha2);
                 render_drawCMediaImage(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
                 render_batchLoadColor();
             }
@@ -2272,7 +2272,7 @@ public class UIEngine<T extends UIAdapter> {
                         cellColor = list.listAction.cellColor(item);
                         if (cellColor != null) {
                             render_batchSaveColor();
-                            render_batch_setColor(cellColor.r, cellColor.g, cellColor.b, 1);
+                            render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1);
                         }
                     }
                 }
@@ -2316,7 +2316,7 @@ public class UIEngine<T extends UIAdapter> {
 
             render_drawCMediaImage(GUIBaseMedia.GUI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
             render_batchSaveColor();
-            render_batch_setColor(knob.color2.r, knob.color2.g, knob.color2.b, knob.color2.a);
+            render_batchSetColor(knob.color2.r, knob.color2.g, knob.color2.b, knob.color2.a);
             if (knob.endless) {
                 int index = MathUtils.round(knob.turned * 36);
                 render_drawCMediaImage(GUIBaseMedia.GUI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
@@ -2335,7 +2335,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (mapOverlay.color.a <= 0) return true;
                 }
                 render_batchSaveColor();
-                render_batch_setColor(mapOverlay.color.r, mapOverlay.color.g, mapOverlay.color.b, alpha * mapOverlay.color.a);
+                render_batchSetColor(mapOverlay.color.r, mapOverlay.color.g, mapOverlay.color.b, alpha * mapOverlay.color.a);
                 render_drawCMediaImage(mapOverlay.image, UICommons.component_getAbsoluteX(map) + mapOverlay.x, UICommons.component_getAbsoluteY(map) + mapOverlay.y, mapOverlay.arrayIndex);
                 render_batchLoadColor();
                 return false;
@@ -2351,7 +2351,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 if (!textField.contentValid) {
                     render_batchSaveColor();
-                    render_batch_setColor(0.90588236f, 0.29803923f, 0.23529412f, 0.2f);
+                    render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, 0.2f);
                     render_drawCMediaImage(GUIBaseMedia.GUI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (wx * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                     render_batchLoadColor();
                 }
@@ -2420,7 +2420,7 @@ public class UIEngine<T extends UIAdapter> {
                         if (inventory.inventoryAction != null) {
                             FColor cellColor = inventory.inventoryAction.cellColor(inventory.items[x][y], x, y);
                             if (cellColor != null) {
-                                render_batch_setColor(cellColor.r, cellColor.g, cellColor.b, 1f);
+                                render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
                             }
                         }
 
@@ -2508,7 +2508,7 @@ public class UIEngine<T extends UIAdapter> {
 
             // Bar Bar
             render_batchSaveColor();
-            render_batch_setColor(progressBar.color2.r, progressBar.color2.g, progressBar.color2.b, alpha2);
+            render_batchSetColor(progressBar.color2.r, progressBar.color2.g, progressBar.color2.b, alpha2);
             int pixels = MathUtils.round(progressBar.progress * (progressBar.width * TILE_SIZE));
             for (int i = 0; i < progressBar.width; i++) {
                 int xOffset = i * TILE_SIZE;
@@ -2555,7 +2555,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inventoryDrag_Item != null) {
             if (inputState.inventoryDrag_Inventory != null && inputState.inventoryDrag_Inventory.inventoryAction != null) {
-                render_batch_setColor(1, 1, 1, api.config.getDragTransparency());
+                render_batchSetColor(1, 1, 1, api.config.getDragTransparency());
                 CMediaGFX icon = inputState.inventoryDrag_Inventory.inventoryAction.icon(inputState.inventoryDrag_Item);
                 render_drawCMediaImage(icon, inputState.mouse_x_gui - inputState.InventoryDrag_offset_x, inputState.mouse_y_gui - inputState.InventoryDrag_offset_y, inputState.inventoryDrag_Inventory.inventoryAction.iconArrayIndex(inputState.inventoryDrag_Item));
             }
@@ -2563,7 +2563,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.listDrag_List.listAction != null) {
 
                 // List
-                render_batch_setColor(inputState.listDrag_List.color.r, inputState.listDrag_List.color.g, inputState.listDrag_List.color.b, Math.min(inputState.listDrag_List.color.a, api.config.getDragTransparency()));
+                render_batchSetColor(inputState.listDrag_List.color.r, inputState.listDrag_List.color.g, inputState.listDrag_List.color.b, Math.min(inputState.listDrag_List.color.a, api.config.getDragTransparency()));
                 for (int x = 0; x < inputState.listDrag_List.width; x++) {
                     this.render_drawCMediaImage(GUIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_x_gui - inputState.listDrag_offset_x + (x * TILE_SIZE), inputState.mouse_y_gui - inputState.listDrag_offset_y, render_getListCMediaIndex(x, 0, inputState.listDrag_List.width));
                 }
@@ -2656,7 +2656,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.tempColorStackPointer = inputState.tempColorStackPointer + 1;
     }
 
-    private void render_batch_setColor(float r, float g, float b, float a) {
+    private void render_batchSetColor(float r, float g, float b, float a) {
         inputState.spriteBatch_gui.setColor(r, g, b, a);
     }
 
