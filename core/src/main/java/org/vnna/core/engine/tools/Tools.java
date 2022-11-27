@@ -149,8 +149,8 @@ public class Tools {
         public static void setDarker(CColor color, float amount) {
             amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
             color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.g = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.b = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.g = Tools.Calc.inBounds(color.g*amount,0f,1f);
+            color.b = Tools.Calc.inBounds(color.b*amount,0f,1f);
             return;
         }
 
@@ -163,8 +163,8 @@ public class Tools {
         public static void setBrighter(CColor color, float amount) {
             amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
             color.r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.g = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            color.b = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            color.g = Tools.Calc.inBounds(color.g*amount,0f,1f);
+            color.b = Tools.Calc.inBounds(color.b*amount,0f,1f);
         }
 
         public static FColor createFixedDarker(FColor color, float amount) {
