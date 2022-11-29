@@ -42,8 +42,7 @@ public class LauncherMain {
         exampleStartParameters.internalResolutionHeight= 360;
         // List of 16:9 resolutions
         // 256x144, 384x216, 512x288, 640x360, 768x432
-        exampleStartParameters.viewportMode = ViewportMode.FIT;
-        exampleStartParameters.stretchModeUpSampling = 2;
+        exampleStartParameters.viewportMode = ViewportMode.STRETCH;
 
         config.setResizable(true);
         config.setWindowedMode(exampleStartParameters.internalResolutionWidth, exampleStartParameters.internalResolutionHeight);

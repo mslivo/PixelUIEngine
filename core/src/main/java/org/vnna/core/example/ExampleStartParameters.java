@@ -12,6 +12,4 @@ public class ExampleStartParameters {
 
     public ViewportMode viewportMode;
 
-    public int stretchModeUpSampling;
-
 }

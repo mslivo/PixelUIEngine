@@ -1,4 +1,1 @@
-[ ] allow white window - split illumantion and shadow textures
-    batch setColorIllumante, setColorShadow - take current colors and remove/increase x percent
-    dont use tools class
 [ ] dont render components outside of windows - to make scrolling within windows possible

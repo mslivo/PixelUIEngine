@@ -45,9 +45,7 @@ public class InputState {
 
     public ViewportMode viewportMode;
 
-    public int stretchModeUpSampling;
-
-
+    public int factor_upScale;
 
     /* Drawing */
 

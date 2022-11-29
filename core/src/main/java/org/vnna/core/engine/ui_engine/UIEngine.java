@@ -3,6 +3,7 @@ package org.vnna.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -56,6 +57,7 @@ import org.vnna.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.vnna.core.engine.ui_engine.render.shaders.GrayScaleShader;
 import org.vnna.core.engine.ui_engine.render.shaders.SharpeningShader;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,11 +91,6 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode) {
-        this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, viewportMode, 1);
-    }
-
-
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, int internalUpscaling) {
         if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize IREngine: invalid parameters");
         }
@@ -102,7 +99,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
         /* Input Init */
-        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode, internalUpscaling);
+        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
         this.api = new API(this.inputState, mediaManager);
         this.timer_windowHiddenChecker = System.currentTimeMillis();
 
@@ -112,7 +109,19 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.init(this.api, this.mediaManager);
     }
 
-    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, int internalUpScaling) {
+    private int determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight){
+        int upSampling = 1;
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int testWidth = (int)(screenSize.getWidth()/2);
+        int testHeight = (int)(screenSize.getHeight()/2);
+        while((internalResolutionWidth*upSampling) < testWidth && (internalResolutionHeight*upSampling) < testHeight){
+            upSampling++;
+        }
+        return upSampling;
+    }
+
+    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode) {
         InputState newInputState = new InputState();
 
         //  ----- Parameters
@@ -120,7 +129,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.internalResolutionWidth = Tools.Calc.lowerBounds(internalResolutionWidth, TILE_SIZE * 2);
         newInputState.internalResolutionHeight = Tools.Calc.lowerBounds(internalResolutionHeight, TILE_SIZE * 2);
         newInputState.viewportMode = viewportMode;
-        newInputState.stretchModeUpSampling = Tools.Calc.lowerBounds(internalUpScaling, 1);
 
         // -----  Game
         newInputState.spriteBatch_game = new SpriteBatch(8191);
@@ -150,7 +158,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui.flip(false, true);
         // StretchMode Buffers
         if (newInputState.viewportMode == ViewportMode.FIT || newInputState.viewportMode == ViewportMode.STRETCH) {
-            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.stretchModeUpSampling, newInputState.internalResolutionHeight * newInputState.stretchModeUpSampling, false);
+            newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
+            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
             newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
             newInputState.texture_upScale.flip(false, true);
