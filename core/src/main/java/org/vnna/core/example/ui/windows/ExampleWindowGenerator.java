@@ -127,24 +127,27 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Shape triangle = api.components.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN, Tools.Colors.NAVY_BLUE_DARK);
 
-        ScrollBarHorizontal scrollBarHorizontal1 = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
+        ScrollBarHorizontal scrollBarHorizontalR = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 Tools.Colors.setRed(oval.color, scrolled);
             }
         }, oval.color.r);
-        ScrollBarHorizontal scrollBarHorizontal2 = api.components.scrollBar.horizontalScrollbar.create(4, 10, 6, new ScrollBarAction() {
+        api.components.setColor1And2(scrollBarHorizontalR, Tools.Colors.RED_BRIGHT);
+        ScrollBarHorizontal scrollBarHorizontalG = api.components.scrollBar.horizontalScrollbar.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 Tools.Colors.setGreen(oval.color, scrolled);
             }
         }, oval.color.g);
-        ScrollBarHorizontal scrollBarHorizontal3 = api.components.scrollBar.horizontalScrollbar.create(4, 12, 6, new ScrollBarAction() {
+        api.components.setColor1And2(scrollBarHorizontalG, Tools.Colors.GREEN_BRIGHT);
+        ScrollBarHorizontal scrollBarHorizontalB = api.components.scrollBar.horizontalScrollbar.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 Tools.Colors.setBlue(oval.color, scrolled);
             }
         }, oval.color.b);
+        api.components.setColor1And2(scrollBarHorizontalB, Tools.Colors.BLUE_BRIGHT);
 
 
         TextField textField = api.components.textField.create(18, 12, 10, "", null, 128);
@@ -233,8 +236,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
         GameViewPort gameViewPort = api.components.gameViewPort.create(29, 9, 4, 4, 100, 100, 1);
 
 
-        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontal1, scrollBarHorizontal2, scrollBarHorizontal3, oval, rect, triangle});
-        components.addAll(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontal1, scrollBarHorizontal2, scrollBarHorizontal3, oval, rect, triangle}));
+        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle});
+        components.addAll(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle}));
 
 
         return components;

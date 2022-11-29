@@ -12,7 +12,7 @@ import java.nio.file.Path;
 
 public class LauncherMain {
 
-    public static ExampleData createTestData(){
+    public static ExampleData createTestData() {
         ExampleData exampleData = new ExampleData();
         return exampleData;
     }
@@ -38,8 +38,8 @@ public class LauncherMain {
 
         ExampleStartParameters exampleStartParameters = new ExampleStartParameters();
         exampleStartParameters.dataFile = testDataFile.toAbsolutePath().toString();
-        exampleStartParameters.internalResolutionWidth= (int) (640/2f);
-        exampleStartParameters.internalResolutionHeight= (int) (360/2f);
+        exampleStartParameters.internalResolutionWidth = 640;
+        exampleStartParameters.internalResolutionHeight = 360;
         // List of 16:9 resolutions
         // 256x144, 384x216, 512x288, 640x360, 768x432
         exampleStartParameters.viewportMode = ViewportMode.FIT;

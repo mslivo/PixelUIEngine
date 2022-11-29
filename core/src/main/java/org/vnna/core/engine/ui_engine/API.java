@@ -2498,14 +2498,14 @@ public class API {
             setSize(component, width, height);
         }
 
-        public void setColor(Component component, FColor fColor) {
+        public void setColor(Component component, FColor color) {
             if (component == null) return;
-            component.color = Tools.Colors.create(fColor == null ? config.componentsDefaultColor : fColor);
+            component.color = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
         }
 
-        public void setColor2(Component component, FColor fColor) {
+        public void setColor2(Component component, FColor color) {
             if (component == null) return;
-            component.color2 = Tools.Colors.create(fColor == null ? config.componentsDefaultColor : fColor);
+            component.color2 = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
         }
 
         public void setColor(Collection<Component> components, FColor color) {
@@ -2522,12 +2522,33 @@ public class API {
         public void setColor(Component[] components, FColor color) {
             if (components == null) return;
             for (Component component : components) setColor(component, color);
-
         }
 
         public void setColor2(Component[] components, FColor color2) {
             if (components == null) return;
             for (Component component : components) setColor2(component, color2);
+        }
+
+        public void setColor1And2(Component component, FColor color) {
+            if (component == null) return;
+            setColor(component, color);
+            setColor2(component, color);
+        }
+
+        public void setColor1And2(Collection<Component> components, FColor color) {
+            if (components == null) return;
+            for (Component component : components){
+                setColor(component, color);
+                setColor2(component, color);
+            }
+        }
+
+        public void setColor1And2(Component[] components, FColor color) {
+            if (components == null) return;
+            for (Component component : components){
+                setColor(component, color);
+                setColor2(component, color);
+            }
         }
 
         public void setTransparency(Component component, float transparency) {
