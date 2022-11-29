@@ -38,11 +38,11 @@ public class LauncherMain {
 
         ExampleStartParameters exampleStartParameters = new ExampleStartParameters();
         exampleStartParameters.dataFile = testDataFile.toAbsolutePath().toString();
-        exampleStartParameters.internalResolutionWidth= 640;
-        exampleStartParameters.internalResolutionHeight= 360;
+        exampleStartParameters.internalResolutionWidth= (int) (640/2f);
+        exampleStartParameters.internalResolutionHeight= (int) (360/2f);
         // List of 16:9 resolutions
         // 256x144, 384x216, 512x288, 640x360, 768x432
-        exampleStartParameters.viewportMode = ViewportMode.STRETCH;
+        exampleStartParameters.viewportMode = ViewportMode.FIT;
 
         config.setResizable(true);
         config.setWindowedMode(exampleStartParameters.internalResolutionWidth, exampleStartParameters.internalResolutionHeight);
@@ -50,7 +50,7 @@ public class LauncherMain {
         config.setDecorated(true);
         config.setMaximized(true);
         config.setWindowPosition(-1, -1);
-        config.setBackBufferConfig(8, 8, 8, 8, 32, 0, 8);
+        config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
 
         new Lwjgl3Application(new ExampleMain(exampleStartParameters), config);
 

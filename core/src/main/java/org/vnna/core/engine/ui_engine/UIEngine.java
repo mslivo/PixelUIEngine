@@ -1823,15 +1823,9 @@ public class UIEngine<T extends UIAdapter> {
         return 4;
     }
 
-
-    private int render_getListCMediaIndex(int x, int y, int width) {
-        if (y == 0) {
-            return (x == 0 ? 0 : (x == (width - 1) ? 4 : 2));
-        } else {
-            return (x == 0 ? 1 : (x == (width - 1) ? 5 : 3));
-        }
+    private int render_getListDragCMediaIndex(int x, int width) {
+        return x == 0 ? 0 : x == (width - 1) ? 2 : 1;
     }
-
 
     private int render_getComponent16TilesCMediaIndex(int x, int y, int width, int height) {
         if (width == 1 && height == 1) return 12;
@@ -2286,7 +2280,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
                 for (int x = 0; x < list.width; x++) {
-                    this.render_drawCMediaImage(selected ? GUIBaseMedia.GUI_LIST_SELECTED : GUIBaseMedia.GUI_LIST, UICommons.component_getAbsoluteX(list) + (x * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, render_getListCMediaIndex(x, y, list.width));
+                    this.render_drawCMediaImage(selected ? GUIBaseMedia.GUI_LIST_SELECTED : GUIBaseMedia.GUI_LIST, UICommons.component_getAbsoluteX(list) + (x * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
                 }
                 if (cellColor != null) render_batchLoadColor();
 
@@ -2299,8 +2293,7 @@ public class UIEngine<T extends UIAdapter> {
 
             if (dragEnabled && dragValid) {
                 for (int x = 0; x < list.width; x++) {
-                    int index = x == 0 ? 0 : x == (list.width - 1) ? 2 : 1;
-                    this.render_drawCMediaImage(GUIBaseMedia.GUI_LIST_DRAG, drag_x + (x * TILE_SIZE), drag_y, index);
+                    this.render_drawCMediaImage(GUIBaseMedia.GUI_LIST_DRAG, drag_x + (x * TILE_SIZE), drag_y, render_getListDragCMediaIndex(x, list.width));
                 }
             }
 
@@ -2574,7 +2567,7 @@ public class UIEngine<T extends UIAdapter> {
                 // List
                 render_batchSetColor(inputState.listDrag_List.color.r, inputState.listDrag_List.color.g, inputState.listDrag_List.color.b, Math.min(inputState.listDrag_List.color.a, api.config.getDragTransparency()));
                 for (int x = 0; x < inputState.listDrag_List.width; x++) {
-                    this.render_drawCMediaImage(GUIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_x_gui - inputState.listDrag_offset_x + (x * TILE_SIZE), inputState.mouse_y_gui - inputState.listDrag_offset_y, render_getListCMediaIndex(x, 0, inputState.listDrag_List.width));
+                    this.render_drawCMediaImage(GUIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_x_gui - inputState.listDrag_offset_x + (x * TILE_SIZE), inputState.mouse_y_gui - inputState.listDrag_offset_y);
                 }
 
                 // Text

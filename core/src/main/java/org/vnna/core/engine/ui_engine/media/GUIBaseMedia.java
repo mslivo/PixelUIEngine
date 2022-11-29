@@ -23,8 +23,8 @@ public class GUIBaseMedia {
     public static CMediaArray GUI_SCROLLBAR_BUTTON_VERTICAL = MediaManager.create_CMediaArray(guiDirectory + "scrollbar_button_vertical.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static CMediaArray GUI_SCROLLBAR_BUTTON_HORIZONAL = MediaManager.create_CMediaArray(guiDirectory + "scrollbar_button_horizontal.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
 
-    public static CMediaArray GUI_LIST = MediaManager.create_CMediaArray(guiDirectory + "list.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static CMediaArray GUI_LIST_SELECTED = MediaManager.create_CMediaArray(guiDirectory + "list_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static CMediaImage GUI_LIST = MediaManager.create_CMediaImage(guiDirectory + "list.png");
+    public static CMediaImage GUI_LIST_SELECTED = MediaManager.create_CMediaImage(guiDirectory + "list_selected.png");
     public static CMediaArray GUI_LIST_DRAG = MediaManager.create_CMediaArray(guiDirectory + "list_drag.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * 2);
 
     public static CMediaArray GUI_COMBOBOX = MediaManager.create_CMediaArray(guiDirectory + "combobox.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
