@@ -113,8 +113,8 @@ public class UIEngine<T extends UIAdapter> {
         int upSampling = 1;
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int testWidth = (int)(screenSize.getWidth()/2);
-        int testHeight = (int)(screenSize.getHeight()/2);
+        int testWidth = (int)(screenSize.getWidth());
+        int testHeight = (int)(screenSize.getHeight());
         while((internalResolutionWidth*upSampling) < testWidth && (internalResolutionHeight*upSampling) < testHeight){
             upSampling++;
         }
