@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.color.FColor;
 
 import java.io.IOException;
@@ -123,59 +122,39 @@ public class Tools {
                 PURPLE_DARK, NAVY_BLUE_BRIGHT, NAVY_BLUE_DARK, BROWN_BRIGHT, BROWN_DARK
         };
 
-        public static CColor create(CColor color) {
-            return Colors.create(color.r, color.g, color.b, color.a);
+        public static FColor create(float r, float g, float b, float a) {
+            return new FColor(
+                    Calc.inBounds(r, 0f, 1f),
+                    Calc.inBounds(g, 0f, 1f),
+                    Calc.inBounds(b, 0f, 1f),
+                    Calc.inBounds(a, 0f, 1f));
         }
 
-        public static CColor create(FColor color) {
-            return Colors.create(color.r, color.g, color.b, color.a);
+        public static FColor create(FColor fColor) {
+            return Colors.create(fColor.r, fColor.g, fColor.b, fColor.a);
         }
 
-        public static CColor create(float r, float g, float b) {
-            return Colors.create(r, g, b, 1);
+        public static FColor create(float r, float g, float b) {
+            return Colors.create(r, g, b, 1f);
         }
 
-        public static CColor create(float r, float g, float b, float a) {
-            CColor color = new CColor();
-            setRGBA(color, r, g, b, a);
-            return color;
-        }
-
-        public static CColor createDarker(CColor color, float amount) {
-            CColor darker = create(color);
+        public static FColor createDarker(FColor color, float amount) {
             amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            darker.r = Tools.Calc.inBounds(darker.r*amount,0f,1f);
-            darker.g = Tools.Calc.inBounds(darker.g*amount,0f,1f);
-            darker.b = Tools.Calc.inBounds(darker.b*amount,0f,1f);
-            return darker;
+            float r = Tools.Calc.inBounds(color.r * amount, 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g * amount, 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b * amount, 0f, 1f);
+            return create(r, g, b, color.a);
         }
 
-        public static FColor createFixedDarker(FColor color, float amount) {
-            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
-            float r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            float g = Tools.Calc.inBounds(color.g*amount,0f,1f);
-            float b = Tools.Calc.inBounds(color.b*amount,0f,1f);
-            return createFixed(r,g,b,color.a);
-        }
-
-        public static CColor createBrighter(CColor color, float amount) {
-            CColor brighter = create(color);
+        public static FColor createBrighter(FColor color, float amount) {
             amount = 1f + Tools.Calc.lowerBounds(amount, 1f);
-            brighter.r = Tools.Calc.inBounds(brighter.r*amount,0f,1f);
-            brighter.g = Tools.Calc.inBounds(brighter.g*amount,0f,1f);
-            brighter.b = Tools.Calc.inBounds(brighter.b*amount,0f,1f);
-            return brighter;
+            float r = Tools.Calc.inBounds(color.r * amount, 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g * amount, 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b * amount, 0f, 1f);
+            return create(r, g, b, color.a);
         }
 
-        public static FColor createFixedBrighter(FColor color, float amount) {
-            amount = 1f + Tools.Calc.lowerBounds(amount, 1f);
-            float r = Tools.Calc.inBounds(color.r*amount,0f,1f);
-            float g = Tools.Calc.inBounds(color.g*amount,0f,1f);
-            float b = Tools.Calc.inBounds(color.b*amount,0f,1f);
-            return createFixed(r,g,b,color.a);
-        }
-
-        public static CColor createFromString(String colorString) {
+        public static FColor createFromString(String colorString) {
             String[] colors = colorString.split(",");
             if (colors.length != 4) return Colors.create(Colors.WHITE);
             try {
@@ -189,67 +168,16 @@ public class Tools {
             }
         }
 
-        public static CColor createFromInt(int rgb8888) {
+        public static float getBrightness(FColor fColor) {
+            return (0.299f * fColor.r) + (0.587f * fColor.g) + (0.114f * fColor.b);
+        }
+
+        public static FColor createFromInt(int rgb8888) {
             return create((float) ((rgb8888 & -16777216) >>> 24) / 255.0F,
                     (float) ((rgb8888 & 16711680) >>> 16) / 255.0F,
                     (float) ((rgb8888 & '\uff00') >>> 8) / 255.0F,
                     (float) (rgb8888 & 255) / 255.0F
             );
-        }
-
-        public static String getAsString(CColor cColor) {
-            return cColor.r + "," + cColor.g + "," + cColor.b + "," + cColor.a;
-        }
-
-        public static float getBrightness(CColor cColor) {
-            return (0.299f * cColor.r) + (0.587f * cColor.g) + (0.114f * cColor.b);
-        }
-
-        public static float getBrightness(FColor fColor) {
-            return (0.299f * fColor.r) + (0.587f * fColor.g) + (0.114f * fColor.b);
-        }
-
-        public static FColor createFixed(float r, float g, float b, float a) {
-            return new FColor(
-                    Calc.inBounds(r, 0f, 1f),
-                    Calc.inBounds(g, 0f, 1f),
-                    Calc.inBounds(b, 0f, 1f),
-                    Calc.inBounds(a, 0f, 1f));
-        }
-
-        public static FColor createFixed(CColor color) {
-            return Colors.createFixed(color.r, color.g, color.b, color.a);
-        }
-
-        public static FColor createFixed(FColor fColor) {
-            return Colors.createFixed(fColor.r, fColor.g, fColor.b, fColor.a);
-        }
-
-        public static FColor createFixed(float r, float g, float b) {
-            return Colors.createFixed(r, g, b, 1f);
-        }
-
-        public static FColor createFixedFromInt(int rgb8888) {
-            return createFixed((float) ((rgb8888 & -16777216) >>> 24) / 255.0F,
-                    (float) ((rgb8888 & 16711680) >>> 16) / 255.0F,
-                    (float) ((rgb8888 & '\uff00') >>> 8) / 255.0F,
-                    (float) (rgb8888 & 255) / 255.0F
-            );
-        }
-
-
-        public static FColor createFixedFromString(String colorString) {
-            String[] colors = colorString.split(",");
-            if (colors.length != 4) return Colors.createFixed(Colors.WHITE);
-            try {
-                return createFixed(
-                        Float.parseFloat(colors[0]),
-                        Float.parseFloat(colors[1]),
-                        Float.parseFloat(colors[2]),
-                        Float.parseFloat(colors[3]));
-            } catch (Exception e) {
-                return Colors.createFixed(Colors.WHITE);
-            }
         }
 
         public static String getAsString(FColor fColor) {
@@ -260,78 +188,8 @@ public class Tools {
             return getAsHex(fColor.r, fColor.g, fColor.b);
         }
 
-        public static String getAsHex(CColor color) {
-            return getAsHex(color.r, color.g, color.b);
-        }
-
         private static String getAsHex(float r, float g, float b) {
             return String.format("#%02x%02x%02x", MathUtils.round(r * 255), MathUtils.round(g * 255), MathUtils.round(b * 255));
-        }
-
-        public static void setAlpha(CColor color, float a) {
-            color.a = Calc.inBounds(a, 0f, 1f);
-        }
-
-        public static void setRed(CColor color, float r) {
-            color.r = Calc.inBounds(r, 0f, 1f);
-        }
-
-        public static void setGreen(CColor color, float g) {
-            color.g = Calc.inBounds(g, 0f, 1f);
-        }
-
-        public static void setBlue(CColor color, float b) {
-            color.b = Calc.inBounds(b, 0f, 1f);
-        }
-
-        public static void setRGBAFrom(CColor color, CColor colorFrom) {
-            setRGBA(color, colorFrom.r, colorFrom.g, colorFrom.b, colorFrom.a);
-        }
-
-        public static void setRGB(CColor color, float r, float g, float b) {
-            setRed(color, r);
-            setGreen(color, g);
-            setBlue(color, b);
-        }
-
-        public static void setRGBA(CColor color, float r, float g, float b, float a) {
-            setRed(color, r);
-            setGreen(color, g);
-            setBlue(color, b);
-            setAlpha(color, a);
-        }
-
-        public static void setRGBAFrom(CColor color, FColor fColor) {
-            setRGBA(color, fColor.r, fColor.g, fColor.b, fColor.a);
-        }
-
-        public static void setRGBFrom(CColor color, FColor fColor) {
-            setRGB(color, fColor.r, fColor.g, fColor.b);
-        }
-
-        public static void setRGBFrom(CColor color, CColor cColor) {
-            setRGB(color, cColor.r, cColor.g, cColor.b);
-        }
-
-        public static boolean matches(CColor color1, FColor color2) {
-            return (color1.r == color2.r &&
-                    color1.g == color2.g &&
-                    color1.b == color2.b &&
-                    color1.a == color2.a);
-        }
-
-        public static boolean matches(FColor color1, CColor color2) {
-            return (color1.r == color2.r &&
-                    color1.g == color2.g &&
-                    color1.b == color2.b &&
-                    color1.a == color2.a);
-        }
-
-        public static boolean matches(CColor color1, CColor color2) {
-            return (color1.r == color2.r &&
-                    color1.g == color2.g &&
-                    color1.b == color2.b &&
-                    color1.a == color2.a);
         }
 
         public static boolean matches(FColor color1, FColor color2) {
@@ -342,29 +200,19 @@ public class Tools {
         }
 
 
-        public static CColor createRandom() {
+        public static FColor createRandom() {
             return Colors.create(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f));
         }
 
-        public static FColor createRandomFixed() {
-            return Colors.createFixed(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f));
-        }
 
-        public static FColor createFixedFromHex(String hex) {
+        public static FColor createFromHex(String hex) {
             if (hex.startsWith("#")) hex = hex.substring(1);
-            return Colors.createFixed(
+            return Colors.create(
                     Integer.parseInt(hex.substring(0, 2), 16) / 255f,
                     Integer.parseInt(hex.substring(2, 4), 16) / 255f,
                     Integer.parseInt(hex.substring(4, 6), 16) / 255f);
         }
 
-        public static CColor createFromHex(String hex) {
-            if (hex.startsWith("#")) hex = hex.substring(1);
-            return Tools.Colors.create(
-                    Integer.parseInt(hex.substring(0, 2), 16) / 255f,
-                    Integer.parseInt(hex.substring(2, 4), 16) / 255f,
-                    Integer.parseInt(hex.substring(4, 6), 16) / 255f);
-        }
 
     }
 

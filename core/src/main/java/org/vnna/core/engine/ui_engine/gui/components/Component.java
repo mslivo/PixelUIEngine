@@ -1,6 +1,5 @@
 package org.vnna.core.engine.ui_engine.gui.components;
 
-import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.ui_engine.gui.Window;
 import org.vnna.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 
 public abstract class Component {
 
-    public int x,y,width,height;
+    public int x, y, width, height;
 
     public int offset_x, offset_y;
 
@@ -18,9 +17,9 @@ public abstract class Component {
 
     public boolean updateToolTip;
 
-    public CColor color;
+    public float color_r, color_g, color_b, color_a;
 
-    public CColor color2;
+    public float color2_r, color2_g, color2_b, color2_a;
 
     public boolean disabled;
 

@@ -1,6 +1,5 @@
 package org.vnna.core.engine.ui_engine.gui.components.map;
 
-import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.media.CMediaGFX;
 
 public class MapOverlay {
@@ -15,7 +14,7 @@ public class MapOverlay {
 
     public Object data;
 
-    public CColor color;
+    public float color_r, color_g, color_b, color_a;
 
     public int arrayIndex;
 

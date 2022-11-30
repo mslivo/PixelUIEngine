@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
-import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.color.FColor;
 import org.vnna.core.engine.media_manager.media.*;
 import org.vnna.core.engine.tools.Tools;
@@ -122,7 +121,7 @@ public class MediaManager {
                 }
 
                 prepareStack.push(loadMedia);
-            }else if (loadMedia.getClass() == CMediaSound.class) {
+            } else if (loadMedia.getClass() == CMediaSound.class) {
                 if (!loadedMedia.contains(loadMedia.file)) {
                     CMediaSound cMediaSound = (CMediaSound) loadMedia;
                     Sound sound = Gdx.audio.newSound(Tools.File.findResource(DIR_SOUND_FX + cMediaSound.file));
@@ -152,15 +151,16 @@ public class MediaManager {
         stackSize = loadStack.size();
         prepareLoop:
         while ((prepareMedia = prepareStack.pollFirst()) != null) {
-            if(prepareMedia.getClass() == CMediaImageCursor.class){
+            if (prepareMedia.getClass() == CMediaImageCursor.class) {
                 CMediaImageCursor cMediaImageCursor = (CMediaImageCursor) prepareMedia;
                 TextureRegion textureRegion = textureAtlas.findRegion(prepareMedia.file);
-                medias_cursors.put(cMediaImageCursor, Gdx.graphics.newCursor(extractPixmapFromTextureRegion(textureRegion),cMediaImageCursor.hotspot_x, cMediaImageCursor.hotspot_y));
+                medias_cursors.put(cMediaImageCursor, Gdx.graphics.newCursor(extractPixmapFromTextureRegion(textureRegion), cMediaImageCursor.hotspot_x, cMediaImageCursor.hotspot_y));
                 // SystemCursors dont need to be put here
-            }else if(prepareMedia.getClass() == CMediaImage.class){
-                CMediaImage cMediaImage = (CMediaImage)prepareMedia;
+            } else if (prepareMedia.getClass() == CMediaImage.class) {
+                CMediaImage cMediaImage = (CMediaImage) prepareMedia;
                 medias_images.put(cMediaImage, textureAtlas.findRegion(prepareMedia.file));
-            }if (prepareMedia.getClass() == CMediaFont.class) {
+            }
+            if (prepareMedia.getClass() == CMediaFont.class) {
                 CMediaFont cMediaFont = (CMediaFont) prepareMedia;
                 BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(DIR_GRAPHICS + cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
                 medias_fonts.put(cMediaFont, bitmapFont);
@@ -212,13 +212,8 @@ public class MediaManager {
         if (!textureData.isPrepared()) {
             textureData.prepare();
         }
-        Pixmap pixmap = new Pixmap(
-                textureRegion.getRegionWidth(),
-                textureRegion.getRegionHeight(),
-                textureData.getFormat()
-        );
-        pixmap.drawPixmap(
-                textureData.consumePixmap(), // The other Pixmap
+        Pixmap pixmap = new Pixmap(textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), textureData.getFormat());
+        pixmap.drawPixmap(textureData.consumePixmap(), // The other Pixmap
                 0, // The target x-coordinate (top left corner)
                 0, // The target y-coordinate (top left corner)
                 textureRegion.getRegionX(), // The source x-coordinate (top left corner)
@@ -228,7 +223,6 @@ public class MediaManager {
         );
         return pixmap;
     }
-
 
 
     public int textWidth(CMediaFont font, String text) {
@@ -246,7 +240,7 @@ public class MediaManager {
     }
 
     public int imageWidth(CMediaGFX cMedia, boolean tileWidth) {
-        if(tileWidth) {
+        if (tileWidth) {
             if (cMedia.getClass() == CMediaArray.class) {
                 return ((CMediaArray) cMedia).tile_width;
             } else if (cMedia.getClass() == CMediaAnimation.class) {
@@ -261,8 +255,8 @@ public class MediaManager {
     }
 
 
-    public int imageHeight(CMediaGFX cMedia,boolean tileHeight) {
-        if(tileHeight) {
+    public int imageHeight(CMediaGFX cMedia, boolean tileHeight) {
+        if (tileHeight) {
             if (cMedia.getClass() == CMediaArray.class) {
                 return ((CMediaArray) cMedia).tile_height;
             } else if (cMedia.getClass() == CMediaAnimation.class) {
@@ -274,11 +268,11 @@ public class MediaManager {
 
     /* Draw Methods */
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y) {
-        drawCMediaGFX(batch, cMedia, x,y, 0, 0);
+        drawCMediaGFX(batch, cMedia, x, y, 0, 0);
     }
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float animation_timer) {
-        drawCMediaGFX(batch, cMedia, x,y, animation_timer, 0);
+        drawCMediaGFX(batch, cMedia, x, y, animation_timer, 0);
     }
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float animation_timer, int arrayIndex) {
@@ -475,10 +469,6 @@ public class MediaManager {
         bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
     }
 
-    public void setCMediaFontColor(CMediaFont font, CColor color) {
-        setCMediaFontColor(font, color.r, color.g, color.b, color.a);
-    }
-
     public void setCMediaFontColorWhite(CMediaFont font) {
         setCMediaFontColor(font, 1, 1, 1, 1);
     }
@@ -524,7 +514,7 @@ public class MediaManager {
         return cMediaImageCursor;
     }
 
-    public static CMediaSystemCursor create_CMediaSystemCursor(Cursor.SystemCursor systemCursor){
+    public static CMediaSystemCursor create_CMediaSystemCursor(Cursor.SystemCursor systemCursor) {
         return new CMediaSystemCursor(systemCursor);
     }
 
@@ -595,7 +585,6 @@ public class MediaManager {
     }
 
 
-
     public boolean prepareFromObject(Object object) {
         return prepareFromObject(object, 3);
     }
@@ -639,8 +628,7 @@ public class MediaManager {
                         resolveCMedia(arrayListItem, scanDepth, level + 1);
                     }
                 } else if (field.getType().isArray()) {
-                    if (field.getType().getName().startsWith("[L") ||
-                            field.getType().getName().startsWith("[[L")) {
+                    if (field.getType().getName().startsWith("[L") || field.getType().getName().startsWith("[[L")) {
                         Object[] arrayObjects = (Object[]) fieldObject;
                         for (Object arrayObject : arrayObjects) {
                             resolveCMedia(arrayObject, scanDepth, level + 1);

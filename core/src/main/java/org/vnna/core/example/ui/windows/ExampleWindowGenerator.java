@@ -104,12 +104,12 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ScrollBarVertical scrollBarVertical = api.components.scrollBar.verticalScrollbar.create(2, 2, 12, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                Tools.Colors.setAlpha(window.color, 0.2f + (scrolled * 0.8f));
+                window.color_a = scrolled;
             }
-        }, window.color.a);
+        }, window.color_a);
 
         Knob knob = api.components.knob.create(4, 2, null, false);
-        api.components.knob.setTurned(knob, knob.color.a);
+        api.components.knob.setTurned(knob, knob.color_a);
         KnobAction knobAction = new KnobAction() {
             @Override
             public void onTurned(float turned, float amount) {
@@ -132,23 +132,23 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ScrollBarHorizontal scrollBarHorizontalR = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                Tools.Colors.setRed(oval.color, scrolled);
+                oval.color_r = scrolled;
             }
-        }, oval.color.r);
+        }, oval.color_r);
         api.components.setColor1And2(scrollBarHorizontalR, Tools.Colors.RED_BRIGHT);
         ScrollBarHorizontal scrollBarHorizontalG = api.components.scrollBar.horizontalScrollbar.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                Tools.Colors.setGreen(oval.color, scrolled);
+                oval.color_g = scrolled;
             }
-        }, oval.color.g);
+        }, oval.color_g);
         api.components.setColor1And2(scrollBarHorizontalG, Tools.Colors.GREEN_BRIGHT);
         ScrollBarHorizontal scrollBarHorizontalB = api.components.scrollBar.horizontalScrollbar.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                Tools.Colors.setBlue(oval.color, scrolled);
+                oval.color_b = scrolled;
             }
-        }, oval.color.b);
+        }, oval.color_b);
         api.components.setColor1And2(scrollBarHorizontalB, Tools.Colors.BLUE_BRIGHT);
 
 
@@ -164,7 +164,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.button.setButtonAction(notiBtn, new ButtonAction() {
             @Override
             public void onRelease() {
-                Notification notification = api.notifications.create(textField.content, Tools.Colors.createRandomFixed());
+                Notification notification = api.notifications.create(textField.content, Tools.Colors.createRandom());
 
                 api.notifications.setNotificationAction(notification, new NotificationAction() {
                     @Override

@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import org.vnna.core.engine.media_manager.MediaManager;
-import org.vnna.core.engine.media_manager.color.CColor;
 import org.vnna.core.engine.media_manager.color.FColor;
 import org.vnna.core.engine.media_manager.media.CMediaCursor;
 import org.vnna.core.engine.media_manager.media.CMediaFont;
@@ -564,7 +563,7 @@ public class API {
             components.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    selectColorFunction.accept(Tools.Colors.createFixed(ok.color));
+                    selectColorFunction.accept(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b));
                     removeCurrentModalWindow();
                 }
             });
@@ -624,7 +623,7 @@ public class API {
                         if (x != xLast || y != yLast) {
 
                             components.setColor(ok, components.map.getPixel(colorMap, x, y));
-                            components.button.textButton.setFont(ok, Tools.Colors.getBrightness(ok.color) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
+                            components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
 
                             components.map.mapOverlay.setPosition(cursorOverlay, x - 2, yInv - 2);
                             xLast = x;
@@ -735,13 +734,16 @@ public class API {
 
             stepSize = Tools.Calc.lowerBounds(stepSize, 0);
             // Background
-            CColor bgBrush = Tools.Colors.create(1, 1, 1, 1);
+            float brush_r = 1f;
+            float brush_g = 1f;
+            float brush_b = 1f;
+
+            FColor bgBrush = Tools.Colors.create(1, 1, 1, 1);
             for (int x = 0; x < map.width * UIEngine.TILE_SIZE; x++) {
-                if (x % 4 == 0) {
-                    Tools.Colors.setRGB(bgBrush, color_bg.r * 0.95f, color_bg.g * 0.95f, color_bg.b * 0.95f);
-                } else {
-                    Tools.Colors.setRGB(bgBrush, color_bg.r, color_bg.g, color_bg.b);
-                }
+                float dark = x % 4 == 0 ? 0.95f : 1;
+                brush_r = color_bg.r * dark;
+                brush_g = color_bg.g * dark;
+                brush_b = color_bg.b * dark;
                 for (int y = 0; y < map.height * UIEngine.TILE_SIZE; y++) {
                     components.map.drawPixel(map, x, y, bgBrush.r, bgBrush.g, bgBrush.b, bgBrush.a);
                 }
@@ -1330,7 +1332,7 @@ public class API {
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
         private CMediaFont notificationsDefaultFont = GUIBaseMedia.FONT_WHITE;
-        private FColor notificationsDefaultColor = Tools.Colors.createFixed(0, 0, 0, 1f);
+        private FColor notificationsDefaultColor = Tools.Colors.create(0, 0, 0, 1f);
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
@@ -1356,7 +1358,7 @@ public class API {
 
         public void setWindowsDefaultColor(FColor windowsDefaultColor) {
             if (windowsDefaultColor == null) return;
-            this.windowsDefaultColor = Tools.Colors.createFixed(windowsDefaultColor);
+            this.windowsDefaultColor = Tools.Colors.create(windowsDefaultColor);
         }
 
         public FColor getComponentsDefaultColor() {
@@ -1365,7 +1367,7 @@ public class API {
 
         public void setComponentsDefaultColor(FColor componentsDefaultColor) {
             if (componentsDefaultColor == null) return;
-            this.componentsDefaultColor = Tools.Colors.createFixed(componentsDefaultColor);
+            this.componentsDefaultColor = Tools.Colors.create(componentsDefaultColor);
         }
 
         public FColor getTooltipDefaultColor() {
@@ -1374,7 +1376,7 @@ public class API {
 
         public void setTooltipDefaultColor(FColor tooltipDefaultColor) {
             if (tooltipDefaultColor == null) return;
-            this.tooltipDefaultColor = Tools.Colors.createFixed(tooltipDefaultColor);
+            this.tooltipDefaultColor = Tools.Colors.create(tooltipDefaultColor);
         }
 
         public CMediaCursor getCursorGui() {
@@ -1476,7 +1478,7 @@ public class API {
 
         public void setNotificationsDefaultColor(FColor notificationsDefaultColor) {
             if (notificationsDefaultColor == null) return;
-            this.notificationsDefaultColor = Tools.Colors.createFixed(notificationsDefaultColor);
+            this.notificationsDefaultColor = Tools.Colors.create(notificationsDefaultColor);
         }
 
         public int getNotificationsFadeoutTime() {
@@ -1727,8 +1729,11 @@ public class API {
         }
 
         public void setColor(Notification notification, FColor color) {
-            if (notification == null) return;
-            notification.color = Tools.Colors.create(color == null ? config.notificationsDefaultColor : color);
+            if (notification == null || color == null) return;
+            notification.color_r = color.r;
+            notification.color_g = color.g;
+            notification.color_b = color.b;
+            notification.color_a = color.a;
         }
 
         public void setFont(Notification notification, CMediaFont font) {
@@ -1760,8 +1765,11 @@ public class API {
         }
 
         public void setColor(ContextMenu contextMenu, FColor color) {
-            if (contextMenu == null) return;
-            contextMenu.color = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
+            if (contextMenu == null || color == null) return;
+            contextMenu.color_r = color.r;
+            contextMenu.color_g = color.g;
+            contextMenu.color_b = color.b;
+            contextMenu.color_a = color.a;
         }
 
         public void setContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
@@ -1833,8 +1841,11 @@ public class API {
             }
 
             public void setColor(ContextMenuItem contextMenuItem, FColor color) {
-                if (contextMenuItem == null) return;
-                contextMenuItem.color = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
+                if (contextMenuItem == null || color == null) return;
+                contextMenuItem.color_r = color.r;
+                contextMenuItem.color_g = color.g;
+                contextMenuItem.color_b = color.b;
+                contextMenuItem.color_a = color.a;
             }
 
             public void setFont(ContextMenuItem contextMenuItem, CMediaFont font) {
@@ -1874,39 +1885,39 @@ public class API {
         }
 
         public Window create(int x, int y, int width, int height) {
-            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title) {
-            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon) {
-            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), null, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, null, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, null, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, null, null);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, config.windowsDefaultColor, null);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components, FColor color) {
@@ -2159,19 +2170,17 @@ public class API {
             window.data = data;
         }
 
-        public void setColor(Window window, CColor color) {
-            if (window == null) return;
-            window.color = color == null ? Tools.Colors.create(config.windowsDefaultColor) : color;
-        }
-
-        public void setColor(Window window, FColor fcolor) {
-            if (window == null) return;
-            window.color = fcolor == null ? Tools.Colors.create(config.windowsDefaultColor) : Tools.Colors.create(fcolor);
+        public void setColor(Window window, FColor color) {
+            if (window == null || color == null) return;
+            window.color_r = color.r;
+            window.color_g = color.g;
+            window.color_b = color.b;
+            window.color_a = color.a;
         }
 
         public void setTransparency(Window window, float transparency) {
             if (window == null) return;
-            Tools.Colors.setAlpha(window.color, transparency);
+            window.color_a = transparency;
         }
 
         public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {
@@ -2297,13 +2306,11 @@ public class API {
         }
 
         public void setColor(ToolTip tooltip, FColor color) {
-            if (tooltip == null) return;
-            tooltip.cColor = color == null ? Tools.Colors.create(config.tooltipDefaultColor) : Tools.Colors.create(color);
-        }
-
-        public void setColor(ToolTip tooltip, CColor color) {
-            if (tooltip == null) return;
-            tooltip.cColor = color == null ? Tools.Colors.create(config.tooltipDefaultColor) : color;
+            if (tooltip == null || color == null) return;
+            tooltip.color_r = color.r;
+            tooltip.color_g = color.g;
+            tooltip.color_b = color.b;
+            tooltip.color_a = color.a;
         }
 
         public void setFont(ToolTip tooltip, CMediaFont font) {
@@ -2591,13 +2598,19 @@ public class API {
         }
 
         public void setColor(Component component, FColor color) {
-            if (component == null) return;
-            component.color = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
+            if (component == null || color == null) return;
+            component.color_r = color.r;
+            component.color_g = color.g;
+            component.color_b = color.b;
+            component.color_a = color.a;
         }
 
         public void setColor2(Component component, FColor color) {
-            if (component == null) return;
-            component.color2 = Tools.Colors.create(color == null ? config.componentsDefaultColor : color);
+            if (component == null || color == null) return;
+            component.color2_r = color.r;
+            component.color2_g = color.g;
+            component.color2_b = color.b;
+            component.color2_a = color.a;
         }
 
         public void setColor(Collection<Component> components, FColor color) {
@@ -2645,7 +2658,7 @@ public class API {
 
         public void setTransparency(Component component, float transparency) {
             if (component == null) return;
-            Tools.Colors.setAlpha(component.color, transparency);
+            component.color_a = transparency;
         }
 
         public void setTransparency(Component[] components, float transparency) {
@@ -2658,9 +2671,14 @@ public class API {
         private void setComponentInitValues(Component component) {
             component.x = component.y = 0;
             component.width = component.height = 1;
-            component.toolTip = null;
-            component.color = Tools.Colors.create(config.componentsDefaultColor);
-            component.color2 = Tools.Colors.create(config.componentsDefaultColor);
+            component.color_r = config.componentsDefaultColor.r;
+            component.color_g = config.componentsDefaultColor.g;
+            component.color_b = config.componentsDefaultColor.b;
+            component.color_a = config.componentsDefaultColor.a;
+            component.color2_r = config.componentsDefaultColor.r;
+            component.color2_g = config.componentsDefaultColor.g;
+            component.color2_b = config.componentsDefaultColor.b;
+            component.color2_a = config.componentsDefaultColor.a;
             component.disabled = false;
             component.updateActions = new ArrayList<>();
             component.data = null;
@@ -3658,7 +3676,7 @@ public class API {
 
             public FColor getPixel(Map map, int x, int y) {
                 if (map == null) return null;
-                return Tools.Colors.createFixedFromInt(map.pMap.getPixel(x, y));
+                return Tools.Colors.createFromInt(map.pMap.getPixel(x, y));
             }
 
             public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
@@ -3753,8 +3771,11 @@ public class API {
                 }
 
                 public void setColor(MapOverlay mapOverlay, FColor color) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.color = Tools.Colors.create(color == null ? Tools.Colors.WHITE : color);
+                    if (mapOverlay == null || color == null) return;
+                    mapOverlay.color_r = color.r;
+                    mapOverlay.color_g = color.g;
+                    mapOverlay.color_b = color.b;
+                    mapOverlay.color_a = color.a;
                 }
 
                 public void setArrayIndex(MapOverlay mapOverlay, int arrayIndex) {
