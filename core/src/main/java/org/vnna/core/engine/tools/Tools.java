@@ -89,6 +89,7 @@ public class Tools {
     public static class Colors {
         public static final FColor WHITE = new FColor(1, 1, 1, 1);
         public static final FColor BLACK = new FColor(0, 0, 0, 1);
+
         public static final FColor TRANSPARENT = new FColor(0, 0, 0, 0);
         public static final FColor GREEN_BRIGHT = new FColor(0.18039216f, 0.8f, 0.44313726f, 1f);
         public static final FColor GREEN_DARK = new FColor(0.15294118f, 0.68235296f, 0.3764706f, 1f);
@@ -149,6 +150,14 @@ public class Tools {
             return darker;
         }
 
+        public static FColor createFixedDarker(FColor color, float amount) {
+            amount = 1f - Tools.Calc.inBounds(amount, 0f, 1f);
+            float r = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            float g = Tools.Calc.inBounds(color.g*amount,0f,1f);
+            float b = Tools.Calc.inBounds(color.b*amount,0f,1f);
+            return createFixed(r,g,b,color.a);
+        }
+
         public static CColor createBrighter(CColor color, float amount) {
             CColor brighter = create(color);
             amount = 1f + Tools.Calc.lowerBounds(amount, 1f);
@@ -156,6 +165,14 @@ public class Tools {
             brighter.g = Tools.Calc.inBounds(brighter.g*amount,0f,1f);
             brighter.b = Tools.Calc.inBounds(brighter.b*amount,0f,1f);
             return brighter;
+        }
+
+        public static FColor createFixedBrighter(FColor color, float amount) {
+            amount = 1f + Tools.Calc.lowerBounds(amount, 1f);
+            float r = Tools.Calc.inBounds(color.r*amount,0f,1f);
+            float g = Tools.Calc.inBounds(color.g*amount,0f,1f);
+            float b = Tools.Calc.inBounds(color.b*amount,0f,1f);
+            return createFixed(r,g,b,color.a);
         }
 
         public static CColor createFromString(String colorString) {
