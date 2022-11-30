@@ -38,11 +38,11 @@ public class LauncherMain {
 
         ExampleStartParameters exampleStartParameters = new ExampleStartParameters();
         exampleStartParameters.dataFile = testDataFile.toAbsolutePath().toString();
-        exampleStartParameters.internalResolutionWidth = 640;
-        exampleStartParameters.internalResolutionHeight = 360;
+        exampleStartParameters.internalResolutionWidth = 768;
+        exampleStartParameters.internalResolutionHeight = 432;
         // List of 16:9 resolutions
         // 256x144, 384x216, 512x288, 640x360, 768x432
-        exampleStartParameters.viewportMode = ViewportMode.FIT;
+        exampleStartParameters.viewportMode = ViewportMode.PIXEL_PERFECT;
 
         config.setResizable(true);
         config.setWindowedMode(exampleStartParameters.internalResolutionWidth, exampleStartParameters.internalResolutionHeight);

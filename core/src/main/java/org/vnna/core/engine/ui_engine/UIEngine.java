@@ -158,8 +158,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui.flip(false, true);
         // StretchMode Buffers
         if (newInputState.viewportMode == ViewportMode.FIT || newInputState.viewportMode == ViewportMode.STRETCH) {
-            newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
-            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
+            newInputState.stretchModeFactor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
+            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.stretchModeFactor_upScale, newInputState.internalResolutionHeight * newInputState.stretchModeFactor_upScale, false);
             newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
             newInputState.texture_upScale.flip(false, true);
