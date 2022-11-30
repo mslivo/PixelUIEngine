@@ -65,12 +65,12 @@ public class ExampleUIAdapter implements UIAdapter {
         createExampleWindowButton.buttonAction.onPress();
         createExampleWindowButton.buttonAction.onRelease();
 
-        api.addHotKey(new int[]{Input.Keys.ESCAPE}, new HotKeyAction() {
+        api.addHotKey(api.hotkey.create(new int[]{Input.Keys.ESCAPE}, new HotKeyAction() {
             @Override
             public void onPress() {
                 api.closeAllWindows();
             }
-        });
+        }));
 
         api.setMouseTool(api.mouseTool.create("Pointer", null,GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW));
 

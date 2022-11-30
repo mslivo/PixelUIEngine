@@ -1,5 +1,6 @@
 package org.vnna.core.engine.ui_engine;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -77,6 +78,9 @@ public class API {
 
     public final _MouseTool mouseTool = new _MouseTool();
 
+
+    public final _HotKey hotkey = new _HotKey();
+
     private InputState inputState;
 
     private MediaManager mediaManager;
@@ -119,6 +123,51 @@ public class API {
         inputState.windows.forEach(window -> {
             UICommons.window_enforceScreenBounds(inputState, window);
         });
+    }
+
+    public class _HotKey {
+
+        public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
+            if (keyCodes == null || keyCodes.length == 0) return null;
+            if (hotKeyAction == null) return null;
+            HotKey hotKey = new HotKey();
+            hotKey.pressed = false;
+            setKeyCodes(hotKey, keyCodes);
+            setHotKeyAction(hotKey, hotKeyAction);
+            setName(hotKey, "");
+            setData(hotKey, null);
+            return hotKey;
+        }
+
+        public void setKeyCodes(HotKey hotKey, int[] keyCodes) {
+            if (hotKey == null) return;
+            hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
+        }
+
+
+        public void setHotKeyAction(HotKey hotKey, HotKeyAction hotKeyAction) {
+            if (hotKey == null) return;
+            hotKey.hotKeyAction = hotKeyAction;
+        }
+
+        public void setName(HotKey hotKey, String name) {
+            if (hotKey == null) return;
+            hotKey.name = Tools.Text.validString(name);
+        }
+
+        public void setData(HotKey hotKey, Object data) {
+            if (hotKey == null) return;
+            hotKey.data = data;
+        }
+
+        public String getKeysAsString(HotKey hotKey) {
+            String result = "";
+            String[] names = new String[hotKey.keyCodes.length];
+            for (int i = 0; i < hotKey.keyCodes.length; i++) {
+                names[i] = Input.Keys.toString(hotKey.keyCodes[i]);
+            }
+            return String.join("+", names);
+        }
     }
 
 
@@ -1180,7 +1229,7 @@ public class API {
     }
 
     public boolean isMouseTool(String name) {
-        if(name == null) return false;
+        if (name == null) return false;
         return inputState.mouseTool != null ? name.equals(inputState.mouseTool.name) : false;
     }
 
@@ -1188,34 +1237,42 @@ public class API {
         return inputState.hotKeys;
     }
 
-    public HotKey addHotKey(int[] keyCodes, HotKeyAction hotKeyAction) {
-        if (keyCodes == null || keyCodes.length == 0) return null;
-        if (hotKeyAction == null) return null;
-        HotKey hotKey = new HotKey();
-        hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
-        hotKey.pressed = false;
-        hotKey.hotKeyAction = hotKeyAction;
+    public void addHotKey(HotKey hotKey) {
+        if (hotKey == null) return;
         inputState.addHotKeyQueue.add(hotKey);
-        return hotKey;
+        return;
     }
 
     public void removeHotKey(HotKey hotKey) {
+        if (hotKey == null) return;
         inputState.removeHotKeyQueue.remove(hotKey);
     }
 
-    public void removeHotKey(HotKey[] hotKeys) {
-        if (hotKeys == null) return;
-        for (HotKey hotKey : hotKeys) removeHotKey(hotKey);
+    public ArrayList<HotKey> findHotKeysByName(String name) {
+        ArrayList<HotKey> result = new ArrayList<>();
+        if (name == null) return result;
+        for (HotKey hotKey : inputState.hotKeys) {
+            if (name.equals(hotKey.name)) {
+                result.add(hotKey);
+            }
+        }
+        return result;
     }
 
     public void removeAllHotKeys() {
         for (HotKey hotKey : inputState.hotKeys) removeHotKey(hotKey);
     }
 
+    public void removeHotKeys(HotKey[] hotKeys) {
+        if (hotKeys == null) return;
+        for (HotKey hotKey : hotKeys) removeHotKey(hotKey);
+    }
+
     public ArrayList<Window> findWindowsByName(String name) {
         ArrayList<Window> result = new ArrayList<>();
+        if (name == null) return result;
         for (Window window : inputState.windows) {
-            if (window.name != null && window.name.equals(name)) {
+            if (name.equals(window.name)) {
                 result.add(window);
             }
         }
@@ -1993,35 +2050,15 @@ public class API {
             for (Component component : components) removeComponent(window, component);
         }
 
-        public void removeComponentsByName(Window window, String name) {
-            if (window == null) return;
-            for (Component component : window.components) {
-                if (component.name != null && component.name.equals(name)) removeComponent(window, component);
-            }
-            for (Component component : window.addComponentsQueue) {
-                if (component.name != null && component.name.equals(name)) removeComponent(window, component);
-            }
-        }
-
-        public Component findComponentByName(Window window, String name) {
-            if (window == null) return null;
-            for (Component component : window.components) {
-                if (component.name != null && component.name.equals(name)) return component;
-            }
-            for (Component component : window.addComponentsQueue) {
-                if (component.name != null && component.name.equals(name)) return component;
-            }
-            return null;
-        }
-
         public ArrayList<Component> findComponentsByName(Window window, String name) {
             ArrayList<Component> result = new ArrayList<>();
+            if (window == null || name == null) return result;
             if (window == null) return result;
             for (Component component : window.components) {
-                if (component.name != null && component.name.equals(name)) result.add(component);
+                if (name.equals(component.name)) result.add(component);
             }
             for (Component component : window.addComponentsQueue) {
-                if (component.name != null && component.name.equals(name)) result.add(component);
+                if (name.equals(component.name)) result.add(component);
             }
             return result;
         }
@@ -2537,7 +2574,7 @@ public class API {
 
         public void setColor1And2(Collection<Component> components, FColor color) {
             if (components == null) return;
-            for (Component component : components){
+            for (Component component : components) {
                 setColor(component, color);
                 setColor2(component, color);
             }
@@ -2545,7 +2582,7 @@ public class API {
 
         public void setColor1And2(Component[] components, FColor color) {
             if (components == null) return;
-            for (Component component : components){
+            for (Component component : components) {
                 setColor(component, color);
                 setColor2(component, color);
             }
@@ -3579,9 +3616,9 @@ public class API {
 
             public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
                 ArrayList<MapOverlay> result = new ArrayList<>();
-                if (map == null || mapOverlay == null) return result;
+                if (map == null || name == null) return result;
                 for (MapOverlay mapOverlay : map.overlays) {
-                    if (mapOverlay.name.equals(name)) result.add(mapOverlay);
+                    if (name.equals(mapOverlay.name)) result.add(mapOverlay);
                 }
                 return result;
             }
