@@ -1,6 +1,7 @@
 package org.vnna.core.example.ui.windows;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import org.vnna.core.engine.game_engine.GameEngine;
 import org.vnna.core.engine.media_manager.MediaManager;
@@ -39,6 +40,7 @@ import org.vnna.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.vnna.core.engine.ui_engine.gui.notification.Notification;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
+import org.vnna.core.engine.ui_engine.misc.BackgroundDrawFunction;
 import org.vnna.core.example.engine.ExampleEngineAdapter;
 import org.vnna.core.example.ui.media.ExampleBaseMedia;
 

@@ -9,8 +9,6 @@ import org.vnna.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.vnna.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.vnna.core.engine.ui_engine.gui.components.textfield.TextField;
 
-import static java.awt.SystemColor.window;
-
 class UICommons {
 
     static int component_getParentWindowX(Component component) {
@@ -115,8 +113,8 @@ class UICommons {
         inputState.listDrag_from_index = 0;
         inputState.tooltip_lastHoverObject = null;
         inputState.pressedMap = null;
-        inputState.contextMenu = null;
-        inputState.contextMenuWidth = 0;
+        inputState.displayedContextMenu = null;
+        inputState.displayedContextMenuWidth = 0;
     }
 
 

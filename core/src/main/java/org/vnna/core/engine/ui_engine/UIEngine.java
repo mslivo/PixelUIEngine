@@ -2,8 +2,8 @@ package org.vnna.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import org.vnna.core.engine.media_manager.MediaManager;
 import org.vnna.core.engine.media_manager.color.FColor;
@@ -55,7 +56,6 @@ import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
 import org.vnna.core.engine.ui_engine.misc.ViewportMode;
 import org.vnna.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.vnna.core.engine.ui_engine.render.shaders.GrayScaleShader;
-import org.vnna.core.engine.ui_engine.render.shaders.SharpeningShader;
 
 import java.awt.*;
 import java.util.ArrayDeque;
@@ -109,13 +109,13 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.init(this.api, this.mediaManager);
     }
 
-    private int determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight){
+    private int determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
         int upSampling = 1;
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int testWidth = (int)(screenSize.getWidth());
-        int testHeight = (int)(screenSize.getHeight());
-        while((internalResolutionWidth*upSampling) < testWidth && (internalResolutionHeight*upSampling) < testHeight){
+        int testWidth = (int) (screenSize.getWidth());
+        int testHeight = (int) (screenSize.getHeight());
+        while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
             upSampling++;
         }
         return upSampling;
@@ -158,13 +158,15 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui.flip(false, true);
         // StretchMode Buffers
         if (newInputState.viewportMode == ViewportMode.FIT || newInputState.viewportMode == ViewportMode.STRETCH) {
-            newInputState.stretchModeFactor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
-            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.stretchModeFactor_upScale, newInputState.internalResolutionHeight * newInputState.stretchModeFactor_upScale, false);
+            // Upscaler
+            newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
+            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
             newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
             newInputState.texture_upScale.flip(false, true);
             newInputState.spriteBatch_upScale = new SpriteBatch(8191);
             newInputState.camera_upScale = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+
         }
         // Screen
         newInputState.spriteBatch_screen = new SpriteBatch(8191);
@@ -197,8 +199,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.removeScreenComponentsQueue = new ArrayDeque<>();
         newInputState.addHotKeyQueue = new ArrayDeque<>();
         newInputState.removeHotKeyQueue = new ArrayDeque<>();
-        newInputState.contextMenu = null;
-        newInputState.contextMenuWidth = 0;
+        newInputState.displayedContextMenu = null;
+        newInputState.displayedContextMenuWidth = 0;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
         newInputState.focusedTextField = null;
@@ -243,11 +245,9 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseTool = null;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.vector_worldCurosr = new Vector2(0, 0);
         // -----  Other
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
-        newInputState.sharpeningShader = new ShaderProgram(SharpeningShader.VERTEX, SharpeningShader.FRAGMENT);
 
         newInputState.tempColorStack = new Color[8];
         for (int i = 0; i < 8; i++) newInputState.tempColorStack[i] = new Color(1, 1, 1, 1);
@@ -555,7 +555,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (inputState.inputEvents.mouseButton == Input.Buttons.LEFT) {
                         if (contextMenuItem.contextMenuItemAction != null) {
                             contextMenuItem.contextMenuItemAction.onSelect();
-                            inputState.contextMenu = null;
+                            inputState.displayedContextMenu = null;
                         }
                     }
                 } else if (inputState.lastGUIMouseHover instanceof Button) {
@@ -818,8 +818,8 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             // close contextmenu
-            if (inputState.contextMenu != null) {
-                inputState.contextMenu = null;
+            if (inputState.displayedContextMenu != null) {
+                inputState.displayedContextMenu = null;
             }
             if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
                 inputState.focusedTextField.focused = false;
@@ -1416,7 +1416,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.displayTemporaryCursor) {
                 inputState.cursor_setNext = inputState.temporaryCursor;
                 inputState.displayTemporaryCursor = false;
-            }else{
+            } else {
                 if (inputState.mouseTool != null) {
                     // 3. Mouse Tool cursor
                     if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
@@ -1469,10 +1469,10 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Context Menu collision
-        if (inputState.contextMenu != null) {
-            for (int i = 0; i < inputState.contextMenu.items.size(); i++) {
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, inputState.contextMenu.x, inputState.contextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.contextMenuWidth * TILE_SIZE, TILE_SIZE)) {
-                    return inputState.contextMenu.items.get(i);
+        if (inputState.displayedContextMenu != null) {
+            for (int i = 0; i < inputState.displayedContextMenu.items.size(); i++) {
+                if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, inputState.displayedContextMenu.x, inputState.displayedContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                    return inputState.displayedContextMenu.items.get(i);
                 }
             }
         }
@@ -1551,6 +1551,7 @@ public class UIEngine<T extends UIAdapter> {
 
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 0);
+        boolean withUpscaleBuffer = inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH;
 
         // Draw Game
         {
@@ -1577,8 +1578,9 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_gui.end();
         }
 
-        // Render to Upscaled buffer
-        if (inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH) {
+        // Render to Upscaled Buffer
+        if (withUpscaleBuffer) {
+            // Render to Upscale Buffer
             inputState.spriteBatch_upScale.setProjectionMatrix(inputState.camera_upScale.combined);
             inputState.frameBuffer_upScale.begin();
             inputState.spriteBatch_screen.begin();
@@ -1588,13 +1590,13 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_upScale.end();
         }
 
+
         // Render Final Screen
         {
-
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             inputState.viewport_screen.apply();
             inputState.spriteBatch_screen.begin();
-            if (inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH) {
+            if (withUpscaleBuffer) {
                 inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             } else {
                 inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
@@ -1887,10 +1889,10 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawContextMenu() {
 
-        if (inputState.contextMenu != null) {
-            ContextMenu contextMenu = inputState.contextMenu;
+        if (inputState.displayedContextMenu != null) {
+            ContextMenu contextMenu = inputState.displayedContextMenu;
 
-            int width = inputState.contextMenuWidth;
+            int width = inputState.displayedContextMenuWidth;
             int height = contextMenu.items.size();
 
             render_batchSaveColor();
@@ -1902,7 +1904,7 @@ public class UIEngine<T extends UIAdapter> {
                     int index = render_getComponent9TilesCMediaIndex(x, y, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     ContextMenuItem item = contextMenu.items.get(y);
                     CMediaArray cMenuTexture = null;
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, contextMenu.x, contextMenu.y - (TILE_SIZE) - (y * TILE_SIZE), inputState.contextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                    if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, contextMenu.x, contextMenu.y - (TILE_SIZE) - (y * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
                     } else {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU;

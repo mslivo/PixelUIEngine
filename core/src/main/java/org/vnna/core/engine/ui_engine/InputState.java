@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.vnna.core.engine.media_manager.media.CMediaCursor;
 import org.vnna.core.engine.ui_engine.gui.Window;
@@ -32,7 +33,6 @@ import org.vnna.core.engine.ui_engine.input_processor.InputEvents;
 import org.vnna.core.engine.ui_engine.input_processor.UIEngineInputProcessor;
 import org.vnna.core.engine.ui_engine.misc.ViewportMode;
 
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -45,45 +45,50 @@ public class InputState {
 
     public ViewportMode viewportMode;
 
-    public int stretchModeFactor_upScale;
 
-    /* Drawing */
+    /* #################### Graphics: Game #################### */
+    public SpriteBatch spriteBatch_game;
 
-    public SpriteBatch spriteBatch_game, spriteBatch_gui, spriteBatch_screen, spriteBatch_upScale;
+    public TextureRegion texture_game;
 
-    public TextureRegion texture_game, texture_gui, texture_upScale;
-
-    public ShaderProgram grayScaleShader;
-
-    public ShaderProgram sharpeningShader;
-
-    public Viewport viewport_screen;
-
-    /* Camera Viewport etc. */
-
-    public OrthographicCamera camera_game; // game camera
+    public OrthographicCamera camera_game;
 
     public float camera_x, camera_y, camera_z, camera_zoom;
 
     public int camera_width, camera_height;
 
-    public OrthographicCamera camera_gui, camera_screen; // static gui and screen cameras
+    public FrameBuffer frameBuffer_game;
 
-    public OrthographicCamera camera_frustum, camera_upScale; // camera for frustum testing and upscaling
 
-    public FrameBuffer frameBuffer_game, frameBuffer_gui;
+    /* #################### Graphics: GUI #################### */
+
+    public SpriteBatch spriteBatch_gui;
+    public TextureRegion texture_gui;
+
+    public OrthographicCamera camera_gui;
+
+    public FrameBuffer frameBuffer_gui;
+
+    /* #################### Graphics: Upscaling #################### */
+
+    public SpriteBatch spriteBatch_upScale;
+
+    public TextureRegion texture_upScale;
+    public int factor_upScale;
+
+    public OrthographicCamera camera_upScale;
 
     public FrameBuffer frameBuffer_upScale;
 
+    /* #################### Graphics: Screen #################### */
 
+    public SpriteBatch spriteBatch_screen;
 
-    /* InputProcessor */
+    public Viewport viewport_screen;
 
-    public UIEngineInputProcessor inputProcessor;
+    public OrthographicCamera camera_screen;
 
-    public InputEvents inputEvents;
-
-    /* GUI */
+    /* #################### GUI: Added Elements #################### */
 
     public ArrayList<Window> windows;
 
@@ -101,10 +106,6 @@ public class InputState {
 
     public Deque<HotKey> removeHotKeyQueue;
 
-    public ContextMenu contextMenu; // Current Displayed Context Menu
-
-    public int contextMenuWidth;
-
     public Window modalWindow;
 
     public ArrayDeque<Window> modalWindowQueue;
@@ -113,13 +114,15 @@ public class InputState {
 
     public ArrayList<HotKey> hotKeys;
 
-    public boolean guiFrozen; // whole gui frozen
+    public boolean guiFrozen;
 
     public ArrayList<GameViewPort> gameViewPorts;
 
     public ArrayList<UpdateAction> delayedOneshotActions;
 
-    /* Temp GUI Variables */
+
+
+    /* #################### GUI: Temporary Switches #################### */
 
     public Window draggedWindow;
 
@@ -134,7 +137,6 @@ public class InputState {
     public ScrollBarHorizontal scrolledScrollBarHorizontal;
 
     public ToolTip tooltip;
-
     public Object tooltip_lastHoverObject;
 
     public Knob turnedKnob;
@@ -175,12 +177,16 @@ public class InputState {
 
     public boolean[] hotKeyPressedKeys;
 
-
+    public Window lastActiveWindow;
     public MouseTool pressedMouseTool;
 
     public ComboBox openComboBox;
 
-    /* Mouse */
+    public ContextMenu displayedContextMenu;
+
+    public int displayedContextMenuWidth;
+
+    /* #################### Mouse #################### */
 
     public int mouse_x;
 
@@ -196,7 +202,6 @@ public class InputState {
 
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
 
-    public Window lastActiveWindow;
     public CMediaCursor cursor_setNext;
 
     public CMediaCursor cursor_current;
@@ -209,9 +214,9 @@ public class InputState {
 
     public Vector3 vector_fboCursor;
 
-    public Vector2 vector2_unproject, vector_worldCurosr;
+    public Vector2 vector2_unproject;
 
-    /* Other */
+    /* #################### Misc. ####################  */
 
     public float animation_timer_gui;
 
@@ -219,4 +224,11 @@ public class InputState {
 
     public int tempColorStackPointer;
 
+    public ShaderProgram grayScaleShader;
+
+    public OrthographicCamera camera_frustum; // camera for frustum testing
+
+    public UIEngineInputProcessor inputProcessor;
+
+    public InputEvents inputEvents;
 }

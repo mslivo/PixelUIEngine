@@ -1064,25 +1064,25 @@ public class API {
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        inputState.contextMenu = contextMenu;
-        inputState.contextMenu.x = x;
-        inputState.contextMenu.y = y;
+        inputState.displayedContextMenu = contextMenu;
+        inputState.displayedContextMenu.x = x;
+        inputState.displayedContextMenu.y = y;
         int textwidth = 0;
-        for (ContextMenuItem item : inputState.contextMenu.items) {
+        for (ContextMenuItem item : inputState.displayedContextMenu.items) {
             int w = mediaManager.textWidth(item.font, item.text);
             if (item.icon != null) w = w + UIEngine.TILE_SIZE;
             if (w > textwidth) textwidth = w;
         }
-        inputState.contextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
+        inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
     }
 
     public void closeContextMenu() {
-        inputState.contextMenu = null;
-        inputState.contextMenuWidth = 0;
+        inputState.displayedContextMenu = null;
+        inputState.displayedContextMenuWidth = 0;
     }
 
     public ContextMenu getContextMenu() {
-        return inputState.contextMenu;
+        return inputState.displayedContextMenu;
     }
 
     public ArrayList<Window> getWindows() {
@@ -1337,6 +1337,10 @@ public class API {
         private HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
+
+        public boolean isWindowsDefaultEnforceScreenBounds() {
+            return windowsDefaultEnforceScreenBounds;
+        }
 
         public boolean getWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -1775,7 +1779,7 @@ public class API {
             return result;
         }
 
-        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name){
+        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return null;
             ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
             return result.size() > 0 ? result.get(0) : null;
@@ -2108,7 +2112,7 @@ public class API {
             return result;
         }
 
-        public Component findComponentByName(Window window, String name){
+        public Component findComponentByName(Window window, String name) {
             if (window == null || name == null) return null;
             ArrayList<Component> result = findComponentsByName(window, name);
             return result.size() > 0 ? result.get(0) : null;
@@ -3411,7 +3415,7 @@ public class API {
                 return result;
             }
 
-            public Tab findTabByName(TabBar tabBar, String name){
+            public Tab findTabByName(TabBar tabBar, String name) {
                 if (tabBar == null || name == null) return null;
                 ArrayList<Tab> result = findTabsByName(tabBar, name);
                 return result.size() > 0 ? result.get(0) : null;
@@ -3689,7 +3693,7 @@ public class API {
                 return result;
             }
 
-            public MapOverlay findMapOverlayByName(Map map, String name){
+            public MapOverlay findMapOverlayByName(Map map, String name) {
                 if (map == null || name == null) return null;
                 ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
                 return result.size() > 0 ? result.get(0) : null;
