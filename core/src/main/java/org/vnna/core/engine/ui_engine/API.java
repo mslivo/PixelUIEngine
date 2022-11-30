@@ -103,6 +103,23 @@ public class API {
         }
     }
 
+    public ArrayList<Notification> findNotificationsByName(String name) {
+        ArrayList<Notification> result = new ArrayList<>();
+        if (name == null) return result;
+        for (Notification notification : inputState.notifications) {
+            if (name.equals(notification.name)) {
+                result.add(notification);
+            }
+        }
+        return result;
+    }
+
+    public Notification findNotificationByName(String name) {
+        if (name == null) return null;
+        ArrayList<Notification> result = findNotificationsByName(name);
+        return result.size() > 0 ? result.get(0) : null;
+    }
+
     public void addDelayedOneshotAction(UpdateAction updateAction) {
         if (updateAction == null) return;
         this.inputState.delayedOneshotActions.add(updateAction);
@@ -1259,6 +1276,13 @@ public class API {
         return result;
     }
 
+    public HotKey findHotKeyByName(String name) {
+        if (name == null) return null;
+        ArrayList<HotKey> result = findHotKeysByName(name);
+        return result.size() > 0 ? result.get(0) : null;
+    }
+
+
     public void removeAllHotKeys() {
         for (HotKey hotKey : inputState.hotKeys) removeHotKey(hotKey);
     }
@@ -1277,6 +1301,12 @@ public class API {
             }
         }
         return result;
+    }
+
+    public Window findWindowByName(String name) {
+        if (name == null) return null;
+        ArrayList<Window> result = findWindowsByName(name);
+        return result.size() > 0 ? result.get(0) : null;
     }
 
     public Window getLastActiveWindow() {
@@ -1736,6 +1766,21 @@ public class API {
             contextMenu.items.addAll(Arrays.asList(contextMenuItems));
         }
 
+        public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
+            ArrayList<ContextMenuItem> result = new ArrayList<>();
+            if (contextMenu == null || name == null) return result;
+            for (ContextMenuItem contextMenuItem : contextMenu.items) {
+                if (name.equals(contextMenuItem.name)) result.add(contextMenuItem);
+            }
+            return result;
+        }
+
+        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name){
+            if (contextMenu == null || name == null) return null;
+            ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
+            return result.size() > 0 ? result.get(0) : null;
+        }
+
         public class _ContextMenuItem {
 
             private ContextMenuItemAction defaultContextMenuItemAction() {
@@ -2061,6 +2106,12 @@ public class API {
                 if (name.equals(component.name)) result.add(component);
             }
             return result;
+        }
+
+        public Component findComponentByName(Window window, String name){
+            if (window == null || name == null) return null;
+            ArrayList<Component> result = findComponentsByName(window, name);
+            return result.size() > 0 ? result.get(0) : null;
         }
 
         public void bringToFront(Window window) {
@@ -3351,6 +3402,21 @@ public class API {
                 for (Tab tab : tabs) addTab(tabBar, tab);
             }
 
+            public ArrayList<Tab> findTabsByName(TabBar tabBar, String name) {
+                ArrayList<Tab> result = new ArrayList<>();
+                if (tabBar == null || name == null) return result;
+                for (Tab tab : tabBar.tabs) {
+                    if (name.equals(tab.name)) result.add(tab);
+                }
+                return result;
+            }
+
+            public Tab findTabByName(TabBar tabBar, String name){
+                if (tabBar == null || name == null) return null;
+                ArrayList<Tab> result = findTabsByName(tabBar, name);
+                return result.size() > 0 ? result.get(0) : null;
+            }
+
         }
 
         public class _Inventory {
@@ -3621,6 +3687,12 @@ public class API {
                     if (name.equals(mapOverlay.name)) result.add(mapOverlay);
                 }
                 return result;
+            }
+
+            public MapOverlay findMapOverlayByName(Map map, String name){
+                if (map == null || name == null) return null;
+                ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
+                return result.size() > 0 ? result.get(0) : null;
             }
 
             public void removeAllOverlays(Map map) {
