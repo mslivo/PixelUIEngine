@@ -2155,7 +2155,7 @@ public class API {
             window.updateActions.remove(updateAction);
         }
 
-        public void clearUpdateActions(Window window) {
+        public void removeAllUpdateActions(Window window) {
             if (window == null) return;
             window.updateActions.clear();
         }
@@ -2570,7 +2570,7 @@ public class API {
             component.updateActions.remove(updateAction);
         }
 
-        public void clearUpdateActions(Component component) {
+        public void removeAllUpdateActions(Component component) {
             if (component == null) return;
             component.updateActions.clear();
         }
