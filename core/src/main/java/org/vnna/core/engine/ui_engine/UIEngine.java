@@ -155,16 +155,16 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.frameBuffer_gui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
-        // Upscaler
+        // ----- UpScaler
         newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
         newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
         newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
         newInputState.texture_upScale.flip(false, true);
-        newInputState.spriteBatch_upScale = new SpriteBatch(8191);
+        newInputState.spriteBatch_upScale = new SpriteBatch(1);
         newInputState.camera_upScale = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        // Screen
-        newInputState.spriteBatch_screen = new SpriteBatch(8191);
+        // ----- Screen
+        newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
         newInputState.viewport_screen = switch (viewportMode) {
