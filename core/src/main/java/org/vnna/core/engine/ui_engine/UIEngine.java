@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import org.vnna.core.engine.media_manager.MediaManager;
 import org.vnna.core.engine.media_manager.color.FColor;
@@ -156,18 +155,14 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.frameBuffer_gui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
-        // StretchMode Buffers
-        if (newInputState.viewportMode == ViewportMode.FIT || newInputState.viewportMode == ViewportMode.STRETCH) {
-            // Upscaler
-            newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
-            newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
-            newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-            newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
-            newInputState.texture_upScale.flip(false, true);
-            newInputState.spriteBatch_upScale = new SpriteBatch(8191);
-            newInputState.camera_upScale = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-
-        }
+        // Upscaler
+        newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
+        newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
+        newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
+        newInputState.texture_upScale.flip(false, true);
+        newInputState.spriteBatch_upScale = new SpriteBatch(8191);
+        newInputState.camera_upScale = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         // Screen
         newInputState.spriteBatch_screen = new SpriteBatch(8191);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -252,7 +247,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.tempColorStack = new Color[8];
         for (int i = 0; i < 8; i++) newInputState.tempColorStack[i] = new Color(1, 1, 1, 1);
         newInputState.tempColorStackPointer = 0;
-        ScreenUtils.clear(0,0,0,1);
+        ScreenUtils.clear(0, 0, 0, 1);
         return newInputState;
     }
 
@@ -1551,7 +1546,6 @@ public class UIEngine<T extends UIAdapter> {
 
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        boolean withUpscaleBuffer = inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH;
 
         // Draw Game
         {
@@ -1579,16 +1573,13 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Render to Upscaled Buffer
-        if (withUpscaleBuffer) {
-            // Render to Upscale Buffer
-            inputState.spriteBatch_upScale.setProjectionMatrix(inputState.camera_upScale.combined);
-            inputState.frameBuffer_upScale.begin();
-            inputState.spriteBatch_screen.begin();
-            inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            inputState.spriteBatch_screen.end();
-            inputState.frameBuffer_upScale.end();
-        }
+        inputState.spriteBatch_upScale.setProjectionMatrix(inputState.camera_upScale.combined);
+        inputState.frameBuffer_upScale.begin();
+        inputState.spriteBatch_screen.begin();
+        inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.spriteBatch_screen.end();
+        inputState.frameBuffer_upScale.end();
 
 
         // Render Final Screen
@@ -1596,12 +1587,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             inputState.viewport_screen.apply();
             inputState.spriteBatch_screen.begin();
-            if (withUpscaleBuffer) {
-                inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            } else {
-                inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-                inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            }
+            inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             inputState.spriteBatch_screen.end();
         }
 

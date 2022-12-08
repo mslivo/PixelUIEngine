@@ -358,8 +358,7 @@ public class XBRShader {
                 //// normal colors
                 FragColor = res * COL0;
             }
-
-                        """;
+            """;
 
 
 
