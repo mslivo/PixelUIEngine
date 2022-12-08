@@ -55,6 +55,7 @@ import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
 import org.vnna.core.engine.ui_engine.misc.ViewportMode;
 import org.vnna.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.vnna.core.engine.ui_engine.render.shaders.GrayScaleShader;
+import org.vnna.core.engine.ui_engine.render.shaders.XBRShader;
 
 import java.awt.*;
 import java.util.ArrayDeque;
@@ -161,8 +162,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
         newInputState.texture_upScale.flip(false, true);
-        newInputState.spriteBatch_upScale = new SpriteBatch(1);
-        newInputState.camera_upScale = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.xbrShader_upScale = new ShaderProgram(XBRShader.VERTEX, XBRShader.FRAGMENT);
         // ----- Screen
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -1572,24 +1572,23 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_gui.end();
         }
 
-        // Render to Upscaled Buffer
-        inputState.spriteBatch_upScale.setProjectionMatrix(inputState.camera_upScale.combined);
-        inputState.frameBuffer_upScale.begin();
-        inputState.spriteBatch_screen.begin();
-        inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.spriteBatch_screen.end();
-        inputState.frameBuffer_upScale.end();
 
-
-        // Render Final Screen
         {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
+            // Render to Upscaled Buffer
+            inputState.frameBuffer_upScale.begin();
+            inputState.spriteBatch_screen.begin();
+            inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            inputState.spriteBatch_screen.end();
+            inputState.frameBuffer_upScale.end();
+            // Render Final Screen
             inputState.viewport_screen.apply();
             inputState.spriteBatch_screen.begin();
             inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             inputState.spriteBatch_screen.end();
         }
+
 
     }
 
