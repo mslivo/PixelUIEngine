@@ -55,7 +55,6 @@ import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
 import org.vnna.core.engine.ui_engine.misc.ViewportMode;
 import org.vnna.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.vnna.core.engine.ui_engine.render.shaders.GrayScaleShader;
-import org.vnna.core.engine.ui_engine.render.shaders.XBRShader;
 
 import java.awt.*;
 import java.util.ArrayDeque;
@@ -162,7 +161,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
         newInputState.texture_upScale.flip(false, true);
-        newInputState.xbrShader_upScale = new ShaderProgram(XBRShader.VERTEX, XBRShader.FRAGMENT);
         // ----- Screen
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);

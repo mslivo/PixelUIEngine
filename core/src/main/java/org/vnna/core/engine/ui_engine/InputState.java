@@ -76,8 +76,6 @@ public class InputState {
 
     public FrameBuffer frameBuffer_upScale;
 
-    public ShaderProgram xbrShader_upScale;
-
 
     /* #################### Graphics: Screen #################### */
 
