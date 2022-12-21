@@ -1894,7 +1894,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                     render_batchSaveColor();
                     render_batchSetColor(item.color_r, item.color_g, item.color_b, item.color_a);
-                    render_drawCMediaImage(cMenuTexture, contextMenu.x + x * TILE_SIZE, contextMenu.y - (y * TILE_SIZE) - TILE_SIZE, index);
+                    render_drawCMediaImage(cMenuTexture, contextMenu.x + (x * TILE_SIZE), contextMenu.y - (y * TILE_SIZE) - TILE_SIZE, index);
                     render_batchLoadColor();
                 }
             }
@@ -1902,7 +1902,7 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int y = 0; y < contextMenu.items.size(); y++) {
                 ContextMenuItem item = contextMenu.items.get(y);
-                render_drawFont(item.font, item.text, contextMenu.color_a, contextMenu.x, contextMenu.y - (y * TILE_SIZE) - TILE_SIZE, 1, 2, item.icon, item.iconIndex, (width) * TILE_SIZE);
+                render_drawFont(item.font, item.text, contextMenu.color_a, contextMenu.x, contextMenu.y - (y * TILE_SIZE) - TILE_SIZE, 2, 2, item.icon, item.iconIndex, (width) * TILE_SIZE);
             }
 
 
@@ -2031,7 +2031,7 @@ public class UIEngine<T extends UIAdapter> {
                 int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
                 render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x + ((tooltip_width / 2) * TILE_SIZE) - (text_width / 2), tooltip_y + (ty * TILE_SIZE), 0, 1);
             } else {
-                render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 1, 1);
+                render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 2);
             }
         }
 
@@ -2138,7 +2138,7 @@ public class UIEngine<T extends UIAdapter> {
                 /* Text */
                 for (int y = 0; y < combobox.items.size(); y++) {
                     Object item = combobox.items.get(y);
-                    render_drawFont(combobox.font, combobox.comboBoxAction.text(item), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (y * TILE_SIZE) - TILE_SIZE, 1, 2, combobox.comboBoxAction.icon(item), combobox.comboBoxAction.iconArrayIndex(item), (combobox.width * TILE_SIZE));
+                    render_drawFont(combobox.font, combobox.comboBoxAction.text(item), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (y * TILE_SIZE) - TILE_SIZE, 2, 2, combobox.comboBoxAction.icon(item), combobox.comboBoxAction.iconArrayIndex(item), (combobox.width * TILE_SIZE));
                 }
             }
 
@@ -2296,7 +2296,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.font, combobox.comboBoxAction.text(combobox.selectedItem), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 1, 2, combobox.comboBoxAction.icon(combobox.selectedItem), combobox.comboBoxAction.iconArrayIndex(combobox.selectedItem), (combobox.width - 2) * TILE_SIZE);
+                render_drawFont(combobox.font, combobox.comboBoxAction.text(combobox.selectedItem), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 2, combobox.comboBoxAction.icon(combobox.selectedItem), combobox.comboBoxAction.iconArrayIndex(combobox.selectedItem), (combobox.width - 2) * TILE_SIZE);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;

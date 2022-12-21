@@ -1321,6 +1321,9 @@ public class API {
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
+
+        private FColor contextMenuDefaultColor = Tools.Colors.WHITE;
+
         private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW;
         private int gameviewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
@@ -1530,6 +1533,15 @@ public class API {
         public void setTooltipFadeInDelayTime(int tooltipFadeInDelayTime) {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
+
+        public FColor getContextMenuDefaultColor() {
+            return contextMenuDefaultColor;
+        }
+
+        public void setContextMenuDefaultColor(FColor contextMenuDefaultColor) {
+            this.contextMenuDefaultColor = contextMenuDefaultColor;
+        }
+
 
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList(new Character[]{
@@ -1753,7 +1765,7 @@ public class API {
         public final _ContextMenuItem item = new _ContextMenuItem();
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems) {
-            return create(contextMenuItems, null);
+            return create(contextMenuItems, config.contextMenuDefaultColor);
         }
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems, FColor color) {
@@ -1801,15 +1813,15 @@ public class API {
             }
 
             public ContextMenuItem create(String text) {
-                return create(text, defaultContextMenuItemAction(), null, null, null);
+                return create(text, defaultContextMenuItemAction(), null, config.contextMenuDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-                return create(text, contextMenuItemAction, null, null, null);
+                return create(text, contextMenuItemAction, null, config.contextMenuDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon) {
-                return create(text, contextMenuItemAction, icon, null, null);
+                return create(text, contextMenuItemAction, icon, config.contextMenuDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {
