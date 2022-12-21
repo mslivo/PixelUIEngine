@@ -10,6 +10,8 @@ public class CMediaAnimation extends CMediaGFX implements Serializable {
 
     public float animation_speed;
 
+    public int frames;
+
     public CMediaAnimation(String filename) {
         super(filename);
     }

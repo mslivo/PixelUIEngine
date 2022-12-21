@@ -188,9 +188,11 @@ public class MediaManager {
                 TextureRegion[][] tmp = textureRegion.split(cMediaAnimation.tile_width, cMediaAnimation.tile_height);
                 TextureRegion[] result = new TextureRegion[count];
                 int tmpCount = 0;
+                framesLoop:
                 for (int x = 0; x < tmp.length; x++) {
                     for (int y = 0; y < tmp[0].length; y++) {
                         result[tmpCount++] = tmp[x][y];
+                        if (tmpCount >= cMediaAnimation.frames) break framesLoop;
                     }
                 }
                 Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
@@ -519,11 +521,16 @@ public class MediaManager {
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, Integer.MAX_VALUE);
+    }
+
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frames) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
         CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
         cMediaAnimation.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
         cMediaAnimation.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
         cMediaAnimation.animation_speed = animation_speed;
+        cMediaAnimation.frames = Tools.Calc.lowerBounds(frames, 1);
         return cMediaAnimation;
     }
 
