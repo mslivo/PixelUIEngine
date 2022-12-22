@@ -728,22 +728,14 @@ public class API {
             return map_drawGraph(map, items, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null);
         }
 
-        public GraphInfo map_drawGraph(Map map, ArrayList items, int steps, int stepSize, Function<Integer, Long> getIndexValue, FColor color_bg, FColor color_rising, FColor color_level, FColor color_falling, int[] customHighLowReference) {
+        public GraphInfo map_drawGraph(Map map, ArrayList items, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor color_bg, FColor color_rising, FColor color_level, FColor color_falling, int[] customHighLowReference) {
             HashMap<Integer, Long> value_at_position = new HashMap<>();
             HashMap<Integer, Integer> index_at_position = new HashMap<>();
 
             stepSize = Tools.Calc.lowerBounds(stepSize, 0);
             // Background
-            float brush_r = 1f;
-            float brush_g = 1f;
-            float brush_b = 1f;
-
-            FColor bgBrush = Tools.Colors.create(1, 1, 1, 1);
+            FColor bgBrush = Tools.Colors.WHITE;
             for (int x = 0; x < map.width * UIEngine.TILE_SIZE; x++) {
-                float dark = x % 4 == 0 ? 0.95f : 1;
-                brush_r = color_bg.r * dark;
-                brush_g = color_bg.g * dark;
-                brush_b = color_bg.b * dark;
                 for (int y = 0; y < map.height * UIEngine.TILE_SIZE; y++) {
                     components.map.drawPixel(map, x, y, bgBrush.r, bgBrush.g, bgBrush.b, bgBrush.a);
                 }
@@ -766,7 +758,7 @@ public class API {
             // Get Highest & Lowest Value
             for (int i = startIndex; i < items.size(); i = i + stepSize) {
                 if (i >= 0) {
-                    Long value = getIndexValue.apply(i);
+                    Long value = getValueAtIndex.apply(i);
                     if (customHighLowReference == null) {
                         if (value > reference_high) reference_high = value;
                         if (value < reference_low) reference_low = value;
@@ -775,9 +767,6 @@ public class API {
                     if (value < lowest_value) lowest_value = value;
                     points.add(value);
                     pointIndexes.add(i);
-                } else {
-                    points.add(null); // filler point
-                    pointIndexes.add(null);
                 }
             }
             if (customHighLowReference != null) {
@@ -803,14 +792,12 @@ public class API {
                 Long drawPointValue;
                 boolean valueChange = point != lastPoint && !point.equals(lastPoint);
                 if (point != lastPoint) {
-
                     if (index > 0) {
                         lineBrush = color_level;
                         Long pointBeforeValue = points.get(index - 1);
                         if (pointBeforeValue != null) {
                             if (pointBeforeValue > point) {
                                 lineBrush = color_falling;
-
                             } else if (pointBeforeValue < point) {
                                 lineBrush = color_rising;
                             }
@@ -827,13 +814,22 @@ public class API {
                 if (drawPointValue != null) { // not a filler
                     float pointRelative = (drawPointValue - reference_low) / (float) v_range;
                     int lineHeight = Tools.Calc.lowerBounds(MathUtils.round(((map.height * UIEngine.TILE_SIZE)) * pointRelative) - 2, 2);
+
+                    // Base line
+                    for (int y = 1; y <= lineHeight; y++) {
+                        components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - y, lineBrush.r, lineBrush.g, lineBrush.b, 1);
+                    }
+                    // Outline
+                    FColor darker = Tools.Colors.createDarker(lineBrush, 0.2f);
                     if (valueChange) {
                         for (int y = 1; y <= lineHeight; y++) {
-                            components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - y, lineBrush.r, lineBrush.g, lineBrush.b, 1);
+                            components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - y, darker.r, darker.g, darker.b, 1);
                         }
                     } else {
-                        components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - lineHeight, lineBrush.r, lineBrush.g, lineBrush.b, 1);
+                        components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - lineHeight, darker.r, darker.g, darker.b, 1);
                     }
+
+
                 }
 
                 value_at_position.put(x, drawPointValue);
