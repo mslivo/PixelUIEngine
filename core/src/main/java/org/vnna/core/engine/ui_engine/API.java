@@ -51,7 +51,6 @@ import org.vnna.core.engine.ui_engine.gui.tool.MouseTool;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
-import org.vnna.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -724,124 +723,134 @@ public class API {
             return modal;
         }
 
-        public GraphInfo map_drawGraph(Map map, ArrayList items, Function<Integer, Long> getIndexValue) {
-            return map_drawGraph(map, items, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null);
+        public GraphInfo map_drawGraph(API api, Map map, int itemCount, Function<Integer, Long> getIndexValue) {
+            return map_drawGraph(api, map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null, true);
         }
 
-        public GraphInfo map_drawGraph(Map map, ArrayList items, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor color_bg, FColor color_rising, FColor color_level, FColor color_falling, int[] customHighLowReference) {
-            HashMap<Integer, Long> value_at_position = new HashMap<>();
-            HashMap<Integer, Integer> index_at_position = new HashMap<>();
-
-            stepSize = Tools.Calc.lowerBounds(stepSize, 0);
-            // Background
-            FColor bgBrush = Tools.Colors.WHITE;
-            for (int x = 0; x < map.width * UIEngine.TILE_SIZE; x++) {
-                for (int y = 0; y < map.height * UIEngine.TILE_SIZE; y++) {
-                    components.map.drawPixel(map, x, y, bgBrush.r, bgBrush.g, bgBrush.b, bgBrush.a);
+        public GraphInfo map_drawGraph(API api, Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+            int mapWidth = map.width * UIEngine.TILE_SIZE;
+            int mapHeight = map.height * UIEngine.TILE_SIZE;
+            int[] indexAtPosition = new int[mapWidth];
+            long[] valueAtPosition = new long[mapWidth];
+            long lowestValue = Integer.MAX_VALUE;
+            long highestValue = Integer.MIN_VALUE;
+            // Get Values
+            ArrayList<Integer> indexes = new ArrayList<>();
+            ArrayList<Long> values = new ArrayList<>();
+            int startIndex = (itemCount - 1) - (steps * stepSize);
+            int indexAndValueCount = 0;
+            long valueBefore = (startIndex - stepSize) > 0 ? getValueAtIndex.apply((startIndex - stepSize)) : Long.MIN_VALUE;
+            for (int i = startIndex; i < itemCount; i += stepSize) {
+                if (i > 0) {
+                    long value = getValueAtIndex.apply(i);
+                    lowestValue = value < lowestValue ? value : lowestValue;
+                    highestValue = value > highestValue ? value : highestValue;
+                    indexes.add(i);
+                    values.add(value);
+                    indexAndValueCount++;
                 }
             }
-            if (items == null || items.size() == 0) {
-                components.map.update(map);
-                return new GraphInfo(0, 0, 0, value_at_position, index_at_position);
-            }
+            long loReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[0] : lowestValue;
+            long hiReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[1] : highestValue;
 
-            // Determine Points
-            ArrayList<Long> points = new ArrayList<>();
-            ArrayList<Integer> pointIndexes = new ArrayList<>();
 
-            long highest_value = 0;
-            long lowest_value = Integer.MAX_VALUE;
-            long reference_high = 0;
-            long reference_low = Integer.MAX_VALUE;
-            long v_range = 0;
-            int startIndex = (items.size() - 1) - (steps * stepSize);
-            // Get Highest & Lowest Value
-            for (int i = startIndex; i < items.size(); i = i + stepSize) {
-                if (i >= 0) {
-                    Long value = getValueAtIndex.apply(i);
-                    if (customHighLowReference == null) {
-                        if (value > reference_high) reference_high = value;
-                        if (value < reference_low) reference_low = value;
-                    }
-                    if (value > highest_value) highest_value = value;
-                    if (value < lowest_value) lowest_value = value;
-                    points.add(value);
-                    pointIndexes.add(i);
+            // Draw Background
+            FColor colorBackGroundDarker = Tools.Colors.createDarker(colorBackGround, 0.02f);
+            for (int iy = 0; iy < mapHeight; iy++) {
+                FColor color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
+                for (int ix = 0; ix < mapWidth; ix++) {
+                    api.components.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
                 }
             }
-            if (customHighLowReference != null) {
-                reference_low = customHighLowReference[0];
-                reference_high = customHighLowReference[1];
-            }
-            v_range = reference_high - reference_low;
 
-            if (points.size() == 0) {
-                components.map.update(map);
-                return new GraphInfo(0, 0, 0, value_at_position, index_at_position);
+            if (values.size() == 0) {
+                // No values available
+                api.components.map.update(map);
+                return null;
             }
 
-            // Draw in Points
-            Long lastPoint = null;
-            FColor lineBrush = color_level;
-            int step = 0;
-            for (int x = 0; x < map.width * UIEngine.TILE_SIZE; x++) {
-                float percent = x / (float) (map.width * UIEngine.TILE_SIZE);
-                int index = MathUtils.round(percent * (points.size() - 1));
-                Long point = points.get(index);
-                Integer pointIndex = pointIndexes.get(index);
-                Long drawPointValue;
-                boolean valueChange = point != lastPoint && !point.equals(lastPoint);
-                if (point != lastPoint) {
-                    if (index > 0) {
-                        lineBrush = color_level;
-                        Long pointBeforeValue = points.get(index - 1);
-                        if (pointBeforeValue != null) {
-                            if (pointBeforeValue > point) {
-                                lineBrush = color_falling;
-                            } else if (pointBeforeValue < point) {
-                                lineBrush = color_rising;
-                            }
-                        }
-                    }
-                    drawPointValue = point;
-                    lastPoint = point;
-                    step++;
-                } else {
-                    drawPointValue = lastPoint;
-                }
+            // Calculate index/value at position
+            for (int ix = 0; ix < mapWidth; ix++) {
+                int indexAndValueIndex = MathUtils.round((ix / (float) mapWidth) * (indexAndValueCount - 1));
+                indexAtPosition[ix] = indexes.get(indexAndValueIndex);
+                valueAtPosition[ix] = values.get(indexAndValueIndex);
+            }
 
-                // draw line
-                if (drawPointValue != null) { // not a filler
-                    float pointRelative = (drawPointValue - reference_low) / (float) v_range;
-                    int lineHeight = Tools.Calc.lowerBounds(MathUtils.round(((map.height * UIEngine.TILE_SIZE)) * pointRelative) - 2, 2);
-
-                    // Base line
-                    for (int y = 1; y <= lineHeight; y++) {
-                        components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - y, lineBrush.r, lineBrush.g, lineBrush.b, 1);
-                    }
-                    // Outline
-                    FColor darker = Tools.Colors.createDarker(lineBrush, 0.2f);
-                    if (valueChange) {
-                        for (int y = 1; y <= lineHeight; y++) {
-                            components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - y, darker.r, darker.g, darker.b, 1);
-                        }
+            // Draw Bars
+            long lastValue = valueBefore;
+            int lastIndex = -1;
+            final float SHADING = 0.1f;
+            FColor color = colorEven;
+            FColor colorBrighter = Tools.Colors.createBrighter(color, SHADING);
+            FColor colorDarker = Tools.Colors.createDarker(color, SHADING);
+            for (int ix = 0; ix < mapWidth; ix++) {
+                int index = indexAtPosition[ix];
+                long value = valueAtPosition[ix];
+                boolean indexChange = false;
+                boolean nextIndexChange = (ix + 1) < mapWidth ? indexAtPosition[ix + 1] != index : false;
+                if (index != lastIndex) {
+                    if (value > lastValue) {
+                        color = colorRising;
+                    } else if (value < lastValue) {
+                        color = colorFalling;
                     } else {
-                        components.map.drawPixel(map, x, map.height * UIEngine.TILE_SIZE - lineHeight, darker.r, darker.g, darker.b, 1);
+                        color = colorEven;
                     }
-
-
+                    colorBrighter = Tools.Colors.createBrighter(color, SHADING);
+                    colorDarker = Tools.Colors.createDarker(color, SHADING);
+                    indexChange = true;
+                    lastIndex = index;
                 }
 
-                value_at_position.put(x, drawPointValue);
-                index_at_position.put(x, pointIndex);
+
+                float heightPct = (value - loReference) / (float) (hiReference - loReference);
+                int heightPixels = MathUtils.round(mapHeight * heightPct);
+                for (int iy = 0; iy < heightPixels; iy++) {
+                    int y = mapHeight - iy;
+                    if (iy == heightPixels - 1) {
+                        api.components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                    } else {
+                        api.components.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
+                    }
+                }
+
+                // Draw Shading
+                if (indexChange && ix != 0) {
+                    for (int iy = 0; iy < heightPixels; iy++) {
+                        int y = mapHeight - iy;
+                        api.components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                    }
+                } else if (nextIndexChange) {
+                    for (int iy = 0; iy < heightPixels; iy++) {
+                        int y = mapHeight - iy;
+                        api.components.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                    }
+                }
+
+
+                lastValue = value;
             }
 
-            // Interpolate points
+            api.components.map.update(map);
+            return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
+        }
 
+        public class GraphInfo {
 
-            components.map.update(map);
+            public final long highestValue;
 
-            return new GraphInfo(highest_value, lowest_value, steps, value_at_position, index_at_position);
+            public final long lowestValue;
+
+            public final int[] indexAtPosition;
+
+            public final long[] valueAtPosition;
+
+            public GraphInfo(long lowestValue, long highestValue, int[] indexAtPosition, long[] valueAtPosition) {
+                this.highestValue = lowestValue;
+                this.lowestValue = highestValue;
+                this.indexAtPosition = indexAtPosition;
+                this.valueAtPosition = valueAtPosition;
+            }
         }
 
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {

@@ -4,18 +4,18 @@ import java.util.HashMap;
 
 public class GraphInfo {
 
-    public final long highest_value;
+    public final long highestValue;
 
-    public final long lowest_value;
+    public final long lowestValue;
 
-    public final HashMap<Integer, Long> value_at_position;
+    public final int[] indexAtPosition;
 
-    public final HashMap<Integer, Integer> index_at_position;
+    public final long[] valueAtPosition;
 
-    public GraphInfo(long highest_value, long lowest_value, int steps, HashMap<Integer, Long> value_at_position,HashMap<Integer, Integer>  index_at_position) {
-        this.highest_value = highest_value;
-        this.lowest_value = lowest_value;
-        this.value_at_position = value_at_position;
-        this.index_at_position = index_at_position;
+    public GraphInfo(long lowestValue, long highestValue, int[] indexAtPosition, long[] valueAtPosition) {
+        this.highestValue = lowestValue;
+        this.lowestValue = highestValue;
+        this.indexAtPosition = indexAtPosition;
+        this.valueAtPosition = valueAtPosition;
     }
 }
