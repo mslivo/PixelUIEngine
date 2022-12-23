@@ -51,6 +51,7 @@ import org.vnna.core.engine.ui_engine.gui.tool.MouseTool;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.vnna.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.vnna.core.engine.ui_engine.media.GUIBaseMedia;
+import org.vnna.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -833,24 +834,6 @@ public class API {
 
             components.map.update(map);
             return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
-        }
-
-        public class GraphInfo {
-
-            public final long highestValue;
-
-            public final long lowestValue;
-
-            public final int[] indexAtPosition;
-
-            public final long[] valueAtPosition;
-
-            public GraphInfo(long lowestValue, long highestValue, int[] indexAtPosition, long[] valueAtPosition) {
-                this.highestValue = lowestValue;
-                this.lowestValue = highestValue;
-                this.indexAtPosition = indexAtPosition;
-                this.valueAtPosition = valueAtPosition;
-            }
         }
 
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
