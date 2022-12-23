@@ -13,8 +13,8 @@ public class GraphInfo {
     public final long[] valueAtPosition;
 
     public GraphInfo(long lowestValue, long highestValue, int[] indexAtPosition, long[] valueAtPosition) {
-        this.highestValue = lowestValue;
-        this.lowestValue = highestValue;
+        this.lowestValue = lowestValue;
+        this.highestValue = highestValue;
         this.indexAtPosition = indexAtPosition;
         this.valueAtPosition = valueAtPosition;
     }
