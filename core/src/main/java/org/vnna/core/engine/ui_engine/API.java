@@ -723,11 +723,11 @@ public class API {
             return modal;
         }
 
-        public GraphInfo map_drawGraph(API api, Map map, int itemCount, Function<Integer, Long> getIndexValue) {
-            return map_drawGraph(api, map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null, true);
+        public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
+            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null, true);
         }
 
-        public GraphInfo map_drawGraph(API api, Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph( Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -759,13 +759,13 @@ public class API {
             for (int iy = 0; iy < mapHeight; iy++) {
                 FColor color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
-                    api.components.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
+                    components.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
                 }
             }
 
             if (values.size() == 0) {
                 // No values available
-                api.components.map.update(map);
+                components.map.update(map);
                 return null;
             }
 
@@ -808,9 +808,9 @@ public class API {
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
-                        api.components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     } else {
-                        api.components.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
+                        components.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
                     }
                 }
 
@@ -818,12 +818,12 @@ public class API {
                 if (indexChange && ix != 0) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        api.components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     }
                 } else if (nextIndexChange) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        api.components.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                        components.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
                     }
                 }
 
@@ -831,7 +831,7 @@ public class API {
                 lastValue = value;
             }
 
-            api.components.map.update(map);
+            components.map.update(map);
             return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
         }
 
