@@ -728,7 +728,7 @@ public class API {
             return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null, true);
         }
 
-        public GraphInfo map_drawGraph( Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -805,7 +805,7 @@ public class API {
 
 
                 float heightPct = (value - loReference) / (float) (hiReference - loReference);
-                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct),2);
+                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct), 2);
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
@@ -3668,21 +3668,62 @@ public class API {
                 return;
             }
 
-            public void drawPixel(Map map, int x, int y, FColor color) {
-                if (map == null) return;
-                FColor drawColor = color == null ? Tools.Colors.BLACK : color;
-                drawPixel(map, x, y, drawColor.r, drawColor.g, drawColor.b, drawColor.a);
-            }
-
             public FColor getPixel(Map map, int x, int y) {
                 if (map == null) return null;
                 return Tools.Colors.createFromInt(map.pMap.getPixel(x, y));
+            }
+
+            public void drawPixel(Map map, int x, int y, FColor fColor) {
+                if (fColor == null) return;
+                drawPixel(map, x, y, fColor.r, fColor.g, fColor.b, fColor.a);
+            }
+
+            public void fillMap(Map map, float r, float g, float b, float a) {
+                if (map == null) return;
+                map.pMap.setColor(r, g, b, a);
+                for (int iy = 0; iy < map.pMap.getHeight(); iy++) {
+                    map.pMap.drawLine(0, iy, map.pMap.getWidth(), iy);
+                }
             }
 
             public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
                 if (map == null) return;
                 map.pMap.setColor(r, g, b, a);
                 map.pMap.drawPixel(x, y);
+            }
+
+            public void drawLine(Map map, int x1, int y1, int x2, int y2, FColor fColor) {
+                if (fColor == null) return;
+
+                drawLine(map, x1, y1, x2, y2, fColor.r, fColor.g, fColor.b, fColor.a);
+            }
+
+            public void drawLine(Map map, int x1, int y1, int x2, int y2, float r, float g, float b, float a) {
+                if (map == null) return;
+                map.pMap.setColor(r, g, b, a);
+                map.pMap.drawLine(x1, y1, x2, y2);
+            }
+
+            public void drawRect(Map map, int x1, int y1, int width, int height, FColor fColor) {
+                if (fColor == null) return;
+                drawRect(map, x1, y1, width, height, fColor.r, fColor.g, fColor.b, fColor.a);
+            }
+
+            public void drawRect(Map map, int x1, int y1, int width, int height, float r, float g, float b, float a) {
+                if (map == null) return;
+                map.pMap.setColor(r, g, b, a);
+                map.pMap.drawRectangle(x1, y1, width, height);
+            }
+
+            public void drawCircle(Map map, int x, int y, int radius, FColor fColor) {
+                if (fColor == null) return;
+                drawCircle(map, x, y, radius, fColor.r, fColor.g, fColor.b, fColor.a);
+            }
+
+            public void drawCircle(Map map, int x, int y, int radius, float r, float g, float b, float a) {
+                if (map == null) return;
+                map.pMap.setColor(r, g, b, a);
+                map.pMap.drawCircle(x, y, radius);
             }
 
             public void addOverlays(Map map, MapOverlay[] mapOverlays) {
