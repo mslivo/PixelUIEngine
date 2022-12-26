@@ -805,7 +805,7 @@ public class API {
 
 
                 float heightPct = (value - loReference) / (float) (hiReference - loReference);
-                int heightPixels = MathUtils.round(mapHeight * heightPct);
+                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct),2);
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
