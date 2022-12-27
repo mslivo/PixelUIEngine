@@ -524,7 +524,6 @@ public class UIEngine<T extends UIAdapter> {
                             processMouseClick = false;
                     }
                 }
-
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
@@ -801,6 +800,9 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
+
+                // Additonal Actions
+                // -> Bring clicked window to top
                 if (moveWindow != null) {
                     inputState.draggedWindow = moveWindow;
                     inputState.draggedWindow_x_offset = inputState.mouse_x_gui - inputState.draggedWindow.x;
@@ -808,19 +810,22 @@ public class UIEngine<T extends UIAdapter> {
                     // Move on top ?
                     UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                 }
-
-
-            }
-
-            // if click goes anyhwere else close open contextmenu and unfocus textfields
-            if (inputState.displayedContextMenu != null) {
-                inputState.displayedContextMenu = null;
-            }
-            if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
-                inputState.focusedTextField.focused = false;
-                if (inputState.focusedTextField.textFieldAction != null)
-                    inputState.focusedTextField.textFieldAction.onUnFocus();
-                inputState.focusedTextField = null;
+                // Hide displayed context Menus
+                if (inputState.displayedContextMenu != null) {
+                    inputState.displayedContextMenu = null;
+                }
+                // Close opened comboboxes if not opened on this frame
+                if (inputState.openComboBox != null && inputState.lastGUIMouseHover != inputState.openComboBox) {
+                    inputState.openComboBox.menuOpen = false;
+                    inputState.openComboBox = null;
+                }
+                // Unfocus focused textfield
+                if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
+                    inputState.focusedTextField.focused = false;
+                    if (inputState.focusedTextField.textFieldAction != null)
+                        inputState.focusedTextField.textFieldAction.onUnFocus();
+                    inputState.focusedTextField = null;
+                }
             }
 
 
