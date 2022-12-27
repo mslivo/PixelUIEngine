@@ -648,8 +648,10 @@ public class UIEngine<T extends UIAdapter> {
                                 }
                             }
                             combobox.menuOpen = false;
+                            inputState.openComboBox = null;
                             if (combobox.comboBoxAction != null) combobox.comboBoxAction.onClose();
                         } else {
+                            // Close other currently opened comboboxes
                             if (inputState.openComboBox != null) {
                                 inputState.openComboBox.menuOpen = false;
                                 inputState.openComboBox = null;
@@ -810,7 +812,7 @@ public class UIEngine<T extends UIAdapter> {
 
             }
 
-            // close contextmenu
+            // if click goes anyhwere else close open contextmenu and unfocus textfields
             if (inputState.displayedContextMenu != null) {
                 inputState.displayedContextMenu = null;
             }
