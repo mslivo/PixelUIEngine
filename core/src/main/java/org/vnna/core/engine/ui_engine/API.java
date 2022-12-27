@@ -2086,16 +2086,12 @@ public class API {
 
         public void addComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
-            for (Component component : components) {
-                addComponent(window, component);
-            }
+            for (Component component : components) addComponent(window, component);
         }
 
         public void addComponents(Window window, ArrayList<Component> components) {
             if (window == null || components == null) return;
-            for (Component component : components) {
-                addComponent(window, component);
-            }
+            for (Component component : components) addComponent(window, component);
         }
 
         public void removeComponent(Window window, Component component) {
@@ -2107,7 +2103,12 @@ public class API {
 
         public void removeComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
-            for (Component component : components) removeComponent(window, component);
+            for(Component component : components) removeComponent(window, component);
+        }
+
+        public void removeComponents(Window window, ArrayList<Component> components) {
+            if (window == null || components == null) return;
+            for(Component component : components) removeComponent(window, component);
         }
 
         public ArrayList<Component> findComponentsByName(Window window, String name) {
@@ -3239,13 +3240,21 @@ public class API {
                 public void addTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
                     for (Component component : components) addTabComponent(tab, component);
-                    return;
                 }
 
                 public void addTabComponents(Tab tab, ArrayList<Component> components) {
                     if (tab == null || components == null) return;
                     for (Component component : components) addTabComponent(tab, component);
-                    return;
+                }
+
+                public void removeTabComponents(Tab tab, Component[] components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) removeTabComponent(tab, component);
+                }
+
+                public void removeTabComponents(Tab tab, ArrayList<Component> components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) removeTabComponent(tab, component);
                 }
 
                 public void removeTabComponent(Tab tab, Component component) {
