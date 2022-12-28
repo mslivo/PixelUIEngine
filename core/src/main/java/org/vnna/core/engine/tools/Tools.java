@@ -440,7 +440,7 @@ public class Tools {
 
 
         public static boolean shouldRun(int ticksPerSecond, long lastRun) {
-            if ((System.currentTimeMillis() - lastRun) > (1000 / ticksPerSecond)) {
+            if ((System.currentTimeMillis() - lastRun) >= (1000 / ticksPerSecond)) {
                 return true;
             } else {
                 return false;
