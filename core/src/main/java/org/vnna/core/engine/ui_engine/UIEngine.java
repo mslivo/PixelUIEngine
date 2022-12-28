@@ -1344,6 +1344,8 @@ public class UIEngine<T extends UIAdapter> {
             }
             while ((componentTmp = window.removeComponentsQueue.pollFirst()) != null) {
                 if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(componentTmp);
+                if(componentTmp.addedToTab != null) componentTmp.addedToTab.components.remove(componentTmp);
+                componentTmp.addedToTab = null;
                 componentTmp.addedToWindow = null;
                 window.components.remove(componentTmp);
             }
