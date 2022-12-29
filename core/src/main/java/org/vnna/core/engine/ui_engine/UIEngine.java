@@ -2190,7 +2190,7 @@ public class UIEngine<T extends UIAdapter> {
         } else if (component.getClass() == Image.class) {
             Image image = (Image) component;
             if (image.image != null) {
-                render_drawCMediaImage(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex);
+                render_drawCMediaImage(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex,image.animationOffset);
             }
         } else if (component.getClass() == Text.class) {
             Text text = (Text) component;
@@ -2675,11 +2675,15 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, inputState.animation_timer_gui, 0);
+        render_drawCMediaImage(cMedia,x,y,0,0);
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, inputState.animation_timer_gui, arrayIndex);
+        render_drawCMediaImage(cMedia,x,y,arrayIndex,0);
+    }
+
+    private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, (inputState.animation_timer_gui+animation_timer_offset), arrayIndex);
     }
 
     public void shutdown() {

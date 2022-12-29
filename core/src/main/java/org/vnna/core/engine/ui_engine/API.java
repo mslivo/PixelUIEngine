@@ -3970,23 +3970,33 @@ public class API {
             }
 
             public Image create(int x, int y, CMediaGFX image) {
-                return create(x, y, image, 0, defaultImageAction());
+                return create(x, y, image, 0, 0f, defaultImageAction());
             }
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex) {
-                return create(x, y, image, arrayIndex, defaultImageAction());
+                return create(x, y, image, arrayIndex, 0f, defaultImageAction());
             }
 
-            public Image create(int x, int y, CMediaGFX image, int arrayIndex, ImageAction imageAction) {
+            public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset) {
+                return create(x, y, image, arrayIndex, animation_offset, defaultImageAction());
+            }
+
+            public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset, ImageAction imageAction) {
                 Image imageC = new Image();
                 setComponentInitValues(imageC);
                 setPosition(imageC, x, y);
                 setImage(imageC, image);
                 setArrayIndex(imageC, arrayIndex);
+                setAnimationOffset(imageC, animation_offset);
                 setSizeAuto(imageC);
                 setColor(imageC, Tools.Colors.WHITE);
                 setImageAction(imageC, imageAction);
                 return imageC;
+            }
+
+            public void setAnimationOffset(Image image, float animationOffset) {
+                if (image == null) return;
+                image.animationOffset = animationOffset;
             }
 
             public void setImageAction(Image image, ImageAction imageAction) {
