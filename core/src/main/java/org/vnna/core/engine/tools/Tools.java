@@ -139,16 +139,16 @@ public class Tools {
         }
 
         public static FColor createDarker(FColor color, float amount) {
-            float r = Tools.Calc.inBounds(color.r - (color.r*amount), 0f, 1f);
-            float g = Tools.Calc.inBounds(color.g - (color.g*amount), 0f, 1f);
-            float b = Tools.Calc.inBounds(color.b - (color.b*amount), 0f, 1f);
+            float r = Tools.Calc.inBounds(color.r - (color.r * amount), 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g - (color.g * amount), 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b - (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
         public static FColor createBrighter(FColor color, float amount) {
-            float r = Tools.Calc.inBounds(color.r + (color.r*amount), 0f, 1f);
-            float g = Tools.Calc.inBounds(color.g + (color.g*amount), 0f, 1f);
-            float b = Tools.Calc.inBounds(color.b + (color.b*amount), 0f, 1f);
+            float r = Tools.Calc.inBounds(color.r + (color.r * amount), 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g + (color.g * amount), 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b + (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
@@ -311,21 +311,23 @@ public class Tools {
             return fileName;
         }
 
-        public static Path findNextValidFile(String folder, String filename, String extension) {
-            Path folderF = Path.of(folder);
-            makeSureDirectoryExists(folderF);
-            filename = makeFileNameValid(filename);
-            extension = extension == null || extension.length() == 0 ? "" : "." + extension;
-            Path file;
-            int count = 1;
-            do {
-                String countExt = count == 1 ? "" : "_" + count;
-                file = Path.of(folder, filename
-                        + countExt
-                        + extension);
-                count++;
-            } while (Files.exists(file));
-            return file;
+        public static Path findNextValidFile(Path folder, String filename, String extension) {
+            if (makeSureDirectoryExists(folder)) {
+                filename = makeFileNameValid(filename);
+                extension = extension == null || extension.length() == 0 ? "" : "." + extension;
+                Path file;
+                int count = 1;
+                do {
+                    String countExt = count == 1 ? "" : "_" + count;
+                    file = Path.of(folder.toString(), filename
+                            + countExt
+                            + extension);
+                    count++;
+                } while (Files.exists(file));
+                return file;
+            } else {
+                return null;
+            }
         }
 
 
