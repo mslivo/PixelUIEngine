@@ -89,7 +89,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
         ArrayList<Component> tabBarComponents = api.presets.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
-                0, null, true, window.height - 4);
+                0, null, true, window.height - 4, false);
 
 
         api.windows.addComponents(window, tabBarComponents);
@@ -383,7 +383,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
         TabBar tabbar = api.components.tabBar.create(2, window.height - 5, window.width - 4, new Tab[]{tabTextButton, tabImageButton, tabTextImage},
-                0, null, true, window.height - 7, 0);
+                0, null, true, window.height - 7, 0, false);
         api.windows.addComponent(window, tabbar);
 
 

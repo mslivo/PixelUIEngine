@@ -979,13 +979,12 @@ public class API {
             return borders;
         }
 
-
-        public ArrayList<Component> tabBar_createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight) {
+        public ArrayList<Component> tabBar_createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
             ArrayList<Component> ret = new ArrayList<>();
 
             width = Tools.Calc.lowerBounds(width, 1);
-            TabBar tabBar = components.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2);
-            ImageButton extendButton = components.button.imageButton.create(x, y, 2, 1, GUIBaseMedia.GUI_ICON_EXTEND);
+            TabBar tabBar = components.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
+            ImageButton extendButton = components.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, GUIBaseMedia.GUI_ICON_EXTEND);
 
             updateExtendableTabBarButton(tabBar, extendButton);
 
@@ -2103,12 +2102,12 @@ public class API {
 
         public void removeComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
-            for(Component component : components) removeComponent(window, component);
+            for (Component component : components) removeComponent(window, component);
         }
 
         public void removeComponents(Window window, ArrayList<Component> components) {
             if (window == null || components == null) return;
-            for(Component component : components) removeComponent(window, component);
+            for (Component component : components) removeComponent(window, component);
         }
 
         public ArrayList<Component> findComponentsByName(Window window, String name) {
@@ -3297,27 +3296,31 @@ public class API {
             }
 
             public TabBar create(int x, int y, int width, Tab[] tabs) {
-                return create(x, y, width, tabs, 0, null, false, 0, 0);
+                return create(x, y, width, tabs, 0, null, false, 0, 0, false);
             }
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab) {
-                return create(x, y, width, tabs, selectedTab, null, false, 0, 0);
+                return create(x, y, width, tabs, selectedTab, null, false, 0, 0, false);
             }
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction) {
-                return create(x, y, width, tabs, selectedTab, tabBarAction, false, 0, 0);
+                return create(x, y, width, tabs, selectedTab, tabBarAction, false, 0, 0, false);
             }
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight) {
-                return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 0);
+                return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 0, false);
             }
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset) {
+                return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, tabOffset, false);
+            }
+
+            public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
                 TabBar tabBar = new TabBar();
                 tabBar.tabs = new ArrayList<>();
                 setComponentInitValues(tabBar);
                 setPosition(tabBar, x, y);
-                setSize(tabBar, width, 1);
+                setSize(tabBar, width, bigIconMode ? 2 : 1);
                 removeAllTabs(tabBar);
                 setTabs(tabBar, tabs);
                 selectTab(tabBar, selectedTab);
@@ -3325,11 +3328,17 @@ public class API {
                 setBorder(tabBar, border);
                 setBorderHeight(tabBar, borderHeight);
                 setTabOffset(tabBar, tabOffset);
+                setBigIconMode(tabBar, bigIconMode);
                 return tabBar;
             }
 
             public void setTabOffset(TabBar tabBar, int tabOffset) {
                 tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
+            }
+
+            public void setBigIconMode(TabBar tabBar, boolean bigIconMode) {
+                if (tabBar == null) return;
+                tabBar.bigIconMode = bigIconMode;
             }
 
             public void setBorder(TabBar tabBar, boolean border) {

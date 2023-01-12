@@ -1344,7 +1344,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             while ((componentTmp = window.removeComponentsQueue.pollFirst()) != null) {
                 if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(componentTmp);
-                if(componentTmp.addedToTab != null) componentTmp.addedToTab.components.remove(componentTmp);
+                if (componentTmp.addedToTab != null) componentTmp.addedToTab.components.remove(componentTmp);
                 componentTmp.addedToTab = null;
                 componentTmp.addedToWindow = null;
                 window.components.remove(componentTmp);
@@ -1690,17 +1690,18 @@ public class UIEngine<T extends UIAdapter> {
         int y_bar = UICommons.component_getAbsoluteY(tabBar);
 
         int tabXOffset = tabBar.tabOffset;
-        selectTabLoop:
         for (int i = 0; i < tabBar.tabs.size(); i++) {
             Tab tab = tabBar.tabs.get(i);
-            if ((tabXOffset + tab.width) > tabBar.width) {
-                break selectTabLoop;
+            int tabWidth  = tabBar.bigIconMode ? 2 : tab.width;
+            if ((tabXOffset + tabWidth) > tabBar.width) {
+                break;
             }
 
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, x_bar + (tabXOffset * TILE_SIZE), y_bar, tab.width * TILE_SIZE, TILE_SIZE)) {
+            int tabHeight = tabBar.bigIconMode ? (TILE_SIZE*2) : TILE_SIZE;
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, x_bar + (tabXOffset * TILE_SIZE), y_bar, tabWidth * TILE_SIZE, tabHeight)) {
                 return i;
             }
-            tabXOffset = tabXOffset + tab.width;
+            tabXOffset = tabXOffset + tabWidth;
         }
 
 
@@ -2190,7 +2191,7 @@ public class UIEngine<T extends UIAdapter> {
         } else if (component.getClass() == Image.class) {
             Image image = (Image) component;
             if (image.image != null) {
-                render_drawCMediaImage(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex,image.animationOffset);
+                render_drawCMediaImage(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex, image.animationOffset);
             }
         } else if (component.getClass() == Text.class) {
             Text text = (Text) component;
@@ -2441,40 +2442,55 @@ public class UIEngine<T extends UIAdapter> {
             TabBar tabBar = (TabBar) component;
             int tabXOffset = tabBar.tabOffset;
             int topBorder = 0;
-            drawTabBarLoop:
             for (int i = 0; i < tabBar.tabs.size(); i++) {
                 Tab tab = tabBar.tabs.get(i);
-                if ((tabXOffset + tab.width) > tabBar.width) {
-                    break drawTabBarLoop;
+                int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
+                if ((tabXOffset + tabWidth) > tabBar.width) break;
+
+                boolean selected = i == tabBar.selectedTab;
+                CMediaGFX tabGraphic;
+                if (tabBar.bigIconMode) {
+                    tabGraphic = selected ? GUIBaseMedia.GUI_TAB_BIGICON_SELECTED : GUIBaseMedia.GUI_TAB_BIGICON;
+                } else {
+                    tabGraphic = selected ? GUIBaseMedia.GUI_TAB_SELECTED : GUIBaseMedia.GUI_TAB;
                 }
-                CMediaGFX tabGraphics = i == tabBar.selectedTab ? GUIBaseMedia.GUI_TAB_SELECTED : GUIBaseMedia.GUI_TAB;
 
-                for (int x = 0; x < tab.width; x++) {
-                    render_drawCMediaImage(tabGraphics, UICommons.component_getAbsoluteX(tabBar) + (x * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), tab_getCMediaIndex(x, tab.width));
+                if (tabBar.bigIconMode) {
+                    render_drawCMediaImage(tabGraphic, UICommons.component_getAbsoluteX(tabBar)  + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
+                    // Icon
+                    if(tab.icon != null) {
+                        int selected_offset = selected ? 0 : 1;
+                        render_drawCMediaImage(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
+                    }
+                } else {
+                    for (int x = 0; x < tabWidth; x++) {
+                        render_drawCMediaImage(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (x * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), tab_getCMediaIndex(x, tab.width));
+                    }
                 }
 
-                render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tab.icon, tab.iconIndex);
-                tabXOffset += tab.width;
-
+                if (!tabBar.bigIconMode) {
+                    render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tab.icon, tab.iconIndex);
+                }
+                tabXOffset += tabWidth;
             }
 
             topBorder = tabBar.width - tabXOffset;
+
+            // Top Border
             for (int ix = 0; ix < topBorder; ix++) {
                 render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
             }
 
             if (tabBar.border) {
-
-
+                // Bottom
                 for (int ix = 0; ix < tabBar.width; ix++) {
                     render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
                 }
-
+                // Left/Right
                 for (int iy = 0; iy < tabBar.borderHeight; iy++) {
-                    render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - ((iy + 1) * TILE_SIZE), 0);
-                    render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - ((iy + 1) * TILE_SIZE), 1);
-
-
+                    int yOffset = (iy + 1) * TILE_SIZE;
+                    render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
+                    render_drawCMediaImage(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
                 }
 
             }
@@ -2675,15 +2691,15 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y) {
-        render_drawCMediaImage(cMedia,x,y,0,0);
+        render_drawCMediaImage(cMedia, x, y, 0, 0);
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex) {
-        render_drawCMediaImage(cMedia,x,y,arrayIndex,0);
+        render_drawCMediaImage(cMedia, x, y, arrayIndex, 0);
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, (inputState.animation_timer_gui+animation_timer_offset), arrayIndex);
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, (inputState.animation_timer_gui + animation_timer_offset), arrayIndex);
     }
 
     public void shutdown() {

@@ -1,1 +1,0 @@
-[ ] tabbar mode with 16x16 icons and no text

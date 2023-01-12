@@ -19,4 +19,6 @@ public class TabBar extends Component {
 
     public int tabOffset;
 
+    public boolean bigIconMode;
+
 }

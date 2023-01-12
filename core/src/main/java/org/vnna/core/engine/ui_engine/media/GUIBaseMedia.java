@@ -37,6 +37,9 @@ public class GUIBaseMedia {
     public static CMediaArray GUI_TAB = MediaManager.create_CMediaArray(guiDirectory + "tab.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static CMediaArray GUI_TAB_SELECTED = MediaManager.create_CMediaArray(guiDirectory + "tab_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
 
+    public static CMediaImage GUI_TAB_BIGICON = MediaManager.create_CMediaImage(guiDirectory + "tab_bigicon.png");
+    public static CMediaImage GUI_TAB_BIGICON_SELECTED = MediaManager.create_CMediaImage(guiDirectory + "tab__bigicon_selected.png");
+
     public static CMediaArray GUI_COMBOBOX_OPEN = MediaManager.create_CMediaArray(guiDirectory + "combobox_open.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
 
     public static CMediaArray GUI_COMBOBOX_LIST = MediaManager.create_CMediaArray(guiDirectory + "combobox_list.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
