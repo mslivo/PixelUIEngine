@@ -11,7 +11,7 @@ public class TextButton extends Button {
 
     public CMediaGFX icon;
 
-    public int iconArray;
+    public int iconArrayIndex;
 
 
 }

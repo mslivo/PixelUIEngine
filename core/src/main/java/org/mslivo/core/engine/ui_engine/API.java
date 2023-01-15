@@ -3004,7 +3004,7 @@ public class API {
                     setText(textButton, text);
                     setFont(textButton, font);
                     setIcon(textButton, icon);
-                    setIconArray(textButton, 0);
+                    setIconArrayIndex(textButton, 0);
                     centerContent(textButton);
                     return textButton;
                 }
@@ -3014,9 +3014,9 @@ public class API {
                     textButton.icon = icon;
                 }
 
-                public void setIconArray(TextButton textButton, int iconArray) {
+                public void setIconArrayIndex(TextButton textButton, int iconArrayIndex) {
                     if (textButton == null) return;
-                    textButton.iconArray = Tools.Calc.lowerBounds(iconArray, 0);
+                    textButton.iconArrayIndex = Tools.Calc.lowerBounds(iconArrayIndex, 0);
                 }
 
 
