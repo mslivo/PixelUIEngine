@@ -344,24 +344,6 @@ public class Tools {
             }
         }
 
-        public static String findAppDataDirectory() {
-            String os = System.getProperty("os.name", "generic").toLowerCase();
-            if (os.indexOf("win") >= 0) {
-                return System.getenv("APPDATA").replace("\\", "/");
-            } else if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
-                return "~/Library/Preferences/";
-            } else if (os.indexOf("nux") >= 0) {
-                if (System.getenv("XDG_CONFIG_HOME") != null) {
-                    return System.getenv("XDG_CONFIG_HOME") + "/";
-                } else {
-                    return "~/.config/";
-                }
-            } else {
-                return System.getProperty("user.home") + "/";
-            }
-        }
-
-
         public static void writeObjectToFile(Object data, Path file) throws Exception {
             Files.createDirectories(file.getParent());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(file));
