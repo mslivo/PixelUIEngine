@@ -27,7 +27,7 @@ public class LauncherMain {
         Tools.logDone();
 
         // Save to AppDAta
-        Path testDataFile = Path.of(System.getenv("user.home") + "/" + appTitle + "/save/test.data");
+        Path testDataFile = Path.of(System.getProperty("user.home") + "/" + appTitle + "/save/test.data");
         Tools.logInProgress("Writing DataFile");
         Tools.File.writeObjectToFile(exampleData, testDataFile);
         Tools.logDone();

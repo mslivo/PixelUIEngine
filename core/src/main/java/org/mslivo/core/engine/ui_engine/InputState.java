@@ -176,7 +176,6 @@ public class InputState {
     public boolean[] hotKeyPressedKeys;
 
     public Window lastActiveWindow;
-    public MouseTool pressedMouseTool;
 
     public ComboBox openComboBox;
 
@@ -205,6 +204,8 @@ public class InputState {
     public CMediaCursor cursor_current;
 
     public MouseTool mouseTool;
+
+    public boolean mouseToolPressed;
 
     public CMediaCursor temporaryCursor;
 

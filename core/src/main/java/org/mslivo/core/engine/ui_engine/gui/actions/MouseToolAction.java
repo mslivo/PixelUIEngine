@@ -3,7 +3,7 @@ package org.mslivo.core.engine.ui_engine.gui.actions;
 public abstract class MouseToolAction {
 
 
-    public void onClick(int button, int x, int y) {
+    public void onPress(int button, int x, int y) {
     }
 
     public void onDoubleClick(int button, int x, int y) {
@@ -15,5 +15,6 @@ public abstract class MouseToolAction {
     public void onDrag(int x, int y) {
     }
 
-
+    public void onMove(int x, int y) {
+    }
 }

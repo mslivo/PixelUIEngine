@@ -225,7 +225,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.tooltip_lastHoverObject = null;
         newInputState.pressedMap = null;
         newInputState.hotKeyPressedKeys = new boolean[256];
-        newInputState.pressedMouseTool = null;
         newInputState.openComboBox = null;
 
         // ----- Mouse
@@ -236,6 +235,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.cursor_setNext = null;
         newInputState.cursor_current = null;
         newInputState.mouseTool = null;
+        newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
         // -----  Other
@@ -399,10 +399,6 @@ public class UIEngine<T extends UIAdapter> {
                     processMouseClick = false;
                 }
             } else {
-                // Tool
-                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
-                    inputState.mouseTool.mouseToolAction.onDoubleClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
-                }
                 processMouseClick = false;
             }
 
@@ -494,6 +490,10 @@ public class UIEngine<T extends UIAdapter> {
                         notification.notificationAction.onMouseDoubleClick(inputState.inputEvents.mouseButton);
                     }
                 }
+            }else{
+                // Tool
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null)
+                    inputState.mouseTool.mouseToolAction.onDoubleClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
             }
         }
         if (inputState.inputEvents.mouseDown) {
@@ -525,11 +525,6 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             } else {
-                // Tool
-                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
-                    inputState.mouseTool.mouseToolAction.onClick(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
-                    inputState.pressedMouseTool = inputState.mouseTool;
-                }
                 processMouseClick = false;
             }
 
@@ -826,6 +821,12 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.focusedTextField.textFieldAction.onUnFocus();
                     inputState.focusedTextField = null;
                 }
+            } else {
+                // Tool
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
+                    inputState.mouseTool.mouseToolAction.onPress(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
+                    inputState.mouseToolPressed = true;
+                }
             }
 
 
@@ -941,12 +942,11 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.listDrag_from_index = 0;
             }
 
-            if (inputState.pressedMouseTool != null) {
-                if (inputState.pressedMouseTool.mouseToolAction != null)
-                    inputState.pressedMouseTool.mouseToolAction.onRelease(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
-                inputState.pressedMouseTool = null;
+            if (inputState.mouseToolPressed) {
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null)
+                    inputState.mouseTool.mouseToolAction.onRelease(inputState.inputEvents.mouseButton, inputState.mouse_x, inputState.mouse_y);
+                inputState.mouseToolPressed = false;
             }
-
         }
 
         if (inputState.inputEvents.mouseDragged) {
@@ -979,15 +979,16 @@ public class UIEngine<T extends UIAdapter> {
                 knob_turnKnob(knob, newValue, amount);
 
             }
-            if (inputState.pressedMouseTool != null) {
-                if (inputState.pressedMouseTool.mouseToolAction != null)
-                    inputState.pressedMouseTool.mouseToolAction.onDrag(inputState.mouse_x, inputState.mouse_y);
-            }
+
+            if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null)
+                inputState.mouseTool.mouseToolAction.onDrag(inputState.mouse_x, inputState.mouse_y);
 
 
         }
         if (inputState.inputEvents.mouseMoved) {
 
+            if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null)
+                inputState.mouseTool.mouseToolAction.onMove(inputState.mouse_x, inputState.mouse_y);
 
         }
 
@@ -1224,13 +1225,13 @@ public class UIEngine<T extends UIAdapter> {
             }
         } else {
             // Set Game Tooltip
-            if(inputState.lastGUIMouseHover == null && inputState.gameToolTip != null){
-                if(inputState.tooltip != inputState.gameToolTip) {
+            if (inputState.lastGUIMouseHover == null && inputState.gameToolTip != null) {
+                if (inputState.tooltip != inputState.gameToolTip) {
                     inputState.tooltip = inputState.gameToolTip;
                     inputState.tooltip_wait_delay = true;
                     inputState.tooltip_delay_timer = System.currentTimeMillis();
                 }
-            }else{
+            } else {
                 inputState.tooltip = null;
                 inputState.tooltip_lastHoverObject = null;
             }
@@ -1699,12 +1700,12 @@ public class UIEngine<T extends UIAdapter> {
         int tabXOffset = tabBar.tabOffset;
         for (int i = 0; i < tabBar.tabs.size(); i++) {
             Tab tab = tabBar.tabs.get(i);
-            int tabWidth  = tabBar.bigIconMode ? 2 : tab.width;
+            int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
             if ((tabXOffset + tabWidth) > tabBar.width) {
                 break;
             }
 
-            int tabHeight = tabBar.bigIconMode ? (TILE_SIZE*2) : TILE_SIZE;
+            int tabHeight = tabBar.bigIconMode ? (TILE_SIZE * 2) : TILE_SIZE;
             if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui, x_bar + (tabXOffset * TILE_SIZE), y_bar, tabWidth * TILE_SIZE, tabHeight)) {
                 return i;
             }
@@ -2463,9 +2464,9 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 if (tabBar.bigIconMode) {
-                    render_drawCMediaImage(tabGraphic, UICommons.component_getAbsoluteX(tabBar)  + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
+                    render_drawCMediaImage(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
                     // Icon
-                    if(tab.icon != null) {
+                    if (tab.icon != null) {
                         int selected_offset = selected ? 0 : 1;
                         render_drawCMediaImage(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
                     }
