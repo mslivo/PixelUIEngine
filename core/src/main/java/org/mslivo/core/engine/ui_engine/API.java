@@ -102,6 +102,10 @@ public class API {
         }
     }
 
+    public void setToolTip(ToolTip toolTip){
+        inputState.gameToolTip = toolTip;
+    }
+
     public ArrayList<Notification> findNotificationsByName(String name) {
         ArrayList<Notification> result = new ArrayList<>();
         if (name == null) return result;

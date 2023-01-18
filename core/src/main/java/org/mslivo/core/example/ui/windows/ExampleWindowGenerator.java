@@ -92,6 +92,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         api.windows.addComponents(window, tabBarComponents);
 
+
         return window;
     }
 
@@ -281,18 +282,21 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("1"));
+                                        api.setToolTip(api.toolTip.create(Tools.Text.toArray("111")));
                                     }
                                 }),
                                 api.contextMenu.item.create("Item 2 ---", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("2"));
+                                        api.setToolTip(api.toolTip.create(Tools.Text.toArray("222")));
                                     }
                                 }),
                                 api.contextMenu.item.create("Item 3 -----", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("3"));
+                                        api.setToolTip(null);
                                     }
                                 }),
                         }

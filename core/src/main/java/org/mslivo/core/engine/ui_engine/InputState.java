@@ -133,6 +133,8 @@ public class InputState {
     public ScrollBarHorizontal scrolledScrollBarHorizontal;
 
     public ToolTip tooltip;
+
+    public ToolTip gameToolTip;
     public Object tooltip_lastHoverObject;
 
     public Knob turnedKnob;

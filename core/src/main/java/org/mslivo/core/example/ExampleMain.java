@@ -100,7 +100,7 @@ public class ExampleMain extends ApplicationAdapter {
         profile_time_gui = System.currentTimeMillis() - profile_time_gui;
 
         // Run engine?
-        if (Tools.Calc.shouldRun(10, gameEngine.getLastUpdateTime())) { // engine is called 10/Second
+        if (Tools.Calc.shouldRun(60, gameEngine.getLastUpdateTime())) { // engine is called 10/Second
             profile_time_engine = System.currentTimeMillis();
             gameEngine.update();
             profile_time_engine = System.currentTimeMillis() - profile_time_engine;
