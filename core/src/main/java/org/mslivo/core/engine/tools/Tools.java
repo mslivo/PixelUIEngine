@@ -613,6 +613,50 @@ public class Tools {
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
+        public static float percentAboveThreshold(long value, long max, int threshold){
+            value = Tools.Calc.upperBounds(value, max);
+            if(value > threshold){
+                long above = value-threshold;
+                float divisor = (max-threshold);
+                return divisor > 0 ? (above/divisor) : 0f;
+            }else{
+                return 0f;
+            }
+        }
+
+        public static float percentBelowThreshold(long value, long min, int threshold){
+            value = Tools.Calc.lowerBounds(value, min);
+            if(value < threshold){
+                long below = threshold-value;
+                float divisor = (threshold-min);
+                return divisor > 0 ? (below/divisor) : 0f;
+            }else{
+                return 0f;
+            }
+        }
+
+        public static float percentAboveThreshold(float value, float max, float threshold){
+            value = Tools.Calc.upperBounds(value, max);
+            if(value > threshold){
+                float above = value-threshold;
+                float divisor = (max-threshold);
+                return divisor > 0 ? (above/divisor) : 0f;
+            }else{
+                return 0f;
+            }
+        }
+
+        public static float percentBelowThreshold(float value, float min, float threshold){
+            value = Tools.Calc.lowerBounds(value, min);
+            if(value < threshold){
+                float below = threshold-value;
+                float divisor = (threshold-min);
+                return divisor > 0 ? (below/divisor) : 0f;
+            }else{
+                return 0f;
+            }
+        }
+
         public static int applyRandomness(int value, float randomness) {
             return (int) applyRandomness((long) value, randomness);
         }
