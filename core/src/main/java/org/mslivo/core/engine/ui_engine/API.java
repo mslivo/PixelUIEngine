@@ -629,7 +629,7 @@ public class API {
                             components.setColor(ok, components.map.getPixel(colorMap, x, y));
                             components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
 
-                            components.map.mapOverlay.setPosition(cursorOverlay, x - 2, yInv - 2);
+                            components.map.mapOverlay.setPosition(cursorOverlay, x-1 , yInv -2);
                             xLast = x;
                             yLast = y;
                         }
