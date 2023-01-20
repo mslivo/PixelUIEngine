@@ -3787,11 +3787,11 @@ public class API {
 
             public class _MapOverlay {
                 public MapOverlay create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y, false, null, 0);
+                    return create(image, x, y, false, Tools.Colors.WHITE, 0);
                 }
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut) {
-                    return create(image, x, y, fadeOut, null, 0);
+                    return create(image, x, y, fadeOut, Tools.Colors.WHITE, 0);
                 }
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, FColor color) {
