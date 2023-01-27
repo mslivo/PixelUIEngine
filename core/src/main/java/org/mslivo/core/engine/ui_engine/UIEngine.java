@@ -2605,7 +2605,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, (inputState.animation_timer_gui + animation_timer_offset), arrayIndex);
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y,arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
+    }
+
+    private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex,(inputState.animation_timer_gui + animation_timer_offset));
     }
 
     public void shutdown() {
