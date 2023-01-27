@@ -1543,7 +1543,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.animation_timer_gui = inputState.animation_timer_gui + Gdx.graphics.getDeltaTime();
 
         inputState.spriteBatch_gui.begin();
-        render_batchSetColorWhite();
+        render_batchSetColorWhite(1f);
 
         if (inputState.modalWindow != null || inputState.guiFrozen) render_enableGrayScaleShader(true);
 
@@ -2221,7 +2221,7 @@ public class UIEngine<T extends UIAdapter> {
 
             render_drawCMediaImage(GUIBaseMedia.GUI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
             render_batchSaveColor();
-            render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, knob.color2_a);
+            render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
             if (knob.endless) {
                 int index = MathUtils.round(knob.turned * 36);
                 render_drawCMediaImage(GUIBaseMedia.GUI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
@@ -2321,7 +2321,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
 
                         render_batchSaveColor();
-                        render_batchSetColorWhite();
+                        render_batchSetColorWhite(alpha);
                         if (inventory.inventoryAction != null) {
                             FColor cellColor = inventory.inventoryAction.cellColor(inventory.items[x][y], x, y);
                             if (cellColor != null) {
@@ -2331,8 +2331,6 @@ public class UIEngine<T extends UIAdapter> {
 
                         int index = inventory.doubleSized ? render_getComponent16TilesCMediaIndex(x, y, inventory.width / 2, inventory.height / 2) : render_getComponent16TilesCMediaIndex(x, y, inventory.width, inventory.height);
                         render_drawCMediaImage(cellMedia, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize), index);
-
-                        render_batchSetColorWhite();
 
                         CMediaGFX icon = (inventory.items[x][y] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[x][y]) : null;
 
@@ -2475,7 +2473,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inventoryDrag_Item != null) {
             if (inputState.inventoryDrag_Inventory != null && inputState.inventoryDrag_Inventory.inventoryAction != null) {
-                render_batchSetColor(1, 1, 1, api.config.getDragTransparency());
+                render_batchSetColorWhite( api.config.getDragTransparency());
                 CMediaGFX icon = inputState.inventoryDrag_Inventory.inventoryAction.icon(inputState.inventoryDrag_Item);
                 render_drawCMediaImage(icon, inputState.mouse_x_gui - inputState.InventoryDrag_offset_x, inputState.mouse_y_gui - inputState.InventoryDrag_offset_y, inputState.inventoryDrag_Inventory.inventoryAction.iconArrayIndex(inputState.inventoryDrag_Item));
             }
@@ -2495,7 +2493,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        render_batchSetColorWhite();
+        render_batchSetColorWhite(1f);
         render_batchLoadColor();
         return;
     }
@@ -2537,7 +2535,7 @@ public class UIEngine<T extends UIAdapter> {
         boolean withIcon = icon != null;
         if (withIcon) {
             render_batchSaveColor();
-            render_batchSetColorWhite();
+            render_batchSetColorWhite(alpha);
             render_drawCMediaImage(icon, x, y, iconIndex);
             if (maxWidth != -1) maxWidth = maxWidth - TILE_SIZE;
             render_batchLoadColor();
@@ -2580,8 +2578,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_gui.setColor(r, g, b, a);
     }
 
-    private void render_batchSetColorWhite() {
-        inputState.spriteBatch_gui.setColor(1, 1, 1, 1);
+    private void render_batchSetColorWhite(float alpha) {
+        inputState.spriteBatch_gui.setColor(1, 1, 1, alpha);
     }
 
     private Color render_batchGetColor() {
