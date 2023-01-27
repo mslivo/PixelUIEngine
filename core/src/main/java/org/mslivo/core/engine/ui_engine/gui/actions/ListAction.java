@@ -8,7 +8,7 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 
 import java.util.HashSet;
 
-public abstract class ListAction<T extends Object> {
+public abstract class ListAction<T extends Object> extends CommonActions {
 
     public CMediaGFX icon(T listItem) {
         return null;
@@ -55,15 +55,9 @@ public abstract class ListAction<T extends Object> {
         return null;
     }
 
-    public void onMouseClick(int button) {
-    }
-
-    public void onMouseDoubleClick(int button) {
-    }
-
     public void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
     }
 
-    public void onMouseScroll(float scrolled) {
-    }
+    public boolean canDragIntoScreen() {return false;}
+
 }

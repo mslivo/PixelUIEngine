@@ -6,7 +6,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 
-public abstract class InventoryAction<T extends Object> {
+public abstract class InventoryAction<T extends Object> extends CommonActions {
 
     public CMediaGFX icon(T listItem) {
         return null;
@@ -37,20 +37,15 @@ public abstract class InventoryAction<T extends Object> {
         return false;
     }
 
+    public boolean canDragIntoScreen() {return false;}
+
     public FColor cellColor(T listItem, int x, int y) {
         return null;
-    }
-
-    public void onMouseClick(int button) {
-    }
-
-    public void onMouseDoubleClick(int button) {
     }
 
     public void onDragIntoScreen(T listItem, int x, int y, int screenX, int screenY) {
     }
 
-    public void onMouseScroll(float scrolled) {
-    }
+
 
 }

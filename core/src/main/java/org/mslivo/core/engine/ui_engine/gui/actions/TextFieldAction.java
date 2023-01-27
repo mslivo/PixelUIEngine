@@ -1,6 +1,6 @@
 package org.mslivo.core.engine.ui_engine.gui.actions;
 
-public abstract class TextFieldAction {
+public abstract class TextFieldAction extends CommonActions {
 
     public boolean isContentValid(String newContent) {
         return true;
@@ -21,9 +21,4 @@ public abstract class TextFieldAction {
     public void onUnFocus() {
     }
 
-    public void onMouseClick(int button) {
-    }
-
-    public void onMouseScroll(float scrolled) {
-    }
 }

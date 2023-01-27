@@ -1326,7 +1326,7 @@ public class API {
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
         private CMediaFont notificationsDefaultFont = GUIBaseMedia.FONT_WHITE;
-        private FColor notificationsDefaultColor = Tools.Colors.create(0, 0, 0, 1f);
+        private FColor notificationsDefaultColor = Tools.Colors.GRAY_DARK;
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
@@ -1673,22 +1673,22 @@ public class API {
 
     public class _Notification {
         public Notification create(String text) {
-            return create(text, null, null, null, null);
+            return create(text, config.notificationsDefaultColor, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
         public Notification create(String text, FColor color) {
-            return create(text, color, null, null, null);
+            return create(text, color, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
         public Notification create(String text, FColor color, CMediaFont font) {
-            return create(text, color, font, null, null);
+            return create(text, color, font, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, FColor color, CMediaFont font, Integer displayTime) {
+        public Notification create(String text, FColor color, CMediaFont font, int displayTime) {
             return create(text, color, font, displayTime, null);
         }
 
-        public Notification create(String text, FColor color, CMediaFont font, Integer displayTime, NotificationAction notificationAction) {
+        public Notification create(String text, FColor color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
             Notification notification = new Notification();
             setText(notification, text);
             setDisplayTime(notification, displayTime);
@@ -1726,9 +1726,9 @@ public class API {
             notification.notificationAction = notificationAction;
         }
 
-        public void setDisplayTime(Notification notification, Integer displayTime) {
+        public void setDisplayTime(Notification notification, int displayTime) {
             if (notification == null) return;
-            notification.displayTime = Tools.Calc.lowerBounds(displayTime == null ? config.notificationsDefaultDisplayTime : displayTime, 0);
+            notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
         }
 
         public void setColor(Notification notification, FColor color) {

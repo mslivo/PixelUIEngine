@@ -3,7 +3,7 @@ package org.mslivo.core.engine.ui_engine.gui.actions;
 /**
  * Created by Admin on 10.03.2019.
  */
-public abstract class ButtonAction {
+public abstract class ButtonAction extends CommonActions {
 
     public void onPress() {
     }
@@ -17,12 +17,4 @@ public abstract class ButtonAction {
     public void onToggle(boolean value) {
     }
 
-    public void onMouseClick(int button) {
-    }
-
-    public void onMouseDoubleClick(int button) {
-    }
-
-    public void onMouseScroll(float scrolled) {
-    }
 }

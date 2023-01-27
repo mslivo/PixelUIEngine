@@ -624,6 +624,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 invItems3[x][y] = null;
                 api.addNotification(api.notifications.create(listItem.text + " " + screenX + "," + screenY));
             }
+
+            @Override
+            public boolean canDragIntoScreen() {
+                return true;
+            }
         };
         api.components.inventory.setInventoryAction(inventory3, inventoryAction3);
         api.windows.addComponent(window, inventory3);
