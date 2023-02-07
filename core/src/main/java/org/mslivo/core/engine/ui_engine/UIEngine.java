@@ -2321,20 +2321,22 @@ public class UIEngine<T extends UIAdapter> {
                         }
 
                         render_batchSaveColor();
-                        render_batchSetColorWhite(alpha);
-                        if (inventory.inventoryAction != null) {
-                            FColor cellColor = inventory.inventoryAction.cellColor(inventory.items[x][y], x, y);
-                            if (cellColor != null) {
-                                render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
-                            }
-                        }
 
+                        // Draw Cell
+                        FColor cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[x][y], x, y) : null;
+                        if(cellColor != null){
+                            render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
+                        }else{
+                            render_batchSetColorWhite(alpha);
+                        }
                         int index = inventory.doubleSized ? render_getComponent16TilesCMediaIndex(x, y, inventory.width / 2, inventory.height / 2) : render_getComponent16TilesCMediaIndex(x, y, inventory.width, inventory.height);
                         render_drawCMediaImage(cellMedia, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize), index);
 
+                        // Draw Icon
                         CMediaGFX icon = (inventory.items[x][y] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[x][y]) : null;
 
                         if (icon != null) {
+                            render_batchSetColorWhite(alpha);
                             int iconIndex = inventory.inventoryAction != null ? inventory.inventoryAction.iconArrayIndex(inventory.items[x][y]) : 0;
                             render_drawCMediaImage(icon, UICommons.component_getAbsoluteX(inventory) + (x * tileSize), UICommons.component_getAbsoluteY(inventory) + (y * tileSize), iconIndex);
                         }
