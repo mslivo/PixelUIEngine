@@ -54,8 +54,10 @@ import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 
 public class API {
 
@@ -728,10 +730,23 @@ public class API {
         }
 
         public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
-            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, Tools.Colors.GREEN_BRIGHT, Tools.Colors.ORANGE_BRIGHT, Tools.Colors.RED_BRIGHT, null, true);
+            BiFunction<Long, Long,FColor> colorFunction = new BiFunction<Long, Long,FColor>() {
+                @Override
+                public FColor apply(Long value, Long lastValue) {
+                    if(value > lastValue){
+                        return Tools.Colors.GREEN_BRIGHT;
+                    }else if(value < lastValue){
+                        return Tools.Colors.RED_BRIGHT;
+                    }else {
+                        return Tools.Colors.ORANGE_BRIGHT;
+                    }
+                }
+
+            };
+            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, colorFunction, null, true);
         }
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, FColor colorRising, FColor colorEven, FColor colorFalling, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, BiFunction<Long, Long,FColor> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -784,7 +799,7 @@ public class API {
             long lastValue = valueBefore;
             int lastIndex = -1;
             final float SHADING = 0.1f;
-            FColor color = colorEven;
+            FColor color = colorFunction.apply(lastValue,valueBefore);
             FColor colorBrighter = Tools.Colors.createBrighter(color, SHADING);
             FColor colorDarker = Tools.Colors.createDarker(color, SHADING);
             for (int ix = 0; ix < mapWidth; ix++) {
@@ -793,13 +808,7 @@ public class API {
                 boolean indexChange = false;
                 boolean nextIndexChange = (ix + 1) < mapWidth ? indexAtPosition[ix + 1] != index : false;
                 if (index != lastIndex) {
-                    if (value > lastValue) {
-                        color = colorRising;
-                    } else if (value < lastValue) {
-                        color = colorFalling;
-                    } else {
-                        color = colorEven;
-                    }
+                    color = colorFunction.apply(value, lastValue);
                     colorBrighter = Tools.Colors.createBrighter(color, SHADING);
                     colorDarker = Tools.Colors.createDarker(color, SHADING);
                     indexChange = true;
