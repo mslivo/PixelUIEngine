@@ -591,9 +591,8 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     components.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        components.map.mapOverlay.setPosition(cursorOverlay, x, colorTexture.getRegionHeight() - y);
+                        components.map.mapOverlay.setPosition(cursorOverlay, x-3, colorTexture.getRegionHeight() - y+1);
                     }
-
                 }
             }
 
@@ -621,15 +620,15 @@ public class API {
                         int x = input.mouseXGUI() - components.getAbsoluteX(colorMap);
                         int yInv = (input.mouseYGUI() - components.getAbsoluteY(colorMap));
                         int y = colorTexture.getRegionHeight() - yInv;
-                        if (x < 0 || y < 0 || x > colorTexture.getRegionWidth() || y > colorTexture.getRegionHeight()) {
+                        if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-
-                            components.setColor(ok, components.map.getPixel(colorMap, x, y));
+                            components.setColor(ok, components.map.getPixel(colorMap, x, y-1));
+                            System.out.println(y);
                             components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
 
-                            components.map.mapOverlay.setPosition(cursorOverlay, x-1 , yInv -2);
+                            components.map.mapOverlay.setPosition(cursorOverlay, x-1 , yInv -1);
                             xLast = x;
                             yLast = y;
                         }

@@ -217,15 +217,17 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
+        final FColor[] lastColor = {null};
+
         Button modal3 = api.components.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
                 api.addWindowAsModal(api.presets.modal_CreateColorRequester("Caption", new Consumer<FColor>() {
                     @Override
                     public void accept(FColor fColor) {
-                        return;
+                        lastColor[0] = fColor;
                     }
-                }, null));
+                }, lastColor[0]));
             }
         });
 
