@@ -8,7 +8,7 @@ public class Hex2FloatImage {
 
     public static void main(String[] args) throws Exception {
 
-        hex2FloatImage("C:\\Users\\Markus\\Idea Projects\\MallSim\\assets\\sprites\\base\\generator\\daytime_gradient_2.png");
+        hex2FloatImage("E:\\Code\\gradient.png");
 
     }
 

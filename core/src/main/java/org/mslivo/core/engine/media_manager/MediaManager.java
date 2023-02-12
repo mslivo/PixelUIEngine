@@ -148,7 +148,7 @@ public class MediaManager {
         // PrepareLoop
         CMedia prepareMedia = null;
         counter = 0;
-        stackSize = loadStack.size();
+        stackSize = prepareStack.size();
         prepareLoop:
         while ((prepareMedia = prepareStack.pollFirst()) != null) {
             if (prepareMedia.getClass() == CMediaImageCursor.class) {
