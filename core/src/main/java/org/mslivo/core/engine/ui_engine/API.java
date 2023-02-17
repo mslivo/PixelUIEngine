@@ -761,6 +761,7 @@ public class API {
             int startIndex = (itemCount - 1) - (steps * stepSize);
             int indexAndValueCount = 0;
             long valueBefore = (startIndex - stepSize) > 0 ? getValueAtIndex.apply((startIndex - stepSize)) : Long.MIN_VALUE;
+            boolean oneValueFound = false;
             for (int i = startIndex; i < itemCount; i += stepSize) {
                 if (i >= 0) {
                     long value = getValueAtIndex.apply(i);
@@ -769,12 +770,17 @@ public class API {
                     indexes.add(i);
                     values.add(value);
                     dataAvailables.add(true);
+                    oneValueFound = true;
                 }else{
                     indexes.add(i);
                     values.add(0l);
                     dataAvailables.add(false);
                 }
                 indexAndValueCount++;
+            }
+            if(!oneValueFound){
+                lowestValue = 0;
+                highestValue = 0;
             }
             long loReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[0] : lowestValue;
             long hiReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[1] : highestValue;
