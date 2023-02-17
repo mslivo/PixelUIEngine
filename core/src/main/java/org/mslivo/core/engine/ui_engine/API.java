@@ -4103,12 +4103,23 @@ public class API {
                 comboBox.comboBoxAction = comboBoxAction;
             }
 
-            public void setSelectedItem(ComboBox comboBox, Object selectedItem) {
+            public void setSelectedItem(ComboBox comboBox, Object selectItem) {
                 if (comboBox == null) return;
-                if (comboBox.items != null && comboBox.items.contains(selectedItem))
-                    comboBox.selectedItem = selectedItem;
+                if (comboBox.items != null && comboBox.items.contains(selectItem))
+                    comboBox.selectedItem = selectItem;
             }
 
+            public void setSelectedItemEquals(ComboBox comboBox, Object selectItem) {
+                if (comboBox == null) return;
+                if(comboBox.items != null){
+                    for(Object item : comboBox.items){
+                        if(selectItem.equals(item)){
+                            comboBox.selectedItem = item;
+                            return;
+                        }
+                    }
+                }
+            }
             public void setUseIcons(ComboBox comboBox, boolean useIcons) {
                 if (comboBox == null) return;
                 comboBox.useIcons = useIcons;
