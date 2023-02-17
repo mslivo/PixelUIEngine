@@ -751,23 +751,30 @@ public class API {
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
             long[] valueAtPosition = new long[mapWidth];
+            boolean[] dataAvailableAtPosition = new boolean[mapWidth];
             long lowestValue = Integer.MAX_VALUE;
             long highestValue = Integer.MIN_VALUE;
             // Get Values
             ArrayList<Integer> indexes = new ArrayList<>();
             ArrayList<Long> values = new ArrayList<>();
+            ArrayList<Boolean> dataAvailables = new ArrayList<>();
             int startIndex = (itemCount - 1) - (steps * stepSize);
             int indexAndValueCount = 0;
             long valueBefore = (startIndex - stepSize) > 0 ? getValueAtIndex.apply((startIndex - stepSize)) : Long.MIN_VALUE;
             for (int i = startIndex; i < itemCount; i += stepSize) {
-                if (i > 0) {
+                if (i >= 0) {
                     long value = getValueAtIndex.apply(i);
                     lowestValue = value < lowestValue ? value : lowestValue;
                     highestValue = value > highestValue ? value : highestValue;
                     indexes.add(i);
                     values.add(value);
-                    indexAndValueCount++;
+                    dataAvailables.add(true);
+                }else{
+                    indexes.add(i);
+                    values.add(0l);
+                    dataAvailables.add(false);
                 }
+                indexAndValueCount++;
             }
             long loReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[0] : lowestValue;
             long hiReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[1] : highestValue;
@@ -793,6 +800,7 @@ public class API {
                 int indexAndValueIndex = MathUtils.round((ix / (float) mapWidth) * (indexAndValueCount - 1));
                 indexAtPosition[ix] = indexes.get(indexAndValueIndex);
                 valueAtPosition[ix] = values.get(indexAndValueIndex);
+                dataAvailableAtPosition[ix] = dataAvailables.get(indexAndValueIndex);
             }
 
             // Draw Bars
@@ -802,9 +810,13 @@ public class API {
             FColor color = colorFunction.apply(lastValue,valueBefore);
             FColor colorBrighter = Tools.Colors.createBrighter(color, SHADING);
             FColor colorDarker = Tools.Colors.createDarker(color, SHADING);
-            for (int ix = 0; ix < mapWidth; ix++) {
+            drawLoop:for (int ix = 0; ix < mapWidth; ix++) {
                 int index = indexAtPosition[ix];
                 long value = valueAtPosition[ix];
+                boolean dataAvailable = dataAvailableAtPosition[ix];
+
+                if(!dataAvailable) continue drawLoop;
+
                 boolean indexChange = false;
                 boolean nextIndexChange = (ix + 1) < mapWidth ? indexAtPosition[ix + 1] != index : false;
                 if (index != lastIndex) {
