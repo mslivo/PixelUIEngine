@@ -424,11 +424,7 @@ public class Tools {
 
 
         public static boolean shouldRun(int ticksPerSecond, long lastRun) {
-            if ((System.currentTimeMillis() - lastRun) >= (1000 / ticksPerSecond)) {
-                return true;
-            } else {
-                return false;
-            }
+            return (System.nanoTime() - lastRun) >= (1000000 / ticksPerSecond);
         }
 
         public static float min(float... values) {
