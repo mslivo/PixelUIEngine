@@ -1,6 +1,7 @@
-[ ] component mouse actions also need to be executed on the window action
+[ ] rename "api.presets"
+[x] component mouse actions also need to be executed on the window action
 [?] scrollable windows:
     - render: own render function with drawable area -> window minus the titlebar - otherwise whole screen
     - scrolling: preset scrollbar component, increases offset_x,offset_y by scorllarea amount
 
-[ ] rename "api.presets"
+
