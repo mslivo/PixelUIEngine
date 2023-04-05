@@ -89,13 +89,8 @@ public class GUIBaseMedia {
 
 
     //Cursors
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_ARROW = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.Arrow);
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_HAND = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.Hand);
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_CROSSHAIR = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.Crosshair);
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_IBEAM = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.Ibeam);
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_VERTICAL_RESIZE = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.VerticalResize);
-    public static CMediaSystemCursor GUI_CURSOR_SYSTEM_HORIZONTAL_RESIZE = MediaManager.create_CMediaSystemCursor(Cursor.SystemCursor.HorizontalResize);
-
+    public static CMediaCursor GUI_CURSOR_ARROW =MediaManager.create_CMediaCursor("gui/cursors/arrow.png", 16, 16);
+    public static CMediaCursor GUI_CURSOR_TRANSPARENT =MediaManager.create_CMediaCursor("gui/cursors/transparent.png", 16, 16);
 
     // Icons
     public static CMediaImage GUI_ICON_CLOSE = MediaManager.create_CMediaImage(guiDirectory + "icons/close.png");

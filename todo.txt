@@ -1,19 +1,9 @@
-[ ] keyboard control
-    option 1:
-        just emulate mouse
-        button 1 = mouse down
-        button 2 = increase scroll speed
-
-    option 2:
-    select window mode = select window
-    select component mode = select component on window - null = screen components
-    component mode
-    scroll/choose item/etc. -
-    button/checkbox = click & return
-    problem: inventory, list etc.
-
+[ ] software cursor mode (scales with pixel upsizing)
 [ ] rename "api.presets"
-
+[x] keyboard control
+     emulate mouse over java robot
+     action key = mouse down/up
+     mouse hovers slightly over components (magnetic)
 [x] component mouse actions also need to be executed on the window action
 [?] scrollable windows:
     ? find a way stuff outside windows is not drawn - scissorstack?

@@ -2,10 +2,14 @@ package org.mslivo.core.engine.media_manager.media;
 
 import java.io.Serializable;
 
-public abstract class CMediaCursor extends CMedia implements Serializable {
+public class CMediaCursor extends CMedia implements Serializable {
 
     public CMediaCursor(String filename) {
         super(filename);
     }
+
+    public int hotspot_x;
+
+    public int hotspot_y;
 
 }

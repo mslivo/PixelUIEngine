@@ -57,7 +57,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntConsumer;
 
 public class API {
 
@@ -1332,14 +1331,25 @@ public class API {
 
     public class _Config {
 
+        private boolean keyBoardControlEnabled = false;
+
+        private float keyBoardControlCursorSpeed = 4.0f;
+
+        private boolean keyBoardControlMagnetModeEnabled = true;
+
+        private int keyBoardControlButtonUp = Input.Keys.UP;
+        private int keyBoardControlButtonDown = Input.Keys.DOWN;
+        private int keyBoardControlButtonLeft = Input.Keys.LEFT;
+
+        private int keyBoardControlButtonRight = Input.Keys.RIGHT;
+        private int keyBoardControlButtonPress = Input.Keys.CONTROL_LEFT;
+
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
-
         private FColor contextMenuDefaultColor = Tools.Colors.WHITE;
-
-        private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_SYSTEM_ARROW;
+        private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_ARROW;
         private int gameviewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
@@ -1557,6 +1567,69 @@ public class API {
             this.contextMenuDefaultColor = contextMenuDefaultColor;
         }
 
+        public boolean isKeyBoardControlEnabled() {
+            return keyBoardControlEnabled;
+        }
+
+        public void setKeyBoardControlEnabled(boolean keyBoardControlEnabled) {
+            this.keyBoardControlEnabled = keyBoardControlEnabled;
+        }
+
+        public float getKeyBoardControlCursorSpeed() {
+            return keyBoardControlCursorSpeed;
+        }
+
+        public void setKeyBoardControlCursorSpeed(float keyBoardControlCursorSpeed) {
+            this.keyBoardControlCursorSpeed = keyBoardControlCursorSpeed;
+        }
+
+        public boolean isKeyBoardControlMagnetModeEnabled() {
+            return keyBoardControlMagnetModeEnabled;
+        }
+
+        public void setKeyBoardControlMagnetModeEnabled(boolean keyBoardControlMagnetModeEnabled) {
+            this.keyBoardControlMagnetModeEnabled = keyBoardControlMagnetModeEnabled;
+        }
+
+        public int getKeyBoardControlButtonUp() {
+            return keyBoardControlButtonUp;
+        }
+
+        public void setKeyBoardControlButtonUp(int keyBoardControlButtonUp) {
+            this.keyBoardControlButtonUp = keyBoardControlButtonUp;
+        }
+
+        public int getKeyBoardControlButtonDown() {
+            return keyBoardControlButtonDown;
+        }
+
+        public void setKeyBoardControlButtonDown(int keyBoardControlButtonDown) {
+            this.keyBoardControlButtonDown = keyBoardControlButtonDown;
+        }
+
+        public int getKeyBoardControlButtonLeft() {
+            return keyBoardControlButtonLeft;
+        }
+
+        public void setKeyBoardControlButtonLeft(int keyBoardControlButtonLeft) {
+            this.keyBoardControlButtonLeft = keyBoardControlButtonLeft;
+        }
+
+        public int getKeyBoardControlButtonRight() {
+            return keyBoardControlButtonRight;
+        }
+
+        public void setKeyBoardControlButtonRight(int keyBoardControlButtonRight) {
+            this.keyBoardControlButtonRight = keyBoardControlButtonRight;
+        }
+
+        public int getKeyBoardControlButtonPress() {
+            return keyBoardControlButtonPress;
+        }
+
+        public void setKeyBoardControlButtonPress(int keyBoardControlButtonPress) {
+            this.keyBoardControlButtonPress = keyBoardControlButtonPress;
+        }
 
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList(new Character[]{
@@ -1571,7 +1644,10 @@ public class API {
             setWindowsDefaultEnforceScreenBounds(config.getWindowsDefaultEnforceScreenBounds());
             setWindowsDefaultColor(config.getWindowsDefaultColor());
             setComponentsDefaultColor(config.getComponentsDefaultColor());
-            setTooltipDefaultColor(config.getTooltipDefaultColor());
+            setTooltipDefaultColor(config.getWindowsDefaultColor());
+            setContextMenuDefaultColor(config.getContextMenuDefaultColor());
+            setCursorGui(config.getCursorGui());
+            setGameviewportDefaultUpdateTime(config.getGameviewportDefaultUpdateTime());
             setTooltipDefaultFont(config.getTooltipDefaultFont());
             setDefaultFont(config.getDefaultFont());
             setDragTransparency(config.getDragTransparency());
@@ -1583,11 +1659,19 @@ public class API {
             setNotificationsDefaultFont(config.getNotificationsDefaultFont());
             setNotificationsDefaultColor(config.getNotificationsDefaultColor());
             setNotificationsFadeoutTime(config.getNotificationsFadeoutTime());
+            setNotificationsScrollSpeed(config.getNotificationsScrollSpeed());
             setMapOverlayDefaultFadeoutTime(config.getMapOverlayDefaultFadeoutTime());
             setTextFieldDefaultAllowedCharacters(config.getTextFieldDefaultAllowedCharacters());
             setTooltipFadeInTime(config.getTooltipFadeInTime());
             setTooltipFadeInDelayTime(config.getTooltipFadeInDelayTime());
-            setNotificationsScrollSpeed(config.getNotificationsScrollSpeed());
+            setKeyBoardControlEnabled(config.isKeyBoardControlEnabled());
+            setKeyBoardControlCursorSpeed(config.getKeyBoardControlCursorSpeed());
+            setKeyBoardControlMagnetModeEnabled(config.isKeyBoardControlMagnetModeEnabled());
+            setKeyBoardControlButtonUp(config.getKeyBoardControlButtonUp());
+            setKeyBoardControlButtonDown(config.getKeyBoardControlButtonDown());
+            setKeyBoardControlButtonLeft(config.getKeyBoardControlButtonLeft());
+            setKeyBoardControlButtonRight(config.getKeyBoardControlButtonRight());
+            setKeyBoardControlButtonPress(config.getKeyBoardControlButtonPress());
         }
 
 
@@ -1674,16 +1758,24 @@ public class API {
             return inputState.inputEvents.mouseScrolled;
         }
 
-        public ArrayList<Character> keysTyped() {
-            return inputState.inputEvents.keysTyped;
+        public ArrayList<Character> keyTypedCharacters() {
+            return inputState.inputEvents.keyTypedCharacters;
         }
 
-        public ArrayList<Integer> keyCodesUp() {
-            return inputState.inputEvents.keyCodesUp;
+        public ArrayList<Integer> keyUpKeyCodes() {
+            return inputState.inputEvents.keyUpKeyCodes;
         }
 
-        public ArrayList<Integer> keyCodesDown() {
-            return inputState.inputEvents.keyCodesDown;
+        public ArrayList<Integer> keyDownKeyCodes() {
+            return inputState.inputEvents.keyDownKeyCodes;
+        }
+
+        public boolean isKeyDown(int keyCode){
+            return inputState.inputEvents.keysDown[keyCode];
+        }
+
+        public boolean isMousebuttonDown(int button){
+            return inputState.inputEvents.mouseButtonsDown[button];
         }
 
         public int mouseButton() {

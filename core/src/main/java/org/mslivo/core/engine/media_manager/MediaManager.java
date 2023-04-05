@@ -109,7 +109,7 @@ public class MediaManager {
         loadLoop:
         while ((loadMedia = loadStack.pollFirst()) != null) {
 
-            if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class || loadMedia.getClass() == CMediaImageCursor.class) {
+            if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class || loadMedia.getClass() == CMediaCursor.class) {
                 if (!loadedMedia.contains(loadMedia.file)) {
                     String textureFileName = loadMedia.getClass() == CMediaFont.class ? loadMedia.file.replace(".fnt", ".png") : loadMedia.file;
                     Texture texture = new Texture(Tools.File.findResource(DIR_GRAPHICS + textureFileName), false);
@@ -151,10 +151,10 @@ public class MediaManager {
         stackSize = prepareStack.size();
         prepareLoop:
         while ((prepareMedia = prepareStack.pollFirst()) != null) {
-            if (prepareMedia.getClass() == CMediaImageCursor.class) {
-                CMediaImageCursor cMediaImageCursor = (CMediaImageCursor) prepareMedia;
+            if (prepareMedia.getClass() == CMediaCursor.class) {
+                CMediaCursor cMediaCursor = (CMediaCursor) prepareMedia;
                 TextureRegion textureRegion = textureAtlas.findRegion(prepareMedia.file);
-                medias_cursors.put(cMediaImageCursor, Gdx.graphics.newCursor(extractPixmapFromTextureRegion(textureRegion), cMediaImageCursor.hotspot_x, cMediaImageCursor.hotspot_y));
+                medias_cursors.put(cMediaCursor, Gdx.graphics.newCursor(extractPixmapFromTextureRegion(textureRegion), cMediaCursor.hotspot_x, cMediaCursor.hotspot_y));
                 // SystemCursors dont need to be put here
             } else if (prepareMedia.getClass() == CMediaImage.class) {
                 CMediaImage cMediaImage = (CMediaImage) prepareMedia;
@@ -547,16 +547,12 @@ public class MediaManager {
         return cMediaImage;
     }
 
-    public static CMediaImageCursor create_CMediaImageCursor(String file, int hotspot_x, int hotspot_y) {
+    public static CMediaCursor create_CMediaCursor(String file, int hotspot_x, int hotspot_y) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
-        CMediaImageCursor cMediaImageCursor = new CMediaImageCursor(file);
-        cMediaImageCursor.hotspot_x = hotspot_x;
-        cMediaImageCursor.hotspot_y = hotspot_y;
-        return cMediaImageCursor;
-    }
-
-    public static CMediaSystemCursor create_CMediaSystemCursor(Cursor.SystemCursor systemCursor) {
-        return new CMediaSystemCursor(systemCursor);
+        CMediaCursor cMediaCursor = new CMediaCursor(file);
+        cMediaCursor.hotspot_x = hotspot_x;
+        cMediaCursor.hotspot_y = hotspot_y;
+        return cMediaCursor;
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
@@ -707,12 +703,8 @@ public class MediaManager {
         return medias_animations.get(cMedia).getKeyFrameIndex(animationTimer);
     }
 
-    public Cursor getCMediaImageCursor(CMediaImageCursor cMedia) {
+    public Cursor getCMediaCursor(CMediaCursor cMedia) {
         return medias_cursors.get(cMedia);
-    }
-
-    public Cursor.SystemCursor getCMediaImageSystemCursor(CMediaSystemCursor cMedia) {
-        return cMedia.systemCursor;
     }
 
     public int getCMediaArraySize(CMediaArray cMedia) {

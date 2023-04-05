@@ -3,8 +3,8 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -60,6 +60,7 @@ import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.render.shaders.GrayScaleShader;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,6 +82,8 @@ public class UIEngine<T extends UIAdapter> {
     private API api;
     public static final int TILE_SIZE = 8;
 
+    public static final int TILE_SIZE_2 = TILE_SIZE / 2;
+
     /* Render */
     private MediaManager mediaManager;
 
@@ -99,7 +102,7 @@ public class UIEngine<T extends UIAdapter> {
         /* Input Init */
         this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
         this.api = new API(this.inputState, mediaManager);
-        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
+
 
         /* Hook Init */
 
@@ -179,7 +182,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents);
         Gdx.input.setInputProcessor(newInputState.inputProcessor);
 
-
         // -----  GUI
         newInputState.windows = new ArrayList<>();
 
@@ -236,6 +238,18 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
+
+        // ----- KeyBoard Control
+        try {
+            newInputState.keyBoardCtrlRobot = new Robot();
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+        newInputState.keyboardCtrlMouseX = newInputState.keyboardCtrlMouseY = 0;
+        newInputState.keyBoardCtrlLastRobotMouseX = newInputState.keyBoardCtrlLastRobotMouseX = 0;
+        newInputState.keyBoardCtrlSpeedUp = 0f;
+        newInputState.keyBoardCtrlActive = false;
+        newInputState.keyBoardCtrlMouseDown = false;
         // -----  Other
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
@@ -252,14 +266,18 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void update() {
+        // GUI
+        this.updateKeyboardControl();
         this.updateMouse();
         this.updateLastGUIMouseHover();
-        if (!this.inputState.guiFrozen) this.updateGUI(); // GUI specific updates
-
-        this.uiAdapter.update();
-
+        if (!this.inputState.guiFrozen) this.updateGUI(); // Main GUI Update happen here
         this.updateGameCamera();
         this.updateMouseCursor();
+
+        // Update Game
+        this.uiAdapter.update();
+
+        // Reset Input Events
         this.inputState.inputEvents.reset();
     }
 
@@ -268,7 +286,7 @@ public class UIEngine<T extends UIAdapter> {
         /* Key Action */
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
-                for (char key : inputState.inputEvents.keysTyped) {
+                for (char key : inputState.inputEvents.keyTypedCharacters) {
 
                     if (inputState.focusedTextField.textFieldAction != null)
                         inputState.focusedTextField.textFieldAction.onTyped(key);
@@ -332,7 +350,7 @@ public class UIEngine<T extends UIAdapter> {
 
             if (processKey) {
                 if (inputState.focusedTextField != null) {
-                    for (int keyCode : inputState.inputEvents.keyCodesDown) {
+                    for (int keyCode : inputState.inputEvents.keyDownKeyCodes) {
                         if (keyCode == Input.Keys.LEFT) {
                             UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition - 1);
                         } else if (keyCode == Input.Keys.RIGHT) {
@@ -345,7 +363,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else {
                     // Hotkeys
-                    for (int keyCode : inputState.inputEvents.keyCodesDown) {
+                    for (int keyCode : inputState.inputEvents.keyDownKeyCodes) {
                         inputState.hotKeyPressedKeys[keyCode] = true;
                     }
                     hkLoop:
@@ -371,7 +389,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inputEvents.keyUp) {
             // Reset Hotkeys
-            for (int keyCode : inputState.inputEvents.keyCodesUp) {
+            for (int keyCode : inputState.inputEvents.keyUpKeyCodes) {
                 inputState.hotKeyPressedKeys[keyCode] = false;
             }
             hkLoop:
@@ -1084,8 +1102,186 @@ public class UIEngine<T extends UIAdapter> {
 
     }
 
-    private void updateMouse() {
+    private void updateKeyboardControl() {
+        if (!api.config.isKeyBoardControlEnabled()) return;
+        boolean mouseMoved = false;
+        boolean mouseButtonPress = false;
+        boolean mouseButtonRelease = false;
 
+        // Determine KeyPressed
+        if (inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonRight()]
+        ) mouseMoved = true;
+
+        if (inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonPress()] != inputState.keyBoardCtrlMouseDown) {
+            inputState.keyBoardCtrlMouseDown = inputState.inputEvents.keysDown[Input.Keys.CONTROL_LEFT];
+            if (inputState.keyBoardCtrlMouseDown) {
+                mouseButtonPress = true;
+            } else {
+                mouseButtonRelease = true;
+            }
+        }
+
+        if (!inputState.keyBoardCtrlActive && (mouseMoved || mouseButtonPress || mouseButtonRelease)) {
+            inputState.keyboardCtrlMouseX = MouseInfo.getPointerInfo().getLocation().x;
+            inputState.keyboardCtrlMouseY = MouseInfo.getPointerInfo().getLocation().y;
+            inputState.keyBoardCtrlLastRobotMouseX = (int) inputState.keyboardCtrlMouseX;
+            inputState.keyBoardCtrlLastRobotMouseY = (int) inputState.keyboardCtrlMouseY;
+            inputState.keyBoardCtrlActive = true;
+        } else if (inputState.keyBoardCtrlActive) {
+            if (MouseInfo.getPointerInfo().getLocation().x != inputState.keyBoardCtrlLastRobotMouseX || MouseInfo.getPointerInfo().getLocation().y != inputState.keyBoardCtrlLastRobotMouseY) {
+                inputState.keyBoardCtrlActive = false;
+            }
+        }
+
+
+        if (inputState.keyBoardCtrlActive) {
+            if (mouseMoved) {
+                inputState.keyBoardCtrlSpeedUp = inputState.keyBoardCtrlSpeedUp < 1f ? inputState.keyBoardCtrlSpeedUp + 0.25f : inputState.keyBoardCtrlSpeedUp;
+                if (inputState.inputEvents.keysDown[Input.Keys.UP])
+                    inputState.keyboardCtrlMouseY -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardCtrlSpeedUp;
+                if (inputState.inputEvents.keysDown[Input.Keys.DOWN])
+                    inputState.keyboardCtrlMouseY += api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardCtrlSpeedUp;
+                if (inputState.inputEvents.keysDown[Input.Keys.LEFT])
+                    inputState.keyboardCtrlMouseX -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardCtrlSpeedUp;
+                if (inputState.inputEvents.keysDown[Input.Keys.RIGHT])
+                    inputState.keyboardCtrlMouseX += api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardCtrlSpeedUp;
+            } else {
+                inputState.keyBoardCtrlSpeedUp = 0;
+                // Magnet
+                if (api.config.isKeyBoardControlMagnetModeEnabled()) {
+                    boolean magnetPossible = false;
+                    if (inputState.lastGUIMouseHover != null) {
+                        if (inputState.modalWindow != null) {
+                            if (inputState.lastGUIMouseHover.getClass() == Window.class && inputState.lastGUIMouseHover == inputState.modalWindow) {
+                                magnetPossible = true;
+                            } else if (inputState.lastGUIMouseHover instanceof Component) {
+                                Component component = (Component) inputState.lastGUIMouseHover;
+                                if (component.addedToWindow == inputState.modalWindow) magnetPossible = true;
+                            }
+                        } else {
+                            magnetPossible = true;
+                        }
+                    } else {
+                        magnetPossible = false;
+                    }
+
+                    if (magnetPossible) {
+                        boolean magnetActive = false;
+                        int magnet_x = 0, magnet_y = 0;
+                        if (inputState.lastGUIMouseHover.getClass() == Window.class) {
+                            Window window = (Window) inputState.lastGUIMouseHover;
+                            if (window.moveAble && window.hasTitleBar && window.visible) {
+                                if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui,
+                                        window.x, window.y + (window.height - 1) * UIEngine.TILE_SIZE,
+                                        window.width * UIEngine.TILE_SIZE,
+                                        UIEngine.TILE_SIZE)
+                                ) {
+                                    magnet_x = inputState.mouse_x_gui;
+                                    magnet_y = (window.y + (window.height) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                }
+                            }
+                        } else if (inputState.lastGUIMouseHover instanceof Component) {
+                            Component component = (Component) inputState.lastGUIMouseHover;
+                            if (!component.disabled && component.visible) {
+                                if (inputState.lastGUIMouseHover.getClass() == List.class) {
+                                    List list = (List) inputState.lastGUIMouseHover;
+                                    magnet_x = inputState.mouse_x_gui;
+                                    magnet_y = UICommons.component_getAbsoluteY(list)
+                                            + (((inputState.mouse_y_gui - UICommons.component_getAbsoluteY(list)) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) + UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                }
+                                if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
+                                    Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
+                                    int cellSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
+                                    int cellSize2 = cellSize / 2;
+                                    magnet_x = UICommons.component_getAbsoluteX(inventory)
+                                            + (((inputState.mouse_x_gui - UICommons.component_getAbsoluteX(inventory)) / cellSize) * cellSize) + cellSize2;
+                                    magnet_y = UICommons.component_getAbsoluteY(inventory)
+                                            + (((inputState.mouse_y_gui - UICommons.component_getAbsoluteY(inventory)) / cellSize) * cellSize) + cellSize2;
+                                    magnetActive = true;
+                                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
+                                    ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
+                                    magnet_x = UICommons.component_getAbsoluteX(scrollBarVertical) + UIEngine.TILE_SIZE_2;
+                                    magnet_y = inputState.mouse_y_gui;
+                                    magnetActive = true;
+                                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
+                                    ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
+                                    magnet_x = inputState.mouse_x_gui;
+                                    magnet_y = UICommons.component_getAbsoluteY(scrollBarHorizontal) + UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
+                                    TextField textField = (TextField) inputState.lastGUIMouseHover;
+                                    magnet_x = inputState.mouse_x_gui;
+                                    magnet_y = UICommons.component_getAbsoluteY(textField) + UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
+                                    ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
+                                    if (!comboBox.menuOpen) {
+                                        magnet_x = inputState.mouse_x_gui;
+                                        magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
+                                        magnetActive = true;
+                                    }
+                                } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
+                                    CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
+                                    magnet_x = UICommons.component_getAbsoluteX(checkBox) + UIEngine.TILE_SIZE_2;
+                                    magnet_y = UICommons.component_getAbsoluteY(checkBox) + UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
+                                    TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
+                                    int xTab = tabBar.tabOffset;
+                                    for (int i = 0; i < tabBar.tabs.size(); i++) {
+                                        Tab tab = tabBar.tabs.get(i);
+                                        if (Tools.Calc.pointRectsCollide(inputState.mouse_x_gui, inputState.mouse_y_gui,
+                                                UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE),
+                                                UICommons.component_getAbsoluteY(tabBar),
+                                                tab.width * UIEngine.TILE_SIZE,
+                                                tabBar.height * UIEngine.TILE_SIZE
+                                        )
+                                        ) {
+                                            magnet_x = UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE) + (tab.width * UIEngine.TILE_SIZE_2);
+                                            magnet_y = UICommons.component_getAbsoluteY(tabBar) + UIEngine.TILE_SIZE_2;
+                                            magnetActive = true;
+                                        }
+                                        xTab += tab.width;
+                                    }
+                                } else if (inputState.lastGUIMouseHover instanceof Button) {
+                                    Button button = (Button) inputState.lastGUIMouseHover;
+                                    magnet_x = UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
+                                    magnet_y = UICommons.component_getAbsoluteY(button) + (button.height * UIEngine.TILE_SIZE_2);
+                                    magnetActive = true;
+                                }
+                            }
+                        }
+                        // Move Cursor
+                        if (magnetActive) {
+                            float distance = Tools.Calc.distancef(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
+                            float degree = Tools.Calc.degreeBetweenPoints(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
+                            inputState.keyboardCtrlMouseX += MathUtils.cos(degree) * (distance / 4f);
+                            inputState.keyboardCtrlMouseY -= MathUtils.sin(degree) * (distance / 4f);
+                        }
+                    }
+
+                }
+            }
+
+
+            inputState.keyBoardCtrlLastRobotMouseX = (int) inputState.keyboardCtrlMouseX;
+            inputState.keyBoardCtrlLastRobotMouseY = (int) inputState.keyboardCtrlMouseY;
+            inputState.keyBoardCtrlRobot.mouseMove(inputState.keyBoardCtrlLastRobotMouseX, inputState.keyBoardCtrlLastRobotMouseY);
+            if (mouseButtonPress) {
+                inputState.keyBoardCtrlRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            } else if (mouseButtonRelease) {
+                inputState.keyBoardCtrlRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            }
+
+        }
+    }
+
+    private void updateMouse() {
         // --- GAME CURSOR ---
         // ScreenCursor To WorldCursor
         inputState.vector2_unproject.x = Gdx.input.getX();
@@ -1100,7 +1296,6 @@ public class UIEngine<T extends UIAdapter> {
         this.inputState.mouse_x = (int) inputState.vector_fboCursor.x;
         this.inputState.mouse_y = (int) inputState.vector_fboCursor.y;
 
-
         // --- GUI CURSOR ---
         // ScreenCursor To WorldCursor
         inputState.vector2_unproject.x = Gdx.input.getX();
@@ -1112,81 +1307,89 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.z = 1;
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         // Set to final
-        this.inputState.mouse_x_gui = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_y_gui = (int) inputState.vector_fboCursor.y;
-
+        inputState.mouse_x_gui = (int) inputState.vector_fboCursor.x;
+        inputState.mouse_y_gui = (int) inputState.vector_fboCursor.y;
         // MOUSE DELTA
         this.inputState.mouse_x_delta = Gdx.input.getDeltaX();
         this.inputState.mouse_y_delta = Gdx.input.getDeltaY();
-
     }
 
     private void updateLastGUIMouseHover() {
         inputState.lastGUIMouseHover = findCurrentLastGUIMouseHover();
-
-
     }
 
+
+    private void removeComponentReferences(Component component){
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(component);
+        if (component.addedToTab != null) component.addedToTab.components.remove(component);
+        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        component.addedToTab = null;
+        component.addedToWindow = null;
+    }
+
+    private void removeWindowReferences(Window window){
+        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
+        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
+        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+    }
 
     private void updateWindowAndComponentAddRemove() {
 
         Window windowTmp;
         Component componentTmp;
         HotKey hotkeyTmp;
+        // Add Window
         while ((windowTmp = inputState.addWindowQueue.pollFirst()) != null) {
             inputState.windows.add(0, windowTmp);
             if (windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
             UICommons.window_bringToFront(inputState, windowTmp);
         }
+        // Remove Window
         while ((windowTmp = inputState.removeWindowQueue.pollFirst()) != null) {
-            for (Component windowTmpComponent : windowTmp.components) {
-                windowTmpComponent.addedToWindow = null;
-                if (windowTmpComponent.getClass() == GameViewPort.class)
-                    inputState.gameViewPorts.remove(windowTmpComponent);
-            }
+            // Remove Components
+            for (Component windowTmpComponent : windowTmp.components) removeComponentReferences(windowTmpComponent);
             windowTmp.components.clear();
+
+            // Remove Window
+            removeWindowReferences(windowTmp);
             inputState.windows.remove(windowTmp);
+            // Call WindowAction
             if (windowTmp.windowAction != null) windowTmp.windowAction.onRemove();
-
-            // Remove if the window was the current modal
-            if (inputState.modalWindow != null && inputState.modalWindow == windowTmp) inputState.modalWindow = null;
-
-            // Reset if it was last active
-            if (inputState.lastActiveWindow == windowTmp) inputState.lastActiveWindow = null;
         }
 
+        // Add Screen Components
         while ((componentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
-            if (componentTmp.getClass() == GameViewPort.class)
-                inputState.gameViewPorts.add((GameViewPort) componentTmp);
-
+            if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) componentTmp);
             inputState.screenComponents.add(componentTmp);
         }
+        // Remove Screen Components
         while ((componentTmp = inputState.removeScreenComponentsQueue.pollFirst()) != null) {
-            if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(componentTmp);
+            // Remove Component
+            removeComponentReferences(componentTmp);
             inputState.screenComponents.remove(componentTmp);
         }
 
         for (Window window : inputState.windows) {
+            // Add Window Components
             while ((componentTmp = window.addComponentsQueue.pollFirst()) != null) {
-                if (componentTmp.getClass() == GameViewPort.class)
-                    inputState.gameViewPorts.add((GameViewPort) componentTmp);
                 if (componentTmp.addedToWindow == null) {
+                    if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) componentTmp);
                     componentTmp.addedToWindow = window;
                     window.components.add(componentTmp);
                 }
             }
+            // Remove Window Components
             while ((componentTmp = window.removeComponentsQueue.pollFirst()) != null) {
-                if (componentTmp.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(componentTmp);
-                if (componentTmp.addedToTab != null) componentTmp.addedToTab.components.remove(componentTmp);
-                componentTmp.addedToTab = null;
-                componentTmp.addedToWindow = null;
+                removeComponentReferences(componentTmp);
                 window.components.remove(componentTmp);
             }
         }
 
+        // Add Hotkey
         while ((hotkeyTmp = inputState.addHotKeyQueue.pollFirst()) != null) {
             inputState.hotKeys.add(hotkeyTmp);
         }
+        // Remove HotKey
         while ((hotkeyTmp = inputState.removeHotKeyQueue.pollFirst()) != null) {
             inputState.hotKeys.remove(hotkeyTmp);
         }
@@ -1333,14 +1536,10 @@ public class UIEngine<T extends UIAdapter> {
         // Set Cursor
         if (inputState.cursor_current != inputState.cursor_setNext) {
             inputState.cursor_current = inputState.cursor_setNext;
-            if(inputState.cursor_current != null) {
-                if (inputState.cursor_current.getClass() == CMediaImageCursor.class) {
-                    Gdx.graphics.setCursor(mediaManager.getCMediaImageCursor((CMediaImageCursor) inputState.cursor_current));
-                } else if (inputState.cursor_current.getClass() == CMediaSystemCursor.class) {
-                    Gdx.graphics.setSystemCursor(mediaManager.getCMediaImageSystemCursor((CMediaSystemCursor) inputState.cursor_current));
-                }
-            }else{
-                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
+            if (inputState.cursor_current != null) {
+                Gdx.graphics.setCursor(mediaManager.getCMediaCursor(inputState.cursor_current));
+            } else {
+                Gdx.graphics.setCursor(mediaManager.getCMediaCursor(GUIBaseMedia.GUI_CURSOR_TRANSPARENT));
             }
         }
 
@@ -2324,9 +2523,9 @@ public class UIEngine<T extends UIAdapter> {
 
                         // Draw Cell
                         FColor cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[x][y], x, y) : null;
-                        if(cellColor != null){
+                        if (cellColor != null) {
                             render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
-                        }else{
+                        } else {
                             render_batchSetColorWhite(alpha);
                         }
                         int index = inventory.doubleSized ? render_getComponent16TilesCMediaIndex(x, y, inventory.width / 2, inventory.height / 2) : render_getComponent16TilesCMediaIndex(x, y, inventory.width, inventory.height);
@@ -2475,7 +2674,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inventoryDrag_Item != null) {
             if (inputState.inventoryDrag_Inventory != null && inputState.inventoryDrag_Inventory.inventoryAction != null) {
-                render_batchSetColorWhite( api.config.getDragTransparency());
+                render_batchSetColorWhite(api.config.getDragTransparency());
                 CMediaGFX icon = inputState.inventoryDrag_Inventory.inventoryAction.icon(inputState.inventoryDrag_Item);
                 render_drawCMediaImage(icon, inputState.mouse_x_gui - inputState.InventoryDrag_offset_x, inputState.mouse_y_gui - inputState.InventoryDrag_offset_y, inputState.inventoryDrag_Inventory.inventoryAction.iconArrayIndex(inputState.inventoryDrag_Item));
             }
@@ -2607,11 +2806,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y,arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
     }
 
     private void render_drawCMediaImage(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex,(inputState.animation_timer_gui + animation_timer_offset));
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
     }
 
     public void shutdown() {
