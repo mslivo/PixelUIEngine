@@ -1,7 +1,22 @@
+[ ] keyboard control
+    option 1:
+        just emulate mouse
+        button 1 = mouse down
+        button 2 = increase scroll speed
+
+    option 2:
+    select window mode = select window
+    select component mode = select component on window - null = screen components
+    component mode
+    scroll/choose item/etc. -
+    button/checkbox = click & return
+    problem: inventory, list etc.
+
 [ ] rename "api.presets"
+
 [x] component mouse actions also need to be executed on the window action
 [?] scrollable windows:
-    - render: own render function with drawable area -> window minus the titlebar - otherwise whole screen
-    - scrolling: preset scrollbar component, increases offset_x,offset_y by scorllarea amount
+    ? find a way stuff outside windows is not drawn - scissorstack?
+    1. preset scrollbar component, increases offset_x,offset_y by scorllarea amount
 
 

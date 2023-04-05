@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -78,11 +79,7 @@ public class UIEngine<T extends UIAdapter> {
     private InputState inputState;
 
     private API api;
-
-    private long timer_windowHiddenChecker;
-
     public static final int TILE_SIZE = 8;
-
 
     /* Render */
     private MediaManager mediaManager;
@@ -102,8 +99,7 @@ public class UIEngine<T extends UIAdapter> {
         /* Input Init */
         this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
         this.api = new API(this.inputState, mediaManager);
-        this.timer_windowHiddenChecker = System.currentTimeMillis();
-
+        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
         /* Hook Init */
 
@@ -1327,8 +1323,8 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.cursor_setNext = inputState.mouseTool.cursor;
                     }
                 } else {
-                    // no mouse tool set - display gui cursor
-                    inputState.cursor_setNext = api.config.getCursorGui();
+                    // no mouse tool set - display no cursor
+                    inputState.cursor_setNext = null;
                 }
             }
         }
@@ -1337,10 +1333,14 @@ public class UIEngine<T extends UIAdapter> {
         // Set Cursor
         if (inputState.cursor_current != inputState.cursor_setNext) {
             inputState.cursor_current = inputState.cursor_setNext;
-            if (inputState.cursor_current.getClass() == CMediaImageCursor.class) {
-                Gdx.graphics.setCursor(mediaManager.getCMediaImageCursor((CMediaImageCursor) inputState.cursor_current));
-            } else if (inputState.cursor_current.getClass() == CMediaSystemCursor.class) {
-                Gdx.graphics.setSystemCursor(mediaManager.getCMediaImageSystemCursor((CMediaSystemCursor) inputState.cursor_current));
+            if(inputState.cursor_current != null) {
+                if (inputState.cursor_current.getClass() == CMediaImageCursor.class) {
+                    Gdx.graphics.setCursor(mediaManager.getCMediaImageCursor((CMediaImageCursor) inputState.cursor_current));
+                } else if (inputState.cursor_current.getClass() == CMediaSystemCursor.class) {
+                    Gdx.graphics.setSystemCursor(mediaManager.getCMediaImageSystemCursor((CMediaSystemCursor) inputState.cursor_current));
+                }
+            }else{
+                Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
             }
         }
 
