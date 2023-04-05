@@ -1,4 +1,5 @@
 [ ] software cursor mode (scales with pixel upsizing)
+[ ] keyboard control: without robot & gamepad support
 [ ] rename "api.presets"
 [x] keyboard control
      emulate mouse over java robot

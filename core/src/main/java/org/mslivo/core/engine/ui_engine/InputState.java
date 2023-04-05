@@ -30,6 +30,7 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input_processor.InputEvents;
 import org.mslivo.core.engine.ui_engine.input_processor.UIEngineInputProcessor;
+import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.awt.*;
@@ -184,8 +185,9 @@ public class InputState {
 
     public int displayedContextMenuWidth;
 
-    /* #################### Mouse #################### */
+    /* #################### Control #################### */
 
+    public ControlMode controlMode;
     public int mouse_x;
 
     public int mouse_y;
@@ -216,13 +218,10 @@ public class InputState {
 
     public Vector2 vector2_unproject;
 
-    /* #################### KeyBoard Control #################### */
-
     public Robot keyBoardCtrlRobot;
     public float keyboardCtrlMouseX, keyboardCtrlMouseY;
     public int keyBoardCtrlLastRobotMouseX, keyBoardCtrlLastRobotMouseY;
     public float keyBoardCtrlSpeedUp;
-    public boolean keyBoardCtrlActive;
     public boolean keyBoardCtrlMouseDown;
 
     /* #################### Misc. ####################  */
