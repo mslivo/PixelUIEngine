@@ -1347,15 +1347,11 @@ public class API {
         private int keyBoardControlButtonRight = Input.Keys.RIGHT;
         private int keyBoardControlButtonMouse1 = Input.Keys.CONTROL_LEFT;
         private int keyBoardControlButtonMouse2 = Input.Keys.CONTROL_RIGHT;
-        private int keyBoardControlButtonMouse3 = Input.Keys.ALT_LEFT;
-        private int keyBoardControlButtonMouse4 = Input.Keys.SHIFT_LEFT;
-        private int keyBoardControlButtonMouse5 = Input.Keys.TAB;
-
-
+        private int keyBoardControlButtonMouse3 = Input.Keys.UNKNOWN;
+        private int keyBoardControlButtonMouse4 = Input.Keys.UNKNOWN;
+        private int keyBoardControlButtonMouse5 = Input.Keys.UNKNOWN;
         private int keyBoardControlButtonScrollUp = Input.Keys.PAGE_UP;
-
         private int keyBoardControlButtonScrollDown = Input.Keys.PAGE_DOWN;
-
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
