@@ -1,3 +1,4 @@
+[?] support mouse button 2
 [ ] rename "api.presets"
 [x] software cursor mode (scales with pixel upsizing)
     - needs to be non optional to remove robot

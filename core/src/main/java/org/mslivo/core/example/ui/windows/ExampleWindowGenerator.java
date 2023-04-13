@@ -93,7 +93,6 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.windows.addComponents(window, tabBarComponents);
 
         api.config.setKeyBoardControlEnabled(true);
-
         return window;
     }
 

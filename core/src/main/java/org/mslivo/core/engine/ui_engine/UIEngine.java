@@ -231,7 +231,8 @@ public class UIEngine<T extends UIAdapter> {
 
         // ----- Controls
         newInputState.controlMode = ControlMode.MOUSE;
-        newInputState.mouse_x_gui = newInputState.mouse_y_gui = 0;
+        newInputState.mouse_x_gui = 0;
+        newInputState.mouse_y_gui = 0;
         newInputState.mouse_x = newInputState.mouse_y = 0;
         newInputState.mouse_x_delta = newInputState.mouse_y_delta = 0;
         newInputState.lastGUIMouseHover = null;
@@ -1111,28 +1112,27 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateControlMode() {
-        if(!api.config.isKeyBoardControlEnabled()){
+        if (!api.config.isKeyBoardControlEnabled()) {
             inputState.controlMode = ControlMode.MOUSE;
-            return;
-        }
-
-        switch (inputState.controlMode) {
-            case MOUSE -> {
-                if (anyKeyboardControlButtonDown()) {
-                    inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
-                    inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
-                    inputState.controlMode = ControlMode.KEYBOARD;
+        }else {
+            switch (inputState.controlMode) {
+                case MOUSE -> {
+                    if (anyKeyboardControlButtonDown()) {
+                        inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
+                        inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
+                        inputState.controlMode = ControlMode.KEYBOARD;
+                    }
                 }
-            }
-            case KEYBOARD -> {
-                if (MouseInfo.getPointerInfo().getLocation().x != inputState.mouseXBeforeKeyboardCtrl || MouseInfo.getPointerInfo().getLocation().y != inputState.mouseYBeforeKeyboardCtrl) {
-                    inputState.controlMode = ControlMode.MOUSE;
+                case KEYBOARD -> {
+                    if (MouseInfo.getPointerInfo().getLocation().x != inputState.mouseXBeforeKeyboardCtrl || MouseInfo.getPointerInfo().getLocation().y != inputState.mouseYBeforeKeyboardCtrl) {
+                        inputState.controlMode = ControlMode.MOUSE;
+                    }
                 }
             }
         }
     }
 
-    private boolean anyKeyboardControlButtonDown(){
+    private boolean anyKeyboardControlButtonDown() {
         return inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()] ||
                 inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()] ||
                 inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()] ||
@@ -1143,8 +1143,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateKeyboardControl() {
-        if(inputState.focusedTextField != null) return; // Stop Keyboard control if the user wants to type into a textfield
-
+        if (inputState.focusedTextField != null)
+            return; // Stop Keyboard control if the user wants to type into a textfield
         int deltaX = 0;
         int deltaY = 0;
         boolean buttonLeft = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()];
@@ -1155,17 +1155,7 @@ public class UIEngine<T extends UIAdapter> {
         boolean buttonScrolledUp = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollUp()];
         boolean buttonScrolledDown = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollDown()];
         //
-        boolean mouseButtonPressed = false;
-        boolean mouseButtonReleased = false;
         boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
-        if (inputState.keyBoardCtrlIsMouseButtonDown != buttonMouseDown) {
-            inputState.keyBoardCtrlIsMouseButtonDown = buttonMouseDown;
-            if (inputState.keyBoardCtrlIsMouseButtonDown) {
-                mouseButtonPressed = true;
-            } else {
-                mouseButtonReleased = true;
-            }
-        }
 
 
         if (moveButtonPressed) {
@@ -1288,15 +1278,15 @@ public class UIEngine<T extends UIAdapter> {
                     }
                     // Move Cursor
                     if (magnetActive) {
-                        if(inputState.mouse_x_gui < magnet_x){
-                            deltaX = MathUtils.round((magnet_x-inputState.mouse_x_gui)/4f);
-                        }else if(inputState.mouse_x_gui > magnet_x){
-                            deltaX = -MathUtils.round((inputState.mouse_x_gui-magnet_x)/4f);
+                        if (inputState.mouse_x_gui < magnet_x) {
+                            deltaX = MathUtils.round((magnet_x - inputState.mouse_x_gui) / 4f);
+                        } else if (inputState.mouse_x_gui > magnet_x) {
+                            deltaX = -MathUtils.round((inputState.mouse_x_gui - magnet_x) / 4f);
                         }
-                        if(inputState.mouse_y_gui < magnet_y){
-                            deltaY = -MathUtils.round((magnet_y-inputState.mouse_y_gui)/4f);
-                        }else if(inputState.mouse_y_gui > magnet_y){
-                            deltaY = MathUtils.round((inputState.mouse_y_gui-magnet_y)/4f);
+                        if (inputState.mouse_y_gui < magnet_y) {
+                            deltaY = -MathUtils.round((magnet_y - inputState.mouse_y_gui) / 4f);
+                        } else if (inputState.mouse_y_gui > magnet_y) {
+                            deltaY = MathUtils.round((inputState.mouse_y_gui - magnet_y) / 4f);
                         }
                     }
                 }
@@ -1305,11 +1295,11 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
+        // Set Coordinates
         inputState.mouse_x_gui += deltaX;
         inputState.mouse_y_gui -= deltaY;
         inputState.mouse_x_delta = MathUtils.round(-deltaX);
         inputState.mouse_y_delta = MathUtils.round(deltaY);
-
 
         // Emulate Mouse Move Events
         if (deltaX != 0 || deltaY != 0) {
@@ -1321,35 +1311,38 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Emulate Mouse Scroll Events
-        if(buttonScrolledUp){
+        if (buttonScrolledUp) {
             inputState.inputEvents.mouseScrolled = true;
             inputState.inputEvents.mouseScrolledAmount = -1;
         }
-        if(buttonScrolledDown){
+        if (buttonScrolledDown) {
             inputState.inputEvents.mouseScrolled = true;
             inputState.inputEvents.mouseScrolledAmount = 1;
         }
 
-        // Emulate Mouse Button Press Events
-        if (mouseButtonPressed) {
-            inputState.inputEvents.mouseDown = true;
-            inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
-        } else if (mouseButtonReleased) {
-            inputState.inputEvents.mouseUp = true;
-            inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
+        // Emulate Mouse Button 1 Press Events
+        if (inputState.keyBoardCtrlIsMouseButtonDown != buttonMouseDown) {
+            inputState.keyBoardCtrlIsMouseButtonDown = buttonMouseDown;
+            if (inputState.keyBoardCtrlIsMouseButtonDown) {
+                inputState.inputEvents.mouseDown = true;
+                inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
+            } else {
+                inputState.inputEvents.mouseUp = true;
+                inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
+            }
         }
         inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT] = inputState.keyBoardCtrlIsMouseButtonDown;
     }
 
 
-    private void updateGameMouseXY(){
+    private void updateGameMouseXY() {
         // MouseXGUI/MouseYGUI -> To MouseX/MouseY
         inputState.vector_fboCursor.x = inputState.mouse_x_gui;
-        inputState.vector_fboCursor.y = Gdx.graphics.getHeight()-inputState.mouse_y_gui;
+        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_y_gui;
         inputState.vector_fboCursor.z = 1;
         inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         this.inputState.mouse_x = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_y = (int)inputState.vector_fboCursor.y;
+        this.inputState.mouse_y = (int) inputState.vector_fboCursor.y;
     }
 
     private void updateMouseControl() {
@@ -1365,8 +1358,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
 
         // Delta
-        this.inputState.mouse_x_delta = inputState.mouse_x_gui-(int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_y_delta = inputState.mouse_y_gui-(int) inputState.vector_fboCursor.y;
+        this.inputState.mouse_x_delta = inputState.mouse_x_gui - (int) inputState.vector_fboCursor.x;
+        this.inputState.mouse_y_delta = inputState.mouse_y_gui - (int) inputState.vector_fboCursor.y;
 
         // Set to final
         inputState.mouse_x_gui = (int) inputState.vector_fboCursor.x;

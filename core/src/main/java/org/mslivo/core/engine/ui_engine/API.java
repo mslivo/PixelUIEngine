@@ -1813,8 +1813,8 @@ public class API {
             return inputState.controlMode == ControlMode.MOUSE;
         }
 
-        public boolean isKeyboardControlActive() {
-            return inputState.controlMode == ControlMode.KEYBOARD;
+        public ControlMode getControlMode() {
+            return inputState.controlMode;
         }
 
     }
