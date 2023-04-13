@@ -1143,8 +1143,10 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateKeyboardControl() {
-        float deltaX = 0;
-        float deltaY = 0;
+        if(inputState.focusedTextField != null) return; // Stop Keyboard control if the user wants to type into a textfield
+
+        int deltaX = 0;
+        int deltaY = 0;
         boolean buttonLeft = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()];
         boolean buttonRight = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonRight()];
         boolean buttonUp = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()];
@@ -1286,12 +1288,15 @@ public class UIEngine<T extends UIAdapter> {
                     }
                     // Move Cursor
                     if (magnetActive) {
-                        float distance = Tools.Calc.distancef(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
-                        if(distance > 1) {
-                            System.out.println("D:"+distance+"   "+inputState.mouse_y_gui+":"+magnet_y+" - "+inputState.mouse_x_gui+":"+magnet_x);
-                            float degree = Tools.Calc.degreeBetweenPoints(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
-                            deltaX += MathUtils.cos(degree) * (distance / 4f);
-                            deltaY -= MathUtils.sin(degree) * (distance / 4f);
+                        if(inputState.mouse_x_gui < magnet_x){
+                            deltaX = MathUtils.round((magnet_x-inputState.mouse_x_gui)/4f);
+                        }else if(inputState.mouse_x_gui > magnet_x){
+                            deltaX = -MathUtils.round((inputState.mouse_x_gui-magnet_x)/4f);
+                        }
+                        if(inputState.mouse_y_gui < magnet_y){
+                            deltaY = -MathUtils.round((magnet_y-inputState.mouse_y_gui)/4f);
+                        }else if(inputState.mouse_y_gui > magnet_y){
+                            deltaY = MathUtils.round((inputState.mouse_y_gui-magnet_y)/4f);
                         }
                     }
                 }
