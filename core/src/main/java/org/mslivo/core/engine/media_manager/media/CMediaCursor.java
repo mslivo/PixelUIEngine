@@ -2,7 +2,7 @@ package org.mslivo.core.engine.media_manager.media;
 
 import java.io.Serializable;
 
-public class CMediaCursor extends CMedia implements Serializable {
+public class CMediaCursor extends CMediaGFX implements Serializable {
 
     public CMediaCursor(String filename) {
         super(filename);

@@ -33,7 +33,6 @@ import org.mslivo.core.engine.ui_engine.input_processor.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
-import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -202,9 +201,7 @@ public class InputState {
 
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
 
-    public CMediaCursor cursor_setNext;
-
-    public CMediaCursor cursor_current;
+    public CMediaCursor cursor;
 
     public MouseTool mouseTool;
 
@@ -218,11 +215,9 @@ public class InputState {
 
     public Vector2 vector2_unproject;
 
-    public Robot keyBoardCtrlRobot;
-    public float keyboardCtrlMouseX, keyboardCtrlMouseY;
-    public int keyBoardCtrlLastRobotMouseX, keyBoardCtrlLastRobotMouseY;
+    public int mouseXBeforeKeyboardCtrl, mouseYBeforeKeyboardCtrl;
     public float keyBoardCtrlSpeedUp;
-    public boolean keyBoardCtrlMouseDown;
+    public boolean keyBoardCtrlIsMouseButtonDown;
 
     /* #################### Misc. ####################  */
 

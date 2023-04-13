@@ -89,7 +89,7 @@ public class GUIBaseMedia {
 
 
     //Cursors
-    public static CMediaCursor GUI_CURSOR_ARROW =MediaManager.create_CMediaCursor("gui/cursors/arrow.png", 16, 16);
+    public static CMediaCursor GUI_CURSOR_ARROW = MediaManager.create_CMediaCursor("gui/cursors/arrow.png", 16, 16);
     public static CMediaCursor GUI_CURSOR_TRANSPARENT =MediaManager.create_CMediaCursor("gui/cursors/transparent.png", 16, 16);
 
     // Icons

@@ -51,6 +51,7 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
@@ -1342,7 +1343,11 @@ public class API {
         private int keyBoardControlButtonLeft = Input.Keys.LEFT;
 
         private int keyBoardControlButtonRight = Input.Keys.RIGHT;
-        private int keyBoardControlButtonPress = Input.Keys.CONTROL_LEFT;
+        private int keyBoardControlButtonMouse = Input.Keys.CONTROL_LEFT;
+
+        private int keyBoardControlButtonScrollUp = Input.Keys.PAGE_UP;
+
+        private int keyBoardControlButtonScrollDown = Input.Keys.PAGE_DOWN;
 
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
@@ -1623,12 +1628,28 @@ public class API {
             this.keyBoardControlButtonRight = keyBoardControlButtonRight;
         }
 
-        public int getKeyBoardControlButtonPress() {
-            return keyBoardControlButtonPress;
+        public int getKeyBoardControlButtonMouse() {
+            return keyBoardControlButtonMouse;
         }
 
-        public void setKeyBoardControlButtonPress(int keyBoardControlButtonPress) {
-            this.keyBoardControlButtonPress = keyBoardControlButtonPress;
+        public void setKeyBoardControlButtonMouse(int keyBoardControlButtonMouse) {
+            this.keyBoardControlButtonMouse = keyBoardControlButtonMouse;
+        }
+
+        public int getKeyBoardControlButtonScrollUp() {
+            return keyBoardControlButtonScrollUp;
+        }
+
+        public void setKeyBoardControlButtonScrollUp(int keyBoardControlButtonScrollUp) {
+            this.keyBoardControlButtonScrollUp = keyBoardControlButtonScrollUp;
+        }
+
+        public int getKeyBoardControlButtonScrollDown() {
+            return keyBoardControlButtonScrollDown;
+        }
+
+        public void setKeyBoardControlButtonScrollDown(int keyBoardControlButtonScrollDown) {
+            this.keyBoardControlButtonScrollDown = keyBoardControlButtonScrollDown;
         }
 
         public _Config() {
@@ -1671,7 +1692,9 @@ public class API {
             setKeyBoardControlButtonDown(config.getKeyBoardControlButtonDown());
             setKeyBoardControlButtonLeft(config.getKeyBoardControlButtonLeft());
             setKeyBoardControlButtonRight(config.getKeyBoardControlButtonRight());
-            setKeyBoardControlButtonPress(config.getKeyBoardControlButtonPress());
+            setKeyBoardControlButtonMouse(config.getKeyBoardControlButtonMouse());
+            setKeyBoardControlButtonScrollDown(config.getKeyBoardControlButtonScrollDown());
+            setKeyBoardControlButtonScrollUp(config.getKeyBoardControlButtonScrollUp());
         }
 
 
@@ -1774,7 +1797,7 @@ public class API {
             return inputState.inputEvents.keysDown[keyCode];
         }
 
-        public boolean isMousebuttonDown(int button){
+        public boolean isMouseButtonDown(int button){
             return inputState.inputEvents.mouseButtonsDown[button];
         }
 
@@ -1785,6 +1808,15 @@ public class API {
         public float mouseScrolledAmount() {
             return inputState.inputEvents.mouseScrolledAmount;
         }
+
+        public boolean isMouseControlActive() {
+            return inputState.controlMode == ControlMode.MOUSE;
+        }
+
+        public boolean isKeyboardControlActive() {
+            return inputState.controlMode == ControlMode.KEYBOARD;
+        }
+
     }
 
     public class _Notification {

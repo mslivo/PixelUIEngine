@@ -35,7 +35,7 @@ public class MediaManager {
 
     private HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
 
-    private HashMap<CMediaCursor, Cursor> medias_cursors = new HashMap<>();
+    private HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
 
 
     private HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
@@ -71,9 +71,8 @@ public class MediaManager {
         for (CMediaFont cMediaFont : medias_fonts.keySet()) {
             medias_fonts.get(cMediaFont).dispose();
         }
-        for (CMediaCursor cMediaCursor : medias_cursors.keySet()) {
-            medias_cursors.get(cMediaCursor).dispose();
-        }
+
+
         this.medias_fonts.clear();
         this.medias_cursors.clear();
         this.medias_images.clear();
@@ -153,8 +152,7 @@ public class MediaManager {
         while ((prepareMedia = prepareStack.pollFirst()) != null) {
             if (prepareMedia.getClass() == CMediaCursor.class) {
                 CMediaCursor cMediaCursor = (CMediaCursor) prepareMedia;
-                TextureRegion textureRegion = textureAtlas.findRegion(prepareMedia.file);
-                medias_cursors.put(cMediaCursor, Gdx.graphics.newCursor(extractPixmapFromTextureRegion(textureRegion), cMediaCursor.hotspot_x, cMediaCursor.hotspot_y));
+                medias_cursors.put(cMediaCursor, textureAtlas.findRegion(prepareMedia.file));
                 // SystemCursors dont need to be put here
             } else if (prepareMedia.getClass() == CMediaImage.class) {
                 CMediaImage cMediaImage = (CMediaImage) prepareMedia;
@@ -281,6 +279,8 @@ public class MediaManager {
             drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer);
         } else if (cMedia.getClass() == CMediaArray.class) {
             drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex);
+        } else if(cMedia.getClass() == CMediaCursor.class){
+            drawCMediaCursor(batch, (CMediaCursor) cMedia, x, y);
         }
     }
 
@@ -373,6 +373,13 @@ public class MediaManager {
         } else if (cMedia.getClass() == CMediaArray.class) {
             drawCMediaArrayScale(batch, (CMediaArray) cMedia, x, y, arrayIndex, origin_x, origin_y, scaleX, scaleY, rotation);
         }
+    }
+
+    /* CMediaCursor */
+
+    public void drawCMediaCursor(SpriteBatch batch, CMediaCursor cMedia, float x, float y) {
+        TextureRegion texture = getCMediaCursor(cMedia);
+        batch.draw(texture, x-cMedia.hotspot_x, y-cMedia.hotspot_y , 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
     /* CMediaImage */
@@ -703,7 +710,7 @@ public class MediaManager {
         return medias_animations.get(cMedia).getKeyFrameIndex(animationTimer);
     }
 
-    public Cursor getCMediaCursor(CMediaCursor cMedia) {
+    public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
         return medias_cursors.get(cMedia);
     }
 

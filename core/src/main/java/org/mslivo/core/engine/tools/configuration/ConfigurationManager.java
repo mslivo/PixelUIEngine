@@ -107,10 +107,10 @@ public class ConfigurationManager {
         this.backUp = null;
     }
 
-    public void addOption(String name, String defaultValue, Function<String, Boolean> evaluationFunction) {
+    public void addOption(String name, String defaultValue, Function<String, Boolean> validateFunction) {
         checkInitialized();
         if (configurations.get(name) == null) {
-            Configuration configuration = new Configuration(name, defaultValue, evaluationFunction);
+            Configuration configuration = new Configuration(name, defaultValue, validateFunction);
             this.configurations.put(configuration.name, configuration);
             if (this.properties.getProperty(configuration.name) == null) {
                 this.properties.setProperty(configuration.name, configuration.defaultValue);

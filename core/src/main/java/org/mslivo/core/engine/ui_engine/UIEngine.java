@@ -3,8 +3,8 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -235,21 +235,15 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouse_x = newInputState.mouse_y = 0;
         newInputState.mouse_x_delta = newInputState.mouse_y_delta = 0;
         newInputState.lastGUIMouseHover = null;
-        newInputState.cursor_setNext = null;
-        newInputState.cursor_current = null;
+        newInputState.cursor = null;
         newInputState.mouseTool = null;
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        try {
-            newInputState.keyBoardCtrlRobot = new Robot();
-        } catch (AWTException e) {
-            throw new RuntimeException(e);
-        }
         newInputState.mouseXBeforeKeyboardCtrl = newInputState.mouseYBeforeKeyboardCtrl = 0;
         newInputState.keyBoardCtrlSpeedUp = 0f;
 
-        newInputState.keyBoardCtrlIsLeftMouseDown = false;
+        newInputState.keyBoardCtrlIsMouseButtonDown = false;
         // -----  Other
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
@@ -1104,63 +1098,75 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateControls() {
-        boolean keyBoardMoveBtn = false;
-        boolean keyBoardLeftMousePress = false;
-        boolean keyBoardLeftMouseRelease = false;
 
-        if (api.config.isKeyBoardControlEnabled()) {
-            // Determine KeyPressed
-            if (inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()] ||
-                    inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()] ||
-                    inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()] ||
-                    inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonRight()]
-            ) keyBoardMoveBtn = true;
-            if (inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonPress()] != inputState.keyBoardCtrlIsLeftMouseDown) {
-                inputState.keyBoardCtrlIsLeftMouseDown = inputState.inputEvents.keysDown[Input.Keys.CONTROL_LEFT];
-                if (inputState.keyBoardCtrlIsLeftMouseDown) {
-                    keyBoardLeftMousePress = true;
-                } else {
-                    keyBoardLeftMouseRelease = true;
-                }
-            }
-            updateControlMode(keyBoardMoveBtn || keyBoardLeftMousePress || keyBoardLeftMouseRelease);
-        } else {
-            updateControlMode(false);
+        updateControlMode();
+
+        switch (inputState.controlMode) {
+            case KEYBOARD -> updateKeyboardControl();
+            case MOUSE -> updateMouseControl();
         }
 
-        if (inputState.controlMode == ControlMode.KEYBOARD) {
-            updateKeyboardControl(keyBoardMoveBtn, keyBoardLeftMousePress, keyBoardLeftMouseRelease);
-        }else{
-            updateMouse();
-        }
-
-        // Update Mouse Info
-
+        // Translate MouseXGUI/MouseYGUI to Game X/Y
+        updateGameMouseXY();
     }
 
-    private void updateControlMode(boolean keyboardControlPressed) {
+    private void updateControlMode() {
+        if(!api.config.isKeyBoardControlEnabled()){
+            inputState.controlMode = ControlMode.MOUSE;
+            return;
+        }
+
         switch (inputState.controlMode) {
             case MOUSE -> {
-                if (keyboardControlPressed) {
-                    inputState.mouseXBeforeKeyboardCtrl  = MouseInfo.getPointerInfo().getLocation().x;
-                    inputState.mouseYBeforeKeyboardCtrl  = MouseInfo.getPointerInfo().getLocation().y;
+                if (anyKeyboardControlButtonDown()) {
+                    inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
+                    inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
                     inputState.controlMode = ControlMode.KEYBOARD;
-                    System.out.println("keyboard");
                 }
             }
             case KEYBOARD -> {
                 if (MouseInfo.getPointerInfo().getLocation().x != inputState.mouseXBeforeKeyboardCtrl || MouseInfo.getPointerInfo().getLocation().y != inputState.mouseYBeforeKeyboardCtrl) {
                     inputState.controlMode = ControlMode.MOUSE;
-                    System.out.println("mouse");
                 }
             }
         }
     }
 
-    private void updateKeyboardControl(boolean keyBoardMoveBtn, boolean keyBoardPressBtn, boolean keyBoardReleaseBtn) {
+    private boolean anyKeyboardControlButtonDown(){
+        return inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonRight()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonMouse()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollUp()] ||
+                inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollDown()];
+    }
+
+    private void updateKeyboardControl() {
         float deltaX = 0;
         float deltaY = 0;
-        if (keyBoardMoveBtn) {
+        boolean buttonLeft = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()];
+        boolean buttonRight = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonRight()];
+        boolean buttonUp = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()];
+        boolean buttonDown = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()];
+        boolean buttonMouseDown = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonMouse()];
+        boolean buttonScrolledUp = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollUp()];
+        boolean buttonScrolledDown = inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonScrollDown()];
+        //
+        boolean mouseButtonPressed = false;
+        boolean mouseButtonReleased = false;
+        boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
+        if (inputState.keyBoardCtrlIsMouseButtonDown != buttonMouseDown) {
+            inputState.keyBoardCtrlIsMouseButtonDown = buttonMouseDown;
+            if (inputState.keyBoardCtrlIsMouseButtonDown) {
+                mouseButtonPressed = true;
+            } else {
+                mouseButtonReleased = true;
+            }
+        }
+
+
+        if (moveButtonPressed) {
             inputState.keyBoardCtrlSpeedUp = inputState.keyBoardCtrlSpeedUp < 1f ? inputState.keyBoardCtrlSpeedUp + 0.25f : inputState.keyBoardCtrlSpeedUp;
             if (inputState.inputEvents.keysDown[Input.Keys.UP])
                 deltaY -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardCtrlSpeedUp;
@@ -1281,55 +1287,67 @@ public class UIEngine<T extends UIAdapter> {
                     // Move Cursor
                     if (magnetActive) {
                         float distance = Tools.Calc.distancef(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
-                        float degree = Tools.Calc.degreeBetweenPoints(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
-                        deltaX += MathUtils.cos(degree) * (distance / 4f);
-                        deltaY -= MathUtils.sin(degree) * (distance / 4f);
+                        if(distance > 1) {
+                            System.out.println("D:"+distance+"   "+inputState.mouse_y_gui+":"+magnet_y+" - "+inputState.mouse_x_gui+":"+magnet_x);
+                            float degree = Tools.Calc.degreeBetweenPoints(inputState.mouse_x_gui, inputState.mouse_y_gui, magnet_x, magnet_y);
+                            deltaX += MathUtils.cos(degree) * (distance / 4f);
+                            deltaY -= MathUtils.sin(degree) * (distance / 4f);
+                        }
                     }
                 }
 
             }
         }
 
+
         inputState.mouse_x_gui += deltaX;
         inputState.mouse_y_gui -= deltaY;
-        inputState.mouse_x_delta = MathUtils.round(deltaX);
+        inputState.mouse_x_delta = MathUtils.round(-deltaX);
         inputState.mouse_y_delta = MathUtils.round(deltaY);
 
 
         // Emulate Mouse Move Events
-        if(deltaX != 0 || deltaY != 0){
-            if(inputState.keyBoardCtrlIsLeftMouseDown){
+        if (deltaX != 0 || deltaY != 0) {
+            if (inputState.keyBoardCtrlIsMouseButtonDown) {
                 inputState.inputEvents.mouseDragged = true;
-            }else{
+            } else {
                 inputState.inputEvents.mouseMoved = true;
             }
         }
 
+        // Emulate Mouse Scroll Events
+        if(buttonScrolledUp){
+            inputState.inputEvents.mouseScrolled = true;
+            inputState.inputEvents.mouseScrolledAmount = -1;
+        }
+        if(buttonScrolledDown){
+            inputState.inputEvents.mouseScrolled = true;
+            inputState.inputEvents.mouseScrolledAmount = 1;
+        }
+
         // Emulate Mouse Button Press Events
-        if (keyBoardPressBtn) {
+        if (mouseButtonPressed) {
             inputState.inputEvents.mouseDown = true;
             inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
-        } else if (keyBoardReleaseBtn) {
+        } else if (mouseButtonReleased) {
             inputState.inputEvents.mouseUp = true;
             inputState.inputEvents.mouseButton = Input.Buttons.LEFT;
         }
+        inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT] = inputState.keyBoardCtrlIsMouseButtonDown;
     }
 
-    private void updateMouse() {
-        // --- GAME CURSOR ---
-        // ScreenCursor To WorldCursor
-        inputState.vector2_unproject.x = Gdx.input.getX();
-        inputState.vector2_unproject.y = Gdx.input.getY();
-        inputState.viewport_screen.unproject(inputState.vector2_unproject);
-        // WorldCursor to  FBOCursor
-        inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
-        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
+
+    private void updateGameMouseXY(){
+        // MouseXGUI/MouseYGUI -> To MouseX/MouseY
+        inputState.vector_fboCursor.x = inputState.mouse_x_gui;
+        inputState.vector_fboCursor.y = Gdx.graphics.getHeight()-inputState.mouse_y_gui;
         inputState.vector_fboCursor.z = 1;
         inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        // Set to final
         this.inputState.mouse_x = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_y = (int) inputState.vector_fboCursor.y;
+        this.inputState.mouse_y = (int)inputState.vector_fboCursor.y;
+    }
 
+    private void updateMouseControl() {
         // --- GUI CURSOR ---
         // ScreenCursor To WorldCursor
         inputState.vector2_unproject.x = Gdx.input.getX();
@@ -1340,12 +1358,14 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
         inputState.vector_fboCursor.z = 1;
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+
+        // Delta
+        this.inputState.mouse_x_delta = inputState.mouse_x_gui-(int) inputState.vector_fboCursor.x;
+        this.inputState.mouse_y_delta = inputState.mouse_y_gui-(int) inputState.vector_fboCursor.y;
+
         // Set to final
         inputState.mouse_x_gui = (int) inputState.vector_fboCursor.x;
         inputState.mouse_y_gui = (int) inputState.vector_fboCursor.y;
-        // MOUSE DELTA
-        this.inputState.mouse_x_delta = Gdx.input.getDeltaX();
-        this.inputState.mouse_y_delta = Gdx.input.getDeltaY();
     }
 
     private void updateLastGUIMouseHover() {
@@ -1547,42 +1567,26 @@ public class UIEngine<T extends UIAdapter> {
         /* Update Cursor*/
         if (inputState.lastGUIMouseHover != null) {
             // 1. GUI Cursor
-            inputState.cursor_setNext = api.config.getCursorGui();
+            inputState.cursor = api.config.getCursorGui();
         } else {
             // 2. Temporary Cursor
             if (inputState.displayTemporaryCursor) {
-                inputState.cursor_setNext = inputState.temporaryCursor;
+                inputState.cursor = inputState.temporaryCursor;
                 inputState.displayTemporaryCursor = false;
             } else {
                 if (inputState.mouseTool != null) {
                     // 3. Mouse Tool cursor
-                    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) || Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
-                        inputState.cursor_setNext = inputState.mouseTool.cursorDown;
+                    if (inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT]) {
+                        inputState.cursor = inputState.mouseTool.cursorDown;
                     } else {
-                        inputState.cursor_setNext = inputState.mouseTool.cursor;
+                        inputState.cursor = inputState.mouseTool.cursor;
                     }
                 } else {
                     // no mouse tool set - display no cursor
-                    inputState.cursor_setNext = null;
+                    inputState.cursor = null;
                 }
             }
         }
-
-
-        // Set Cursor
-        if (inputState.cursor_current != inputState.cursor_setNext) {
-            inputState.cursor_current = inputState.cursor_setNext;
-        }
-        /*
-        if (inputState.cursor_current != inputState.cursor_setNext) {
-            inputState.cursor_current = inputState.cursor_setNext;
-            if (inputState.cursor_current != null) {
-                Gdx.graphics.setCursor(mediaManager.getCMediaCursor(inputState.cursor_current));
-            } else {
-                Gdx.graphics.setCursor(mediaManager.getCMediaCursor(GUIBaseMedia.GUI_CURSOR_TRANSPARENT));
-            }
-        }*/
-
 
     }
 
@@ -1818,8 +1822,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_gui.end();
     }
 
-    private void render_drawCursor(){
-        render_drawCMediaGFX(inputState.cursor_current, inputState.mouse_x_gui, inputState.mouse_y_gui);
+    private void render_drawCursor() {
+        render_drawCMediaGFX(inputState.cursor, inputState.mouse_x_gui, inputState.mouse_y_gui);
     }
 
 
