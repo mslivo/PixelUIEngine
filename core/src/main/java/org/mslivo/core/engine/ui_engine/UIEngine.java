@@ -230,9 +230,9 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.openComboBox = null;
 
         // ----- Controls
-        newInputState.controlMode = ControlMode.MOUSE;
-        newInputState.mouse_x_gui = 0;
-        newInputState.mouse_y_gui = 0;
+        newInputState.controlMode = ControlMode.KEYBOARD;
+        newInputState.mouse_x_gui = internalResolutionWidth/2;
+        newInputState.mouse_y_gui = internalResolutionHeight/2;
         newInputState.mouse_x = newInputState.mouse_y = 0;
         newInputState.mouse_x_delta = newInputState.mouse_y_delta = 0;
         newInputState.lastGUIMouseHover = null;
@@ -241,7 +241,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.mouseXBeforeKeyboardCtrl = newInputState.mouseYBeforeKeyboardCtrl = 0;
+        newInputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
+        newInputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
         newInputState.keyBoardCtrlSpeedUp = 0f;
 
         newInputState.keyBoardCtrlIsMouseButtonDown = false;
@@ -263,8 +264,6 @@ public class UIEngine<T extends UIAdapter> {
     public void update() {
         // GUI
         this.updateControls();
-        //this.updateKeyboardControl();
-        //this.updateMouse();
         this.updateLastGUIMouseHover();
         if (!this.inputState.guiFrozen) this.updateGUI(); // Main GUI Update happen here
         this.updateGameCamera();
