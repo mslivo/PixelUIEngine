@@ -1311,7 +1311,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.mouse_y_delta = MathUtils.round(deltaY);
 
         // Emulate Mouse Button Press Events
-        boolean anyChange = false;
+        boolean anyButtonChanged = false;
         for (int i = 0; i <= 4; i++) {
             boolean buttonMouseXDown = switch (i) {
                 case 0 -> buttonMouse1Down;
@@ -1326,8 +1326,9 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.keyBoardCtrlIsMouseButtonDown[i]) {
                     inputState.inputEvents.mouseDown = true;
                     inputState.inputEvents.mouseDownButton = i;
-                    anyChange = true;
+                    anyButtonChanged = true;
                     if(i==Input.Buttons.LEFT){
+                        // DoubleClick
                         if((System.currentTimeMillis()-inputState.keyBoardCtrlLastMouseClick) < DOUBLECLICK_TIME_MS){
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
@@ -1337,12 +1338,12 @@ public class UIEngine<T extends UIAdapter> {
                 } else {
                     inputState.inputEvents.mouseUp = true;
                     inputState.inputEvents.mouseUpButton = i;
-                    anyChange = true;
+                    anyButtonChanged = true;
                 }
             }
             inputState.inputEvents.mouseButtonsDown[i] = inputState.keyBoardCtrlIsMouseButtonDown[i];
         }
-        if(!anyChange){
+        if(!anyButtonChanged){
             inputState.inputEvents.mouseDown = false;
             inputState.inputEvents.mouseUp = false;
             inputState.inputEvents.mouseDoubleClick = false;
@@ -1367,7 +1368,6 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Emulate Mouse Scroll Events
-
         inputState.inputEvents.mouseScrolled = buttonScrolledUp || buttonScrolledDown ? true : false;
         inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
     }
