@@ -1,5 +1,7 @@
 [ ] software cursor mode (scales with pixel upsizing)
-[ ] keyboard control: without robot & gamepad support
+    - needs to be non optional to remove robot
+[ ] keyboard control: remove awt.Robot
+[ ] keyboard control gamepad support
 [ ] rename "api.presets"
 [x] keyboard control
      emulate mouse over java robot
