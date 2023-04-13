@@ -1,5 +1,5 @@
-[?] support mouse button 2
 [ ] rename "api.presets"
+[x] support mouse button 2
 [x] software cursor mode (scales with pixel upsizing)
     - needs to be non optional to remove robot
 [x] keyboard control: remove awt.Robot

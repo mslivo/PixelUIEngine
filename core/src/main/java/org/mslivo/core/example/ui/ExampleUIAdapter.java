@@ -72,7 +72,7 @@ public class ExampleUIAdapter implements UIAdapter {
             }
         }));
 
-        api.setMouseTool(api.mouseTool.create("Pointer", null,GUIBaseMedia.GUI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         this.particleSystem = new ParticleSystem<>(mediaManager, Integer.MAX_VALUE);
     }
@@ -80,13 +80,12 @@ public class ExampleUIAdapter implements UIAdapter {
     @Override
     public void update() {
         if (api.input.keyDown()) {
-            for (int key : api.input.keyDownKeyCodes()) {
-                if (key == Input.Keys.P) {
-                    particlesTest = particlesTest == 4 ? 0 : particlesTest + 1;
-                    if (particlesTest == 0) particleSystem.removeAllParticles();
-                    Tools.log("Particle Performance Test [%d]", particlesTest);
-                }
+            if (api.input.keyUpKeyCode() == Input.Keys.P) {
+                particlesTest = particlesTest == 4 ? 0 : particlesTest + 1;
+                if (particlesTest == 0) particleSystem.removeAllParticles();
+                Tools.log("Particle Performance Test [%d]", particlesTest);
             }
+
         }
 
         updateParticlesPerformanceTest();

@@ -1,12 +1,15 @@
 package org.mslivo.core.engine.ui_engine.input_processor;
 
 import com.badlogic.gdx.InputProcessor;
+import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor {
 
     private InputEvents inputEvents;
 
     private long lastClickTime;
+
+
 
     public UIEngineInputProcessor(InputEvents inputEvents){
         this.inputEvents = inputEvents;
@@ -16,7 +19,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         this.inputEvents.keyDown = true;
-        this.inputEvents.keyDownKeyCodes.add(keycode);
+        this.inputEvents.keyDownKeyCode = keycode;
         this.inputEvents.keysDown[keycode] = true;
         return false;
     }
@@ -24,7 +27,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         this.inputEvents.keyUp = true;
-        this.inputEvents.keyUpKeyCodes.add(keycode);
+        this.inputEvents.keyUpKeyCode = keycode;
         this.inputEvents.keysDown[keycode] = false;
         return false;
     }
@@ -32,16 +35,16 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyTyped(char character) {
         this.inputEvents.keyTyped = true;
-        this.inputEvents.keyTypedCharacters.add(character);
+        this.inputEvents.keyTypedCharacter = character;
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         this.inputEvents.mouseDown = true;
-        this.inputEvents.mouseButton = button;
+        this.inputEvents.mouseDownButton = button;
         this.inputEvents.mouseButtonsDown[button] = true;
-        if(button == 0 && (System.currentTimeMillis()-lastClickTime) < 180){
+        if(button == 0 && (System.currentTimeMillis()-lastClickTime) < UIEngine.DOUBLECLICK_TIME_MS){
             this.inputEvents.mouseDoubleClick = true;
         }
         lastClickTime = System.currentTimeMillis();
@@ -51,7 +54,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         this.inputEvents.mouseUp = true;
-        this.inputEvents.mouseButton = button;
+        this.inputEvents.mouseUpButton = button;
         this.inputEvents.mouseButtonsDown[button] = false;
         return false;
     }

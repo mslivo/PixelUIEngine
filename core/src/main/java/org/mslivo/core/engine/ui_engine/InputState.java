@@ -216,8 +216,10 @@ public class InputState {
     public Vector2 vector2_unproject;
 
     public int mouseXBeforeKeyboardCtrl, mouseYBeforeKeyboardCtrl;
+
+    public long keyBoardCtrlLastMouseClick;
     public float keyBoardCtrlSpeedUp;
-    public boolean keyBoardCtrlIsMouseButtonDown;
+    public boolean[] keyBoardCtrlIsMouseButtonDown;
 
     /* #################### Misc. ####################  */
 
