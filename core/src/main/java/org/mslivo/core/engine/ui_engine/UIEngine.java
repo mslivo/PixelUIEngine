@@ -1120,6 +1120,7 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
                         inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
                         inputState.controlMode = ControlMode.KEYBOARD;
+
                     }
                 }
                 case KEYBOARD -> {
