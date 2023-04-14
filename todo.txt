@@ -1,3 +1,4 @@
+[ ] use GridPoint2 instead of *_x,*_y variables
 [ ] rename "api.presets"
 [x] support mouse button 2
 [x] software cursor mode (scales with pixel upsizing)

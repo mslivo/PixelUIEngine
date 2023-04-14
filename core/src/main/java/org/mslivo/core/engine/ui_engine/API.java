@@ -1869,6 +1869,11 @@ public class API {
             return inputState.controlMode;
         }
 
+        public void setMousePosition(int x, int y){
+            inputState.lastGUIMouseHover = null;
+            inputState.mouse_x_gui = x;
+            inputState.mouse_y_gui = y;
+        }
     }
 
     public class _Notification {

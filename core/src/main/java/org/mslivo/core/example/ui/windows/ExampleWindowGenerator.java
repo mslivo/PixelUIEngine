@@ -258,7 +258,12 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.tabBar.tab.setWidthAuto(tabTextButton);
 
 
-        TextButton textBtn1 = api.components.button.textButton.create(3, 3, 4, 2, "Toggle", null, null, false, true);
+        TextButton textBtn1 = api.components.button.textButton.create(3, 3, 4, 2, "Toggle", new ButtonAction() {
+            @Override
+            public void onToggle(boolean value) {
+                api.input.setMousePosition(100,100);
+            }
+        }, null, false, true);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);
         api.components.button.centerContent(textBtn1);
         api.components.setColor(textBtn1, Tools.Colors.BLUE_BRIGHT);
