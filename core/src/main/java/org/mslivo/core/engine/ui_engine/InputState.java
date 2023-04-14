@@ -124,7 +124,7 @@ public class InputState {
 
     public Window draggedWindow;
 
-    public int draggedWindow_x_offset, draggedWindow_y_offset;
+    public GridPoint2 draggedWindow_offset;
 
     public Button pressedButton;
 
@@ -151,13 +151,9 @@ public class InputState {
 
     public Inventory inventoryDrag_Inventory;
 
-    public int inventoryDrag_from_x;
+    public GridPoint2 inventoryDrag_from;
 
-    public int inventoryDrag_from_y;
-
-    public int InventoryDrag_offset_x;
-
-    public int InventoryDrag_offset_y;
+    public GridPoint2 inventoryDrag_offset;
 
     public Object listDrag_Item;
 
@@ -165,9 +161,7 @@ public class InputState {
 
     public int listDrag_from_index;
 
-    public int listDrag_offset_x;
-
-    public int listDrag_offset_y;
+    public GridPoint2 listDrag_offset;
 
     public float tooltip_fadeIn_pct;
 
@@ -188,17 +182,12 @@ public class InputState {
     /* #################### Control #################### */
 
     public ControlMode controlMode;
-    public int mouse_x;
 
-    public int mouse_y;
+    public GridPoint2 mouse;
 
-    public int mouse_x_gui;
+    public GridPoint2 mouse_gui;
 
-    public int mouse_y_gui;
-
-    public int mouse_x_delta;
-
-    public int mouse_y_delta;
+    public GridPoint2 mouse_delta;
 
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
 

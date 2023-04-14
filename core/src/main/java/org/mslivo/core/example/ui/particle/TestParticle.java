@@ -25,9 +25,6 @@ public class TestParticle extends Particle {
         testParticle.x += MathUtils.random(-2f, 2f);
         testParticle.y += MathUtils.random(-2f, 2f);
         testParticle.timer++;
-        if(testParticle.timer > 100){
-            return false;
-        }
-        return true;
+        return testParticle.timer <= 100;
     }
 }

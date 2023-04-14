@@ -20,9 +20,9 @@ public class InputEvents {
 
     public boolean mouseScrolled;
 
-    public boolean[] keysDown;
+    public final boolean[] keysDown;
 
-    public boolean[] mouseButtonsDown;
+    public final boolean[] mouseButtonsDown;
 
     public char keyTypedCharacter;
 

@@ -14,7 +14,7 @@ public class SoundPlayer2D {
 
     private float camera_x, camera_y;
 
-    private MediaManager mediaManager;
+    private final MediaManager mediaManager;
 
     public SoundPlayer2D(MediaManager mediaManager, int range) {
         this.volume = 0;

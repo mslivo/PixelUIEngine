@@ -18,7 +18,7 @@ public class ConfigurationManager {
 
     private Path file;
 
-    private HashMap<String, Configuration> configurations;
+    private final HashMap<String, Configuration> configurations;
 
     private boolean initialized;
 
@@ -55,9 +55,7 @@ public class ConfigurationManager {
         this.checkInitialized();
         if (isBackupActive()) {
             this.properties = new Properties();
-            backUp.forEach((key, value) -> {
-                this.properties.setProperty((String) key, (String) value);
-            });
+            backUp.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
             validateAllProperties();
             saveToFile();
             discardBackup();
@@ -78,10 +76,7 @@ public class ConfigurationManager {
         if (isBackupActive()) {
             if (this.properties.get(option) != null && this.backUp.get(option) != null) {
                 return !this.properties.get(option).equals(this.backUp.get(option));
-            } else if (this.properties.get(option) == null && this.backUp.get(option) == null) {
-                return false;
-            }
-            return true;
+            } else return this.properties.get(option) != null || this.backUp.get(option) != null;
         } else {
             return false;
         }
@@ -167,9 +162,7 @@ public class ConfigurationManager {
         Configuration configuration = configurations.get(name);
         int value = 0;
         if (configuration != null) {
-            if (this.properties.getProperty(configuration.name).equals("true")) {
-                return true;
-            }
+            return this.properties.getProperty(configuration.name).equals("true");
         }
         return false;
     }
@@ -202,14 +195,13 @@ public class ConfigurationManager {
 
     public String checkString(String value) {
         checkInitialized();
-        if (value == null) return null;
         return value;
     }
 
     public Boolean checkBoolean(String value) {
         checkInitialized();
         if (value == null) return null;
-        Boolean boolValue;
+        boolean boolValue;
         try {
             boolValue = Boolean.parseBoolean(value);
         } catch (NumberFormatException e) {
@@ -221,7 +213,7 @@ public class ConfigurationManager {
     public Float checkFloat(String value) {
         checkInitialized();
         if (value == null) return null;
-        Float floatValue;
+        float floatValue;
         try {
             floatValue = Float.parseFloat(value);
         } catch (NumberFormatException e) {
@@ -233,7 +225,7 @@ public class ConfigurationManager {
     public Integer checkInt(String value) {
         checkInitialized();
         if (value == null) return null;
-        Integer intValue;
+        int intValue;
         try {
             intValue = Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -262,7 +254,6 @@ public class ConfigurationManager {
 
     public String checkStringList(String value) {
         checkInitialized();
-        if (value == null) return null;
         return value;
     }
 

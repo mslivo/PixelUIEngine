@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.gui.Window;
@@ -60,9 +61,7 @@ class UICommons {
 
     static boolean inventory_positionValid(Inventory inventory, int x, int y) {
         if (inventory.items != null) {
-            if (x >= 0 && x < inventory.items.length && y >= 0 && y < inventory.items[0].length) {
-                return true;
-            }
+            return x >= 0 && x < inventory.items.length && y >= 0 && y < inventory.items[0].length;
         }
         return false;
     }
@@ -105,11 +104,11 @@ class UICommons {
         inputState.scrolledScrollBarHorizontal = null;
         inputState.inventoryDrag_Item = null;
         inputState.inventoryDrag_Inventory = null;
-        inputState.InventoryDrag_offset_x = inputState.InventoryDrag_offset_y = 0;
-        inputState.inventoryDrag_from_x = inputState.inventoryDrag_from_y = 0;
+        inputState.inventoryDrag_offset = new GridPoint2();
+        inputState.inventoryDrag_from = new GridPoint2();
         inputState.listDrag_Item = null;
         inputState.listDrag_List = null;
-        inputState.listDrag_offset_x = inputState.listDrag_offset_y = 0;
+        inputState.listDrag_offset = new GridPoint2();
         inputState.listDrag_from_index = 0;
         inputState.tooltip_lastHoverObject = null;
         inputState.pressedMap = null;

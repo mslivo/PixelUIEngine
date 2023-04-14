@@ -8,7 +8,7 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 
 import java.util.HashSet;
 
-public abstract class ListAction<T extends Object> extends CommonActions {
+public abstract class ListAction<T> extends CommonActions {
 
     public CMediaGFX icon(T listItem) {
         return null;

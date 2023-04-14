@@ -62,9 +62,7 @@ import java.util.function.Function;
 public class API {
 
     public final _Notification notifications = new _Notification();
-
     public final _ContextMenu contextMenu = new _ContextMenu();
-
     public final _Windows windows = new _Windows();
 
     public final _Components components = new _Components();
@@ -79,16 +77,16 @@ public class API {
 
     public final _MouseTool mouseTool = new _MouseTool();
 
-
     public final _HotKey hotkey = new _HotKey();
 
-    private InputState inputState;
+    public final _ToolBox toolBox = new _ToolBox();
 
-    private MediaManager mediaManager;
+    private final InputState inputState;
 
-    private HashMap<Class, WindowGenerator> windowGeneratorCache;
+    private final MediaManager mediaManager;
 
-    public final _Presets presets = new _Presets();
+    private final HashMap<Class, WindowGenerator> windowGeneratorCache;
+
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
@@ -104,7 +102,7 @@ public class API {
         }
     }
 
-    public void setToolTip(ToolTip toolTip){
+    public void setToolTip(ToolTip toolTip) {
         inputState.gameToolTip = toolTip;
     }
 
@@ -142,12 +140,10 @@ public class API {
     }
 
     public void windowsEnforceScreenBounds() {
-        inputState.windows.forEach(window -> {
-            UICommons.window_enforceScreenBounds(inputState, window);
-        });
+        inputState.windows.forEach(window -> UICommons.window_enforceScreenBounds(inputState, window));
     }
 
-    public class _HotKey {
+    public static class _HotKey {
 
         public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
             if (keyCodes == null || keyCodes.length == 0) return null;
@@ -193,7 +189,7 @@ public class API {
     }
 
 
-    public class _MouseTool {
+    public static class _MouseTool {
 
         public MouseTool create(String name, Object data, CMediaCursor cursor) {
             return create(name, data, cursor, cursor, null);
@@ -244,8 +240,11 @@ public class API {
 
     }
 
-    public class _Presets {
+    public class _ToolBox {
 
+        private final HashSet<Character> numbersAllowedCharacters = new HashSet<>(Arrays.asList(new Character[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
+
+        private final HashSet<Character> decimalsAllowedCharacters = new HashSet<>(Arrays.asList(new Character[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
         public TextField list_CreateSearchBar(List list) {
             return list_CreateSearchBar(list, null, false, false);
         }
@@ -335,21 +334,21 @@ public class API {
             if (text != null) {
                 ArrayList<String> textList = new ArrayList<>();
                 int pixelWidth = ((width - 1) * UIEngine.TILE_SIZE);
-                for (int i = 0; i < text.length; i++) {
-                    if (text[i].trim().length() > 0) {
-                        String[] split = text[i].split(" ");
+                for (String s : text) {
+                    if (s.trim().length() > 0) {
+                        String[] split = s.split(" ");
                         if (split.length > 0) {
-                            String currentLine = "";
-                            for (int i2 = 0; i2 < split.length; i2++) {
-                                if (mediaManager.textWidth(config.getDefaultFont(), currentLine + split[i2] + " ") >= pixelWidth) {
-                                    textList.add(currentLine);
-                                    currentLine = split[i2] + " ";
+                            StringBuilder currentLine = new StringBuilder();
+                            for (String value : split) {
+                                if (mediaManager.textWidth(config.getDefaultFont(), currentLine + value + " ") >= pixelWidth) {
+                                    textList.add(currentLine.toString());
+                                    currentLine = new StringBuilder(value + " ");
                                 } else {
-                                    currentLine += split[i2] + " ";
+                                    currentLine.append(value).append(" ");
                                 }
                             }
-                            if (currentLine.trim().length() > 0) {
-                                textList.add(currentLine);
+                            if (currentLine.toString().trim().length() > 0) {
+                                textList.add(currentLine.toString());
                             }
                         }
                     } else {
@@ -555,7 +554,7 @@ public class API {
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
             Window modal = windows.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
-            ImageButton closeButton = presets.button_CreateWindowCloseButton(modal);
+            ImageButton closeButton = toolBox.button_CreateWindowCloseButton(modal);
             components.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
@@ -593,7 +592,7 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     components.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        components.map.mapOverlay.setPosition(cursorOverlay, x-3, colorTexture.getRegionHeight() - y+1);
+                        components.map.mapOverlay.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
                     }
                 }
             }
@@ -626,9 +625,9 @@ public class API {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            components.setColor(ok, components.map.getPixel(colorMap, x, y-1));
+                            components.setColor(ok, components.map.getPixel(colorMap, x, y - 1));
                             components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
-                            components.map.mapOverlay.setPosition(cursorOverlay, x-1 , yInv -1);
+                            components.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
                         }
@@ -718,8 +717,7 @@ public class API {
             });
             components.button.centerContent(okBtn);
 
-            ArrayList<Component> componentsl = new ArrayList<>();
-            componentsl.addAll(Arrays.asList(texts));
+            ArrayList<Component> componentsl = new ArrayList<>(Arrays.asList(texts));
             componentsl.add(okBtn);
 
             components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
@@ -728,23 +726,19 @@ public class API {
         }
 
         public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
-            BiFunction<Long, Long,FColor> colorFunction = new BiFunction<Long, Long,FColor>() {
-                @Override
-                public FColor apply(Long value, Long lastValue) {
-                    if(value > lastValue){
-                        return Tools.Colors.GREEN_BRIGHT;
-                    }else if(value < lastValue){
-                        return Tools.Colors.RED_BRIGHT;
-                    }else {
-                        return Tools.Colors.ORANGE_BRIGHT;
-                    }
+            BiFunction<Long, Long, FColor> colorFunction = (value, lastValue) -> {
+                if (value > lastValue) {
+                    return Tools.Colors.GREEN_BRIGHT;
+                } else if (value < lastValue) {
+                    return Tools.Colors.RED_BRIGHT;
+                } else {
+                    return Tools.Colors.ORANGE_BRIGHT;
                 }
-
             };
             return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, colorFunction, null, true);
         }
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, BiFunction<Long, Long,FColor> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, BiFunction<Long, Long, FColor> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -763,20 +757,20 @@ public class API {
             for (int i = startIndex; i < itemCount; i += stepSize) {
                 if (i >= 0) {
                     long value = getValueAtIndex.apply(i);
-                    lowestValue = value < lowestValue ? value : lowestValue;
-                    highestValue = value > highestValue ? value : highestValue;
+                    lowestValue = Math.min(value, lowestValue);
+                    highestValue = Math.max(value, highestValue);
                     indexes.add(i);
                     values.add(value);
                     dataAvailables.add(true);
                     oneValueFound = true;
-                }else{
+                } else {
                     indexes.add(i);
-                    values.add(0l);
+                    values.add(0L);
                     dataAvailables.add(false);
                 }
                 indexAndValueCount++;
             }
-            if(!oneValueFound){
+            if (!oneValueFound) {
                 lowestValue = 0;
                 highestValue = 0;
             }
@@ -811,18 +805,19 @@ public class API {
             long lastValue = valueBefore;
             int lastIndex = -1;
             final float SHADING = 0.1f;
-            FColor color = colorFunction.apply(lastValue,valueBefore);
+            FColor color = colorFunction.apply(lastValue, valueBefore);
             FColor colorBrighter = Tools.Colors.createBrighter(color, SHADING);
             FColor colorDarker = Tools.Colors.createDarker(color, SHADING);
-            drawLoop:for (int ix = 0; ix < mapWidth; ix++) {
+            drawLoop:
+            for (int ix = 0; ix < mapWidth; ix++) {
                 int index = indexAtPosition[ix];
                 long value = valueAtPosition[ix];
                 boolean dataAvailable = dataAvailableAtPosition[ix];
 
-                if(!dataAvailable) continue drawLoop;
+                if (!dataAvailable) continue drawLoop;
 
                 boolean indexChange = false;
-                boolean nextIndexChange = (ix + 1) < mapWidth ? indexAtPosition[ix + 1] != index : false;
+                boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
                 if (index != lastIndex) {
                     color = colorFunction.apply(value, lastValue);
                     colorBrighter = Tools.Colors.createBrighter(color, SHADING);
@@ -928,9 +923,7 @@ public class API {
 
         public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, Consumer<Float> onChange) {
             TextField textField = components.textField.create(x, y, width);
-            HashSet<Character> numbers = new HashSet<>();
-            numbers.addAll(Arrays.asList(new Character[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
-            components.textField.setAllowedCharacters(textField, numbers);
+            components.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
             components.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
@@ -939,10 +932,7 @@ public class API {
                         value = Float.parseFloat(newContent);
                     } catch (Exception e) {
                     }
-                    if (value != null && value >= min && value <= max) {
-                        return true;
-                    }
-                    return false;
+                    return (value != null && value >= min && value <= max);
                 }
 
                 @Override
@@ -955,9 +945,7 @@ public class API {
 
         public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, Consumer<Integer> onChange) {
             TextField textField = components.textField.create(x, y, width);
-            HashSet<Character> numbers = new HashSet<>();
-            numbers.addAll(Arrays.asList(new Character[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
-            components.textField.setAllowedCharacters(textField, numbers);
+            components.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
             components.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
@@ -966,10 +954,7 @@ public class API {
                         value = Integer.parseInt(newContent);
                     } catch (Exception e) {
                     }
-                    if (value != null && value >= min && value <= max) {
-                        return true;
-                    }
-                    return false;
+                    return value != null && value >= min && value <= max;
                 }
 
                 @Override
@@ -1076,7 +1061,7 @@ public class API {
     }
 
     public void openContextMenu(ContextMenu contextMenu) {
-        openContextMenu(contextMenu, inputState.mouse_x_gui, inputState.mouse_y_gui);
+        openContextMenu(contextMenu, inputState.mouse_gui.x, inputState.mouse_gui.y);
     }
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
@@ -1146,8 +1131,7 @@ public class API {
         if (window == null) return false;
         ArrayList<Component> result = windows.findComponentsByName(window, "WndCloseBtn");
         if (result.size() == 1) {
-            if (result.get(0) instanceof Button) {
-                Button button = (Button) result.get(0);
+            if (result.get(0) instanceof Button button) {
                 if (button.buttonAction != null) {
                     button.buttonAction.onPress();
                     button.buttonAction.onRelease();
@@ -1264,7 +1248,7 @@ public class API {
 
     public boolean isMouseTool(String name) {
         if (name == null) return false;
-        return inputState.mouseTool != null ? name.equals(inputState.mouseTool.name) : false;
+        return inputState.mouseTool != null && name.equals(inputState.mouseTool.name);
     }
 
     public ArrayList<HotKey> getHotKeys() {
@@ -1274,7 +1258,6 @@ public class API {
     public void addHotKey(HotKey hotKey) {
         if (hotKey == null) return;
         inputState.addHotKeyQueue.add(hotKey);
-        return;
     }
 
     public void removeHotKey(HotKey hotKey) {
@@ -1330,7 +1313,7 @@ public class API {
         return inputState.lastActiveWindow;
     }
 
-    public class _Config {
+    public static class _Config {
 
         private boolean keyBoardControlEnabled = false;
 
@@ -1372,7 +1355,7 @@ public class API {
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
-        private HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet();
+        private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
 
@@ -1421,7 +1404,6 @@ public class API {
 
         public void setCursorGui(CMediaCursor cursorGui) {
             if (cursorGui == null) return;
-            ;
             this.cursorGui = cursorGui;
         }
 
@@ -1696,12 +1678,10 @@ public class API {
         }
 
         public _Config() {
-            this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList(new Character[]{
-                    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                    ' ', '_', '.', ',', '!', '?'
-            }));
+                    ' ', '_', '.', ',', '!', '?'));
         }
 
         public void loadConfig(_Config config) {
@@ -1760,8 +1740,7 @@ public class API {
             if (inputState.pressedMap != null) return true;
             if (inputState.pressedGameViewPort != null) return true;
             if (inputState.inventoryDrag_Item != null) return true;
-            if (inputState.listDrag_List != null) return true;
-            return false;
+            return inputState.listDrag_List != null;
         }
 
 
@@ -1770,27 +1749,27 @@ public class API {
         }
 
         public int mouseXGUI() {
-            return inputState.mouse_x_gui;
+            return inputState.mouse_gui.x;
         }
 
         public int mouseYGUI() {
-            return inputState.mouse_y_gui;
+            return inputState.mouse_gui.y;
         }
 
         public int mouseX() {
-            return inputState.mouse_x;
+            return inputState.mouse.x;
         }
 
         public int mouseY() {
-            return inputState.mouse_y;
+            return inputState.mouse.y;
         }
 
         public int mouseXDelta() {
-            return inputState.mouse_x_delta;
+            return inputState.mouse_delta.x;
         }
 
         public int mouseYDelta() {
-            return inputState.mouse_y_delta;
+            return inputState.mouse_delta.y;
         }
 
         public boolean keyDown() {
@@ -1841,11 +1820,11 @@ public class API {
             return inputState.inputEvents.keyDownKeyCode;
         }
 
-        public boolean isKeyDown(int keyCode){
+        public boolean isKeyDown(int keyCode) {
             return inputState.inputEvents.keysDown[keyCode];
         }
 
-        public boolean isMouseButtonDown(int button){
+        public boolean isMouseButtonDown(int button) {
             return inputState.inputEvents.mouseButtonsDown[button];
         }
 
@@ -1869,10 +1848,10 @@ public class API {
             return inputState.controlMode;
         }
 
-        public void setMousePosition(int x, int y){
+        public void setMousePosition(int x, int y) {
             inputState.lastGUIMouseHover = null;
-            inputState.mouse_x_gui = x;
-            inputState.mouse_y_gui = y;
+            inputState.mouse_gui.x = x;
+            inputState.mouse_gui.y = y;
         }
     }
 
@@ -2218,13 +2197,13 @@ public class API {
 
             for (Component component : window.addComponentsQueue) {
 
-                if (exceptions == null || !Arrays.stream(exceptions).anyMatch(exceptionClass -> exceptionClass == component.getClass())) {
+                if (exceptions == null || Arrays.stream(exceptions).noneMatch(exceptionClass -> exceptionClass == component.getClass())) {
                     if (setColor1) components.setColor(component, color);
                     if (setColor2) components.setColor2(component, color);
                 }
             }
             for (Component component : window.components) {
-                if (exceptions == null || !Arrays.stream(exceptions).anyMatch(exceptionClass -> exceptionClass == component.getClass())) {
+                if (exceptions == null || Arrays.stream(exceptions).noneMatch(exceptionClass -> exceptionClass == component.getClass())) {
                     if (setColor1) components.setColor(component, color);
                     if (setColor2) components.setColor2(component, color);
                 }
@@ -2281,15 +2260,13 @@ public class API {
                 windowGeneratorCache.put(windowGeneratorClass, windowGenerator);
             }
 
-            Window window = windowGenerator.create(p);
-            return window;
+            return windowGenerator.create(p);
         }
 
 
         public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
             window.addComponentsQueue.add(component);
-            return;
         }
 
         public void addComponents(Window window, Component[] components) {
@@ -2322,7 +2299,6 @@ public class API {
         public ArrayList<Component> findComponentsByName(Window window, String name) {
             ArrayList<Component> result = new ArrayList<>();
             if (window == null || name == null) return result;
-            if (window == null) return result;
             for (Component component : window.components) {
                 if (name.equals(component.name)) result.add(component);
             }
@@ -2432,7 +2408,7 @@ public class API {
 
     public class _ToolTip {
 
-        public _ToolTipImage toolTipImage = new _ToolTipImage();
+        public final  _ToolTipImage toolTipImage = new _ToolTipImage();
 
         public class _ToolTipImage {
 
@@ -3564,11 +3540,7 @@ public class API {
                 for (Tab tabB : tabBar.tabs) {
                     xOffset += tabB.width;
                     if (tabB == tab) {
-                        if (xOffset > tabBar.width) {
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return xOffset <= tabBar.width;
                     }
                 }
                 return false;
@@ -3801,7 +3773,7 @@ public class API {
                 setTextFieldAction(textField, textFieldAction);
 
                 setMarkerPosition(textField, textField.content.length());
-                textField.contentValid = textField.textFieldAction == null ? true : textField.textFieldAction.isContentValid(textField.content);
+                textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
                 return textField;
             }
 
@@ -4296,15 +4268,16 @@ public class API {
 
             public void setSelectedItemEquals(ComboBox comboBox, Object selectItem) {
                 if (comboBox == null) return;
-                if(comboBox.items != null){
-                    for(Object item : comboBox.items){
-                        if(selectItem.equals(item)){
+                if (comboBox.items != null) {
+                    for (Object item : comboBox.items) {
+                        if (selectItem.equals(item)) {
                             comboBox.selectedItem = item;
                             return;
                         }
                     }
                 }
             }
+
             public void setUseIcons(ComboBox comboBox, boolean useIcons) {
                 if (comboBox == null) return;
                 comboBox.useIcons = useIcons;

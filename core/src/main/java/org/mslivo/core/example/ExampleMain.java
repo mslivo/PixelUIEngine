@@ -27,7 +27,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     private UIEngine<UIAdapter> uiEngine;
 
-    public ExampleStartParameters exampleStartParameters;
+    public final ExampleStartParameters exampleStartParameters;
 
     public ExampleEngineAdapter exampleEngineAdapter;
 

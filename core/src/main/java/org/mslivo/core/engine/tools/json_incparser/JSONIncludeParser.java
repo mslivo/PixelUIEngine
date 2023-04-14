@@ -42,7 +42,7 @@ public class JSONIncludeParser {
 
 
     private static ArrayList<String> getFileContent(String basePath, String fileName, boolean include, boolean trimInclude, InputFileMode inputFileMode) throws IOException {
-        ArrayList<String> lines = new ArrayList();
+        ArrayList<String> lines = new ArrayList<>();
         String fileContent = null;
         if (inputFileMode == InputFileMode.CLASSPATH) {
             FileHandle fileHandle = Gdx.files.internal(basePath + fileName);
@@ -124,7 +124,7 @@ public class JSONIncludeParser {
         }
 
         for (String line : lines) {
-            result.append(line + System.lineSeparator());
+            result.append(line).append(System.lineSeparator());
         }
 
         return result.toString();

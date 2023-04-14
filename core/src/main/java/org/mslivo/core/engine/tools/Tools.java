@@ -72,13 +72,10 @@ public class Tools {
     }
 
     public static void logBenchmark(String... customValues) {
-        String custom = "";
-        if (customValues.length > 0) {
-            for (String customValue : customValues) {
-                custom = custom + " | " + String.format("%1$10s", customValue);
-            }
+        StringBuilder custom = new StringBuilder();
+        for (String customValue : customValues) {
+            custom.append(" | ").append(String.format("%1$10s", customValue));
         }
-
         Tools.log(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
                 String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM" +
                 " | " +
@@ -353,15 +350,12 @@ public class Tools {
         }
 
         public static Object readObjectFromFile(Path file) throws Exception {
-            ObjectInputStream objectInputStream = new ObjectInputStream(Files.newInputStream(file));
-            try {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(Files.newInputStream(file))) {
                 Object ret = objectInputStream.readObject();
                 objectInputStream.close();
                 return ret;
             } catch (Exception e) {
                 throw e;
-            } finally {
-                objectInputStream.close();
             }
         }
 
@@ -384,8 +378,8 @@ public class Tools {
 
         public static int selectRandomProbabilities(int... values) {
             int sum = 0;
-            for (int i = 0; i < values.length; i++) {
-                sum += values[i];
+            for (int value : values) {
+                sum += value;
             }
             float[] probabilities = new float[values.length];
 
@@ -494,14 +488,12 @@ public class Tools {
 
         public static boolean inBoundsX(int x, int map_width) {
             if (x < 0) return false;
-            if (x > (map_width - 1)) return false;
-            return true;
+            return x <= (map_width - 1);
         }
 
         public static boolean inBoundsY(int y, int map_height) {
             if (y < 0) return false;
-            if (y > (map_height - 1)) return false;
-            return true;
+            return y <= (map_height - 1);
         }
 
         public static boolean inBoundsXY(int x, int y, int map_width, int map_height) {
@@ -562,20 +554,17 @@ public class Tools {
             return (2 * iso_Y - iso_X) / 2;
         }
 
-        private static ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
+        private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
 
         public static void doInRadiusCached(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
             ArrayList<Long> cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new ArrayList<>();
                 ArrayList<Long> finalCached = cached;
-                doInRadius(0, 0, radius, new BiFunction<Integer, Integer, Boolean>() {
-                    @Override
-                    public Boolean apply(Integer x, Integer y) {
-                        finalCached.add(
-                                (((long) x) << 32) | (y & 0xffffffffL));
-                        return true;
-                    }
+                doInRadius(0, 0, radius, (x1, y1) -> {
+                    finalCached.add(
+                            (((long) x1) << 32) | (y1 & 0xffffffffL));
+                    return true;
                 });
                 doInRadiusCache.put(radius, cached);
             }

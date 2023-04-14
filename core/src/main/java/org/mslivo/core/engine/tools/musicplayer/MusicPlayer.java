@@ -21,7 +21,7 @@ public class MusicPlayer {
 
     private byte playMode, state;
 
-    private ArrayList<CMediaMusic> playlist;
+    private final ArrayList<CMediaMusic> playlist;
 
     private MediaManager mediaManager;
 
@@ -35,7 +35,7 @@ public class MusicPlayer {
 
     private float volume;
 
-    private ArrayDeque<Integer> randomHistory;
+    private final ArrayDeque<Integer> randomHistory;
 
     public MusicPlayer(MediaManager mediaManager){
         this.mediaManager = mediaManager;
@@ -83,7 +83,7 @@ public class MusicPlayer {
     }
 
     public boolean isPlaying(){
-        return playCurrent != null ? playCurrent.isPlaying() : false;
+        return playCurrent != null && playCurrent.isPlaying();
     }
 
     public void playListAdd(CMediaMusic cMediaMusic){
@@ -116,7 +116,7 @@ public class MusicPlayer {
                         if(playCurrent.getVolume() != volume){
                             playCurrent.setVolume(volume);
                         }
-                        if(playNext == true || playPrevious == true){
+                        if(playNext || playPrevious ){
                             playCurrent.stop();
                             playCurrent = null;
                             playCurrentFileName = "";
@@ -148,7 +148,7 @@ public class MusicPlayer {
                                     playListPosition = newPosition;
                                 }
                                 case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition + 1 > (playlist.size() - 1) ? 0 : (playListPosition + 1));
-                                case PLAYMODE_LOOP -> playListPosition = playListPosition;
+                                case PLAYMODE_LOOP -> {}
                             }
                             playNext = false;
                         }else if(playPrevious){
@@ -162,7 +162,7 @@ public class MusicPlayer {
                                     }
                                 }
                                 case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playListPosition = playlist.size()-1 : playListPosition -1);
-                                case PLAYMODE_LOOP -> playListPosition = playListPosition;
+                                case PLAYMODE_LOOP -> {}
                             }
                             playPrevious = false;
                         }
@@ -172,14 +172,11 @@ public class MusicPlayer {
                         if(playCurrent != null) {
                             playCurrentFileName = nextTrack.file;
                             playCurrent.setVolume(volume);
-                            playCurrent.setOnCompletionListener(new Music.OnCompletionListener() {
-                                @Override
-                                public void onCompletion(Music music) {
-                                    playCurrent.stop();
-                                    playCurrent = null;
-                                    playCurrentFileName = "";
-                                    playNext = true;
-                                }
+                            playCurrent.setOnCompletionListener(music -> {
+                                playCurrent.stop();
+                                playCurrent = null;
+                                playCurrentFileName = "";
+                                playNext = true;
                             });
                         }
                     }

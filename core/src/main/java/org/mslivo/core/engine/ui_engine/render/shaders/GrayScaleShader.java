@@ -1,32 +1,34 @@
 package org.mslivo.core.engine.ui_engine.render.shaders;
 
 public class GrayScaleShader {
-    public static String VERTEX = "attribute vec4 a_position;\n" +
-            "attribute vec4 a_color;\n" +
-            "attribute vec2 a_texCoord0;\n" +
-            "\n" +
-            "uniform mat4 u_projTrans;\n" +
-            "\n" +
-            "varying vec4 v_color;\n" +
-            "varying vec2 v_texCoords;\n" +
-            "\n" +
-            "void main() {\n" +
-            "    v_color = a_color;\n" +
-            "    v_texCoords = a_texCoord0;\n" +
-            "    gl_Position = u_projTrans * a_position;\n" +
-            "}";
+    public static final String VERTEX = """
+            attribute vec4 a_position;
+            attribute vec4 a_color;
+            attribute vec2 a_texCoord0;
 
-    public static String FRAGMENT = "#ifdef GL_ES\n" +
-            "    precision mediump float;\n" +
-            "#endif\n" +
-            "\n" +
-            "varying vec4 v_color;\n" +
-            "varying vec2 v_texCoords;\n" +
-            "uniform sampler2D u_texture;\n" +
-            "\n" +
-            "void main() {\n" +
-            "  vec4 c = v_color * texture2D(u_texture, v_texCoords);\n" +
-            "  float grey = (c.r + c.g + c.b) / 4.0;\n" +
-            "  gl_FragColor = vec4(grey, grey, grey, c.a);\n" +
-            "}";
+            uniform mat4 u_projTrans;
+
+            varying vec4 v_color;
+            varying vec2 v_texCoords;
+
+            void main() {
+                v_color = a_color;
+                v_texCoords = a_texCoord0;
+                gl_Position = u_projTrans * a_position;
+            }""";
+
+    public static final String FRAGMENT = """
+            #ifdef GL_ES
+                precision mediump float;
+            #endif
+
+            varying vec4 v_color;
+            varying vec2 v_texCoords;
+            uniform sampler2D u_texture;
+
+            void main() {
+              vec4 c = v_color * texture2D(u_texture, v_texCoords);
+              float grey = (c.r + c.g + c.b) / 4.0;
+              gl_FragColor = vec4(grey, grey, grey, c.a);
+            }""";
 }

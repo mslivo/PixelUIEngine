@@ -5,7 +5,7 @@ import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor {
 
-    private InputEvents inputEvents;
+    private final InputEvents inputEvents;
 
     private long lastClickTime;
 

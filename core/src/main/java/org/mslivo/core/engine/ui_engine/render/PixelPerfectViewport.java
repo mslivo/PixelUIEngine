@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class PixelPerfectViewport extends FitViewport {
 
-    private int iRateMin;
+    private final int iRateMin;
 
     public PixelPerfectViewport(float worldWidth, float worldHeight, Camera camera, int iRateMin) {
         super(worldWidth, worldHeight, camera);

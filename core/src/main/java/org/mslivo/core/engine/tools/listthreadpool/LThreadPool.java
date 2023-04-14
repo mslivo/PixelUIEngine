@@ -15,13 +15,13 @@ public class LThreadPool {
 
     private ExecutorService threadPool;
 
-    private LThreadPoolUpdater lThreadPoolUpdater;
+    private final LThreadPoolUpdater lThreadPoolUpdater;
 
-    private int objectsPerWorker;
+    private final int objectsPerWorker;
 
-    private ArrayDeque<Worker> tasks;
+    private final ArrayDeque<Worker> tasks;
 
-    private List updateObjects;
+    private final List updateObjects;
 
     public LThreadPool(List updateObjects, LThreadPoolUpdater lThreadPoolUpdater, int objectsPerWorker, ThreadPoolAlgorithm threadPoolAlgorithm) {
         this(updateObjects, lThreadPoolUpdater, objectsPerWorker, threadPoolAlgorithm, 5);
@@ -33,9 +33,7 @@ public class LThreadPool {
         this.updateObjects = updateObjects;
         this.objectsPerWorker = Tools.Calc.lowerBounds(objectsPerWorker, 1);
         switch (threadPoolAlgorithm) {
-            case FIXED -> {
-                this.threadPool = Executors.newFixedThreadPool(Tools.Calc.lowerBounds(fixedThreadCount, 1));
-            }
+            case FIXED -> this.threadPool = Executors.newFixedThreadPool(Tools.Calc.lowerBounds(fixedThreadCount, 1));
             case CACHED -> this.threadPool = Executors.newCachedThreadPool();
             case WORKSTEALING -> this.threadPool = Executors.newWorkStealingPool();
         }
@@ -43,9 +41,8 @@ public class LThreadPool {
     }
 
 
-
     public void update() {
-        if(updateObjects.size() == 0) return;
+        if (updateObjects.size() == 0) return;
 
         if (updateObjects.size() <= objectsPerWorker) { // dont use threadpool if objects would fit into one thread
             try {
@@ -70,14 +67,14 @@ public class LThreadPool {
 
     class Worker implements Callable<Object> {
 
-        private int fromIndex, toIndex;
-        private List objects;
+        private final int fromIndex, toIndex;
+
+        private final List objects;
 
         public Worker(List objects, int fromIndex, int toIndex) {
             this.objects = objects;
             this.fromIndex = fromIndex;
-            this.toIndex = toIndex;
-            if (this.toIndex > (objects.size() - 1)) this.toIndex = objects.size() - 1;
+            this.toIndex = Math.min(toIndex, (objects.size() - 1));
         }
 
         @Override

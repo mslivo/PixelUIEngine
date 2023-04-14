@@ -3,7 +3,6 @@ package org.mslivo.core.engine.media_manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
@@ -14,10 +13,7 @@ import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 
 import java.lang.reflect.Field;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -29,25 +25,24 @@ public class MediaManager {
 
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND_FX = "sound/";
 
-    private HashMap<CMediaSound, Sound> medias_sounds = new HashMap<>();
+    private final HashMap<CMediaSound, Sound> medias_sounds = new HashMap<>();
 
-    private HashMap<CMediaMusic, Music> medias_music = new HashMap<>();
+    private final HashMap<CMediaMusic, Music> medias_music = new HashMap<>();
 
-    private HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
+    private final HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
 
-    private HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
-
-
-    private HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
-
-    private HashMap<CMediaArray, TextureRegion[]> medias_arrays = new HashMap<>();
-
-    private HashMap<CMediaAnimation, Animation> medias_animations = new HashMap<>();
+    private final HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
 
 
-    private ArrayDeque<CMedia> loadStack = new ArrayDeque<>();
+    private final HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
 
-    public HashSet<String> loadedMedia = new HashSet<>();
+    private final HashMap<CMediaArray, TextureRegion[]> medias_arrays = new HashMap<>();
+
+    private final HashMap<CMediaAnimation, Animation> medias_animations = new HashMap<>();
+
+    private final ArrayDeque<CMedia> loadStack = new ArrayDeque<>();
+
+    public final HashSet<String> loadedMedia = new HashSet<>();
 
     private PixmapPacker pixmapPacker;
 
@@ -187,9 +182,9 @@ public class MediaManager {
                 TextureRegion[] result = new TextureRegion[count];
                 int tmpCount = 0;
                 framesLoop:
-                for (int x = 0; x < tmp.length; x++) {
+                for (TextureRegion[] textureRegions : tmp) {
                     for (int y = 0; y < tmp[0].length; y++) {
-                        result[tmpCount++] = tmp[x][y];
+                        result[tmpCount++] = textureRegions[y];
                         if (tmpCount >= cMediaAnimation.frames) break framesLoop;
                     }
                 }
@@ -279,7 +274,7 @@ public class MediaManager {
             drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer);
         } else if (cMedia.getClass() == CMediaArray.class) {
             drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex);
-        } else if(cMedia.getClass() == CMediaCursor.class){
+        } else if (cMedia.getClass() == CMediaCursor.class) {
             drawCMediaCursor(batch, (CMediaCursor) cMedia, x, y);
         }
     }
@@ -334,7 +329,7 @@ public class MediaManager {
     }
 
     public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
-        drawCMediaGFXCut(batch, cMedia, x, y, 0,0,widthCut, heightCut, animationTimer, arrayIndex);
+        drawCMediaGFXCut(batch, cMedia, x, y, 0, 0, widthCut, heightCut, animationTimer, arrayIndex);
     }
 
     public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
@@ -353,15 +348,15 @@ public class MediaManager {
     }
 
     public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
-        drawCMediaGFX(batch, cMedia, x,y, origin_x, origin_y, scaleX, scaleY, 0,0,0);
+        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, 0, 0);
     }
 
     public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
-        drawCMediaGFX(batch, cMedia, x,y, origin_x, origin_y, scaleX, scaleY, 0,animationTimer,arrayIndex);
+        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, animationTimer, arrayIndex);
     }
 
     public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        drawCMediaGFX(batch, cMedia, x,y, origin_x, origin_y, scaleX, scaleY, rotation,0,0);
+        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation, 0, 0);
     }
 
     public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
@@ -379,7 +374,7 @@ public class MediaManager {
 
     public void drawCMediaCursor(SpriteBatch batch, CMediaCursor cMedia, float x, float y) {
         TextureRegion texture = getCMediaCursor(cMedia);
-        batch.draw(texture, x-cMedia.hotspot_x, y-cMedia.hotspot_y , 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
+        batch.draw(texture, x - cMedia.hotspot_x, y - cMedia.hotspot_y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
     /* CMediaImage */
@@ -550,8 +545,7 @@ public class MediaManager {
 
     public static CMediaImage create_CMediaImage(String file) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(" file missing");
-        CMediaImage cMediaImage = new CMediaImage(file);
-        return cMediaImage;
+        return new CMediaImage(file);
     }
 
     public static CMediaCursor create_CMediaCursor(String file, int hotspot_x, int hotspot_y) {
@@ -586,14 +580,12 @@ public class MediaManager {
 
     public static CMediaMusic create_CMediaMusic(String file) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
-        CMediaMusic cMediaMusic = new CMediaMusic(file);
-        return cMediaMusic;
+        return new CMediaMusic(file);
     }
 
     public static CMediaSound create_CMediaSound(String file) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
-        CMediaSound cMediaSound = new CMediaSound(file);
-        return cMediaSound;
+        return new CMediaSound(file);
     }
 
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight) {
@@ -610,9 +602,7 @@ public class MediaManager {
             try {
                 if (field.getType().isArray()) {
                     CMedia[] medias = (CMedia[]) field.get(null);
-                    for (CMedia media : medias) {
-                        loadStack.add(media);
-                    }
+                    loadStack.addAll(Arrays.asList(medias));
                 } else {
                     cMedia = (CMedia) field.get(null);
                     loadStack.add(cMedia);

@@ -13,8 +13,8 @@ public interface UIAdapter {
 
     void shutdown();
 
-    default void renderBeforeGUI(SpriteBatch spriteBatch_gui){return;};
+    default void renderBeforeGUI(SpriteBatch spriteBatch_gui){}
 
-    default void renderAfterGUI(SpriteBatch spriteBatch_gui){return;};
+    default void renderAfterGUI(SpriteBatch spriteBatch_gui){}
 
 }

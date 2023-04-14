@@ -27,7 +27,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
     private API api;
 
-    private GameEngine gameEngine;
+    private final GameEngine gameEngine;
 
     private float animation_timer;
 
@@ -48,8 +48,8 @@ public class ExampleUIAdapter implements UIAdapter {
         this.animation_timer = 0;
         this.start_x = -(api.resolutionWidth() / 2);
         this.start_y = -(api.resolutionHeight() / 2);
-        this.end_x = +(api.resolutionWidth() / 2);
-        this.end_y = +(api.resolutionHeight() / 2);
+        this.end_x = (api.resolutionWidth() / 2);
+        this.end_y = (api.resolutionHeight() / 2);
 
         // Init GUI
         TextButton createExampleWindowButton = api.components.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {

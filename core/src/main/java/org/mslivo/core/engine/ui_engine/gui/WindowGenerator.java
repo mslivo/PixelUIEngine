@@ -4,7 +4,7 @@ import org.mslivo.core.engine.ui_engine.API;
 
 public abstract class WindowGenerator {
 
-    protected API api;
+    protected final API api;
 
     public WindowGenerator(API api){
         this.api = api;

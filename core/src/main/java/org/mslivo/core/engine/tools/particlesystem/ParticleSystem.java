@@ -17,11 +17,11 @@ import java.util.function.Consumer;
  */
 public class ParticleSystem<T extends Particle> {
 
-    private ArrayList<T> particles;
+    private final ArrayList<T> particles;
 
-    private ArrayDeque<T> deleteQueue;
+    private final ArrayDeque<T> deleteQueue;
 
-    private MediaManager mediaManager;
+    private final MediaManager mediaManager;
 
     private int particleLimit;
 
@@ -36,15 +36,16 @@ public class ParticleSystem<T extends Particle> {
         this.deleteQueue = new ArrayDeque<>();
         this.particleLimit = particleLimit;
     }
+
     public void setParticleLimit(int particleLimit) {
         this.particleLimit = particleLimit;
     }
 
     public void update() {
         if (particles.size() == 0) return;
-        for(int i=0;i<particles.size();i++){
+        for (int i = 0; i < particles.size(); i++) {
             T particle = particles.get(i);
-            if(!particle.update(this, particle, i)){
+            if (!particle.update(this, particle, i)) {
                 deleteQueue.add(particle);
             }
         }
@@ -57,8 +58,8 @@ public class ParticleSystem<T extends Particle> {
 
 
     public void forEveryParticle(Consumer<T> consumer) {
-        for (int i = 0; i < particles.size(); i++) {
-            consumer.accept(particles.get(i));
+        for (T particle : particles) {
+            consumer.accept(particle);
         }
         return;
     }
@@ -105,15 +106,13 @@ public class ParticleSystem<T extends Particle> {
                         mediaManager.drawCMediaFont(batch, particle.font, particle.x, particle.y, particle.text);
                     }
                 }
-                case IMAGE -> {
-                    mediaManager.drawCMediaImageScale(batch, (CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                }
-                case ARRAY -> {
-                    mediaManager.drawCMediaArrayScale(batch, (CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                }
-                case ANIMATION -> {
-                    mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, animation_timer, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
-                }
+                case IMAGE ->
+                        mediaManager.drawCMediaImageScale(batch, (CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
+                case ARRAY ->
+                        mediaManager.drawCMediaArrayScale(batch, (CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
+                case ANIMATION ->
+                        mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, animation_timer, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
+
             }
         }
         batch.setColor(Color.WHITE);

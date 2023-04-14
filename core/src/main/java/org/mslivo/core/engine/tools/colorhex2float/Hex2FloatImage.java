@@ -20,7 +20,6 @@ public class Hex2FloatImage {
             int green = (c & 0x0000ff00) >> 8;
             int blue = c & 0x000000ff;
             String hex = String.format("#%02x%02x%02x", red, green, blue);
-            ;
             System.out.println("\"" + hex + "\",");
         }
 

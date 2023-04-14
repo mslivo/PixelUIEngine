@@ -5,7 +5,7 @@ package org.mslivo.core.engine.ui_engine.gui.actions;
  */
 public abstract class UpdateAction {
 
-    public int interval;
+    public final int interval;
 
     public long lastUpdate;
 

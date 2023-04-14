@@ -18,17 +18,17 @@ import java.util.Deque;
  */
 public class GameEngine<T extends GameEngineAdapter> {
 
-    private Object data;
+    private final Object data;
 
     private long lastUpdateTime;
 
     private long ticks;
 
-    private T adapter;
+    private final T adapter;
 
-    private Deque<EngineInput> inputs;
+    private final Deque<EngineInput> inputs;
 
-    private ArrayList<EngineOutput> outputs;
+    private final ArrayList<EngineOutput> outputs;
 
     public long getTicks() {
         return ticks;
@@ -112,7 +112,6 @@ public class GameEngine<T extends GameEngineAdapter> {
         adapter.update();
         this.lastUpdateTime = System.currentTimeMillis();
         this.ticks = this.ticks + 1;
-        return;
     }
 
 

@@ -9,7 +9,7 @@ public interface GameEngineAdapter {
 
     void init(Object data, ArrayList<EngineOutput> outputs);
 
-    default void beforeInputs(){};
+    default void beforeInputs(){}
 
     void update();
 

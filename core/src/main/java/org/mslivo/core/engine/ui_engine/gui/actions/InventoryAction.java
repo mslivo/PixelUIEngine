@@ -6,7 +6,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 
-public abstract class InventoryAction<T extends Object> extends CommonActions {
+public abstract class InventoryAction<T> extends CommonActions {
 
     public CMediaGFX icon(T listItem) {
         return null;

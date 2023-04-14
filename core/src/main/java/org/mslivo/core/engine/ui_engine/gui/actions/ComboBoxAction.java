@@ -2,7 +2,8 @@ package org.mslivo.core.engine.ui_engine.gui.actions;
 
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 
-public abstract class ComboBoxAction<T extends Object> extends CommonActions {
+public abstract class ComboBoxAction<T> extends CommonActions {
+
 
     public CMediaGFX icon(T listItem) {
         return null;
@@ -24,7 +25,7 @@ public abstract class ComboBoxAction<T extends Object> extends CommonActions {
     public void onOpen() {
     }
 
-    public void onClose() {
+    public void onClose(){
     }
 
 }

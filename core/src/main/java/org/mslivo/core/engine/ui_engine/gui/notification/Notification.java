@@ -17,7 +17,7 @@ public class Notification {
 
     public int displayTime;
 
-    public float scroll;
+    public int scroll;
 
     public int scrollMax;
 
