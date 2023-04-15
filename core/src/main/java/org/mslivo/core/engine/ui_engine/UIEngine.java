@@ -1586,7 +1586,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private boolean executeUpdateAction(UpdateAction updateAction, long currentTimeMillis) {
-        if (updateAction.interval == 0 || ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval)) {
+        if ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval) {
             updateAction.onUpdate();
             updateAction.lastUpdate = currentTimeMillis;
             return true;
