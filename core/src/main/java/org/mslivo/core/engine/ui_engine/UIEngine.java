@@ -201,8 +201,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.hotKeys = new ArrayList<>();
         newInputState.guiFrozen = false;
         newInputState.gameViewPorts = new ArrayList<>();
-        newInputState.engineSingleUpdateActions = new ArrayList<>();
-        newInputState.engineSingleUpdateActionsRemoveQ = new ArrayDeque<>();
+        newInputState.singleUpdateActions = new ArrayList<>();
+        newInputState.singleUpdateActionsRemoveQ = new ArrayDeque<>();
         // ----- Temp GUI Variables
         newInputState.draggedWindow = null;
         newInputState.draggedWindow_offset = new GridPoint2();
@@ -995,15 +995,15 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Engine SingleUpdateActions
-        for(int i=0;i<inputState.engineSingleUpdateActions.size();i++){
-            UpdateAction updateAction = inputState.engineSingleUpdateActions.get(i);
+        for(int i = 0; i<inputState.singleUpdateActions.size(); i++){
+            UpdateAction updateAction = inputState.singleUpdateActions.get(i);
             if(this.executeUpdateAction(updateAction, currentTimeMillis)){
-                inputState.engineSingleUpdateActionsRemoveQ.push(updateAction);
+                inputState.singleUpdateActionsRemoveQ.push(updateAction);
             }
         }
         UpdateAction removeUpdateAction;
-        while((removeUpdateAction = inputState.engineSingleUpdateActionsRemoveQ.pollFirst()) != null){
-            inputState.engineSingleUpdateActions.remove(removeUpdateAction);
+        while((removeUpdateAction = inputState.singleUpdateActionsRemoveQ.pollFirst()) != null){
+            inputState.singleUpdateActions.remove(removeUpdateAction);
         }
     }
 
@@ -2859,7 +2859,7 @@ public class UIEngine<T extends UIAdapter> {
 
         inputState.modalWindowQueue.clear();
         inputState.hotKeys.clear();
-        inputState.engineSingleUpdateActions.clear();
+        inputState.singleUpdateActions.clear();
         inputState.screenComponents.clear();
         inputState.notifications.clear();
         inputState.gameViewPorts.clear();

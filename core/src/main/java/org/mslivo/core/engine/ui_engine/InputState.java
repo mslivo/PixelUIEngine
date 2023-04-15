@@ -103,9 +103,9 @@ public class InputState {
 
     public ArrayList<GameViewPort> gameViewPorts;
 
-    public ArrayList<UpdateAction> engineSingleUpdateActions;
+    public ArrayList<UpdateAction> singleUpdateActions;
 
-    public ArrayDeque<UpdateAction> engineSingleUpdateActionsRemoveQ;
+    public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
     /* #################### GUI: Temporary Switches #################### */
 

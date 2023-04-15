@@ -117,9 +117,9 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    public void addEngineSingleUpdateAction(UpdateAction updateAction) {
+    public void executeSingleUpdateAction(UpdateAction updateAction) {
         if (updateAction == null) return;
-        this.inputState.engineSingleUpdateActions.add(updateAction);
+        this.inputState.singleUpdateActions.add(updateAction);
     }
 
     public void sendMessageToWindows(String message_type, Object... p) {
