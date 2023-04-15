@@ -140,7 +140,10 @@ public class API {
     }
 
     public void windowsEnforceScreenBounds() {
-        inputState.windows.forEach(window -> UICommons.window_enforceScreenBounds(inputState, window));
+        for(int i=0;i<inputState.windows.size();i++){
+            Window window = inputState.windows.get(i);
+            UICommons.window_enforceScreenBounds(inputState, window);
+        }
     }
 
     public static class _HotKey {
@@ -2247,12 +2250,12 @@ public class API {
         }
 
 
-        public Window createFromGenerator(Class<org.mslivo.core.example.ui.windows.ExampleWindowGenerator> windowGeneratorClass, Object... p) {
+        public Window createFromGenerator(Class windowGeneratorClass, Object... p) {
             if (windowGeneratorClass == null) return null;
             WindowGenerator windowGenerator = windowGeneratorCache.get(windowGeneratorClass);
             if (windowGenerator == null) {
                 try {
-                    windowGenerator = windowGeneratorClass.getDeclaredConstructor(API.class).newInstance(API.this);
+                    windowGenerator = (WindowGenerator) windowGeneratorClass.getDeclaredConstructor(API.class).newInstance(API.this);
                 } catch (Exception e) {
                     return null;
                 }

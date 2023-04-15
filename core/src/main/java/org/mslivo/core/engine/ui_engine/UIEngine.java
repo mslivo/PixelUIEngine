@@ -927,20 +927,27 @@ public class UIEngine<T extends UIAdapter> {
         /* UpdateActions */
         {
             long currentTimeMillis = System.currentTimeMillis();
-            inputState.screenComponents.forEach(component -> {
-                component.updateActions.forEach(updateAction -> {
-                    this.executeUpdateAction(updateAction, currentTimeMillis);
-                });
-            });
+            for(int i=0;i<inputState.screenComponents.size();i++){
+                Component component = inputState.screenComponents.get(i);
+                for(int i2=0;i2<component.updateActions.size();i2++){
+                    this.executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
+                }
+            }
 
-            inputState.windows.forEach(window -> {
-                window.updateActions.forEach(updateAction -> {
-                    this.executeUpdateAction(updateAction, currentTimeMillis);
-                });
-                window.components.forEach(component -> {
-                    component.updateActions.forEach(updateAction -> this.executeUpdateAction(updateAction, currentTimeMillis));
-                });
-            });
+
+            for(int i=0;i<inputState.windows.size();i++){
+                Window window = inputState.windows.get(i);
+                for(int i2=0;i2<window.updateActions.size();i2++){
+                    this.executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
+                }
+                for(int i2=0;i2<window.components.size();i2++){
+                    Component component = window.components.get(i2);
+                    for(int i3=0;i3<component.updateActions.size();i3++){
+                        this.executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
+                    }
+                }
+            }
+
 
             inputState.delayedOneshotActions.removeIf(updateAction -> this.executeUpdateAction(updateAction, currentTimeMillis));
 
@@ -971,11 +978,10 @@ public class UIEngine<T extends UIAdapter> {
         updateToolTip();
 
         /* Enforce Screen bounds */
-        inputState.windows.forEach(window -> {
-            if (window.enforceScreenBounds) {
-                UICommons.window_enforceScreenBounds(inputState, window);
-            }
-        });
+        for(int i=0;i<inputState.windows.size();i++){
+            Window window = inputState.windows.get(i);
+            if (window.enforceScreenBounds) UICommons.window_enforceScreenBounds(inputState, window);
+        }
     }
 
 
@@ -1449,7 +1455,8 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        inputState.windows.forEach(window -> {
+        for(int i=0;i<inputState.windows.size();i++){
+            Window window = inputState.windows.get(i);
             Component windowComponentTmp;
             while ((windowComponentTmp = window.addComponentsQueue.pollFirst()) != null) {
                 if (windowComponentTmp.addedToWindow == null) {
@@ -1463,8 +1470,7 @@ public class UIEngine<T extends UIAdapter> {
                 removeComponentReferences(windowComponentTmp);
                 window.components.remove(windowComponentTmp);
             }
-        });
-
+        }
 
         // Add Hotkey
         HotKey hotkeyTmp;
@@ -1812,15 +1818,18 @@ public class UIEngine<T extends UIAdapter> {
 
 
         /* Draw Screen Components */
-        inputState.screenComponents.forEach(component -> {
+        for(int i=0;i<inputState.screenComponents.size();i++){
+            Component component = inputState.screenComponents.get(i);
             render_drawComponent(component);
             render_drawComponentTopLayer(null, component);
-        });
+        }
+
         /* Draw Windows */
-        inputState.windows.forEach(window ->{
+        for(int i=0;i<inputState.windows.size();i++){
+            Window window = inputState.windows.get(i);
             if (inputState.modalWindow != null && inputState.modalWindow == window) render_enableGrayScaleShader(false);
             render_drawWindow(window);
-        });
+        }
 
         render_enableGrayScaleShader(false);
 
@@ -2271,21 +2280,17 @@ public class UIEngine<T extends UIAdapter> {
         }
         // Draw Components
 
-        if (!window.folded) {
-            window.components.forEach(component -> {
+        for(int i=0;i<window.components.size();i++){
+            Component component = window.components.get(i);
+            if(!window.folded) {
                 render_drawComponent(component);
-            });
-        } else {
-            window.components.forEach(component -> {
-                if (component.y == window.height - 1) render_drawComponent(component);
-            });
-        }
-
-        // Draw combobox menu
-        if (!window.folded) {
-            window.components.forEach(component -> {
-                render_drawComponentTopLayer(window, component);
-            });
+                render_drawComponentTopLayer(window, component); // Combobox etc.
+            }else{
+                if (component.y == window.height - 1) {
+                    // draw title bar components only
+                    render_drawComponent(component);
+                }
+            }
         }
 
         render_batchLoadColor();
