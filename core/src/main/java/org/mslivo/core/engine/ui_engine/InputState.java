@@ -36,7 +36,6 @@ import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 
 public class InputState {
 
@@ -90,19 +89,7 @@ public class InputState {
 
     public ArrayList<Window> windows;
 
-    public Deque<Window> addWindowQueue;
-
-    public Deque<Window> removeWindowQueue;
-
     public ArrayList<Component> screenComponents;
-
-    public Deque<Component> addScreenComponentsQueue;
-
-    public Deque<Component> removeScreenComponentsQueue;
-
-    public Deque<HotKey> addHotKeyQueue;
-
-    public Deque<HotKey> removeHotKeyQueue;
 
     public Window modalWindow;
 
@@ -116,9 +103,9 @@ public class InputState {
 
     public ArrayList<GameViewPort> gameViewPorts;
 
-    public ArrayList<UpdateAction> delayedOneshotActions;
+    public ArrayList<UpdateAction> engineSingleUpdateActions;
 
-
+    public ArrayDeque<UpdateAction> engineSingleUpdateActionsRemoveQ;
 
     /* #################### GUI: Temporary Switches #################### */
 
@@ -226,4 +213,5 @@ public class InputState {
     public UIEngineInputProcessor inputProcessor;
 
     public InputEvents inputEvents;
+
 }

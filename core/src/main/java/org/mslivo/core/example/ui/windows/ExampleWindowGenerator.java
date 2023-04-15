@@ -94,7 +94,6 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         api.config.setKeyBoardControlEnabled(true);
         api.config.setMouseControlEnabled(true);
-
         return window;
     }
 
@@ -203,6 +202,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
             @Override
             public void onRelease() {
                 api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("FollowUp 1 ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("FollowUp 2 ", "Modal 1 Example Text", null));
             }
         });
 

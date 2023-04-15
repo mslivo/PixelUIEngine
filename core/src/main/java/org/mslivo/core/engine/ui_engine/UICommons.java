@@ -9,6 +9,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 
 class UICommons {
 
@@ -88,6 +89,29 @@ class UICommons {
     static void textfield_setContent(TextField textField, String content) {
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
+    }
+
+    public static void removeComponentReferences(InputState inputState, Component component) {
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(component);
+        if (component.addedToTab != null) component.addedToTab.components.remove(component);
+        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        component.addedToTab = null;
+        component.addedToWindow = null;
+    }
+
+    public static void removeWindowReferences(InputState inputState, Window window) {
+        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
+        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
+        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+    }
+
+    public static void setComponentReferences(InputState inputState, Window window, Component component) {
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+        component.addedToWindow = window;
+    }
+
+    public static void setWindowReferences(InputState inputState, Window window) {
+        // Placeholder method
     }
 
     static void resetGUIVariables(InputState inputState) {

@@ -192,12 +192,6 @@ public class UIEngine<T extends UIAdapter> {
         // -----  GUI
         newInputState.windows = new ArrayList<>();
         newInputState.screenComponents = new ArrayList<>();
-        newInputState.addWindowQueue = new ArrayDeque<>();
-        newInputState.removeWindowQueue = new ArrayDeque<>();
-        newInputState.addScreenComponentsQueue = new ArrayDeque<>();
-        newInputState.removeScreenComponentsQueue = new ArrayDeque<>();
-        newInputState.addHotKeyQueue = new ArrayDeque<>();
-        newInputState.removeHotKeyQueue = new ArrayDeque<>();
         newInputState.displayedContextMenu = null;
         newInputState.displayedContextMenuWidth = 0;
         newInputState.modalWindow = null;
@@ -207,7 +201,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.hotKeys = new ArrayList<>();
         newInputState.guiFrozen = false;
         newInputState.gameViewPorts = new ArrayList<>();
-        newInputState.delayedOneshotActions = new ArrayList<>();
+        newInputState.engineSingleUpdateActions = new ArrayList<>();
+        newInputState.engineSingleUpdateActionsRemoveQ = new ArrayDeque<>();
         // ----- Temp GUI Variables
         newInputState.draggedWindow = null;
         newInputState.draggedWindow_offset = new GridPoint2();
@@ -282,9 +277,8 @@ public class UIEngine<T extends UIAdapter> {
         this.inputState.inputEvents.reset();
     }
 
-    private void updateGUI() {
 
-        /* Key Action */
+    private void updateKeyInteractions() {
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
                 for (Character keyTypedCharacter : inputState.inputEvents.keyTypedCharacters) {
@@ -337,7 +331,6 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
         }
-
         if (inputState.inputEvents.keyDown) {
             boolean processKey = true;
             if (inputState.modalWindow != null) {
@@ -367,13 +360,14 @@ public class UIEngine<T extends UIAdapter> {
                     // Hotkeys
                     for (HotKey hotKey : inputState.hotKeys) {
                         boolean hotKeyPressed = true;
-                        hkLoop:for (int hotKeyCode : hotKey.keyCodes) {
-                            if(!inputState.inputEvents.keysDown[hotKeyCode]){
+                        hkLoop:
+                        for (int hotKeyCode : hotKey.keyCodes) {
+                            if (!inputState.inputEvents.keysDown[hotKeyCode]) {
                                 hotKeyPressed = false;
                                 break hkLoop;
                             }
                         }
-                        if(hotKeyPressed){
+                        if (hotKeyPressed) {
                             hotKey.pressed = true;
                             if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
                         }
@@ -383,19 +377,19 @@ public class UIEngine<T extends UIAdapter> {
 
 
         }
-
         if (inputState.inputEvents.keyUp) {
             // Reset Hotkeys
             for (HotKey hotKey : inputState.hotKeys) {
                 if (hotKey.pressed) {
                     boolean hotKeyPressed = true;
-                    hkLoop:for (int hotKeyCode : hotKey.keyCodes) {
-                        if(!inputState.inputEvents.keysDown[hotKeyCode]){
+                    hkLoop:
+                    for (int hotKeyCode : hotKey.keyCodes) {
+                        if (!inputState.inputEvents.keysDown[hotKeyCode]) {
                             hotKeyPressed = false;
                             break hkLoop;
                         }
                     }
-                    if(!hotKeyPressed){
+                    if (!hotKeyPressed) {
                         hotKey.pressed = false;
                         if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
                     }
@@ -405,8 +399,9 @@ public class UIEngine<T extends UIAdapter> {
 
 
         }
+    }
 
-        /* Mouse Action */
+    private void updateMouseInteractions() {
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseClick = true;
             if (inputState.lastGUIMouseHover != null) {
@@ -729,7 +724,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 // Execute Common Actions
-                for(Integer mouseDownButton : inputState.inputEvents.mouseUpButtons) {
+                for (Integer mouseDownButton : inputState.inputEvents.mouseDownButtons) {
                     executeOnMouseClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
                 }
 
@@ -737,7 +732,7 @@ public class UIEngine<T extends UIAdapter> {
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
-                    for(Integer mouseDownButton : inputState.inputEvents.mouseUpButtons){
+                    for (Integer mouseDownButton : inputState.inputEvents.mouseDownButtons) {
                         inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse.x, inputState.mouse.y);
                         inputState.mouseToolPressed = true;
                     }
@@ -852,15 +847,14 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             if (inputState.mouseToolPressed) {
-                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null){
-                    for(Integer mouseUpButton : inputState.inputEvents.mouseUpButtons){
+                if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
+                    for (Integer mouseUpButton : inputState.inputEvents.mouseUpButtons) {
                         inputState.mouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse.x, inputState.mouse.y);
                     }
                 }
                 inputState.mouseToolPressed = false;
             }
         }
-
         if (inputState.inputEvents.mouseDragged) {
             if (inputState.draggedWindow != null) {
                 inputState.draggedWindow.x = inputState.mouse_gui.x - inputState.draggedWindow_offset.x;
@@ -903,7 +897,6 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.mouseTool.mouseToolAction.onMove(inputState.mouse.x, inputState.mouse.y);
 
         }
-
         if (inputState.inputEvents.mouseScrolled) {
             if (inputState.lastGUIMouseHover != null) {
                 if (inputState.lastGUIMouseHover.getClass() == List.class) {
@@ -940,67 +933,86 @@ public class UIEngine<T extends UIAdapter> {
             }
 
         }
+    }
 
-        /* UpdateActions */
-        {
-            long currentTimeMillis = System.currentTimeMillis();
-            for (int i = 0; i < inputState.screenComponents.size(); i++) {
-                Component component = inputState.screenComponents.get(i);
-                for (int i2 = 0; i2 < component.updateActions.size(); i2++) {
-                    this.executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
-                }
-            }
-
-
-            for (int i = 0; i < inputState.windows.size(); i++) {
-                Window window = inputState.windows.get(i);
-                for (int i2 = 0; i2 < window.updateActions.size(); i2++) {
-                    this.executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
-                }
-                for (int i2 = 0; i2 < window.components.size(); i2++) {
-                    Component component = window.components.get(i2);
-                    for (int i3 = 0; i3 < component.updateActions.size(); i3++) {
-                        this.executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
-                    }
-                }
-            }
-
-
-            inputState.delayedOneshotActions.removeIf(updateAction -> this.executeUpdateAction(updateAction, currentTimeMillis));
-
-        }
-
-        /* Button Hold Actions */
-        {
-            if (inputState.pressedButton != null) {
-                if (inputState.pressedButton.canHold) {
-                    inputState.pressedButton_timer_hold = inputState.pressedButton_timer_hold + 1;
-                    if (inputState.pressedButton_timer_hold > api.config.getButtonHoldTimer()) {
-                        if (inputState.pressedButton.buttonAction != null)
-                            inputState.pressedButton.buttonAction.onHold();
-                        inputState.pressedButton_timer_hold = 0;
-                    }
+    private void updateButtonHoldActions() {
+        /* Button Hold Interactions */
+        if (inputState.pressedButton != null) {
+            if (inputState.pressedButton.canHold) {
+                inputState.pressedButton_timer_hold = inputState.pressedButton_timer_hold + 1;
+                if (inputState.pressedButton_timer_hold > api.config.getButtonHoldTimer()) {
+                    if (inputState.pressedButton.buttonAction != null)
+                        inputState.pressedButton.buttonAction.onHold();
+                    inputState.pressedButton_timer_hold = 0;
                 }
             }
         }
+    }
 
+    private void updateGUI() {
 
-        /* Add/Remove windows & components */
-        updateWindowAndComponentAddRemove();
+        updateKeyInteractions();
 
-        /* Update Notifications */
+        updateMouseInteractions();
+
+        updateButtonHoldActions();
+
+        updateUpdateActions();
+
+        updateEnforceWindowScreenBounds();
+
         updateNotifications();
 
-        /* Update Tooltip */
         updateToolTip();
 
-        /* Enforce Screen bounds */
+    }
+
+    private void updateUpdateActions() {
+        // for(int i) is used to avoid iterator creation and avoid concurrentModification
+        // If UpdateActions are removing/adding other update actions they are caught on the next update/frame
+
+        // ScreenComponent UpdateActions
+        long currentTimeMillis = System.currentTimeMillis();
+        for (int i = 0; i < inputState.screenComponents.size(); i++) {
+            Component component = inputState.screenComponents.get(i);
+            for (int i2 = 0; i2 < component.updateActions.size(); i2++) {
+                executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
+            }
+        }
+        for (int i = 0; i < inputState.windows.size(); i++) {
+            // Window UpdateActions
+            Window window = inputState.windows.get(i);
+            for (int i2 = 0; i2 < window.updateActions.size(); i2++) {
+                executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
+            }
+            // Window Component UpdateActions
+            for (int i2 = 0; i2 < window.components.size(); i2++) {
+                Component component = window.components.get(i2);
+                for (int i3 = 0; i3 < component.updateActions.size(); i3++) {
+                    executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
+                }
+            }
+        }
+
+        // Engine SingleUpdateActions
+        for(int i=0;i<inputState.engineSingleUpdateActions.size();i++){
+            UpdateAction updateAction = inputState.engineSingleUpdateActions.get(i);
+            if(this.executeUpdateAction(updateAction, currentTimeMillis)){
+                inputState.engineSingleUpdateActionsRemoveQ.push(updateAction);
+            }
+        }
+        UpdateAction removeUpdateAction;
+        while((removeUpdateAction = inputState.engineSingleUpdateActionsRemoveQ.pollFirst()) != null){
+            inputState.engineSingleUpdateActions.remove(removeUpdateAction);
+        }
+    }
+
+    private void updateEnforceWindowScreenBounds() {
         for (int i = 0; i < inputState.windows.size(); i++) {
             Window window = inputState.windows.get(i);
             if (window.enforceScreenBounds) UICommons.window_enforceScreenBounds(inputState, window);
         }
     }
-
 
     private void updateToolTip() {
         // Anything dragged ?
@@ -1357,7 +1369,8 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseDown = false;
             inputState.inputEvents.mouseUp = false;
             inputState.inputEvents.mouseDoubleClick = false;
-            inputState.inputEvents.mouseDownButtons.clear();;
+            inputState.inputEvents.mouseDownButtons.clear();
+            ;
             inputState.inputEvents.mouseUpButtons.clear();
         }
 
@@ -1434,72 +1447,6 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
     }
 
-    private void updateWindowAndComponentAddRemove() {
-
-
-        // Add Window
-        Window windowTmp;
-        while ((windowTmp = inputState.addWindowQueue.pollFirst()) != null) {
-            inputState.windows.add(0, windowTmp);
-            if (windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
-            UICommons.window_bringToFront(inputState, windowTmp);
-        }
-        // Remove Window
-        while ((windowTmp = inputState.removeWindowQueue.pollFirst()) != null) {
-            // Remove Components
-            for (Component windowTmpComponent : windowTmp.components) removeComponentReferences(windowTmpComponent);
-            windowTmp.components.clear();
-
-            // Remove Window
-            removeWindowReferences(windowTmp);
-            inputState.windows.remove(windowTmp);
-            // Call WindowAction
-            if (windowTmp.windowAction != null) windowTmp.windowAction.onRemove();
-        }
-
-        // Add Screen Components
-        Component screenComponentTmp;
-        while ((screenComponentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
-            if (screenComponentTmp.getClass() == GameViewPort.class)
-                inputState.gameViewPorts.add((GameViewPort) screenComponentTmp);
-            inputState.screenComponents.add(screenComponentTmp);
-        }
-        // Remove Screen Components
-        while ((screenComponentTmp = inputState.removeScreenComponentsQueue.pollFirst()) != null) {
-            // Remove Component
-            removeComponentReferences(screenComponentTmp);
-            inputState.screenComponents.remove(screenComponentTmp);
-        }
-
-
-        for (int i = 0; i < inputState.windows.size(); i++) {
-            Window window = inputState.windows.get(i);
-            Component windowComponentTmp;
-            while ((windowComponentTmp = window.addComponentsQueue.pollFirst()) != null) {
-                if (windowComponentTmp.addedToWindow == null) {
-                    if (windowComponentTmp.getClass() == GameViewPort.class)
-                        inputState.gameViewPorts.add((GameViewPort) windowComponentTmp);
-                    windowComponentTmp.addedToWindow = window;
-                    window.components.add(windowComponentTmp);
-                }
-            }
-            while ((windowComponentTmp = window.removeComponentsQueue.pollFirst()) != null) {
-                removeComponentReferences(windowComponentTmp);
-                window.components.remove(windowComponentTmp);
-            }
-        }
-
-        // Add Hotkey
-        HotKey hotkeyTmp;
-        while ((hotkeyTmp = inputState.addHotKeyQueue.pollFirst()) != null) {
-            inputState.hotKeys.add(hotkeyTmp);
-        }
-        // Remove HotKey
-        while ((hotkeyTmp = inputState.removeHotKeyQueue.pollFirst()) != null) {
-            inputState.hotKeys.remove(hotkeyTmp);
-        }
-
-    }
 
     private void updateNotifications() {
         if (inputState.notifications.size() > 0) {
@@ -1639,15 +1586,17 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private boolean executeUpdateAction(UpdateAction updateAction, long currentTimeMillis) {
-        if (updateAction.interval == 0) {
+        if (updateAction.interval == 0 || ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval)) {
             updateAction.onUpdate();
-            return true;
-        } else if ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval) {
-            updateAction.onUpdate();
-            updateAction.lastUpdate = System.currentTimeMillis();
+            updateAction.lastUpdate = currentTimeMillis;
             return true;
         }
         return false;
+    }
+
+    private void executeUpdateAction(UpdateAction updateAction) {
+
+
     }
 
     private Object findCurrentLastGUIMouseHover() {
@@ -2907,15 +2856,10 @@ public class UIEngine<T extends UIAdapter> {
     public void shutdown() {
         // Lists
         inputState.windows.clear();
-        inputState.addWindowQueue.clear();
-        inputState.removeHotKeyQueue.clear();
+
         inputState.modalWindowQueue.clear();
-        inputState.addScreenComponentsQueue.clear();
-        inputState.removeScreenComponentsQueue.clear();
-        inputState.addHotKeyQueue.clear();
-        inputState.removeHotKeyQueue.clear();
         inputState.hotKeys.clear();
-        inputState.delayedOneshotActions.clear();
+        inputState.engineSingleUpdateActions.clear();
         inputState.screenComponents.clear();
         inputState.notifications.clear();
         inputState.gameViewPorts.clear();

@@ -107,14 +107,8 @@ public class API {
     }
 
     public ArrayList<Notification> findNotificationsByName(String name) {
-        ArrayList<Notification> result = new ArrayList<>();
-        if (name == null) return result;
-        for (Notification notification : inputState.notifications) {
-            if (name.equals(notification.name)) {
-                result.add(notification);
-            }
-        }
-        return result;
+        if (name == null) return new ArrayList<>();
+        return new ArrayList<>(inputState.notifications.stream().filter(notification -> name.equals(notification.name)).toList());
     }
 
     public Notification findNotificationByName(String name) {
@@ -123,9 +117,9 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    public void addDelayedOneshotAction(UpdateAction updateAction) {
+    public void addEngineSingleUpdateAction(UpdateAction updateAction) {
         if (updateAction == null) return;
-        this.inputState.delayedOneshotActions.add(updateAction);
+        this.inputState.engineSingleUpdateActions.add(updateAction);
     }
 
     public void sendMessageToWindows(String message_type, Object... p) {
@@ -140,8 +134,7 @@ public class API {
     }
 
     public void windowsEnforceScreenBounds() {
-        for(int i=0;i<inputState.windows.size();i++){
-            Window window = inputState.windows.get(i);
+        for(Window window : inputState.windows){
             UICommons.window_enforceScreenBounds(inputState, window);
         }
     }
@@ -1115,17 +1108,27 @@ public class API {
 
     public void addWindow(Window window) {
         if (window == null) return;
-        inputState.addWindowQueue.add(window);
+        UICommons.setWindowReferences(inputState,window);
+        inputState.windows.add(window);
+        if (window.windowAction != null) window.windowAction.onAdd();
     }
 
     public void removeWindow(Window window) {
         if (inputState.windows.contains(window)) {
-            inputState.removeWindowQueue.add(window);
+            UICommons.removeWindowReferences(inputState, window);
+            inputState.windows.remove(window);
+            if (window.windowAction != null) window.windowAction.onRemove();
+        }
+    }
+
+    public void removeWindows(Window[] windows) {
+        for(Window window : windows){
+            removeWindow(window);
         }
     }
 
     public void removeAllWindows() {
-        for (Window window : inputState.windows) removeWindow(window);
+        removeWindows(inputState.windows.toArray(new Window[]{}));
         UICommons.resetGUIVariables(inputState);
     }
 
@@ -1133,10 +1136,10 @@ public class API {
         if (window == null) return false;
         ArrayList<Component> result = windows.findComponentsByName(window, "WndCloseBtn");
         if (result.size() == 1) {
-            if (result.get(0) instanceof Button button) {
-                if (button.buttonAction != null) {
-                    button.buttonAction.onPress();
-                    button.buttonAction.onRelease();
+            if (result.get(0) instanceof Button closeButton) {
+                if (closeButton.buttonAction != null) {
+                    closeButton.buttonAction.onPress();
+                    closeButton.buttonAction.onRelease();
                     return true;
                 }
             }
@@ -1144,13 +1147,9 @@ public class API {
         return false;
     }
 
-    public void closeWindows(Window[] windows) {
-        if (windows == null) return;
-        for (Window window : inputState.windows) closeWindow(window);
-    }
-
     public void closeAllWindows() {
-        for (Window window : inputState.windows) {
+        ArrayList<Window> windows = new ArrayList<>(inputState.windows);
+        for(Window window : windows){
             closeWindow(window);
         }
         UICommons.resetGUIVariables(inputState);
@@ -1200,8 +1199,9 @@ public class API {
 
     public void addScreenComponent(Component component) {
         if (component == null) return;
-        if (!inputState.screenComponents.contains(component)) {
-            inputState.addScreenComponentsQueue.add(component);
+        if (component.addedToWindow == null && !inputState.screenComponents.contains(component)) {
+            UICommons.setComponentReferences(inputState, null, component);
+            inputState.screenComponents.add(component);
         }
     }
 
@@ -1212,7 +1212,8 @@ public class API {
 
     public void removeScreenComponent(Component component) {
         if (component == null) return;
-        inputState.removeScreenComponentsQueue.remove(component);
+        UICommons.removeComponentReferences(inputState, component);
+        inputState.screenComponents.remove(component);
     }
 
     public void removeScreenComponents(Component[] components) {
@@ -1223,7 +1224,7 @@ public class API {
     }
 
     public void removeAllScreenComponents() {
-        for (Component component : inputState.screenComponents) removeScreenComponent(component);
+        removeScreenComponents(inputState.screenComponents.toArray(new Component[]{}));
         UICommons.resetGUIVariables(inputState);
     }
 
@@ -1259,23 +1260,17 @@ public class API {
 
     public void addHotKey(HotKey hotKey) {
         if (hotKey == null) return;
-        inputState.addHotKeyQueue.add(hotKey);
+        inputState.hotKeys.add(hotKey);
     }
 
     public void removeHotKey(HotKey hotKey) {
         if (hotKey == null) return;
-        inputState.removeHotKeyQueue.remove(hotKey);
+        inputState.hotKeys.remove(hotKey);
     }
 
     public ArrayList<HotKey> findHotKeysByName(String name) {
-        ArrayList<HotKey> result = new ArrayList<>();
-        if (name == null) return result;
-        for (HotKey hotKey : inputState.hotKeys) {
-            if (name.equals(hotKey.name)) {
-                result.add(hotKey);
-            }
-        }
-        return result;
+        if (name == null) return new ArrayList<>();
+        return new ArrayList<>(inputState.hotKeys.stream().filter(hotKey -> name.equals(hotKey)).toList());
     }
 
     public HotKey findHotKeyByName(String name) {
@@ -1295,14 +1290,8 @@ public class API {
     }
 
     public ArrayList<Window> findWindowsByName(String name) {
-        ArrayList<Window> result = new ArrayList<>();
-        if (name == null) return result;
-        for (Window window : inputState.windows) {
-            if (name.equals(window.name)) {
-                result.add(window);
-            }
-        }
-        return result;
+        if (name == null) return new ArrayList<>();
+        return new ArrayList<>(inputState.windows.stream().filter(window -> name.equals(window.name)).toList());
     }
 
     public Window findWindowByName(String name) {
@@ -2003,12 +1992,8 @@ public class API {
         }
 
         public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
-            ArrayList<ContextMenuItem> result = new ArrayList<>();
-            if (contextMenu == null || name == null) return result;
-            for (ContextMenuItem contextMenuItem : contextMenu.items) {
-                if (name.equals(contextMenuItem.name)) result.add(contextMenuItem);
-            }
-            return result;
+            if (contextMenu == null || name == null) return new ArrayList<>();
+            return new ArrayList(contextMenu.items.stream().filter(contextMenuItem -> name.equals(contextMenuItem)).toList());
         }
 
         public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
@@ -2167,8 +2152,6 @@ public class API {
             setEnforceScreenBounds(window, config.getWindowsDefaultEnforceScreenBounds());
             window.components = new ArrayList<>();
             window.font = config.defaultFont;
-            window.addComponentsQueue = new ArrayDeque<>();
-            window.removeComponentsQueue = new ArrayDeque<>();
             window.messageReceiverActions = new ArrayList<>();
             window.updateActions = new ArrayList<>();
             addComponents(window, components);
@@ -2231,14 +2214,6 @@ public class API {
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean setColor1, boolean setColor2, boolean includeWindow) {
             if (window == null) return;
-
-            for (Component component : window.addComponentsQueue) {
-
-                if (exceptions == null || Arrays.stream(exceptions).noneMatch(exceptionClass -> exceptionClass == component.getClass())) {
-                    if (setColor1) components.setColor(component, color);
-                    if (setColor2) components.setColor2(component, color);
-                }
-            }
             for (Component component : window.components) {
                 if (exceptions == null || Arrays.stream(exceptions).noneMatch(exceptionClass -> exceptionClass == component.getClass())) {
                     if (setColor1) components.setColor(component, color);
@@ -2268,12 +2243,6 @@ public class API {
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
             if (window == null) return;
 
-            for (Component component : window.addComponentsQueue) {
-                if (inclusions != null && Arrays.stream(inclusions).anyMatch(inclusionClass -> inclusionClass == component.getClass())) {
-                    if (setColor1) components.setColor(component, color);
-                    if (setColor2) components.setColor2(component, color);
-                }
-            }
             for (Component component : window.components) {
                 if (inclusions != null && Arrays.stream(inclusions).anyMatch(inclusionClass -> inclusionClass == component.getClass())) {
                     if (setColor1) components.setColor(component, color);
@@ -2303,7 +2272,10 @@ public class API {
 
         public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            window.addComponentsQueue.add(component);
+            if(component.addedToWindow == null && !window.components.contains(component)) {
+                UICommons.setComponentReferences(inputState, window, component);
+                window.components.add(component);
+            }
         }
 
         public void addComponents(Window window, Component[] components) {
@@ -2319,7 +2291,8 @@ public class API {
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
             if (window.components.contains(component)) {
-                window.removeComponentsQueue.add(component);
+                UICommons.removeComponentReferences(inputState,component);
+                window.components.remove(component);
             }
         }
 
@@ -2334,15 +2307,8 @@ public class API {
         }
 
         public ArrayList<Component> findComponentsByName(Window window, String name) {
-            ArrayList<Component> result = new ArrayList<>();
-            if (window == null || name == null) return result;
-            for (Component component : window.components) {
-                if (name.equals(component.name)) result.add(component);
-            }
-            for (Component component : window.addComponentsQueue) {
-                if (name.equals(component.name)) result.add(component);
-            }
-            return result;
+            if (window == null || name == null) return new ArrayList<>();
+            return new ArrayList<>(window.components.stream().filter(component -> name.equals(component.name)).toList());
         }
 
         public Component findComponentByName(Window window, String name) {
@@ -3647,12 +3613,8 @@ public class API {
             }
 
             public ArrayList<Tab> findTabsByName(TabBar tabBar, String name) {
-                ArrayList<Tab> result = new ArrayList<>();
-                if (tabBar == null || name == null) return result;
-                for (Tab tab : tabBar.tabs) {
-                    if (name.equals(tab.name)) result.add(tab);
-                }
-                return result;
+                if (tabBar == null || name == null) return new ArrayList<>();
+                return new ArrayList<>(tabBar.tabs.stream().filter(tab1 -> name.equals(tab1.name)).toList());
             }
 
             public Tab findTabByName(TabBar tabBar, String name) {
@@ -3965,12 +3927,8 @@ public class API {
             }
 
             public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
-                ArrayList<MapOverlay> result = new ArrayList<>();
-                if (map == null || name == null) return result;
-                for (MapOverlay mapOverlay : map.overlays) {
-                    if (name.equals(mapOverlay.name)) result.add(mapOverlay);
-                }
-                return result;
+                if (map == null || name == null) return new ArrayList<>();
+                return new ArrayList<>(map.overlays.stream().filter(mapOverlay1 -> name.equals(mapOverlay1.name)).toList());
             }
 
             public MapOverlay findMapOverlayByName(Map map, String name) {

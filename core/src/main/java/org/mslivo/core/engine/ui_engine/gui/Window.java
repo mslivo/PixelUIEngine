@@ -23,10 +23,6 @@ public class Window {
 
     public ArrayList<Component> components;
 
-    public Deque<Component> addComponentsQueue;
-
-    public Deque<Component> removeComponentsQueue;
-
     public ArrayList<UpdateAction> updateActions;
 
     public String name;
