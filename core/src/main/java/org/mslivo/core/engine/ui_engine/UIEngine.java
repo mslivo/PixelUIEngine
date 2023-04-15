@@ -995,14 +995,14 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Engine SingleUpdateActions
-        for(int i = 0; i<inputState.singleUpdateActions.size(); i++){
+        for (int i = 0; i < inputState.singleUpdateActions.size(); i++) {
             UpdateAction updateAction = inputState.singleUpdateActions.get(i);
-            if(this.executeUpdateAction(updateAction, currentTimeMillis)){
+            if (this.executeUpdateAction(updateAction, currentTimeMillis)) {
                 inputState.singleUpdateActionsRemoveQ.push(updateAction);
             }
         }
         UpdateAction removeUpdateAction;
-        while((removeUpdateAction = inputState.singleUpdateActionsRemoveQ.pollFirst()) != null){
+        while ((removeUpdateAction = inputState.singleUpdateActionsRemoveQ.pollFirst()) != null) {
             inputState.singleUpdateActions.remove(removeUpdateAction);
         }
     }
