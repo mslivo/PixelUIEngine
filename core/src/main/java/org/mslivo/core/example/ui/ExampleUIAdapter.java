@@ -83,7 +83,10 @@ public class ExampleUIAdapter implements UIAdapter {
 
             if (api.input.isKeyDownKeyCode(Input.Keys.P)) {
                 particlesTest = particlesTest == 4 ? 0 : particlesTest + 1;
-                if (particlesTest == 0) particleSystem.removeAllParticles();
+                if (particlesTest == 0){
+                    particleSystem.removeAllParticles();
+                    System.gc();
+                }
                 Tools.log("Particle Performance Test [%d]", particlesTest);
             }
 
