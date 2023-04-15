@@ -61,7 +61,7 @@ public class InputEvents {
         keyDown = false;
         keyUp = false;
         keyTyped = false;
-        keyUpKeyCode = '\0';
+        keyTypedCharacter = '\0';
         keyDownKeyCode = -1;
         keyUpKeyCode = -1;
         /* Mouse */

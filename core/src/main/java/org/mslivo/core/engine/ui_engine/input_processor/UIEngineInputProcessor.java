@@ -1,7 +1,6 @@
 package org.mslivo.core.engine.ui_engine.input_processor;
 
 import com.badlogic.gdx.InputProcessor;
-import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor {
 
@@ -10,7 +9,7 @@ public class UIEngineInputProcessor implements InputProcessor {
 
     private long lastClickTime;
 
-    public UIEngineInputProcessor(InputEvents inputEvents){
+    public UIEngineInputProcessor(InputEvents inputEvents) {
         this.inputEvents = inputEvents;
         this.lastClickTime = System.currentTimeMillis();
     }
@@ -43,7 +42,7 @@ public class UIEngineInputProcessor implements InputProcessor {
         this.inputEvents.mouseDown = true;
         this.inputEvents.mouseDownButton = button;
         this.inputEvents.mouseButtonsDown[button] = true;
-        if(button == 0 && (System.currentTimeMillis()-lastClickTime) < DOUBLECLICK_TIME_MS){
+        if (button == 0 && (System.currentTimeMillis() - lastClickTime) < DOUBLECLICK_TIME_MS) {
             this.inputEvents.mouseDoubleClick = true;
         }
         lastClickTime = System.currentTimeMillis();

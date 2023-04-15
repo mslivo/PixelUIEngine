@@ -85,9 +85,12 @@ public class UIEngine<T extends UIAdapter> {
     private final API api;
     public static final int TILE_SIZE = 8;
 
-    public static final int COLORSTACK_SIZE = 8;
-
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
+
+    private static final int COLORSTACK_SIZE = 8;
+
+    private static final int TEXT_OFFSET_X = 1;
+    private static final int TEXT_OFFSET_Y = 2;
 
     /* Render */
     private final MediaManager mediaManager;
@@ -234,8 +237,8 @@ public class UIEngine<T extends UIAdapter> {
         // ----- Controls
         newInputState.controlMode = ControlMode.KEYBOARD;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
-        newInputState.mouse = new GridPoint2(0,0);
-        newInputState.mouse_delta = new GridPoint2(0,0);
+        newInputState.mouse = new GridPoint2(0, 0);
+        newInputState.mouse_delta = new GridPoint2(0, 0);
         newInputState.lastGUIMouseHover = null;
         newInputState.cursor = null;
         newInputState.mouseTool = null;
@@ -252,7 +255,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
 
         newInputState.colorStack = new Color[COLORSTACK_SIZE];
-        for(int i = 0; i< COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color();
+        for (int i = 0; i < COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color();
 
         for (int i = 0; i < 8; i++) newInputState.colorStack[i] = new Color(1, 1, 1, 1);
         newInputState.colorStackPointer = 0;
@@ -362,7 +365,6 @@ public class UIEngine<T extends UIAdapter> {
                 } else {
                     // Hotkeys
                     inputState.hotKeyPressedKeys[inputState.inputEvents.keyDownKeyCode] = true;
-                    hkLoop:
                     for (HotKey hotKey : inputState.hotKeys) {
                         boolean hotkeyPressed = true;
                         kcLoop:
@@ -386,7 +388,6 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.inputEvents.keyUp) {
             // Reset Hotkeys
             inputState.hotKeyPressedKeys[inputState.inputEvents.keyUpKeyCode] = false;
-            hkLoop:
             for (HotKey hotKey : inputState.hotKeys) {
                 if (hotKey.pressed) {
                     kcLoop:
@@ -978,11 +979,9 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateToolTip() {
-        boolean showComponentToolTip = true;
         // Anything dragged ?
-        if (showComponentToolTip) {
-            showComponentToolTip = inputState.listDrag_Item == null && inputState.inventoryDrag_Item == null;
-        }
+        boolean showComponentToolTip = inputState.listDrag_Item == null && inputState.inventoryDrag_Item == null;
+
         // hovering over a component ?
         if (showComponentToolTip) {
             showComponentToolTip = (inputState.lastGUIMouseHover instanceof Component);
@@ -1101,11 +1100,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateControlMode() {
-        if(!api.config.isKeyBoardControlEnabled() && api.config.isMouseControlEnabled()) {
+        if (!api.config.isKeyBoardControlEnabled() && api.config.isMouseControlEnabled()) {
             inputState.controlMode = ControlMode.MOUSE;
-        }else if(api.config.isKeyBoardControlEnabled() && !api.config.isMouseControlEnabled()) {
+        } else if (api.config.isKeyBoardControlEnabled() && !api.config.isMouseControlEnabled()) {
             inputState.controlMode = ControlMode.KEYBOARD;
-        }else if(api.config.isKeyBoardControlEnabled() && api.config.isMouseControlEnabled()){
+        } else if (api.config.isKeyBoardControlEnabled() && api.config.isMouseControlEnabled()) {
             switch (inputState.controlMode) {
                 case MOUSE -> {
                     if (anyKeyboardControlButtonDown()) {
@@ -1120,7 +1119,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             }
-        }else if(!api.config.isKeyBoardControlEnabled() && !api.config.isMouseControlEnabled()){
+        } else if (!api.config.isKeyBoardControlEnabled() && !api.config.isMouseControlEnabled()) {
             inputState.controlMode = ControlMode.NONE;
         }
     }
@@ -1185,8 +1184,6 @@ public class UIEngine<T extends UIAdapter> {
                     } else {
                         magnetPossible = true;
                     }
-                } else {
-                    magnetPossible = false;
                 }
 
                 if (magnetPossible) {
@@ -1316,9 +1313,9 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.inputEvents.mouseDown = true;
                     inputState.inputEvents.mouseDownButton = i;
                     anyButtonChanged = true;
-                    if(i==Input.Buttons.LEFT){
+                    if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if((System.currentTimeMillis()-inputState.keyBoardCtrlLastMouseClick) < UIEngineInputProcessor.DOUBLECLICK_TIME_MS){
+                        if ((System.currentTimeMillis() - inputState.keyBoardCtrlLastMouseClick) < UIEngineInputProcessor.DOUBLECLICK_TIME_MS) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
                         inputState.keyBoardCtrlLastMouseClick = System.currentTimeMillis();
@@ -1332,7 +1329,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             inputState.inputEvents.mouseButtonsDown[i] = inputState.keyBoardCtrlIsMouseButtonDown[i];
         }
-        if(!anyButtonChanged){
+        if (!anyButtonChanged) {
             inputState.inputEvents.mouseDown = false;
             inputState.inputEvents.mouseUp = false;
             inputState.inputEvents.mouseDoubleClick = false;
@@ -1344,8 +1341,9 @@ public class UIEngine<T extends UIAdapter> {
         if (deltaX != 0 || deltaY != 0) {
             inputState.inputEvents.mouseMoved = true;
             inputState.inputEvents.mouseDragged = false;
-            draggedLoop:for (int i = 0; i <= 4; i++) {
-                if(inputState.keyBoardCtrlIsMouseButtonDown[i]){
+            draggedLoop:
+            for (int i = 0; i <= 4; i++) {
+                if (inputState.keyBoardCtrlIsMouseButtonDown[i]) {
                     inputState.inputEvents.mouseDragged = true;
                     inputState.inputEvents.mouseMoved = false;
                     break draggedLoop;
@@ -1764,7 +1762,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void renderGameViewPortFrameBuffer(GameViewPort gameViewPort) {
-        if (!render_isComponentRendered(gameViewPort)) return;
+        if (render_isComponentNotRendered(gameViewPort)) return;
 
         if (System.currentTimeMillis() - gameViewPort.updateTimer > gameViewPort.updateTime) {
             // save camera settings
@@ -1847,10 +1845,10 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private boolean render_isComponentRendered(Component component) {
-        if (!component.visible) return false;
-        if (component.addedToWindow != null && !component.addedToWindow.visible) return false;
-        return !isHiddenByTab(component);
+    private boolean render_isComponentNotRendered(Component component) {
+        if (!component.visible) return true;
+        if (component.addedToWindow != null && !component.addedToWindow.visible) return true;
+        return isHiddenByTab(component);
     }
 
     private Integer tabBar_getInfoAtPointer(TabBar tabBar) {
@@ -2069,7 +2067,7 @@ public class UIEngine<T extends UIAdapter> {
                 for (int y = 0; y < height; y++) {
                     int index = render_getComponent9TilesCMediaIndex(x, y, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     ContextMenuItem item = contextMenu.items.get(y);
-                    CMediaArray cMenuTexture = null;
+                    CMediaArray cMenuTexture;
                     if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (y * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
                     } else {
@@ -2226,7 +2224,6 @@ public class UIEngine<T extends UIAdapter> {
 
 
         render_batchLoadColor();
-        return;
     }
 
     private void render_drawNotifications() {
@@ -2252,7 +2249,6 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         render_batchLoadColor();
-        return;
     }
 
     private void render_drawWindow(Window window) {
@@ -2295,7 +2291,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawComponentTopLayer(Window window, Component component) {
-        if (!render_isComponentRendered(component)) ;
+        if (render_isComponentNotRendered(component)) return;
         float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
         if (component.getClass() == ComboBox.class) {
@@ -2308,7 +2304,7 @@ public class UIEngine<T extends UIAdapter> {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         int index = render_getComponent9TilesCMediaIndex(x, y, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
-                        CMediaArray cMenuTexture = null;
+                        CMediaArray cMenuTexture;
                         if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (y * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
                             cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
                         } else {
@@ -2330,7 +2326,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawComponent(Component component) {
-        if (!render_isComponentRendered(component)) return;
+        if (render_isComponentNotRendered(component)) return;
 
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
         float alpha2 = (component.addedToWindow != null ? (component.color2_a * component.addedToWindow.color_a) : component.color2_a);
@@ -2527,11 +2523,11 @@ public class UIEngine<T extends UIAdapter> {
 
                 if (textField.content != null) {
                     render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
-                }
-                if (textField.focused) {
-                    int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
-                    if (xOffset < textField.width * TILE_SIZE) {
-                        render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
+                    if (textField.focused) {
+                        int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
+                        if (xOffset < textField.width * TILE_SIZE) {
+                            render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
+                        }
                     }
                 }
             }
@@ -2571,7 +2567,7 @@ public class UIEngine<T extends UIAdapter> {
 
             for (int x = 0; x < inventoryWidth; x++) {
                 for (int y = 0; y < inventoryHeight; y++) {
-                    if (inventory.items != null && x <= inventoryWidth && y <= inventoryHeight) {
+                    if (inventory.items != null) {
                         CMediaGFX cellMedia;
                         boolean selected = inventory.items[x][y] != null && inventory.items[x][y] == inventory.selectedItem;
                         if (dragEnabled && dragValid && drag_x == x && drag_y == y) {
@@ -2613,7 +2609,7 @@ public class UIEngine<T extends UIAdapter> {
         } else if (component.getClass() == TabBar.class) {
             TabBar tabBar = (TabBar) component;
             int tabXOffset = tabBar.tabOffset;
-            int topBorder = 0;
+            int topBorder;
             for (int i = 0; i < tabBar.tabs.size(); i++) {
                 Tab tab = tabBar.tabs.get(i);
                 int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
@@ -2729,7 +2725,6 @@ public class UIEngine<T extends UIAdapter> {
 
 
         render_enableGrayScaleShader(disableShaderState);
-        return;
     }
 
     private void render_drawCursorListDrags() {
@@ -2759,7 +2754,6 @@ public class UIEngine<T extends UIAdapter> {
 
         render_batchSetColorWhite(1f);
         render_batchLoadColor();
-        return;
     }
 
 
@@ -2828,7 +2822,6 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-
     private void render_batchSetColor(float r, float g, float b, float a) {
         inputState.spriteBatch_gui.setColor(r, g, b, a);
     }
@@ -2844,7 +2837,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_fontSaveColor(CMediaFont font) {
         BitmapFont bmpFont = mediaManager.getCMediaFont(font);
         Color color = bmpFont.getColor();
-        render_colorStackPush(color.r,  color.g,  color.b,  color.a);
+        render_colorStackPush(color.r, color.g, color.b, color.a);
     }
 
     private void render_fontLoadColor(CMediaFont font) {
@@ -2854,7 +2847,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_batchSaveColor() {
         Color color = inputState.spriteBatch_gui.getColor();
-        render_colorStackPush(color.r,  color.g,  color.b,  color.a);
+        render_colorStackPush(color.r, color.g, color.b, color.a);
     }
 
     private void render_batchLoadColor() {
@@ -2862,13 +2855,14 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_gui.setColor(inputState.colorStack[inputState.colorStackPointer]);
     }
 
-    private void render_colorStackPush(float r, float g, float b, float a){
+    private void render_colorStackPush(float r, float g, float b, float a) {
         inputState.colorStack[inputState.colorStackPointer].r = r;
         inputState.colorStack[inputState.colorStackPointer].g = g;
         inputState.colorStack[inputState.colorStackPointer].b = b;
         inputState.colorStack[inputState.colorStackPointer].a = a;
         inputState.colorStackPointer++;
-        if(inputState.colorStackPointer > inputState.colorStack.length) throw new RuntimeException("colorStackPointer overFlow");
+        if (inputState.colorStackPointer > inputState.colorStack.length)
+            throw new RuntimeException("colorStackPointer overFlow");
     }
 
     private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y) {

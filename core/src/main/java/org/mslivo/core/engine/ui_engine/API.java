@@ -85,7 +85,7 @@ public class API {
 
     private final MediaManager mediaManager;
 
-    private final HashMap<Class, WindowGenerator> windowGeneratorCache;
+    private final HashMap<Class<org.mslivo.core.example.ui.windows.ExampleWindowGenerator>, WindowGenerator> windowGeneratorCache;
 
 
     public API(InputState inputState, MediaManager mediaManager) {
@@ -242,9 +242,10 @@ public class API {
 
     public class _ToolBox {
 
-        private final HashSet<Character> numbersAllowedCharacters = new HashSet<>(Arrays.asList(new Character[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
+        private final HashSet<Character> numbersAllowedCharacters = new HashSet<>(Arrays.asList('-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 
-        private final HashSet<Character> decimalsAllowedCharacters = new HashSet<>(Arrays.asList(new Character[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}));
+        private final HashSet<Character> decimalsAllowedCharacters = new HashSet<>(Arrays.asList('-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
+
         public TextField list_CreateSearchBar(List list) {
             return list_CreateSearchBar(list, null, false, false);
         }
@@ -323,11 +324,10 @@ public class API {
         public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text) {
             ArrayList<Component> result = new ArrayList<>();
 
-            // Cut text to fit
             Text textField = components.text.create(x, y, null);
             components.setSize(textField, width - 1, height);
             ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
-            String[] textAll;
+            String[] textConverted;
             String[] textDisplayedLines = new String[height];
 
             // Cut Text to Fit
@@ -355,23 +355,22 @@ public class API {
                         textList.add("");
                     }
                 }
-                textAll = textList.toArray(new String[]{});
+                textConverted = textList.toArray(new String[]{});
             } else {
-                textAll = new String[]{};
+                textConverted = new String[]{};
             }
 
             // Actions
-
             components.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(text.length, 1)) * input.mouseScrolledAmount();
-
+                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouseScrolledAmount();
                     if (!scrollBarVertical.disabled) {
                         components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
                                 scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
                     }
+
                 }
             });
             components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
@@ -380,16 +379,16 @@ public class API {
                     float scrolled = 1f - scrolledPct;
 
                     int scrolledTextIndex;
-                    if (textAll.length > height) {
-                        scrolledTextIndex = MathUtils.round((textAll.length - height) * scrolled);
+                    if (textConverted.length > height) {
+                        scrolledTextIndex = MathUtils.round((textConverted.length - height) * scrolled);
                     } else {
                         scrolledTextIndex = 0;
                     }
 
                     for (int iy = 0; iy < height; iy++) {
                         int textIndex = scrolledTextIndex + iy;
-                        if (textIndex < textAll.length) {
-                            textDisplayedLines[iy] = textAll[textIndex];
+                        if (textIndex < textConverted.length) {
+                            textDisplayedLines[iy] = textConverted[textIndex];
                         } else {
                             textDisplayedLines[iy] = "";
                         }
@@ -399,7 +398,7 @@ public class API {
 
             // Init
             components.scrollBar.setScrolled(scrollBarVertical, 1f);
-            if (textAll.length <= height) {
+            if (textConverted.length <= height) {
                 components.setDisabled(scrollBarVertical, true);
             }
 
@@ -442,7 +441,7 @@ public class API {
 
 
         public HotKeyAction hotkey_CreateForButton(Button button) {
-            HotKeyAction hotKeyAction = null;
+            HotKeyAction hotKeyAction;
             if (button.toggleMode) {
                 hotKeyAction = new HotKeyAction() {
                     @Override
@@ -1355,7 +1354,7 @@ public class API {
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
-        private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet();
+        private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
 
@@ -2248,12 +2247,12 @@ public class API {
         }
 
 
-        public Window createFromGenerator(Class windowGeneratorClass, Object... p) {
+        public Window createFromGenerator(Class<org.mslivo.core.example.ui.windows.ExampleWindowGenerator> windowGeneratorClass, Object... p) {
             if (windowGeneratorClass == null) return null;
             WindowGenerator windowGenerator = windowGeneratorCache.get(windowGeneratorClass);
             if (windowGenerator == null) {
                 try {
-                    windowGenerator = (WindowGenerator) windowGeneratorClass.getDeclaredConstructor(API.class).newInstance(API.this);
+                    windowGenerator = windowGeneratorClass.getDeclaredConstructor(API.class).newInstance(API.this);
                 } catch (Exception e) {
                     return null;
                 }
@@ -2408,7 +2407,7 @@ public class API {
 
     public class _ToolTip {
 
-        public final  _ToolTipImage toolTipImage = new _ToolTipImage();
+        public final _ToolTipImage toolTipImage = new _ToolTipImage();
 
         public class _ToolTipImage {
 
@@ -2521,7 +2520,7 @@ public class API {
         }
 
         public boolean pointVisible(float x, float y) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.internalResolutionWidth, inputState.internalResolutionHeight, inputState.camera_z);
+            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) {
                 return true;
             }
@@ -2534,7 +2533,7 @@ public class API {
         }
 
         public boolean boundsVisible(float x, float y, float halfWidth, float halfHeight) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.internalResolutionWidth, inputState.internalResolutionHeight, inputState.camera_z);
+            setTestingCameraTo(inputState.camera_x, inputState.camera_y,inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
                 return true;
             }
@@ -2546,7 +2545,7 @@ public class API {
         }
 
         public boolean sphereVisible(float x, float y, float radius) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.internalResolutionWidth, inputState.internalResolutionHeight, inputState.camera_z);
+            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) {
                 return true;
             }
@@ -2564,7 +2563,6 @@ public class API {
             inputState.camera_frustum.viewportWidth = width;
             inputState.camera_frustum.viewportHeight = height;
             inputState.camera_frustum.update();
-            return;
         }
 
         public float viewPortStretchFactorWidth() {
@@ -2577,66 +2575,54 @@ public class API {
 
         public void moveAbs(float x, float y) {
             moveAbs(x, y, inputState.camera_z);
-            return;
         }
 
         public void moveAbs(float x, float y, float z) {
             inputState.camera_x = x;
             inputState.camera_y = y;
             inputState.camera_z = z;
-            return;
         }
 
         public void moveRel(float x, float y) {
             moveRel(x, y, inputState.camera_z);
-            return;
         }
 
         public void moveRel(float x, float y, float z) {
             inputState.camera_x += x;
             inputState.camera_y += y;
             inputState.camera_y += z;
-            return;
         }
 
         public void xRel(float x) {
             inputState.camera_x += x;
-            return;
         }
 
         public void xAbs(float x) {
             inputState.camera_x = x;
-            return;
         }
 
         public void yRel(float y) {
             inputState.camera_y += y;
-            return;
         }
 
         public void yAbs(float zoom) {
             inputState.camera_y = zoom;
-            return;
         }
 
         public void zRel(float z) {
             inputState.camera_z += z;
-            return;
         }
 
         public void zAbs(float z) {
             inputState.camera_z = z;
-            return;
         }
 
         public void zoomRel(float z) {
             inputState.camera_zoom += z;
-            return;
         }
 
         public void zoomAbs(float z) {
             inputState.camera_zoom = z;
-            return;
         }
 
         public float zoom() {
@@ -3418,7 +3404,6 @@ public class API {
                     if (component.addedToTab != null) return; // component can only be on one tab
                     component.addedToTab = tab;
                     tab.components.add(component);
-                    return;
                 }
 
                 public void addTabComponents(Tab tab, Component[] components) {
@@ -3864,7 +3849,6 @@ public class API {
             public void update(Map map) {
                 if (map == null) return;
                 map.texture = new Texture(map.pMap);
-                return;
             }
 
             public FColor getPixel(Map map, int x, int y) {
