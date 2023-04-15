@@ -81,7 +81,6 @@ public class SoundPlayer2D {
     }
 
     public void shutdown() {
-        return;
     }
 
 }

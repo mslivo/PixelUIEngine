@@ -161,7 +161,7 @@ public class MusicPlayer {
                                         playListPosition = MathUtils.random(0, playlist.size() - 1);
                                     }
                                 }
-                                case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playListPosition = playlist.size()-1 : playListPosition -1);
+                                case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playlist.size()-1 : playListPosition -1);
                                 case PLAYMODE_LOOP -> {}
                             }
                             playPrevious = false;
@@ -251,7 +251,6 @@ public class MusicPlayer {
         this.mediaManager = null;
         this.playlist.clear();
         this.randomHistory.clear();
-        return;
     }
 
 }

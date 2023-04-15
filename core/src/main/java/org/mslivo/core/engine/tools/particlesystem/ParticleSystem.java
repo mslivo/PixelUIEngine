@@ -61,7 +61,6 @@ public class ParticleSystem<T extends Particle> {
         for (T particle : particles) {
             consumer.accept(particle);
         }
-        return;
     }
 
     public void removeAllParticles() {

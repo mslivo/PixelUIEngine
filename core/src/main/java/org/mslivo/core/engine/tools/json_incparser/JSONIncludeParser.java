@@ -17,16 +17,8 @@ public class JSONIncludeParser {
 
     private static final String INCLUDE_TRIM = "//INCLUDE_TRIM ";
 
-    static class IncludeInfo {
+    record IncludeInfo(String includeFile, boolean trim) {
 
-        public final String includeFile;
-
-        public final boolean trim;
-
-        IncludeInfo(String includeFile, boolean trim) {
-            this.includeFile = includeFile;
-            this.trim = trim;
-        }
     }
 
     private static IncludeInfo findIncludeInfo(String line){
@@ -43,7 +35,7 @@ public class JSONIncludeParser {
 
     private static ArrayList<String> getFileContent(String basePath, String fileName, boolean include, boolean trimInclude, InputFileMode inputFileMode) throws IOException {
         ArrayList<String> lines = new ArrayList<>();
-        String fileContent = null;
+        String fileContent = "";
         if (inputFileMode == InputFileMode.CLASSPATH) {
             FileHandle fileHandle = Gdx.files.internal(basePath + fileName);
             fileContent = fileHandle.readString();
@@ -86,7 +78,7 @@ public class JSONIncludeParser {
         StringBuilder result = new StringBuilder();
 
         // Read File
-        String basePath = "", fileName = "";
+        String basePath = "", fileName;
         File jsonFile = new File(jsonPath);
         if (jsonFile.getParent() != null) {
             basePath = jsonFile.getParent() + "\\";
