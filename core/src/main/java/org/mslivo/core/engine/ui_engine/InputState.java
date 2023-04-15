@@ -215,9 +215,9 @@ public class InputState {
 
     public float animation_timer_gui;
 
-    public Color[] tempColorStack;
+    public Color[] colorStack;
 
-    public int tempColorStackPointer;
+    public int colorStackPointer;
 
     public ShaderProgram grayScaleShader;
 

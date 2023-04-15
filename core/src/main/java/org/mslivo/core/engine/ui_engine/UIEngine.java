@@ -67,7 +67,6 @@ import org.mslivo.core.engine.ui_engine.render.shaders.GrayScaleShader;
 import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 
 /**
@@ -86,7 +85,7 @@ public class UIEngine<T extends UIAdapter> {
     private final API api;
     public static final int TILE_SIZE = 8;
 
-    public static final long DOUBLECLICK_TIME_MS = 180;
+    public static final int COLORSTACK_SIZE = 8;
 
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
 
@@ -252,9 +251,11 @@ public class UIEngine<T extends UIAdapter> {
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
 
-        newInputState.tempColorStack = new Color[8];
-        for (int i = 0; i < 8; i++) newInputState.tempColorStack[i] = new Color(1, 1, 1, 1);
-        newInputState.tempColorStackPointer = 0;
+        newInputState.colorStack = new Color[COLORSTACK_SIZE];
+        for(int i = 0; i< COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color();
+
+        for (int i = 0; i < 8; i++) newInputState.colorStack[i] = new Color(1, 1, 1, 1);
+        newInputState.colorStackPointer = 0;
         ScreenUtils.clear(0, 0, 0, 1);
         return newInputState;
     }
@@ -1317,7 +1318,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                     if(i==Input.Buttons.LEFT){
                         // DoubleClick
-                        if((System.currentTimeMillis()-inputState.keyBoardCtrlLastMouseClick) < DOUBLECLICK_TIME_MS){
+                        if((System.currentTimeMillis()-inputState.keyBoardCtrlLastMouseClick) < UIEngineInputProcessor.DOUBLECLICK_TIME_MS){
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
                         inputState.keyBoardCtrlLastMouseClick = System.currentTimeMillis();
@@ -2826,16 +2827,7 @@ public class UIEngine<T extends UIAdapter> {
         return mediaManager.getCMediaFont(font).getColor();
     }
 
-    private void render_fontLoadColor(CMediaFont font) {
-        inputState.tempColorStackPointer = inputState.tempColorStackPointer - 1;
-        mediaManager.getCMediaFont(font).setColor(inputState.tempColorStack[inputState.tempColorStackPointer]);
-    }
 
-    private void render_fontSaveColor(CMediaFont font) {
-        BitmapFont bmpFont = mediaManager.getCMediaFont(font);
-        inputState.tempColorStack[inputState.tempColorStackPointer] = new Color(bmpFont.getColor());
-        inputState.tempColorStackPointer = inputState.tempColorStackPointer + 1;
-    }
 
     private void render_batchSetColor(float r, float g, float b, float a) {
         inputState.spriteBatch_gui.setColor(r, g, b, a);
@@ -2849,14 +2841,34 @@ public class UIEngine<T extends UIAdapter> {
         return inputState.spriteBatch_gui.getColor();
     }
 
+    private void render_fontSaveColor(CMediaFont font) {
+        BitmapFont bmpFont = mediaManager.getCMediaFont(font);
+        Color color = bmpFont.getColor();
+        render_colorStackPush(color.r,  color.g,  color.b,  color.a);
+    }
+
+    private void render_fontLoadColor(CMediaFont font) {
+        inputState.colorStackPointer--;
+        mediaManager.getCMediaFont(font).setColor(inputState.colorStack[inputState.colorStackPointer]);
+    }
+
     private void render_batchSaveColor() {
-        inputState.tempColorStack[inputState.tempColorStackPointer] = new Color(inputState.spriteBatch_gui.getColor());
-        inputState.tempColorStackPointer = inputState.tempColorStackPointer + 1;
+        Color color = inputState.spriteBatch_gui.getColor();
+        render_colorStackPush(color.r,  color.g,  color.b,  color.a);
     }
 
     private void render_batchLoadColor() {
-        inputState.tempColorStackPointer = inputState.tempColorStackPointer - 1;
-        inputState.spriteBatch_gui.setColor(inputState.tempColorStack[inputState.tempColorStackPointer]);
+        inputState.colorStackPointer--;
+        inputState.spriteBatch_gui.setColor(inputState.colorStack[inputState.colorStackPointer]);
+    }
+
+    private void render_colorStackPush(float r, float g, float b, float a){
+        inputState.colorStack[inputState.colorStackPointer].r = r;
+        inputState.colorStack[inputState.colorStackPointer].g = g;
+        inputState.colorStack[inputState.colorStackPointer].b = b;
+        inputState.colorStack[inputState.colorStackPointer].a = a;
+        inputState.colorStackPointer++;
+        if(inputState.colorStackPointer > inputState.colorStack.length) throw new RuntimeException("colorStackPointer overFlow");
     }
 
     private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y) {
