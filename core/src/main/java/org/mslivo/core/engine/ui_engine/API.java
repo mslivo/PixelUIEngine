@@ -1810,32 +1810,67 @@ public class API {
             return inputState.inputEvents.mouseScrolled;
         }
 
-        public char keyTypedCharacters() {
-            return inputState.inputEvents.keyTypedCharacter;
+        public ArrayList<Character> keyTypedCharacters() {
+            return inputState.inputEvents.keyTypedCharacters;
         }
 
-        public int keyUpKeyCode() {
-            return inputState.inputEvents.keyUpKeyCode;
+        public ArrayList<Integer> keyUpKeyCodes() {
+            return inputState.inputEvents.keyUpKeyCodes;
         }
 
-        public int keyDownKeyCode() {
-            return inputState.inputEvents.keyDownKeyCode;
+        public ArrayList<Integer> keyDownKeyCodes() {
+            return inputState.inputEvents.keyDownKeyCodes;
         }
 
-        public boolean isKeyDown(int keyCode) {
+        public boolean isKeyDownKeyCode(int keyCode) {
+            for(Integer kc : inputState.inputEvents.keyDownKeyCodes){
+                if(keyCode == kc ) return true;
+            }
+            return false;
+        }
+
+        public boolean isKeyUpKeyCode(int keyCode) {
+            for(Integer kc : inputState.inputEvents.keyUpKeyCodes){
+                if(keyCode == kc ) return true;
+            }
+            return false;
+        }
+
+        public boolean isMouseDownButton(int button) {
+            for(Integer bt : inputState.inputEvents.mouseDownButtons){
+                if(button == bt ) return true;
+            }
+            return false;
+        }
+
+        public boolean isMouseUpButton(int button) {
+            for(Integer bt : inputState.inputEvents.mouseUpButtons){
+                if(button == bt ) return true;
+            }
+            return false;
+        }
+        public boolean isCharacterTyped(Character character) {
+            for(Character ch : inputState.inputEvents.keyTypedCharacters){
+                if(character == ch ) return true;
+            }
+            return false;
+        }
+
+
+        public boolean isKeyCurrentlyDown(int keyCode) {
             return inputState.inputEvents.keysDown[keyCode];
         }
 
-        public boolean isMouseButtonDown(int button) {
+        public boolean isMouseButtonCurrentlyDown(int button) {
             return inputState.inputEvents.mouseButtonsDown[button];
         }
 
-        public int mouseDownButton() {
-            return inputState.inputEvents.mouseDownButton;
+        public ArrayList<Integer> mouseDownButtons() {
+            return inputState.inputEvents.mouseDownButtons;
         }
 
-        public int mouseUpButton() {
-            return inputState.inputEvents.mouseUpButton;
+        public ArrayList<Integer> mouseUpButton() {
+            return inputState.inputEvents.mouseUpButtons;
         }
 
         public float mouseScrolledAmount() {

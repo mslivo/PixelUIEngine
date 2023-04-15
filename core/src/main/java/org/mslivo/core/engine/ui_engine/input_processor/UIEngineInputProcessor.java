@@ -17,7 +17,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         this.inputEvents.keyDown = true;
-        this.inputEvents.keyDownKeyCode = keycode;
+        this.inputEvents.keyDownKeyCodes.add(keycode);
         this.inputEvents.keysDown[keycode] = true;
         return false;
     }
@@ -25,7 +25,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         this.inputEvents.keyUp = true;
-        this.inputEvents.keyUpKeyCode = keycode;
+        this.inputEvents.keyUpKeyCodes.add(keycode);
         this.inputEvents.keysDown[keycode] = false;
         return false;
     }
@@ -33,14 +33,14 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean keyTyped(char character) {
         this.inputEvents.keyTyped = true;
-        this.inputEvents.keyTypedCharacter = character;
+        this.inputEvents.keyTypedCharacters.add(character);
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         this.inputEvents.mouseDown = true;
-        this.inputEvents.mouseDownButton = button;
+        this.inputEvents.mouseDownButtons.add(button);
         this.inputEvents.mouseButtonsDown[button] = true;
         if (button == 0 && (System.currentTimeMillis() - lastClickTime) < DOUBLECLICK_TIME_MS) {
             this.inputEvents.mouseDoubleClick = true;
@@ -52,7 +52,7 @@ public class UIEngineInputProcessor implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         this.inputEvents.mouseUp = true;
-        this.inputEvents.mouseUpButton = button;
+        this.inputEvents.mouseUpButtons.add(button);
         this.inputEvents.mouseButtonsDown[button] = false;
         return false;
     }

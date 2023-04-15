@@ -1,5 +1,7 @@
 package org.mslivo.core.engine.ui_engine.input_processor;
 
+import java.util.ArrayList;
+
 public class InputEvents {
 
     public boolean keyDown;
@@ -24,27 +26,27 @@ public class InputEvents {
 
     public final boolean[] mouseButtonsDown;
 
-    public char keyTypedCharacter;
+    public ArrayList<Character> keyTypedCharacters;
 
-    public int keyUpKeyCode;
+    public ArrayList<Integer> keyUpKeyCodes;
 
-    public int keyDownKeyCode;
+    public ArrayList<Integer> keyDownKeyCodes;
 
-    public int mouseUpButton;
+    public ArrayList<Integer> mouseUpButtons;
 
-    public int mouseDownButton;
+    public ArrayList<Integer> mouseDownButtons;
 
     public float mouseScrolledAmount;
 
-    public InputEvents(){
+    public InputEvents() {
         keyDown = false;
         keyUp = false;
         keyTyped = false;
-        keyUpKeyCode = -1;
-        keyDownKeyCode = -1;
-        keyTypedCharacter = ' ';
-        mouseUpButton = -1;
-        mouseDownButton = -1;
+        keyUpKeyCodes = new ArrayList<>();
+        keyDownKeyCodes = new ArrayList<>();
+        keyTypedCharacters = new ArrayList<>();
+        mouseUpButtons = new ArrayList<>();
+        mouseDownButtons = new ArrayList<>();
         mouseDown = false;
         mouseUp = false;
         mouseDragged = false;
@@ -56,14 +58,16 @@ public class InputEvents {
         mouseButtonsDown = new boolean[5];
     }
 
-    public void reset(){
+    public void reset() {
         /* Keys */
         keyDown = false;
         keyUp = false;
         keyTyped = false;
-        keyTypedCharacter = '\0';
-        keyDownKeyCode = -1;
-        keyUpKeyCode = -1;
+        keyUpKeyCodes.clear();
+        keyDownKeyCodes.clear();
+        keyTypedCharacters.clear();
+        mouseUpButtons.clear();
+        mouseDownButtons.clear();
         /* Mouse */
         mouseDown = false;
         mouseUp = false;

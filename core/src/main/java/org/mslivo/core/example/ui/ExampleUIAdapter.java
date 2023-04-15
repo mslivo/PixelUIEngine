@@ -80,11 +80,13 @@ public class ExampleUIAdapter implements UIAdapter {
     @Override
     public void update() {
         if (api.input.keyDown()) {
-            if (api.input.keyUpKeyCode() == Input.Keys.P) {
+
+            if (api.input.isKeyDownKeyCode(Input.Keys.P)) {
                 particlesTest = particlesTest == 4 ? 0 : particlesTest + 1;
                 if (particlesTest == 0) particleSystem.removeAllParticles();
                 Tools.log("Particle Performance Test [%d]", particlesTest);
             }
+
 
         }
 
