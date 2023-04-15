@@ -928,16 +928,17 @@ public class UIEngine<T extends UIAdapter> {
         {
             long currentTimeMillis = System.currentTimeMillis();
             inputState.screenComponents.forEach(component -> {
-                for (UpdateAction updateAction : component.updateActions)
+                component.updateActions.forEach(updateAction -> {
                     this.executeUpdateAction(updateAction, currentTimeMillis);
+                });
             });
 
             inputState.windows.forEach(window -> {
-                for (UpdateAction updateAction : window.updateActions)
+                window.updateActions.forEach(updateAction -> {
                     this.executeUpdateAction(updateAction, currentTimeMillis);
+                });
                 window.components.forEach(component -> {
-                    for (UpdateAction updateAction : component.updateActions)
-                        this.executeUpdateAction(updateAction, currentTimeMillis);
+                    component.updateActions.forEach(updateAction -> this.executeUpdateAction(updateAction, currentTimeMillis));
                 });
             });
 
@@ -1412,10 +1413,9 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateWindowAndComponentAddRemove() {
 
-        Window windowTmp;
-        Component componentTmp;
-        HotKey hotkeyTmp;
+
         // Add Window
+        Window windowTmp;
         while ((windowTmp = inputState.addWindowQueue.pollFirst()) != null) {
             inputState.windows.add(0, windowTmp);
             if (windowTmp.windowAction != null) windowTmp.windowAction.onAdd();
@@ -1435,36 +1435,39 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Add Screen Components
-        while ((componentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
-            if (componentTmp.getClass() == GameViewPort.class)
-                inputState.gameViewPorts.add((GameViewPort) componentTmp);
-            inputState.screenComponents.add(componentTmp);
+        Component screenComponentTmp;
+        while ((screenComponentTmp = inputState.addScreenComponentsQueue.pollFirst()) != null) {
+            if (screenComponentTmp.getClass() == GameViewPort.class)
+                inputState.gameViewPorts.add((GameViewPort) screenComponentTmp);
+            inputState.screenComponents.add(screenComponentTmp);
         }
         // Remove Screen Components
-        while ((componentTmp = inputState.removeScreenComponentsQueue.pollFirst()) != null) {
+        while ((screenComponentTmp = inputState.removeScreenComponentsQueue.pollFirst()) != null) {
             // Remove Component
-            removeComponentReferences(componentTmp);
-            inputState.screenComponents.remove(componentTmp);
+            removeComponentReferences(screenComponentTmp);
+            inputState.screenComponents.remove(screenComponentTmp);
         }
 
-        for (Window window : inputState.windows) {
-            // Add Window Components
-            while ((componentTmp = window.addComponentsQueue.pollFirst()) != null) {
-                if (componentTmp.addedToWindow == null) {
-                    if (componentTmp.getClass() == GameViewPort.class)
-                        inputState.gameViewPorts.add((GameViewPort) componentTmp);
-                    componentTmp.addedToWindow = window;
-                    window.components.add(componentTmp);
+
+        inputState.windows.forEach(window -> {
+            Component windowComponentTmp;
+            while ((windowComponentTmp = window.addComponentsQueue.pollFirst()) != null) {
+                if (windowComponentTmp.addedToWindow == null) {
+                    if (windowComponentTmp.getClass() == GameViewPort.class)
+                        inputState.gameViewPorts.add((GameViewPort) windowComponentTmp);
+                    windowComponentTmp.addedToWindow = window;
+                    window.components.add(windowComponentTmp);
                 }
             }
-            // Remove Window Components
-            while ((componentTmp = window.removeComponentsQueue.pollFirst()) != null) {
-                removeComponentReferences(componentTmp);
-                window.components.remove(componentTmp);
+            while ((windowComponentTmp = window.removeComponentsQueue.pollFirst()) != null) {
+                removeComponentReferences(windowComponentTmp);
+                window.components.remove(windowComponentTmp);
             }
-        }
+        });
+
 
         // Add Hotkey
+        HotKey hotkeyTmp;
         while ((hotkeyTmp = inputState.addHotKeyQueue.pollFirst()) != null) {
             inputState.hotKeys.add(hotkeyTmp);
         }
@@ -1652,7 +1655,7 @@ public class UIEngine<T extends UIAdapter> {
 
         // Window / WindowComponent collision
         windowLoop:
-        for (int i = inputState.windows.size() - 1; i >= 0; i--) {
+        for (int i = inputState.windows.size() - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
             Window window = inputState.windows.get(i);
             if (!window.visible) continue windowLoop;
 
@@ -1674,10 +1677,9 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Screen component collision
-        for (Component component : inputState.screenComponents) {
-            if (mouseCollidesWithComponent(component)) {
-                return component;
-            }
+        for (int i = 0; i < inputState.screenComponents.size(); i++) { // use for(i) to avoid iterator creation
+            Component screenComponent = inputState.screenComponents.get(i);
+            if (mouseCollidesWithComponent(screenComponent)) return screenComponent;
         }
         return null;
     }
@@ -1810,16 +1812,15 @@ public class UIEngine<T extends UIAdapter> {
 
 
         /* Draw Screen Components */
-        for (Component component : inputState.screenComponents) {
+        inputState.screenComponents.forEach(component -> {
             render_drawComponent(component);
             render_drawComponentTopLayer(null, component);
-        }
-
+        });
         /* Draw Windows */
-        for (Window window : inputState.windows) {
+        inputState.windows.forEach(window ->{
             if (inputState.modalWindow != null && inputState.modalWindow == window) render_enableGrayScaleShader(false);
             render_drawWindow(window);
-        }
+        });
 
         render_enableGrayScaleShader(false);
 
@@ -2271,20 +2272,20 @@ public class UIEngine<T extends UIAdapter> {
         // Draw Components
 
         if (!window.folded) {
-            for (Component component : window.components) {
+            window.components.forEach(component -> {
                 render_drawComponent(component);
-            }
+            });
         } else {
-            for (Component component : window.components) {
+            window.components.forEach(component -> {
                 if (component.y == window.height - 1) render_drawComponent(component);
-            }
+            });
         }
 
         // Draw combobox menu
         if (!window.folded) {
-            for (Component component : window.components) {
+            window.components.forEach(component -> {
                 render_drawComponentTopLayer(window, component);
-            }
+            });
         }
 
         render_batchLoadColor();
