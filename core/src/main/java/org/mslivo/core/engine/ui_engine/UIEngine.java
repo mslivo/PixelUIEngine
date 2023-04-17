@@ -56,8 +56,8 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.input_processor.InputEvents;
-import org.mslivo.core.engine.ui_engine.input_processor.UIEngineInputProcessor;
+import org.mslivo.core.engine.ui_engine.input.InputEvents;
+import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
@@ -76,21 +76,21 @@ import java.util.ArrayList;
  */
 public class UIEngine<T extends UIAdapter> {
 
+    /* Members */
     private final T uiAdapter;
-
-    /* Input  */
 
     private InputState inputState;
 
     private final API api;
+
+    /* Statics */
     public static final int TILE_SIZE = 8;
 
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
 
-    private static final int COLORSTACK_SIZE = 8;
+    public static final int DOUBLECLICK_TIME_MS = 180;
 
-    private static final int TEXT_OFFSET_X = 1;
-    private static final int TEXT_OFFSET_Y = 2;
+    private static final int COLORSTACK_SIZE = 8;
 
     /* Render */
     private final MediaManager mediaManager;
@@ -1363,7 +1363,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                     if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.keyBoardCtrlLastMouseClick) < UIEngineInputProcessor.DOUBLECLICK_TIME_MS) {
+                        if ((System.currentTimeMillis() - inputState.keyBoardCtrlLastMouseClick) < DOUBLECLICK_TIME_MS) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
                         inputState.keyBoardCtrlLastMouseClick = System.currentTimeMillis();

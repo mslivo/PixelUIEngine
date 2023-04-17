@@ -29,8 +29,8 @@ import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.input_processor.InputEvents;
-import org.mslivo.core.engine.ui_engine.input_processor.UIEngineInputProcessor;
+import org.mslivo.core.engine.ui_engine.input.InputEvents;
+import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 

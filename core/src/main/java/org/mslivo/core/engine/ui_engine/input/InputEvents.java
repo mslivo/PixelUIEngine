@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.input_processor;
+package org.mslivo.core.engine.ui_engine.input;
 
 import java.util.ArrayList;
 
