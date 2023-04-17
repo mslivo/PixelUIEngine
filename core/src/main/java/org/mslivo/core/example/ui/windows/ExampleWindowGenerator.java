@@ -191,7 +191,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        TextField number = api.toolBox.textField_createIntegerInputField(18, 7, 4, 0, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
+        TextField number = api.toolBox.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
 
 
         ArrayList list = new ArrayList(Arrays.asList("One", "Two", "Three"));

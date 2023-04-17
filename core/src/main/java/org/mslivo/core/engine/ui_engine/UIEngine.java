@@ -1799,6 +1799,11 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
             Component component = inputState.screenComponents.get(i);
             render_drawComponent(component);
+        }
+
+        /* Draw Screen Components Top Layer */
+        for (int i = 0; i < inputState.screenComponents.size(); i++) {
+            Component component = inputState.screenComponents.get(i);
             render_drawComponentTopLayer(null, component);
         }
 
@@ -2260,18 +2265,22 @@ public class UIEngine<T extends UIAdapter> {
             render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 2, window.icon, window.iconIndex, (window.width - 1) * TILE_SIZE);
         }
         // Draw Components
-
         for (int i = 0; i < window.components.size(); i++) {
             Component component = window.components.get(i);
             if (!window.folded) {
                 render_drawComponent(component);
-                render_drawComponentTopLayer(window, component); // Combobox etc.
             } else {
                 if (component.y == window.height - 1) {
-                    // draw title bar components only
+                    // draw title bar components only if folded
                     render_drawComponent(component);
                 }
             }
+        }
+
+        // Draw Component TopLayer
+        for (int i = 0; i < window.components.size(); i++) {
+            Component component = window.components.get(i);
+            if (!window.folded) render_drawComponentTopLayer(window, component);
         }
 
         render_batchLoadColor();
