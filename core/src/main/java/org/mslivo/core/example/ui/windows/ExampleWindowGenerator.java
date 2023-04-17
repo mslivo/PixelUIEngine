@@ -180,7 +180,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        ProgressBar progressBar = api.components.progressBar.create(18, 3, 8, 0, true, false, GUIBaseMedia.FONT_WHITE, Tools.Colors.BLUE_BRIGHT);
+        ProgressBar progressBar = api.components.progressBar.create(18, 3, 8, 0, true, true, GUIBaseMedia.FONT_WHITE, Tools.Colors.BLUE_BRIGHT);
         api.components.setColor2(progressBar, Tools.Colors.RED_DARK);
 
         ScrollBarHorizontal pgScrollbar = api.components.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {

@@ -2689,7 +2689,7 @@ public class UIEngine<T extends UIAdapter> {
             render_batchLoadColor();
 
             if (progressBar.progressText) {
-                String percentTxt = progressBar.progressText2Decimal ? Tools.Text.formatPercent2Decimal(progressBar.progress) : Tools.Text.formatPercent(progressBar.progress);
+                String percentTxt = progressBar.progressText2Decimal ? UICommons.progressBar_getProgressText2Decimal(progressBar.progress) : UICommons.progressBar_getProgressText(progressBar.progress);
                 int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (mediaManager.textWidth(progressBar.font, percentTxt) / 2);
                 render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 2);
             }

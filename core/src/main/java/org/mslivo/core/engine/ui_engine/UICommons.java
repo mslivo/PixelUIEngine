@@ -10,8 +10,17 @@ import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
 class UICommons {
+
+    public static String progressBar_getProgressText(float progress){
+        return ProgressBarPercentText.progressText[(int)(progress*100)];
+    }
+
+    public static String progressBar_getProgressText2Decimal(float progress){
+        return ProgressBarPercentText.progressText2Decimal[(int)(progress*10000)];
+    }
 
     static int component_getParentWindowX(Component component) {
         return component.addedToWindow != null ? component.addedToWindow.x : 0;
