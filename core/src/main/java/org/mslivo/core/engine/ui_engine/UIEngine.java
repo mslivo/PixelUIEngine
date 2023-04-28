@@ -192,7 +192,7 @@ public class UIEngine<T extends UIAdapter> {
         // -----  GUI
         newInputState.windows = new ArrayList<>();
         newInputState.screenComponents = new ArrayList<>();
-        newInputState.displayedContextMenu = null;
+        newInputState.openContextMenu = null;
         newInputState.displayedContextMenuWidth = 0;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
@@ -311,7 +311,6 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                     } else if (keyTypedCharacter == '\n') { // ENTER
-                        inputState.focusedTextField.focused = false;
                         if (inputState.focusedTextField.textFieldAction != null) {
                             inputState.focusedTextField.textFieldAction.onEnter(inputState.focusedTextField.content, inputState.focusedTextField.contentValid);
                         }
@@ -334,14 +333,6 @@ public class UIEngine<T extends UIAdapter> {
         }
         if (inputState.inputEvents.keyDown) {
             boolean processKey = true;
-            if (inputState.modalWindow != null) {
-                if (inputState.focusedTextField != null) {
-                    if (inputState.focusedTextField.addedToWindow != inputState.modalWindow) processKey = false;
-                } else {
-                    processKey = false;
-                }
-            }
-
             if (processKey) {
                 if (inputState.focusedTextField != null) {
                     for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size(); ik++) {
@@ -502,7 +493,7 @@ public class UIEngine<T extends UIAdapter> {
                         ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
                         if (contextMenuItem.contextMenuItemAction != null) {
                             contextMenuItem.contextMenuItemAction.onSelect();
-                            inputState.displayedContextMenu = null;
+                            inputState.openContextMenu = null;
                         }
                     } else if (inputState.lastGUIMouseHover instanceof Button button) {
                         inputState.pressedButton = button;
@@ -568,7 +559,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
                         ComboBox combobox = (ComboBox) inputState.lastGUIMouseHover;
 
-                        if (combobox.menuOpen) {
+                        if (UICommons.comboBox_isOpen(inputState, combobox)) {
                             for (int i = 0; i < combobox.items.size(); i++) {
                                 if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                                         UICommons.component_getParentWindowX(combobox) + (combobox.x * TILE_SIZE) + combobox.offset_x,
@@ -583,18 +574,11 @@ public class UIEngine<T extends UIAdapter> {
                                     }
                                 }
                             }
-                            combobox.menuOpen = false;
-                            inputState.openComboBox = null;
-                            if (combobox.comboBoxAction != null) combobox.comboBoxAction.onClose();
+
+                            UICommons.comboBox_close(inputState, combobox);
                         } else {
-                            // Close other currently opened comboboxes
-                            if (inputState.openComboBox != null) {
-                                inputState.openComboBox.menuOpen = false;
-                                inputState.openComboBox = null;
-                            }
-                            combobox.menuOpen = true;
-                            inputState.openComboBox = combobox;
-                            if (combobox.comboBoxAction != null) combobox.comboBoxAction.onOpen();
+                            // Open this combobox
+                            UICommons.comboBox_open(inputState, combobox);
                         }
 
                     } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
@@ -625,15 +609,8 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
                         TextField textField = (TextField) inputState.lastGUIMouseHover;
 
-                        if (inputState.focusedTextField != null && inputState.focusedTextField != textField) {
-                            inputState.focusedTextField.focused = false;
-                            if (inputState.focusedTextField.textFieldAction != null)
-                                inputState.focusedTextField.textFieldAction.onUnFocus();
-                        }
-                        inputState.focusedTextField = textField;
-                        inputState.focusedTextField.focused = true;
-                        if (textField.textFieldAction != null) textField.textFieldAction.onFocus();
-
+                        // Set Focus
+                        UICommons.textField_focus(inputState, textField);
                         // Set Marker to mouse position
                         int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(inputState.focusedTextField);
                         char[] fieldContent = inputState.focusedTextField.content.substring(inputState.focusedTextField.offset).toCharArray();
@@ -684,15 +661,6 @@ public class UIEngine<T extends UIAdapter> {
                         Integer selectedTab = tabBar_getInfoAtPointer(tabBar);
 
                         if (selectedTab != null && tabBar.selectedTab != selectedTab) {
-                            Tab currentTab = UICommons.tabBar_getSelectedTab(tabBar);
-                            for (int i = 0; i < currentTab.components.size(); i++) {
-                                Component component = currentTab.components.get(i);
-                                if (component.getClass() == ComboBox.class) {
-                                    ComboBox comboBox = (ComboBox) component;
-                                    comboBox.menuOpen = false;
-                                }
-                            }
-
                             Tab newTab = tabBar.tabs.get(selectedTab);
                             UICommons.tabBar_selectTab(tabBar, selectedTab);
                             if (newTab.tabAction != null) newTab.tabAction.onSelect();
@@ -715,20 +683,16 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
                     // Hide displayed context Menus
-                    if (inputState.displayedContextMenu != null) {
-                        inputState.displayedContextMenu = null;
+                    if (inputState.openContextMenu != null) {
+                        inputState.openContextMenu = null;
                     }
-                    // Close opened comboboxes if not opened on this frame
+                    // Close opened Comboboxes
                     if (inputState.openComboBox != null && inputState.lastGUIMouseHover != inputState.openComboBox) {
-                        inputState.openComboBox.menuOpen = false;
-                        inputState.openComboBox = null;
+                        UICommons.comboBox_close(inputState, inputState.openComboBox);
                     }
-                    // Unfocus focused textfield
+                    // Unfocus focused textfields
                     if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
-                        inputState.focusedTextField.focused = false;
-                        if (inputState.focusedTextField.textFieldAction != null)
-                            inputState.focusedTextField.textFieldAction.onUnFocus();
-                        inputState.focusedTextField = null;
+                        UICommons.textField_unFocus(inputState, inputState.focusedTextField);
                     }
                 }
 
@@ -1250,6 +1214,11 @@ public class UIEngine<T extends UIAdapter> {
                                 magnetActive = true;
                             }
                         }
+                    } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
+                        ContextMenuItem contextMenuItem = (ContextMenuItem)inputState.lastGUIMouseHover;
+                        magnet_x = inputState.mouse_gui.x;
+                        magnet_y = contextMenuItem.contextMenu.y - (((contextMenuItem.contextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
                     } else if (inputState.lastGUIMouseHover instanceof Component component) {
                         if (!component.disabled && component.visible) {
                             if (inputState.lastGUIMouseHover.getClass() == List.class) {
@@ -1285,9 +1254,13 @@ public class UIEngine<T extends UIAdapter> {
                                 magnetActive = true;
                             } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
                                 ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                                if (!comboBox.menuOpen) {
+                                if (!UICommons.comboBox_isOpen(inputState, comboBox)) {
                                     magnet_x = inputState.mouse_gui.x;
                                     magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
+                                    magnetActive = true;
+                                } else {
+                                    magnet_x = inputState.mouse_gui.x;
+                                    magnet_y = UICommons.component_getAbsoluteY(comboBox) - (((UICommons.component_getAbsoluteY(comboBox) - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
                                     magnetActive = true;
                                 }
                             } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
@@ -1622,16 +1595,17 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        // Context Menu collision
-        if (inputState.displayedContextMenu != null) {
-            for (int i = 0; i < inputState.displayedContextMenu.items.size(); i++) {
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, inputState.displayedContextMenu.x, inputState.displayedContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
-                    return inputState.displayedContextMenu.items.get(i);
+        // Context Menu Item collision
+        if (inputState.openContextMenu != null) {
+            for (int i = 0; i < inputState.openContextMenu.items.size(); i++) {
+                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, inputState.openContextMenu.x, inputState.openContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                    return inputState.openContextMenu.items.get(i);
                 }
             }
         }
+
         // Combobox Open Menu collision
-        if (inputState.openComboBox != null && inputState.openComboBox.menuOpen) {
+        if (inputState.openComboBox != null) {
             if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * TILE_SIZE), inputState.openComboBox.width * TILE_SIZE, (inputState.openComboBox.items.size() * TILE_SIZE))) {
                 return inputState.openComboBox;
             }
@@ -2046,8 +2020,8 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawContextMenu() {
 
-        if (inputState.displayedContextMenu != null) {
-            ContextMenu contextMenu = inputState.displayedContextMenu;
+        if (inputState.openContextMenu != null) {
+            ContextMenu contextMenu = inputState.openContextMenu;
 
             int width = inputState.displayedContextMenuWidth;
             int height = contextMenu.items.size();
@@ -2293,7 +2267,7 @@ public class UIEngine<T extends UIAdapter> {
         if (component.getClass() == ComboBox.class) {
             ComboBox combobox = (ComboBox) component;
             // Menu
-            if (combobox.menuOpen) {
+            if (UICommons.comboBox_isOpen(inputState, combobox)) {
                 int width = combobox.width;
                 int height = combobox.items.size();
                 /* Menu */
@@ -2465,7 +2439,7 @@ public class UIEngine<T extends UIAdapter> {
             // Box
             for (int ix = 0; ix < combobox.width; ix++) {
                 int index = ix == 0 ? 0 : (ix == combobox.width - 1 ? 2 : 1);
-                CMediaGFX comboMedia = combobox.menuOpen ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
+                CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, combobox) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
                 this.render_drawCMediaGFX(comboMedia, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox), index);
             }
             // Text
@@ -2519,7 +2493,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 if (textField.content != null) {
                     render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
-                    if (textField.focused) {
+                    if (UICommons.textField_isFocused(inputState, textField)) {
                         int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                         if (xOffset < textField.width * TILE_SIZE) {
                             render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));

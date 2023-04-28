@@ -18,6 +18,4 @@ public class ComboBox extends Component {
 
     public CMediaFont font;
 
-    public boolean menuOpen;
-
 }

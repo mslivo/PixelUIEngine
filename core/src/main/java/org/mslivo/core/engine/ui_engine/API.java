@@ -675,12 +675,17 @@ public class API {
             });
 
 
+
             Component[] componentsl = new Component[]{textC, okC, input};
             components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             components.setOffset(input, UIEngine.TILE_SIZE / 2, 0);
             windows.addComponents(modal, componentsl);
-
-            components.textField.focus(input);
+            windows.setWindowAction(modal, new WindowAction() {
+                @Override
+                public void onAdd() {
+                    components.textField.focus(input);
+                }
+            });
             return modal;
         }
 
@@ -1061,11 +1066,11 @@ public class API {
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        inputState.displayedContextMenu = contextMenu;
-        inputState.displayedContextMenu.x = x;
-        inputState.displayedContextMenu.y = y;
+        inputState.openContextMenu = contextMenu;
+        inputState.openContextMenu.x = x;
+        inputState.openContextMenu.y = y;
         int textwidth = 0;
-        for (ContextMenuItem item : inputState.displayedContextMenu.items) {
+        for (ContextMenuItem item : inputState.openContextMenu.items) {
             int w = mediaManager.textWidth(item.font, item.text);
             if (item.icon != null) w = w + UIEngine.TILE_SIZE;
             if (w > textwidth) textwidth = w;
@@ -1074,12 +1079,12 @@ public class API {
     }
 
     public void closeContextMenu() {
-        inputState.displayedContextMenu = null;
+        inputState.openContextMenu = null;
         inputState.displayedContextMenuWidth = 0;
     }
 
     public ContextMenu getContextMenu() {
-        return inputState.displayedContextMenu;
+        return inputState.openContextMenu;
     }
 
     public ArrayList<Window> getWindows() {
@@ -1987,8 +1992,26 @@ public class API {
 
         public void setContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            contextMenu.items.clear();
-            contextMenu.items.addAll(Arrays.asList(contextMenuItems));
+            removeAllContextMenuItems(contextMenu);
+            for(ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
+        }
+
+        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
+            if(contextMenu == null || contextMenuItem == null) return;
+            contextMenu.items.add(contextMenuItem);
+            contextMenuItem.contextMenu = contextMenu;
+        }
+
+        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
+            if(contextMenu == null || contextMenuItem == null) return;
+            if(contextMenu.items.contains(contextMenuItem)){
+                UICommons.removeContextMenuItemReferences(contextMenuItem);
+                contextMenu.items.remove(contextMenuItem);
+            }
+        }
+
+        public void removeAllContextMenuItems(ContextMenu contextMenu){
+            for(ContextMenuItem contextMenuItem : contextMenu.items) removeContextMenuItem(contextMenu, contextMenuItem);
         }
 
         public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
@@ -3601,7 +3624,7 @@ public class API {
             public void removeTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
                 if (tabBar.tabs.contains(tab)) {
-                    tab.tabBar = null;
+                    UICommons.removeTabReferences(tab);
                     tabBar.tabs.remove(tab);
                 }
             }
@@ -3795,16 +3818,16 @@ public class API {
 
             public void unFocus(TextField textField) {
                 if (textField == null) return;
-                if (inputState.focusedTextField == textField) {
-                    inputState.focusedTextField.focused = false;
-                    inputState.focusedTextField = null;
-                }
+                UICommons.textField_unFocus(inputState, textField);
             }
 
             public void focus(TextField textField) {
                 if (textField == null) return;
-                inputState.focusedTextField = textField;
-                textField.focused = true;
+                UICommons.textField_focus(inputState, textField);
+            }
+
+            public boolean isFocused(TextField textField){
+                return UICommons.textField_isFocused(inputState, textField);
             }
 
 
@@ -4270,14 +4293,17 @@ public class API {
 
             public void open(ComboBox comboBox) {
                 if (comboBox == null) return;
-                comboBox.menuOpen = true;
+                UICommons.comboBox_open(inputState, comboBox);
             }
 
             public void close(ComboBox comboBox) {
                 if (comboBox == null) return;
-                comboBox.menuOpen = false;
+                UICommons.comboBox_close(inputState, comboBox);
             }
 
+            public boolean isOpen(ComboBox comboBox) {
+                return UICommons.comboBox_isOpen(inputState, comboBox);
+            }
         }
 
         public class _ScrollBar {

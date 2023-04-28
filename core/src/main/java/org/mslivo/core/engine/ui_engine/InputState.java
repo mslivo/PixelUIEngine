@@ -123,6 +123,12 @@ public class InputState {
 
     public ToolTip tooltip;
 
+    public float tooltip_fadeIn_pct;
+
+    public boolean tooltip_wait_delay;
+
+    public long tooltip_delay_timer, tooltip_fadeIn_timer;
+
     public ToolTip gameToolTip;
     public Object tooltip_lastHoverObject;
 
@@ -134,35 +140,22 @@ public class InputState {
 
     public TextField focusedTextField;
 
-    public Object inventoryDrag_Item;
 
     public Inventory inventoryDrag_Inventory;
 
     public GridPoint2 inventoryDrag_from;
 
     public GridPoint2 inventoryDrag_offset;
-
-    public Object listDrag_Item;
+    public Object inventoryDrag_Item;
 
     public List listDrag_List;
-
     public int listDrag_from_index;
-
     public GridPoint2 listDrag_offset;
-
-    public float tooltip_fadeIn_pct;
-
-    public boolean tooltip_wait_delay;
-
-    public long tooltip_delay_timer, tooltip_fadeIn_timer;
-
-    public boolean[] hotKeyPressedKeys;
-
-    public Window lastActiveWindow;
+    public Object listDrag_Item;
 
     public ComboBox openComboBox;
 
-    public ContextMenu displayedContextMenu;
+    public ContextMenu openContextMenu;
 
     public int displayedContextMenuWidth;
 
@@ -214,4 +207,7 @@ public class InputState {
 
     public InputEvents inputEvents;
 
+    public boolean[] hotKeyPressedKeys;
+
+    public Window lastActiveWindow;
 }

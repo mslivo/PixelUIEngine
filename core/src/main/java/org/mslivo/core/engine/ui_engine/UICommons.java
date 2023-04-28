@@ -1,25 +1,26 @@
 package org.mslivo.core.engine.ui_engine;
 
-import com.badlogic.gdx.math.GridPoint2;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
 class UICommons {
 
-    public static String progressBar_getProgressText(float progress){
-        return ProgressBarPercentText.progressText[(int)(progress*100)];
+    public static String progressBar_getProgressText(float progress) {
+        return ProgressBarPercentText.progressText[(int) (progress * 100)];
     }
 
-    public static String progressBar_getProgressText2Decimal(float progress){
-        return ProgressBarPercentText.progressText2Decimal[(int)(progress*10000)];
+    public static String progressBar_getProgressText2Decimal(float progress) {
+        return ProgressBarPercentText.progressText2Decimal[(int) (progress * 10000)];
     }
 
     static int component_getParentWindowX(Component component) {
@@ -39,7 +40,7 @@ class UICommons {
     }
 
     static Tab tabBar_getSelectedTab(TabBar tabBar) {
-        if(tabBar == null){
+        if (tabBar == null) {
             return null;
         }
         return tabBar.tabs.get(Tools.Calc.inBounds(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
@@ -63,7 +64,7 @@ class UICommons {
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getRealWidth(window);
-        int wndheight =  window_getRealHeight(window);
+        int wndheight = window_getRealHeight(window);
         window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
         window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - wndheight);
     }
@@ -123,34 +124,110 @@ class UICommons {
         // Placeholder method
     }
 
+    public static void removeTabReferences(Tab tab){
+        tab.tabBar = null;
+    }
+
+    public static void removeContextMenuItemReferences(ContextMenuItem contextMenuItem){
+        contextMenuItem.contextMenu = null;
+    }
+
     static void resetGUIVariables(InputState inputState) {
+        // Window
         inputState.draggedWindow = null;
+        inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
+        // Buton
         inputState.pressedButton = null;
         inputState.pressedButton_timer_hold = 0;
-        inputState.turnedKnob = null;
+        // Scrollbar
+        inputState.scrolledScrollBarVertical = null;
+        inputState.scrolledScrollBarHorizontal = null;
+
+        // ToolTip
         inputState.tooltip = null;
         inputState.tooltip_fadeIn_pct = 0f;
         inputState.tooltip_wait_delay = false;
         inputState.tooltip_delay_timer = 0;
         inputState.tooltip_fadeIn_timer = 0;
-        inputState.scrolledScrollBarVertical = null;
-        inputState.scrolledScrollBarHorizontal = null;
-        inputState.inventoryDrag_Item = null;
-        inputState.inventoryDrag_Inventory = null;
-        inputState.inventoryDrag_offset = new GridPoint2();
-        inputState.inventoryDrag_from = new GridPoint2();
-        inputState.listDrag_Item = null;
-        inputState.listDrag_List = null;
-        inputState.listDrag_offset = new GridPoint2();
-        inputState.listDrag_from_index = 0;
         inputState.tooltip_lastHoverObject = null;
+        inputState.gameToolTip = null;
+
+        // Knob
+        inputState.turnedKnob = null;
+
+        // Map
         inputState.pressedMap = null;
-        inputState.displayedContextMenu = null;
+
+        // Viewport
+        inputState.pressedGameViewPort = null;
+
+        // Textfield
+        inputState.focusedTextField = null;
+
+        // Inventory
+        inputState.inventoryDrag_Inventory = null;
+        inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
+        inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
+        inputState.inventoryDrag_Item = null;
+
+        // List
+        inputState.listDrag_List = null;
+        inputState.listDrag_from_index = 0;
+        inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
+        inputState.listDrag_Item = null;
+
+        // ComboBox
+        inputState.openComboBox = null;
+
+        // ContextMenu
+        inputState.openContextMenu = null;
         inputState.displayedContextMenuWidth = 0;
+
     }
 
+    public static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox){
+        return inputState.openComboBox != null && inputState.openComboBox == comboBox;
+    }
 
-    static void window_bringToFront(InputState inputState, Window window){
+    public static void comboBox_open(InputState inputState, ComboBox comboBox){
+        // Close other Comboboxes
+        if(inputState.openComboBox != null){
+            comboBox_close(inputState, inputState.openComboBox);
+        }
+        // Open this one
+        inputState.openComboBox = comboBox;
+        if(inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onOpen();
+    }
+
+    public static void comboBox_close(InputState inputState, ComboBox comboBox){
+        if(comboBox_isOpen(inputState, comboBox)){
+            if(inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onClose();
+            inputState.openComboBox = null;
+        }
+    }
+
+    public static boolean textField_isFocused(InputState inputState, TextField textField){
+        return inputState.focusedTextField != null && inputState.focusedTextField == textField;
+    }
+
+    public static void textField_focus(InputState inputState, TextField textField){
+        // Unfocus other textfields
+        if(inputState.focusedTextField != null){
+            textField_unFocus(inputState, inputState.focusedTextField);
+        }
+        // Focus this one
+        inputState.focusedTextField = textField;
+        if(inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
+    }
+
+    public static void textField_unFocus(InputState inputState, TextField textField){
+        if(textField_isFocused(inputState, textField)){
+            if(inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onUnFocus();
+            inputState.focusedTextField = null;
+        }
+    }
+
+    static void window_bringToFront(InputState inputState, Window window) {
         if (inputState.windows.size() == 1) return;
         if (window.alwaysOnTop) {
             if (inputState.windows.get(inputState.windows.size() - 1) != window) {

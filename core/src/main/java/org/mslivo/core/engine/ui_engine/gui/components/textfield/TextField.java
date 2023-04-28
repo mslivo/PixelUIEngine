@@ -14,7 +14,7 @@ public class TextField extends Component {
 
     public TextFieldAction textFieldAction;
 
-    public boolean focused;
+    //public boolean focused;
 
     public int contentMaxLength;
 

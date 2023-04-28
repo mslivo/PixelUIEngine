@@ -1,3 +1,4 @@
+[ ] magnet for contextmenu
 [x] profile iterator creation
 [x] use GridPoint2 instead of *_x,*_y variables
 [x] rename "api.presets"

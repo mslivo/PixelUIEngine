@@ -18,6 +18,8 @@ public class ContextMenuItem {
 
     public ContextMenuItemAction contextMenuItemAction;
 
+    public ContextMenu contextMenu;
+
     public String name;
 
     public Object data;
