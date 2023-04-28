@@ -1217,7 +1217,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
                         ContextMenuItem contextMenuItem = (ContextMenuItem)inputState.lastGUIMouseHover;
                         magnet_x = inputState.mouse_gui.x;
-                        magnet_y = contextMenuItem.contextMenu.y - (((contextMenuItem.contextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                        magnet_y = contextMenuItem.addedToContextMenu.y - (((contextMenuItem.addedToContextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
                         magnetActive = true;
                     } else if (inputState.lastGUIMouseHover instanceof Component component) {
                         if (!component.disabled && component.visible) {

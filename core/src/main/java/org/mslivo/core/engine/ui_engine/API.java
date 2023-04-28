@@ -1997,8 +1997,8 @@ public class API {
 
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
             if(contextMenu == null || contextMenuItem == null) return;
-            if(!contextMenu.items.contains(contextMenuItem) && contextMenuItem.contextMenu == null) {
-                contextMenuItem.contextMenu = contextMenu;
+            if(contextMenuItem.addedToContextMenu == null && !contextMenu.items.contains(contextMenuItem)) {
+                contextMenuItem.addedToContextMenu = contextMenu;
                 contextMenu.items.add(contextMenuItem);
             }
         }
@@ -2059,6 +2059,7 @@ public class API {
                 setName(contextMenuItem, "");
                 setData(contextMenuItem, null);
                 setContextMenuItemAction(contextMenuItem, contextMenuItemAction);
+                contextMenuItem.addedToContextMenu = null;
                 return contextMenuItem;
             }
 
@@ -2483,24 +2484,32 @@ public class API {
             setColor(tooltip, color);
             setToolTipAction(tooltip, toolTipAction);
             setFont(tooltip, font);
-            setImages(tooltip, images);
+            addImages(tooltip, images);
             return tooltip;
         }
 
-        public void setImages(ToolTip toolTip, ToolTipImage[] images) {
+        public void addImages(ToolTip toolTip, ToolTipImage[] images) {
             if (toolTip == null) return;
-            toolTip.images.clear();
-            if (images != null) {
-                for (ToolTipImage image : images) {
-                    addImage(toolTip, image);
-                }
+            for(ToolTipImage toolTipImage : toolTip.images) addToolTipImage(toolTip, toolTipImage);
+        }
+
+        public void removeAllToolTipImages(ToolTip toolTip){
+            for(ToolTipImage toolTipImage : toolTip.images) removeToolTipImage(toolTip, toolTipImage);
+        }
+
+        public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+            if (toolTip == null || toolTipImage == null) return;
+            if (toolTipImage.addedToToolTip == null && !toolTip.images.contains(toolTipImage)) {
+                toolTipImage.addedToToolTip = toolTip;
+                toolTip.images.add(toolTipImage);
             }
         }
 
-        public void addImage(ToolTip toolTip, ToolTipImage toolTipImage) {
-            if (toolTip == null) return;
-            if (toolTipImage != null) {
-                toolTip.images.add(toolTipImage);
+        public void removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+            if (toolTip == null || toolTipImage == null) return;
+            if (toolTip.images.contains(toolTipImage)) {
+                UICommons.removeToolTipImageReferences(toolTipImage);
+                toolTip.images.remove(toolTipImage);
             }
         }
 
@@ -2529,7 +2538,6 @@ public class API {
             if (tooltip == null) return;
             tooltip.font = font == null ? config.tooltipDefaultFont : font;
         }
-
 
     }
 
@@ -3429,9 +3437,10 @@ public class API {
 
                 public void addTabComponent(Tab tab, Component component) {
                     if (tab == null || component == null) return;
-                    if (component.addedToTab != null) return; // component can only be on one tab
-                    component.addedToTab = tab;
-                    tab.components.add(component);
+                    if (component.addedToTab == null && !tab.components.contains(component)) {
+                        component.addedToTab = tab;
+                        tab.components.add(component);
+                    }
                 }
 
                 public void addTabComponents(Tab tab, Component[] components) {
@@ -3456,8 +3465,10 @@ public class API {
 
                 public void removeTabComponent(Tab tab, Component component) {
                     if (tab == null || component == null) return;
-                    component.addedToTab = null;
-                    tab.components.remove(component);
+                    if(tab.components.contains(component)) {
+                        component.addedToTab = null;
+                        tab.components.remove(component);
+                    }
                 }
 
                 public void setIcon(Tab tab, CMediaGFX icon) {
@@ -3620,7 +3631,7 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab, int index) {
                 if (tabBar == null || tab == null) return;
-                if(!tabBar.tabs.contains(tab) && tab.tabBar == null) {
+                if(tab.tabBar == null && !tabBar.tabs.contains(tab)) {
                     tab.tabBar = tabBar;
                     tabBar.tabs.add(index, tab);
                 }
@@ -3943,8 +3954,8 @@ public class API {
 
             public void addMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if (!map.mapOverlays.contains(mapOverlay) && mapOverlay.map == null){
-                    mapOverlay.map = map;
+                if (mapOverlay.addedToMap == null && !map.mapOverlays.contains(mapOverlay)){
+                    mapOverlay.addedToMap = map;
                     map.mapOverlays.add(mapOverlay);
                 }
             }
@@ -3999,6 +4010,7 @@ public class API {
                     setName(mapOverlay, "");
                     setData(mapOverlay, null);
                     mapOverlay.timer = fadeOut ? System.currentTimeMillis() : 0;
+                    mapOverlay.addedToMap = null;
                     return mapOverlay;
                 }
 

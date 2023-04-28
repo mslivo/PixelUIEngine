@@ -12,6 +12,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
 class UICommons {
@@ -130,11 +131,15 @@ class UICommons {
     }
 
     public static void removeContextMenuItemReferences(ContextMenuItem contextMenuItem){
-        contextMenuItem.contextMenu = null;
+        contextMenuItem.addedToContextMenu = null;
     }
 
     public static void removeMapOverlayReferences(MapOverlay mapOverlay){
-        mapOverlay.map = null;
+        mapOverlay.addedToMap = null;
+    }
+
+    public static void removeToolTipImageReferences(ToolTipImage toolTipImage){
+        toolTipImage.addedToToolTip = null;
     }
 
     static void resetGUIVariables(InputState inputState) {

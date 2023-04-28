@@ -10,4 +10,6 @@ public class ToolTipImage {
 
     public int offset_y;
 
+    public ToolTip addedToToolTip;
+
 }

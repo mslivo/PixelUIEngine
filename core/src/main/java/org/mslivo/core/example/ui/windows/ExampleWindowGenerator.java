@@ -44,7 +44,6 @@ import org.mslivo.core.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 public class ExampleWindowGenerator extends WindowGenerator {
 
@@ -341,8 +340,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("Button 1\n\n\n\nThese"));
 
-        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 8));
-        api.toolTip.addImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 8, 16));
+        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 8));
+        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 8, 16));
 
         api.components.setToolTip(imageButton3, imageToolTip);
         api.components.setToolTip(imageButton4, api.toolTip.create(Tools.Text.toArray("Button 2\nAre")));

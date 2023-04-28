@@ -24,6 +24,6 @@ public class MapOverlay {
 
     public long timer;
 
-    public Map map;
+    public Map addedToMap;
 
 }

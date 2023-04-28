@@ -18,7 +18,7 @@ public class ContextMenuItem {
 
     public ContextMenuItemAction contextMenuItemAction;
 
-    public ContextMenu contextMenu;
+    public ContextMenu addedToContextMenu;
 
     public String name;
 
