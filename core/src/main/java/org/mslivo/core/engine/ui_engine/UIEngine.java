@@ -290,8 +290,8 @@ public class UIEngine<T extends UIAdapter> {
                         if (!inputState.focusedTextField.content.isEmpty() && inputState.focusedTextField.markerPosition > 0) {
 
                             String newContent = inputState.focusedTextField.content.substring(0, inputState.focusedTextField.markerPosition - 1) + inputState.focusedTextField.content.substring(inputState.focusedTextField.markerPosition);
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition - 1);
-                            UICommons.textfield_setContent(inputState.focusedTextField, newContent);
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition - 1);
+                            UICommons.textField_setContent(inputState.focusedTextField, newContent);
 
                             if (inputState.focusedTextField.textFieldAction != null) {
                                 inputState.focusedTextField.contentValid = inputState.focusedTextField.textFieldAction.isContentValid(newContent);
@@ -303,7 +303,7 @@ public class UIEngine<T extends UIAdapter> {
 
                             String newContent = inputState.focusedTextField.content.substring(0, inputState.focusedTextField.markerPosition) + inputState.focusedTextField.content.substring(inputState.focusedTextField.markerPosition + 1);
 
-                            UICommons.textfield_setContent(inputState.focusedTextField, newContent);
+                            UICommons.textField_setContent(inputState.focusedTextField, newContent);
 
                             if (inputState.focusedTextField.textFieldAction != null) {
                                 inputState.focusedTextField.contentValid = inputState.focusedTextField.textFieldAction.isContentValid(newContent);
@@ -319,8 +319,8 @@ public class UIEngine<T extends UIAdapter> {
                         if (inputState.focusedTextField.allowedCharacters == null || inputState.focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             if (inputState.focusedTextField.content.length() < inputState.focusedTextField.contentMaxLength) {
                                 String newContent = inputState.focusedTextField.content.substring(0, inputState.focusedTextField.markerPosition) + keyTypedCharacter + inputState.focusedTextField.content.substring(inputState.focusedTextField.markerPosition);
-                                UICommons.textfield_setContent(inputState.focusedTextField, newContent);
-                                UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition + 1);
+                                UICommons.textField_setContent(inputState.focusedTextField, newContent);
+                                UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition + 1);
                                 if (inputState.focusedTextField.textFieldAction != null) {
                                     inputState.focusedTextField.contentValid = inputState.focusedTextField.textFieldAction.isContentValid(newContent);
                                     inputState.focusedTextField.textFieldAction.onContentChange(newContent, inputState.focusedTextField.contentValid);
@@ -338,13 +338,13 @@ public class UIEngine<T extends UIAdapter> {
                     for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size(); ik++) {
                         int keyDownKeyCode = inputState.inputEvents.keyDownKeyCodes.get(ik);
                         if (keyDownKeyCode == Input.Keys.LEFT) {
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition - 1);
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition - 1);
                         } else if (keyDownKeyCode == Input.Keys.RIGHT) {
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition + 1);
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.markerPosition + 1);
                         } else if (keyDownKeyCode == Input.Keys.HOME) {
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.content.length());
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, inputState.focusedTextField.content.length());
                         } else if (keyDownKeyCode == Input.Keys.END) {
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField, 0);
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField, 0);
                         }
                     }
 
@@ -620,7 +620,7 @@ public class UIEngine<T extends UIAdapter> {
                         for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
                             if (mediaManager.textWidth(inputState.focusedTextField.font, testString) > mouseX) {
-                                UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
+                                UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField,
                                         inputState.focusedTextField.offset + i);
                                 found = true;
                                 break charLoop;
@@ -628,7 +628,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                         if (!found) {
                             // Set to end
-                            UICommons.textfield_setMarkerPosition(mediaManager, inputState.focusedTextField,
+                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField,
                                     inputState.focusedTextField.offset + fieldContent.length);
                         }
 
@@ -1646,10 +1646,10 @@ public class UIEngine<T extends UIAdapter> {
     private boolean isHiddenByTab(Component component) {
         if (component.addedToTab == null) return false;
 
-        Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.tabBar);
+        Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
         if (selectedTab != null && selectedTab == component.addedToTab) {
-            if (component.addedToTab.tabBar.addedToTab != null) {
-                return isHiddenByTab(component.addedToTab.tabBar);
+            if (component.addedToTab.addedToTabBar.addedToTab != null) {
+                return isHiddenByTab(component.addedToTab.addedToTabBar);
             } else {
                 return false;
             }

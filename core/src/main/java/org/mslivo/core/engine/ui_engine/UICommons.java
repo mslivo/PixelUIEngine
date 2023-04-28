@@ -6,12 +6,15 @@ import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
@@ -79,7 +82,7 @@ class UICommons {
         return false;
     }
 
-    static void textfield_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
+    static void textField_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
         textField.markerPosition = Tools.Calc.inBounds(position, 0, textField.content.length());
 
         if (textField.markerPosition < textField.offset) {
@@ -98,7 +101,7 @@ class UICommons {
         }
     }
 
-    static void textfield_setContent(TextField textField, String content) {
+    static void textField_setContent(TextField textField, String content) {
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
     }
@@ -111,35 +114,47 @@ class UICommons {
         component.addedToWindow = null;
     }
 
+    public static void setComponentReferences(InputState inputState, Window window, Component component) {
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+        component.addedToWindow = window;
+    }
+
     public static void removeWindowReferences(InputState inputState, Window window) {
         if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
         if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
     }
 
-    public static void setComponentReferences(InputState inputState, Window window, Component component) {
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
-        component.addedToWindow = window;
-    }
-
     public static void setWindowReferences(InputState inputState, Window window) {
-        // Placeholder method
+        // None
     }
 
     public static void removeTabReferences(Tab tab){
-        tab.tabBar = null;
+        tab.addedToTabBar = null;
+    }
+    public static void setTabReferences(Tab tab, TabBar addedToTabBar){
+        tab.addedToTabBar = addedToTabBar;
     }
 
     public static void removeContextMenuItemReferences(ContextMenuItem contextMenuItem){
         contextMenuItem.addedToContextMenu = null;
     }
+    public static void setContextMenuItemReferences(ContextMenuItem contextMenuItem, ContextMenu addedToContextMenu){
+        contextMenuItem.addedToContextMenu = addedToContextMenu;
+    }
 
     public static void removeMapOverlayReferences(MapOverlay mapOverlay){
         mapOverlay.addedToMap = null;
     }
+    public static void setMapOverlayReferences(MapOverlay mapOverlay, Map addedToMap){
+        mapOverlay.addedToMap = addedToMap;
+    }
 
     public static void removeToolTipImageReferences(ToolTipImage toolTipImage){
         toolTipImage.addedToToolTip = null;
+    }
+    public static void setToolTipImageReferences(ToolTipImage toolTipImage, ToolTip toolTip){
+        toolTipImage.addedToToolTip = toolTip;
     }
 
     static void resetGUIVariables(InputState inputState) {

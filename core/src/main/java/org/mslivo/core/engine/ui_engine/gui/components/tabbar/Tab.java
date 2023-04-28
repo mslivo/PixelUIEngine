@@ -15,7 +15,7 @@ public class Tab {
 
     public TabAction tabAction;
 
-    public TabBar tabBar;
+    public TabBar addedToTabBar;
 
     public CMediaFont font;
 

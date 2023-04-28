@@ -1113,7 +1113,7 @@ public class API {
 
     public void addWindow(Window window) {
         if (window == null) return;
-        UICommons.setWindowReferences(inputState,window);
+        UICommons.setWindowReferences(inputState, window);
         inputState.windows.add(window);
         if (window.windowAction != null) window.windowAction.onAdd();
     }
@@ -1223,9 +1223,7 @@ public class API {
 
     public void removeScreenComponents(Component[] components) {
         if (components == null) return;
-        for (Component component : components) {
-            removeScreenComponent(component);
-        }
+        for (Component component : components) removeScreenComponent(component);
     }
 
     public void removeAllScreenComponents() {
@@ -1998,7 +1996,7 @@ public class API {
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
             if(contextMenu == null || contextMenuItem == null) return;
             if(contextMenuItem.addedToContextMenu == null && !contextMenu.items.contains(contextMenuItem)) {
-                contextMenuItem.addedToContextMenu = contextMenu;
+                UICommons.setContextMenuItemReferences(contextMenuItem, contextMenu);
                 contextMenu.items.add(contextMenuItem);
             }
         }
@@ -2500,7 +2498,7 @@ public class API {
         public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
             if (toolTipImage.addedToToolTip == null && !toolTip.images.contains(toolTipImage)) {
-                toolTipImage.addedToToolTip = toolTip;
+                UICommons.setToolTipImageReferences(toolTipImage, toolTip);
                 toolTip.images.add(toolTipImage);
             }
         }
@@ -3623,16 +3621,16 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
-                if(!tabBar.tabs.contains(tab) && tab.tabBar == null) {
-                    tab.tabBar = tabBar;
+                if(!tabBar.tabs.contains(tab) && tab.addedToTabBar == null) {
+                    UICommons.setTabReferences(tab, tabBar);
                     tabBar.tabs.add(tab);
                 }
             }
 
             public void addTab(TabBar tabBar, Tab tab, int index) {
                 if (tabBar == null || tab == null) return;
-                if(tab.tabBar == null && !tabBar.tabs.contains(tab)) {
-                    tab.tabBar = tabBar;
+                if(tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
+                    UICommons.setTabReferences(tab, tabBar);
                     tabBar.tabs.add(index, tab);
                 }
             }
@@ -3802,12 +3800,12 @@ public class API {
 
             public void setMarkerPosition(TextField textField, int position) {
                 if (textField == null) return;
-                UICommons.textfield_setMarkerPosition(mediaManager, textField, position);
+                UICommons.textField_setMarkerPosition(mediaManager, textField, position);
             }
 
             public void setContent(TextField textField, String content) {
                 if (textField == null) return;
-                UICommons.textfield_setContent(textField, content);
+                UICommons.textField_setContent(textField, content);
             }
 
             public void setFont(TextField textField, CMediaFont font) {
@@ -3955,7 +3953,7 @@ public class API {
             public void addMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
                 if (mapOverlay.addedToMap == null && !map.mapOverlays.contains(mapOverlay)){
-                    mapOverlay.addedToMap = map;
+                    UICommons.setMapOverlayReferences(mapOverlay, map);
                     map.mapOverlays.add(mapOverlay);
                 }
             }
