@@ -2062,15 +2062,13 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawContextMenu() {
-        float alpha = 1f;
         if (inputState.openContextMenu != null) {
-            ContextMenu contextMenu = inputState.openContextMenu;
+            float alpha = inputState.openContextMenu.color_a;
 
+            ContextMenu contextMenu = inputState.openContextMenu;
             int width = inputState.displayedContextMenuWidth;
             int height = contextMenu.items.size();
 
-            render_batchSaveColor();
-            render_batchSetColor(contextMenu.color_r, contextMenu.color_g, contextMenu.color_b, contextMenu.color_a);
 
             /* Menu */
             for (int iy = 0; iy < height; iy++) {
@@ -2093,11 +2091,9 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextMenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, contextMenu.color_a, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, item.icon, item.iconIndex, (width) * TILE_SIZE);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, item.icon, item.iconIndex, (width) * TILE_SIZE);
             }
 
-
-            render_batchLoadColor();
         }
 
 
@@ -2230,8 +2226,10 @@ public class UIEngine<T extends UIAdapter> {
         // Images
         for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
-            render_drawCMediaGFX(toolTipImage.image, tooltip_x + toolTipImage.offset_x, tooltip_y + toolTipImage.offset_y);
-
+            render_batchSaveColor();
+            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, toolTipImage.color_a);
+            render_drawCMediaGFX(toolTipImage.image, tooltip_x + toolTipImage.x, tooltip_y + toolTipImage.y);
+            render_batchLoadColor();
         }
 
 
@@ -2459,8 +2457,6 @@ public class UIEngine<T extends UIAdapter> {
                 render_batchSetColor(color_r, color_g, color_b, alpha2);
                 this.render_drawCMediaGFX(comboMedia, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox), index);
                 render_batchLoadColor();
-
-
 
             }
             // Text
@@ -2723,7 +2719,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inventoryDrag_Item != null) {
             if (inputState.inventoryDrag_Inventory != null && inputState.inventoryDrag_Inventory.inventoryAction != null) {
-                render_batchSetColorWhite(api.config.getDragTransparency());
+                render_batchSetColorWhite(api.config.getDragAlpha());
                 CMediaGFX icon = inputState.inventoryDrag_Inventory.inventoryAction.icon(inputState.inventoryDrag_Item);
                 render_drawCMediaGFX(icon, inputState.mouse_gui.x - inputState.inventoryDrag_offset.x, inputState.mouse_gui.y - inputState.inventoryDrag_offset.y, inputState.inventoryDrag_Inventory.inventoryAction.iconArrayIndex(inputState.inventoryDrag_Item));
             }
@@ -2731,7 +2727,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.listDrag_List.listAction != null) {
 
                 // List
-                render_batchSetColor(inputState.listDrag_List.color_r, inputState.listDrag_List.color_g, inputState.listDrag_List.color_b, Math.min(inputState.listDrag_List.color_a, api.config.getDragTransparency()));
+                render_batchSetColor(inputState.listDrag_List.color_r, inputState.listDrag_List.color_g, inputState.listDrag_List.color_b, Math.min(inputState.listDrag_List.color_a, api.config.getDragAlpha()));
                 for (int ix = 0; ix < inputState.listDrag_List.width; ix++) {
                     this.render_drawCMediaGFX(GUIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_gui.x - inputState.listDrag_offset.x + (ix * TILE_SIZE), inputState.mouse_gui.y - inputState.listDrag_offset.y);
                 }
@@ -2801,7 +2797,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_fontSetAlpha(CMediaFont font, float a) {
-        mediaManager.getCMediaFont(font).setColor(1,1,1, a);
+        mediaManager.getCMediaFont(font).setColor(1, 1, 1, a);
     }
 
     private void render_fontSetColorWhite() {

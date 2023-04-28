@@ -1333,12 +1333,11 @@ public class API {
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
-        private FColor contextMenuDefaultColor = Tools.Colors.WHITE;
         private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_ARROW;
         private int gameviewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
-        private float dragTransparency = 0.8f;
+        private float dragAlpha = 0.8f;
         private int buttonHoldTimer = 8;
         private float knobSensitivity = 0.7f;
         private boolean foldWindowsOnDoubleClick = true;
@@ -1467,12 +1466,12 @@ public class API {
             this.defaultFont = defaultFont;
         }
 
-        public float getDragTransparency() {
-            return dragTransparency;
+        public float getDragAlpha() {
+            return dragAlpha;
         }
 
-        public void setDragTransparency(float dragTransparency) {
-            this.dragTransparency = Tools.Calc.inBounds(dragTransparency, 0f, 1f);
+        public void setDragAlpha(float dragAlpha) {
+            this.dragAlpha = Tools.Calc.inBounds(dragAlpha, 0f, 1f);
         }
 
         public int getButtonHoldTimer() {
@@ -1583,14 +1582,6 @@ public class API {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
 
-        public FColor getContextMenuDefaultColor() {
-            return contextMenuDefaultColor;
-        }
-
-        public void setContextMenuDefaultColor(FColor contextMenuDefaultColor) {
-            this.contextMenuDefaultColor = contextMenuDefaultColor;
-        }
-
         public boolean isKeyBoardControlEnabled() {
             return keyBoardControlEnabled;
         }
@@ -1683,12 +1674,11 @@ public class API {
             setWindowsDefaultColor(config.getWindowsDefaultColor());
             setComponentsDefaultColor(config.getComponentsDefaultColor());
             setTooltipDefaultColor(config.getWindowsDefaultColor());
-            setContextMenuDefaultColor(config.getContextMenuDefaultColor());
             setCursorGui(config.getCursorGui());
             setGameviewportDefaultUpdateTime(config.getGameviewportDefaultUpdateTime());
             setTooltipDefaultFont(config.getTooltipDefaultFont());
             setDefaultFont(config.getDefaultFont());
-            setDragTransparency(config.getDragTransparency());
+            setDragAlpha(config.getDragAlpha());
             setButtonHoldTimer(config.getButtonHoldTimer());
             setKnobSensitivity(config.getKnobSensitivity());
             setFoldWindowsOnDoubleClick(config.isFoldWindowsOnDoubleClick());
@@ -1970,23 +1960,20 @@ public class API {
         public final _ContextMenuItem item = new _ContextMenuItem();
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems) {
-            return create(contextMenuItems, config.contextMenuDefaultColor);
+            return create(contextMenuItems, 1f);
         }
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, FColor color) {
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, float alpha) {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.items = new ArrayList<>();
+            setAlpha(contextMenu, alpha);
             addContextMenuItems(contextMenu, contextMenuItems);
-            setColor(contextMenu, color);
             return contextMenu;
         }
 
-        public void setColor(ContextMenu contextMenu, FColor color) {
-            if (contextMenu == null || color == null) return;
-            contextMenu.color_r = color.r;
-            contextMenu.color_g = color.g;
-            contextMenu.color_b = color.b;
-            contextMenu.color_a = color.a;
+        public void setAlpha(ContextMenu contextMenu, float alpha){
+            if(contextMenu == null) return;
+            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f,1f);
         }
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
@@ -2034,15 +2021,15 @@ public class API {
             }
 
             public ContextMenuItem create(String text) {
-                return create(text, defaultContextMenuItemAction(), null, config.contextMenuDefaultColor, null);
+                return create(text, defaultContextMenuItemAction(), null, config.componentsDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-                return create(text, contextMenuItemAction, null, config.contextMenuDefaultColor, null);
+                return create(text, contextMenuItemAction, null, config.componentsDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon) {
-                return create(text, contextMenuItemAction, icon, config.contextMenuDefaultColor, null);
+                return create(text, contextMenuItemAction, icon, config.componentsDefaultColor, null);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {
@@ -2220,40 +2207,60 @@ public class API {
             window.windowAction = windowAction;
         }
 
-        public void setColorEverything(Window window, FColor color) {
-            setColorEverythingExcept(window, color, null, true, true, true);
+
+        private enum SETCOLOR_MODE {
+            INCLUDE, EXCEPT
         }
 
-        public void setColorEverything(Window window, FColor color, boolean setColor1, boolean setColor2) {
-            setColorEverythingExcept(window, color, null, setColor1, setColor2, true);
+        private void setColorFunction(Window window, FColor color, SETCOLOR_MODE setcolormode, Class[] classes,
+                                      boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
+            if(classes == null) classes = new Class[]{};
+            if(windowColor) setColor(window, color);
+            for (Component component : window.components) {
+                boolean match = switch (setcolormode){
+                    case INCLUDE -> Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
+                    case EXCEPT -> Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
+                };
+                if(match){
+                    if(componentColor1) components.setColor(component, color);
+                    if(componentColor2) components.setColor2(component, color);
+                    if(component.getClass() == ComboBox.class){
+                        ComboBox comboBox = (ComboBox) component;
+                        for(ComboBoxItem comboBoxItem : comboBox.items) components.comboBox.item.setColor(comboBoxItem, color);
+                    }
+                }
+            }
+        }
+
+        public void setColorEverything(Window window, FColor color) {
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,null,
+                    true, true, true,true);
+        }
+
+        public void setColorEverything(Window window, FColor color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,null,
+                    windowColor, componentColor1, componentColor2,comboBoxItems);
         }
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions) {
-            setColorEverythingExcept(window, color, exceptions, false, false);
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,exceptions,
+                    true, true, true,true);
         }
 
-        public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean setColor1, boolean setColor2) {
-            setColorEverythingExcept(window, color, exceptions, setColor1, setColor2, false);
+        public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,exceptions,
+                    windowColor, componentColor1, componentColor2,comboBoxItems);
         }
 
-        public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean setColor1, boolean setColor2, boolean includeWindow) {
-            if (window == null) return;
-            for (Component component : window.components) {
-                if (exceptions == null || Arrays.stream(exceptions).noneMatch(exceptionClass -> exceptionClass == component.getClass())) {
-                    if (setColor1) components.setColor(component, color);
-                    if (setColor2) components.setColor2(component, color);
-                }
-            }
-
-            if (includeWindow) setColor(window, color);
-        }
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions) {
-            setColorEverythingInclude(window, color, inclusions, false, false);
+            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE,inclusions,
+                    true, true, true,true);
         }
 
-        public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean setColor1, boolean setColor2) {
-            setColorEverythingInclude(window, color, inclusions, setColor1, setColor2, false);
+        public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE,inclusions,
+                    windowColor, componentColor1, componentColor2,comboBoxItems);
         }
 
         public int getRealWidth(Window window) {
@@ -2390,7 +2397,7 @@ public class API {
             window.color_a = color.a;
         }
 
-        public void setTransparency(Window window, float transparency) {
+        public void setAlpha(Window window, float transparency) {
             if (window == null) return;
             window.color_a = transparency;
         }
@@ -2439,12 +2446,35 @@ public class API {
 
         public class _ToolTipImage {
 
-            public ToolTipImage create(CMediaImage image, int offset_x, int offset_y) {
+            public ToolTipImage create(CMediaGFX image, int offset_x, int offset_y) {
+                return create(image, offset_x, offset_y, Tools.Colors.WHITE);
+            }
+
+            public ToolTipImage create(CMediaGFX image, int offset_x, int offset_y, FColor color) {
                 ToolTipImage toolTipImage = new ToolTipImage();
-                toolTipImage.image = image;
-                toolTipImage.offset_x = offset_x;
-                toolTipImage.offset_y = offset_y;
+                setImage(toolTipImage, image);
+                setPosition(toolTipImage, offset_x, offset_y);
+                setColor(toolTipImage, color);
                 return toolTipImage;
+            }
+
+            public void setImage(ToolTipImage toolTipImage, CMediaGFX image){
+                if(toolTipImage == null) return;
+                toolTipImage.image = image;
+            }
+
+            public void setPosition(ToolTipImage toolTipImage, int x, int y){
+                if(toolTipImage == null) return;
+                toolTipImage.x = x;
+                toolTipImage.y = y;
+            }
+
+            public void setColor(ToolTipImage toolTipImage, FColor color){
+                if(toolTipImage == null) return;
+                toolTipImage.color_r = color.r;
+                toolTipImage.color_g = color.g;
+                toolTipImage.color_b = color.b;
+                toolTipImage.color_a = color.a;
             }
 
         }
@@ -2862,15 +2892,15 @@ public class API {
             }
         }
 
-        public void setTransparency(Component component, float transparency) {
+        public void setAlpha(Component component, float transparency) {
             if (component == null) return;
             component.color_a = transparency;
         }
 
-        public void setTransparency(Component[] components, float transparency) {
+        public void setAlpha(Component[] components, float transparency) {
             if (components == null) return;
             for (Component component : components) {
-                if (component != null) setTransparency(component, transparency);
+                if (component != null) setAlpha(component, transparency);
             }
         }
 
@@ -4364,15 +4394,15 @@ public class API {
                 }
 
                 public ComboBoxItem create(String text) {
-                    return create(text, defaultComboBoxItem(), null, config.contextMenuDefaultColor, null);
+                    return create(text, defaultComboBoxItem(), null, config.componentsDefaultColor, null);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction) {
-                    return create(text, defaultComboBoxItem(), null, config.contextMenuDefaultColor, null);
+                    return create(text, defaultComboBoxItem(), null, config.componentsDefaultColor, null);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon) {
-                    return create(text, defaultComboBoxItem(), icon, config.contextMenuDefaultColor, null);
+                    return create(text, defaultComboBoxItem(), icon, config.componentsDefaultColor, null);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {

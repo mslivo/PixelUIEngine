@@ -418,7 +418,9 @@ public class Tools {
 
 
         public static boolean shouldRun(int ticksPerSecond, long lastRun) {
-            return (System.nanoTime() - lastRun) >= (1000000 / ticksPerSecond);
+            long nanoPerTick = 1000000000L / ticksPerSecond; // convert ticks per second to nanoseconds per tick
+            long currentTime = System.nanoTime();
+            return (currentTime - lastRun) >= nanoPerTick;
         }
 
         public static float min(float... values) {

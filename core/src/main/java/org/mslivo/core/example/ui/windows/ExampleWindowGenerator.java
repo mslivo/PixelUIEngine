@@ -113,7 +113,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         KnobAction knobAction = new KnobAction() {
             @Override
             public void onTurned(float turned, float amount) {
-                api.components.setTransparency(knob, 0.2f + (turned * 0.8f));
+                api.components.setAlpha(knob, 0.2f + (turned * 0.8f));
             }
         };
         api.components.knob.setKnobAction(knob, knobAction);
@@ -299,7 +299,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                     }
                                 }),
                         }
-                ));
+                , 1f));
             }
         }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1);
         api.components.setColor(textBtn4, Tools.Colors.GRAY_BRIGHT);
