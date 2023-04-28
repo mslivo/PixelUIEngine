@@ -34,6 +34,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
@@ -568,9 +569,12 @@ public class UIEngine<T extends UIAdapter> {
                                         TILE_SIZE
                                 )) {
                                     if (combobox.comboBoxAction != null) {
-                                        Object item = combobox.items.get(i);
-                                        combobox.selectedItem = item;
-                                        combobox.comboBoxAction.onItemSelected(item);
+                                        ComboBoxItem comboBoxItem = combobox.items.get(i);
+                                        combobox.selectedItem = comboBoxItem;
+                                        if (comboBoxItem.comboBoxItemAction != null)
+                                            comboBoxItem.comboBoxItemAction.onSelect();
+                                        if (combobox.comboBoxAction != null)
+                                            combobox.comboBoxAction.onItemSelected(comboBoxItem);
                                     }
                                 }
                             }
@@ -1215,7 +1219,7 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                     } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
-                        ContextMenuItem contextMenuItem = (ContextMenuItem)inputState.lastGUIMouseHover;
+                        ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
                         magnet_x = inputState.mouse_gui.x;
                         magnet_y = contextMenuItem.addedToContextMenu.y - (((contextMenuItem.addedToContextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
                         magnetActive = true;
@@ -2018,8 +2022,47 @@ public class UIEngine<T extends UIAdapter> {
         return 4;
     }
 
-    private void render_drawContextMenu() {
+    private void render_drawComponentTopLayer(Window window, Component component) {
+        if (render_isComponentNotRendered(component)) return;
+        float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
+        render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
+        if (component.getClass() == ComboBox.class) {
+            ComboBox combobox = (ComboBox) component;
+            // Menu
+            if (UICommons.comboBox_isOpen(inputState, combobox)) {
+                int width = combobox.width;
+                int height = combobox.items.size();
+                /* Menu */
+                for (int iy = 0; iy < height; iy++) {
+                    ComboBoxItem comboBoxItem = combobox.items.get(iy);
+                    for (int ix = 0; ix < width; ix++) {
+                        int index = render_getComponent9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                        CMediaArray cMenuTexture;
+                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
+                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
+                        } else {
+                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST;
+                        }
+                        render_batchSaveColor();
+                        render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
+                        render_drawCMediaGFX(cMenuTexture, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox) - (iy * TILE_SIZE) - TILE_SIZE, index);
+                        render_batchLoadColor();
+                    }
+                }
 
+                /* Text */
+                for (int i = 0; i < combobox.items.size(); i++) {
+                    ComboBoxItem comboBoxItem = combobox.items.get(i);
+                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, comboBoxItem.icon, comboBoxItem.iconIndex, (combobox.width * TILE_SIZE));
+                }
+            }
+
+        }
+
+    }
+
+    private void render_drawContextMenu() {
+        float alpha = 1f;
         if (inputState.openContextMenu != null) {
             ContextMenu contextMenu = inputState.openContextMenu;
 
@@ -2030,10 +2073,10 @@ public class UIEngine<T extends UIAdapter> {
             render_batchSetColor(contextMenu.color_r, contextMenu.color_g, contextMenu.color_b, contextMenu.color_a);
 
             /* Menu */
-            for (int ix = 0; ix < width; ix++) {
-                for (int iy = 0; iy < height; iy++) {
+            for (int iy = 0; iy < height; iy++) {
+                ContextMenuItem contextMenuItem = contextMenu.items.get(iy);
+                for (int ix = 0; ix < width; ix++) {
                     int index = render_getComponent9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
-                    ContextMenuItem item = contextMenu.items.get(iy);
                     CMediaArray cMenuTexture;
                     if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
@@ -2041,7 +2084,7 @@ public class UIEngine<T extends UIAdapter> {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU;
                     }
                     render_batchSaveColor();
-                    render_batchSetColor(item.color_r, item.color_g, item.color_b, item.color_a);
+                    render_batchSetColor(contextMenuItem.color_r, contextMenuItem.color_g, contextMenuItem.color_b, alpha);
                     render_drawCMediaGFX(cMenuTexture, contextMenu.x + (ix * TILE_SIZE), contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, index);
                     render_batchLoadColor();
                 }
@@ -2260,40 +2303,6 @@ public class UIEngine<T extends UIAdapter> {
         render_batchLoadColor();
     }
 
-    private void render_drawComponentTopLayer(Window window, Component component) {
-        if (render_isComponentNotRendered(component)) return;
-        float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
-        render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
-        if (component.getClass() == ComboBox.class) {
-            ComboBox combobox = (ComboBox) component;
-            // Menu
-            if (UICommons.comboBox_isOpen(inputState, combobox)) {
-                int width = combobox.width;
-                int height = combobox.items.size();
-                /* Menu */
-                for (int ix = 0; ix < width; ix++) {
-                    for (int iy = 0; iy < height; iy++) {
-                        int index = render_getComponent9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
-                        CMediaArray cMenuTexture;
-                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
-                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
-                        } else {
-                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST;
-                        }
-                        render_drawCMediaGFX(cMenuTexture, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox) - (iy * TILE_SIZE) - TILE_SIZE, index);
-                    }
-                }
-
-                /* Text */
-                for (int i = 0; i < combobox.items.size(); i++) {
-                    Object item = combobox.items.get(i);
-                    render_drawFont(combobox.font, combobox.comboBoxAction.text(item), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, combobox.comboBoxAction.icon(item), combobox.comboBoxAction.iconArrayIndex(item), (combobox.width * TILE_SIZE));
-                }
-            }
-
-        }
-
-    }
 
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
@@ -2440,11 +2449,23 @@ public class UIEngine<T extends UIAdapter> {
             for (int ix = 0; ix < combobox.width; ix++) {
                 int index = ix == 0 ? 0 : (ix == combobox.width - 1 ? 2 : 1);
                 CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, combobox) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
+
+                // Item color or default color
+                float color_r = combobox.selectedItem != null ? combobox.selectedItem.color_r : combobox.color_r;
+                float color_g = combobox.selectedItem != null ? combobox.selectedItem.color_g : combobox.color_g;
+                float color_b = combobox.selectedItem != null ? combobox.selectedItem.color_b : combobox.color_b;
+
+                render_batchSaveColor();
+                render_batchSetColor(color_r, color_g, color_b, alpha2);
                 this.render_drawCMediaGFX(comboMedia, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox), index);
+                render_batchLoadColor();
+
+
+
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.font, combobox.comboBoxAction.text(combobox.selectedItem), alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, combobox.comboBoxAction.icon(combobox.selectedItem), combobox.comboBoxAction.iconArrayIndex(combobox.selectedItem), (combobox.width - 2) * TILE_SIZE);
+                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, combobox.selectedItem.icon, combobox.selectedItem.iconIndex, (combobox.width - 2) * TILE_SIZE);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;
@@ -2770,7 +2791,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         render_fontSaveColor(font);
-        render_fontSetColor(font, 1, 1, 1, alpha);
+        render_fontSetAlpha(font, alpha);
         if (maxWidth == -1) {
             mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
@@ -2779,8 +2800,8 @@ public class UIEngine<T extends UIAdapter> {
         render_fontLoadColor(font);
     }
 
-    private void render_fontSetColor(CMediaFont font, float r, float g, float b, float a) {
-        mediaManager.getCMediaFont(font).setColor(r, g, b, a);
+    private void render_fontSetAlpha(CMediaFont font, float a) {
+        mediaManager.getCMediaFont(font).setColor(1,1,1, a);
     }
 
     private void render_fontSetColorWhite() {

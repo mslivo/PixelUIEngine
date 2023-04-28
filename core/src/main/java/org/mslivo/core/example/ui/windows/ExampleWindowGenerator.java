@@ -20,6 +20,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
@@ -193,8 +194,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextField number = api.toolBox.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
 
 
-        ArrayList list = new ArrayList(Arrays.asList("One", "Two", "Three"));
-        ComboBox comboBox = api.components.comboBox.create(25, 7, 6, list);
+        ArrayList<ComboBoxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
+        ComboBox comboBox = api.components.comboBox.create(25, 7, 6, new ComboBoxItem[]{
+                api.components.comboBox.item.create("One",null,null,Tools.Colors.RED_BRIGHT),
+                api.components.comboBox.item.create("Two",null,null,Tools.Colors.YELLOW_BRIGHT),
+                api.components.comboBox.item.create("Three",null,null,Tools.Colors.GREEN_BRIGHT),
+
+        });
 
 
         Button modal1 = api.components.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {

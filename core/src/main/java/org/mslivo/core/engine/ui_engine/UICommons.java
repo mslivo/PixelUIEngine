@@ -5,6 +5,7 @@ import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
@@ -141,6 +142,16 @@ class UICommons {
     }
     public static void setContextMenuItemReferences(ContextMenuItem contextMenuItem, ContextMenu addedToContextMenu){
         contextMenuItem.addedToContextMenu = addedToContextMenu;
+    }
+
+    public static void removeComboBoxItemReferences(ComboBoxItem comboBoxItem){
+        if(comboBoxItem.addedToComboBox != null && comboBoxItem.addedToComboBox.selectedItem == comboBoxItem){
+            comboBoxItem.addedToComboBox.selectedItem = null;
+        }
+        comboBoxItem.addedToComboBox = null;
+    }
+    public static void setComboBoxItemReferences(ComboBoxItem comboBoxItem, ComboBox addedToComboBox){
+        comboBoxItem.addedToComboBox = addedToComboBox;
     }
 
     public static void removeMapOverlayReferences(MapOverlay mapOverlay){

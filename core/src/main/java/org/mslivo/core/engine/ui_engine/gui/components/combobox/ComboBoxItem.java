@@ -1,10 +1,12 @@
-package org.mslivo.core.engine.ui_engine.gui.contextmenu;
+package org.mslivo.core.engine.ui_engine.gui.components.combobox;
 
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
+import org.mslivo.core.engine.ui_engine.gui.actions.ComboBoxItemAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.ContextMenuItemAction;
+import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 
-public class ContextMenuItem {
+public class ComboBoxItem {
 
     public String text;
 
@@ -16,9 +18,9 @@ public class ContextMenuItem {
 
     public int iconIndex;
 
-    public ContextMenuItemAction contextMenuItemAction;
+    public ComboBoxItemAction comboBoxItemAction;
 
-    public ContextMenu addedToContextMenu;
+    public ComboBox addedToComboBox;
 
     public String name;
 

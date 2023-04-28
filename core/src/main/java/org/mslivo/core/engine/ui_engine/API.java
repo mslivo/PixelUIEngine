@@ -25,6 +25,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
@@ -134,7 +135,7 @@ public class API {
     }
 
     public void windowsEnforceScreenBounds() {
-        for(Window window : inputState.windows){
+        for (Window window : inputState.windows) {
             UICommons.window_enforceScreenBounds(inputState, window);
         }
     }
@@ -675,7 +676,6 @@ public class API {
             });
 
 
-
             Component[] componentsl = new Component[]{textC, okC, input};
             components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             components.setOffset(input, UIEngine.TILE_SIZE / 2, 0);
@@ -1127,7 +1127,7 @@ public class API {
     }
 
     public void removeWindows(Window[] windows) {
-        for(Window window : windows){
+        for (Window window : windows) {
             removeWindow(window);
         }
     }
@@ -1154,7 +1154,7 @@ public class API {
 
     public void closeAllWindows() {
         ArrayList<Window> windows = new ArrayList<>(inputState.windows);
-        for(Window window : windows){
+        for (Window window : windows) {
             closeWindow(window);
         }
         UICommons.resetGUIVariables(inputState);
@@ -1815,35 +1815,36 @@ public class API {
         }
 
         public boolean isKeyDownKeyCode(int keyCode) {
-            for(Integer kc : inputState.inputEvents.keyDownKeyCodes){
-                if(keyCode == kc ) return true;
+            for (Integer kc : inputState.inputEvents.keyDownKeyCodes) {
+                if (keyCode == kc) return true;
             }
             return false;
         }
 
         public boolean isKeyUpKeyCode(int keyCode) {
-            for(Integer kc : inputState.inputEvents.keyUpKeyCodes){
-                if(keyCode == kc ) return true;
+            for (Integer kc : inputState.inputEvents.keyUpKeyCodes) {
+                if (keyCode == kc) return true;
             }
             return false;
         }
 
         public boolean isMouseDownButton(int button) {
-            for(Integer bt : inputState.inputEvents.mouseDownButtons){
-                if(button == bt ) return true;
+            for (Integer bt : inputState.inputEvents.mouseDownButtons) {
+                if (button == bt) return true;
             }
             return false;
         }
 
         public boolean isMouseUpButton(int button) {
-            for(Integer bt : inputState.inputEvents.mouseUpButtons){
-                if(button == bt ) return true;
+            for (Integer bt : inputState.inputEvents.mouseUpButtons) {
+                if (button == bt) return true;
             }
             return false;
         }
+
         public boolean isCharacterTyped(Character character) {
-            for(Character ch : inputState.inputEvents.keyTypedCharacters){
-                if(character == ch ) return true;
+            for (Character ch : inputState.inputEvents.keyTypedCharacters) {
+                if (character == ch) return true;
             }
             return false;
         }
@@ -1990,27 +1991,28 @@ public class API {
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for(ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
+            for (ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
         }
 
-        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
-            if(contextMenu == null || contextMenuItem == null) return;
-            if(contextMenuItem.addedToContextMenu == null && !contextMenu.items.contains(contextMenuItem)) {
+        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+            if (contextMenu == null || contextMenuItem == null) return;
+            if (contextMenuItem.addedToContextMenu == null && !contextMenu.items.contains(contextMenuItem)) {
                 UICommons.setContextMenuItemReferences(contextMenuItem, contextMenu);
                 contextMenu.items.add(contextMenuItem);
             }
         }
 
-        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
-            if(contextMenu == null || contextMenuItem == null) return;
-            if(contextMenu.items.contains(contextMenuItem)){
+        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+            if (contextMenu == null || contextMenuItem == null) return;
+            if (contextMenu.items.contains(contextMenuItem)) {
                 UICommons.removeContextMenuItemReferences(contextMenuItem);
                 contextMenu.items.remove(contextMenuItem);
             }
         }
 
-        public void removeAllContextMenuItems(ContextMenu contextMenu){
-            for(ContextMenuItem contextMenuItem : contextMenu.items) removeContextMenuItem(contextMenu, contextMenuItem);
+        public void removeAllContextMenuItems(ContextMenu contextMenu) {
+            for (ContextMenuItem contextMenuItem : contextMenu.items)
+                removeContextMenuItem(contextMenu, contextMenuItem);
         }
 
         public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
@@ -2077,7 +2079,6 @@ public class API {
                 contextMenuItem.color_r = color.r;
                 contextMenuItem.color_g = color.g;
                 contextMenuItem.color_b = color.b;
-                contextMenuItem.color_a = color.a;
             }
 
             public void setFont(ContextMenuItem contextMenuItem, CMediaFont font) {
@@ -2295,7 +2296,7 @@ public class API {
 
         public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            if(component.addedToWindow == null && !window.components.contains(component)) {
+            if (component.addedToWindow == null && !window.components.contains(component)) {
                 UICommons.setComponentReferences(inputState, window, component);
                 window.components.add(component);
             }
@@ -2314,7 +2315,7 @@ public class API {
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
             if (window.components.contains(component)) {
-                UICommons.removeComponentReferences(inputState,component);
+                UICommons.removeComponentReferences(inputState, component);
                 window.components.remove(component);
             }
         }
@@ -2488,11 +2489,11 @@ public class API {
 
         public void addImages(ToolTip toolTip, ToolTipImage[] images) {
             if (toolTip == null) return;
-            for(ToolTipImage toolTipImage : toolTip.images) addToolTipImage(toolTip, toolTipImage);
+            for (ToolTipImage toolTipImage : toolTip.images) addToolTipImage(toolTip, toolTipImage);
         }
 
-        public void removeAllToolTipImages(ToolTip toolTip){
-            for(ToolTipImage toolTipImage : toolTip.images) removeToolTipImage(toolTip, toolTipImage);
+        public void removeAllToolTipImages(ToolTip toolTip) {
+            for (ToolTipImage toolTipImage : toolTip.images) removeToolTipImage(toolTip, toolTipImage);
         }
 
         public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
@@ -2567,7 +2568,7 @@ public class API {
         }
 
         public boolean boundsVisible(float x, float y, float halfWidth, float halfHeight) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y,inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
                 return true;
             }
@@ -3463,7 +3464,7 @@ public class API {
 
                 public void removeTabComponent(Tab tab, Component component) {
                     if (tab == null || component == null) return;
-                    if(tab.components.contains(component)) {
+                    if (tab.components.contains(component)) {
                         component.addedToTab = null;
                         tab.components.remove(component);
                     }
@@ -3621,7 +3622,7 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
-                if(!tabBar.tabs.contains(tab) && tab.addedToTabBar == null) {
+                if (!tabBar.tabs.contains(tab) && tab.addedToTabBar == null) {
                     UICommons.setTabReferences(tab, tabBar);
                     tabBar.tabs.add(tab);
                 }
@@ -3629,7 +3630,7 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab, int index) {
                 if (tabBar == null || tab == null) return;
-                if(tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
+                if (tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
                     UICommons.setTabReferences(tab, tabBar);
                     tabBar.tabs.add(index, tab);
                 }
@@ -3839,7 +3840,7 @@ public class API {
                 UICommons.textField_focus(inputState, textField);
             }
 
-            public boolean isFocused(TextField textField){
+            public boolean isFocused(TextField textField) {
                 return UICommons.textField_isFocused(inputState, textField);
             }
 
@@ -3865,9 +3866,9 @@ public class API {
 
             public Map create(int x, int y, int width, int height, MapAction mapAction, MapOverlay[] mapOverlays) {
                 Map map = new Map();
+                map.mapOverlays = new ArrayList<>();
                 setComponentInitValues(map);
                 setColor(map, Tools.Colors.WHITE);
-                map.mapOverlays = new ArrayList<>();
                 map.pMap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
                 setPosition(map, x, y);
                 setSize(map, width, height);
@@ -3952,7 +3953,7 @@ public class API {
 
             public void addMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if (mapOverlay.addedToMap == null && !map.mapOverlays.contains(mapOverlay)){
+                if (mapOverlay.addedToMap == null && !map.mapOverlays.contains(mapOverlay)) {
                     UICommons.setMapOverlayReferences(mapOverlay, map);
                     map.mapOverlays.add(mapOverlay);
                 }
@@ -3960,7 +3961,7 @@ public class API {
 
             public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if(map.mapOverlays.contains(mapOverlay)) {
+                if (map.mapOverlays.contains(mapOverlay)) {
                     UICommons.removeMapOverlayReferences(mapOverlay);
                     map.mapOverlays.remove(mapOverlay);
                 }
@@ -3981,7 +3982,6 @@ public class API {
                 ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
                 return result.size() > 0 ? result.get(0) : null;
             }
-
 
 
             public class _MapOverlay {
@@ -4238,6 +4238,8 @@ public class API {
 
         public class _ComboBox {
 
+            public final _ComboBox._ComboBoxItem item = new _ComboBox._ComboBoxItem();
+
             private ComboBoxAction defaultComboBoxAction() {
                 return new ComboBoxAction() {
                 };
@@ -4247,35 +4249,40 @@ public class API {
                 return create(x, y, width, null, false, defaultComboBoxAction(), null);
             }
 
-            public ComboBox create(int x, int y, int width, ArrayList items) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] items) {
                 return create(x, y, width, items, false, defaultComboBoxAction(), null);
             }
 
-            public ComboBox create(int x, int y, int width, ArrayList items, boolean useIcons) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons) {
                 return create(x, y, width, items, useIcons, defaultComboBoxAction(), null);
             }
 
-            public ComboBox create(int x, int y, int width, ArrayList items, boolean useIcons, ComboBoxAction comboBoxAction) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons, ComboBoxAction comboBoxAction) {
                 return create(x, y, width, items, useIcons, comboBoxAction, null);
             }
 
-            public ComboBox create(int x, int y, int width, ArrayList items, boolean useIcons, ComboBoxAction comboBoxAction, CMediaFont font) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons, ComboBoxAction comboBoxAction, CMediaFont font) {
                 ComboBox comboBox = new ComboBox();
+                comboBox.items = new ArrayList<>();
                 setComponentInitValues(comboBox);
                 setPosition(comboBox, x, y);
                 setSize(comboBox, width, 1);
-                setItems(comboBox, items);
                 setUseIcons(comboBox, useIcons);
                 setComboBoxAction(comboBox, comboBoxAction);
+                addComboBoxItems(comboBox, items);
                 setSelectedItem(comboBox, null);
-                setFont(comboBox, font);
                 close(comboBox);
                 return comboBox;
             }
 
-            public void setItems(ComboBox comboBox, ArrayList items) {
-                if (comboBox == null || items == null) return;
-                comboBox.items = items;
+            public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
+                if (comboBox == null || comboBoxItems == null) return;
+                for (ComboBoxItem comboBoxItem : comboBoxItems) addComboBoxItem(comboBox, comboBoxItem);
+            }
+
+            public void removeAllComboBoxItems(ComboBox comboBox) {
+                if (comboBox == null) return;
+                for (ComboBoxItem comboBoxItem : comboBox.items) removeComboBoxItem(comboBox, comboBoxItem);
             }
 
             public void setComboBoxAction(ComboBox comboBox, ComboBoxAction comboBoxAction) {
@@ -4283,20 +4290,48 @@ public class API {
                 comboBox.comboBoxAction = comboBoxAction;
             }
 
-            public void setSelectedItem(ComboBox comboBox, Object selectItem) {
+            public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectedItem) {
                 if (comboBox == null) return;
-                if (comboBox.items != null && comboBox.items.contains(selectItem))
-                    comboBox.selectedItem = selectItem;
+                if (selectedItem != null) {
+                    if (comboBox.items != null && comboBox.items.contains(selectedItem))
+                        comboBox.selectedItem = selectedItem;
+                } else {
+                    comboBox.selectedItem = null;
+                }
             }
 
-            public void setSelectedItemEquals(ComboBox comboBox, Object selectItem) {
-                if (comboBox == null) return;
-                if (comboBox.items != null) {
-                    for (Object item : comboBox.items) {
-                        if (selectItem.equals(item)) {
-                            comboBox.selectedItem = item;
-                            return;
-                        }
+            public void addComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return;
+                if (comboBoxItem.addedToComboBox == null && !comboBox.items.contains(comboBoxItem)) {
+                    UICommons.setComboBoxItemReferences(comboBoxItem, comboBox);
+                    comboBox.items.add(comboBoxItem);
+                }
+            }
+
+            public void removeComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return;
+                if (comboBox.items.contains(comboBoxItem)) {
+                    UICommons.removeComboBoxItemReferences(comboBoxItem);
+                    comboBox.items.remove(comboBoxItem);
+                }
+            }
+
+            public boolean isComboBoxItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return false;
+                return comboBox.selectedItem == comboBoxItem;
+            }
+
+            public boolean isComboBoxSelectedItemText(ComboBox comboBox, String text) {
+                if (comboBox == null || text == null) return false;
+                return comboBox.selectedItem.text.equals(text);
+            }
+
+            public void setComboBoxSelectedItemByText(ComboBox comboBox, String text) {
+                if (comboBox == null || text == null) return;
+                for (ComboBoxItem comboBoxItem : comboBox.items) {
+                    if (comboBoxItem.text.equals(text)) {
+                        setSelectedItem(comboBox, comboBoxItem);
+                        return;
                     }
                 }
             }
@@ -4304,11 +4339,6 @@ public class API {
             public void setUseIcons(ComboBox comboBox, boolean useIcons) {
                 if (comboBox == null) return;
                 comboBox.useIcons = useIcons;
-            }
-
-            public void setFont(ComboBox comboBox, CMediaFont font) {
-                if (comboBox == null) return;
-                comboBox.font = font == null ? config.defaultFont : font;
             }
 
             public void open(ComboBox comboBox) {
@@ -4323,6 +4353,89 @@ public class API {
 
             public boolean isOpen(ComboBox comboBox) {
                 return UICommons.comboBox_isOpen(inputState, comboBox);
+            }
+
+
+            public class _ComboBoxItem {
+
+                private ComboBoxItemAction defaultComboBoxItem() {
+                    return new ComboBoxItemAction() {
+                    };
+                }
+
+                public ComboBoxItem create(String text) {
+                    return create(text, defaultComboBoxItem(), null, config.contextMenuDefaultColor, null);
+                }
+
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction) {
+                    return create(text, defaultComboBoxItem(), null, config.contextMenuDefaultColor, null);
+                }
+
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon) {
+                    return create(text, defaultComboBoxItem(), icon, config.contextMenuDefaultColor, null);
+                }
+
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {
+                    return create(text, defaultComboBoxItem(), icon, color, null);
+                }
+
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, FColor color, CMediaFont font) {
+                    ComboBoxItem comboBoxItem = new ComboBoxItem();
+                    setText(comboBoxItem, text);
+                    setFont(comboBoxItem, font);
+                    setColor(comboBoxItem, color);
+                    setIcon(comboBoxItem, icon);
+                    setIconIndex(comboBoxItem, 0);
+                    setName(comboBoxItem, "");
+                    setData(comboBoxItem, null);
+                    setComboBoxItemAction(comboBoxItem, contextMenuItemAction);
+                    comboBoxItem.addedToComboBox = null;
+                    return comboBoxItem;
+                }
+
+                public void setName(ComboBoxItem comboBoxItem, String name) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.name = Tools.Text.validString(name);
+
+                }
+
+                public void setData(ComboBoxItem comboBoxItem, Object data) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.data = data;
+                }
+
+                public void setColor(ComboBoxItem comboBoxItem, FColor color) {
+                    if (comboBoxItem == null || color == null) return;
+                    comboBoxItem.color_r = color.r;
+                    comboBoxItem.color_g = color.g;
+                    comboBoxItem.color_b = color.b;
+                }
+
+                public void setFont(ComboBoxItem comboBoxItem, CMediaFont font) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.font = font == null ? config.defaultFont : font;
+                }
+
+                public void setComboBoxItemAction(ComboBoxItem comboBoxItem, ComboBoxItemAction comboBoxItemAction) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.comboBoxItemAction = comboBoxItemAction;
+                }
+
+                public void setText(ComboBoxItem comboBoxItem, String text) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.text = Tools.Text.validString(text);
+                }
+
+                public void setIcon(ComboBoxItem comboBoxItem, CMediaGFX icon) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.icon = icon;
+                }
+
+                public void setIconIndex(ComboBoxItem comboBoxItem, int index) {
+                    if (comboBoxItem == null) return;
+                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(index, 0);
+                }
+
             }
         }
 
