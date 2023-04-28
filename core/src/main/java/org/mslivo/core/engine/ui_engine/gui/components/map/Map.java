@@ -15,6 +15,6 @@ public class Map extends Component {
 
     public MapAction mapAction;
 
-    public ArrayList<MapOverlay> overlays;
+    public ArrayList<MapOverlay> mapOverlays;
 
 }

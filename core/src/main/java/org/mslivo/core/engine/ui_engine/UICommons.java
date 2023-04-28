@@ -6,6 +6,7 @@ import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
@@ -130,6 +131,10 @@ class UICommons {
 
     public static void removeContextMenuItemReferences(ContextMenuItem contextMenuItem){
         contextMenuItem.contextMenu = null;
+    }
+
+    public static void removeMapOverlayReferences(MapOverlay mapOverlay){
+        mapOverlay.map = null;
     }
 
     static void resetGUIVariables(InputState inputState) {

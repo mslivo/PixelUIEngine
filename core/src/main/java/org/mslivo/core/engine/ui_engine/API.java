@@ -574,7 +574,7 @@ public class API {
 
 
             MapOverlay cursorOverlay = components.map.mapOverlay.create(GUIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
-            components.map.addOverlay(colorMap, cursorOverlay);
+            components.map.addMapOverlay(colorMap, cursorOverlay);
 
 
             if (!colorTexture.getTexture().getTextureData().isPrepared())
@@ -1977,7 +1977,7 @@ public class API {
         public ContextMenu create(ContextMenuItem[] contextMenuItems, FColor color) {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.items = new ArrayList<>();
-            setContextMenuItems(contextMenu, contextMenuItems);
+            addContextMenuItems(contextMenu, contextMenuItems);
             setColor(contextMenu, color);
             return contextMenu;
         }
@@ -1990,16 +1990,17 @@ public class API {
             contextMenu.color_a = color.a;
         }
 
-        public void setContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            removeAllContextMenuItems(contextMenu);
             for(ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
         }
 
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
             if(contextMenu == null || contextMenuItem == null) return;
-            contextMenu.items.add(contextMenuItem);
-            contextMenuItem.contextMenu = contextMenu;
+            if(!contextMenu.items.contains(contextMenuItem) && contextMenuItem.contextMenu == null) {
+                contextMenuItem.contextMenu = contextMenu;
+                contextMenu.items.add(contextMenuItem);
+            }
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem){
@@ -3519,7 +3520,7 @@ public class API {
                 setPosition(tabBar, x, y);
                 setSize(tabBar, width, bigIconMode ? 2 : 1);
                 removeAllTabs(tabBar);
-                setTabs(tabBar, tabs);
+                addTabs(tabBar, tabs);
                 selectTab(tabBar, selectedTab);
                 setTabBarAction(tabBar, tabBarAction);
                 setBorder(tabBar, border);
@@ -3611,14 +3612,18 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
-                tab.tabBar = tabBar;
-                tabBar.tabs.add(tab);
+                if(!tabBar.tabs.contains(tab) && tab.tabBar == null) {
+                    tab.tabBar = tabBar;
+                    tabBar.tabs.add(tab);
+                }
             }
 
             public void addTab(TabBar tabBar, Tab tab, int index) {
                 if (tabBar == null || tab == null) return;
-                tab.tabBar = tabBar;
-                tabBar.tabs.add(index, tab);
+                if(!tabBar.tabs.contains(tab) && tab.tabBar == null) {
+                    tab.tabBar = tabBar;
+                    tabBar.tabs.add(index, tab);
+                }
             }
 
             public void removeTab(TabBar tabBar, Tab tab) {
@@ -3629,9 +3634,8 @@ public class API {
                 }
             }
 
-            public void setTabs(TabBar tabBar, Tab[] tabs) {
+            public void addTabs(TabBar tabBar, Tab[] tabs) {
                 if (tabBar == null || tabs == null) return;
-                removeAllTabs(tabBar);
                 for (Tab tab : tabs) addTab(tabBar, tab);
             }
 
@@ -3854,12 +3858,12 @@ public class API {
                 Map map = new Map();
                 setComponentInitValues(map);
                 setColor(map, Tools.Colors.WHITE);
-                map.overlays = new ArrayList<>();
+                map.mapOverlays = new ArrayList<>();
                 map.pMap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
                 setPosition(map, x, y);
                 setSize(map, width, height);
                 setMapAction(map, mapAction);
-                addOverlays(map, mapOverlays);
+                addMapOverlays(map, mapOverlays);
                 update(map);
                 return map;
             }
@@ -3932,26 +3936,35 @@ public class API {
                 map.pMap.drawCircle(x, y, radius);
             }
 
-            public void addOverlays(Map map, MapOverlay[] mapOverlays) {
+            public void addMapOverlays(Map map, MapOverlay[] mapOverlays) {
                 if (map == null || mapOverlays == null) return;
-                for (MapOverlay mapOverlay : mapOverlays) {
-                    addOverlay(map, mapOverlay);
+                for (MapOverlay mapOverlay : mapOverlays) addMapOverlay(map, mapOverlay);
+            }
+
+            public void addMapOverlay(Map map, MapOverlay mapOverlay) {
+                if (map == null || mapOverlay == null) return;
+                if (!map.mapOverlays.contains(mapOverlay) && mapOverlay.map == null){
+                    mapOverlay.map = map;
+                    map.mapOverlays.add(mapOverlay);
                 }
             }
 
-            public void addOverlay(Map map, MapOverlay mapOverlay) {
+            public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if (!map.overlays.contains(mapOverlay)) map.overlays.add(mapOverlay);
+                if(map.mapOverlays.contains(mapOverlay)) {
+                    UICommons.removeMapOverlayReferences(mapOverlay);
+                    map.mapOverlays.remove(mapOverlay);
+                }
             }
 
-            public void removeOverlay(Map map, MapOverlay mapOverlay) {
-                if (map == null || mapOverlay == null) return;
-                map.overlays.remove(mapOverlay);
+            public void removeAllMapOverlays(Map map) {
+                if (map == null) return;
+                for (MapOverlay mapOverlay : map.mapOverlays) removeMapOverlay(map, mapOverlay);
             }
 
             public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
                 if (map == null || name == null) return new ArrayList<>();
-                return new ArrayList<>(map.overlays.stream().filter(mapOverlay1 -> name.equals(mapOverlay1.name)).toList());
+                return new ArrayList<>(map.mapOverlays.stream().filter(mapOverlay1 -> name.equals(mapOverlay1.name)).toList());
             }
 
             public MapOverlay findMapOverlayByName(Map map, String name) {
@@ -3960,10 +3973,7 @@ public class API {
                 return result.size() > 0 ? result.get(0) : null;
             }
 
-            public void removeAllOverlays(Map map) {
-                if (map == null) return;
-                for (MapOverlay mapOverlay : map.overlays) removeOverlay(map, mapOverlay);
-            }
+
 
             public class _MapOverlay {
                 public MapOverlay create(CMediaGFX image, int x, int y) {

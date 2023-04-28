@@ -2464,7 +2464,7 @@ public class UIEngine<T extends UIAdapter> {
             Map map = (Map) component;
             inputState.spriteBatch_gui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
 
-            map.overlays.removeIf(mapOverlay -> {
+            map.mapOverlays.removeIf(mapOverlay -> {
                 if (mapOverlay.fadeOut) {
                     mapOverlay.color_a = 1 - ((System.currentTimeMillis() - mapOverlay.timer) / (float) mapOverlay.fadeOutTime);
                     if (mapOverlay.color_a <= 0) return true;
