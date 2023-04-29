@@ -864,6 +864,10 @@ public class UIEngine<T extends UIAdapter> {
                 float newValue = knob.turned + amount;
                 knob_turnKnob(knob, newValue, amount);
 
+                if(inputState.controlMode == ControlMode.KEYBOARD) {
+                    // Keep mouse position on keyboard mode
+                    inputState.mouse_gui.y += inputState.mouse_delta.y;
+                }
             }
 
             if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null)

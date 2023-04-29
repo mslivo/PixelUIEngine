@@ -1078,6 +1078,10 @@ public class API {
             if (w > textwidth) textwidth = w;
         }
         inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
+        // move to mouse to first item on keyboard mode
+        if(input.getControlMode() == ControlMode.KEYBOARD) {
+            input.setMousePosition(input.mouseXGUI() + 5, input.mouseYGUI() - 1);
+        }
     }
 
     public void closeContextMenu() {
@@ -1336,7 +1340,7 @@ public class API {
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
         private float dragAlpha = 0.8f;
         private int buttonHoldTimer = 8;
-        private float knobSensitivity = 0.7f;
+        private float knobSensitivity = 0.8f;
         private boolean foldWindowsOnDoubleClick = true;
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
