@@ -1,5 +1,7 @@
-[ ] UICommons notificatons
-[ ] window & notifcations -> addedToScreen boolean
+
+
+[x] UICommons notificatons
+[x] window & notifcations -> addedToScreen boolean
 [x] combobitems inherit color
 [x] context menu alpha in config
 [x] magnet for contextmenu

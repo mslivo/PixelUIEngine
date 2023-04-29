@@ -99,7 +99,6 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
     private ArrayList<Component> createTab3(Window window) {
-        ArrayList<Component> components = new ArrayList<>();
 
         ScrollBarVertical scrollBarVertical = api.components.scrollBar.verticalScrollbar.create(2, 2, 12, new ScrollBarAction() {
             @Override
@@ -238,7 +237,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
         api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle});
-        components.addAll(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle}));
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle}));
 
 
         return components;
