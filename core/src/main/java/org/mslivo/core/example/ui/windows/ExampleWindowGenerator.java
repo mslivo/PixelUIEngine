@@ -295,7 +295,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("3"));
-                                        api.setToolTip(null);
+                                        api.setGameToolTip(null);
                                     }
                                 }),
                         }

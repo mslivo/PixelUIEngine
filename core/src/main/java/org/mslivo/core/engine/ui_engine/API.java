@@ -103,7 +103,7 @@ public class API {
         }
     }
 
-    public void setToolTip(ToolTip toolTip) {
+    public void setGameToolTip(ToolTip toolTip) {
         inputState.gameToolTip = toolTip;
     }
 
@@ -1242,7 +1242,7 @@ public class API {
         inputState.mouseTool = mouseTool;
     }
 
-    public void displayTemporaryCursor(CMediaCursor temporaryCursor) {
+    public void overrideCursor(CMediaCursor temporaryCursor) {
         if (temporaryCursor == null) return;
         inputState.temporaryCursor = temporaryCursor;
         inputState.displayTemporaryCursor = true;
