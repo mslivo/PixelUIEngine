@@ -46,9 +46,7 @@ class UICommons {
     }
 
     static Tab tabBar_getSelectedTab(TabBar tabBar) {
-        if (tabBar == null) {
-            return null;
-        }
+        if (tabBar == null) return null;
         return tabBar.tabs.get(Tools.Calc.inBounds(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
     }
 
@@ -107,66 +105,144 @@ class UICommons {
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
     }
 
-    public static void removeComponentReferences(InputState inputState, Component component) {
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(component);
-        if (component.addedToTab != null) component.addedToTab.components.remove(component);
-        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
-        component.addedToTab = null;
-        component.addedToWindow = null;
-    }
 
-    public static void setComponentReferences(InputState inputState, Window window, Component component) {
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+    public static void component_addToWindow(Component component, InputState inputState, Window window) {
+        if (component.addedToWindow != null) return;
+        if (component.addedToScreen) return;
+        component_setCommonReferences(component, inputState);
         component.addedToWindow = window;
+        window.components.add(component);
     }
 
-    public static void removeWindowReferences(InputState inputState, Window window) {
+    public static void component_removeFromWindow(Component component, InputState inputState, Window window) {
+        if (component.addedToWindow == window) {
+            component_removeCommonReferences(component, inputState);
+            component.addedToWindow.components.remove(component);
+            component.addedToWindow = null;
+        }
+    }
+
+    public static void component_addToScreen(Component component, InputState inputState) {
+        if (component.addedToWindow != null) return;
+        if (component.addedToScreen) return;
+        component_setCommonReferences(component, inputState);
+        component.addedToScreen = true;
+        inputState.screenComponents.add(component);
+    }
+
+    public static void component_removeFromScreen(Component component, InputState inputState) {
+        if (!component.addedToScreen) return;
+        component_removeCommonReferences(component, inputState);
+        component.addedToScreen = true;
+        inputState.screenComponents.remove(component);
+    }
+
+    private static void component_setCommonReferences(Component component, InputState inputState) {
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+    }
+
+    private static void component_removeCommonReferences(Component component, InputState inputState) {
+        if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
+        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+    }
+
+
+    public static void tab_removeComponent( Tab tab, Component component) {
+        if (component.addedToTab != tab) return;
+        component.addedToTab.components.remove(component);
+        component.addedToTab = tab;
+    }
+
+    public static void tab_addComponent(Tab tab, Component component) {
+        if (component.addedToTab != null) return;
+        component.addedToTab = tab;
+        tab.components.add(component);
+    }
+
+
+    public static void window_addToScreen(InputState inputState, Window window) {
+        if (inputState.windows.contains(window)) return;
+        inputState.windows.add(window);
+    }
+
+    public static void window_removeFromScreen(InputState inputState, Window window) {
+        if (!inputState.windows.contains(window)) return;
         if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
         if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+        inputState.windows.remove(window);
     }
 
-    public static void setWindowReferences(InputState inputState, Window window) {
-        // None
+    public static void tabBar_addTab(TabBar tabBar, Tab tab) {
+        if (tab.addedToTabBar != null) return;
+        tab.addedToTabBar = tabBar;
+        tabBar.tabs.add(tab);
     }
 
-    public static void removeTabReferences(Tab tab){
+    public static void tabBar_addTab(TabBar tabBar, Tab tab, int index) {
+        if (tab.addedToTabBar != null) return;
+        tab.addedToTabBar = tabBar;
+        tabBar.tabs.add(index, tab);
+    }
+
+    public static void tabBar_removeTab(TabBar tabBar, Tab tab) {
+        if (tab.addedToTabBar != tabBar) return;
         tab.addedToTabBar = null;
-    }
-    public static void setTabReferences(Tab tab, TabBar addedToTabBar){
-        tab.addedToTabBar = addedToTabBar;
+        tabBar.tabs.remove(tab);
     }
 
-    public static void removeContextMenuItemReferences(ContextMenuItem contextMenuItem){
+    public static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        if (contextMenuItem.addedToContextMenu != null) return;
+        contextMenuItem.addedToContextMenu = contextMenu;
+        contextMenu.items.add(contextMenuItem);
+    }
+
+    public static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
-    }
-    public static void setContextMenuItemReferences(ContextMenuItem contextMenuItem, ContextMenu addedToContextMenu){
-        contextMenuItem.addedToContextMenu = addedToContextMenu;
+        contextMenu.items.remove(contextMenuItem);
     }
 
-    public static void removeComboBoxItemReferences(ComboBoxItem comboBoxItem){
-        if(comboBoxItem.addedToComboBox != null && comboBoxItem.addedToComboBox.selectedItem == comboBoxItem){
-            comboBoxItem.addedToComboBox.selectedItem = null;
-        }
+
+    public static void comboBox_addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+        if (comboBoxItem.addedToComboBox != null) return;
+        comboBoxItem.addedToComboBox = comboBox;
+        comboBox.items.add(comboBoxItem);
+    }
+
+    public static void comboBox_removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+        if (comboBoxItem.addedToComboBox != comboBox) return;
+        if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
-    }
-    public static void setComboBoxItemReferences(ComboBoxItem comboBoxItem, ComboBox addedToComboBox){
-        comboBoxItem.addedToComboBox = addedToComboBox;
+        comboBox.items.remove(comboBoxItem);
     }
 
-    public static void removeMapOverlayReferences(MapOverlay mapOverlay){
+
+    public static void map_addMapOverlay(Map map, MapOverlay mapOverlay) {
+        if (mapOverlay.addedToMap != null) return;
+        mapOverlay.addedToMap = map;
+        map.mapOverlays.add(mapOverlay);
+    }
+
+    public static void map_removeMapOverlay(Map map, MapOverlay mapOverlay) {
+        if (mapOverlay.addedToMap != map) return;
         mapOverlay.addedToMap = null;
-    }
-    public static void setMapOverlayReferences(MapOverlay mapOverlay, Map addedToMap){
-        mapOverlay.addedToMap = addedToMap;
+        map.mapOverlays.remove(mapOverlay);
     }
 
-    public static void removeToolTipImageReferences(ToolTipImage toolTipImage){
-        toolTipImage.addedToToolTip = null;
-    }
-    public static void setToolTipImageReferences(ToolTipImage toolTipImage, ToolTip toolTip){
+    public static void toolTip_addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+        if (toolTipImage.addedToToolTip != null) return;
         toolTipImage.addedToToolTip = toolTip;
+        toolTip.images.add(toolTipImage);
     }
+
+    public static void toolTip_removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+        if (toolTipImage.addedToToolTip != toolTip) return;
+        toolTipImage.addedToToolTip = null;
+        toolTip.images.remove(toolTipImage);
+    }
+
 
     static void resetGUIVariables(InputState inputState) {
         // Window
@@ -221,44 +297,45 @@ class UICommons {
 
     }
 
-    public static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox){
+    public static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;
     }
 
-    public static void comboBox_open(InputState inputState, ComboBox comboBox){
+    public static void comboBox_open(InputState inputState, ComboBox comboBox) {
         // Close other Comboboxes
-        if(inputState.openComboBox != null){
+        if (inputState.openComboBox != null) {
             comboBox_close(inputState, inputState.openComboBox);
         }
         // Open this one
         inputState.openComboBox = comboBox;
-        if(inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onOpen();
+        if (inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onOpen();
     }
 
-    public static void comboBox_close(InputState inputState, ComboBox comboBox){
-        if(comboBox_isOpen(inputState, comboBox)){
-            if(inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onClose();
+    public static void comboBox_close(InputState inputState, ComboBox comboBox) {
+        if (comboBox_isOpen(inputState, comboBox)) {
+            if (inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onClose();
             inputState.openComboBox = null;
         }
     }
 
-    public static boolean textField_isFocused(InputState inputState, TextField textField){
+    public static boolean textField_isFocused(InputState inputState, TextField textField) {
         return inputState.focusedTextField != null && inputState.focusedTextField == textField;
     }
 
-    public static void textField_focus(InputState inputState, TextField textField){
+    public static void textField_focus(InputState inputState, TextField textField) {
         // Unfocus other textfields
-        if(inputState.focusedTextField != null){
+        if (inputState.focusedTextField != null) {
             textField_unFocus(inputState, inputState.focusedTextField);
         }
         // Focus this one
         inputState.focusedTextField = textField;
-        if(inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
+        if (inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
     }
 
-    public static void textField_unFocus(InputState inputState, TextField textField){
-        if(textField_isFocused(inputState, textField)){
-            if(inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onUnFocus();
+    public static void textField_unFocus(InputState inputState, TextField textField) {
+        if (textField_isFocused(inputState, textField)) {
+            if (inputState.focusedTextField.textFieldAction != null)
+                inputState.focusedTextField.textFieldAction.onUnFocus();
             inputState.focusedTextField = null;
         }
     }

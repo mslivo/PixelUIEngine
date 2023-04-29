@@ -35,4 +35,6 @@ public abstract class Component {
 
     public Window addedToWindow; // set by engine
 
+    public boolean addedToScreen;
+
 }

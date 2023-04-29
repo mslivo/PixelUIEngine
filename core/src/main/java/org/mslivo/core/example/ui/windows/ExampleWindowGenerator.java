@@ -251,7 +251,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         // Text Buttons Tab
 
         Tab tabTextButton = api.components.tabBar.tab.create("Buttons 1");
-        api.components.tabBar.tab.setWidthAuto(tabTextButton);
+        api.components.tabBar.tab.updateWidthAuto(tabTextButton);
 
 
         TextButton textBtn1 = api.components.button.textButton.create(3, 3, 4, 2, "Toggle", new ButtonAction() {
@@ -311,7 +311,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         // Image Buttons Tab
 
         Tab tabImageButton = api.components.tabBar.tab.create("Buttons 2");
-        api.components.tabBar.tab.setWidthAuto(tabImageButton);
+        api.components.tabBar.tab.updateWidthAuto(tabImageButton);
 
         ImageButton imageButton1 = api.components.button.imageButton.create(3, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE);
 
@@ -365,7 +365,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         /* Text / Image / Seperator */
 
         Tab tabTextImage = api.components.tabBar.tab.create("Text/Image");
-        api.components.tabBar.tab.setWidthAuto(tabTextImage);
+        api.components.tabBar.tab.updateWidthAuto(tabTextImage);
 
         Image image1 = api.components.image.create(3, 4, ExampleBaseMedia.GUI_ICON_EXAMPLE_ANIMATION_2);
 

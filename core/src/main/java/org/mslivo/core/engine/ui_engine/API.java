@@ -621,7 +621,7 @@ public class API {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            components.setColor(ok, components.map.getPixel(colorMap, x, y - 1));
+                            components.setColor(ok, components.map.getPixelColor(colorMap, x, y - 1));
                             components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
                             components.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
@@ -1049,7 +1049,9 @@ public class API {
 
 
     public void removeNotification(Notification notification) {
-        inputState.notifications.remove(notification);
+        if(inputState.notifications.contains(notification)) {
+            inputState.notifications.remove(notification);
+        }
     }
 
     public void removeAllNotifications() {
@@ -1113,15 +1115,13 @@ public class API {
 
     public void addWindow(Window window) {
         if (window == null) return;
-        UICommons.setWindowReferences(inputState, window);
-        inputState.windows.add(window);
+        UICommons.window_addToScreen(inputState, window);
         if (window.windowAction != null) window.windowAction.onAdd();
     }
 
     public void removeWindow(Window window) {
         if (inputState.windows.contains(window)) {
-            UICommons.removeWindowReferences(inputState, window);
-            inputState.windows.remove(window);
+            UICommons.window_removeFromScreen(inputState, window);
             if (window.windowAction != null) window.windowAction.onRemove();
         }
     }
@@ -1204,10 +1204,7 @@ public class API {
 
     public void addScreenComponent(Component component) {
         if (component == null) return;
-        if (component.addedToWindow == null && !inputState.screenComponents.contains(component)) {
-            UICommons.setComponentReferences(inputState, null, component);
-            inputState.screenComponents.add(component);
-        }
+        UICommons.component_addToScreen(component, inputState);
     }
 
     public void addScreenComponents(Component[] components) {
@@ -1217,8 +1214,8 @@ public class API {
 
     public void removeScreenComponent(Component component) {
         if (component == null) return;
-        UICommons.removeComponentReferences(inputState, component);
-        inputState.screenComponents.remove(component);
+        UICommons.component_removeFromScreen(component, inputState);
+
     }
 
     public void removeScreenComponents(Component[] components) {
@@ -1983,18 +1980,12 @@ public class API {
 
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
-            if (contextMenuItem.addedToContextMenu == null && !contextMenu.items.contains(contextMenuItem)) {
-                UICommons.setContextMenuItemReferences(contextMenuItem, contextMenu);
-                contextMenu.items.add(contextMenuItem);
-            }
+            UICommons.contextMenu_addItem(contextMenu,contextMenuItem );
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
-            if (contextMenu.items.contains(contextMenuItem)) {
-                UICommons.removeContextMenuItemReferences(contextMenuItem);
-                contextMenu.items.remove(contextMenuItem);
-            }
+            UICommons.contextMenu_addItem(contextMenu,contextMenuItem );
         }
 
         public void removeAllContextMenuItems(ContextMenu contextMenu) {
@@ -2303,10 +2294,7 @@ public class API {
 
         public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            if (component.addedToWindow == null && !window.components.contains(component)) {
-                UICommons.setComponentReferences(inputState, window, component);
-                window.components.add(component);
-            }
+            UICommons.component_addToWindow(component, inputState, window);
         }
 
         public void addComponents(Window window, Component[] components) {
@@ -2321,10 +2309,7 @@ public class API {
 
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            if (window.components.contains(component)) {
-                UICommons.removeComponentReferences(inputState, component);
-                window.components.remove(component);
-            }
+            UICommons.component_removeFromWindow(component, inputState, window);
         }
 
         public void removeComponents(Window window, Component[] components) {
@@ -2528,18 +2513,13 @@ public class API {
 
         public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
-            if (toolTipImage.addedToToolTip == null && !toolTip.images.contains(toolTipImage)) {
-                UICommons.setToolTipImageReferences(toolTipImage, toolTip);
-                toolTip.images.add(toolTipImage);
-            }
+            UICommons.toolTip_addToolTipImage(toolTip, toolTipImage);
         }
 
         public void removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
-            if (toolTip.images.contains(toolTipImage)) {
-                UICommons.removeToolTipImageReferences(toolTipImage);
-                toolTip.images.remove(toolTipImage);
-            }
+            UICommons.toolTip_removeToolTipImage(toolTip, toolTipImage);
+
         }
 
         public void setToolTipAction(ToolTip toolTip, ToolTipAction toolTipAction) {
@@ -2925,6 +2905,7 @@ public class API {
             component.addedToTab = null;
             component.addedToWindow = null;
             component.toolTip = null;
+            component.addedToScreen = false;
         }
 
         public void setVisible(Component component, boolean visible) {
@@ -3384,155 +3365,6 @@ public class API {
 
             public final _Tab tab = new _Tab();
 
-            public class _Tab {
-
-                private TabAction defaultTabAction() {
-                    return new TabAction() {
-                    };
-                }
-
-                public Tab create(String title) {
-                    return create(title, null, null, defaultTabAction(), 0, null);
-                }
-
-                public Tab create(String title, CMediaGFX icon) {
-                    return create(title, icon, null, null, 0, null);
-                }
-
-                public Tab create(String title, CMediaGFX icon, Component[] components) {
-                    return create(title, icon, components, defaultTabAction(), 0, null);
-                }
-
-                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width) {
-                    return create(title, icon, components, tabAction, width, null);
-                }
-
-                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width, CMediaFont font) {
-                    Tab tab = new Tab();
-                    tab.components = new ArrayList<>();
-                    setTitle(tab, title);
-                    setTabAction(tab, tabAction);
-                    setIcon(tab, icon);
-                    setIconIndex(tab, 0);
-                    setFont(tab, font);
-                    setContentOffset(tab, 0);
-                    removeAllTabComponents(tab);
-                    setName(tab, "");
-                    setData(tab, null);
-                    addTabComponents(tab, components);
-                    if (width == 0) {
-                        setWidthAuto(tab);
-                    } else {
-                        setWidth(tab, width);
-                    }
-                    return tab;
-                }
-
-                public void setName(Tab tab, String name) {
-                    if (tab == null) return;
-                    tab.name = Tools.Text.validString(name);
-                }
-
-                public void setData(Tab tab, Object data) {
-                    if (tab == null) return;
-                    tab.data = data;
-                }
-
-                public void setContentOffset(Tab tab, int content_offset_x) {
-                    if (tab == null) return;
-                    tab.content_offset_x = content_offset_x;
-                }
-
-                public void centerTitle(Tab tab) {
-                    if (tab == null) return;
-                    tab.content_offset_x = ((tab.width * UIEngine.TILE_SIZE) / 2) - ((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0)) / 2) - 2;
-                }
-
-                public void setIconIndex(Tab tab, int iconIndex) {
-                    if (tab == null) return;
-                    tab.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
-                }
-
-                public void setTabComponents(Tab tab, Component[] components) {
-                    if (tab == null || components == null) return;
-                    removeAllTabComponents(tab);
-                    for (Component component : components) addTabComponent(tab, component);
-                }
-
-                public void removeAllTabComponents(Tab tab) {
-                    if (tab == null) return;
-                    for (Component component : tab.components) removeTabComponent(tab, component);
-                }
-
-                public void addTabComponent(Tab tab, Component component) {
-                    if (tab == null || component == null) return;
-                    if (component.addedToTab == null && !tab.components.contains(component)) {
-                        component.addedToTab = tab;
-                        tab.components.add(component);
-                    }
-                }
-
-                public void addTabComponents(Tab tab, Component[] components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) addTabComponent(tab, component);
-                }
-
-                public void addTabComponents(Tab tab, ArrayList<Component> components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) addTabComponent(tab, component);
-                }
-
-                public void removeTabComponents(Tab tab, Component[] components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) removeTabComponent(tab, component);
-                }
-
-                public void removeTabComponents(Tab tab, ArrayList<Component> components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) removeTabComponent(tab, component);
-                }
-
-                public void removeTabComponent(Tab tab, Component component) {
-                    if (tab == null || component == null) return;
-                    if (tab.components.contains(component)) {
-                        component.addedToTab = null;
-                        tab.components.remove(component);
-                    }
-                }
-
-                public void setIcon(Tab tab, CMediaGFX icon) {
-                    if (tab == null) return;
-                    tab.icon = icon;
-                }
-
-                public void setTitle(Tab tab, String title) {
-                    if (tab == null) return;
-                    tab.title = Tools.Text.validString(title);
-                }
-
-                public void setFont(Tab tab, CMediaFont font) {
-                    if (tab == null) return;
-                    tab.font = font == null ? config.defaultFont : font;
-                }
-
-                public void setTabAction(Tab tab, TabAction tabAction) {
-                    if (tab == null) return;
-                    tab.tabAction = tabAction;
-                }
-
-                public void setWidth(Tab tab, int width) {
-                    if (tab == null) return;
-                    tab.width = Tools.Calc.lowerBounds(width, 1);
-                }
-
-                public void setWidthAuto(Tab tab) {
-                    if (tab == null) return;
-                    int width = MathUtils.round((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
-                    setWidth(tab, width);
-                }
-
-            }
-
             public TabBar create(int x, int y, int width, Tab[] tabs) {
                 return create(x, y, width, tabs, 0, null, false, 0, 0, false);
             }
@@ -3571,6 +3403,7 @@ public class API {
             }
 
             public void setTabOffset(TabBar tabBar, int tabOffset) {
+                if(tabBar == null) return;
                 tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
             }
 
@@ -3585,26 +3418,6 @@ public class API {
 
             public void setBorderHeight(TabBar tabBar, int borderHeight) {
                 tabBar.borderHeight = Tools.Calc.lowerBounds(borderHeight, 0);
-            }
-
-            public boolean isTabVisible(TabBar tabBar, Tab tab) {
-                if (tabBar == null || tab == null) return false;
-                int xOffset = 0;
-                for (Tab tabB : tabBar.tabs) {
-                    xOffset += tabB.width;
-                    if (tabB == tab) {
-                        return xOffset <= tabBar.width;
-                    }
-                }
-                return false;
-            }
-
-            public int getCombinedTabsWidth(TabBar tabBar) {
-                int width = 0;
-                for (Tab tab : tabBar.tabs) {
-                    width += tab.width;
-                }
-                return width;
             }
 
             public void setTabBarAction(TabBar tabBar, TabBarAction tabBarAction) {
@@ -3650,33 +3463,27 @@ public class API {
                 for (Tab tab : tabBar.tabs) removeTab(tabBar, tab);
             }
 
-            public void addTab(TabBar tabBar, Tab tab) {
-                if (tabBar == null || tab == null) return;
-                if (!tabBar.tabs.contains(tab) && tab.addedToTabBar == null) {
-                    UICommons.setTabReferences(tab, tabBar);
-                    tabBar.tabs.add(tab);
-                }
-            }
-
-            public void addTab(TabBar tabBar, Tab tab, int index) {
-                if (tabBar == null || tab == null) return;
-                if (tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
-                    UICommons.setTabReferences(tab, tabBar);
-                    tabBar.tabs.add(index, tab);
-                }
-            }
-
             public void removeTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
-                if (tabBar.tabs.contains(tab)) {
-                    UICommons.removeTabReferences(tab);
-                    tabBar.tabs.remove(tab);
-                }
+                UICommons.tabBar_removeTab(tabBar, tab);
             }
 
             public void addTabs(TabBar tabBar, Tab[] tabs) {
                 if (tabBar == null || tabs == null) return;
                 for (Tab tab : tabs) addTab(tabBar, tab);
+            }
+
+            public void addTab(TabBar tabBar, Tab tab) {
+                if (tabBar == null || tab == null) return;
+                UICommons.tabBar_addTab(tabBar, tab);
+            }
+
+            public void addTab(TabBar tabBar, Tab tab, int index) {
+                if (tabBar == null || tab == null) return;
+                if (tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
+                    UICommons.tabBar_addTab(tabBar, tab, index);
+                    tabBar.tabs.add(index, tab);
+                }
             }
 
             public ArrayList<Tab> findTabsByName(TabBar tabBar, String name) {
@@ -3690,6 +3497,168 @@ public class API {
                 return result.size() > 0 ? result.get(0) : null;
             }
 
+            public boolean isTabVisible(TabBar tabBar, Tab tab) {
+                if (tabBar == null || tab == null) return false;
+                int xOffset = 0;
+                for (Tab tabB : tabBar.tabs) {
+                    xOffset += tabB.width;
+                    if (tabB == tab) {
+                        return xOffset <= tabBar.width;
+                    }
+                }
+                return false;
+            }
+
+            public int getTabsWidth(TabBar tabBar) {
+                int width = 0;
+                for (Tab tab : tabBar.tabs) {
+                    width += tab.width;
+                }
+                return width;
+            }
+
+            public class _Tab {
+
+                private TabAction defaultTabAction() {
+                    return new TabAction() {
+                    };
+                }
+
+                public Tab create(String title) {
+                    return create(title, null, null, defaultTabAction(), 0, null);
+                }
+
+                public Tab create(String title, CMediaGFX icon) {
+                    return create(title, icon, null, null, 0, null);
+                }
+
+                public Tab create(String title, CMediaGFX icon, Component[] components) {
+                    return create(title, icon, components, defaultTabAction(), 0, null);
+                }
+
+                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width) {
+                    return create(title, icon, components, tabAction, width, null);
+                }
+
+                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width, CMediaFont font) {
+                    Tab tab = new Tab();
+                    tab.components = new ArrayList<>();
+                    setTitle(tab, title);
+                    setTabAction(tab, tabAction);
+                    setIcon(tab, icon);
+                    setIconIndex(tab, 0);
+                    setFont(tab, font);
+                    setContentOffset(tab, 0);
+                    removeAllTabComponents(tab);
+                    setName(tab, "");
+                    setData(tab, null);
+                    addTabComponents(tab, components);
+                    if (width == 0) {
+                        updateWidthAuto(tab);
+                    } else {
+                        setWidth(tab, width);
+                    }
+                    return tab;
+                }
+
+                public void setName(Tab tab, String name) {
+                    if (tab == null) return;
+                    tab.name = Tools.Text.validString(name);
+                }
+
+                public void setData(Tab tab, Object data) {
+                    if (tab == null) return;
+                    tab.data = data;
+                }
+
+                public void setContentOffset(Tab tab, int content_offset_x) {
+                    if (tab == null) return;
+                    tab.content_offset_x = content_offset_x;
+                }
+
+                public void centerTitle(Tab tab) {
+                    if (tab == null) return;
+                    tab.content_offset_x = ((tab.width * UIEngine.TILE_SIZE) / 2) - ((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0)) / 2) - 2;
+                }
+
+                public void setIconIndex(Tab tab, int iconIndex) {
+                    if (tab == null) return;
+                    tab.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+                }
+
+                public void setTabComponents(Tab tab, Component[] components) {
+                    if (tab == null || components == null) return;
+                    removeAllTabComponents(tab);
+                    for (Component component : components) addTabComponent(tab, component);
+                }
+
+                public void removeAllTabComponents(Tab tab) {
+                    if (tab == null) return;
+                    for (Component component : tab.components) removeTabComponent(tab, component);
+                }
+
+                public void addTabComponent(Tab tab, Component component) {
+                    if (tab == null || component == null) return;
+                    UICommons.tab_addComponent(tab, component);
+                }
+
+                public void addTabComponents(Tab tab, Component[] components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) addTabComponent(tab, component);
+                }
+
+                public void addTabComponents(Tab tab, ArrayList<Component> components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) addTabComponent(tab, component);
+                }
+
+                public void removeTabComponents(Tab tab, Component[] components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) removeTabComponent(tab, component);
+                }
+
+                public void removeTabComponents(Tab tab, ArrayList<Component> components) {
+                    if (tab == null || components == null) return;
+                    for (Component component : components) removeTabComponent(tab, component);
+                }
+
+                public void removeTabComponent(Tab tab, Component component) {
+                    if (tab == null || component == null) return;
+                    UICommons.tab_removeComponent(tab, component);
+                }
+
+                public void setIcon(Tab tab, CMediaGFX icon) {
+                    if (tab == null) return;
+                    tab.icon = icon;
+                }
+
+                public void setTitle(Tab tab, String title) {
+                    if (tab == null) return;
+                    tab.title = Tools.Text.validString(title);
+                }
+
+                public void setFont(Tab tab, CMediaFont font) {
+                    if (tab == null) return;
+                    tab.font = font == null ? config.defaultFont : font;
+                }
+
+                public void setTabAction(Tab tab, TabAction tabAction) {
+                    if (tab == null) return;
+                    tab.tabAction = tabAction;
+                }
+
+                public void setWidth(Tab tab, int width) {
+                    if (tab == null) return;
+                    tab.width = Tools.Calc.lowerBounds(width, 1);
+                }
+
+                public void updateWidthAuto(Tab tab) {
+                    if (tab == null) return;
+                    int width = MathUtils.round((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
+                    setWidth(tab, width);
+                }
+
+            }
         }
 
         public class _Inventory {
@@ -3719,7 +3688,6 @@ public class API {
                 return create(x, y, items, inventoryAction, dragEnabled, dragOutEnabled, dragInEnabled, false);
             }
 
-
             public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
                 Inventory inventory = new Inventory();
                 setComponentInitValues(inventory);
@@ -3730,13 +3698,13 @@ public class API {
                 setDragOutEnabled(inventory, dragOutEnabled);
                 setDragInEnabled(inventory, dragInEnabled);
                 setDoubleSized(inventory, doubleSized);
-                updateDimensions(inventory);
+                updateSize(inventory);
                 return inventory;
             }
 
             public void setDoubleSized(Inventory inventory, boolean doubleSized) {
                 inventory.doubleSized = doubleSized;
-                updateDimensions(inventory);
+                updateSize(inventory);
             }
 
             public boolean isPositionValid(Inventory inventory, int x, int y) {
@@ -3767,9 +3735,10 @@ public class API {
             public void setItems(Inventory inventory, Object[][] items) {
                 if (inventory == null || items == null) return;
                 inventory.items = items;
+                updateSize(inventory);
             }
 
-            public void updateDimensions(Inventory inventory) {
+            private void updateSize(Inventory inventory) {
                 if (inventory == null) return;
                 int factor = inventory.doubleSized ? 2 : 1;
                 if (inventory.items != null) {
@@ -3874,7 +3843,6 @@ public class API {
                 return UICommons.textField_isFocused(inputState, textField);
             }
 
-
         }
 
         public class _Map {
@@ -3918,22 +3886,24 @@ public class API {
                 map.texture = new Texture(map.pMap);
             }
 
-            public FColor getPixel(Map map, int x, int y) {
+            public FColor getPixelColor(Map map, int x, int y) {
                 if (map == null) return null;
                 return Tools.Colors.createFromInt(map.pMap.getPixel(x, y));
             }
 
-            public void drawPixel(Map map, int x, int y, FColor fColor) {
-                if (fColor == null) return;
-                drawPixel(map, x, y, fColor.r, fColor.g, fColor.b, fColor.a);
+            public void clearMap(Map map, FColor fColor) {
+                clearMap(map, fColor);
             }
-
-            public void fillMap(Map map, float r, float g, float b, float a) {
+            public void clearMap(Map map, float r, float g, float b, float a) {
                 if (map == null) return;
                 map.pMap.setColor(r, g, b, a);
                 for (int iy = 0; iy < map.pMap.getHeight(); iy++) {
                     map.pMap.drawLine(0, iy, map.pMap.getWidth(), iy);
                 }
+            }
+
+            public void drawPixel(Map map, int x, int y, FColor fColor) {
+                drawPixel(map, x, y, fColor.r, fColor.g, fColor.b, fColor.a);
             }
 
             public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
@@ -3943,8 +3913,6 @@ public class API {
             }
 
             public void drawLine(Map map, int x1, int y1, int x2, int y2, FColor fColor) {
-                if (fColor == null) return;
-
                 drawLine(map, x1, y1, x2, y2, fColor.r, fColor.g, fColor.b, fColor.a);
             }
 
@@ -3955,7 +3923,6 @@ public class API {
             }
 
             public void drawRect(Map map, int x1, int y1, int width, int height, FColor fColor) {
-                if (fColor == null) return;
                 drawRect(map, x1, y1, width, height, fColor.r, fColor.g, fColor.b, fColor.a);
             }
 
@@ -3966,7 +3933,6 @@ public class API {
             }
 
             public void drawCircle(Map map, int x, int y, int radius, FColor fColor) {
-                if (fColor == null) return;
                 drawCircle(map, x, y, radius, fColor.r, fColor.g, fColor.b, fColor.a);
             }
 
@@ -3983,18 +3949,12 @@ public class API {
 
             public void addMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if (mapOverlay.addedToMap == null && !map.mapOverlays.contains(mapOverlay)) {
-                    UICommons.setMapOverlayReferences(mapOverlay, map);
-                    map.mapOverlays.add(mapOverlay);
-                }
+                UICommons.map_addMapOverlay(map, mapOverlay);
             }
 
             public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
-                if (map.mapOverlays.contains(mapOverlay)) {
-                    UICommons.removeMapOverlayReferences(mapOverlay);
-                    map.mapOverlays.remove(mapOverlay);
-                }
+                UICommons.map_removeMapOverlay(map, mapOverlay);
             }
 
             public void removeAllMapOverlays(Map map) {
@@ -4012,7 +3972,6 @@ public class API {
                 ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
                 return result.size() > 0 ? result.get(0) : null;
             }
-
 
             public class _MapOverlay {
                 public MapOverlay create(CMediaGFX image, int x, int y) {
@@ -4042,6 +4001,11 @@ public class API {
                     return mapOverlay;
                 }
 
+                public void setFadeOut(MapOverlay mapOverlay, boolean fadeOut) {
+                    if (mapOverlay == null) return;
+                    mapOverlay.fadeOut = fadeOut;
+                }
+
                 public void setFadeOutTime(MapOverlay mapOverlay, int fadeoutTime) {
                     if (mapOverlay == null) return;
                     mapOverlay.fadeOutTime = Tools.Calc.lowerBounds(fadeoutTime, 0);
@@ -4058,17 +4022,16 @@ public class API {
                     mapOverlay.image = image;
                 }
 
-                public void setFadeOut(MapOverlay mapOverlay, boolean fadeOut) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.fadeOut = fadeOut;
+                public void setColor(MapOverlay mapOverlay, FColor color) {
+                    setColor(mapOverlay, color.r, color.b, color.g, color.a);
                 }
 
-                public void setColor(MapOverlay mapOverlay, FColor color) {
-                    if (mapOverlay == null || color == null) return;
-                    mapOverlay.color_r = color.r;
-                    mapOverlay.color_g = color.g;
-                    mapOverlay.color_b = color.b;
-                    mapOverlay.color_a = color.a;
+                public void setColor(MapOverlay mapOverlay, float r, float g, float b, float a) {
+                    if (mapOverlay == null) return;
+                    mapOverlay.color_r = r;
+                    mapOverlay.color_g = g;
+                    mapOverlay.color_b = b;
+                    mapOverlay.color_a = a;
                 }
 
                 public void setArrayIndex(MapOverlay mapOverlay, int arrayIndex) {
@@ -4145,7 +4108,7 @@ public class API {
             }
 
             public Text create(int x, int y, String[] lines) {
-                return create(x, y, lines, null, defaultTextAction());
+                return create(x, y, lines, config.defaultFont, defaultTextAction());
             }
 
             public Text create(int x, int y, String[] lines, CMediaFont font) {
@@ -4156,10 +4119,9 @@ public class API {
                 Text textC = new Text();
                 setComponentInitValues(textC);
                 setPosition(textC, x, y);
-                setLines(textC, lines);
                 setFont(textC, font);
-                setSizeAuto(textC);
                 setTextAction(textC, textAction);
+                setLines(textC, lines);
                 return textC;
             }
 
@@ -4171,6 +4133,7 @@ public class API {
             public void setLines(Text text, String[] lines) {
                 if (text == null) return;
                 text.lines = Tools.Text.validString(lines);
+                updateSize(text);
             }
 
             public void setFont(Text[] textComponents, CMediaFont font) {
@@ -4179,19 +4142,12 @@ public class API {
                 }
             }
 
-
             public void setFont(Text text, CMediaFont font) {
                 if (text == null) return;
                 text.font = font == null ? config.defaultFont : font;
             }
 
-            public void setSizeAuto(Text[] textComponents) {
-                for (Text text : textComponents) {
-                    setSizeAuto(text);
-                }
-            }
-
-            public void setSizeAuto(Text text) {
+            private void updateSize(Text text) {
                 if (text == null) return;
                 int width = 0;
                 for (String line : text.lines) {
@@ -4231,7 +4187,6 @@ public class API {
                 setImage(imageC, image);
                 setArrayIndex(imageC, arrayIndex);
                 setAnimationOffset(imageC, animation_offset);
-                setSizeAuto(imageC);
                 setColor(imageC, Tools.Colors.WHITE);
                 setImageAction(imageC, imageAction);
                 return imageC;
@@ -4255,12 +4210,13 @@ public class API {
             public void setImage(Image imageC, CMediaGFX image) {
                 if (imageC == null) return;
                 imageC.image = image;
+                updateSize(imageC);
             }
 
-            public void setSizeAuto(Image image) {
-                if (image == null || image.image == null) return;
-                int width = mediaManager.imageWidth(image.image) / UIEngine.TILE_SIZE;
-                int height = mediaManager.imageHeight(image.image) / UIEngine.TILE_SIZE;
+            private void updateSize(Image image) {
+                if (image == null) return;
+                int width = image.image != null ? mediaManager.imageWidth(image.image) / UIEngine.TILE_SIZE : 0;
+                int height = image.image != null ? mediaManager.imageHeight(image.image) / UIEngine.TILE_SIZE : 0;
                 setSize(image, width, height);
             }
 
@@ -4305,58 +4261,58 @@ public class API {
                 return comboBox;
             }
 
-            public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
-                if (comboBox == null || comboBoxItems == null) return;
-                for (ComboBoxItem comboBoxItem : comboBoxItems) addComboBoxItem(comboBox, comboBoxItem);
-            }
-
-            public void removeAllComboBoxItems(ComboBox comboBox) {
-                if (comboBox == null) return;
-                for (ComboBoxItem comboBoxItem : comboBox.items) removeComboBoxItem(comboBox, comboBoxItem);
-            }
-
             public void setComboBoxAction(ComboBox comboBox, ComboBoxAction comboBoxAction) {
                 if (comboBox == null) return;
                 comboBox.comboBoxAction = comboBoxAction;
             }
 
-            public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectedItem) {
+            public void setUseIcons(ComboBox comboBox, boolean useIcons) {
                 if (comboBox == null) return;
-                if (selectedItem != null) {
-                    if (comboBox.items != null && comboBox.items.contains(selectedItem))
-                        comboBox.selectedItem = selectedItem;
+                comboBox.useIcons = useIcons;
+            }
+
+            public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
+                if (comboBox == null || comboBoxItems == null) return;
+                for (ComboBoxItem comboBoxItem : comboBoxItems) addItem(comboBox, comboBoxItem);
+            }
+
+            public void addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return;
+                UICommons.comboBox_addItem(comboBox, comboBoxItem);
+            }
+
+            public void removeAllComboBoxItems(ComboBox comboBox) {
+                if (comboBox == null) return;
+                for (ComboBoxItem comboBoxItem : comboBox.items) removeItem(comboBox, comboBoxItem);
+            }
+
+            public void removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return;
+                UICommons.comboBox_removeItem(comboBox, comboBoxItem);
+            }
+
+            public boolean isItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+                if (comboBox == null || comboBoxItem == null) return false;
+                return comboBox.selectedItem != null ? comboBox.selectedItem == comboBoxItem : false;
+            }
+
+            public boolean isSelectedItemText(ComboBox comboBox, String text) {
+                if (comboBox == null || text == null) return false;
+                return comboBox.selectedItem != null ? comboBox.selectedItem.text.equals(text) : false;
+            }
+
+
+            public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectItem) {
+                if (comboBox == null) return;
+                if (selectItem != null) {
+                    if (comboBox.items != null && comboBox.items.contains(selectItem))
+                        comboBox.selectedItem = selectItem;
                 } else {
                     comboBox.selectedItem = null;
                 }
             }
 
-            public void addComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
-                if (comboBox == null || comboBoxItem == null) return;
-                if (comboBoxItem.addedToComboBox == null && !comboBox.items.contains(comboBoxItem)) {
-                    UICommons.setComboBoxItemReferences(comboBoxItem, comboBox);
-                    comboBox.items.add(comboBoxItem);
-                }
-            }
-
-            public void removeComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
-                if (comboBox == null || comboBoxItem == null) return;
-                if (comboBox.items.contains(comboBoxItem)) {
-                    UICommons.removeComboBoxItemReferences(comboBoxItem);
-                    comboBox.items.remove(comboBoxItem);
-                }
-            }
-
-            public boolean isComboBoxItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
-                if (comboBox == null || comboBoxItem == null) return false;
-                return comboBox.selectedItem == comboBoxItem;
-            }
-
-            public boolean isComboBoxSelectedItemText(ComboBox comboBox, String text) {
-                if (comboBox == null || text == null) return false;
-                return comboBox.selectedItem.text.equals(text);
-            }
-
-            public void setComboBoxSelectedItemByText(ComboBox comboBox, String text) {
+            public void setSelectedItemByText(ComboBox comboBox, String text) {
                 if (comboBox == null || text == null) return;
                 for (ComboBoxItem comboBoxItem : comboBox.items) {
                     if (comboBoxItem.text.equals(text)) {
@@ -4364,11 +4320,6 @@ public class API {
                         return;
                     }
                 }
-            }
-
-            public void setUseIcons(ComboBox comboBox, boolean useIcons) {
-                if (comboBox == null) return;
-                comboBox.useIcons = useIcons;
             }
 
             public void open(ComboBox comboBox) {
@@ -4384,7 +4335,6 @@ public class API {
             public boolean isOpen(ComboBox comboBox) {
                 return UICommons.comboBox_isOpen(inputState, comboBox);
             }
-
 
             public class _ComboBoxItem {
 
@@ -4574,12 +4524,13 @@ public class API {
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, CMediaFont font) {
                 List list = new List();
+                list.selectedItems = new HashSet<>();
                 setComponentInitValues(list);
                 setPosition(list, x, y);
                 setSize(list, width, height);
                 setItems(list, items);
                 setListAction(list, listAction);
-                setMultiSelected(list, multiSelect);
+                setMultiSelect(list, multiSelect);
                 setScrolled(list, 0f);
                 setDragEnabled(list, dragEnabled);
                 setDragInEnabled(list, dragInEnabled);
@@ -4623,18 +4574,26 @@ public class API {
                 list.font = font == null ? config.defaultFont : font;
             }
 
-            public void setSelectedItem(List list, Object selectedItem) {
-                if (list == null) return;
-                if (list.items != null && list.items.contains(selectedItem)) list.selectedItem = selectedItem;
-            }
-
-            public void setMultiSelected(List list, boolean multiSelect) {
+            public void setMultiSelect(List list, boolean multiSelect) {
                 if (list == null) return;
                 list.multiSelect = multiSelect;
+                // Clear selecteditem/items after mode switch
+                if(multiSelect){
+                    list.selectedItem = null;
+                }else{
+                    list.selectedItems.clear();
+                }
+            }
+
+            public void setSelectedItem(List list, Object selectedItem) {
+                if (list == null) return;
+                if(list.multiSelect) return;
+                if (list.items != null && list.items.contains(selectedItem)) list.selectedItem = selectedItem;
             }
 
             public void setSelectedItems(List list, Object[] selectedItems) {
                 if (list == null || selectedItems == null) return;
+                if(!list.multiSelect) return;
                 list.selectedItems.clear();
                 for (Object item : selectedItems) {
                     if (item != null) {
