@@ -868,7 +868,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             if (inputState.turnedKnob != null) {
                 Knob knob = inputState.turnedKnob;
-                float amount = -(inputState.mouse_delta.y / (500 - (400 * api.config.getKnobSensitivity())));
+                float amount = -(inputState.mouse_delta.y / 100f)*api.config.getKnobSensitivity();
                 float newValue = knob.turned + amount;
                 knob_turnKnob(knob, newValue, amount);
 
@@ -905,14 +905,14 @@ public class UIEngine<T extends UIAdapter> {
                     knob_turnKnob(knob, newValue, amount);
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                     ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount);
                     scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
                     if (scrollBarHorizontal.scrollBarAction != null) {
                         scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                     ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount);
                     scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
                     if (scrollBarVertical.scrollBarAction != null) {
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);

@@ -1369,7 +1369,7 @@ public class API {
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
         private float dragAlpha = 0.8f;
         private int buttonHoldTimer = 8;
-        private float knobSensitivity = 0.8f;
+        private float knobSensitivity = 1f;
         private boolean foldWindowsOnDoubleClick = true;
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
