@@ -493,8 +493,10 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
                         ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
                         ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
-                        if (contextMenuItem.contextMenuItemAction != null) contextMenuItem.contextMenuItemAction.onSelect();
-                        if(contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+                        if (contextMenuItem.contextMenuItemAction != null)
+                            contextMenuItem.contextMenuItemAction.onSelect();
+                        if (contextMenu.contextMenuAction != null)
+                            contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
                         UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
                     } else if (inputState.lastGUIMouseHover instanceof Button button) {
                         inputState.pressedButton = button;
@@ -568,13 +570,15 @@ public class UIEngine<T extends UIAdapter> {
                                         combobox.width * TILE_SIZE,
                                         TILE_SIZE
                                 )) {
-                                    if (combobox.comboBoxAction != null) {
-                                        ComboBoxItem comboBoxItem = combobox.items.get(i);
-                                        combobox.selectedItem = comboBoxItem;
-                                        if (comboBoxItem.comboBoxItemAction != null)
-                                            comboBoxItem.comboBoxItemAction.onSelect();
-                                        if (combobox.comboBoxAction != null)
-                                            combobox.comboBoxAction.onItemSelected(comboBoxItem);
+                                    ComboBoxItem comboBoxItem = combobox.items.get(i);
+                                    combobox.selectedItem = comboBoxItem;
+                                    if (comboBoxItem.comboBoxItemAction != null)
+                                        comboBoxItem.comboBoxItemAction.onSelect();
+                                    if (combobox.comboBoxAction != null)
+                                        combobox.comboBoxAction.onItemSelected(comboBoxItem);
+                                    if(inputState.controlMode == ControlMode.KEYBOARD){
+                                        // keyboard mode: move mouse back to combobox on item select
+                                        inputState.mouse_gui.y = UICommons.component_getAbsoluteY(combobox)+TILE_SIZE_2;
                                     }
                                 }
                             }
@@ -687,7 +691,7 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
                     // Hide displayed context Menus
-                    if(inputState.openContextMenu != null) {
+                    if (inputState.openContextMenu != null) {
                         UICommons.contextMenu_close(inputState.openContextMenu, inputState);
                     }
                     // Close opened Comboboxes
@@ -866,8 +870,8 @@ public class UIEngine<T extends UIAdapter> {
                 float newValue = knob.turned + amount;
                 knob_turnKnob(knob, newValue, amount);
 
-                if(inputState.controlMode == ControlMode.KEYBOARD) {
-                    // Keep mouse position on keyboard mode
+                if (inputState.controlMode == ControlMode.KEYBOARD) {
+                    // keyboard mode: keep mouse position steady
                     inputState.mouse_gui.y += inputState.mouse_delta.y;
                 }
             }

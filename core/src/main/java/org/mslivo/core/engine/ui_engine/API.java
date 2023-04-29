@@ -60,6 +60,21 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/*
+    - Collections related functions are provided like
+        - add(X)
+        - adds(X[]) -> add(X)
+        - removeX(X)
+        - removeXs(X[]) ->  removeX()
+        - removeAllX() -> remove(X[])
+        - Optional: ArrayList<X> findXsByName
+        - Optional: X findXByName
+
+    - Color related functions are provided like:
+        - setColor(X, float r, float g, float b, float a)
+        - setColor(X, FColor color) -> setColor(X, float r, float g, float b, float a)
+
+ */
 public class API {
 
     public final _Notification notifications = new _Notification();
@@ -1017,19 +1032,28 @@ public class API {
         this.inputState.singleUpdateActions.add(updateAction);
     }
 
-    public void addNotifications(Notification[] notifications) {
-        if (notifications == null) return;
-        for (Notification notification : notifications) addNotification(notification);
-    }
-
     public void addNotification(Notification notification) {
         if (notification == null) return;
         UICommons.notification_addToScreen(inputState, notification, config.notificationsMax);
     }
 
+    public void addNotifications(Notification[] notifications) {
+        if (notifications == null) return;
+        for (Notification notification : notifications) addNotification(notification);
+    }
+
     public void removeNotification(Notification notification) {
         if (notification == null) return;
         UICommons.notification_removeFromScreen(inputState, notification);
+    }
+
+    public void removeNotifications(Notification[] notifications) {
+        if (notifications == null) return;
+        for(Notification notification : notifications) removeNotification(notification);
+    }
+
+    public void removeAllNotifications() {
+        removeNotifications(inputState.notifications.toArray(new Notification[]{}));
     }
 
     public ArrayList<Notification> findNotificationsByName(String name) {
@@ -1048,9 +1072,7 @@ public class API {
         return notification.addedToScreen;
     }
 
-    public void removeAllNotifications() {
-        for (Notification notification : inputState.notifications) removeNotification(notification);
-    }
+
 
     public ArrayList<Notification> getNotifications() {
         return new ArrayList<>(inputState.notifications);
@@ -1122,6 +1144,11 @@ public class API {
         UICommons.window_addToScreen(inputState, window);
     }
 
+    public void addWindows(Window[] windows) {
+        if (windows == null) return;
+        for(Window window : windows) addWindow(window);
+    }
+
     public void removeWindow(Window window) {
         if (window == null) return;
         UICommons.window_removeFromScreen(inputState, window);
@@ -1137,16 +1164,6 @@ public class API {
         UICommons.resetGUIVariables(inputState);
     }
 
-    public void closeAllWindows() {
-        closeWindows(inputState.windows.toArray(new Window[]{}));
-        UICommons.resetGUIVariables(inputState);
-    }
-
-    public void closeWindows(Window[] windows) {
-        if (windows == null) return;
-        for (Window window : windows) closeWindow(window);
-    }
-
     public boolean closeWindow(Window window) {
         if (window == null) return false;
         ArrayList<Component> result = windows.findComponentsByName(window, WND_CLOSE_BUTTON);
@@ -1160,6 +1177,16 @@ public class API {
             }
         }
         return false;
+    }
+
+    public void closeWindows(Window[] windows) {
+        if (windows == null) return;
+        for (Window window : windows) closeWindow(window);
+    }
+
+    public void closeAllWindows() {
+        closeWindows(inputState.windows.toArray(new Window[]{}));
+        UICommons.resetGUIVariables(inputState);
     }
 
     public void addWindowAsModal(Window modalWindow) {
@@ -1217,7 +1244,6 @@ public class API {
     public void removeScreenComponent(Component component) {
         if (component == null) return;
         UICommons.component_removeFromScreen(component, inputState);
-
     }
 
     public void removeScreenComponents(Component[] components) {
@@ -1265,9 +1291,23 @@ public class API {
         inputState.hotKeys.add(hotKey);
     }
 
+    public void addHotKeys(HotKey[] hotKeys) {
+        if (hotKeys == null) return;
+        for(HotKey hotKey : hotKeys) addHotKey(hotKey);
+    }
+
     public void removeHotKey(HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.remove(hotKey);
+    }
+
+    public void removeHotKeys(HotKey[] hotKeys) {
+        if (hotKeys == null) return;
+        for (HotKey hotKey : hotKeys) removeHotKey(hotKey);
+    }
+
+    public void removeAllHotKeys() {
+        removeHotKeys(inputState.hotKeys.toArray(new HotKey[]{}));
     }
 
     public ArrayList<HotKey> findHotKeysByName(String name) {
@@ -1282,14 +1322,7 @@ public class API {
     }
 
 
-    public void removeAllHotKeys() {
-        for (HotKey hotKey : inputState.hotKeys) removeHotKey(hotKey);
-    }
 
-    public void removeHotKeys(HotKey[] hotKeys) {
-        if (hotKeys == null) return;
-        for (HotKey hotKey : hotKeys) removeHotKey(hotKey);
-    }
 
     public ArrayList<Window> findWindowsByName(String name) {
         if (name == null) return new ArrayList<>();
@@ -1995,14 +2028,14 @@ public class API {
             contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
         }
 
-        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
-            if (contextMenu == null || contextMenuItems == null) return;
-            for (ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
-        }
-
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
+        }
+
+        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+            if (contextMenu == null || contextMenuItems == null) return;
+            for (ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -2010,10 +2043,15 @@ public class API {
             UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
         }
 
+        public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+            if (contextMenu == null || contextMenuItems == null) return;
+            for (ContextMenuItem contextMenuItem : contextMenuItems)
+                removeContextMenuItem(contextMenu, contextMenuItem);
+        }
+
         public void removeAllContextMenuItems(ContextMenu contextMenu) {
             if (contextMenu == null) return;
-            for (ContextMenuItem contextMenuItem : contextMenu.items)
-                removeContextMenuItem(contextMenu, contextMenuItem);
+            removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
         }
 
         public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
@@ -2189,14 +2227,33 @@ public class API {
             return window;
         }
 
-        public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiver) {
-            if (window == null) return;
-            window.messageReceiverActions.remove(messageReceiver);
+        public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
+            if (window == null || messageReceiverAction == null) return;
+            window.messageReceiverActions.add(messageReceiverAction);
         }
 
-        public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiver) {
-            window.messageReceiverActions.add(messageReceiver);
+        public void addMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
+            if (window == null || messageReceiverActions == null) return;
+            for (MessageReceiverAction messageReceiverAction : messageReceiverActions)
+                addMessageReceiverAction(window, messageReceiverAction);
         }
+
+        public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
+            if (window == null || messageReceiverAction == null) return;
+            window.messageReceiverActions.remove(messageReceiverAction);
+        }
+
+        public void removeMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
+            if (window == null || messageReceiverActions == null) return;
+            for (MessageReceiverAction messageReceiverAction : messageReceiverActions)
+                removeMessageReceiverAction(window, messageReceiverAction);
+        }
+
+        public void removeAllMessageReceiverActions(Window window) {
+            if (window == null) return;
+            removeMessageReceiverActions(window, window.messageReceiverActions.toArray(new MessageReceiverAction[]{}));
+        }
+
 
         public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
             if (window == null) return;
@@ -2386,14 +2443,24 @@ public class API {
             window.updateActions.add(updateAction);
         }
 
+        public void addUpdateActions(Window window, UpdateAction[] updateActions) {
+            if (window == null || updateActions == null) return;
+            for (UpdateAction updateAction : updateActions) addUpdateAction(window, updateAction);
+        }
+
         public void removeUpdateAction(Window window, UpdateAction updateAction) {
             if (window == null || updateAction == null) return;
             window.updateActions.remove(updateAction);
         }
 
+        public void removeUpdateActions(Window window, UpdateAction[] updateActions) {
+            if (window == null || updateActions == null) return;
+            for (UpdateAction updateAction : updateActions) removeUpdateAction(window, updateAction);
+        }
+
         public void removeAllUpdateActions(Window window) {
             if (window == null) return;
-            window.updateActions.clear();
+            removeUpdateActions(window, window.updateActions.toArray(new UpdateAction[]{}));
         }
 
         public void setName(Window window, String name) {
@@ -2540,17 +2607,8 @@ public class API {
             setColor(tooltip, color);
             setToolTipAction(tooltip, toolTipAction);
             setFont(tooltip, font);
-            addImages(tooltip, images);
+            addToolTipImages(tooltip, images);
             return tooltip;
-        }
-
-        public void addImages(ToolTip toolTip, ToolTipImage[] images) {
-            if (toolTip == null) return;
-            for (ToolTipImage toolTipImage : toolTip.images) addToolTipImage(toolTip, toolTipImage);
-        }
-
-        public void removeAllToolTipImages(ToolTip toolTip) {
-            for (ToolTipImage toolTipImage : toolTip.images) removeToolTipImage(toolTip, toolTipImage);
         }
 
         public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
@@ -2558,10 +2616,24 @@ public class API {
             UICommons.toolTip_addToolTipImage(toolTip, toolTipImage);
         }
 
+        public void addToolTipImages(ToolTip toolTip, ToolTipImage[] images) {
+            if (toolTip == null || images == null) return;
+            for (ToolTipImage toolTipImage : images) addToolTipImage(toolTip, toolTipImage);
+        }
+
         public void removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
             UICommons.toolTip_removeToolTipImage(toolTip, toolTipImage);
+        }
 
+        public void removeToolTipImages(ToolTip toolTip, ToolTipImage[] toolTipImages) {
+            if (toolTip == null || toolTipImages == null) return;
+            for (ToolTipImage toolTipImage : toolTipImages) removeToolTipImage(toolTip, toolTipImage);
+        }
+
+        public void removeAllToolTipImages(ToolTip toolTip) {
+            if (toolTip == null) return;
+            removeToolTipImages(toolTip, toolTip.images.toArray(new ToolTipImage[]{}));
         }
 
         public void setToolTipAction(ToolTip toolTip, ToolTipAction toolTipAction) {
@@ -2828,14 +2900,24 @@ public class API {
             component.updateActions.add(updateAction);
         }
 
+        public void addUpdateActions(Component component, UpdateAction[] updateActions) {
+            if (component == null || updateActions == null) return;
+            for (UpdateAction updateAction : updateActions) addUpdateAction(component, updateAction);
+        }
+
         public void removeUpdateAction(Component component, UpdateAction updateAction) {
             if (component == null || updateAction == null) return;
             component.updateActions.remove(updateAction);
         }
 
+        public void removeUpdateActions(Component component, UpdateAction[] updateActions) {
+            if (component == null || updateActions == null) return;
+            for (UpdateAction updateAction : updateActions) removeUpdateAction(component, updateAction);
+        }
+
         public void removeAllUpdateActions(Component component) {
             if (component == null) return;
-            component.updateActions.clear();
+            removeUpdateActions(component, component.updateActions.toArray(new UpdateAction[]{}));
         }
 
         public void setName(Component component, String name) {
@@ -2975,12 +3057,12 @@ public class API {
         }
 
         public boolean isAddedToWindow(Component component, Window window) {
-            if(component == null || window == null) return false;
+            if (component == null || window == null) return false;
             return component.addedToWindow != null && component.addedToWindow == window;
         }
 
         public boolean isAddedToScreen(Component component) {
-            if(component == null) return false;
+            if (component == null) return false;
             return component != null && component.addedToScreen;
         }
 
@@ -3504,21 +3586,6 @@ public class API {
                 }
             }
 
-            public void removeAllTabs(TabBar tabBar) {
-                if (tabBar == null) return;
-                for (Tab tab : tabBar.tabs) removeTab(tabBar, tab);
-            }
-
-            public void removeTab(TabBar tabBar, Tab tab) {
-                if (tabBar == null || tab == null) return;
-                UICommons.tabBar_removeTab(tabBar, tab);
-            }
-
-            public void addTabs(TabBar tabBar, Tab[] tabs) {
-                if (tabBar == null || tabs == null) return;
-                for (Tab tab : tabs) addTab(tabBar, tab);
-            }
-
             public void addTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return;
                 UICommons.tabBar_addTab(tabBar, tab);
@@ -3530,6 +3597,26 @@ public class API {
                     UICommons.tabBar_addTab(tabBar, tab, index);
                     tabBar.tabs.add(index, tab);
                 }
+            }
+
+            public void addTabs(TabBar tabBar, Tab[] tabs) {
+                if (tabBar == null || tabs == null) return;
+                for (Tab tab : tabs) addTab(tabBar, tab);
+            }
+
+            public void removeTab(TabBar tabBar, Tab tab) {
+                if (tabBar == null || tab == null) return;
+                UICommons.tabBar_removeTab(tabBar, tab);
+            }
+
+            public void removeTabs(TabBar tabBar, Tab[] tabs) {
+                if (tabBar == null || tabs == null) return;
+                for(Tab tab : tabs) removeTab(tabBar, tab);
+            }
+
+            public void removeAllTabs(TabBar tabBar) {
+                if (tabBar == null) return;
+                removeTabs(tabBar, tabBar.tabs.toArray(new Tab[]{}));
             }
 
             public ArrayList<Tab> findTabsByName(TabBar tabBar, String name) {
@@ -3638,11 +3725,6 @@ public class API {
                     for (Component component : components) addTabComponent(tab, component);
                 }
 
-                public void removeAllTabComponents(Tab tab) {
-                    if (tab == null) return;
-                    for (Component component : tab.components) removeTabComponent(tab, component);
-                }
-
                 public void addTabComponent(Tab tab, Component component) {
                     if (tab == null || component == null) return;
                     UICommons.tab_addComponent(tab, component);
@@ -3653,14 +3735,19 @@ public class API {
                     for (Component component : components) addTabComponent(tab, component);
                 }
 
+                public void removeTabComponent(Tab tab, Component component) {
+                    if (tab == null || component == null) return;
+                    UICommons.tab_removeComponent(tab, component);
+                }
+
                 public void removeTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
                     for (Component component : components) removeTabComponent(tab, component);
                 }
 
-                public void removeTabComponent(Tab tab, Component component) {
-                    if (tab == null || component == null) return;
-                    UICommons.tab_removeComponent(tab, component);
+                public void removeAllTabComponents(Tab tab) {
+                    if (tab == null) return;
+                    removeTabComponents(tab, tab.components.toArray(new Component[]{}));
                 }
 
                 public void setIcon(Tab tab, CMediaGFX icon) {
@@ -3979,14 +4066,14 @@ public class API {
                 map.pMap.drawCircle(x, y, radius);
             }
 
-            public void addMapOverlays(Map map, MapOverlay[] mapOverlays) {
-                if (map == null || mapOverlays == null) return;
-                for (MapOverlay mapOverlay : mapOverlays) addMapOverlay(map, mapOverlay);
-            }
-
             public void addMapOverlay(Map map, MapOverlay mapOverlay) {
                 if (map == null || mapOverlay == null) return;
                 UICommons.map_addMapOverlay(map, mapOverlay);
+            }
+
+            public void addMapOverlays(Map map, MapOverlay[] mapOverlays) {
+                if (map == null || mapOverlays == null) return;
+                for (MapOverlay mapOverlay : mapOverlays) addMapOverlay(map, mapOverlay);
             }
 
             public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
@@ -3994,9 +4081,14 @@ public class API {
                 UICommons.map_removeMapOverlay(map, mapOverlay);
             }
 
+            public void removeMapOverlays(Map map, MapOverlay[] mapOverlays) {
+                if (map == null || mapOverlays == null) return;
+                for (MapOverlay mapOverlay : mapOverlays) removeMapOverlay(map, mapOverlay);
+            }
+
             public void removeAllMapOverlays(Map map) {
                 if (map == null) return;
-                for (MapOverlay mapOverlay : map.mapOverlays) removeMapOverlay(map, mapOverlay);
+                removeMapOverlays(map, map.mapOverlays.toArray(new MapOverlay[]{}));
             }
 
             public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
@@ -4308,24 +4400,29 @@ public class API {
                 comboBox.useIcons = useIcons;
             }
 
-            public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
-                if (comboBox == null || comboBoxItems == null) return;
-                for (ComboBoxItem comboBoxItem : comboBoxItems) addItem(comboBox, comboBoxItem);
-            }
-
-            public void addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+            public void addComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
                 if (comboBox == null || comboBoxItem == null) return;
                 UICommons.comboBox_addItem(comboBox, comboBoxItem);
             }
 
-            public void removeAllComboBoxItems(ComboBox comboBox) {
-                if (comboBox == null) return;
-                for (ComboBoxItem comboBoxItem : comboBox.items) removeItem(comboBox, comboBoxItem);
+            public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
+                if (comboBox == null || comboBoxItems == null) return;
+                for (ComboBoxItem comboBoxItem : comboBoxItems) addComboBoxItem(comboBox, comboBoxItem);
             }
 
-            public void removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+            public void removeComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
                 if (comboBox == null || comboBoxItem == null) return;
                 UICommons.comboBox_removeItem(comboBox, comboBoxItem);
+            }
+
+            public void removeComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
+                if (comboBox == null || comboBoxItems == null) return;
+                for (ComboBoxItem comboBoxItem : comboBoxItems) removeComboBoxItem(comboBox, comboBoxItem);
+            }
+
+            public void removeAllComboBoxItems(ComboBox comboBox) {
+                if (comboBox == null) return;
+                removeComboBoxItems(comboBox, comboBox.items.toArray(new ComboBoxItem[]{}));
             }
 
             public boolean isItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
@@ -4337,7 +4434,6 @@ public class API {
                 if (comboBox == null || text == null) return false;
                 return comboBox.selectedItem != null ? comboBox.selectedItem.text.equals(text) : false;
             }
-
 
             public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectItem) {
                 if (comboBox == null) return;

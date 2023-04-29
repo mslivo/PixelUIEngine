@@ -81,8 +81,9 @@ class UICommons {
     public static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
         boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x,inputState.mouse_gui.y);
         if(success && inputState.controlMode == ControlMode.KEYBOARD){
-            inputState.mouse_gui.x += 4;
-            inputState.mouse_gui.y -= 4;
+            // keyboard mode: move mouse onto the opened menu
+            inputState.mouse_gui.x += UIEngine.TILE_SIZE_2;
+            inputState.mouse_gui.y -= UIEngine.TILE_SIZE_2;
         }
         return success;
     }
@@ -392,7 +393,7 @@ class UICommons {
         }
         // Open this one
         inputState.openComboBox = comboBox;
-        if (inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onOpen();
+        if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onOpen();
     }
 
     public static void comboBox_close(ComboBox comboBox, InputState inputState) {
