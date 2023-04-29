@@ -15,11 +15,106 @@ import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
 class UICommons {
+
+    static void window_bringToFront(InputState inputState, Window window) {
+        if (inputState.windows.size() == 1) return;
+        if (window.alwaysOnTop) {
+            if (inputState.windows.get(inputState.windows.size() - 1) != window) {
+                inputState.windows.remove(window);
+                inputState.windows.add(window);
+            }
+        } else {
+            int index = inputState.windows.size() - 1;
+            searchIndex:
+            while (index > 0) {
+                if (!inputState.windows.get(index).alwaysOnTop) {
+                    break searchIndex;
+                }
+                index = index - 1;
+            }
+            inputState.windows.remove(window);
+            inputState.windows.add(index, window);
+        }
+
+        inputState.lastActiveWindow = window;
+    }
+
+    public static void window_addToScreen(InputState inputState, Window window) {
+        if (window.addedToScreen) return;
+        window.addedToScreen = true;
+        inputState.windows.add(window);
+        if (window.windowAction != null) window.windowAction.onAdd();
+    }
+
+    public static void window_removeFromScreen(InputState inputState, Window window) {
+        if (!window.addedToScreen) return;
+        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
+        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
+        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+        window.addedToScreen = false;
+        inputState.windows.remove(window);
+        if (window.windowAction != null) window.windowAction.onRemove();
+    }
+
+
+    public static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
+        if (notification.addedToScreen) return;
+        notification.addedToScreen = true;
+        inputState.notifications.add(notification);
+        // Remove first if too many
+        if (inputState.notifications.size() > notificationsMax) notification_removeFromScreen(inputState, inputState.notifications.get(0));
+    }
+
+    public static void notification_removeFromScreen(InputState inputState, Notification notification) {
+        if (!notification.addedToScreen) return;
+        notification.addedToScreen = false;
+        inputState.notifications.remove(notification);
+    }
+
+    public static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
+        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x,inputState.mouse_gui.y);
+        if(success && inputState.controlMode == ControlMode.KEYBOARD){
+            inputState.mouse_gui.x += 4;
+            inputState.mouse_gui.y -= 4;
+        }
+        return success;
+    }
+
+    public static boolean contextMenu_open(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager, int x, int y) {
+        if (contextMenu.items.size() == 0) return false;
+        // Close open ContextMenus
+        if (inputState.openContextMenu != null) {
+            contextMenu_close(inputState.openContextMenu, inputState);
+        }
+        // Open this one
+        contextMenu.x = inputState.mouse_gui.x;
+        contextMenu.y = inputState.mouse_gui.y;
+        int textwidth = 0;
+        for (ContextMenuItem item : contextMenu.items) {
+            int w = mediaManager.textWidth(item.font, item.text);
+            if (item.icon != null) w = w + UIEngine.TILE_SIZE;
+            if (w > textwidth) textwidth = w;
+        }
+        inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
+        inputState.openContextMenu = contextMenu;
+        if(inputState.openContextMenu.contextMenuAction != null) inputState.openContextMenu.contextMenuAction.onOpen();
+        return true;
+    }
+
+    public static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
+        if(contextMenu_isOpen(contextMenu, inputState)) {
+            inputState.openContextMenu = null;
+            inputState.displayedContextMenuWidth = 0;
+            if(contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
+        }
+    }
 
     public static String progressBar_getProgressText(float progress) {
         return ProgressBarPercentText.progressText[(int) (progress * 100)];
@@ -148,7 +243,7 @@ class UICommons {
     }
 
 
-    public static void tab_removeComponent( Tab tab, Component component) {
+    public static void tab_removeComponent(Tab tab, Component component) {
         if (component.addedToTab != tab) return;
         component.addedToTab.components.remove(component);
         component.addedToTab = tab;
@@ -160,19 +255,6 @@ class UICommons {
         tab.components.add(component);
     }
 
-
-    public static void window_addToScreen(InputState inputState, Window window) {
-        if (inputState.windows.contains(window)) return;
-        inputState.windows.add(window);
-    }
-
-    public static void window_removeFromScreen(InputState inputState, Window window) {
-        if (!inputState.windows.contains(window)) return;
-        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
-        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
-        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
-        inputState.windows.remove(window);
-    }
 
     public static void tabBar_addTab(TabBar tabBar, Tab tab) {
         if (tab.addedToTabBar != null) return;
@@ -289,32 +371,34 @@ class UICommons {
         inputState.listDrag_Item = null;
 
         // ComboBox
-        inputState.openComboBox = null;
+        if(inputState.openComboBox != null) UICommons.comboBox_close(inputState.openComboBox, inputState);
 
         // ContextMenu
-        inputState.openContextMenu = null;
-        inputState.displayedContextMenuWidth = 0;
-
+        if(inputState.openContextMenu != null) UICommons.contextMenu_close(inputState.openContextMenu, inputState);
     }
 
-    public static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox) {
+    public static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;
     }
 
-    public static void comboBox_open(InputState inputState, ComboBox comboBox) {
+    public static boolean contextMenu_isOpen(ContextMenu contextMenu, InputState inputState) {
+        return inputState.openContextMenu != null && inputState.openContextMenu == contextMenu;
+    }
+
+    public static void comboBox_open(ComboBox comboBox, InputState inputState) {
         // Close other Comboboxes
         if (inputState.openComboBox != null) {
-            comboBox_close(inputState, inputState.openComboBox);
+            comboBox_close(inputState.openComboBox, inputState);
         }
         // Open this one
         inputState.openComboBox = comboBox;
         if (inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onOpen();
     }
 
-    public static void comboBox_close(InputState inputState, ComboBox comboBox) {
-        if (comboBox_isOpen(inputState, comboBox)) {
-            if (inputState.openComboBox.comboBoxAction != null) inputState.openComboBox.comboBoxAction.onClose();
+    public static void comboBox_close(ComboBox comboBox, InputState inputState) {
+        if (comboBox_isOpen(comboBox, inputState)) {
             inputState.openComboBox = null;
+            if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
         }
     }
 
@@ -340,27 +424,5 @@ class UICommons {
         }
     }
 
-    static void window_bringToFront(InputState inputState, Window window) {
-        if (inputState.windows.size() == 1) return;
-        if (window.alwaysOnTop) {
-            if (inputState.windows.get(inputState.windows.size() - 1) != window) {
-                inputState.windows.remove(window);
-                inputState.windows.add(window);
-            }
-        } else {
-            int index = inputState.windows.size() - 1;
-            searchIndex:
-            while (index > 0) {
-                if (!inputState.windows.get(index).alwaysOnTop) {
-                    break searchIndex;
-                }
-                index = index - 1;
-            }
-            inputState.windows.remove(window);
-            inputState.windows.add(index, window);
-        }
-
-        inputState.lastActiveWindow = window;
-    }
 
 }

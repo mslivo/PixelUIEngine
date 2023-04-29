@@ -90,7 +90,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 0, null, true, window.height - 4, false);
 
 
-        api.windows.addComponents(window, tabBarComponents);
+        api.windows.addComponents(window, tabBarComponents.toArray(new Component[]{}));
 
         api.config.setKeyBoardControlEnabled(true);
         api.config.setMouseControlEnabled(true);
@@ -296,10 +296,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("3"));
                                         api.setGameToolTip(null);
+                                        api.removeAllWindows();
                                     }
                                 }),
                         }
-                , 1f));
+                , null, 1f));
             }
         }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1);
         api.components.setColor(textBtn4, Tools.Colors.GRAY_BRIGHT);
@@ -356,8 +357,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
         ArrayList<Component> border = api.toolBox.image_createBorder(10, 4, 4, 4);
-        api.windows.addComponents(window, border);
-        api.components.tabBar.tab.addTabComponents(tabImageButton, border);
+        api.windows.addComponents(window, border.toArray(new Component[]{}));
+        api.components.tabBar.tab.addTabComponents(tabImageButton, border.toArray(new Component[]{}));
 
         api.windows.addComponents(window, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
         api.components.tabBar.tab.addTabComponents(tabImageButton, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
@@ -371,14 +372,14 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.components.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        ArrayList separatorHorizontal = api.toolBox.image_CreateSeparatorHorizontal(12, 9, 13);
+        ArrayList<Component> separatorHorizontal = api.toolBox.image_CreateSeparatorHorizontal(12, 9, 13);
 
         Text text2 = api.components.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
 
         api.windows.addComponents(window, new Component[]{image1, text, text2});
-        api.windows.addComponents(window, separatorHorizontal);
+        api.windows.addComponents(window, separatorHorizontal.toArray(new Component[]{}));
         api.components.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
-        api.components.tabBar.tab.addTabComponents(tabTextImage, separatorHorizontal);
+        api.components.tabBar.tab.addTabComponents(tabTextImage, separatorHorizontal.toArray(new Component[]{}));
 
         // Tab Bar
 

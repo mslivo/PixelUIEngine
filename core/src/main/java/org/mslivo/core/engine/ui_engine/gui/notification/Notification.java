@@ -27,4 +27,6 @@ public class Notification {
 
     public Object data;
 
+    public boolean addedToScreen;
+
 }

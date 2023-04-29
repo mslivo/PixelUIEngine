@@ -88,6 +88,7 @@ public class API {
 
     private final HashMap<Class<org.mslivo.core.example.ui.windows.ExampleWindowGenerator>, WindowGenerator> windowGeneratorCache;
 
+    private final String WND_CLOSE_BUTTON = "wnd_close_btn";
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
@@ -95,50 +96,6 @@ public class API {
         this.windowGeneratorCache = new HashMap<>();
     }
 
-    public void addNotification(Notification notification) {
-        if (notification == null) return;
-        inputState.notifications.add(notification);
-        if (inputState.notifications.size() > config.notificationsMax) {
-            inputState.notifications.remove(0);
-        }
-    }
-
-    public void setGameToolTip(ToolTip toolTip) {
-        inputState.gameToolTip = toolTip;
-    }
-
-    public ArrayList<Notification> findNotificationsByName(String name) {
-        if (name == null) return new ArrayList<>();
-        return new ArrayList<>(inputState.notifications.stream().filter(notification -> name.equals(notification.name)).toList());
-    }
-
-    public Notification findNotificationByName(String name) {
-        if (name == null) return null;
-        ArrayList<Notification> result = findNotificationsByName(name);
-        return result.size() > 0 ? result.get(0) : null;
-    }
-
-    public void executeSingleUpdateAction(UpdateAction updateAction) {
-        if (updateAction == null) return;
-        this.inputState.singleUpdateActions.add(updateAction);
-    }
-
-    public void sendMessageToWindows(String message_type, Object... p) {
-        for (Window window : inputState.windows) {
-            for (MessageReceiverAction messageReceiver : window.messageReceiverActions) {
-                if (messageReceiver.messageType.equals(message_type)) {
-                    messageReceiver.onMessageReceived(p);
-                }
-            }
-
-        }
-    }
-
-    public void windowsEnforceScreenBounds() {
-        for (Window window : inputState.windows) {
-            UICommons.window_enforceScreenBounds(inputState, window);
-        }
-    }
 
     public static class _HotKey {
 
@@ -721,7 +678,7 @@ public class API {
             componentsl.add(okBtn);
 
             components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            windows.addComponents(modal, componentsl);
+            windows.addComponents(modal, componentsl.toArray(new Component[]{}));
             return modal;
         }
 
@@ -909,7 +866,7 @@ public class API {
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
-            components.setName(closeButton, "WndCloseBtn");
+            components.setName(closeButton, WND_CLOSE_BUTTON);
             components.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override
@@ -1047,58 +1004,101 @@ public class API {
 
     }
 
+    public void setGameToolTip(ToolTip toolTip) {
+        inputState.gameToolTip = toolTip;
+    }
+
+    public boolean isGameToolTipDisplayed() {
+        return inputState.gameToolTip != null;
+    }
+
+    public void executeSingleUpdateAction(UpdateAction updateAction) {
+        if (updateAction == null) return;
+        this.inputState.singleUpdateActions.add(updateAction);
+    }
+
+    public void addNotifications(Notification[] notifications) {
+        if (notifications == null) return;
+        for (Notification notification : notifications) addNotification(notification);
+    }
+
+    public void addNotification(Notification notification) {
+        if (notification == null) return;
+        UICommons.notification_addToScreen(inputState, notification, config.notificationsMax);
+    }
 
     public void removeNotification(Notification notification) {
-        if(inputState.notifications.contains(notification)) {
-            inputState.notifications.remove(notification);
-        }
+        if (notification == null) return;
+        UICommons.notification_removeFromScreen(inputState, notification);
+    }
+
+    public ArrayList<Notification> findNotificationsByName(String name) {
+        if (name == null) return new ArrayList<>();
+        return new ArrayList<>(inputState.notifications.stream().filter(notification -> name.equals(notification.name)).toList());
+    }
+
+    public Notification findNotificationByName(String name) {
+        if (name == null) return null;
+        ArrayList<Notification> result = findNotificationsByName(name);
+        return result.size() > 0 ? result.get(0) : null;
+    }
+
+    public boolean isNotificationAddedToScreen(Notification notification) {
+        if (notification == null) return false;
+        return notification.addedToScreen;
     }
 
     public void removeAllNotifications() {
-        inputState.notifications.clear();
+        for (Notification notification : inputState.notifications) removeNotification(notification);
     }
 
     public ArrayList<Notification> getNotifications() {
-        return inputState.notifications;
+        return new ArrayList<>(inputState.notifications);
     }
 
     public void openContextMenu(ContextMenu contextMenu) {
-        openContextMenu(contextMenu, inputState.mouse_gui.x, inputState.mouse_gui.y);
+        UICommons.contextMenu_openAtMousePosition(contextMenu, inputState, mediaManager);
     }
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        inputState.openContextMenu = contextMenu;
-        inputState.openContextMenu.x = x;
-        inputState.openContextMenu.y = y;
-        int textwidth = 0;
-        for (ContextMenuItem item : inputState.openContextMenu.items) {
-            int w = mediaManager.textWidth(item.font, item.text);
-            if (item.icon != null) w = w + UIEngine.TILE_SIZE;
-            if (w > textwidth) textwidth = w;
-        }
-        inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
-        // move to mouse to first item on keyboard mode
-        if(input.getControlMode() == ControlMode.KEYBOARD) {
-            input.setMousePosition(input.mouseXGUI() + 5, input.mouseYGUI() - 1);
-        }
+        UICommons.contextMenu_open(contextMenu, inputState, mediaManager, x, y);
     }
 
-    public void closeContextMenu() {
-        inputState.openContextMenu = null;
-        inputState.displayedContextMenuWidth = 0;
+    public void closeContextMenu(ContextMenu contextMenu) {
+        UICommons.contextMenu_close(contextMenu, inputState);
     }
 
-    public ContextMenu getContextMenu() {
-        return inputState.openContextMenu;
+    public boolean isContextMenuOpen(ContextMenu contextMenu) {
+        return UICommons.contextMenu_isOpen(contextMenu, inputState);
     }
 
     public ArrayList<Window> getWindows() {
-        return inputState.windows;
+        return new ArrayList<>(inputState.windows);
+    }
+
+    public void sendMessageToWindows(String message_type, Object... content) {
+        if (message_type == null) return;
+        for (int i = 0; i < inputState.windows.size(); i++) {
+            Window window = inputState.windows.get(i);
+            for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
+                MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
+                if (messageReceiverAction.messageType.equals(message_type)) {
+                    messageReceiverAction.onMessageReceived(content);
+                }
+            }
+        }
+    }
+
+    public void windowsEnforceScreenBounds() {
+        for (int i = 0; i < inputState.windows.size(); i++) {
+            Window window = inputState.windows.get(i);
+            UICommons.window_enforceScreenBounds(inputState, window);
+        }
     }
 
     public ArrayList<Component> getScreenComponents() {
-        return inputState.screenComponents;
+        return new ArrayList<>(inputState.screenComponents);
     }
 
     public void freezeGUI() {
@@ -1120,20 +1120,16 @@ public class API {
     public void addWindow(Window window) {
         if (window == null) return;
         UICommons.window_addToScreen(inputState, window);
-        if (window.windowAction != null) window.windowAction.onAdd();
     }
 
     public void removeWindow(Window window) {
-        if (inputState.windows.contains(window)) {
-            UICommons.window_removeFromScreen(inputState, window);
-            if (window.windowAction != null) window.windowAction.onRemove();
-        }
+        if (window == null) return;
+        UICommons.window_removeFromScreen(inputState, window);
     }
 
     public void removeWindows(Window[] windows) {
-        for (Window window : windows) {
-            removeWindow(window);
-        }
+        if (windows == null) return;
+        for (Window window : windows) removeWindow(window);
     }
 
     public void removeAllWindows() {
@@ -1141,9 +1137,19 @@ public class API {
         UICommons.resetGUIVariables(inputState);
     }
 
+    public void closeAllWindows() {
+        closeWindows(inputState.windows.toArray(new Window[]{}));
+        UICommons.resetGUIVariables(inputState);
+    }
+
+    public void closeWindows(Window[] windows) {
+        if (windows == null) return;
+        for (Window window : windows) closeWindow(window);
+    }
+
     public boolean closeWindow(Window window) {
         if (window == null) return false;
-        ArrayList<Component> result = windows.findComponentsByName(window, "WndCloseBtn");
+        ArrayList<Component> result = windows.findComponentsByName(window, WND_CLOSE_BUTTON);
         if (result.size() == 1) {
             if (result.get(0) instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
@@ -1154,14 +1160,6 @@ public class API {
             }
         }
         return false;
-    }
-
-    public void closeAllWindows() {
-        ArrayList<Window> windows = new ArrayList<>(inputState.windows);
-        for (Window window : windows) {
-            closeWindow(window);
-        }
-        UICommons.resetGUIVariables(inputState);
     }
 
     public void addWindowAsModal(Window modalWindow) {
@@ -1189,6 +1187,12 @@ public class API {
         }
     }
 
+    private void addNextModal() {
+        if (inputState.modalWindow == null && inputState.modalWindowQueue.size() > 0) {
+            addWindowAsModal(inputState.modalWindowQueue.pollFirst());
+        }
+    }
+
     public boolean closeCurrentModalWindow() {
         if (inputState.modalWindow != null) {
             if (closeWindow(inputState.modalWindow)) {
@@ -1198,12 +1202,6 @@ public class API {
             }
         }
         return false;
-    }
-
-    private void addNextModal() {
-        if (inputState.modalWindow == null && inputState.modalWindowQueue.size() > 0) {
-            addWindowAsModal(inputState.modalWindowQueue.pollFirst());
-        }
     }
 
     public void addScreenComponent(Component component) {
@@ -1259,7 +1257,7 @@ public class API {
     }
 
     public ArrayList<HotKey> getHotKeys() {
-        return inputState.hotKeys;
+        return new ArrayList<>(inputState.hotKeys);
     }
 
     public void addHotKey(HotKey hotKey) {
@@ -1938,10 +1936,15 @@ public class API {
 
         public void setColor(Notification notification, FColor color) {
             if (notification == null || color == null) return;
-            notification.color_r = color.r;
-            notification.color_g = color.g;
-            notification.color_b = color.b;
-            notification.color_a = color.a;
+            setColor(notification, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor(Notification notification, float r, float g, float b, float a) {
+            if (notification == null) return;
+            notification.color_r = r;
+            notification.color_g = g;
+            notification.color_b = b;
+            notification.color_a = a;
         }
 
         public void setFont(Notification notification, CMediaFont font) {
@@ -1958,23 +1961,38 @@ public class API {
 
     public class _ContextMenu {
 
+        private ContextMenuAction defaultContextMenuAction() {
+            return new ContextMenuAction() {
+            };
+        }
+
         public final _ContextMenuItem item = new _ContextMenuItem();
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems) {
-            return create(contextMenuItems, 1f);
+            return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, float alpha) {
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+            return create(contextMenuItems, defaultContextMenuAction(), 1f);
+        }
+
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.items = new ArrayList<>();
             setAlpha(contextMenu, alpha);
             addContextMenuItems(contextMenu, contextMenuItems);
+            setContextMenuAction(contextMenu, contextMenuAction);
             return contextMenu;
         }
 
-        public void setAlpha(ContextMenu contextMenu, float alpha){
-            if(contextMenu == null) return;
-            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f,1f);
+        public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
+            if (contextMenu == null) return;
+            contextMenu.contextMenuAction = contextMenuAction;
+        }
+
+        public void setAlpha(ContextMenu contextMenu, float alpha) {
+            if (contextMenu == null) return;
+            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
         }
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
@@ -1984,15 +2002,16 @@ public class API {
 
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
-            UICommons.contextMenu_addItem(contextMenu,contextMenuItem );
+            UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
-            UICommons.contextMenu_addItem(contextMenu,contextMenuItem );
+            UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
         }
 
         public void removeAllContextMenuItems(ContextMenu contextMenu) {
+            if (contextMenu == null) return;
             for (ContextMenuItem contextMenuItem : contextMenu.items)
                 removeContextMenuItem(contextMenu, contextMenuItem);
         }
@@ -2058,9 +2077,14 @@ public class API {
 
             public void setColor(ContextMenuItem contextMenuItem, FColor color) {
                 if (contextMenuItem == null || color == null) return;
-                contextMenuItem.color_r = color.r;
-                contextMenuItem.color_g = color.g;
-                contextMenuItem.color_b = color.b;
+                setColor(contextMenuItem, color.r, color.b, color.g);
+            }
+
+            public void setColor(ContextMenuItem contextMenuItem, float r, float g, float b) {
+                if (contextMenuItem == null) return;
+                contextMenuItem.color_r = r;
+                contextMenuItem.color_g = g;
+                contextMenuItem.color_b = b;
             }
 
             public void setFont(ContextMenuItem contextMenuItem, CMediaFont font) {
@@ -2160,11 +2184,13 @@ public class API {
             window.font = config.defaultFont;
             window.messageReceiverActions = new ArrayList<>();
             window.updateActions = new ArrayList<>();
+            window.addedToScreen = false;
             addComponents(window, components);
             return window;
         }
 
         public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiver) {
+            if (window == null) return;
             window.messageReceiverActions.remove(messageReceiver);
         }
 
@@ -2202,6 +2228,10 @@ public class API {
             window.windowAction = windowAction;
         }
 
+        public boolean isAddedToScreen(Window window) {
+            if (window == null) return false;
+            return window.addedToScreen;
+        }
 
         private enum SETCOLOR_MODE {
             INCLUDE, EXCEPT
@@ -2209,53 +2239,56 @@ public class API {
 
         private void setColorFunction(Window window, FColor color, SETCOLOR_MODE setcolormode, Class[] classes,
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
-            if(classes == null) classes = new Class[]{};
-            if(windowColor) setColor(window, color);
+            if (classes == null) classes = new Class[]{};
+            if (windowColor) setColor(window, color);
             for (Component component : window.components) {
-                boolean match = switch (setcolormode){
-                    case INCLUDE -> Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
-                    case EXCEPT -> Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
+                boolean match = switch (setcolormode) {
+                    case INCLUDE ->
+                            Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
+                    case EXCEPT ->
+                            Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
                 };
-                if(match){
-                    if(componentColor1) components.setColor(component, color);
-                    if(componentColor2) components.setColor2(component, color);
-                    if(component.getClass() == ComboBox.class){
+                if (match) {
+                    if (componentColor1) components.setColor(component, color);
+                    if (componentColor2) components.setColor2(component, color);
+                    if (component.getClass() == ComboBox.class) {
                         ComboBox comboBox = (ComboBox) component;
-                        for(ComboBoxItem comboBoxItem : comboBox.items) components.comboBox.item.setColor(comboBoxItem, color);
+                        for (ComboBoxItem comboBoxItem : comboBox.items)
+                            components.comboBox.item.setColor(comboBoxItem, color);
                     }
                 }
             }
         }
 
         public void setColorEverything(Window window, FColor color) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,null,
-                    true, true, true,true);
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, null,
+                    true, true, true, true);
         }
 
         public void setColorEverything(Window window, FColor color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,null,
-                    windowColor, componentColor1, componentColor2,comboBoxItems);
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, null,
+                    windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,exceptions,
-                    true, true, true,true);
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, exceptions,
+                    true, true, true, true);
         }
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT,exceptions,
-                    windowColor, componentColor1, componentColor2,comboBoxItems);
+            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, exceptions,
+                    windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions) {
-            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE,inclusions,
-                    true, true, true,true);
+            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE, inclusions,
+                    true, true, true, true);
         }
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE,inclusions,
-                    windowColor, componentColor1, componentColor2,comboBoxItems);
+            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE, inclusions,
+                    windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
         public int getRealWidth(Window window) {
@@ -2306,11 +2339,6 @@ public class API {
             for (Component component : components) addComponent(window, component);
         }
 
-        public void addComponents(Window window, ArrayList<Component> components) {
-            if (window == null || components == null) return;
-            for (Component component : components) addComponent(window, component);
-        }
-
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
             UICommons.component_removeFromWindow(component, inputState, window);
@@ -2321,9 +2349,9 @@ public class API {
             for (Component component : components) removeComponent(window, component);
         }
 
-        public void removeComponents(Window window, ArrayList<Component> components) {
-            if (window == null || components == null) return;
-            for (Component component : components) removeComponent(window, component);
+        public void removeAllComponents(Window window) {
+            if (window == null) return;
+            removeComponents(window, window.components.toArray(new Component[]{}));
         }
 
         public ArrayList<Component> findComponentsByName(Window window, String name) {
@@ -2380,10 +2408,15 @@ public class API {
 
         public void setColor(Window window, FColor color) {
             if (window == null || color == null) return;
-            window.color_r = color.r;
-            window.color_g = color.g;
-            window.color_b = color.b;
-            window.color_a = color.a;
+            setColor(window, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor(Window window, float r, float g, float b, float a) {
+            if (window == null) return;
+            window.color_r = r;
+            window.color_g = g;
+            window.color_b = b;
+            window.color_a = a;
         }
 
         public void setAlpha(Window window, float transparency) {
@@ -2447,23 +2480,28 @@ public class API {
                 return toolTipImage;
             }
 
-            public void setImage(ToolTipImage toolTipImage, CMediaGFX image){
-                if(toolTipImage == null) return;
+            public void setImage(ToolTipImage toolTipImage, CMediaGFX image) {
+                if (toolTipImage == null) return;
                 toolTipImage.image = image;
             }
 
-            public void setPosition(ToolTipImage toolTipImage, int x, int y){
-                if(toolTipImage == null) return;
+            public void setPosition(ToolTipImage toolTipImage, int x, int y) {
+                if (toolTipImage == null) return;
                 toolTipImage.x = x;
                 toolTipImage.y = y;
             }
 
-            public void setColor(ToolTipImage toolTipImage, FColor color){
-                if(toolTipImage == null) return;
-                toolTipImage.color_r = color.r;
-                toolTipImage.color_g = color.g;
-                toolTipImage.color_b = color.b;
-                toolTipImage.color_a = color.a;
+            public void setColor(ToolTipImage toolTipImage, FColor color) {
+                if (toolTipImage == null) return;
+                setColor(toolTipImage, color.r, color.g, color.b, color.a);
+            }
+
+            public void setColor(ToolTipImage toolTipImage, float r, float g, float b, float a) {
+                if (toolTipImage == null) return;
+                toolTipImage.color_r = r;
+                toolTipImage.color_g = g;
+                toolTipImage.color_b = b;
+                toolTipImage.color_a = a;
             }
 
         }
@@ -2541,10 +2579,15 @@ public class API {
 
         public void setColor(ToolTip tooltip, FColor color) {
             if (tooltip == null || color == null) return;
-            tooltip.color_r = color.r;
-            tooltip.color_g = color.g;
-            tooltip.color_b = color.b;
-            tooltip.color_a = color.a;
+            setColor(tooltip, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor(ToolTip tooltip, float r, float g, float b, float a) {
+            if (tooltip == null) return;
+            tooltip.color_r = r;
+            tooltip.color_g = g;
+            tooltip.color_b = b;
+            tooltip.color_a = a;
         }
 
         public void setFont(ToolTip tooltip, CMediaFont font) {
@@ -2817,36 +2860,22 @@ public class API {
             setSize(component, width, height);
         }
 
-        public void setColor(Component component, FColor color) {
-            if (component == null || color == null) return;
-            component.color_r = color.r;
-            component.color_g = color.g;
-            component.color_b = color.b;
-            component.color_a = color.a;
-        }
-
-        public void setColor2(Component component, FColor color) {
-            if (component == null || color == null) return;
-            component.color2_r = color.r;
-            component.color2_g = color.g;
-            component.color2_b = color.b;
-            component.color2_a = color.a;
-        }
-
-        public void setColor(Collection<Component> components, FColor color) {
-            if (components == null) return;
-            for (Component component : components) setColor(component, color);
-
-        }
-
-        public void setColor2(Collection<Component> components, FColor color2) {
-            if (components == null) return;
-            for (Component component : components) setColor2(component, color2);
-        }
-
         public void setColor(Component[] components, FColor color) {
             if (components == null) return;
             for (Component component : components) setColor(component, color);
+        }
+
+        public void setColor(Component component, FColor color) {
+            if (component == null || color == null) return;
+            setColor(component, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor(Component component, float r, float g, float b, float a) {
+            if (component == null) return;
+            component.color_r = r;
+            component.color_g = g;
+            component.color_b = b;
+            component.color_a = a;
         }
 
         public void setColor2(Component[] components, FColor color2) {
@@ -2854,18 +2883,23 @@ public class API {
             for (Component component : components) setColor2(component, color2);
         }
 
+        public void setColor2(Component component, FColor color) {
+            if (component == null || color == null) return;
+            setColor2(component, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor2(Component component, float r, float g, float b, float a) {
+            if (component == null) return;
+            component.color2_r = r;
+            component.color2_g = g;
+            component.color2_b = b;
+            component.color2_a = a;
+        }
+
         public void setColor1And2(Component component, FColor color) {
             if (component == null) return;
             setColor(component, color);
             setColor2(component, color);
-        }
-
-        public void setColor1And2(Collection<Component> components, FColor color) {
-            if (components == null) return;
-            for (Component component : components) {
-                setColor(component, color);
-                setColor2(component, color);
-            }
         }
 
         public void setColor1And2(Component[] components, FColor color) {
@@ -2876,16 +2910,14 @@ public class API {
             }
         }
 
-        public void setAlpha(Component component, float transparency) {
+        public void setAlpha(Component component, float alpha) {
             if (component == null) return;
-            component.color_a = transparency;
+            component.color_a = alpha;
         }
 
-        public void setAlpha(Component[] components, float transparency) {
+        public void setAlpha(Component[] components, float alpha) {
             if (components == null) return;
-            for (Component component : components) {
-                if (component != null) setAlpha(component, transparency);
-            }
+            for (Component component : components) setAlpha(component, alpha);
         }
 
         private void setComponentInitValues(Component component) {
@@ -2940,6 +2972,16 @@ public class API {
         public int getRealHeight(Component component) {
             if (component == null) return 0;
             return component.height * UIEngine.TILE_SIZE;
+        }
+
+        public boolean isAddedToWindow(Component component, Window window) {
+            if(component == null || window == null) return false;
+            return component.addedToWindow != null && component.addedToWindow == window;
+        }
+
+        public boolean isAddedToScreen(Component component) {
+            if(component == null) return false;
+            return component != null && component.addedToScreen;
         }
 
         public class _GameViewPort {
@@ -3407,7 +3449,7 @@ public class API {
             }
 
             public void setTabOffset(TabBar tabBar, int tabOffset) {
-                if(tabBar == null) return;
+                if (tabBar == null) return;
                 tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
             }
 
@@ -3611,17 +3653,7 @@ public class API {
                     for (Component component : components) addTabComponent(tab, component);
                 }
 
-                public void addTabComponents(Tab tab, ArrayList<Component> components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) addTabComponent(tab, component);
-                }
-
                 public void removeTabComponents(Tab tab, Component[] components) {
-                    if (tab == null || components == null) return;
-                    for (Component component : components) removeTabComponent(tab, component);
-                }
-
-                public void removeTabComponents(Tab tab, ArrayList<Component> components) {
                     if (tab == null || components == null) return;
                     for (Component component : components) removeTabComponent(tab, component);
                 }
@@ -3898,6 +3930,7 @@ public class API {
             public void clearMap(Map map, FColor fColor) {
                 clearMap(map, fColor);
             }
+
             public void clearMap(Map map, float r, float g, float b, float a) {
                 if (map == null) return;
                 map.pMap.setColor(r, g, b, a);
@@ -4328,16 +4361,16 @@ public class API {
 
             public void open(ComboBox comboBox) {
                 if (comboBox == null) return;
-                UICommons.comboBox_open(inputState, comboBox);
+                UICommons.comboBox_open(comboBox, inputState);
             }
 
             public void close(ComboBox comboBox) {
                 if (comboBox == null) return;
-                UICommons.comboBox_close(inputState, comboBox);
+                UICommons.comboBox_close(comboBox, inputState);
             }
 
             public boolean isOpen(ComboBox comboBox) {
-                return UICommons.comboBox_isOpen(inputState, comboBox);
+                return UICommons.comboBox_isOpen(comboBox, inputState);
             }
 
             public class _ComboBoxItem {
@@ -4582,22 +4615,22 @@ public class API {
                 if (list == null) return;
                 list.multiSelect = multiSelect;
                 // Clear selecteditem/items after mode switch
-                if(multiSelect){
+                if (multiSelect) {
                     list.selectedItem = null;
-                }else{
+                } else {
                     list.selectedItems.clear();
                 }
             }
 
             public void setSelectedItem(List list, Object selectedItem) {
                 if (list == null) return;
-                if(list.multiSelect) return;
+                if (list.multiSelect) return;
                 if (list.items != null && list.items.contains(selectedItem)) list.selectedItem = selectedItem;
             }
 
             public void setSelectedItems(List list, Object[] selectedItems) {
                 if (list == null || selectedItems == null) return;
-                if(!list.multiSelect) return;
+                if (!list.multiSelect) return;
                 list.selectedItems.clear();
                 for (Object item : selectedItems) {
                     if (item != null) {

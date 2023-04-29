@@ -492,10 +492,10 @@ public class UIEngine<T extends UIAdapter> {
                         if (window.moveAble) moveWindow = window;
                     } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
                         ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
-                        if (contextMenuItem.contextMenuItemAction != null) {
-                            contextMenuItem.contextMenuItemAction.onSelect();
-                            inputState.openContextMenu = null;
-                        }
+                        ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
+                        if (contextMenuItem.contextMenuItemAction != null) contextMenuItem.contextMenuItemAction.onSelect();
+                        if(contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+                        UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
                     } else if (inputState.lastGUIMouseHover instanceof Button button) {
                         inputState.pressedButton = button;
 
@@ -560,7 +560,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
                         ComboBox combobox = (ComboBox) inputState.lastGUIMouseHover;
 
-                        if (UICommons.comboBox_isOpen(inputState, combobox)) {
+                        if (UICommons.comboBox_isOpen(combobox, inputState)) {
                             for (int i = 0; i < combobox.items.size(); i++) {
                                 if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                                         UICommons.component_getParentWindowX(combobox) + (combobox.x * TILE_SIZE) + combobox.offset_x,
@@ -579,10 +579,10 @@ public class UIEngine<T extends UIAdapter> {
                                 }
                             }
 
-                            UICommons.comboBox_close(inputState, combobox);
+                            UICommons.comboBox_close(combobox, inputState);
                         } else {
                             // Open this combobox
-                            UICommons.comboBox_open(inputState, combobox);
+                            UICommons.comboBox_open(combobox, inputState);
                         }
 
                     } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
@@ -687,12 +687,14 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
                     // Hide displayed context Menus
-                    if (inputState.openContextMenu != null) {
-                        inputState.openContextMenu = null;
+                    if(inputState.openContextMenu != null) {
+                        UICommons.contextMenu_close(inputState.openContextMenu, inputState);
                     }
                     // Close opened Comboboxes
-                    if (inputState.openComboBox != null && inputState.lastGUIMouseHover != inputState.openComboBox) {
-                        UICommons.comboBox_close(inputState, inputState.openComboBox);
+                    if (inputState.openComboBox != null &&
+                            inputState.lastGUIMouseHover != inputState.openComboBox // dont close immediately on opening
+                    ) {
+                        UICommons.comboBox_close(inputState.openComboBox, inputState);
                     }
                     // Unfocus focused textfields
                     if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
@@ -1262,7 +1264,7 @@ public class UIEngine<T extends UIAdapter> {
                                 magnetActive = true;
                             } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
                                 ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                                if (!UICommons.comboBox_isOpen(inputState, comboBox)) {
+                                if (!UICommons.comboBox_isOpen(comboBox, inputState)) {
                                     magnet_x = inputState.mouse_gui.x;
                                     magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
                                     magnetActive = true;
@@ -1470,14 +1472,11 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case FADEOUT -> {
                     if ((System.currentTimeMillis() - notification.timer > api.config.getNotificationsFadeoutTime())) {
-                        inputState.notifications.remove(0);
+                        UICommons.notification_removeFromScreen(inputState, notification);
                     }
                 }
             }
-
-
         }
-
     }
 
 
@@ -2033,7 +2032,7 @@ public class UIEngine<T extends UIAdapter> {
         if (component.getClass() == ComboBox.class) {
             ComboBox combobox = (ComboBox) component;
             // Menu
-            if (UICommons.comboBox_isOpen(inputState, combobox)) {
+            if (UICommons.comboBox_isOpen(combobox, inputState)) {
                 int width = combobox.width;
                 int height = combobox.items.size();
                 /* Menu */
@@ -2450,7 +2449,7 @@ public class UIEngine<T extends UIAdapter> {
             // Box
             for (int ix = 0; ix < combobox.width; ix++) {
                 int index = ix == 0 ? 0 : (ix == combobox.width - 1 ? 2 : 1);
-                CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, combobox) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
+                CMediaGFX comboMedia = UICommons.comboBox_isOpen(combobox, inputState) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
 
                 // Item color or default color
                 float color_r = combobox.selectedItem != null ? combobox.selectedItem.color_r : combobox.color_r;

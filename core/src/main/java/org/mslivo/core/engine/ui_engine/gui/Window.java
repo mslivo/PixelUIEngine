@@ -51,4 +51,6 @@ public class Window {
 
     public ArrayList<MessageReceiverAction> messageReceiverActions;
 
+    public boolean addedToScreen;
+
 }
