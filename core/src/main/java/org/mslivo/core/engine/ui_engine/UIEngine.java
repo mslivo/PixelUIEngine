@@ -89,6 +89,8 @@ public class UIEngine<T extends UIAdapter> {
 
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
 
+    public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
+
     public static final int DOUBLECLICK_TIME_MS = 180;
 
     private static final int COLORSTACK_SIZE = 8;

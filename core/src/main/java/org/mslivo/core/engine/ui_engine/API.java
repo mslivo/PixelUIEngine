@@ -103,8 +103,6 @@ public class API {
 
     private final HashMap<Class<org.mslivo.core.example.ui.windows.ExampleWindowGenerator>, WindowGenerator> windowGeneratorCache;
 
-    private final String WND_CLOSE_BUTTON = "wnd_close_btn";
-
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
         this.mediaManager = mediaManager;
@@ -881,7 +879,7 @@ public class API {
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
-            components.setName(closeButton, WND_CLOSE_BUTTON);
+            components.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
             components.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override
@@ -1166,7 +1164,7 @@ public class API {
 
     public boolean closeWindow(Window window) {
         if (window == null) return false;
-        ArrayList<Component> result = windows.findComponentsByName(window, WND_CLOSE_BUTTON);
+        ArrayList<Component> result = windows.findComponentsByName(window, UIEngine.WND_CLOSE_BUTTON);
         if (result.size() == 1) {
             if (result.get(0) instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
