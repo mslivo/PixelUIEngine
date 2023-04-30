@@ -49,14 +49,28 @@ class UICommons {
         inputState.lastActiveWindow = window;
     }
 
-    public static void window_addToScreen(InputState inputState, Window window) {
+    static boolean component_isHiddenByTab(Component component){
+        if (component.addedToTab == null) return false;
+        Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
+        if (selectedTab != null && selectedTab == component.addedToTab) {
+            if (component.addedToTab.addedToTabBar.addedToTab != null) {
+                return component_isHiddenByTab(component.addedToTab.addedToTabBar);
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    static void window_addToScreen(InputState inputState, Window window) {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         inputState.windows.add(window);
         if (window.windowAction != null) window.windowAction.onAdd();
     }
 
-    public static void window_removeFromScreen(InputState inputState, Window window) {
+    static void window_removeFromScreen(InputState inputState, Window window) {
         if (!window.addedToScreen) return;
         if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
@@ -67,7 +81,7 @@ class UICommons {
     }
 
 
-    public static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
+    static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
         if (notification.addedToScreen) return;
         notification.addedToScreen = true;
         inputState.notifications.add(notification);
@@ -75,13 +89,13 @@ class UICommons {
         if (inputState.notifications.size() > notificationsMax) notification_removeFromScreen(inputState, inputState.notifications.get(0));
     }
 
-    public static void notification_removeFromScreen(InputState inputState, Notification notification) {
+    static void notification_removeFromScreen(InputState inputState, Notification notification) {
         if (!notification.addedToScreen) return;
         notification.addedToScreen = false;
         inputState.notifications.remove(notification);
     }
 
-    public static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
+    static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
         boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x,inputState.mouse_gui.y);
         if(success && inputState.controlMode == ControlMode.KEYBOARD){
             // keyboard mode: move mouse onto the opened menu
@@ -91,7 +105,7 @@ class UICommons {
         return success;
     }
 
-    public static boolean contextMenu_open(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager, int x, int y) {
+    static boolean contextMenu_open(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager, int x, int y) {
         if (contextMenu.items.size() == 0) return false;
         // Close open ContextMenus
         if (inputState.openContextMenu != null) {
@@ -112,7 +126,7 @@ class UICommons {
         return true;
     }
 
-    public static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
+    static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
         if(contextMenu_isOpen(contextMenu, inputState)) {
             inputState.openContextMenu = null;
             inputState.displayedContextMenuWidth = 0;
@@ -120,11 +134,11 @@ class UICommons {
         }
     }
 
-    public static String progressBar_getProgressText(float progress) {
+    static String progressBar_getProgressText(float progress) {
         return ProgressBarPercentText.progressText[(int) (progress * 100)];
     }
 
-    public static String progressBar_getProgressText2Decimal(float progress) {
+    static String progressBar_getProgressText2Decimal(float progress) {
         return ProgressBarPercentText.progressText2Decimal[(int) (progress * 10000)];
     }
 
@@ -205,7 +219,7 @@ class UICommons {
     }
 
 
-    public static void component_addToWindow(Component component, InputState inputState, Window window) {
+    static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
         component_setCommonReferences(component, inputState);
@@ -213,7 +227,7 @@ class UICommons {
         window.components.add(component);
     }
 
-    public static void component_removeFromWindow(Component component, InputState inputState, Window window) {
+    static void component_removeFromWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow == window) {
             component_removeCommonReferences(component, inputState);
             component.addedToWindow.components.remove(component);
@@ -221,7 +235,7 @@ class UICommons {
         }
     }
 
-    public static void component_addToScreen(Component component, InputState inputState) {
+    static void component_addToScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
         component_setCommonReferences(component, inputState);
@@ -229,7 +243,7 @@ class UICommons {
         inputState.screenComponents.add(component);
     }
 
-    public static void component_removeFromScreen(Component component, InputState inputState) {
+    static void component_removeFromScreen(Component component, InputState inputState) {
         if (!component.addedToScreen) return;
         component_removeCommonReferences(component, inputState);
         component.addedToScreen = true;
@@ -247,57 +261,57 @@ class UICommons {
     }
 
 
-    public static void tab_removeComponent(Tab tab, Component component) {
+    static void tab_removeComponent(Tab tab, Component component) {
         if (component.addedToTab != tab) return;
         component.addedToTab.components.remove(component);
         component.addedToTab = tab;
     }
 
-    public static void tab_addComponent(Tab tab, Component component) {
+    static void tab_addComponent(Tab tab, Component component) {
         if (component.addedToTab != null) return;
         component.addedToTab = tab;
         tab.components.add(component);
     }
 
 
-    public static void tabBar_addTab(TabBar tabBar, Tab tab) {
+    static void tabBar_addTab(TabBar tabBar, Tab tab) {
         if (tab.addedToTabBar != null) return;
         tab.addedToTabBar = tabBar;
         tabBar.tabs.add(tab);
     }
 
-    public static void tabBar_addTab(TabBar tabBar, Tab tab, int index) {
+    static void tabBar_addTab(TabBar tabBar, Tab tab, int index) {
         if (tab.addedToTabBar != null) return;
         tab.addedToTabBar = tabBar;
         tabBar.tabs.add(index, tab);
     }
 
-    public static void tabBar_removeTab(TabBar tabBar, Tab tab) {
+    static void tabBar_removeTab(TabBar tabBar, Tab tab) {
         if (tab.addedToTabBar != tabBar) return;
         tab.addedToTabBar = null;
         tabBar.tabs.remove(tab);
     }
 
-    public static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+    static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != null) return;
         contextMenuItem.addedToContextMenu = contextMenu;
         contextMenu.items.add(contextMenuItem);
     }
 
-    public static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+    static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
         contextMenu.items.remove(contextMenuItem);
     }
 
 
-    public static void comboBox_addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+    static void comboBox_addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != null) return;
         comboBoxItem.addedToComboBox = comboBox;
         comboBox.items.add(comboBoxItem);
     }
 
-    public static void comboBox_removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
+    static void comboBox_removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != comboBox) return;
         if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
@@ -305,25 +319,25 @@ class UICommons {
     }
 
 
-    public static void map_addMapOverlay(Map map, MapOverlay mapOverlay) {
+    static void map_addMapOverlay(Map map, MapOverlay mapOverlay) {
         if (mapOverlay.addedToMap != null) return;
         mapOverlay.addedToMap = map;
         map.mapOverlays.add(mapOverlay);
     }
 
-    public static void map_removeMapOverlay(Map map, MapOverlay mapOverlay) {
+    static void map_removeMapOverlay(Map map, MapOverlay mapOverlay) {
         if (mapOverlay.addedToMap != map) return;
         mapOverlay.addedToMap = null;
         map.mapOverlays.remove(mapOverlay);
     }
 
-    public static void toolTip_addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+    static void toolTip_addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
         if (toolTipImage.addedToToolTip != null) return;
         toolTipImage.addedToToolTip = toolTip;
         toolTip.images.add(toolTipImage);
     }
 
-    public static void toolTip_removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+    static void toolTip_removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
         if (toolTipImage.addedToToolTip != toolTip) return;
         toolTipImage.addedToToolTip = null;
         toolTip.images.remove(toolTipImage);
@@ -381,15 +395,15 @@ class UICommons {
         if(inputState.openContextMenu != null) UICommons.contextMenu_close(inputState.openContextMenu, inputState);
     }
 
-    public static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
+    static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;
     }
 
-    public static boolean contextMenu_isOpen(ContextMenu contextMenu, InputState inputState) {
+    static boolean contextMenu_isOpen(ContextMenu contextMenu, InputState inputState) {
         return inputState.openContextMenu != null && inputState.openContextMenu == contextMenu;
     }
 
-    public static void comboBox_open(ComboBox comboBox, InputState inputState) {
+    static void comboBox_open(ComboBox comboBox, InputState inputState) {
         // Close other Comboboxes
         if (inputState.openComboBox != null) {
             comboBox_close(inputState.openComboBox, inputState);
@@ -399,18 +413,18 @@ class UICommons {
         if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onOpen();
     }
 
-    public static void comboBox_close(ComboBox comboBox, InputState inputState) {
+    static void comboBox_close(ComboBox comboBox, InputState inputState) {
         if (comboBox_isOpen(comboBox, inputState)) {
             inputState.openComboBox = null;
             if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
         }
     }
 
-    public static boolean textField_isFocused(InputState inputState, TextField textField) {
+    static boolean textField_isFocused(InputState inputState, TextField textField) {
         return inputState.focusedTextField != null && inputState.focusedTextField == textField;
     }
 
-    public static void textField_focus(InputState inputState, TextField textField) {
+    static void textField_focus(InputState inputState, TextField textField) {
         // Unfocus other textfields
         if (inputState.focusedTextField != null) {
             textField_unFocus(inputState, inputState.focusedTextField);
@@ -420,7 +434,7 @@ class UICommons {
         if (inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
     }
 
-    public static void textField_unFocus(InputState inputState, TextField textField) {
+    static void textField_unFocus(InputState inputState, TextField textField) {
         if (textField_isFocused(inputState, textField)) {
             if (inputState.focusedTextField.textFieldAction != null)
                 inputState.focusedTextField.textFieldAction.onUnFocus();
@@ -428,7 +442,7 @@ class UICommons {
         }
     }
 
-    public static void knob_turnKnob(Knob knob, float newValue, float amount) {
+    static void knob_turnKnob(Knob knob, float newValue, float amount) {
         if (knob.endless) {
             if (newValue > 1) {
                 newValue = newValue - 1f;
@@ -440,15 +454,15 @@ class UICommons {
         if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
     }
 
-    public static boolean list_canDragIntoScreen(List list) {
+    static boolean list_canDragIntoScreen(List list) {
         return list.listAction != null && list.listAction.canDragIntoScreen();
     }
 
-    public static boolean inventory_canDragIntoScreen(Inventory inventory) {
+    static boolean inventory_canDragIntoScreen(Inventory inventory) {
         return inventory.inventoryAction != null && inventory.inventoryAction.canDragIntoScreen();
     }
 
-    public static boolean list_canDragIntoList(InputState inputState,List list) {
+    static boolean list_canDragIntoList(InputState inputState,List list) {
         if (inputState.listDrag_Item != null) {
             if (inputState.listDrag_List == null || list == null) return false;
             if (inputState.listDrag_List == list) return true; // into itself
@@ -465,8 +479,34 @@ class UICommons {
         }
     }
 
+    static void tabBar_updateItemInfoAtMousePosition(InputState inputState, TabBar tabBar){
+        int x_bar = UICommons.component_getAbsoluteX(tabBar);
+        int y_bar = UICommons.component_getAbsoluteY(tabBar);
 
-    public static void list_updateItemInfoAtMousePosition(InputState inputState, List list) {
+        int tabXOffset = tabBar.tabOffset;
+        for (int i = 0; i < tabBar.tabs.size(); i++) {
+            Tab tab = tabBar.tabs.get(i);
+            int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
+            if ((tabXOffset + tabWidth) > tabBar.width) {
+                break;
+            }
+
+            int tabHeight = tabBar.bigIconMode ? (UIEngine.TILE_SIZE * 2) : UIEngine.TILE_SIZE;
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
+                inputState.itemInfo[0] = i;
+                inputState.itemInfoValid = true;
+                return;
+            }
+            tabXOffset = tabXOffset + tabWidth;
+        }
+
+
+        inputState.itemInfo[0] = 0;
+        inputState.itemInfoValid = false;
+        return;
+    }
+
+    static void list_updateItemInfoAtMousePosition(InputState inputState, List list) {
         if (list.items != null && list.items.size() > 0 && list.listAction != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
             itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
@@ -491,7 +531,7 @@ class UICommons {
         return;
     }
 
-    public static void inventory_updateItemInfoAtMousePosition(InputState inputState, Inventory inventory) {
+    static void inventory_updateItemInfoAtMousePosition(InputState inputState, Inventory inventory) {
         int tileSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
         int x_inventory = UICommons.component_getAbsoluteX(inventory);
         int y_inventory = UICommons.component_getAbsoluteY(inventory);
@@ -509,7 +549,7 @@ class UICommons {
     }
 
 
-    public static boolean inventory_canDragIntoInventory(InputState inputState, Inventory inventory) {
+    static boolean inventory_canDragIntoInventory(InputState inputState, Inventory inventory) {
         if (inputState.inventoryDrag_Item != null) {
             if (inputState.inventoryDrag_Inventory == null || inventory == null) return false;
             if (inputState.inventoryDrag_Inventory == inventory) return true; // into itself

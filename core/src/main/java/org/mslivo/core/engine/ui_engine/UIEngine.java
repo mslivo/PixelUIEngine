@@ -668,14 +668,12 @@ public class UIEngine<T extends UIAdapter> {
 
                     } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
                         TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-
-                        Integer selectedTab = tabBar_getInfoAtPointer(tabBar);
-
-                        if (selectedTab != null && tabBar.selectedTab != selectedTab) {
-                            Tab newTab = tabBar.tabs.get(selectedTab);
-                            UICommons.tabBar_selectTab(tabBar, selectedTab);
+                        UICommons.tabBar_updateItemInfoAtMousePosition(inputState, tabBar);
+                        if (inputState.itemInfoValid && tabBar.selectedTab != inputState.itemInfo[0]) {
+                            Tab newTab = tabBar.tabs.get(inputState.itemInfo[0]);
+                            UICommons.tabBar_selectTab(tabBar, inputState.itemInfo[0]);
                             if (newTab.tabAction != null) newTab.tabAction.onSelect();
-                            if (tabBar.tabBarAction != null) tabBar.tabBarAction.onChangeTab(selectedTab);
+                            if (tabBar.tabBarAction != null) tabBar.tabBarAction.onChangeTab(inputState.itemInfo[0]);
                         }
 
                     } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
@@ -1643,26 +1641,10 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private boolean isHiddenByTab(Component component) {
-        if (component.addedToTab == null) return false;
-
-        Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
-        if (selectedTab != null && selectedTab == component.addedToTab) {
-            if (component.addedToTab.addedToTabBar.addedToTab != null) {
-                return isHiddenByTab(component.addedToTab.addedToTabBar);
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
-
-
     private boolean mouseCollidesWithComponent(Component component) {
         if (!component.visible) return false;
         if (component.disabled) return false;
-        if (isHiddenByTab(component)) return false;
+        if (UICommons.component_isHiddenByTab(component)) return false;
 
         if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
             inputState.lastGUIMouseHover = component;
@@ -1815,33 +1797,10 @@ public class UIEngine<T extends UIAdapter> {
     private boolean render_isComponentNotRendered(Component component) {
         if (!component.visible) return true;
         if (component.addedToWindow != null && !component.addedToWindow.visible) return true;
-        return isHiddenByTab(component);
+        return UICommons.component_isHiddenByTab(component);
     }
 
-    private Integer tabBar_getInfoAtPointer(TabBar tabBar) {
-        int x_bar = UICommons.component_getAbsoluteX(tabBar);
-        int y_bar = UICommons.component_getAbsoluteY(tabBar);
-
-        int tabXOffset = tabBar.tabOffset;
-        for (int i = 0; i < tabBar.tabs.size(); i++) {
-            Tab tab = tabBar.tabs.get(i);
-            int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
-            if ((tabXOffset + tabWidth) > tabBar.width) {
-                break;
-            }
-
-            int tabHeight = tabBar.bigIconMode ? (TILE_SIZE * 2) : TILE_SIZE;
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * TILE_SIZE), y_bar, tabWidth * TILE_SIZE, tabHeight)) {
-                return i;
-            }
-            tabXOffset = tabXOffset + tabWidth;
-        }
-
-
-        return null;
-    }
-
-    private int tab_getCMediaIndex(int x, int width) {
+    private int render_getTabCMediaIndex(int x, int width) {
         if (width == 1) {
             return 3;
         } else {
@@ -1853,11 +1812,7 @@ public class UIEngine<T extends UIAdapter> {
                 return 1;
             }
         }
-
-
     }
-
-
 
     private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitlebar) {
         if (x == 0 && y == 0) return 2;
@@ -2320,7 +2275,6 @@ public class UIEngine<T extends UIAdapter> {
                 boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
 
                 // Cell
-
                 FColor cellColor = null;
                 if (list.listAction != null && list.items != null) {
                     if (itemIndex < list.items.size()) {
@@ -2531,7 +2485,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else {
                     for (int ix = 0; ix < tabWidth; ix++) {
-                        render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), tab_getCMediaIndex(ix, tab.width));
+                        render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
                     }
                 }
 
