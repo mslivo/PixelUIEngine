@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.gui.Window;
@@ -7,6 +8,8 @@ import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.gui.components.list.List;
 import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
@@ -422,6 +425,104 @@ class UICommons {
             if (inputState.focusedTextField.textFieldAction != null)
                 inputState.focusedTextField.textFieldAction.onUnFocus();
             inputState.focusedTextField = null;
+        }
+    }
+
+    public static void knob_turnKnob(Knob knob, float newValue, float amount) {
+        if (knob.endless) {
+            if (newValue > 1) {
+                newValue = newValue - 1f;
+            } else if (newValue < 0) {
+                newValue = 1f - Math.abs(newValue);
+            }
+        }
+        knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
+        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
+    }
+
+    public static boolean list_canDragIntoScreen(List list) {
+        return list.listAction != null && list.listAction.canDragIntoScreen();
+    }
+
+    public static boolean inventory_canDragIntoScreen(Inventory inventory) {
+        return inventory.inventoryAction != null && inventory.inventoryAction.canDragIntoScreen();
+    }
+
+    public static boolean list_canDragIntoList(InputState inputState,List list) {
+        if (inputState.listDrag_Item != null) {
+            if (inputState.listDrag_List == null || list == null) return false;
+            if (inputState.listDrag_List == list) return true; // into itself
+            return list.dragInEnabled &&
+                    !list.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
+                    list.listAction != null && list.listAction.canDragFromList(inputState.listDrag_List);
+        } else if (inputState.inventoryDrag_Item != null) {
+            if (inputState.inventoryDrag_Inventory == null || list == null) return false;
+            return list.dragInEnabled &&
+                    !list.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
+                    list.listAction != null && list.listAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
+        } else {
+            return false;
+        }
+    }
+
+
+    public static void list_updateItemInfoAtMousePosition(InputState inputState, List list) {
+        if (list.items != null && list.items.size() > 0 && list.listAction != null) {
+            int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
+            itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
+            int x_list = UICommons.component_getAbsoluteX(list);
+            int y_list = UICommons.component_getAbsoluteY(list);
+            for (int iy = 0; iy < list.height; iy++) {
+                int itemIndex = itemFrom + iy;
+                if (itemIndex < list.items.size()) {
+                    int itemOffsetY = ((list.height - 1) - iy);
+                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                            x_list, y_list + itemOffsetY * UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE)) {
+                        inputState.itemInfo[0] = itemIndex;
+                        inputState.itemInfo[1] = itemOffsetY;
+                        inputState.itemInfoValid = true;
+                        return;
+                    }
+                }
+            }
+        }
+        inputState.itemInfo[0] = inputState.itemInfo[1] = 0;
+        inputState.itemInfoValid = false;
+        return;
+    }
+
+    public static void inventory_updateItemInfoAtMousePosition(InputState inputState, Inventory inventory) {
+        int tileSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
+        int x_inventory = UICommons.component_getAbsoluteX(inventory);
+        int y_inventory = UICommons.component_getAbsoluteY(inventory);
+        int inv_to_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
+        int inv_to_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
+        if (UICommons.inventory_positionValid(inventory, inv_to_x, inv_to_y)) {
+            inputState.itemInfo[0] = inv_to_x;
+            inputState.itemInfo[1] = inv_to_y;
+            inputState.itemInfoValid = true;
+            return;
+        }
+        inputState.itemInfo[0] = inputState.itemInfo[1] = 0;
+        inputState.itemInfoValid = false;
+        return;
+    }
+
+
+    public static boolean inventory_canDragIntoInventory(InputState inputState, Inventory inventory) {
+        if (inputState.inventoryDrag_Item != null) {
+            if (inputState.inventoryDrag_Inventory == null || inventory == null) return false;
+            if (inputState.inventoryDrag_Inventory == inventory) return true; // into itself
+            return inventory.dragInEnabled &&
+                    !inventory.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
+                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
+        } else if (inputState.listDrag_Item != null) {
+            if (inputState.listDrag_List == null || inventory == null) return false;
+            return inventory.dragInEnabled &&
+                    !inventory.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
+                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromList(inputState.listDrag_List);
+        } else {
+            return false;
         }
     }
 

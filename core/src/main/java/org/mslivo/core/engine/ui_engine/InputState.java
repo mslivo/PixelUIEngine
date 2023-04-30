@@ -203,11 +203,12 @@ public class InputState {
 
     public OrthographicCamera camera_frustum; // camera for frustum testing
 
+    public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;
 
-    public InputEvents inputEvents;
-
-    public boolean[] hotKeyPressedKeys;
-
     public Window lastActiveWindow;
+
+    public int[] itemInfo;
+
+    public boolean itemInfoValid;
 }

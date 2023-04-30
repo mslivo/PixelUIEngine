@@ -155,8 +155,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.frameBuffer_game.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_game = new TextureRegion(newInputState.frameBuffer_game.getColorBufferTexture());
         newInputState.texture_game.flip(false, true);
-        newInputState.camera_frustum = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.camera_frustum.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+
         // -----  GUI
         newInputState.spriteBatch_gui = new SpriteBatch(8191);
         newInputState.spriteBatch_gui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
@@ -185,12 +184,6 @@ public class UIEngine<T extends UIAdapter> {
                     new StretchViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
         };
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        // -----  Input
-
-
-        newInputState.inputEvents = new InputEvents();
-        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents);
-        Gdx.input.setInputProcessor(newInputState.inputProcessor);
 
         // -----  GUI
         newInputState.windows = new ArrayList<>();
@@ -229,7 +222,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.listDrag_from_index = 0;
         newInputState.tooltip_lastHoverObject = null;
         newInputState.pressedMap = null;
-        newInputState.hotKeyPressedKeys = new boolean[256];
         newInputState.openComboBox = null;
 
         // ----- Controls
@@ -248,15 +240,24 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.keyBoardCtrlLastMouseClick = 0;
         newInputState.keyBoardCtrlSpeedUp = 0f;
         newInputState.keyBoardCtrlIsMouseButtonDown = new boolean[]{false, false, false, false, false};
-        // -----  Other
-        ShaderProgram.pedantic = false;
-        newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
 
+        // ---- Misc
+        newInputState.animation_timer_gui = 0f;
         newInputState.colorStack = new Color[COLORSTACK_SIZE];
         for (int i = 0; i < COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color();
-
         for (int i = 0; i < 8; i++) newInputState.colorStack[i] = new Color(1, 1, 1, 1);
         newInputState.colorStackPointer = 0;
+        ShaderProgram.pedantic = false;
+        newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
+        newInputState.camera_frustum = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.camera_frustum.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.inputEvents = new InputEvents();
+        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents);
+        Gdx.input.setInputProcessor(newInputState.inputProcessor);
+        newInputState.lastActiveWindow = null;
+        newInputState.itemInfo = new int[]{0,0};
+        newInputState.itemInfoValid = false;
+
         ScreenUtils.clear(0, 0, 0, 1);
         return newInputState;
     }
@@ -530,9 +531,9 @@ public class UIEngine<T extends UIAdapter> {
                             inputState.scrolledScrollBarHorizontal.scrollBarAction.onPress();
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
-                        int[] itemInfo = list_getInfoAtPointer(list);
+                        UICommons.list_updateItemInfoAtMousePosition(inputState,list);
                         Object item = null;
-                        if (itemInfo != null) item = list.items.get(itemInfo[0]);
+                        if (inputState.itemInfoValid) item = list.items.get(inputState.itemInfo[0]);
                         if (item != null) {
                             if (list.multiSelect) {
                                 if (list.selectedItems.contains(item)) {
@@ -546,9 +547,9 @@ public class UIEngine<T extends UIAdapter> {
                                 if (list.listAction != null) list.listAction.onItemSelected(list.selectedItem);
                             }
                             if (list.dragEnabled) {
-                                inputState.listDrag_from_index = itemInfo[0];
+                                inputState.listDrag_from_index = inputState.itemInfo[0];
                                 inputState.listDrag_offset.x = inputState.mouse_gui.x - (UICommons.component_getAbsoluteX(list));
-                                inputState.listDrag_offset.y = inputState.mouse_gui.y - (UICommons.component_getAbsoluteY(list) + (itemInfo[1] * TILE_SIZE));
+                                inputState.listDrag_offset.y = inputState.mouse_gui.y - (UICommons.component_getAbsoluteY(list) + (inputState.itemInfo[1] * TILE_SIZE));
                                 inputState.listDrag_Item = item;
                                 inputState.listDrag_List = list;
                             }
@@ -769,22 +770,24 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
                         Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                        if (inventory_canDragIntoInventory(inventory)) {
-                            int[] info = inventory_getInventoryInfoAtMousePointer(inventory);
-                            if (info != null) {
-                                inventory.inventoryAction.onDragFromInventory(inputState.inventoryDrag_Inventory, inputState.inventoryDrag_from.x, inputState.inventoryDrag_from.y, info[0], info[1]);
+                        if (UICommons.inventory_canDragIntoInventory(inputState, inventory)) {
+                            UICommons.inventory_updateItemInfoAtMousePosition(inputState, inventory);
+                            if (inputState.itemInfoValid) {
+                                inventory.inventoryAction.onDragFromInventory(inputState.inventoryDrag_Inventory,
+                                        inputState.inventoryDrag_from.x, inputState.inventoryDrag_from.y,
+                                        inputState.itemInfo[0], inputState.itemInfo[1]);
                             }
                         }
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
-                        if (list_canDragIntoList(list)) {
-                            int[] itemInfo = list_getInfoAtPointer(list);
-                            int toIndex = itemInfo != null ? itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
+                        if (UICommons.list_canDragIntoList(inputState, list)) {
+                             UICommons.list_updateItemInfoAtMousePosition(inputState, list);
+                            int toIndex = inputState.itemInfoValid ? inputState.itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
                             if (list.listAction != null)
                                 list.listAction.onDragFromInventory(inputState.inventoryDrag_Inventory, inputState.inventoryDrag_from.x, inputState.inventoryDrag_from.y, toIndex);
                         }
                     }
-                } else if (inventory_canDragIntoScreen(inputState.inventoryDrag_Inventory)) {
+                } else if (UICommons.inventory_canDragIntoScreen(inputState.inventoryDrag_Inventory)) {
                     inputState.inventoryDrag_Inventory.inventoryAction.onDragIntoScreen(
                             inputState.inventoryDrag_Item,
                             inputState.inventoryDrag_from.x, inputState.inventoryDrag_from.y,
@@ -803,22 +806,23 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
-                        if (list_canDragIntoList(list)) {
-                            int[] itemInfo = list_getInfoAtPointer(list);
-                            int toIndex = itemInfo != null ? itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
+                        if (UICommons.list_canDragIntoList(inputState,list)) {
+                            UICommons.list_updateItemInfoAtMousePosition(inputState, list);
+                            int toIndex = inputState.itemInfoValid ? inputState.itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
                             if (list.listAction != null)
                                 list.listAction.onDragFromList(inputState.listDrag_List, inputState.listDrag_from_index, toIndex);
                         }
                     } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
                         Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                        if (inventory_canDragIntoInventory(inventory)) {
-                            int[] info = inventory_getInventoryInfoAtMousePointer(inventory);
-                            if (info != null) {
-                                inventory.inventoryAction.onDragFromList(inputState.listDrag_List, inputState.listDrag_from_index, info[0], info[1]);
+                        if (UICommons.inventory_canDragIntoInventory(inputState, inventory)) {
+                            UICommons.inventory_updateItemInfoAtMousePosition(inputState, inventory);
+                            if (inputState.itemInfoValid) {
+                                inventory.inventoryAction.onDragFromList(inputState.listDrag_List, inputState.listDrag_from_index,
+                                        inputState.itemInfo[0], inputState.itemInfo[1]);
                             }
                         }
                     }
-                } else if (list_canDragIntoScreen(inputState.listDrag_List)) {
+                } else if (UICommons.list_canDragIntoScreen(inputState.listDrag_List)) {
                     inputState.listDrag_List.listAction.onDragIntoScreen(
                             inputState.listDrag_Item,
                             inputState.listDrag_from_index,
@@ -870,7 +874,7 @@ public class UIEngine<T extends UIAdapter> {
                 Knob knob = inputState.turnedKnob;
                 float amount = -(inputState.mouse_delta.y / 100f)*api.config.getKnobSensitivity();
                 float newValue = knob.turned + amount;
-                knob_turnKnob(knob, newValue, amount);
+                UICommons.knob_turnKnob(knob, newValue, amount);
 
                 if (inputState.controlMode == ControlMode.KEYBOARD) {
                     // keyboard mode: keep mouse position steady
@@ -902,7 +906,7 @@ public class UIEngine<T extends UIAdapter> {
                     Knob knob = (Knob) inputState.lastGUIMouseHover;
                     float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
                     float newValue = knob.turned + amount;
-                    knob_turnKnob(knob, newValue, amount);
+                    UICommons.knob_turnKnob(knob, newValue, amount);
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                     ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
                     float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount);
@@ -1025,9 +1029,9 @@ public class UIEngine<T extends UIAdapter> {
             if (hoverComponent.getClass() == List.class) {
                 List list = (List) inputState.lastGUIMouseHover;
                 if (list.listAction != null) {
-                    int[] info = list_getInfoAtPointer(list);
-                    if (info != null) {
-                        toolTipSubItem = list.items.get(info[0]);
+                    UICommons.list_updateItemInfoAtMousePosition(inputState, list);
+                    if (inputState.itemInfoValid) {
+                        toolTipSubItem = list.items.get(inputState.itemInfo[0]);
                     }
                 }
             } else if (hoverComponent.getClass() == Inventory.class) {
@@ -1135,7 +1139,7 @@ public class UIEngine<T extends UIAdapter> {
         } else if (api.config.isKeyBoardControlEnabled() && api.config.isMouseControlEnabled()) {
             switch (inputState.controlMode) {
                 case MOUSE -> {
-                    if (anyKeyboardControlButtonDown()) {
+                    if (isAnyKeyboardControlButtonDown()) {
                         inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
                         inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
                         inputState.controlMode = ControlMode.KEYBOARD;
@@ -1152,7 +1156,7 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private boolean anyKeyboardControlButtonDown() {
+    private boolean isAnyKeyboardControlButtonDown() {
         return inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonUp()] ||
                 inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonDown()] ||
                 inputState.inputEvents.keysDown[api.config.getKeyBoardControlButtonLeft()] ||
@@ -1433,22 +1437,6 @@ public class UIEngine<T extends UIAdapter> {
         inputState.lastGUIMouseHover = findCurrentLastGUIMouseHover();
     }
 
-
-    private void removeComponentReferences(Component component) {
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove(component);
-        if (component.addedToTab != null) component.addedToTab.components.remove(component);
-        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
-        component.addedToTab = null;
-        component.addedToWindow = null;
-    }
-
-    private void removeWindowReferences(Window window) {
-        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
-        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
-        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
-    }
-
-
     private void updateNotifications() {
         if (inputState.notifications.size() > 0) {
             Notification notification = inputState.notifications.get(0);
@@ -1544,7 +1532,6 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             return null;
         }
-
     }
 
 
@@ -1870,91 +1857,7 @@ public class UIEngine<T extends UIAdapter> {
 
     }
 
-    private void knob_turnKnob(Knob knob, float newValue, float amount) {
-        if (knob.endless) {
-            if (newValue > 1) {
-                newValue = newValue - 1f;
-            } else if (newValue < 0) {
-                newValue = 1f - Math.abs(newValue);
-            }
-        }
-        knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
-        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
-    }
 
-    private boolean list_canDragIntoScreen(List list) {
-        return list.listAction != null && list.listAction.canDragIntoScreen();
-    }
-
-    private boolean inventory_canDragIntoScreen(Inventory inventory) {
-        return inventory.inventoryAction != null && inventory.inventoryAction.canDragIntoScreen();
-    }
-
-    private boolean list_canDragIntoList(List list) {
-        if (inputState.listDrag_Item != null) {
-            if (inputState.listDrag_List == null || list == null) return false;
-            if (inputState.listDrag_List == list) return true; // into itself
-            return list.dragInEnabled &&
-                    !list.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromList(inputState.listDrag_List);
-        } else if (inputState.inventoryDrag_Item != null) {
-            if (inputState.inventoryDrag_Inventory == null || list == null) return false;
-            return list.dragInEnabled &&
-                    !list.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
-        } else {
-            return false;
-        }
-    }
-
-
-    private int[] list_getInfoAtPointer(List list) {
-        if (!(list.items != null && list.items.size() > 0 && list.listAction != null)) return null;
-        int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-        itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
-        int x_list = UICommons.component_getAbsoluteX(list);
-        int y_list = UICommons.component_getAbsoluteY(list);
-        for (int iy = 0; iy < list.height; iy++) {
-            int itemIndex = itemFrom + iy;
-            if (itemIndex < list.items.size()) {
-                int itemOffsetY = ((list.height - 1) - iy);
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_list, y_list + itemOffsetY * TILE_SIZE, TILE_SIZE * list.width, TILE_SIZE)) {
-                    return new int[]{itemIndex, itemOffsetY};
-                }
-            }
-        }
-        return null;
-    }
-
-    private int[] inventory_getInventoryInfoAtMousePointer(Inventory inventory) {
-        int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-        int x_inventory = UICommons.component_getAbsoluteX(inventory);
-        int y_inventory = UICommons.component_getAbsoluteY(inventory);
-        int inv_to_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
-        int inv_to_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
-        if (UICommons.inventory_positionValid(inventory, inv_to_x, inv_to_y)) {
-            return new int[]{inv_to_x, inv_to_y};
-        }
-        return null;
-    }
-
-
-    private boolean inventory_canDragIntoInventory(Inventory inventory) {
-        if (inputState.inventoryDrag_Item != null) {
-            if (inputState.inventoryDrag_Inventory == null || inventory == null) return false;
-            if (inputState.inventoryDrag_Inventory == inventory) return true; // into itself
-            return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
-        } else if (inputState.listDrag_Item != null) {
-            if (inputState.listDrag_List == null || inventory == null) return false;
-            return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromList(inputState.listDrag_List);
-        } else {
-            return false;
-        }
-    }
 
     private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitlebar) {
         if (x == 0 && y == 0) return 2;
@@ -2390,7 +2293,7 @@ public class UIEngine<T extends UIAdapter> {
             int drag_x = -1, drag_y = -1;
             if ((inputState.listDrag_Item != null || inputState.inventoryDrag_Item != null) && list == inputState.lastGUIMouseHover) {
                 dragEnabled = true;
-                dragValid = list_canDragIntoList(list);
+                dragValid = UICommons.list_canDragIntoList(inputState,list);
                 if (dragValid) {
                     drag_x = UICommons.component_getAbsoluteX(list);
                     int y_list = UICommons.component_getAbsoluteY(list);
@@ -2541,7 +2444,7 @@ public class UIEngine<T extends UIAdapter> {
             int drag_x = -1, drag_y = -1;
             if ((inputState.inventoryDrag_Item != null || inputState.listDrag_Item != null) && inventory == inputState.lastGUIMouseHover) {
                 dragEnabled = true;
-                dragValid = inventory_canDragIntoInventory(inventory);
+                dragValid = UICommons.inventory_canDragIntoInventory(inputState,inventory);
                 if (dragValid) {
                     int x_inventory = UICommons.component_getAbsoluteX(inventory);
                     int y_inventory = UICommons.component_getAbsoluteY(inventory);
