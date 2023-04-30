@@ -77,14 +77,17 @@ import java.util.ArrayList;
  */
 public class UIEngine<T extends UIAdapter> {
 
-    /* Members */
+    /* Attributes */
     private final T uiAdapter;
 
     private InputState inputState;
 
     private final API api;
 
-    /* Statics */
+    private final MediaManager mediaManager;
+
+    /* Constants */
+
     public static final int TILE_SIZE = 8;
 
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
@@ -93,10 +96,7 @@ public class UIEngine<T extends UIAdapter> {
 
     public static final int DOUBLECLICK_TIME_MS = 180;
 
-    private static final int COLORSTACK_SIZE = 8;
-
-    /* Render */
-    private final MediaManager mediaManager;
+    public static final int COLORSTACK_SIZE = 8;
 
     public T getAdapter() {
         return uiAdapter;
