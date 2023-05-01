@@ -1267,8 +1267,8 @@ public class API {
 
     public void overrideCursor(CMediaCursor temporaryCursor) {
         if (temporaryCursor == null) return;
-        inputState.temporaryCursor = temporaryCursor;
-        inputState.displayTemporaryCursor = true;
+        inputState.overrideCursor = temporaryCursor;
+        inputState.displayOverrideCursor = true;
     }
 
     public MouseTool getMouseTool() {

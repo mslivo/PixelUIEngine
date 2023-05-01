@@ -256,7 +256,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents);
         Gdx.input.setInputProcessor(newInputState.inputProcessor);
         newInputState.lastActiveWindow = null;
-        newInputState.itemInfo = new int[]{0,0};
+        newInputState.itemInfo = new int[]{0, 0};
         newInputState.itemInfoValid = false;
 
 
@@ -269,8 +269,8 @@ public class UIEngine<T extends UIAdapter> {
 
     public void update() {
         // GUI
-        this.updateControls();
-        this.updateLastGUIMouseHover();
+        this.updateControls(); // Gather Keyboard/Mouse Inputs
+        this.updateLastGUIMouseHover(); // Determine object that is targeted by cursor
         if (!this.inputState.guiFrozen) this.updateGUI(); // Main GUI Update happen here
         this.updateGameCamera();
         this.updateMouseCursor();
@@ -279,7 +279,7 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.update();
 
         // Reset Input Events
-        this.inputState.inputEvents.reset();
+        this.inputState.inputEvents.reset(); // Reset Inputs
     }
 
 
@@ -532,7 +532,7 @@ public class UIEngine<T extends UIAdapter> {
                             inputState.scrolledScrollBarHorizontal.scrollBarAction.onPress();
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
-                        UICommons.list_updateItemInfoAtMousePosition(inputState,list);
+                        UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                         Object item = null;
                         if (inputState.itemInfoValid) item = list.items.get(inputState.itemInfo[0]);
                         if (item != null) {
@@ -580,9 +580,9 @@ public class UIEngine<T extends UIAdapter> {
                                         comboBoxItem.comboBoxItemAction.onSelect();
                                     if (combobox.comboBoxAction != null)
                                         combobox.comboBoxAction.onItemSelected(comboBoxItem);
-                                    if(inputState.controlMode == ControlMode.KEYBOARD){
+                                    if (inputState.controlMode == ControlMode.KEYBOARD) {
                                         // keyboard mode: move mouse back to combobox on item select
-                                        inputState.mouse_gui.y = UICommons.component_getAbsoluteY(combobox)+TILE_SIZE_2;
+                                        inputState.mouse_gui.y = UICommons.component_getAbsoluteY(combobox) + TILE_SIZE_2;
                                     }
                                 }
                             }
@@ -780,7 +780,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
                         if (UICommons.list_canDragIntoList(inputState, list)) {
-                             UICommons.list_updateItemInfoAtMousePosition(inputState, list);
+                            UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                             int toIndex = inputState.itemInfoValid ? inputState.itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
                             if (list.listAction != null)
                                 list.listAction.onDragFromInventory(inputState.inventoryDrag_Inventory, inputState.inventoryDrag_from.x, inputState.inventoryDrag_from.y, toIndex);
@@ -805,7 +805,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
-                        if (UICommons.list_canDragIntoList(inputState,list)) {
+                        if (UICommons.list_canDragIntoList(inputState, list)) {
                             UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                             int toIndex = inputState.itemInfoValid ? inputState.itemInfo[0] : (list.items.size() != 0 ? list.items.size() - 1 : 0);
                             if (list.listAction != null)
@@ -871,7 +871,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             if (inputState.turnedKnob != null) {
                 Knob knob = inputState.turnedKnob;
-                float amount = -(inputState.mouse_delta.y / 100f)*api.config.getKnobSensitivity();
+                float amount = -(inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
                 float newValue = knob.turned + amount;
                 UICommons.knob_turnKnob(knob, newValue, amount);
 
@@ -1548,10 +1548,10 @@ public class UIEngine<T extends UIAdapter> {
             // 1. GUI Cursor
             inputState.cursor = api.config.getCursorGui();
         } else {
-            // 2. Temporary Cursor
-            if (inputState.displayTemporaryCursor) {
-                inputState.cursor = inputState.temporaryCursor;
-                inputState.displayTemporaryCursor = false;
+            // 2. Manually overidden Cursor
+            if (inputState.displayOverrideCursor) {
+                inputState.cursor = inputState.overrideCursor;
+                inputState.displayOverrideCursor = false;
             } else {
                 if (inputState.mouseTool != null) {
                     // 3. Mouse Tool cursor
@@ -1576,11 +1576,6 @@ public class UIEngine<T extends UIAdapter> {
             return true;
         }
         return false;
-    }
-
-    private void executeUpdateAction(UpdateAction updateAction) {
-
-
     }
 
     private Object findCurrentLastGUIMouseHover() {
@@ -2249,7 +2244,7 @@ public class UIEngine<T extends UIAdapter> {
             int drag_x = -1, drag_y = -1;
             if ((inputState.listDrag_Item != null || inputState.inventoryDrag_Item != null) && list == inputState.lastGUIMouseHover) {
                 dragEnabled = true;
-                dragValid = UICommons.list_canDragIntoList(inputState,list);
+                dragValid = UICommons.list_canDragIntoList(inputState, list);
                 if (dragValid) {
                     drag_x = UICommons.component_getAbsoluteX(list);
                     int y_list = UICommons.component_getAbsoluteY(list);
@@ -2399,7 +2394,7 @@ public class UIEngine<T extends UIAdapter> {
             int drag_x = -1, drag_y = -1;
             if ((inputState.inventoryDrag_Item != null || inputState.listDrag_Item != null) && inventory == inputState.lastGUIMouseHover) {
                 dragEnabled = true;
-                dragValid = UICommons.inventory_canDragIntoInventory(inputState,inventory);
+                dragValid = UICommons.inventory_canDragIntoInventory(inputState, inventory);
                 if (dragValid) {
                     int x_inventory = UICommons.component_getAbsoluteX(inventory);
                     int y_inventory = UICommons.component_getAbsoluteY(inventory);

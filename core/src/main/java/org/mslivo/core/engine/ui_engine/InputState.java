@@ -177,9 +177,9 @@ public class InputState {
 
     public boolean mouseToolPressed;
 
-    public CMediaCursor temporaryCursor;
+    public CMediaCursor overrideCursor;
 
-    public boolean displayTemporaryCursor;
+    public boolean displayOverrideCursor;
 
     public Vector3 vector_fboCursor;
 
