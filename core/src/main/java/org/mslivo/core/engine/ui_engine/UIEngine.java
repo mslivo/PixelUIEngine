@@ -110,12 +110,13 @@ public class UIEngine<T extends UIAdapter> {
         this.mediaManager = mediaManager;
 
 
-        /* Input UIEngine */
+        /* Setup InputState */
         this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
         this.api = new API(this.inputState, mediaManager);
+        ScreenUtils.clear(0, 0, 0, 1);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
-        /* Hook Init */
+        /*  Call Adapter Init */
         this.uiAdapter.init(this.api, this.mediaManager);
     }
 
@@ -258,7 +259,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.itemInfo = new int[]{0,0};
         newInputState.itemInfoValid = false;
 
-        ScreenUtils.clear(0, 0, 0, 1);
+
         return newInputState;
     }
 
