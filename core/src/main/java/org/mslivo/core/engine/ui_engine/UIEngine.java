@@ -2615,12 +2615,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_enableGrayScaleShader(boolean enable) {
-        if (enable) {
-            if (!render_GrayScaleShaderEnabled()) inputState.spriteBatch_gui.setShader(inputState.grayScaleShader);
-        } else {
-            if (render_GrayScaleShaderEnabled()) inputState.spriteBatch_gui.setShader(null);
-        }
-
+        inputState.spriteBatch_gui.setShader(enable ? inputState.grayScaleShader : null);
     }
 
 
