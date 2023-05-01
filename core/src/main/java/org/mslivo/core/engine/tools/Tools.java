@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import org.mslivo.core.engine.media_manager.color.FColor;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

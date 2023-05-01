@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.soundplayer2d;
+package org.mslivo.core.engine.tools.sound;
 
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaSound;

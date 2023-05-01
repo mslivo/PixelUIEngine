@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.musicplayer;
+package org.mslivo.core.engine.tools.sound;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;

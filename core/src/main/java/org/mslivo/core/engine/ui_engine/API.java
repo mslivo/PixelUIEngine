@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.media_manager.color.FColor;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -1338,19 +1338,13 @@ public class API {
     }
 
     public static class _Config {
-
         private boolean keyBoardControlEnabled = false;
-
         private boolean mouseControlEnabled = true;
-
         private float keyBoardControlCursorSpeed = 4.0f;
-
         private boolean keyBoardControlMagnetModeEnabled = true;
-
         private int keyBoardControlButtonUp = Input.Keys.UP;
         private int keyBoardControlButtonDown = Input.Keys.DOWN;
         private int keyBoardControlButtonLeft = Input.Keys.LEFT;
-
         private int keyBoardControlButtonRight = Input.Keys.RIGHT;
         private int keyBoardControlButtonMouse1 = Input.Keys.CONTROL_LEFT;
         private int keyBoardControlButtonMouse2 = Input.Keys.CONTROL_RIGHT;
@@ -1364,7 +1358,7 @@ public class API {
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
         private FColor tooltipDefaultColor = Tools.Colors.WHITE;
         private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_ARROW;
-        private int gameviewportDefaultUpdateTime = 200;
+        private int gameViewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
         private CMediaFont defaultFont = GUIBaseMedia.FONT_BLACK;
         private float dragAlpha = 0.8f;
@@ -1381,15 +1375,12 @@ public class API {
         private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
-
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
         }
-
         public boolean getWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
         }
-
         public void setWindowsDefaultEnforceScreenBounds(boolean windowsDefaultEnforceScreenBounds) {
             this.windowsDefaultEnforceScreenBounds = windowsDefaultEnforceScreenBounds;
         }
@@ -1430,12 +1421,12 @@ public class API {
             this.cursorGui = cursorGui;
         }
 
-        public int getGameviewportDefaultUpdateTime() {
-            return gameviewportDefaultUpdateTime;
+        public int getGameViewportDefaultUpdateTime() {
+            return gameViewportDefaultUpdateTime;
         }
 
-        public void setGameviewportDefaultUpdateTime(int gameviewportDefaultUpdateTime) {
-            this.gameviewportDefaultUpdateTime = Tools.Calc.lowerBounds(gameviewportDefaultUpdateTime, 0);
+        public void setGameViewportDefaultUpdateTime(int gameViewportDefaultUpdateTime) {
+            this.gameViewportDefaultUpdateTime = Tools.Calc.lowerBounds(gameViewportDefaultUpdateTime, 0);
         }
 
         public boolean isMouseControlEnabled() {
@@ -1705,7 +1696,7 @@ public class API {
             setComponentsDefaultColor(config.getComponentsDefaultColor());
             setTooltipDefaultColor(config.getWindowsDefaultColor());
             setCursorGui(config.getCursorGui());
-            setGameviewportDefaultUpdateTime(config.getGameviewportDefaultUpdateTime());
+            setGameViewportDefaultUpdateTime(config.getGameViewportDefaultUpdateTime());
             setTooltipDefaultFont(config.getTooltipDefaultFont());
             setDefaultFont(config.getDefaultFont());
             setDragAlpha(config.getDragAlpha());
@@ -1756,7 +1747,6 @@ public class API {
             if (inputState.inventoryDrag_Item != null) return true;
             return inputState.listDrag_List != null;
         }
-
 
         public Object lastGUIMouseHover() {
             return inputState.lastGUIMouseHover;
@@ -3104,7 +3094,7 @@ public class API {
 
             public void setUpdateTime(GameViewPort gameViewPort, Integer updateTime) {
                 if (gameViewPort == null) return;
-                gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime == null ? config.gameviewportDefaultUpdateTime : updateTime, 0);
+                gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime == null ? config.gameViewportDefaultUpdateTime : updateTime, 0);
             }
 
             public void setCamZoom(GameViewPort gameViewPort, float camZoom) {

@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.media_manager.color;
+package org.mslivo.core.engine.ui_engine.misc;
 
 import java.io.Serializable;
 

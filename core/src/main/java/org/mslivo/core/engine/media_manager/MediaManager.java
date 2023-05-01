@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
-import org.mslivo.core.engine.media_manager.color.FColor;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 

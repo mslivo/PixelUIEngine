@@ -1,6 +1,6 @@
 package org.mslivo.core.engine.ui_engine.gui.actions;
 
-import org.mslivo.core.engine.media_manager.color.FColor;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;

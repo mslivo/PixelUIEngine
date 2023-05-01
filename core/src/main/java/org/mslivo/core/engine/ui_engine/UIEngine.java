@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.media_manager.color.FColor;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -246,7 +246,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.animation_timer_gui = 0f;
         newInputState.colorStack = new Color[COLORSTACK_SIZE];
         for (int i = 0; i < COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color();
-        for (int i = 0; i < 8; i++) newInputState.colorStack[i] = new Color(1, 1, 1, 1);
+        for (int i = 0; i < COLORSTACK_SIZE; i++) newInputState.colorStack[i] = new Color(1, 1, 1, 1);
         newInputState.colorStackPointer = 0;
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);

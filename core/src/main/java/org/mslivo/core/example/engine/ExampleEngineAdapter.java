@@ -3,7 +3,7 @@ package org.mslivo.core.example.engine;
 import org.mslivo.core.engine.game_engine.GameEngineAdapter;
 import org.mslivo.core.engine.game_engine.inout.EngineInput;
 import org.mslivo.core.engine.game_engine.inout.EngineOutput;
-import org.mslivo.core.engine.tools.listthreadpool.LThreadPoolUpdater;
+import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
 import org.mslivo.core.example.data.ExampleData;
 
 import java.util.ArrayList;

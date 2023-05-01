@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.json_incparser;
+package org.mslivo.core.engine.tools.jsonparser;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

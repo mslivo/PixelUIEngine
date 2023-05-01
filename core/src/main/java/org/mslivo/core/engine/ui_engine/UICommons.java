@@ -115,9 +115,10 @@ class UICommons {
         contextMenu.x = inputState.mouse_gui.x;
         contextMenu.y = inputState.mouse_gui.y;
         int textwidth = 0;
-        for (ContextMenuItem item : contextMenu.items) {
-            int w = mediaManager.textWidth(item.font, item.text);
-            if (item.icon != null) w = w + UIEngine.TILE_SIZE;
+        for(int i=0;i<contextMenu.items.size();i++){
+            ContextMenuItem contextMenuItem = contextMenu.items.get(i);
+            int w = mediaManager.textWidth(contextMenuItem.font, contextMenuItem.text);
+            if (contextMenuItem.icon != null) w = w + UIEngine.TILE_SIZE;
             if (w > textwidth) textwidth = w;
         }
         inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;

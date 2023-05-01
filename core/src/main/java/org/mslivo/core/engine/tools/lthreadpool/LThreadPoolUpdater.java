@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.listthreadpool;
+package org.mslivo.core.engine.tools.lthreadpool;
 
 public interface LThreadPoolUpdater<T> {
 
