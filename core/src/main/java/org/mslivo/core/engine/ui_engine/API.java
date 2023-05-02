@@ -2278,20 +2278,17 @@ public class API {
             return window.addedToScreen;
         }
 
-        private enum SETCOLOR_MODE {
-            INCLUDE, EXCEPT
-        }
-
-        private void setColorFunction(Window window, FColor color, SETCOLOR_MODE setcolormode, Class[] classes,
+        private void setColorFunction(Window window, FColor color, int setColorMode, Class[] classes,
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
             if (classes == null) classes = new Class[]{};
             if (windowColor) setColor(window, color);
             for (Component component : window.components) {
-                boolean match = switch (setcolormode) {
-                    case INCLUDE ->
-                            Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
-                    case EXCEPT ->
-                            Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
+                boolean match = switch (setColorMode) {
+                    // 1 = INCLUDE Mode
+                    case 1 -> Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
+                    // 2 = EXCEPT Mode
+                    case 2 -> Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
+                    default -> throw new IllegalStateException("Unexpected value: " + setColorMode);
                 };
                 if (match) {
                     if (componentColor1) components.setColor(component, color);
@@ -2306,33 +2303,33 @@ public class API {
         }
 
         public void setColorEverything(Window window, FColor color) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, null,
+            setColorFunction(window, color, 2, null,
                     true, true, true, true);
         }
 
         public void setColorEverything(Window window, FColor color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, null,
+            setColorFunction(window, color, 2, null,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, exceptions,
+            setColorFunction(window, color, 2, exceptions,
                     true, true, true, true);
         }
 
         public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.EXCEPT, exceptions,
+            setColorFunction(window, color, 2, exceptions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions) {
-            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE, inclusions,
+            setColorFunction(window, color, 1, inclusions,
                     true, true, true, true);
         }
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, SETCOLOR_MODE.INCLUDE, inclusions,
+            setColorFunction(window, color, 1, inclusions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 

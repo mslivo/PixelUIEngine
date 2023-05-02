@@ -62,8 +62,8 @@ import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
-import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
-import org.mslivo.core.engine.ui_engine.render.shaders.GrayScaleShader;
+import org.mslivo.core.engine.ui_engine.misc.PixelPerfectViewport;
+import org.mslivo.core.engine.ui_engine.misc.GrayScaleShader;
 
 import java.awt.*;
 import java.util.ArrayDeque;
@@ -71,9 +71,9 @@ import java.util.ArrayList;
 
 
 /**
- * Input and Render Engine
- * Handles Cameras, Hardware Systems, GUI and Drawing of GUI Elements
- * 2 External Hooks allow interpreting of hardware/gui to translate them to EngineInputs and Drawing of the GameState
+ * UI Engine
+ * Handles GUI Elements, Input, Cameras
+ * Game needs to be implemented inside the uiAdapter
  */
 public class UIEngine<T extends UIAdapter> {
 
@@ -87,7 +87,6 @@ public class UIEngine<T extends UIAdapter> {
     private final MediaManager mediaManager;
 
     /* Constants */
-
     public static final int TILE_SIZE = 8;
 
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
