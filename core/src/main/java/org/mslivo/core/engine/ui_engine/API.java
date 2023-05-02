@@ -54,7 +54,6 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
-import org.mslivo.core.example.ui.windows.ExampleWindowGenerator;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -102,7 +101,7 @@ public class API {
 
     private final MediaManager mediaManager;
 
-    private final HashMap<Class<ExampleWindowGenerator>, WindowGenerator> windowGeneratorCache;
+    private final HashMap<Class, WindowGenerator> windowGeneratorCache;
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
