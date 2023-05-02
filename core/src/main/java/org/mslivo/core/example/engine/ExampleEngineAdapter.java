@@ -21,7 +21,7 @@ public class ExampleEngineAdapter implements GameEngineAdapter, LThreadPoolUpdat
 
     @Override
     public void processInput(EngineInput engineInput) {
-        switch (engineInput.type) {
+        switch (engineInput.type()) {
 
         }
     }

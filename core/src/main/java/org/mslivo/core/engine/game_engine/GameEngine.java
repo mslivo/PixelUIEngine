@@ -42,15 +42,15 @@ public class GameEngine<T extends GameEngineAdapter> {
         inputs.add(input);
     }
 
-    public boolean outputAvaiable(){
+    public boolean outputAvaiable() {
         return this.outputs.size() > 0;
     }
 
-    public ArrayList<EngineOutput> getOutputs(){
+    public ArrayList<EngineOutput> getOutputs() {
         return this.outputs;
     }
 
-    public void clearOutputs(){
+    public void clearOutputs() {
         this.outputs.clear();
     }
 
@@ -58,17 +58,17 @@ public class GameEngine<T extends GameEngineAdapter> {
         return adapter;
     }
 
-    public GameEngine(T adapter, Object dataObject) {
-        if (dataObject == null || adapter == null) {
-            throw new RuntimeException("Cannot initialize GameEngine: invalid parameters");
+    public GameEngine(T adapter, Object data) {
+        if (data == null || adapter == null) {
+            throw new GameEngineException("Cannot initialize GameEngine: invalid parameters");
         }
-        if (isInvalidDataObject(dataObject.getClass())) {
-            throw new RuntimeException("Cannot initialize GameEngine: dataObject contains non-public Fields, Methods or Non-Serializable Classes");
+        if (isInvalidDataObject(data.getClass())) {
+            throw new GameEngineException("Cannot initialize data Object "+data.getClass().getSimpleName()+" invalid: contains non-public fields, methods or non-serializable classes");
         }
 
-        this.data = dataObject;
+        this.data = data;
         this.inputs = new ArrayDeque<>();
-        this.outputs = new  ArrayList<>();
+        this.outputs = new ArrayList<>();
         this.lastUpdateTime = 0;
         // Start
         this.adapter = adapter;
@@ -76,18 +76,10 @@ public class GameEngine<T extends GameEngineAdapter> {
     }
 
     private boolean isInvalidDataObject(Class checkClass) {
-        if (Collection.class.isAssignableFrom(checkClass)) {
-            return false;
-        }
-        if (!String.class.isAssignableFrom(checkClass)) {
-            return false;
-        }
-        if (!Serializable.class.isAssignableFrom(checkClass)) {
-            return true;
-        }
-        if (checkClass.getDeclaredMethods().length != 0) {
-            return true;
-        }
+        if (Collection.class.isAssignableFrom(checkClass)) return false;
+        if (!String.class.isAssignableFrom(checkClass)) return false;
+        if (!Serializable.class.isAssignableFrom(checkClass)) return true;
+        if (checkClass.getDeclaredMethods().length != 0) return true;
         for (Field field : checkClass.getDeclaredFields()) {
             if (!Modifier.isPublic(field.getModifiers())) {
                 return true;
@@ -105,7 +97,7 @@ public class GameEngine<T extends GameEngineAdapter> {
     public void update() {
         adapter.beforeInputs();
         EngineInput engineInput = null;
-        while((engineInput = this.inputs.pollFirst()) != null){
+        while ((engineInput = this.inputs.pollFirst()) != null) {
             adapter.processInput(engineInput);
         }
         inputs.clear();

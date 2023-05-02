@@ -21,9 +21,12 @@ import java.util.function.Consumer;
  */
 public class MediaManager {
 
-    private static final GlyphLayout glyphLayout = new GlyphLayout();
-
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND_FX = "sound/";
+
+    private static final GlyphLayout glyphLayout = new GlyphLayout();
+    private static final int DEFAULT_PAGE_WIDTH = 4096;
+
+    private static final int DEFAULT_PAGE_HEIGHT = 4096;
 
     private final HashMap<CMediaSound, Sound> medias_sounds = new HashMap<>();
 
@@ -32,7 +35,6 @@ public class MediaManager {
     private final HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
 
     private final HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
-
 
     private final HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
 
@@ -47,6 +49,8 @@ public class MediaManager {
     private PixmapPacker pixmapPacker;
 
     private TextureAtlas textureAtlas;
+
+
 
     public MediaManager() {
         unloadAllAndReset();
@@ -88,7 +92,15 @@ public class MediaManager {
 
 
     public boolean loadAssets() {
-        return loadAssets(4096, 4096, null, Texture.TextureFilter.Nearest);
+        return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, null, Texture.TextureFilter.Nearest);
+    }
+
+    public boolean loadAssets(Consumer<Float> progress, Texture.TextureFilter textureFilter) {
+        return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, progress, textureFilter);
+    }
+
+    public boolean loadAssets(int pageWidth, int pageHeight) {
+        return loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
     public boolean loadAssets(int pageWidth, int pageHeight, Consumer<Float> progress, Texture.TextureFilter textureFilter) {

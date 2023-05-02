@@ -373,8 +373,6 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             }
-
-
         }
         if (inputState.inputEvents.keyUp) {
             // Reset Hotkeys
