@@ -345,13 +345,14 @@ class UICommons {
     }
 
 
-    static void resetGUIVariables(InputState inputState) {
+    static void resetGUITempVariables(InputState inputState) {
         // Window
         inputState.draggedWindow = null;
         inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
         // Buton
         inputState.pressedButton = null;
         inputState.pressedButton_timer_hold = 0;
+
         // Scrollbar
         inputState.scrolledScrollBarVertical = null;
         inputState.scrolledScrollBarHorizontal = null;
@@ -374,9 +375,6 @@ class UICommons {
         // Viewport
         inputState.pressedGameViewPort = null;
 
-        // Textfield
-        inputState.focusedTextField = null;
-
         // Inventory
         inputState.inventoryDrag_Inventory = null;
         inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
@@ -388,6 +386,9 @@ class UICommons {
         inputState.listDrag_from_index = 0;
         inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
         inputState.listDrag_Item = null;
+
+        // Textfield
+        if(inputState.focusedTextField != null) UICommons.textField_unFocus(inputState, inputState.focusedTextField);
 
         // ComboBox
         if(inputState.openComboBox != null) UICommons.comboBox_close(inputState.openComboBox, inputState);
@@ -464,14 +465,13 @@ class UICommons {
     }
 
     static boolean list_canDragIntoList(InputState inputState,List list) {
-        if (inputState.listDrag_Item != null) {
-            if (inputState.listDrag_List == null || list == null) return false;
+        if (list == null) return false;
+        if (inputState.listDrag_List != null) {
             if (inputState.listDrag_List == list) return true; // into itself
             return list.dragInEnabled &&
                     !list.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
                     list.listAction != null && list.listAction.canDragFromList(inputState.listDrag_List);
-        } else if (inputState.inventoryDrag_Item != null) {
-            if (inputState.inventoryDrag_Inventory == null || list == null) return false;
+        } else if (inputState.inventoryDrag_Inventory != null) {
             return list.dragInEnabled &&
                     !list.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
                     list.listAction != null && list.listAction.canDragFromInventory(inputState.inventoryDrag_Inventory);

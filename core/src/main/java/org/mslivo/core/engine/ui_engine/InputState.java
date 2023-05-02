@@ -140,7 +140,6 @@ public class InputState {
 
     public TextField focusedTextField;
 
-
     public Inventory inventoryDrag_Inventory;
 
     public GridPoint2 inventoryDrag_from;

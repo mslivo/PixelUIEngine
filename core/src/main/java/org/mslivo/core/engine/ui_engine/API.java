@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -53,6 +52,7 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.ControlMode;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 
 import java.util.*;
@@ -1047,7 +1047,7 @@ public class API {
 
     public void removeNotifications(Notification[] notifications) {
         if (notifications == null) return;
-        for(Notification notification : notifications) removeNotification(notification);
+        for (Notification notification : notifications) removeNotification(notification);
     }
 
     public void removeAllNotifications() {
@@ -1069,7 +1069,6 @@ public class API {
         if (notification == null) return false;
         return notification.addedToScreen;
     }
-
 
 
     public ArrayList<Notification> getNotifications() {
@@ -1144,7 +1143,7 @@ public class API {
 
     public void addWindows(Window[] windows) {
         if (windows == null) return;
-        for(Window window : windows) addWindow(window);
+        for (Window window : windows) addWindow(window);
     }
 
     public void removeWindow(Window window) {
@@ -1159,7 +1158,7 @@ public class API {
 
     public void removeAllWindows() {
         removeWindows(inputState.windows.toArray(new Window[]{}));
-        UICommons.resetGUIVariables(inputState);
+        UICommons.resetGUITempVariables(inputState);
     }
 
     public boolean closeWindow(Window window) {
@@ -1184,13 +1183,13 @@ public class API {
 
     public void closeAllWindows() {
         closeWindows(inputState.windows.toArray(new Window[]{}));
-        UICommons.resetGUIVariables(inputState);
+        UICommons.resetGUITempVariables(inputState);
     }
 
     public void addWindowAsModal(Window modalWindow) {
         if (modalWindow == null) return;
         if (inputState.modalWindow == null) {
-            UICommons.resetGUIVariables(inputState);
+            UICommons.resetGUITempVariables(inputState);
             windows.setAlwaysOnTop(modalWindow, true);
             windows.setVisible(modalWindow, true);
             windows.setFolded(modalWindow, false);
@@ -1251,14 +1250,14 @@ public class API {
 
     public void removeAllScreenComponents() {
         removeScreenComponents(inputState.screenComponents.toArray(new Component[]{}));
-        UICommons.resetGUIVariables(inputState);
+        UICommons.resetGUITempVariables(inputState);
     }
 
     public void removeEverything() {
         removeAllWindows();
         removeAllScreenComponents();
         removeAllNotifications();
-        UICommons.resetGUIVariables(inputState);
+        UICommons.resetGUITempVariables(inputState);
     }
 
     public void setMouseTool(MouseTool mouseTool) {
@@ -1291,7 +1290,7 @@ public class API {
 
     public void addHotKeys(HotKey[] hotKeys) {
         if (hotKeys == null) return;
-        for(HotKey hotKey : hotKeys) addHotKey(hotKey);
+        for (HotKey hotKey : hotKeys) addHotKey(hotKey);
     }
 
     public void removeHotKey(HotKey hotKey) {
@@ -1318,8 +1317,6 @@ public class API {
         ArrayList<HotKey> result = findHotKeysByName(name);
         return result.size() > 0 ? result.get(0) : null;
     }
-
-
 
 
     public ArrayList<Window> findWindowsByName(String name) {
@@ -1375,12 +1372,15 @@ public class API {
         private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
+
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
         }
+
         public boolean getWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
         }
+
         public void setWindowsDefaultEnforceScreenBounds(boolean windowsDefaultEnforceScreenBounds) {
             this.windowsDefaultEnforceScreenBounds = windowsDefaultEnforceScreenBounds;
         }
@@ -1744,8 +1744,9 @@ public class API {
             if (inputState.turnedKnob != null) return true;
             if (inputState.pressedMap != null) return true;
             if (inputState.pressedGameViewPort != null) return true;
-            if (inputState.inventoryDrag_Item != null) return true;
-            return inputState.listDrag_List != null;
+            if (inputState.inventoryDrag_Inventory != null) return true;
+            if (inputState.listDrag_List != null) return true;
+            return false;
         }
 
         public Object lastGUIMouseHover() {
@@ -2287,7 +2288,8 @@ public class API {
                     // 1 = INCLUDE Mode
                     case 1 -> Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
                     // 2 = EXCEPT Mode
-                    case 2 -> Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
+                    case 2 ->
+                            Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
                     default -> throw new IllegalStateException("Unexpected value: " + setColorMode);
                 };
                 if (match) {
@@ -3596,7 +3598,7 @@ public class API {
 
             public void removeTabs(TabBar tabBar, Tab[] tabs) {
                 if (tabBar == null || tabs == null) return;
-                for(Tab tab : tabs) removeTab(tabBar, tab);
+                for (Tab tab : tabs) removeTab(tabBar, tab);
             }
 
             public void removeAllTabs(TabBar tabBar) {
