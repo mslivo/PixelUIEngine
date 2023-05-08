@@ -17,9 +17,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>at.slivovsky.markus</groupId>
+			<groupId>org.mslivo</groupId>
 			<artifactId>guiengine-core</artifactId>
-			<version>${project.version}</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

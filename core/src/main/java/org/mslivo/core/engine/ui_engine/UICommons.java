@@ -436,6 +436,16 @@ class UICommons {
         if (inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
     }
 
+    static void list_setMultiSelect(List list, boolean multiSelect){
+        // Clear selecteditem/items after mode switch
+        list.multiSelect = multiSelect;
+        if(multiSelect){
+            list.selectedItem = null;
+        }else{
+            list.selectedItems.clear();
+        }
+    }
+
     static void textField_unFocus(InputState inputState, TextField textField) {
         if (textField_isFocused(inputState, textField)) {
             if (inputState.focusedTextField.textFieldAction != null)

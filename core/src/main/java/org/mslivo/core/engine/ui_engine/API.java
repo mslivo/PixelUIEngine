@@ -4644,6 +4644,7 @@ public class API {
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, CMediaFont font) {
                 List list = new List();
+                list.selectedItem = null;
                 list.selectedItems = new HashSet<>();
                 setComponentInitValues(list);
                 setPosition(list, x, y);
@@ -4696,13 +4697,7 @@ public class API {
 
             public void setMultiSelect(List list, boolean multiSelect) {
                 if (list == null) return;
-                list.multiSelect = multiSelect;
-                // Clear selecteditem/items after mode switch
-                if (multiSelect) {
-                    list.selectedItem = null;
-                } else {
-                    list.selectedItems.clear();
-                }
+                UICommons.list_setMultiSelect(list, multiSelect);
             }
 
             public void setSelectedItem(List list, Object selectedItem) {
