@@ -66,7 +66,7 @@ public class ExampleMain extends ApplicationAdapter {
             Tools.logDone();
             Tools.File.writeObjectToFile(exampleData, DATA_FILE);
             Tools.logInProgress("Loading DataFile");
-            this.exampleData = (ExampleData) Tools.File.readObjectFromFile(Path.of(exampleStartParameters.dataFile));
+            this.exampleData = (ExampleData) Tools.File.readObjectFromFile(DATA_FILE);
             Tools.logDone();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -74,15 +74,6 @@ public class ExampleMain extends ApplicationAdapter {
     }
 
     private void bootEngine() {
-        Tools.logInProgress("Loading DataFile");
-        try {
-            this.exampleData = (ExampleData) Tools.File.readObjectFromFile(Path.of(exampleStartParameters.dataFile));
-        } catch (Exception e) {
-            Tools.logError("Error while loading Datafile: " + e.getLocalizedMessage());
-            e.printStackTrace();
-            System.exit(0);
-        }
-        Tools.logDone();
         Tools.logInProgress("Loading Assets");
         this.mediaManager = new MediaManager();
 

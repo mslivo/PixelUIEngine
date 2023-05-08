@@ -37,7 +37,6 @@ public class LauncherMain {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 
         ExampleStartParameters exampleStartParameters = new ExampleStartParameters();
-        exampleStartParameters.dataFile = testDataFile.toAbsolutePath().toString();
         exampleStartParameters.internalResolutionWidth = 640;
         exampleStartParameters.internalResolutionHeight = 480;
         // List of 16:9 resolutions
