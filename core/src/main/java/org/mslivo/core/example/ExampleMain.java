@@ -51,8 +51,26 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void create() {
 
+        this.writeAndReadExampleDataFile();
+
         this.bootEngine();
 
+    }
+
+
+    private void writeAndReadExampleDataFile(){
+        final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/example/test.data");
+        ExampleData exampleData = new ExampleData();
+        try {
+            Tools.logInProgress("Writing DataFile");
+            Tools.logDone();
+            Tools.File.writeObjectToFile(exampleData, DATA_FILE);
+            Tools.logInProgress("Loading DataFile");
+            this.exampleData = (ExampleData) Tools.File.readObjectFromFile(Path.of(exampleStartParameters.dataFile));
+            Tools.logDone();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void bootEngine() {
