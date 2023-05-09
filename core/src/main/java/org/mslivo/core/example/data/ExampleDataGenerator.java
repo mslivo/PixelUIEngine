@@ -7,9 +7,9 @@ package org.mslivo.core.example.data;
 public class ExampleDataGenerator {
 
     public static ExampleData create_exampleData(){
-        ExampleData exampleData = new ExampleData();
-        exampleData.variable = 123;
-        return exampleData;
+        ExampleData data = new ExampleData();
+        data.variable = 123;
+        return data;
     }
 
 
