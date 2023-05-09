@@ -3,20 +3,21 @@ package org.mslivo.core.example.engine;
 import org.mslivo.core.engine.game_engine.EngineInput;
 import org.mslivo.core.engine.game_engine.EngineOutput;
 import org.mslivo.core.engine.game_engine.GameEngineAdapter;
+import org.mslivo.core.engine.game_engine.Output;
 import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
 import org.mslivo.core.example.data.ExampleData;
 
-import java.util.ArrayDeque;
+import java.util.function.Consumer;
 
 public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LThreadPoolUpdater {
 
     private ExampleData data;
 
-    private ArrayDeque<EngineOutput> outputs;
+    private Output output;
 
-    public void init(ExampleData data, ArrayDeque<EngineOutput> outputs) {
+    public void init(ExampleData data, Output output) {
         this.data = data;
-        this.outputs = outputs;
+        this.output = output;
     }
 
     @Override
@@ -29,6 +30,8 @@ public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LTh
     @Override
     public void update() {
         /* Main Loop: modify data, produce outputs */
+        //output.add(new EngineOutput(0,"TestOutput"));
+
     }
 
     @Override

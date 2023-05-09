@@ -67,7 +67,14 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
         this.lastUpdateTime = 0;
         // Start
         this.adapter = adapter;
-        this.adapter.init(this.data, this.outputs);
+
+        Output output = new Output() {
+            @Override
+            public void add(EngineOutput engineOutput) {
+                outputs.add(engineOutput);
+            }
+        };
+        this.adapter.init(this.data, output);
     }
 
     private boolean isInvalidDataObject(Class checkClass) {
