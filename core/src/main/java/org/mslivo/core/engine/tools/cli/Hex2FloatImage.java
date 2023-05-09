@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.colorhex2float;
+package org.mslivo.core.engine.tools.cli;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
