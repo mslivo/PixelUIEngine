@@ -31,7 +31,6 @@ public class ExampleUIAdapter implements UIAdapter {
 
     private float animation_timer;
 
-    private int start_x, start_y, end_x, end_y;
 
     public ExampleUIAdapter(GameEngine<ExampleEngineAdapter, ExampleData> gameEngine) {
         this.gameEngine = gameEngine;
@@ -43,10 +42,6 @@ public class ExampleUIAdapter implements UIAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.start_x = -(api.resolutionWidth() / 2);
-        this.start_y = -(api.resolutionHeight() / 2);
-        this.end_x = (api.resolutionWidth() / 2);
-        this.end_y = (api.resolutionHeight() / 2);
 
         // Init GUI
         TextButton createExampleWindowButton = api.components.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
@@ -68,6 +63,7 @@ public class ExampleUIAdapter implements UIAdapter {
                 api.closeAllWindows();
             }
         }));
+        api.camera.moveAbs(api.resolutionWidth()/2, api.resolutionHeight()/2);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
     }
@@ -93,8 +89,8 @@ public class ExampleUIAdapter implements UIAdapter {
 
         // Draw game based on data
         batch.begin();
-        for (int x = start_x; x < end_x; x += 32) {
-            for (int y = start_y; y < end_y; y += 32) {
+        for (int x = 0; x < api.resolutionWidth(); x += 32) {
+            for (int y = 0; y < api.resolutionHeight(); y += 32) {
                 mediaManager.drawCMediaAnimation(batch, ExampleBaseMedia.GUI_BACKGROUND,
                         x, y, animation_timer);
             }
