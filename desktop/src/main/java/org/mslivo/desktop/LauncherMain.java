@@ -8,11 +8,6 @@ import org.mslivo.core.example.data.ExampleData;
 
 public class LauncherMain {
 
-    public static ExampleData createTestData() {
-        ExampleData exampleData = new ExampleData();
-        return exampleData;
-    }
-
     private static final String appTitle = "Engine Example";
 
     public static void main(String[] args) {

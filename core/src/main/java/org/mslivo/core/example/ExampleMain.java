@@ -20,16 +20,13 @@ public class ExampleMain extends ApplicationAdapter {
     /* Subsystems */
 
     private MediaManager mediaManager;
-
-    private ExampleData exampleData;
-
+    private ExampleData data;
     public ExampleEngineAdapter engineAdapter;
     private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
     public UIAdapter UIAdapter;
-
     private UIEngine<UIAdapter> uiEngine;
 
-    /* */
+    /* --- */
 
     private long profile_time_gui, profile_time_engine, profile_time_render;
 
@@ -62,7 +59,7 @@ public class ExampleMain extends ApplicationAdapter {
             Tools.logDone();
             Tools.File.writeObjectToFile(exampleData, DATA_FILE);
             Tools.logInProgress("Loading DataFile");
-            this.exampleData = (ExampleData) Tools.File.readObjectFromFile(DATA_FILE);
+            this.data = (ExampleData) Tools.File.readObjectFromFile(DATA_FILE);
             Tools.logDone();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -81,7 +78,7 @@ public class ExampleMain extends ApplicationAdapter {
         // Engine
         Tools.logInProgress("Starting Engine Subsystem");
         this.engineAdapter = new ExampleEngineAdapter();
-        this.gameEngine = new GameEngine<>(this.engineAdapter, this.exampleData);
+        this.gameEngine = new GameEngine<>(this.engineAdapter, this.data);
 
         Tools.logDone();
         // Input/Render
