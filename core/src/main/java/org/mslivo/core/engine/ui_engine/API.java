@@ -1749,6 +1749,8 @@ public class API {
             return false;
         }
 
+        /* Events */
+
         public Object lastGUIMouseHover() {
             return inputState.lastGUIMouseHover;
         }
@@ -1813,69 +1815,89 @@ public class API {
             return inputState.inputEvents.mouseScrolled;
         }
 
-        public ArrayList<Character> keyTypedCharacters() {
-            return inputState.inputEvents.keyTypedCharacters;
+        /* Key Up */
+
+        public ArrayList<Integer> keyUpKeys() {
+            return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
         }
 
-        public ArrayList<Integer> keyUpKeyCodes() {
-            return inputState.inputEvents.keyUpKeyCodes;
-        }
-
-        public ArrayList<Integer> keyDownKeyCodes() {
-            return inputState.inputEvents.keyDownKeyCodes;
-        }
-
-        public boolean isKeyDownKeyCode(int keyCode) {
-            for (Integer kc : inputState.inputEvents.keyDownKeyCodes) {
-                if (keyCode == kc) return true;
+        public boolean keyUpKey(int keyCode) {
+            for (int i=0;i< inputState.inputEvents.keyUpKeyCodes.size();i++) {
+                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
             }
             return false;
         }
 
-        public boolean isKeyUpKeyCode(int keyCode) {
-            for (Integer kc : inputState.inputEvents.keyUpKeyCodes) {
-                if (keyCode == kc) return true;
+        public boolean isKeyUp(int keyCode) {
+            return !inputState.inputEvents.keysDown[keyCode];
+        }
+
+
+        /* Key Down */
+
+        public ArrayList<Integer> keyDownKeys() {
+            return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
+        }
+
+        public boolean keyDownKey(int keyCode) {
+            for (int i=0;i< inputState.inputEvents.keyDownKeyCodes.size();i++) {
+                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
             }
             return false;
         }
 
-        public boolean isMouseDownButton(int button) {
-            for (Integer bt : inputState.inputEvents.mouseDownButtons) {
-                if (button == bt) return true;
-            }
-            return false;
-        }
-
-        public boolean isMouseUpButton(int button) {
-            for (Integer bt : inputState.inputEvents.mouseUpButtons) {
-                if (button == bt) return true;
-            }
-            return false;
-        }
-
-        public boolean isCharacterTyped(Character character) {
-            for (Character ch : inputState.inputEvents.keyTypedCharacters) {
-                if (character == ch) return true;
-            }
-            return false;
-        }
-
-
-        public boolean isKeyCurrentlyDown(int keyCode) {
+        public boolean isKeyDown(int keyCode) {
             return inputState.inputEvents.keysDown[keyCode];
         }
 
-        public boolean isMouseButtonCurrentlyDown(int button) {
+        /* Character Typed */
+
+        public boolean keyTypedCharacter(Character character) {
+            for (int i=0;i<inputState.inputEvents.keyTypedCharacters.size();i++) {
+                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
+            }
+            return false;
+        }
+
+        public ArrayList<Character> keyTypedCharacters() {
+            return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
+        }
+
+
+        /* Mouse Up */
+        public ArrayList<Integer> mouseUpButtons() {
+            return new ArrayList<>(inputState.inputEvents.mouseUpButtons);
+        }
+
+        public boolean mouseUpButton(int button) {
+            for (int i=0;i<inputState.inputEvents.mouseUpButtons.size();i++) {
+                if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean isMouseButtonUp(int button){
+            return !inputState.inputEvents.mouseButtonsDown[button];
+        }
+
+        /* Mouse Down */
+
+        public ArrayList<Integer> mouseDownButtons() {
+            return new ArrayList<>(inputState.inputEvents.mouseDownButtons);
+        }
+
+        public boolean mouseDownButton(int button) {
+            for (int i=0;i<inputState.inputEvents.mouseDownButtons.size();i++) {
+                if(button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean isMouseButtonDown(int button) {
             return inputState.inputEvents.mouseButtonsDown[button];
         }
 
-        public ArrayList<Integer> mouseDownButtons() {
-            return inputState.inputEvents.mouseDownButtons;
-        }
-
-        public ArrayList<Integer> mouseUpButton() {
-            return inputState.inputEvents.mouseUpButtons;
-        }
+        /* Other */
 
         public float mouseScrolledAmount() {
             return inputState.inputEvents.mouseScrolledAmount;
