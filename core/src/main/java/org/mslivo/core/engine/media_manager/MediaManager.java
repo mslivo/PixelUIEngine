@@ -45,8 +45,6 @@ public class MediaManager {
 
     public final HashSet<CMedia> loadedMediaList = new HashSet<>();
 
-    private PixmapPacker pixmapPacker;
-
     private TextureAtlas textureAtlas;
 
 
@@ -77,12 +75,9 @@ public class MediaManager {
 
         if (textureAtlas != null) {
             this.textureAtlas.dispose();
-            this.textureAtlas = null;
         }
-        if (pixmapPacker != null) {
-            this.pixmapPacker.dispose();
-            this.pixmapPacker = null;
-        }
+        this.textureAtlas = new TextureAtlas();
+
     }
 
 
@@ -100,12 +95,12 @@ public class MediaManager {
 
     public void loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
 
-        this.pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
-        this.textureAtlas = new TextureAtlas();
+        PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
         ArrayList<CMedia> imageData = new ArrayList<>();
         ArrayList<CMedia> soundData = new ArrayList<>();
         int step = 0;
         int stepsMax = 0;
+        boolean anyImageData = false;
 
         // Split into Image and Sound Data
         CMedia loadMedia;
@@ -113,12 +108,15 @@ public class MediaManager {
             if (!loadedMediaList.contains(loadMedia)) {
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
                     imageData.add(loadMedia);
+                    loadedMediaList.add(loadMedia);
                     stepsMax += 2;
+                    anyImageData = true;
                 } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                     soundData.add(loadMedia);
+                    loadedMediaList.add(loadMedia);
                     stepsMax += 1;
                 } else {
-                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: " + loadMedia.getClass().getSimpleName());
+                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName()+"\"");
                 }
             }
         }
@@ -139,7 +137,9 @@ public class MediaManager {
 
 
         // 2. Create Image Texture Atlas
-        pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
+        if(anyImageData) {
+            pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
+        }
 
         // 3. Prepare image Data
         for (int i = 0; i < imageData.size(); i++) {
@@ -189,7 +189,7 @@ public class MediaManager {
                 medias_fonts.put(cMediaFont, bitmapFont);
             }
 
-            loadedMediaList.add(imageMedia);
+
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
         }
@@ -211,15 +211,15 @@ public class MediaManager {
                 }
             }
 
-            loadedMediaList.add(soundMedia);
-            loadMediaList.remove(soundMedia);
+
+
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(soundMedia.file, step, stepsMax);
         }
 
-
         imageData.clear();
         soundData.clear();
+        pixmapPacker.dispose();
     }
 
     private Pixmap extractPixmapFromTextureRegion(TextureRegion textureRegion) {
