@@ -8,13 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -42,43 +41,39 @@ public class MediaManager {
 
     private final HashMap<CMediaAnimation, Animation> medias_animations = new HashMap<>();
 
-    private final ArrayDeque<CMedia> loadStack = new ArrayDeque<>();
+    private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
 
-    public final HashSet<String> loadedMedia = new HashSet<>();
+    public final HashSet<CMedia> loadedMediaList = new HashSet<>();
 
     private PixmapPacker pixmapPacker;
 
     private TextureAtlas textureAtlas;
 
 
-
     public MediaManager() {
-        unloadAllAndReset();
+        unloadAndReset();
     }
 
-    public void unloadAllAndReset() {
+    public void unloadAndReset() {
         for (CMediaSound cMediaSound : medias_sounds.keySet()) {
             medias_sounds.get(cMediaSound).dispose();
         }
         this.medias_sounds.clear();
-
         for (CMediaMusic cMediaMusic : medias_music.keySet()) {
             medias_music.get(cMediaMusic).dispose();
         }
         this.medias_music.clear();
-
         for (CMediaFont cMediaFont : medias_fonts.keySet()) {
             medias_fonts.get(cMediaFont).dispose();
         }
-
 
         this.medias_fonts.clear();
         this.medias_cursors.clear();
         this.medias_images.clear();
         this.medias_arrays.clear();
         this.medias_animations.clear();
-        this.loadedMedia.clear();
-        this.loadStack.clear();
+        this.loadedMediaList.clear();
+        this.loadMediaList.clear();
 
         if (textureAtlas != null) {
             this.textureAtlas.dispose();
@@ -91,86 +86,72 @@ public class MediaManager {
     }
 
 
-    public boolean loadAssets() {
-        return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, null, Texture.TextureFilter.Nearest);
+    public void loadAssets() {
+        loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, null, Texture.TextureFilter.Nearest);
     }
 
-    public boolean loadAssets(Consumer<Float> progress, Texture.TextureFilter textureFilter) {
-        return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, progress, textureFilter);
+    public void loadAssets(LoadProgress progress, Texture.TextureFilter textureFilter) {
+        loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, progress, textureFilter);
     }
 
-    public boolean loadAssets(int pageWidth, int pageHeight) {
-        return loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
+    public void loadAssets(int pageWidth, int pageHeight) {
+        loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
-    public boolean loadAssets(int pageWidth, int pageHeight, Consumer<Float> progress, Texture.TextureFilter textureFilter) {
+    public void loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
+
         this.pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
         this.textureAtlas = new TextureAtlas();
+        ArrayList<CMedia> imageData = new ArrayList<>();
+        ArrayList<CMedia> soundData = new ArrayList<>();
+        int step = 0;
+        int stepsMax = 0;
 
-        ArrayDeque<CMedia> prepareStack = new ArrayDeque<>();
-
-        CMedia loadMedia = null;
-        int counter = 0;
-        int stackSize = loadStack.size();
-        loadLoop:
-        while ((loadMedia = loadStack.pollFirst()) != null) {
-
-            if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class || loadMedia.getClass() == CMediaCursor.class) {
-                if (!loadedMedia.contains(loadMedia.file)) {
-                    String textureFileName = loadMedia.getClass() == CMediaFont.class ? loadMedia.file.replace(".fnt", ".png") : loadMedia.file;
-                    Texture texture = new Texture(Tools.File.findResource(DIR_GRAPHICS + textureFileName), false);
-                    TextureData textureData = texture.getTextureData();
-                    textureData.prepare();
-                    pixmapPacker.pack(loadMedia.file, textureData.consumePixmap());
-                    textureData.disposePixmap();
-                    texture.dispose();
+        // Split into Image and Sound Data
+        CMedia loadMedia;
+        while((loadMedia = loadMediaList.poll()) != null){
+            if (!loadedMediaList.contains(loadMedia)) {
+                if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
+                    imageData.add(loadMedia);
+                    stepsMax += 2;
+                } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
+                    soundData.add(loadMedia);
+                    stepsMax += 1;
+                } else {
+                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: " + loadMedia.getClass().getSimpleName());
                 }
-
-                prepareStack.push(loadMedia);
-            } else if (loadMedia.getClass() == CMediaSound.class) {
-                if (!loadedMedia.contains(loadMedia.file)) {
-                    CMediaSound cMediaSound = (CMediaSound) loadMedia;
-                    Sound sound = Gdx.audio.newSound(Tools.File.findResource(DIR_SOUND_FX + cMediaSound.file));
-                    medias_sounds.put(cMediaSound, sound);
-                }
-            } else if (loadMedia.getClass() == CMediaMusic.class) {
-                if (!loadedMedia.contains(loadMedia.file)) {
-                    CMediaMusic cMediaMusic = (CMediaMusic) loadMedia;
-                    Music music = Gdx.audio.newMusic(Tools.File.findResource(DIR_MUSIC + loadMedia.file));
-                    medias_music.put(cMediaMusic, music);
-                }
-            }
-
-
-            loadedMedia.add(loadMedia.file);
-            counter++;
-            if (progress != null) {
-                progress.accept(0.5F * (counter / (float) stackSize));
             }
         }
-        // Create Texture Atlas
+
+        // 1. Load Image Data Into Pixmap Packer
+        for (int i = 0; i < imageData.size(); i++) {
+            CMedia imageMedia = imageData.get(i);
+            String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
+            Texture texture = new Texture(Tools.File.findResource(DIR_GRAPHICS + textureFileName), false);
+            TextureData textureData = texture.getTextureData();
+            textureData.prepare();
+            pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
+            textureData.disposePixmap();
+            texture.dispose();
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
+        }
+
+
+        // 2. Create Image Texture Atlas
         pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
 
-        // PrepareLoop
-        CMedia prepareMedia = null;
-        counter = 0;
-        stackSize = prepareStack.size();
-        prepareLoop:
-        while ((prepareMedia = prepareStack.pollFirst()) != null) {
-            if (prepareMedia.getClass() == CMediaCursor.class) {
-                CMediaCursor cMediaCursor = (CMediaCursor) prepareMedia;
-                medias_cursors.put(cMediaCursor, textureAtlas.findRegion(prepareMedia.file));
-                // SystemCursors dont need to be put here
-            } else if (prepareMedia.getClass() == CMediaImage.class) {
-                CMediaImage cMediaImage = (CMediaImage) prepareMedia;
-                medias_images.put(cMediaImage, textureAtlas.findRegion(prepareMedia.file));
-            }
-            if (prepareMedia.getClass() == CMediaFont.class) {
-                CMediaFont cMediaFont = (CMediaFont) prepareMedia;
-                BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(DIR_GRAPHICS + cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
-                medias_fonts.put(cMediaFont, bitmapFont);
-            } else if (prepareMedia.getClass() == CMediaArray.class) {
-                CMediaArray cMediaArray = (CMediaArray) prepareMedia;
+        // 3. Prepare image Data
+        for (int i = 0; i < imageData.size(); i++) {
+            CMedia imageMedia = imageData.get(i);
+            if (imageMedia.getClass() == CMediaImage.class) {
+                CMediaImage cMediaImage = (CMediaImage) imageMedia;
+                medias_images.put(cMediaImage, textureAtlas.findRegion(imageMedia.file));
+            } else if (imageMedia.getClass() == CMediaCursor.class) {
+                CMediaCursor cMediaCursor = (CMediaCursor) imageMedia;
+                medias_cursors.put(cMediaCursor, textureAtlas.findRegion(imageMedia.file));
+            } else if (imageMedia.getClass() == CMediaArray.class) {
+                CMediaArray cMediaArray = (CMediaArray) imageMedia;
                 TextureRegion textureRegion = textureAtlas.findRegion(cMediaArray.file);
                 int width = (textureRegion.getRegionWidth() / cMediaArray.tile_width);
                 int height = (textureRegion.getRegionHeight() / cMediaArray.tile_height);
@@ -184,8 +165,8 @@ public class MediaManager {
                     }
                 }
                 medias_arrays.put(cMediaArray, result);
-            } else if (prepareMedia.getClass() == CMediaAnimation.class) {
-                CMediaAnimation cMediaAnimation = (CMediaAnimation) prepareMedia;
+            } else if (imageMedia.getClass() == CMediaAnimation.class) {
+                CMediaAnimation cMediaAnimation = (CMediaAnimation) imageMedia;
                 TextureRegion textureRegion = textureAtlas.findRegion(cMediaAnimation.file);
                 int width = (textureRegion.getRegionWidth() / cMediaAnimation.tile_width);
                 int height = (textureRegion.getRegionHeight() / cMediaAnimation.tile_height);
@@ -202,16 +183,43 @@ public class MediaManager {
                 }
                 Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
                 medias_animations.put(cMediaAnimation, animation);
+            } else if (imageMedia.getClass() == CMediaFont.class) {
+                CMediaFont cMediaFont = (CMediaFont) imageMedia;
+                BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(DIR_GRAPHICS + cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
+                medias_fonts.put(cMediaFont, bitmapFont);
             }
 
-            counter++;
-            if (progress != null) {
-                progress.accept(0.5f + (0.5F * (counter / (float) stackSize)));
+            loadedMediaList.add(imageMedia);
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
+        }
+
+        // 4. Load Sound Data
+        for (int i = 0; i < soundData.size(); i++) {
+            CMedia soundMedia = soundData.get(i);
+            if (soundMedia.getClass() == CMediaSound.class) {
+                if (!loadedMediaList.contains(soundMedia.file)) {
+                    CMediaSound cMediaSound = (CMediaSound) soundMedia;
+                    Sound sound = Gdx.audio.newSound(Tools.File.findResource(DIR_SOUND_FX + cMediaSound.file));
+                    medias_sounds.put(cMediaSound, sound);
+                }
+            } else if (soundMedia.getClass() == CMediaMusic.class) {
+                if (!loadedMediaList.contains(soundMedia.file)) {
+                    CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
+                    Music music = Gdx.audio.newMusic(Tools.File.findResource(DIR_MUSIC + soundMedia.file));
+                    medias_music.put(cMediaMusic, music);
+                }
             }
+
+            loadedMediaList.add(soundMedia);
+            loadMediaList.remove(soundMedia);
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(soundMedia.file, step, stepsMax);
         }
 
 
-        return true;
+        imageData.clear();
+        soundData.clear();
     }
 
     private Pixmap extractPixmapFromTextureRegion(TextureRegion textureRegion) {
@@ -614,10 +622,10 @@ public class MediaManager {
             try {
                 if (field.getType().isArray()) {
                     CMedia[] medias = (CMedia[]) field.get(null);
-                    loadStack.addAll(Arrays.asList(medias));
+                    loadMediaList.addAll(Arrays.asList(medias));
                 } else {
                     cMedia = (CMedia) field.get(null);
-                    loadStack.add(cMedia);
+                    loadMediaList.add(cMedia);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -631,7 +639,7 @@ public class MediaManager {
 
 
     public boolean prepareCMedia(CMedia cMedia) {
-        loadStack.add(cMedia);
+        loadMediaList.add(cMedia);
         return true;
     }
 
@@ -657,7 +665,7 @@ public class MediaManager {
         if (level > scanDepth) return true; // scan up to depth 3
         if (CMedia.class.isAssignableFrom(object.getClass())) {
             CMedia cMedia = (CMedia) object;
-            loadStack.add(cMedia);
+            loadMediaList.add(cMedia);
             return true;
         }
 
@@ -672,7 +680,7 @@ public class MediaManager {
             if (fieldObject != null) {
                 if (CMedia.class.isAssignableFrom(fieldObject.getClass())) {
                     CMedia cMedia = (CMedia) fieldObject;
-                    loadStack.add(cMedia);
+                    loadMediaList.add(cMedia);
                 } else if (fieldObject.getClass() == ArrayList.class) {
                     ArrayList arrayList = (ArrayList) fieldObject;
                     for (Object arrayListItem : arrayList) {
@@ -737,7 +745,7 @@ public class MediaManager {
     }
 
     public void shutdown() {
-        this.unloadAllAndReset();
+        this.unloadAndReset();
         return;
     }
 
