@@ -4,41 +4,38 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
+import org.mslivo.core.engine.game_engine.EngineInput;
+import org.mslivo.core.engine.game_engine.EngineOutput;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.particlesystem.ParticleSystem;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.example.data.ExampleData;
+import org.mslivo.core.example.engine.ExampleEngineAdapter;
 import org.mslivo.core.example.ui.media.ExampleBaseMedia;
-import org.mslivo.core.example.ui.particle.TestParticle;
 import org.mslivo.core.example.ui.windows.ExampleWindowGenerator;
 
 public class ExampleUIAdapter implements UIAdapter {
 
-    private int particlesTest = 0;
-
-    private long particlesOutputTimer = 0;
-
     private API api;
-
-    private final GameEngine gameEngine;
-
-    private float animation_timer;
 
     private MediaManager mediaManager;
 
-    private ParticleSystem<TestParticle> particleSystem;
+    private final GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
+
+    private final ExampleData data;
+
+    private float animation_timer;
 
     private int start_x, start_y, end_x, end_y;
 
-    public ExampleUIAdapter(GameEngine gameEngine) {
+    public ExampleUIAdapter(GameEngine<ExampleEngineAdapter, ExampleData> gameEngine) {
         this.gameEngine = gameEngine;
+        this.data = gameEngine.getData();
     }
 
     @Override
@@ -71,61 +68,30 @@ public class ExampleUIAdapter implements UIAdapter {
                 api.closeAllWindows();
             }
         }));
-
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
-        this.particleSystem = new ParticleSystem<>(mediaManager, Integer.MAX_VALUE);
     }
 
     @Override
     public void update() {
+        // Process Outputs
+        while (gameEngine.outputAvailable()){
+            EngineOutput engineOutput = gameEngine.processOutput();
+        }
+
+        // Create Inputs
         if (api.input.keyDown()) {
-
-            if (api.input.isKeyDownKeyCode(Input.Keys.P)) {
-                particlesTest = particlesTest == 4 ? 0 : particlesTest + 1;
-                if (particlesTest == 0){
-                    particleSystem.removeAllParticles();
-                    System.gc();
-                }
-                Tools.log("Particle Performance Test [%d]", particlesTest);
-            }
-
-
+            gameEngine.input(new EngineInput(0,"TestInput"));
         }
-
-        updateParticlesPerformanceTest();
     }
 
-    private void updateParticlesPerformanceTest() {
-        if (particlesTest == 0) return;
-        int amount = switch (particlesTest) {
-            case 1 -> 1000;
-            case 2 -> 2000;
-            case 3 -> 4000;
-            case 4 -> 8000;
-            default -> 0;
-        };
-        for (int i2 = 0; i2 < amount; i2++) {
-            this.particleSystem.addParticle(new TestParticle(
-                    MathUtils.random(start_x, end_x),
-                    MathUtils.random(start_y, end_y),
-                    particlesTest
-            ));
-        }
-        if (System.currentTimeMillis() - particlesOutputTimer > 1000) {
-            Tools.log("Particles: " + particleSystem.getParticleCount());
-            particlesOutputTimer = System.currentTimeMillis();
-        }
-        particleSystem.update();
-    }
 
     @Override
     public void render(SpriteBatch batch, boolean mainViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Draw Game Here
-
+        // Draw game based on data
         batch.begin();
         for (int x = start_x; x < end_x; x += 32) {
             for (int y = start_y; y < end_y; y += 32) {
@@ -134,16 +100,13 @@ public class ExampleUIAdapter implements UIAdapter {
             }
         }
 
-        if (particlesTest != 0) {
-            particleSystem.render(batch);
-        }
         batch.end();
 
     }
 
     @Override
     public void shutdown() {
-        particleSystem.shutdown();
+        mediaManager.shutdown();
     }
 
 

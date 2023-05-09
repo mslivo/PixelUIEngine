@@ -40,6 +40,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
 import org.mslivo.core.example.ui.media.ExampleBaseMedia;
 
@@ -52,7 +53,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         super(api);
     }
 
-    private GameEngine<ExampleEngineAdapter> gameEngine;
+    private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
 
     private MediaManager mediaManager;
 

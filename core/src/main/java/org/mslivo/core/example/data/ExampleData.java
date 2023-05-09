@@ -1,7 +1,5 @@
 package org.mslivo.core.example.data;
 
-import org.mslivo.core.example.data.game.ExampleObject;
-
 import java.io.Serializable;
 
 /**
@@ -14,7 +12,6 @@ import java.io.Serializable;
  */
 public class ExampleData implements Serializable {
 
-    public ExampleObject exampleObject;
-
+    public int variable;
 
 }

@@ -12,13 +12,11 @@ public class ExampleBaseMedia {
 
     public static final CMediaAnimation GUI_ICON_BUTTON_ANIM_EXAMPLE = MediaManager.create_CMediaAnimation(exampleDirectory + "example_animation.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE, 0.1f);
     public static final CMediaArray GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY = MediaManager.create_CMediaArray(exampleDirectory + "example_array.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE);
-    public static final CMediaImage GUI_SCREEN_BG = MediaManager.create_CMediaImage(exampleDirectory + "screen_bg.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_1 = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_1.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_2 = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_2.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_3 = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_3.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_4 = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_4.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_DOUBLE = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_double.png");
-
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_GREEN = MediaManager.create_CMediaImage(exampleDirectory + "example_bullet_green.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_BLUE = MediaManager.create_CMediaImage(exampleDirectory + "example_bullet_blue.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_ORANGE = MediaManager.create_CMediaImage(exampleDirectory + "example_bullet_orange.png");

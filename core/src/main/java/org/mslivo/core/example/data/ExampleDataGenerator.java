@@ -1,16 +1,15 @@
 package org.mslivo.core.example.data;
 
-import org.mslivo.core.example.data.game.ExampleObject;
 
 /**
- * All GameObjects are create here using Static Methods
+ * All Data-Objects are create here using Static Methods (create_)
  */
 public class ExampleDataGenerator {
 
-    public static ExampleObject create_ExampleObject(){
-        ExampleObject object = new ExampleObject();
-        object.someVariable = 1;
-        return object;
+    public static ExampleData create_exampleData(){
+        ExampleData exampleData = new ExampleData();
+        exampleData.variable = 123;
+        return exampleData;
     }
 
 

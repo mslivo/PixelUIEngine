@@ -1,16 +1,12 @@
 package org.mslivo.core.engine.game_engine;
 
-import org.mslivo.core.engine.game_engine.inout.EngineInput;
-import org.mslivo.core.engine.game_engine.inout.EngineOutput;
+import java.util.ArrayDeque;
 
-import java.util.ArrayList;
+public interface GameEngineAdapter<D> {
 
-public interface GameEngineAdapter {
+    void init(D data, ArrayDeque<EngineOutput> outputs);
 
-    void init(Object data, ArrayList<EngineOutput> outputs);
-
-    default void beforeInputs() {
-    }
+    default void beforeInputs() {}
 
     void update();
 

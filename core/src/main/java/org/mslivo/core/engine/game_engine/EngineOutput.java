@@ -1,7 +1,7 @@
-package org.mslivo.core.engine.game_engine.inout;
+package org.mslivo.core.engine.game_engine;
 
 
-public record EngineInput(int type, Object... p) {
+public record EngineOutput(int type, Object... p) {
 
     public Object p(int index) {
         return (index >= 0 && index < p.length) ? p[index] : null;

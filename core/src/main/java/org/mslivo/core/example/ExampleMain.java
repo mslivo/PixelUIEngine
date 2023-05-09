@@ -23,15 +23,11 @@ public class ExampleMain extends ApplicationAdapter {
 
     private ExampleData exampleData;
 
-    private GameEngine<ExampleEngineAdapter> gameEngine;
+    public ExampleEngineAdapter engineAdapter;
+    private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
+    public UIAdapter UIAdapter;
 
     private UIEngine<UIAdapter> uiEngine;
-
-    public final ExampleStartParameters exampleStartParameters;
-
-    public ExampleEngineAdapter exampleEngineAdapter;
-
-    public UIAdapter UIAdapter;
 
     /* */
 
@@ -39,13 +35,13 @@ public class ExampleMain extends ApplicationAdapter {
 
     private long timer_debug_info;
 
-    public ExampleMain(ExampleStartParameters exampleStartParameters) {
-        this.exampleStartParameters = exampleStartParameters;
+    public ExampleMain() {
+
     }
 
     @Override
     public void resize(int width, int height) {
-        if(this.uiEngine != null) this.uiEngine.resize(width,height);
+        if (this.uiEngine != null) this.uiEngine.resize(width, height);
     }
 
     @Override
@@ -58,7 +54,7 @@ public class ExampleMain extends ApplicationAdapter {
     }
 
 
-    private void writeAndReadExampleDataFile(){
+    private void writeAndReadExampleDataFile() {
         final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/example/test.data");
         ExampleData exampleData = new ExampleData();
         try {
@@ -84,17 +80,18 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.logDone();
         // Engine
         Tools.logInProgress("Starting Engine Subsystem");
-        this.exampleEngineAdapter = new ExampleEngineAdapter();
-        this.gameEngine = new GameEngine<>(this.exampleEngineAdapter, exampleData);
+        this.engineAdapter = new ExampleEngineAdapter();
+        this.gameEngine = new GameEngine<>(this.engineAdapter, this.exampleData);
 
         Tools.logDone();
         // Input/Render
-        Tools.logInProgress("Starting Input/Render Subsystem");
+        Tools.logInProgress("Starting UI Subsystem");
         this.UIAdapter = new ExampleUIAdapter(this.gameEngine);
-        this.uiEngine = new UIEngine<>(this.UIAdapter,
-                mediaManager,
-                exampleStartParameters.internalResolutionWidth, exampleStartParameters.internalResolutionHeight,
-                exampleStartParameters.viewportMode);
+        this.uiEngine = new UIEngine<>(
+                this.UIAdapter,
+                this.mediaManager,
+                ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight,
+                ExampleMainConstants.viewportMode);
         Tools.logDone();
     }
 
@@ -102,20 +99,17 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void render() {
 
-        // Update Input
+        // Update UI Engine / Gather Input / Process Output
         profile_time_gui = System.currentTimeMillis();
         this.uiEngine.update();
-        this.gameEngine.clearOutputs();
         profile_time_gui = System.currentTimeMillis() - profile_time_gui;
 
-        // Run engine?
-        if (Tools.Calc.shouldRun(60, gameEngine.getLastUpdateTime())) { // engine is called 10/Second
-            profile_time_engine = System.currentTimeMillis();
-            gameEngine.update();
-            profile_time_engine = System.currentTimeMillis() - profile_time_engine;
-        }
+        // Update Game Engine / Process Input / Create Output
+        profile_time_engine = System.currentTimeMillis();
+        this.gameEngine.update();
+        profile_time_engine = System.currentTimeMillis() - profile_time_engine;
 
-        // Render
+        // Render Everything
         profile_time_render = System.currentTimeMillis();
         this.uiEngine.render();
         profile_time_render = System.currentTimeMillis() - profile_time_render;
@@ -123,7 +117,7 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Out
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.logBenchmark("Render: "+profile_time_render+"ms");
+            Tools.logBenchmark("Render: " + profile_time_render + "ms");
             timer_debug_info = System.currentTimeMillis();
         }
     }
