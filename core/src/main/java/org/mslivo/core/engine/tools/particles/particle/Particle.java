@@ -1,7 +1,7 @@
-package org.mslivo.core.engine.tools.particlesystem.particle;
+package org.mslivo.core.engine.tools.particles.particle;
 
 import org.mslivo.core.engine.media_manager.media.*;
-import org.mslivo.core.engine.tools.particlesystem.ParticleSystem;
+import org.mslivo.core.engine.tools.particles.ParticleSystem;
 
 public abstract class Particle {
 

@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.particlesystem;
+package org.mslivo.core.engine.tools.particles;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,7 +6,7 @@ import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaAnimation;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
-import org.mslivo.core.engine.tools.particlesystem.particle.Particle;
+import org.mslivo.core.engine.tools.particles.particle.Particle;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
