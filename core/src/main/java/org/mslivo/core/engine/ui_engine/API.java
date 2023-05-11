@@ -2654,7 +2654,12 @@ public class API {
             tooltip.displayFistLineAsTitle = firstLineIsTitle;
         }
 
+        public void setLines2(ToolTip tooltip, String... lines) {
+            setLines(tooltip, lines);
+        }
+
         public void setLines(ToolTip tooltip, String[] lines) {
+            if(tooltip == null) return;
             tooltip.lines = Tools.Text.validString(lines);
         }
 
@@ -4266,6 +4271,10 @@ public class API {
             public void setTextAction(Text text, TextAction textAction) {
                 if (text == null) return;
                 text.textAction = textAction;
+            }
+
+            public void setLines2(Text text, String... lines) {
+                setLines(text, lines);
             }
 
             public void setLines(Text text, String[] lines) {
