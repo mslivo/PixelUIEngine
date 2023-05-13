@@ -292,38 +292,31 @@ public class UIEngine<T extends UIAdapter> {
                             UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
                             UICommons.textField_setContent(inputState.focusedTextField, newContent);
 
-                            if (focusedTextField.textFieldAction != null) {
-                                focusedTextField.contentValid = focusedTextField.textFieldAction.isContentValid(newContent);
+                            if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                            }
+
                         }
                     } else if (keyTypedCharacter == '\u007F') { // DEL
                         if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
 
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
-
                             UICommons.textField_setContent(focusedTextField, newContent);
 
-                            if (focusedTextField.textFieldAction != null) {
-                                focusedTextField.contentValid = focusedTextField.textFieldAction.isContentValid(newContent);
+                            if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                            }
+
                         }
                     } else if (keyTypedCharacter == '\n') { // ENTER
-                        if (focusedTextField.textFieldAction != null) {
-                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
-                        }
                         UICommons.textField_unFocus(inputState, focusedTextField);
+                        if (focusedTextField.textFieldAction != null) focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                     } else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             if (focusedTextField.content.length() < focusedTextField.contentMaxLength) {
                                 String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
                                 UICommons.textField_setContent(focusedTextField, newContent);
                                 UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
-                                if (focusedTextField.textFieldAction != null) {
-                                    focusedTextField.contentValid = focusedTextField.textFieldAction.isContentValid(newContent);
+                                if (focusedTextField.textFieldAction != null)
                                     focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                                }
                             }
                         }
                     }
@@ -642,7 +635,7 @@ public class UIEngine<T extends UIAdapter> {
                         int inv_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
                         if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
                             Object selectInvItem = inventory.items[inv_x][inv_y];
-                            if(selectInvItem != null){
+                            if (selectInvItem != null) {
                                 inventory.selectedItem = selectInvItem;
                                 inventory.inventoryAction.onItemSelected(selectInvItem, inv_x, inv_y);
                                 if (inventory.dragEnabled) {
@@ -653,7 +646,7 @@ public class UIEngine<T extends UIAdapter> {
                                     inputState.inventoryDrag_Item = inventory.items[inv_x][inv_y];
                                     inputState.inventoryDrag_Inventory = inventory;
                                 }
-                            }else{
+                            } else {
                                 inventory.selectedItem = null;
                                 inventory.inventoryAction.onItemSelected(null, inv_x, inv_y);
                             }

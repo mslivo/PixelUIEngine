@@ -55,7 +55,10 @@ import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -611,49 +614,73 @@ public class API {
         }
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, Integer.MAX_VALUE, 0);
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, 0,Integer.MAX_VALUE, true,0);
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int maxInputLength) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, maxInputLength, 0);
-
+        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true,0);
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int maxInputLength, int wndMinWidth) {
+        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int wndMinWidth) {
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, Tools.Calc.lowerBounds(wndMinWidth, 8));
             final int HEIGHT = 6;
+            originalText = originalText != null ? originalText : "";
             Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
             Text textC = components.text.create(0, 3, Tools.Text.toArray(text));
-            TextField input = components.textField.create(0, 2, WIDTH - 1, originalText != null ? originalText : "", null, maxInputLength);
+
+            TextField inputTextField = components.textField.create(0, 2, WIDTH - 1, originalText, null, maxInputLength);
+
+            ArrayList<Component> componentsList = new ArrayList<>();
+            componentsList.add(textC);
+            componentsList.add(inputTextField);
 
 
-            components.textField.setTextFieldAction(input, new TextFieldAction() {
-                @Override
-                public void onTyped(char character) {
-                    if (character == '\n') {
-                        inputResultFunction.accept(input.content);
+            Button okBtn = null;
+            if (showOKButton) {
+                okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+                    @Override
+                    public void onRelease() {
+                        if(inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                         removeCurrentModalWindow();
                     }
-                }
-            });
+                });
+                componentsList.add(okBtn);
+            }
 
-            Button okC = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+            Button finalOkBtn = okBtn;
+            components.textField.setTextFieldAction(inputTextField, new TextFieldAction() {
+
                 @Override
-                public void onRelease() {
-                    inputResultFunction.accept(input.content);
-                    removeCurrentModalWindow();
+                public void onEnter(String content, boolean valid) {
+                    if (valid) {
+                        if(inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                        removeCurrentModalWindow();
+                    }else{
+                        components.textField.focus(inputTextField);
+                    }
                 }
+
+                @Override
+                public void onContentChange(String newContent, boolean valid) {
+                    if (finalOkBtn != null) components.setDisabled(finalOkBtn, valid);
+                }
+
+                @Override
+                public boolean isContentValid(String newContent) {
+                    return newContent.length() >= minInputLength;
+                }
+
             });
 
 
-            Component[] componentsl = new Component[]{textC, okC, input};
-            components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            components.setOffset(input, UIEngine.TILE_SIZE / 2, 0);
-            windows.addComponents(modal, componentsl);
+            Component[] componentArr = componentsList.toArray(new Component[]{});
+            components.setOffset(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            components.setOffset(inputTextField, UIEngine.TILE_SIZE / 2, 0);
+            windows.addComponents(modal, componentArr);
             windows.setWindowAction(modal, new WindowAction() {
                 @Override
                 public void onAdd() {
-                    components.textField.focus(input);
+                    components.textField.focus(inputTextField);
                 }
             });
             return modal;
@@ -687,11 +714,10 @@ public class API {
             });
             components.button.centerContent(okBtn);
 
-            ArrayList<Component> componentsl = new ArrayList<>(Arrays.asList(texts));
-            componentsl.add(okBtn);
 
-            components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            windows.addComponents(modal, componentsl.toArray(new Component[]{}));
+            Component[] componentsArr = new Component[]{okBtn};
+            components.setOffset(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            windows.addComponents(modal, componentsArr);
             return modal;
         }
 
@@ -1822,7 +1848,7 @@ public class API {
         }
 
         public boolean keyUpKey(int keyCode) {
-            for (int i=0;i< inputState.inputEvents.keyUpKeyCodes.size();i++) {
+            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) {
                 if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
             }
             return false;
@@ -1840,7 +1866,7 @@ public class API {
         }
 
         public boolean keyDownKey(int keyCode) {
-            for (int i=0;i< inputState.inputEvents.keyDownKeyCodes.size();i++) {
+            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) {
                 if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
             }
             return false;
@@ -1853,7 +1879,7 @@ public class API {
         /* Character Typed */
 
         public boolean keyTypedCharacter(Character character) {
-            for (int i=0;i<inputState.inputEvents.keyTypedCharacters.size();i++) {
+            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) {
                 if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
             }
             return false;
@@ -1870,13 +1896,13 @@ public class API {
         }
 
         public boolean mouseUpButton(int button) {
-            for (int i=0;i<inputState.inputEvents.mouseUpButtons.size();i++) {
+            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++) {
                 if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
             }
             return false;
         }
 
-        public boolean isMouseButtonUp(int button){
+        public boolean isMouseButtonUp(int button) {
             return !inputState.inputEvents.mouseButtonsDown[button];
         }
 
@@ -1887,8 +1913,8 @@ public class API {
         }
 
         public boolean mouseDownButton(int button) {
-            for (int i=0;i<inputState.inputEvents.mouseDownButtons.size();i++) {
-                if(button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++) {
+                if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
             }
             return false;
         }
@@ -2659,7 +2685,7 @@ public class API {
         }
 
         public void setLines(ToolTip tooltip, String[] lines) {
-            if(tooltip == null) return;
+            if (tooltip == null) return;
             tooltip.lines = Tools.Text.validString(lines);
         }
 
@@ -2883,12 +2909,6 @@ public class API {
             component.offset_y = y;
         }
 
-        public void setOffset(Collection<Component> components, int x, int y) {
-            if (components == null) return;
-            for (Component component : components) {
-                setOffset(component, x, y);
-            }
-        }
 
         public void setOffset(Component[] components, int x, int y) {
             if (components == null) return;
@@ -3953,6 +3973,7 @@ public class API {
             public void setTextFieldAction(TextField textField, TextFieldAction textFieldAction) {
                 if (textField == null) return;
                 textField.textFieldAction = textFieldAction;
+                UICommons.textField_setContent(textField, textField.content); // Trigger validation
             }
 
             public void setContentMaxLength(TextField textField, int contentMaxLength) {
@@ -3980,6 +4001,10 @@ public class API {
                 return UICommons.textField_isFocused(inputState, textField);
             }
 
+            public boolean isContentValid(TextField textField) {
+                if (textField == null) return false;
+                return textField.contentValid;
+            }
         }
 
         public class _Map {

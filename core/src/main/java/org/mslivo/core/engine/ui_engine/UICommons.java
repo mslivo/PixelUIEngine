@@ -217,6 +217,11 @@ class UICommons {
     static void textField_setContent(TextField textField, String content) {
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
+        if (textField.textFieldAction != null) {
+            textField.contentValid = textField.textFieldAction.isContentValid(content);
+        }else{
+            textField.contentValid = true;
+        }
     }
 
 
