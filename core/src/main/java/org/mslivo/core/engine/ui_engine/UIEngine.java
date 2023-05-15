@@ -1679,9 +1679,9 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_gui.begin();
             Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
             inputState.spriteBatch_gui.setProjectionMatrix(this.inputState.camera_gui.combined);
-            this.uiAdapter.renderBeforeGUI(inputState.spriteBatch_gui);
+            this.uiAdapter.renderUIBefore(inputState.spriteBatch_gui);
             this.renderGUI();
-            this.uiAdapter.renderAfterGUI(inputState.spriteBatch_gui);
+            this.uiAdapter.renderUIAfter(inputState.spriteBatch_gui);
             inputState.frameBuffer_gui.end();
         }
 
@@ -1690,10 +1690,10 @@ public class UIEngine<T extends UIAdapter> {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             // Render to Upscaled Buffer
             inputState.frameBuffer_upScale.begin();
-            inputState.spriteBatch_screen.begin();
-            inputState.spriteBatch_screen.draw(inputState.texture_game, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            inputState.spriteBatch_screen.draw(inputState.texture_gui, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            inputState.spriteBatch_screen.end();
+            this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
+                    inputState.texture_game, inputState.texture_gui,
+                    inputState.internalResolutionWidth, inputState.internalResolutionHeight
+            );
             inputState.frameBuffer_upScale.end();
             // Render Final Screen
             inputState.viewport_screen.apply();

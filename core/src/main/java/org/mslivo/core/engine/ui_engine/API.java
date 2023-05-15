@@ -623,12 +623,12 @@ public class API {
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int wndMinWidth) {
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, Tools.Calc.lowerBounds(wndMinWidth, 8));
-            final int HEIGHT = 6;
+            final int HEIGHT = showOKButton ? 6 : 5;
             originalText = originalText != null ? originalText : "";
             Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
-            Text textC = components.text.create(0, 3, Tools.Text.toArray(text));
+            Text textC = components.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
 
-            TextField inputTextField = components.textField.create(0, 2, WIDTH - 1, originalText, null, maxInputLength);
+            TextField inputTextField = components.textField.create(0, showOKButton ? 2 : 1, WIDTH - 1, originalText, null, maxInputLength);
 
             ArrayList<Component> componentsList = new ArrayList<>();
             componentsList.add(textC);

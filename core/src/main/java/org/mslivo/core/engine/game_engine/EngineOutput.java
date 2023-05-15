@@ -4,7 +4,7 @@ package org.mslivo.core.engine.game_engine;
 public record EngineOutput(int type, Object... p) {
 
     public Object p(int index) {
-        return (index >= 0 && index < p.length) ? p[index] : null;
+        return (index >= 0 && index < p.length-1) ? p[index] : null;
     }
 
     public int pCount(){
