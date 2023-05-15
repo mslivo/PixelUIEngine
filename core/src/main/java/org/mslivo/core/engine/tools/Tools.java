@@ -13,9 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.function.BiFunction;
 
 public class Tools {
@@ -234,6 +236,14 @@ public class Tools {
 
         public static String[] toArray(String text) {
             return text.split("\n");
+        }
+
+        public static String formatNumber(int number){
+            return NumberFormat.getNumberInstance(Locale.GERMAN).format(number);
+        }
+
+        public static String formatNumber(long number){
+            return NumberFormat.getNumberInstance(Locale.GERMAN).format(number);
         }
 
         public static String format2Decimal(float decimal) {
