@@ -65,7 +65,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         this.mediaManager = (MediaManager) p[2];
         /* Window */
         Window window = api.windows.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, false, true, true);
-        api.windows.addComponent(window, api.toolBox.button_CreateWindowCloseButton(window));
+        api.windows.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
         api.windows.center(window);
 
@@ -87,7 +87,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         tabs.add(api.components.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, components_tab3.toArray(new Component[]{})));
 
 
-        ArrayList<Component> tabBarComponents = api.toolBox.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
+        ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
                 0, null, true, window.height - 4, false);
 
 
@@ -191,7 +191,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        TextField number = api.toolBox.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
+        TextField number = api.preConfigured.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
 
 
         ArrayList<ComboBoxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
@@ -206,9 +206,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal1 = api.components.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", null));
-                api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("FollowUp 1 ", "Modal 1 Example Text", null));
-                api.addWindowAsModal(api.toolBox.modal_CreateYesNoRequester("FollowUp 2 ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.preConfigured.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.preConfigured.modal_CreateYesNoRequester("FollowUp 1 ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.preConfigured.modal_CreateYesNoRequester("FollowUp 2 ", "Modal 1 Example Text", null));
             }
         });
 
@@ -216,7 +216,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal2 = api.components.button.textButton.create(28, 4, 5, 1, "Modal 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.toolBox.modal_CreateMessageRequester("Caption", new String[]{"Modal 2 Example Text"}, null));
+                api.addWindowAsModal(api.preConfigured.modal_CreateMessageRequester("Caption", new String[]{"Modal 2 Example Text"}, null));
             }
         });
 
@@ -225,7 +225,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal3 = api.components.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.toolBox.modal_CreateColorRequester("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
+                api.addWindowAsModal(api.preConfigured.modal_CreateColorRequester("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
             }
         });
 
@@ -268,7 +268,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn3 = api.components.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.toolBox.modal_CreateTextInput("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notifications.create(s))));
+                api.addWindowAsModal(api.preConfigured.modal_CreateTextInput("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notifications.create(s))));
             }
         });
 
@@ -356,7 +356,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setToolTip(imageButton6, api.toolTip.create(Tools.Text.toArray("Button 3\nButtons")));
 
 
-        ArrayList<Component> border = api.toolBox.image_createBorder(10, 4, 4, 4);
+        ArrayList<Component> border = api.preConfigured.image_createBorder(10, 4, 4, 4);
         api.windows.addComponents(window, border.toArray(new Component[]{}));
         api.components.tabBar.tab.addTabComponents(tabImageButton, border.toArray(new Component[]{}));
 
@@ -372,7 +372,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.components.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        ArrayList<Component> separatorHorizontal = api.toolBox.image_CreateSeparatorHorizontal(12, 9, 13);
+        ArrayList<Component> separatorHorizontal = api.preConfigured.image_CreateSeparatorHorizontal(12, 9, 13);
 
         Text text2 = api.components.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
 
@@ -496,11 +496,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.list.setListAction(list2, list2Action);
 
         api.windows.addComponent(window, list1);
-        ScrollBar list1ScrollBar = api.toolBox.list_CreateScrollBar(list1);
+        ScrollBar list1ScrollBar = api.preConfigured.list_CreateScrollBar(list1);
         api.windows.addComponent(window, list1ScrollBar);
 
         api.windows.addComponent(window, list2);
-        ScrollBar list2ScrollBar = api.toolBox.list_CreateScrollBar(list2);
+        ScrollBar list2ScrollBar = api.preConfigured.list_CreateScrollBar(list2);
         api.windows.addComponent(window, list2ScrollBar);
 
 

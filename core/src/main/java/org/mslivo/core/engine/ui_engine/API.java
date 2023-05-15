@@ -98,7 +98,7 @@ public class API {
 
     public final _HotKey hotkey = new _HotKey();
 
-    public final _ToolBox toolBox = new _ToolBox();
+    public final _PreConfigured preConfigured = new _PreConfigured();
 
     private final InputState inputState;
 
@@ -210,7 +210,7 @@ public class API {
 
     }
 
-    public class _ToolBox {
+    public class _PreConfigured {
 
         private final HashSet<Character> numbersAllowedCharacters = new HashSet<>(Arrays.asList('-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 
@@ -523,7 +523,7 @@ public class API {
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
             Window modal = windows.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
-            ImageButton closeButton = toolBox.button_CreateWindowCloseButton(modal);
+            ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
             components.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
@@ -1277,6 +1277,17 @@ public class API {
     public void removeAllScreenComponents() {
         removeScreenComponents(inputState.screenComponents.toArray(new Component[]{}));
         UICommons.resetGUITempVariables(inputState);
+    }
+
+    public ArrayList<Component> findScreenComponentsByName(String name) {
+        if (name == null) return new ArrayList<>();
+        return new ArrayList<>(inputState.screenComponents.stream().filter(component -> name.equals(component.name)).toList());
+    }
+
+    public Component findScreenComponentByName( String name) {
+        if (name == null) return null;
+        ArrayList<Component> result = findScreenComponentsByName(name);
+        return result.size() > 0 ? result.get(0) : null;
     }
 
     public void removeEverything() {
