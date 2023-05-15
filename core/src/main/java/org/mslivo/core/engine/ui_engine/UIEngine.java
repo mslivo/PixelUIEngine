@@ -1134,6 +1134,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Translate MouseXGUI/MouseYGUI to Game X/Y
+        updateGUIMouseBounds();
         updateGameMouseXY();
     }
 
@@ -1407,8 +1408,18 @@ public class UIEngine<T extends UIAdapter> {
         inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
     }
 
+    private void updateGUIMouseBounds() {
+        if(inputState.mouse_gui.x < 0) inputState.mouse_gui.x = 0;
+        if(inputState.mouse_gui.x > inputState.internalResolutionWidth) inputState.mouse_gui.x = inputState.internalResolutionWidth;
+        if(inputState.mouse_gui.y < 0) inputState.mouse_gui.y = 0;
+        if(inputState.mouse_gui.y > inputState.internalResolutionHeight) inputState.mouse_gui.y = inputState.internalResolutionHeight;
+    }
 
     private void updateGameMouseXY() {
+        // Enforce mouse gui x
+
+
+
         // MouseXGUI/MouseYGUI -> To MouseX/MouseY
         inputState.vector_fboCursor.x = inputState.mouse_gui.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_gui.y;
