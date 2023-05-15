@@ -4,10 +4,12 @@ package org.mslivo.core.engine.game_engine;
 public record EngineInput(int type, Object... p) {
 
     public Object p(int index) {
-        return (p.length > 0 && index >= 0 && index < p.length) ? p[index] : null;
+        if(p == null || p.length == 0) return null;
+        return (index >= 0 && index < p.length) ? p[index] : null;
     }
 
     public int pCount(){
-        return p.length;
+        if(p == null) return 0;
+        return p != null ? p.length : 0;
     }
 }
