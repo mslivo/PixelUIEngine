@@ -104,7 +104,7 @@ public class ParticleSystem<P extends Particle> {
                     mediaManager.drawCMediaArrayScale(batch, (CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
                 }
                 case ANIMATION -> {
-                    mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, animation_timer, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
+                    mediaManager.drawCMediaAnimationScale(batch, (CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer+particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
                 }
                 case CURSOR -> {
                     mediaManager.drawCMediaCursor(batch, (CMediaCursor) particle.appearance, particle.x, particle.y);
