@@ -93,6 +93,38 @@ public class MediaManager {
         loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
+
+    private TextureRegion[] splitFrames(String file, int tile_width, int tile_height, int frameOffset, int frameLength) {
+        TextureRegion textureRegion = textureAtlas.findRegion(file);
+        int width = (textureRegion.getRegionWidth() / tile_width);
+        int height = (textureRegion.getRegionHeight() / tile_height);
+        int maxFrames = Tools.Calc.upperBounds(width * height, frameLength);
+
+        int frameCount = maxFrames-frameOffset;
+        if (frameCount == 0) return new TextureRegion[]{};
+        if (frameCount < 0)
+            throw new RuntimeException("Error loading: \"" + file + "\": Negative frameCount = " + frameCount);
+
+
+        TextureRegion[][] tmp = textureRegion.split(tile_width, tile_height);
+        TextureRegion[] result = new TextureRegion[frameCount];
+        int allCounter = 0;
+        int indexCounter = 0;
+        framesLoop:
+
+        for (int ix = 0; ix < tmp.length; ix++) {
+            for (int iy = 0; iy < tmp[0].length; iy++) {
+                allCounter++;
+                if (allCounter > frameOffset) {
+                    result[indexCounter] = tmp[ix][iy];
+                    indexCounter++;
+                }
+                if (allCounter >= frameLength) break framesLoop;
+            }
+        }
+        return result;
+    }
+
     public void loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
 
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
@@ -104,7 +136,7 @@ public class MediaManager {
 
         // Split into Image and Sound Data
         CMedia loadMedia;
-        while((loadMedia = loadMediaList.poll()) != null){
+        while ((loadMedia = loadMediaList.poll()) != null) {
             if (!loadedMediaList.contains(loadMedia)) {
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
                     imageData.add(loadMedia);
@@ -116,7 +148,7 @@ public class MediaManager {
                     loadedMediaList.add(loadMedia);
                     stepsMax += 1;
                 } else {
-                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName()+"\"");
+                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName() + "\"");
                 }
             }
         }
@@ -137,7 +169,7 @@ public class MediaManager {
 
 
         // 2. Create Image Texture Atlas
-        if(anyImageData) {
+        if (anyImageData) {
             pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
         }
 
@@ -152,35 +184,13 @@ public class MediaManager {
                 medias_cursors.put(cMediaCursor, textureAtlas.findRegion(imageMedia.file));
             } else if (imageMedia.getClass() == CMediaArray.class) {
                 CMediaArray cMediaArray = (CMediaArray) imageMedia;
-                TextureRegion textureRegion = textureAtlas.findRegion(cMediaArray.file);
-                int width = (textureRegion.getRegionWidth() / cMediaArray.tile_width);
-                int height = (textureRegion.getRegionHeight() / cMediaArray.tile_height);
-                int count = width * height;
-                TextureRegion[][] tmp = textureRegion.split(cMediaArray.tile_width, cMediaArray.tile_height);
-                int tmpCount = 0;
-                TextureRegion[] result = new TextureRegion[count];
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        result[tmpCount++] = tmp[y][x];
-                    }
-                }
+                TextureRegion[] result = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
+                        cMediaArray.frameOffset, cMediaArray.frameLength);
                 medias_arrays.put(cMediaArray, result);
             } else if (imageMedia.getClass() == CMediaAnimation.class) {
                 CMediaAnimation cMediaAnimation = (CMediaAnimation) imageMedia;
-                TextureRegion textureRegion = textureAtlas.findRegion(cMediaAnimation.file);
-                int width = (textureRegion.getRegionWidth() / cMediaAnimation.tile_width);
-                int height = (textureRegion.getRegionHeight() / cMediaAnimation.tile_height);
-                int count = width * height;
-                TextureRegion[][] tmp = textureRegion.split(cMediaAnimation.tile_width, cMediaAnimation.tile_height);
-                TextureRegion[] result = new TextureRegion[count];
-                int tmpCount = 0;
-                framesLoop:
-                for (TextureRegion[] textureRegions : tmp) {
-                    for (int y = 0; y < tmp[0].length; y++) {
-                        result[tmpCount++] = textureRegions[y];
-                        if (tmpCount >= cMediaAnimation.frames) break framesLoop;
-                    }
-                }
+                TextureRegion[] result = splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
+                        cMediaAnimation.frameOffset, cMediaAnimation.frameLength);
                 Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
                 medias_animations.put(cMediaAnimation, animation);
             } else if (imageMedia.getClass() == CMediaFont.class) {
@@ -210,7 +220,6 @@ public class MediaManager {
                     medias_music.put(cMediaMusic, music);
                 }
             }
-
 
 
             step++;
@@ -577,16 +586,17 @@ public class MediaManager {
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
-        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, Integer.MAX_VALUE);
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE);
     }
 
-    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frames) {
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
         CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
         cMediaAnimation.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
         cMediaAnimation.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
         cMediaAnimation.animation_speed = animation_speed;
-        cMediaAnimation.frames = Tools.Calc.lowerBounds(frames, 1);
+        cMediaAnimation.frameOffset = Tools.Calc.lowerBounds(frameOffset, 0);
+        cMediaAnimation.frameLength = frameLength;
         return cMediaAnimation;
     }
 
@@ -609,10 +619,16 @@ public class MediaManager {
     }
 
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight) {
+        return create_CMediaArray(file, tileWidth, tileHeight, 0, Integer.MAX_VALUE);
+    }
+
+    public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
         CMediaArray cMediaArray = new CMediaArray(file);
         cMediaArray.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
         cMediaArray.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
+        cMediaArray.frameOffset = Tools.Calc.lowerBounds(frameOffset, 0);
+        cMediaArray.frameLength = frameLength;
         return cMediaArray;
     }
 

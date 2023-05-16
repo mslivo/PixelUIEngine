@@ -9,9 +9,9 @@ public class CMediaAnimation extends CMediaGFX implements Serializable {
     public int tile_height;
 
     public float animation_speed;
+    public int frameOffset;
 
-    public int frames;
-
+    public int frameLength;
     public CMediaAnimation(String filename) {
         super(filename);
     }

@@ -8,6 +8,10 @@ public class CMediaArray extends CMediaGFX implements Serializable {
 
     public int tile_height;
 
+    public int frameOffset;
+
+    public int frameLength;
+
     public CMediaArray(String filename) {
         super(filename);
     }

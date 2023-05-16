@@ -21,7 +21,7 @@ public class GUIBaseMedia {
     public static final CMediaArray GUI_SCROLLBAR_BUTTON_HORIZONAL = MediaManager.create_CMediaArray(guiDirectory + "scrollbar_button_horizontal.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaImage GUI_LIST = MediaManager.create_CMediaImage(guiDirectory + "list.png");
     public static final CMediaImage GUI_LIST_SELECTED = MediaManager.create_CMediaImage(guiDirectory + "list_selected.png");
-    public static final CMediaArray GUI_LIST_DRAG = MediaManager.create_CMediaArray(guiDirectory + "list_drag.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * 2);
+    public static final CMediaArray GUI_LIST_DRAG = MediaManager.create_CMediaArray(guiDirectory + "list_drag.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * 2,1,3);
     public static final CMediaArray GUI_COMBOBOX = MediaManager.create_CMediaArray(guiDirectory + "combobox.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_TAB_BORDERS = MediaManager.create_CMediaArray(guiDirectory + "tab_border.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_BORDERS = MediaManager.create_CMediaArray(guiDirectory + "border.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);

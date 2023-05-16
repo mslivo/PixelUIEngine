@@ -1828,59 +1828,65 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitlebar) {
-        if (x == 0 && y == 0) return 2;
-        if (x == width - 1 && y == height - 1) return hasTitlebar ? 6 : 11;
-        if (x == width - 1 && y == 0) return 8;
-        if (x == 0 && y == height - 1) return hasTitlebar ? 0 : 9;
-        if (x == 0) return 1;
-        if (x == width - 1) return 7;
-        if (y == 0) return 5;
-        if (y == height - 1) return hasTitlebar ? 3 : 10;
-
-        return 4;
+    private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitleBar) {
+        if(hasTitleBar){
+            if(y == (height-1)){
+                if(x == 0){
+                    return 12;
+                }else if(x==width-1){
+                    return 14;
+                }else{
+                    return 13;
+                }
+            }else{
+                return render_get16TilesCMediaIndex(x,y,width,height);
+            }
+        }else{
+            return render_get16TilesCMediaIndex(x,y,width,height);
+        }
     }
+
 
     private int render_getListDragCMediaIndex(int x, int width) {
         return x == 0 ? 0 : x == (width - 1) ? 2 : 1;
     }
 
-    private int render_getComponent16TilesCMediaIndex(int x, int y, int width, int height) {
-        if (width == 1 && height == 1) return 12;
+    private int render_get16TilesCMediaIndex(int x, int y, int width, int height) {
+        if (width == 1 && height == 1) return 3;
         if (width == 1) {
             if (y == 0) {
-                return 15;
+                return 7;
             } else if (y == height - 1) {
-                return 13;
+                return 15;
             } else {
-                return 14;
+                return 11;
             }
         } else if (height == 1) {
             if (x == 0) {
-                return 3;
+                return 12;
             } else if (x == width - 1) {
-                return 11;
+                return 14;
             } else {
-                return 7;
+                return 13;
             }
         } else {
             if (x == 0 && y == 0) {
-                return 2;
-            } else if (x == width - 1 && y == height - 1) {
                 return 8;
+            } else if (x == width - 1 && y == height - 1) {
+                return 2;
             } else if (x == width - 1 && y == 0) {
                 return 10;
             } else if (x == 0 && y == height - 1) {
                 return 0;
             } else {
                 if (x == 0) {
-                    return 1;
-                } else if (x == width - 1) {
-                    return 9;
-                } else if (y == 0) {
-                    return 6;
-                } else if (y == height - 1) {
                     return 4;
+                } else if (x == width - 1) {
+                    return 6;
+                } else if (y == 0) {
+                    return 9;
+                } else if (y == height - 1) {
+                    return 1;
                 } else {
                     return 5;
                 }
@@ -1888,18 +1894,15 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private int render_getComponent9TilesCMediaIndex(int x, int y, int width, int height) {
-        if (x == 0 && y == 0) return 0;
-        if (x == width - 1 && y == 0) return 6;
-        if (x == 0 && y == (height - 1)) return 2;
-        if (x == width - 1 && y == (height - 1)) return 8;
-
-        if (y == 0) return 3;
-        if (y == (height - 1)) return 5;
-        if (x == 0) return 1;
-        if (x == width - 1) return 7;
-
-
+    private int render_get9TilesCMediaIndex(int x, int y, int width, int height) {
+        if (x == 0 && y == 0) return 6;
+        if (x == width - 1 && y == 0) return 8;
+        if (x == 0 && y == (height - 1)) return 0;
+        if (x == width - 1 && y == (height - 1)) return 2;
+        if (y == 0) return 7;
+        if (y == (height - 1)) return 1;
+        if (x == 0) return 3;
+        if (x == width - 1) return 5;
         return 4;
     }
 
@@ -1917,7 +1920,7 @@ public class UIEngine<T extends UIAdapter> {
                 for (int iy = 0; iy < height; iy++) {
                     ComboBoxItem comboBoxItem = combobox.items.get(iy);
                     for (int ix = 0; ix < width; ix++) {
-                        int index = render_getComponent9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                        int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                         CMediaArray cMenuTexture;
                         if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
                             cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
@@ -1955,7 +1958,7 @@ public class UIEngine<T extends UIAdapter> {
             for (int iy = 0; iy < height; iy++) {
                 ContextMenuItem contextMenuItem = contextMenu.items.get(iy);
                 for (int ix = 0; ix < width; ix++) {
-                    int index = render_getComponent9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                    int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     CMediaArray cMenuTexture;
                     if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
@@ -2087,7 +2090,7 @@ public class UIEngine<T extends UIAdapter> {
                     int titleIndex = (tx == 0 ? 0 : ((tx == tooltip_width - 1) ? 2 : 1));
                     render_drawCMediaGFX(GUIBaseMedia.GUI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
                 } else {
-                    render_drawCMediaGFX(GUIBaseMedia.GUI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_getComponent16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
                 }
             }
         }
@@ -2199,7 +2202,7 @@ public class UIEngine<T extends UIAdapter> {
 
             for (int ix = 0; ix < button.width; ix++) {
                 for (int iy = 0; iy < button.height; iy++) {
-                    render_drawCMediaGFX(buttonMedia, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_getComponent16TilesCMediaIndex(ix, iy, button.width, button.height));
+                    render_drawCMediaGFX(buttonMedia, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_get16TilesCMediaIndex(ix, iy, button.width, button.height));
                 }
             }
             if (button.getClass() == TextButton.class) {
@@ -2456,7 +2459,7 @@ public class UIEngine<T extends UIAdapter> {
                         } else {
                             render_batchSetColorWhite(alpha);
                         }
-                        int index = inventory.doubleSized ? render_getComponent16TilesCMediaIndex(ix, iy, inventory.width / 2, inventory.height / 2) : render_getComponent16TilesCMediaIndex(ix, iy, inventory.width, inventory.height);
+                        int index = inventory.doubleSized ? render_get16TilesCMediaIndex(ix, iy, inventory.width / 2, inventory.height / 2) : render_get16TilesCMediaIndex(ix, iy, inventory.width, inventory.height);
                         render_drawCMediaGFX(cellMedia, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), index);
 
                         // Draw Icon
