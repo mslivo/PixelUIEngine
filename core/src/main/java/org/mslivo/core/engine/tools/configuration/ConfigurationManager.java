@@ -18,12 +18,12 @@ public class ConfigurationManager {
 
     private Path file;
 
-    private final HashMap<String, Configuration> configurations;
+    private final HashMap<String, ConfigurationEntry> entries;
 
     private boolean initialized;
 
     public ConfigurationManager() throws ConfigurationException {
-        this.configurations = new HashMap<>();
+        this.entries = new HashMap<>();
         this.properties = new Properties();
         this.initialized = false;
     }
@@ -103,14 +103,14 @@ public class ConfigurationManager {
 
     public void addOption(String name, String defaultValue, Function<String, Boolean> validateFunction) {
         checkInitialized();
-        if (configurations.get(name) == null) {
-            Configuration configuration = new Configuration(name, defaultValue, validateFunction);
-            this.configurations.put(configuration.name(), configuration);
-            if (this.properties.getProperty(configuration.name()) == null) {
-                this.properties.setProperty(configuration.name(), configuration.defaultValue());
+        if (entries.get(name) == null) {
+            ConfigurationEntry configurationEntry = new ConfigurationEntry(name, defaultValue, validateFunction);
+            this.entries.put(configurationEntry.name(), configurationEntry);
+            if (this.properties.getProperty(configurationEntry.name()) == null) {
+                this.properties.setProperty(configurationEntry.name(), configurationEntry.defaultValue());
             } else {
                 // already loaded
-                validateProperty(configuration.name());
+                validateProperty(configurationEntry.name());
             }
             saveToFile();
         }
@@ -118,25 +118,25 @@ public class ConfigurationManager {
 
     public void removeOption(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            this.properties.remove(configuration.name());
-            this.configurations.remove(configuration.name());
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
+            this.properties.remove(configurationEntry.name());
+            this.entries.remove(configurationEntry.name());
             saveToFile();
         }
     }
 
     public void setToDefault(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            set(configuration.name(), configuration.defaultValue());
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
+            set(configurationEntry.name(), configurationEntry.defaultValue());
         }
     }
 
     public void setAllToDefault() {
         checkInitialized();
-        for (String optionsName : configurations.keySet()) {
+        for (String optionsName : entries.keySet()) {
             setToDefault(optionsName);
         }
     }
@@ -158,21 +158,21 @@ public class ConfigurationManager {
 
     public boolean getBoolean(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
+        ConfigurationEntry configurationEntry = entries.get(name);
         int value = 0;
-        if (configuration != null) {
-            return this.properties.getProperty(configuration.name()).equals("true");
+        if (configurationEntry != null) {
+            return this.properties.getProperty(configurationEntry.name()).equals("true");
         }
         return false;
     }
 
     public float getFloat(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
+        ConfigurationEntry configurationEntry = entries.get(name);
         float value = 0;
-        if (configuration != null) {
+        if (configurationEntry != null) {
             try {
-                value = Float.parseFloat(this.properties.getProperty(configuration.name()));
+                value = Float.parseFloat(this.properties.getProperty(configurationEntry.name()));
             } catch (Exception e) {
             }
         }
@@ -181,11 +181,11 @@ public class ConfigurationManager {
 
     public int getInt(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
+        ConfigurationEntry configurationEntry = entries.get(name);
         int value = 0;
-        if (configuration != null) {
+        if (configurationEntry != null) {
             try {
-                value = Integer.parseInt(this.properties.getProperty(configuration.name()));
+                value = Integer.parseInt(this.properties.getProperty(configurationEntry.name()));
             } catch (Exception e) {
             }
         }
@@ -235,17 +235,17 @@ public class ConfigurationManager {
 
     public String get(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            return this.properties.getProperty(configuration.name());
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
+            return this.properties.getProperty(configurationEntry.name());
         }
         return null;
     }
 
     public String[] getStringList(String name) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
             return get(name).split(";");
         }
         return null;
@@ -258,8 +258,8 @@ public class ConfigurationManager {
 
     public void setStringList(String name, String[] values) {
         checkInitialized();
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
             set(name, String.join(";", values));
         }
     }
@@ -270,27 +270,27 @@ public class ConfigurationManager {
     }
 
     private void validateAllProperties() {
-        for (String name : configurations.keySet()) {
+        for (String name : entries.keySet()) {
             validateProperty(name);
         }
     }
 
     private void validateProperty(String name) {
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            if (!configuration.validate().apply(properties.getProperty(name))) {
-                this.properties.setProperty(name, configuration.defaultValue());
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
+            if (!configurationEntry.validate().apply(properties.getProperty(name))) {
+                this.properties.setProperty(name, configurationEntry.defaultValue());
             }
         }
     }
 
     public void set(String name, String value) {
         if (value == null) return;
-        Configuration configuration = configurations.get(name);
-        if (configuration != null) {
-            String oldValue = this.properties.getProperty(configuration.name());
-            this.properties.setProperty(configuration.name(), value);
-            validateProperty(configuration.name());
+        ConfigurationEntry configurationEntry = entries.get(name);
+        if (configurationEntry != null) {
+            String oldValue = this.properties.getProperty(configurationEntry.name());
+            this.properties.setProperty(configurationEntry.name(), value);
+            validateProperty(configurationEntry.name());
             if (oldValue != null && !oldValue.equals(value)) {
                 saveToFile();
             }
