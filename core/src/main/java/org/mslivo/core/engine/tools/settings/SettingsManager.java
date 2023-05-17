@@ -169,42 +169,39 @@ public class SettingsManager {
         return value;
     }
 
-    public static String getIfValidString(String value) throws ValueInvalidException {
-        if(value == null) throw new ValueInvalidException(value+" not a valid String");
-        return value;
+    public static boolean isValidString(String value) {
+        if(value == null) return false;
+        return true;
     }
 
-    public static boolean getIfValidBoolean(String value) throws ValueInvalidException {
-        if (value == null) throw new ValueInvalidException(value+" not a valid boolean");
-        boolean boolValue;
+    public static boolean isValidBoolean(String value) {
+        if (value == null) return false;
         try {
-            boolValue = Boolean.parseBoolean(value);
+            Boolean.parseBoolean(value);
         } catch (NumberFormatException e) {
-            throw new ValueInvalidException(value+" not a valid boolean");
+            return false;
         }
-        return boolValue;
+        return true;
     }
 
-    public static float getIfValidFloat(String value) throws ValueInvalidException {
-        if (value == null) throw new ValueInvalidException(value+" not a valid boolean");
-        float floatValue;
+    public static boolean isValidFloat(String value) {
+        if (value == null) return false;
         try {
-            floatValue = Float.parseFloat(value);
+            Float.parseFloat(value);
         } catch (NumberFormatException e) {
-            throw new ValueInvalidException(value+" not a valid boolean");
+            return false;
         }
-        return floatValue;
+        return true;
     }
 
-    public static int getIfValidInt(String value) throws ValueInvalidException {
-        if (value == null) throw new ValueInvalidException(value+" not a valid int");
-        int intValue;
+    public static boolean isValidInt(String value)  {
+        if (value == null) return false;
         try {
-            intValue = Integer.parseInt(value);
+            Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new ValueInvalidException(value+" not a valid int");
+            return false;
         }
-        return intValue;
+        return true;
     }
 
     public String get(String name) {
