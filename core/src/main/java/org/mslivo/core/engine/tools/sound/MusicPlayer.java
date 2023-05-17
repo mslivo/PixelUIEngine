@@ -47,11 +47,10 @@ public class MusicPlayer {
         this.playCurrent = null;
         this.playCurrentFileName = "";
         this.playListPosition = 0;
-        this.volume = 1f;
         this.muteVolume = 0;
         this.randomHistory = new ArrayDeque<>();
         this.playNext = this.playPrevious = false;
-
+        this.volume = 1f;
     }
 
     public void playlist_clear(){
@@ -249,16 +248,15 @@ public class MusicPlayer {
         this.state = STATE_STOP;
     }
 
-    public void mute() {
-        this.muteVolume = this.volume;
-        setVolume(0f);
+    public void setMuted(boolean muted) {
+        if(muted){
+            this.muteVolume = this.volume;
+            setVolume(0f);
+        }else{
+            setVolume(this.muteVolume);
+            this.muteVolume = 0;
+        }
     }
-
-    public void unmute() {
-        setVolume(this.muteVolume);
-        this.muteVolume = 0;
-    }
-
 
     public void shutdown(){
         this.playCurrent = null;

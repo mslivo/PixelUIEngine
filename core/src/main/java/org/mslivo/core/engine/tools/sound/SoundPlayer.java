@@ -22,11 +22,10 @@ public class SoundPlayer {
         this(mediaManager, 0);
     }
     public SoundPlayer(MediaManager mediaManager, int range2D) {
-        this.volume = 0;
         this.mediaManager = mediaManager;
         this.muteVolume = 0;
-        set2DRange(range2D);
-        setVolume(1f);
+        this.volume = 1f;
+        setRange2D(range2D);
     }
 
     public float volume() {
@@ -37,7 +36,7 @@ public class SoundPlayer {
         this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
     }
 
-    private void set2DRange(int range2D) {
+    private void setRange2D(int range2D) {
         this.range = Tools.Calc.lowerBounds(range2D, 1);
     }
 
@@ -92,14 +91,14 @@ public class SoundPlayer {
         mediaManager.getCMediaSound(cMediaSound).setVolume(id, this.volume*volume);
     }
 
-    public void mute() {
-        this.muteVolume = this.volume;
-        setVolume(0f);
-    }
-
-    public void unmute() {
-        setVolume(this.muteVolume);
-        this.muteVolume = 0;
+    public void setMuted(boolean muted) {
+        if(muted){
+            this.muteVolume = this.volume;
+            setVolume(0f);
+        }else{
+            setVolume(this.muteVolume);
+            this.muteVolume = 0;
+        }
     }
 
     public void update() {
