@@ -39,6 +39,8 @@ public class MusicPlayer {
 
     public float muteVolume;
 
+    private boolean muted;
+
     public MusicPlayer(MediaManager mediaManager){
         this.mediaManager = mediaManager;
         this.playlist = new ArrayList<>();
@@ -47,10 +49,11 @@ public class MusicPlayer {
         this.playCurrent = null;
         this.playCurrentFileName = "";
         this.playListPosition = 0;
-        this.muteVolume = 0;
         this.randomHistory = new ArrayDeque<>();
         this.playNext = this.playPrevious = false;
         this.volume = 1f;
+        this.muted = false;
+        this.muteVolume = 0;
     }
 
     public void playlist_clear(){
@@ -249,13 +252,15 @@ public class MusicPlayer {
     }
 
     public void setMuted(boolean muted) {
-        if(muted){
+        if(!this.muted && muted){
             this.muteVolume = this.volume;
             setVolume(0f);
-        }else{
+        }
+        if(this.muted && !muted){
             setVolume(this.muteVolume);
             this.muteVolume = 0;
         }
+        this.muted = muted;
     }
 
     public void shutdown(){

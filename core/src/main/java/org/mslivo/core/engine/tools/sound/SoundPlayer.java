@@ -18,13 +18,16 @@ public class SoundPlayer {
 
     private float muteVolume;
 
+    private boolean muted;
+
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
     }
     public SoundPlayer(MediaManager mediaManager, int range2D) {
         this.mediaManager = mediaManager;
-        this.muteVolume = 0;
         this.volume = 1f;
+        this.muted = false;
+        this.muteVolume = 0;
         setRange2D(range2D);
     }
 
@@ -92,15 +95,16 @@ public class SoundPlayer {
     }
 
     public void setMuted(boolean muted) {
-        if(muted){
+        if(!this.muted && muted){
             this.muteVolume = this.volume;
             setVolume(0f);
-        }else{
+        }
+        if(this.muted && !muted){
             setVolume(this.muteVolume);
             this.muteVolume = 0;
         }
+        this.muted = muted;
     }
-
     public void update() {
         update(0,0);
     }
