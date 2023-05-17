@@ -1805,6 +1805,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawCursor() {
         render_drawCMediaGFX(inputState.cursor, inputState.mouse_gui.x, inputState.mouse_gui.y);
+        render_batchSetColorWhite(1f);
     }
 
 
@@ -1943,6 +1944,7 @@ public class UIEngine<T extends UIAdapter> {
 
         }
 
+        render_batchSetColorWhite(1f);
     }
 
     private void render_drawContextMenu() {
@@ -1981,6 +1983,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
+        render_batchSetColorWhite(1f);
     }
 
     private void render_drawTooltip() {
@@ -1989,8 +1992,6 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.tooltip.lines == null || inputState.tooltip.lines.length == 0) return;
 
         ToolTip tooltip = inputState.tooltip;
-
-        render_batchSaveColor();
 
         int text_width_max = 0;
         for (int i = 0; i < tooltip.lines.length; i++) {
@@ -2117,14 +2118,14 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        render_batchLoadColor();
+        render_batchSetColorWhite(1f);
     }
 
     private void render_drawNotifications() {
         if (inputState.notifications.size() == 0) return;
         int width = (inputState.internalResolutionWidth % TILE_SIZE == 0) ? (inputState.internalResolutionWidth / TILE_SIZE) : ((inputState.internalResolutionWidth / TILE_SIZE) + 1);
 
-        render_batchSaveColor();
+
 
         int y = 0;
         int yOffsetSlideFade = 0;
@@ -2134,6 +2135,7 @@ public class UIEngine<T extends UIAdapter> {
                 float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) api.config.getNotificationsFadeoutTime());
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TILE_SIZE * (fadeoutProgress));
             }
+            render_batchSaveColor();
             render_batchSetColor(notification.color_r, notification.color_g, notification.color_b, notification.color_a);
             for (int ix = 0; ix < width; ix++) {
                 render_drawCMediaGFX(GUIBaseMedia.GUI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
@@ -2141,14 +2143,14 @@ public class UIEngine<T extends UIAdapter> {
             int xOffset = ((width * TILE_SIZE) / 2) - (mediaManager.textWidth(notification.font, notification.text) / 2) - notification.scroll;
             render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
             y = y + 1;
+            render_batchLoadColor();
         }
 
-        render_batchLoadColor();
+        render_batchSetColorWhite(1f);
     }
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        render_batchSaveColor();
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
@@ -2182,7 +2184,7 @@ public class UIEngine<T extends UIAdapter> {
             if (!window.folded) render_drawComponentTopLayer(window, component);
         }
 
-        render_batchLoadColor();
+        render_batchSetColorWhite(1f);
     }
 
 
@@ -2595,11 +2597,10 @@ public class UIEngine<T extends UIAdapter> {
 
 
         render_enableGrayScaleShader(disableShaderState);
+        render_batchSetColorWhite(1f);
     }
 
     private void render_drawCursorListDrags() {
-        render_batchSaveColor();
-
         if (inputState.inventoryDrag_Inventory != null) {
             Inventory dragInventory = inputState.inventoryDrag_Inventory;
             int dragOffsetX = inputState.inventoryDrag_offset.x;
@@ -2630,7 +2631,6 @@ public class UIEngine<T extends UIAdapter> {
 
 
         render_batchSetColorWhite(1f);
-        render_batchLoadColor();
     }
 
 
