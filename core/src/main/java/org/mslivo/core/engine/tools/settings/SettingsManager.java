@@ -170,41 +170,42 @@ public class SettingsManager {
         return value;
     }
 
-    public String checkString(String value) {
-        return value;
+    public boolean checkString(String value) {
+        if(value == null) return false;
+        return true;
     }
 
-    public Boolean checkBoolean(String value) {
-        if (value == null) return null;
+    public boolean checkBoolean(String value) {
+        if (value == null) return false;
         boolean boolValue;
         try {
             boolValue = Boolean.parseBoolean(value);
         } catch (NumberFormatException e) {
-            return null;
+            return false;
         }
-        return boolValue;
+        return true;
     }
 
-    public Float checkFloat(String value) {
-        if (value == null) return null;
+    public boolean checkFloat(String value) {
+        if (value == null) return false;
         float floatValue;
         try {
             floatValue = Float.parseFloat(value);
         } catch (NumberFormatException e) {
-            return null;
+            return false;
         }
-        return floatValue;
+        return true;
     }
 
-    public Integer checkInt(String value) {
-        if (value == null) return null;
+    public boolean checkInt(String value) {
+        if (value == null) return false;
         int intValue;
         try {
             intValue = Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            return null;
+            return false;
         }
-        return intValue;
+        return true;
     }
 
     public String get(String name) {
