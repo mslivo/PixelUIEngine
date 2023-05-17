@@ -28,6 +28,7 @@ import org.mslivo.core.engine.ui_engine.gui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ImageButton;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
@@ -490,7 +491,7 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
                     } else if (inputState.lastGUIMouseHover instanceof Button button) {
                         inputState.pressedButton = button;
-                        if (button.toggleMode) {
+                        if (button.mode == ButtonMode.TOGGLE) {
                             button.pressed = !button.pressed;
                         } else {
                             button.pressed = true;
@@ -498,7 +499,7 @@ public class UIEngine<T extends UIAdapter> {
 
                         if (button.buttonAction != null) {
                             button.buttonAction.onPress();
-                            if (button.toggleMode) button.buttonAction.onToggle(button.pressed);
+                            if (button.mode == ButtonMode.TOGGLE) button.buttonAction.onToggle(button.pressed);
                             inputState.pressedButton_timer_hold = 0;
                         }
                     } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
@@ -730,8 +731,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             if (inputState.pressedButton != null) {
                 Button pressedButton = inputState.pressedButton;
-                if (!pressedButton.toggleMode)
-                    pressedButton.pressed = false;
+                if (pressedButton.mode != ButtonMode.TOGGLE) pressedButton.pressed = false;
                 if (pressedButton.buttonAction != null) pressedButton.buttonAction.onRelease();
                 inputState.pressedButton = null;
             }
@@ -940,7 +940,7 @@ public class UIEngine<T extends UIAdapter> {
     private void updateButtonHoldActions() {
         /* Button Hold Interactions */
         if (inputState.pressedButton != null) {
-            if (inputState.pressedButton.canHold) {
+            if (inputState.pressedButton.mode == ButtonMode.HOLD) {
                 inputState.pressedButton_timer_hold = inputState.pressedButton_timer_hold + 1;
                 if (inputState.pressedButton_timer_hold > api.config.getButtonHoldTimer()) {
                     if (inputState.pressedButton.buttonAction != null)

@@ -1,6 +1,7 @@
 package org.mslivo.core.engine.tools.settings;
 
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.tools.particles.particle.ParticleType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -136,6 +137,11 @@ public class SettingsManager {
         set(name, boolValue ? "true" : "false");
     }
 
+    public<T extends Enum<T>> void setEnum(String name, Enum<T> enumValue){
+        set(name, enumValue.name());
+    };
+
+
     public boolean getBoolean(String name) {
         SettingsEntry settingsEntry = entries.get(name);
         int value = 0;
@@ -194,6 +200,10 @@ public class SettingsManager {
         return true;
     }
 
+    public static <T extends Enum<T>> boolean isValidEnum(String value, Class<T> enumClass){
+        return Enum.valueOf(enumClass, value) != null;
+    };
+
     public static boolean isValidInt(String value)  {
         if (value == null) return false;
         try {
@@ -204,31 +214,29 @@ public class SettingsManager {
         return true;
     }
 
-    public String get(String name) {
+    public String getString(String name) {
         SettingsEntry settingsEntry = entries.get(name);
-        if (settingsEntry != null) {
-            return this.properties.getProperty(settingsEntry.name());
-        }
+        if (settingsEntry != null) return this.properties.getProperty(settingsEntry.name());
         return null;
     }
+
+    public<T extends Enum<T>> T getEnum(String name, Class<T> enumClass){
+        SettingsEntry settingsEntry = entries.get(name);
+        if (settingsEntry != null) return Enum.valueOf(enumClass, this.properties.getProperty(settingsEntry.name())) ;
+        return null;
+    };
+
 
     public String[] getStringList(String name) {
         SettingsEntry settingsEntry = entries.get(name);
-        if (settingsEntry != null) {
-            return get(name).split(";");
-        }
+        if (settingsEntry != null) return getString(name).split(";");
         return null;
-    }
-
-    public String checkStringList(String value) {
-        return value;
     }
 
     public void setStringList(String name, String[] values) {
         SettingsEntry settingsEntry = entries.get(name);
-        if (settingsEntry != null) {
-            set(name, String.join(";", values));
-        }
+        if (settingsEntry != null) set(name, String.join(";", values));
+
     }
 
     private void validateAllProperties() {
@@ -246,7 +254,11 @@ public class SettingsManager {
         }
     }
 
-    public void set(String name, String value) {
+    public void setString(String name, String value) {
+        set(name, value);
+    }
+
+    private void set(String name, String value) {
         if (value == null) return;
         SettingsEntry settingsEntry = entries.get(name);
         if (settingsEntry != null) {
@@ -258,6 +270,7 @@ public class SettingsManager {
             }
         }
     }
+
 
     private void saveToFile() {
         try {

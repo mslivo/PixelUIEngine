@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
+import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -259,7 +260,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             public void onToggle(boolean value) {
                 api.input.setMousePosition(100,100);
             }
-        }, null, false, true);
+        }, null, ButtonMode.TOGGLE);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);
         api.components.button.centerContent(textBtn1);
         api.components.setColor(textBtn1, Tools.Colors.BLUE_BRIGHT);
@@ -330,10 +331,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         };
         api.components.button.setButtonAction(imageButton2, imageButton2Action);
 
-        ImageButton imageButton3 = api.components.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, false, true);
-        ImageButton imageButton4 = api.components.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 0, null, false, true);
-        ImageButton imageButton5 = api.components.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 0, null, false, true);
-        ImageButton imageButton6 = api.components.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_4, 0, null, false, true);
+        ImageButton imageButton3 = api.components.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton4 = api.components.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton5 = api.components.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton6 = api.components.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_4, 0, null, ButtonMode.TOGGLE);
 
         api.components.button.centerContent(imageButton3);
         api.components.button.centerContent(imageButton4);

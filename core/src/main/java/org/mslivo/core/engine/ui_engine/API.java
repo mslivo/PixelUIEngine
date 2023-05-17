@@ -19,6 +19,7 @@ import org.mslivo.core.engine.ui_engine.gui.WindowGenerator;
 import org.mslivo.core.engine.ui_engine.gui.actions.*;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ImageButton;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
@@ -412,7 +413,7 @@ public class API {
 
         public HotKeyAction hotkey_CreateForButton(Button button) {
             HotKeyAction hotKeyAction;
-            if (button.toggleMode) {
+            if (button.mode == ButtonMode.TOGGLE) {
                 hotKeyAction = new HotKeyAction() {
                     @Override
                     public void onPress() {
@@ -3280,16 +3281,9 @@ public class API {
                 }
             }
 
-            public void setCanHold(Button button, boolean canHold) {
+            public void setButtonMode(Button button, ButtonMode buttonMode) {
                 if (button == null) return;
-                button.canHold = canHold;
-                if (button.canHold && button.toggleMode) setToggleMode(button, false);
-            }
-
-            public void setToggleMode(Button button, boolean toggleMode) {
-                if (button == null) return;
-                button.toggleMode = toggleMode;
-                if (button.toggleMode && button.canHold) setCanHold(button, false);
+                button.mode = buttonMode;
             }
 
             public void setOffsetContent(Button button, int x, int y) {
@@ -3306,11 +3300,10 @@ public class API {
                 }
             }
 
-            private void setButtonValues(Button button, ButtonAction buttonAction, boolean canHold, boolean toggleMode, boolean pressed, int contentOffsetX, int contentOffsetY) {
+            private void setButtonValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
                 setButtonAction(button, buttonAction);
-                setPressed(button, pressed);
-                setCanHold(button, canHold);
-                setToggleMode(button, toggleMode);
+                setButtonMode(button, buttonMode);
+                setPressed(button, false);
                 setOffsetContent(button, contentOffsetX, contentOffsetY);
             }
 
@@ -3355,40 +3348,30 @@ public class API {
 
             public class _TextButton {
                 public TextButton create(int x, int y, int width, int height, String text) {
-                    return create(x, y, width, height, text, defaultButtonAction(), null, false, false, false, 0, 0, null);
+                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, null);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                    return create(x, y, width, height, text, buttonAction, null, false, false, false, 0, 0, null);
+                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, null);
                 }
 
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon) {
-                    return create(x, y, width, height, text, buttonAction, icon, false, false, false, 0, 0, null);
+                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, null);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, boolean canHold) {
-                    return create(x, y, width, height, text, buttonAction, icon, canHold, false, false, 0, 0, null);
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode) {
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, null);
                 }
 
-
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, boolean canHold, boolean toggleMode) {
-                    return create(x, y, width, height, text, buttonAction, icon, canHold, toggleMode, false, 0, 0, null);
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, null);
                 }
 
-
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, boolean canHold, boolean toggleMode, boolean pressed) {
-                    return create(x, y, width, height, text, buttonAction, icon, canHold, toggleMode, pressed, 0, 0, null);
-                }
-
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, boolean canHold, boolean toggleMode, boolean pressed, int contentOffsetX, int contentOffsetY) {
-                    return create(x, y, width, height, text, buttonAction, icon, canHold, toggleMode, pressed, contentOffsetX, contentOffsetY, null);
-                }
-
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, boolean canHold, boolean toggleMode, boolean pressed, int contentOffsetX, int contentOffsetY, CMediaFont font) {
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font) {
                     TextButton textButton = new TextButton();
                     setComponentInitValues(textButton);
-                    setButtonValues(textButton, buttonAction, canHold, toggleMode, pressed, contentOffsetX, contentOffsetY);
+                    setButtonValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
                     setPosition(textButton, x, y);
                     setSize(textButton, width, height);
                     setText(textButton, text);
@@ -3425,33 +3408,25 @@ public class API {
             public class _ImageButton {
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image) {
-                    return create(x, y, width, height, image, 0, defaultButtonAction(), false, false, false, 0, 0);
+                    return create(x, y, width, height, image, 0, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex) {
-                    return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), false, false, false, 0, 0);
+                    return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, false, false, false, 0, 0);
+                    return create(x, y, width, height, image, arrayIndex, buttonAction, ButtonMode.DEFAULT, 0, 0);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, boolean canHold) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, canHold, false, false, 0, 0);
+                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction,  ButtonMode buttonMode) {
+                    return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, 0, 0);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, boolean canHold, boolean toggleMode) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, canHold, toggleMode, false, 0, 0);
-                }
-
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, boolean canHold, boolean toggleMode, boolean pressed) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, canHold, toggleMode, pressed, 0, 0);
-                }
-
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, boolean canHold, boolean toggleMode, boolean pressed, int contentOffsetX, int contentOffsetY) {
+                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
                     ImageButton imageButton = new ImageButton();
                     setComponentInitValues(imageButton);
-                    setButtonValues(imageButton, buttonAction, canHold, toggleMode, pressed, contentOffsetX, contentOffsetY);
+                    setButtonValues(imageButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
                     setPosition(imageButton, x, y);
                     setSize(imageButton, width, height);
                     setImage(imageButton, image);

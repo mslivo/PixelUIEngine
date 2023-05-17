@@ -9,9 +9,7 @@ public abstract class Button extends Component {
 
     public boolean pressed;
 
-    public boolean canHold;
-
-    public boolean toggleMode;
+    public ButtonMode mode;
 
     public int offset_content_x;
 

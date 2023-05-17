@@ -12,6 +12,7 @@ import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
+import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.example.data.ExampleData;
@@ -49,7 +50,7 @@ public class ExampleUIAdapter implements UIAdapter {
             public void onRelease() {
                 api.addWindow(api.windows.createFromGenerator(ExampleWindowGenerator.class, "Example Window", gameEngine, mediaManager));
             }
-        }, null, false, false);
+        }, null, ButtonMode.DEFAULT);
 
         api.components.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
