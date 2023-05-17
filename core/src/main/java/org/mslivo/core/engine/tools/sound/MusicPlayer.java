@@ -37,6 +37,8 @@ public class MusicPlayer {
 
     private final ArrayDeque<Integer> randomHistory;
 
+    public float muteVolume;
+
     public MusicPlayer(MediaManager mediaManager){
         this.mediaManager = mediaManager;
         this.playlist = new ArrayList<>();
@@ -46,6 +48,7 @@ public class MusicPlayer {
         this.playCurrentFileName = "";
         this.playListPosition = 0;
         this.volume = 1f;
+        this.muteVolume = 0;
         this.randomHistory = new ArrayDeque<>();
         this.playNext = this.playPrevious = false;
 
@@ -245,6 +248,17 @@ public class MusicPlayer {
     public void stop(){
         this.state = STATE_STOP;
     }
+
+    public void mute() {
+        this.muteVolume = this.volume;
+        setVolume(0f);
+    }
+
+    public void unmute() {
+        setVolume(this.muteVolume);
+        this.muteVolume = 0;
+    }
+
 
     public void shutdown(){
         this.playCurrent = null;
