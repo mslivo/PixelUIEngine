@@ -89,7 +89,7 @@ public class SettingsManager {
         this.backUp = null;
     }
 
-    public void addSettings(String name, String defaultValue, Function<String, Boolean> validateFunction) {
+    public void addSetting(String name, String defaultValue, Function<String, Boolean> validateFunction) {
         if (entries.get(name) == null) {
             SettingsEntry settingsEntry = new SettingsEntry(name, defaultValue, validateFunction);
             this.entries.put(settingsEntry.name(), settingsEntry);
