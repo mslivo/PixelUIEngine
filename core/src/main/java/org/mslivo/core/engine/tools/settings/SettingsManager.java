@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.function.Function;
 
 
 public class SettingsManager {
@@ -170,42 +169,42 @@ public class SettingsManager {
         return value;
     }
 
-    public boolean checkString(String value) {
-        if(value == null) return false;
-        return true;
+    public static String getIfValidString(String value) throws ValueInvalidException {
+        if(value == null) throw new ValueInvalidException(value+" not a valid String");
+        return value;
     }
 
-    public boolean checkBoolean(String value) {
-        if (value == null) return false;
+    public static boolean getIfValidBoolean(String value) throws ValueInvalidException {
+        if (value == null) throw new ValueInvalidException(value+" not a valid boolean");
         boolean boolValue;
         try {
             boolValue = Boolean.parseBoolean(value);
         } catch (NumberFormatException e) {
-            return false;
+            throw new ValueInvalidException(value+" not a valid boolean");
         }
-        return true;
+        return boolValue;
     }
 
-    public boolean checkFloat(String value) {
-        if (value == null) return false;
+    public static float getIfValidFloat(String value) throws ValueInvalidException {
+        if (value == null) throw new ValueInvalidException(value+" not a valid boolean");
         float floatValue;
         try {
             floatValue = Float.parseFloat(value);
         } catch (NumberFormatException e) {
-            return false;
+            throw new ValueInvalidException(value+" not a valid boolean");
         }
-        return true;
+        return floatValue;
     }
 
-    public boolean checkInt(String value) {
-        if (value == null) return false;
+    public static int getIfValidInt(String value) throws ValueInvalidException {
+        if (value == null) throw new ValueInvalidException(value+" not a valid int");
         int intValue;
         try {
             intValue = Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            return false;
+            throw new ValueInvalidException(value+" not a valid int");
         }
-        return true;
+        return intValue;
     }
 
     public String get(String name) {
