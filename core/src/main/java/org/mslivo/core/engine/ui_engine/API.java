@@ -386,7 +386,7 @@ public class API {
             return result;
         }
 
-        public Text text_CreateURL(int x, int y, String uri, Consumer<Integer> onClick) {
+        public Text text_CreateClickableURL(int x, int y, String uri) {
             return text_CreateClickableText(x, y, new String[]{uri}, new Consumer<Integer>() {
                 @Override
                 public void accept(Integer integer) {
