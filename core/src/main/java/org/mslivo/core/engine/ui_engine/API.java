@@ -386,12 +386,12 @@ public class API {
             return result;
         }
 
-        public Text text_CreateClickableURL(int x, int y, String uri) {
-            return text_CreateClickableText(x, y, new String[]{uri}, new Consumer<Integer>() {
+        public Text text_CreateClickableURL(int x, int y, String text, String url) {
+            return text_CreateClickableText(x, y, new String[]{text}, new Consumer<Integer>() {
                 @Override
                 public void accept(Integer integer) {
                     try {
-                        Desktop.getDesktop().browse(new URI(uri));
+                        Desktop.getDesktop().browse(new URI(url));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
