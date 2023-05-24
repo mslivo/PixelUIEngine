@@ -56,6 +56,10 @@ import org.mslivo.core.engine.ui_engine.misc.ControlMode;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -380,6 +384,19 @@ public class API {
             result.add(scrollBarVertical);
             result.add(textField);
             return result;
+        }
+
+        public Text text_CreateURL(int x, int y, String uri, Consumer<Integer> onClick) {
+            return text_CreateClickableText(x, y, new String[]{uri}, new Consumer<Integer>() {
+                @Override
+                public void accept(Integer integer) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(uri));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
         public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick) {
