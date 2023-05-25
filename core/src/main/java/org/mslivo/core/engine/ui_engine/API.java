@@ -1810,6 +1810,17 @@ public class API {
             return inputState.lastGUIMouseHover;
         }
 
+        public String lastGUIMouseHoverName() {
+            if(inputState.lastGUIMouseHover != null){
+                if(inputState.lastGUIMouseHover instanceof Component){
+                    return ((Component)inputState.lastGUIMouseHover).name;
+                }else if(inputState.lastGUIMouseHover instanceof Window){
+                    return ((Window)inputState.lastGUIMouseHover).name;
+                }
+            }
+            return "";
+        }
+
         public int mouseXGUI() {
             return inputState.mouse_gui.x;
         }
