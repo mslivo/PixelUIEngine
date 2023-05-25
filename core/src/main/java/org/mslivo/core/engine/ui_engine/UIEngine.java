@@ -1669,8 +1669,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-
+        Gdx.gl.glClearColor(0,0,0,0);
         // Draw Game
         {
             // Draw GUI GameViewPort FrameBuffers
