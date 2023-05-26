@@ -14,12 +14,14 @@ public interface UIAdapter {
 
     void shutdown();
 
-    default void renderUIBefore(SpriteBatch spriteBatch_gui){}
+    default void renderUIBefore(SpriteBatch spriteBatch_gui) {
+    }
 
-    default void renderUIAfter(SpriteBatch spriteBatch_gui){}
+    default void renderUIAfter(SpriteBatch spriteBatch_gui) {
+    }
 
     default void renderFinalScreen(SpriteBatch spriteBatch_screen, TextureRegion texture_game, TextureRegion texture_gui,
-                                   int internalResolutionWidth, int internalResolutionHeight){
+                                   int internalResolutionWidth, int internalResolutionHeight) {
         spriteBatch_screen.begin();
         spriteBatch_screen.draw(texture_game, 0, 0, internalResolutionWidth, internalResolutionHeight);
         spriteBatch_screen.draw(texture_gui, 0, 0, internalResolutionWidth, internalResolutionHeight);

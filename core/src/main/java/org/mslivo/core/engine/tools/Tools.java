@@ -138,16 +138,16 @@ public class Tools {
         }
 
         public static FColor createDarker(FColor color, float amount) {
-            float r = Tools.Calc.inBounds(color.r - (color.r * amount), 0f, 1f);
-            float g = Tools.Calc.inBounds(color.g - (color.g * amount), 0f, 1f);
-            float b = Tools.Calc.inBounds(color.b - (color.b * amount), 0f, 1f);
+            float r = Calc.inBounds(color.r - (color.r * amount), 0f, 1f);
+            float g = Calc.inBounds(color.g - (color.g * amount), 0f, 1f);
+            float b = Calc.inBounds(color.b - (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
         public static FColor createBrighter(FColor color, float amount) {
-            float r = Tools.Calc.inBounds(color.r + (color.r * amount), 0f, 1f);
-            float g = Tools.Calc.inBounds(color.g + (color.g * amount), 0f, 1f);
-            float b = Tools.Calc.inBounds(color.b + (color.b * amount), 0f, 1f);
+            float r = Calc.inBounds(color.r + (color.r * amount), 0f, 1f);
+            float g = Calc.inBounds(color.g + (color.g * amount), 0f, 1f);
+            float b = Calc.inBounds(color.b + (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
@@ -498,18 +498,19 @@ public class Tools {
             return ret;
         }
 
-        public static boolean inBoundsX(int x, int map_width) {
-            if (x < 0) return false;
-            return x <= (map_width - 1);
+        public static boolean mapXValid(int x, int map_width) {
+            if (x < 0 || x <= (map_width - 1)) return false;
+            return true;
         }
 
-        public static boolean inBoundsY(int y, int map_height) {
-            if (y < 0) return false;
-            return y <= (map_height - 1);
+        public static boolean mapYValid(int y, int map_height) {
+            if (y < 0 || y <= (map_height - 1)) return false;
+            return true;
         }
 
-        public static boolean inBoundsXY(int x, int y, int map_width, int map_height) {
-            return inBoundsX(x, map_width) && inBoundsY(y, map_height);
+        public static boolean mapXYValid(int x, int y, int map_width, int map_height) {
+            if (x < 0 || x <= (map_width - 1) || y < 0 || y <= (map_height - 1)) return false;
+            return true;
         }
 
         public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
@@ -727,6 +728,10 @@ public class Tools {
             if (value < lower) value = lower;
             if (value > upper) value = upper;
             return value;
+        }
+
+        public static float inBounds0And1(float value) {
+            return Calc.inBounds(value,0f,1f);
         }
 
         public static double inBounds(double value, double lower, double upper) {
