@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
@@ -105,16 +104,18 @@ public class UIEngine<T extends UIAdapter> {
         }
         this.uiAdapter = uiAdapter;
         this.mediaManager = mediaManager;
-
-
-        /* Setup InputState */
+        /* Setup */
         this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
         this.api = new API(this.inputState, mediaManager);
-        ScreenUtils.clear(0, 0, 0, 1);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
-
+        render_glClear();
         /*  Call Adapter Init */
         this.uiAdapter.init(this.api, this.mediaManager);
+    }
+
+    private void render_glClear(){
+        Gdx.gl.glClearColor(0,0,0,0);
+        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
     }
 
     private int determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
@@ -1669,7 +1670,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void render() {
-        Gdx.gl.glClearColor(0,0,0,0);
+
         // Draw Game
         {
             // Draw GUI GameViewPort FrameBuffers
@@ -1687,7 +1688,7 @@ public class UIEngine<T extends UIAdapter> {
 
         { // Draw GUI
             inputState.frameBuffer_gui.begin();
-            Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+            render_glClear();
             inputState.spriteBatch_gui.setProjectionMatrix(this.inputState.camera_gui.combined);
             this.uiAdapter.renderUIBefore(inputState.spriteBatch_gui);
             this.renderGUI();
@@ -1707,6 +1708,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_upScale.end();
             // Render Final Screen
             inputState.viewport_screen.apply();
+            render_glClear();
             inputState.spriteBatch_screen.begin();
             inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
             inputState.spriteBatch_screen.end();
