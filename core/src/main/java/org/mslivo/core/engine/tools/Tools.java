@@ -730,7 +730,7 @@ public class Tools {
             return value;
         }
 
-        public static float inBounds0And1(float value) {
+        public static float inBounds01(float value) {
             return Calc.inBounds(value,0f,1f);
         }
 
