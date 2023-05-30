@@ -651,7 +651,7 @@ public class MediaManager {
         prepareCMedia(GUIBaseMedia.ALL);
     }
 
-    public boolean prepareFromStaticClass(Class loadFromClass) {
+    public boolean prepareFromStaticClassReflection(Class loadFromClass) {
         for (Field field : loadFromClass.getFields()) {
             CMedia cMedia = null;
             try {
@@ -672,11 +672,11 @@ public class MediaManager {
         return true;
     }
 
-    public boolean prepareCMediaFromObject(Object object) {
-        return prepareCMediaFromObject(object, 3);
+    public boolean prepareCMediaFromObjectReflection(Object object) {
+        return prepareCMediaFromObjectReflection(object, 3);
     }
 
-    public boolean prepareCMediaFromObject(Object object, int scanDepth) {
+    public boolean prepareCMediaFromObjectReflection(Object object, int scanDepth) {
         try {
             prepareCMediaFromObjectResolve(object, scanDepth, 1);
         } catch (Exception e) {

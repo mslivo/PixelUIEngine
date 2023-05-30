@@ -70,8 +70,8 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.logInProgress("Loading Assets");
         this.mediaManager = new MediaManager();
 
-        this.mediaManager.prepareFromStaticClass(GUIBaseMedia.class);
-        this.mediaManager.prepareFromStaticClass(ExampleBaseMedia.class);
+        this.mediaManager.prepareFromStaticClassReflection(GUIBaseMedia.class);
+        this.mediaManager.prepareFromStaticClassReflection(ExampleBaseMedia.class);
         this.mediaManager.loadAssets();
 
         Tools.logDone();

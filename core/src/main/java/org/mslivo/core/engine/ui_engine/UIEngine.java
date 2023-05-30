@@ -324,11 +324,7 @@ public class UIEngine<T extends UIAdapter> {
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
 
                         }
-                    } else if (keyTypedCharacter == '\n') { // ENTER
-                        UICommons.textField_unFocus(inputState, focusedTextField);
-                        if (focusedTextField.textFieldAction != null)
-                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
-                    } else {
+                    }else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             if (focusedTextField.content.length() < focusedTextField.contentMaxLength) {
                                 String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
@@ -359,6 +355,10 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.content.length());
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
+                    } else if(keyDownKeyCode == Input.Keys.ENTER){
+                        UICommons.textField_unFocus(inputState, focusedTextField);
+                        if (focusedTextField.textFieldAction != null)
+                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                     }
                 }
 
