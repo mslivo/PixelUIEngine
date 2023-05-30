@@ -2,6 +2,7 @@ package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -73,6 +74,8 @@ public class InputState {
 
     public TextureRegion texture_upScale;
     public int factor_upScale;
+
+    public Texture.TextureFilter textureFilter_upScale;
 
     public FrameBuffer frameBuffer_upScale;
 

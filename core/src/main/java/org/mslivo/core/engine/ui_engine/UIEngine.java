@@ -113,21 +113,36 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.init(this.api, this.mediaManager);
     }
 
-    private void render_glClear(){
-        Gdx.gl.glClearColor(0,0,0,0);
+    private void render_glClear() {
+        Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
     }
 
-    private int determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
-        int upSampling = 1;
+    private Texture.TextureFilter determineUpscaleTextureFilter(ViewportMode viewportMode) {
+        return switch (viewportMode) {
+            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
+            case FIT, STRETCH -> Texture.TextureFilter.Linear;
+        };
+    }
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int testWidth = (int) (screenSize.getWidth());
-        int testHeight = (int) (screenSize.getHeight());
-        while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
-            upSampling++;
+    private int determineUpscaleFactor(ViewportMode viewportMode, int internalResolutionWidth, int internalResolutionHeight) {
+        switch (viewportMode) {
+            case PIXEL_PERFECT -> {
+                return 1;
+            }
+            case FIT, STRETCH -> {
+                int upSampling = 1;
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                int testWidth = (int) (screenSize.getWidth());
+                int testHeight = (int) (screenSize.getHeight());
+                while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
+                    upSampling++;
+                }
+                return upSampling;
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + viewportMode);
         }
-        return upSampling;
     }
 
     private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode) {
@@ -165,9 +180,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
         // ----- UpScaler
-        newInputState.factor_upScale = determineUpscaleFactor(internalResolutionWidth, internalResolutionHeight);
+        newInputState.factor_upScale = determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
+        newInputState.textureFilter_upScale = determineUpscaleTextureFilter(viewportMode);
         newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
-        newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(newInputState.textureFilter_upScale, newInputState.textureFilter_upScale);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
         newInputState.texture_upScale.flip(false, true);
         // ----- Screen
@@ -310,7 +326,8 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     } else if (keyTypedCharacter == '\n') { // ENTER
                         UICommons.textField_unFocus(inputState, focusedTextField);
-                        if (focusedTextField.textFieldAction != null) focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
+                        if (focusedTextField.textFieldAction != null)
+                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                     } else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             if (focusedTextField.content.length() < focusedTextField.contentMaxLength) {
@@ -1410,15 +1427,16 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateGUIMouseBounds() {
-        if(inputState.mouse_gui.x < 0) inputState.mouse_gui.x = 0;
-        if(inputState.mouse_gui.x > inputState.internalResolutionWidth) inputState.mouse_gui.x = inputState.internalResolutionWidth;
-        if(inputState.mouse_gui.y < 0) inputState.mouse_gui.y = 0;
-        if(inputState.mouse_gui.y > inputState.internalResolutionHeight) inputState.mouse_gui.y = inputState.internalResolutionHeight;
+        if (inputState.mouse_gui.x < 0) inputState.mouse_gui.x = 0;
+        if (inputState.mouse_gui.x > inputState.internalResolutionWidth)
+            inputState.mouse_gui.x = inputState.internalResolutionWidth;
+        if (inputState.mouse_gui.y < 0) inputState.mouse_gui.y = 0;
+        if (inputState.mouse_gui.y > inputState.internalResolutionHeight)
+            inputState.mouse_gui.y = inputState.internalResolutionHeight;
     }
 
     private void updateGameMouseXY() {
         // Enforce mouse gui x
-
 
 
         // MouseXGUI/MouseYGUI -> To MouseX/MouseY
@@ -1831,20 +1849,20 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitleBar) {
-        if(hasTitleBar){
-            if(y == (height-1)){
-                if(x == 0){
+        if (hasTitleBar) {
+            if (y == (height - 1)) {
+                if (x == 0) {
                     return 12;
-                }else if(x==width-1){
+                } else if (x == width - 1) {
                     return 14;
-                }else{
+                } else {
                     return 13;
                 }
-            }else{
-                return render_get16TilesCMediaIndex(x,y,width,height);
+            } else {
+                return render_get16TilesCMediaIndex(x, y, width, height);
             }
-        }else{
-            return render_get16TilesCMediaIndex(x,y,width,height);
+        } else {
+            return render_get16TilesCMediaIndex(x, y, width, height);
         }
     }
 
@@ -2125,7 +2143,6 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawNotifications() {
         if (inputState.notifications.size() == 0) return;
         int width = (inputState.internalResolutionWidth % TILE_SIZE == 0) ? (inputState.internalResolutionWidth / TILE_SIZE) : ((inputState.internalResolutionWidth / TILE_SIZE) + 1);
-
 
 
         int y = 0;
