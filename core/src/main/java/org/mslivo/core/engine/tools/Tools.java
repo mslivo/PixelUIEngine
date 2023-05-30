@@ -11,7 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +36,7 @@ public class Tools {
     private static boolean debugEnabled = false;
 
     private static String timestamp() {
-        return sdf.format(new Timestamp(new Date().getTime()));
+        return sdf.format(new Date());
     }
 
     public static void log(String msg) {
