@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 
 import java.lang.reflect.Field;
@@ -632,6 +633,24 @@ public class MediaManager {
         return cMediaArray;
     }
 
+
+
+    public void prepareCMedia(CMedia cMedia) {
+        loadMediaList.add(cMedia);
+        return;
+    }
+
+    public void prepareCMedia(CMedia[] cMedias) {
+        for(int i=0;i<cMedias.length;i++) {
+            loadMediaList.add(cMedias[i]);
+        }
+        return;
+    }
+
+    public void prepareGUICMedia(){
+        prepareCMedia(GUIBaseMedia.ALL);
+    }
+
     public boolean prepareFromStaticClass(Class loadFromClass) {
         for (Field field : loadFromClass.getFields()) {
             CMedia cMedia = null;
@@ -653,20 +672,13 @@ public class MediaManager {
         return true;
     }
 
-
-    public boolean prepareCMedia(CMedia cMedia) {
-        loadMediaList.add(cMedia);
-        return true;
+    public boolean prepareCMediaFromObject(Object object) {
+        return prepareCMediaFromObject(object, 3);
     }
 
-
-    public boolean prepareFromObject(Object object) {
-        return prepareFromObject(object, 3);
-    }
-
-    public boolean prepareFromObject(Object object, int scanDepth) {
+    public boolean prepareCMediaFromObject(Object object, int scanDepth) {
         try {
-            resolveCMedia(object, scanDepth, 1);
+            prepareCMediaFromObjectResolve(object, scanDepth, 1);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -674,8 +686,7 @@ public class MediaManager {
         return true;
     }
 
-
-    private boolean resolveCMedia(Object object, int scanDepth, int level) {
+    private boolean prepareCMediaFromObjectResolve(Object object, int scanDepth, int level) {
         if (object == null) return true;
         if (object.getClass().getPackageName().startsWith("java")) return true;
         if (level > scanDepth) return true; // scan up to depth 3
@@ -700,17 +711,17 @@ public class MediaManager {
                 } else if (fieldObject.getClass() == ArrayList.class) {
                     ArrayList arrayList = (ArrayList) fieldObject;
                     for (Object arrayListItem : arrayList) {
-                        resolveCMedia(arrayListItem, scanDepth, level + 1);
+                        prepareCMediaFromObjectResolve(arrayListItem, scanDepth, level + 1);
                     }
                 } else if (field.getType().isArray()) {
                     if (field.getType().getName().startsWith("[L") || field.getType().getName().startsWith("[[L")) {
                         Object[] arrayObjects = (Object[]) fieldObject;
                         for (Object arrayObject : arrayObjects) {
-                            resolveCMedia(arrayObject, scanDepth, level + 1);
+                            prepareCMediaFromObjectResolve(arrayObject, scanDepth, level + 1);
                         }
                     }
                 } else {
-                    resolveCMedia(fieldObject, scanDepth, level + 1);
+                    prepareCMediaFromObjectResolve(fieldObject, scanDepth, level + 1);
                 }
             }
         }

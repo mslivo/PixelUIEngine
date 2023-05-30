@@ -77,7 +77,6 @@ public class GUIBaseMedia {
     public static final CMediaImage GUI_SHAPE_TRIANGLE_RIGHT_DOWN = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_rd.png");
     public static final CMediaImage GUI_SHAPE_TRIANGLE_LEFT_UP = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_lu.png");
     public static final CMediaImage GUI_SHAPE_TRIANGLE_RIGHT_UP = MediaManager.create_CMediaImage(guiDirectory + "shape_right_triangle_ru.png");
-
     public static final CMediaImage GUI_COLOR_SELECTOR = MediaManager.create_CMediaImage(guiDirectory + "colors.png");
     public static final CMediaImage GUI_COLOR_SELECTOR_OVERLAY = MediaManager.create_CMediaImage(guiDirectory + "colors_overlay.png");
 
@@ -86,4 +85,70 @@ public class GUIBaseMedia {
     public static final CMediaFont FONT_WHITE = MediaManager.create_CMediaFont(guiDirectory + "fonts/font_white.fnt", 0, 5);
 
 
+    public static final CMedia[] ALL = new CMedia[]{
+            GUI_WINDOW,
+            GUI_BUTTON,
+            GUI_BUTTON_PRESSED,
+            GUI_SCROLLBAR_VERTICAL,
+            GUI_SCROLLBAR_HORIZONTAL,
+            GUI_SCROLLBAR_BUTTON_VERTICAL,
+            GUI_SCROLLBAR_BUTTON_HORIZONAL,
+            GUI_LIST,
+            GUI_LIST_SELECTED,
+            GUI_LIST_DRAG,
+            GUI_COMBOBOX,
+            GUI_TAB_BORDERS,
+            GUI_BORDERS,
+            GUI_TAB,
+            GUI_TAB_SELECTED,
+            GUI_TAB_BIGICON,
+            GUI_TAB_BIGICON_SELECTED,
+            GUI_COMBOBOX_OPEN,
+            GUI_COMBOBOX_LIST,
+            GUI_COMBOBOX_LIST_SELECTED,
+            GUI_KNOB_BACKGROUND,
+            GUI_KNOB,
+            GUI_KNOB_ENDLESS,
+            GUI_SEPARATOR_HORIZONTAL,
+            GUI_SEPARATOR_VERTICAL,
+            GUI_TOOLTIP,
+            GUI_TOOLTIP_LINE_X,
+            GUI_TOOLTIP_LINE_Y,
+            GUI_TOOLTIP_TITLE,
+            GUI_CONTEXT_MENU,
+            GUI_CONTEXT_MENU_SELECTED,
+            GUI_TEXTFIELD,
+            GUI_TEXTFIELD_VALIDATION_OVERLAY,
+            GUI_TEXTFIELD_FOCUSED,
+            GUI_TEXTFIELD_CARET,
+            GUI_INVENTORY,
+            GUI_INVENTORY_DRAGGED,
+            GUI_INVENTORY_SELECTED,
+            GUI_INVENTORY_X2,
+            GUI_INVENTORY_DRAGGED_X2,
+            GUI_INVENTORY_SELECTED_X2,
+            GUI_PROGRESSBAR,
+            GUI_PROGRESSBAR_BAR,
+            GUI_NOTIFICATION_BAR,
+            GUI_CHECKBOX_CHECKBOX,
+            GUI_CHECKBOX_RADIO,
+            GUI_CURSOR_ARROW,
+            GUI_CURSOR_TRANSPARENT,
+            GUI_ICON_CLOSE,
+            GUI_ICON_COLOR,
+            GUI_ICON_INFORMATION,
+            GUI_ICON_QUESTION,
+            GUI_ICON_EXTEND,
+            GUI_SHAPE_RECT,
+            GUI_SHAPE_DIAMOND,
+            GUI_SHAPE_OVAL,
+            GUI_SHAPE_TRIANGLE_LEFT_DOWN,
+            GUI_SHAPE_TRIANGLE_RIGHT_DOWN,
+            GUI_SHAPE_TRIANGLE_LEFT_UP,
+            GUI_SHAPE_TRIANGLE_RIGHT_UP,
+            GUI_COLOR_SELECTOR,
+            GUI_COLOR_SELECTOR_OVERLAY,
+            FONT_BLACK,
+            FONT_WHITE,
+    };
 }
