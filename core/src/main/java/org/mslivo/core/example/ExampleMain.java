@@ -71,7 +71,7 @@ public class ExampleMain extends ApplicationAdapter {
         this.mediaManager = new MediaManager();
 
         this.mediaManager.prepareGUICMedia();
-        this.mediaManager.prepareFromStaticClass(ExampleBaseMedia.class);
+        this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
 
         Tools.logDone();

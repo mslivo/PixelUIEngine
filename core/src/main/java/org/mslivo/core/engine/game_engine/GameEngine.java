@@ -57,9 +57,6 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
         if (data == null || adapter == null) {
             throw new GameEngineException("Cannot initialize GameEngine: invalid parameters");
         }
-        if (isInvalidDataObject(data.getClass())) {
-            throw new GameEngineException("Cannot initialize data Object "+data.getClass().getSimpleName()+" invalid: contains non-public fields, methods or non-serializable classes");
-        }
 
         this.data = data;
         this.inputs = new ArrayDeque<>();
@@ -75,25 +72,6 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
             }
         };
         this.adapter.init(this.data, output);
-    }
-
-    private boolean isInvalidDataObject(Class checkClass) {
-        if (Collection.class.isAssignableFrom(checkClass)) return false;
-        if (!String.class.isAssignableFrom(checkClass)) return false;
-        if (!Serializable.class.isAssignableFrom(checkClass)) return true;
-        if (checkClass.getDeclaredMethods().length != 0) return true;
-        for (Field field : checkClass.getDeclaredFields()) {
-            if (!Modifier.isPublic(field.getModifiers())) {
-                return true;
-            } else {
-                if (!field.getType().isPrimitive()) {
-                    if (isInvalidDataObject(field.getType())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     public void update() {

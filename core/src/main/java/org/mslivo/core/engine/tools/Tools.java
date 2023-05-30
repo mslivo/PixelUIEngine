@@ -4,19 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
+import org.mslivo.core.engine.media_manager.media.CMedia;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class Tools {
@@ -792,6 +794,110 @@ public class Tools {
             if (value > upper) value = upper;
             return value;
         }
+    }
+
+    public static class Reflection {
+        /* Dont use these if you target HTML */
+
+        public static boolean gameEngine_checkDataObjectValid(Class checkClass){
+            if (Collection.class.isAssignableFrom(checkClass)) return false;
+            if (!String.class.isAssignableFrom(checkClass)) return false;
+            if (!Serializable.class.isAssignableFrom(checkClass)) return true;
+            if (checkClass.getDeclaredMethods().length != 0) return true;
+            for (Field field : checkClass.getDeclaredFields()) {
+                if (!Modifier.isPublic(field.getModifiers())) {
+                    return true;
+                } else {
+                    if (!field.getType().isPrimitive()) {
+                        if (gameEngine_checkDataObjectValid(field.getType())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static CMedia[] mediaManager_prepareCMediaFromStaticClass(Class loadFromClass) {
+            ArrayList<CMedia> prepareList = new ArrayList<>();
+            for (Field field : loadFromClass.getFields()) {
+                CMedia cMedia = null;
+                try {
+                    if (field.getType().isArray()) {
+                        CMedia[] medias = (CMedia[]) field.get(null);
+                        prepareList.addAll(Arrays.asList(medias));
+                    } else {
+                        cMedia = (CMedia) field.get(null);
+                        prepareList.add(cMedia);
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return prepareList.toArray(new CMedia[]{});
+                }
+
+            }
+
+            return prepareList.toArray(new CMedia[]{});
+        }
+
+        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object){
+            return mediaManager_prepareCMediaFromObject(object, 3);
+        }
+
+        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object, int scanDepthMax){
+            ArrayList<CMedia> prepareList = new ArrayList<>();
+            try {
+                mediaManager_prepareCMediaFromObjectResolve(object, scanDepthMax,1, prepareList);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new CMedia[]{};
+            }
+
+            return prepareList.toArray(new CMedia[]{});
+        }
+
+        private static void mediaManager_prepareCMediaFromObjectResolve(Object object, int scanDepthMax, int currentDepth, ArrayList<CMedia> prepareList) {
+            if (object == null) return;
+            if (object.getClass().getPackageName().startsWith("java")) return;
+            if (currentDepth > scanDepthMax) return;
+            if (CMedia.class.isAssignableFrom(object.getClass())) {
+                CMedia cMedia = (CMedia) object;
+                prepareList.add(cMedia);
+                return;
+            }
+
+            for (Field field : object.getClass().getFields()) {
+                Object fieldObject = null;
+                try {
+                    fieldObject = field.get(object);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                if (fieldObject != null) {
+                    if (CMedia.class.isAssignableFrom(fieldObject.getClass())) {
+                        CMedia cMedia = (CMedia) fieldObject;
+                        prepareList.add(cMedia);
+                    } else if (fieldObject.getClass() == ArrayList.class) {
+                        ArrayList arrayList = (ArrayList) fieldObject;
+                        for (Object arrayListItem : arrayList) {
+                            mediaManager_prepareCMediaFromObjectResolve(arrayListItem, scanDepthMax, currentDepth+1, prepareList);
+                        }
+                    } else if (field.getType().isArray()) {
+                        if (field.getType().getName().startsWith("[L") || field.getType().getName().startsWith("[[L")) {
+                            Object[] arrayObjects = (Object[]) fieldObject;
+                            for (Object arrayObject : arrayObjects) {
+                                mediaManager_prepareCMediaFromObjectResolve(arrayObject, scanDepthMax, currentDepth+1, prepareList);
+                            }
+                        }
+                    } else {
+                        mediaManager_prepareCMediaFromObjectResolve(fieldObject, scanDepthMax, currentDepth+1, prepareList);
+                    }
+                }
+            }
+        }
+
+
     }
 
 }

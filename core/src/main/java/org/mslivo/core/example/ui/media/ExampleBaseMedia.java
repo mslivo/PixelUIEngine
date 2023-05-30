@@ -1,6 +1,7 @@
 package org.mslivo.core.example.ui.media;
 
 import org.mslivo.core.engine.media_manager.MediaManager;
+import org.mslivo.core.engine.media_manager.media.CMedia;
 import org.mslivo.core.engine.media_manager.media.CMediaAnimation;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
@@ -21,9 +22,24 @@ public class ExampleBaseMedia {
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_BLUE = MediaManager.create_CMediaImage(exampleDirectory + "example_bullet_blue.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_ORANGE = MediaManager.create_CMediaImage(exampleDirectory + "example_bullet_orange.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_WINDOW = MediaManager.create_CMediaImage(exampleDirectory + "example_icon_window.png");
-
     public static final CMediaAnimation GUI_ICON_EXAMPLE_ANIMATION_2 = MediaManager.create_CMediaAnimation(exampleDirectory + "example_animation_2.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8, 0.1f);
     public static final CMediaAnimation GUI_BACKGROUND = MediaManager.create_CMediaAnimation(exampleDirectory + "background.png", 32, 32, 0.2f);
 
+    public static CMedia[] ALL = new CMedia[]{
+            GUI_ICON_BUTTON_ANIM_EXAMPLE,
+            GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY,
+            GUI_ICON_EXAMPLE_1,
+            GUI_ICON_EXAMPLE_2,
+            GUI_ICON_EXAMPLE_3,
+            GUI_ICON_EXAMPLE_4,
+            GUI_ICON_EXAMPLE_DOUBLE,
+            GUI_ICON_EXAMPLE_BULLET_GREEN,
+            GUI_ICON_EXAMPLE_BULLET_BLUE,
+            GUI_ICON_EXAMPLE_BULLET_ORANGE,
+            GUI_ICON_EXAMPLE_WINDOW,
+            GUI_ICON_EXAMPLE_ANIMATION_2,
+            GUI_BACKGROUND
+
+    };
 
 }
