@@ -433,12 +433,20 @@ class UICommons {
 
     static void textField_focus(InputState inputState, TextField textField) {
         // Unfocus other textfields
-        if (inputState.focusedTextField != null) {
+        if (inputState.focusedTextField != null && inputState.focusedTextField != textField) {
             textField_unFocus(inputState, inputState.focusedTextField);
         }
         // Focus this one
         inputState.focusedTextField = textField;
-        if (inputState.focusedTextField.textFieldAction != null) inputState.focusedTextField.textFieldAction.onFocus();
+        if (textField.textFieldAction != null) textField.textFieldAction.onFocus();
+    }
+
+    static void textField_unFocus(InputState inputState, TextField textField) {
+        if (textField_isFocused(inputState, textField)) {
+            inputState.focusedTextField = null;
+            if (textField.textFieldAction != null)
+                textField.textFieldAction.onUnFocus();
+        }
     }
 
     static void list_setMultiSelect(List list, boolean multiSelect){
@@ -451,13 +459,7 @@ class UICommons {
         }
     }
 
-    static void textField_unFocus(InputState inputState, TextField textField) {
-        if (textField_isFocused(inputState, textField)) {
-            if (inputState.focusedTextField.textFieldAction != null)
-                inputState.focusedTextField.textFieldAction.onUnFocus();
-            inputState.focusedTextField = null;
-        }
-    }
+
 
     static void knob_turnKnob(Knob knob, float newValue, float amount) {
         if (knob.endless) {
