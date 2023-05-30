@@ -1,61 +1,61 @@
 package org.mslivo.core.engine.tools.settings;
 
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.particles.particle.ParticleType;
+import org.mslivo.core.engine.tools.settings.file.FileLoadFunction;
+import org.mslivo.core.engine.tools.settings.file.FileSaveFunction;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Properties;
 
 
 public class SettingsManager {
+    private final Properties properties;
 
-    private Properties properties;
+    private final Properties backUp;
 
-    private Properties backUp;
-
-    private Path settingsFile;
+    private final String settingsName;
 
     private final HashMap<String, SettingsEntry> entries;
 
-    public SettingsManager(Path settingsFile) throws SettingsException {
-        this.entries = new HashMap<>();
-        this.properties = new Properties();
-        this.init(settingsFile);
+    private final SaveFunction saveFunction;
+
+    private final LoadFunction loadFunction;
+
+    public SettingsManager(String settingsName) throws SettingsException {
+        this(settingsName,new FileSaveFunction(), new FileLoadFunction());
+        this.init();
     }
 
-    public void init(Path settingsFile) {
-        this.settingsFile = settingsFile;
-        if (Files.exists(settingsFile) && Files.isRegularFile(settingsFile)) {
-            try {
-                properties.load(Files.newInputStream(settingsFile));
-            } catch (IOException e) {
-                throw new SettingsException(e);
-            }
-        } else {
-            if (!Tools.File.makeSureDirectoryExists(settingsFile.getParent())) {
-                throw new SettingsException("Can't create directory " + settingsFile.getParent().toString());
-            }
-        }
+
+    public SettingsManager(String settingsName, SaveFunction saveFunction, LoadFunction loadFunction) throws SettingsException {
+        this.entries = new HashMap<>();
+        this.properties = new Properties();
+        this.backUp = new Properties();
+        this.settingsName = Tools.Text.validString(settingsName);
+        this.saveFunction = saveFunction;
+        this.loadFunction = loadFunction;
+        this.init();
+    }
+
+    public void init() {
+        loadFunction.loadSettings(settingsName, properties);
         validateAllProperties();
-        saveToFile();
+        saveFunction.saveSettings(settingsName, properties);
     }
 
 
     public void restoreBackup() {
         if (isBackupActive()) {
-            this.properties = new Properties();
+            this.properties.clear();
             backUp.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
             validateAllProperties();
-            saveToFile();
+            saveFunction.saveSettings(settingsName, properties);
             discardBackup();
         }
     }
 
     public void createBackup() {
-        this.backUp = new Properties();
+        this.backUp.clear();
         for (Object propertyO : this.properties.keySet()) {
             String property = (String) propertyO;
             this.backUp.setProperty(property, this.properties.getProperty(property));
@@ -86,29 +86,28 @@ public class SettingsManager {
 
     public void discardBackup() {
         this.backUp.clear();
-        this.backUp = null;
     }
 
     public void addSetting(String name, String defaultValue, ValidateFunction validateFunction) {
         if (entries.get(name) == null) {
             SettingsEntry settingsEntry = new SettingsEntry(name, defaultValue, validateFunction);
-            this.entries.put(settingsEntry.name(), settingsEntry);
-            if (this.properties.getProperty(settingsEntry.name()) == null) {
-                this.properties.setProperty(settingsEntry.name(), settingsEntry.defaultValue());
+            entries.put(settingsEntry.name(), settingsEntry);
+            if (properties.getProperty(settingsEntry.name()) == null) {
+                properties.setProperty(settingsEntry.name(), settingsEntry.defaultValue());
             } else {
                 // already loaded
                 validateProperty(settingsEntry.name());
             }
-            saveToFile();
+            saveFunction.saveSettings(settingsName, properties);
         }
     }
 
     public void removeSettings(String name) {
         SettingsEntry settingsEntry = entries.get(name);
         if (settingsEntry != null) {
-            this.properties.remove(settingsEntry.name());
-            this.entries.remove(settingsEntry.name());
-            saveToFile();
+            properties.remove(settingsEntry.name());
+            entries.remove(settingsEntry.name());
+            saveFunction.saveSettings(settingsName, properties);
         }
     }
 
@@ -137,9 +136,11 @@ public class SettingsManager {
         set(name, boolValue ? "true" : "false");
     }
 
-    public<T extends Enum<T>> void setEnum(String name, Enum<T> enumValue){
+    public <T extends Enum<T>> void setEnum(String name, Enum<T> enumValue) {
         set(name, enumValue.name());
-    };
+    }
+
+    ;
 
 
     public boolean getBoolean(String name) {
@@ -176,7 +177,7 @@ public class SettingsManager {
     }
 
     public static boolean isValidString(String value) {
-        if(value == null) return false;
+        if (value == null) return false;
         return true;
     }
 
@@ -200,11 +201,13 @@ public class SettingsManager {
         return true;
     }
 
-    public static <T extends Enum<T>> boolean isValidEnum(String value, Class<T> enumClass){
+    public static <T extends Enum<T>> boolean isValidEnum(String value, Class<T> enumClass) {
         return Enum.valueOf(enumClass, value) != null;
-    };
+    }
 
-    public static boolean isValidInt(String value)  {
+    ;
+
+    public static boolean isValidInt(String value) {
         if (value == null) return false;
         try {
             Integer.parseInt(value);
@@ -220,11 +223,13 @@ public class SettingsManager {
         return null;
     }
 
-    public<T extends Enum<T>> T getEnum(String name, Class<T> enumClass){
+    public <T extends Enum<T>> T getEnum(String name, Class<T> enumClass) {
         SettingsEntry settingsEntry = entries.get(name);
-        if (settingsEntry != null) return Enum.valueOf(enumClass, this.properties.getProperty(settingsEntry.name())) ;
+        if (settingsEntry != null) return Enum.valueOf(enumClass, this.properties.getProperty(settingsEntry.name()));
         return null;
-    };
+    }
+
+    ;
 
 
     public String[] getStringList(String name) {
@@ -263,22 +268,13 @@ public class SettingsManager {
         SettingsEntry settingsEntry = entries.get(name);
         if (settingsEntry != null) {
             String oldValue = this.properties.getProperty(settingsEntry.name());
-            this.properties.setProperty(settingsEntry.name(), value);
+            properties.setProperty(settingsEntry.name(), value);
             validateProperty(settingsEntry.name());
             if (oldValue != null && !oldValue.equals(value)) {
-                saveToFile();
+                saveFunction.saveSettings(settingsName, properties);
             }
         }
     }
 
-
-    private void saveToFile() {
-        try {
-            this.properties.store(Files.newOutputStream(settingsFile), null);
-        } catch (IOException e) {
-            throw new SettingsException(e);
-        }
-
-    }
 
 }
