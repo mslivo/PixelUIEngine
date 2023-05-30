@@ -250,8 +250,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
-        newInputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
+        newInputState.mouseXBeforeKeyboardCtrl = Gdx.input.getX();
+        newInputState.mouseYBeforeKeyboardCtrl = Gdx.input.getY();
         newInputState.keyBoardCtrlLastMouseClick = 0;
         newInputState.keyBoardCtrlSpeedUp = 0f;
         newInputState.keyBoardCtrlIsMouseButtonDown = new boolean[]{false, false, false, false, false};
@@ -1165,13 +1165,13 @@ public class UIEngine<T extends UIAdapter> {
             switch (inputState.controlMode) {
                 case MOUSE -> {
                     if (isAnyKeyboardControlButtonDown()) {
-                        inputState.mouseXBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().x;
-                        inputState.mouseYBeforeKeyboardCtrl = MouseInfo.getPointerInfo().getLocation().y;
+                        inputState.mouseXBeforeKeyboardCtrl = Gdx.input.getX();
+                        inputState.mouseYBeforeKeyboardCtrl = Gdx.input.getY();
                         inputState.controlMode = ControlMode.KEYBOARD;
                     }
                 }
                 case KEYBOARD -> {
-                    if (MouseInfo.getPointerInfo().getLocation().x != inputState.mouseXBeforeKeyboardCtrl || MouseInfo.getPointerInfo().getLocation().y != inputState.mouseYBeforeKeyboardCtrl) {
+                    if (Gdx.input.getX() != inputState.mouseXBeforeKeyboardCtrl || Gdx.input.getY() != inputState.mouseYBeforeKeyboardCtrl) {
                         inputState.controlMode = ControlMode.MOUSE;
                     }
                 }
