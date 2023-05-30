@@ -688,6 +688,10 @@ public class API {
                     return newContent.length() >= minInputLength;
                 }
 
+                @Override
+                public void onUnFocus() {
+                    components.textField.focus(inputTextField);
+                }
             });
 
 
