@@ -1359,8 +1359,8 @@ public class UIEngine<T extends UIAdapter> {
         // Set Coordinates
         inputState.mouse_gui.x += deltaX;
         inputState.mouse_gui.y -= deltaY;
-        inputState.mouse_delta.x = MathUtils.round(-deltaX);
-        inputState.mouse_delta.y = MathUtils.round(deltaY);
+        inputState.mouse_delta.x = MathUtils.round(deltaX);
+        inputState.mouse_delta.y = MathUtils.round(-deltaY);
 
         // Emulate Mouse Button Press Events
         boolean anyButtonChanged = false;
@@ -1461,8 +1461,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
 
         // Delta
-        this.inputState.mouse_delta.x = inputState.mouse_gui.x - (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_delta.y = inputState.mouse_gui.y - (int) inputState.vector_fboCursor.y;
+        this.inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x-inputState.mouse_gui.x;
+        this.inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y-inputState.mouse_gui.y;
 
         // Set to final
         inputState.mouse_gui.x = (int) inputState.vector_fboCursor.x;
