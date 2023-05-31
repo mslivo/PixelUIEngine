@@ -716,6 +716,7 @@ public class API {
                     longest = len;
                 }
             }
+            ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
             Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
@@ -723,6 +724,7 @@ public class API {
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
                 texts[i] = components.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
+                componentsList.add(texts[i]);
             }
 
             Button okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
@@ -735,9 +737,10 @@ public class API {
                 }
             });
             components.button.centerContent(okBtn);
+            componentsList.add(okBtn);
 
 
-            Component[] componentsArr = new Component[]{okBtn};
+            Component[] componentsArr = componentsList.toArray(new Component[]{});
             components.setOffset(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             windows.addComponents(modal, componentsArr);
             return modal;
