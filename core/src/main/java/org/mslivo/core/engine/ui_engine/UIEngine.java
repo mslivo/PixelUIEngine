@@ -1356,7 +1356,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        // Set Coordinates
+        // Set to final
         inputState.mouse_gui.x += deltaX;
         inputState.mouse_gui.y -= deltaY;
         inputState.mouse_delta.x = MathUtils.round(deltaX);
@@ -1460,11 +1460,9 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.z = 1;
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
 
-        // Delta
-        this.inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x-inputState.mouse_gui.x;
-        this.inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y-inputState.mouse_gui.y;
-
         // Set to final
+        inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x-inputState.mouse_gui.x;
+        inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y-inputState.mouse_gui.y;
         inputState.mouse_gui.x = (int) inputState.vector_fboCursor.x;
         inputState.mouse_gui.y = (int) inputState.vector_fboCursor.y;
     }
