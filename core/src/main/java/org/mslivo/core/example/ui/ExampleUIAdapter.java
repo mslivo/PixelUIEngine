@@ -80,9 +80,7 @@ public class ExampleUIAdapter implements UIAdapter {
         }
 
         // Create Inputs
-        if (api.input.keyDown()) {
-            //api.input.setMousePosition(MathUtils.random(0,200),MathUtils.random(0,200));
-        }
+        // gameEngine.input(new EngineInput(0,"TestInput"));
     }
 
 
