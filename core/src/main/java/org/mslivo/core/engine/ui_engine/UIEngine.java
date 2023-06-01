@@ -1247,14 +1247,10 @@ public class UIEngine<T extends UIAdapter> {
 
         if (moveButtonPressed) {
             inputState.keyMouseControlSpeedUp = inputState.keyMouseControlSpeedUp < 1f ? inputState.keyMouseControlSpeedUp + 0.25f : inputState.keyMouseControlSpeedUp;
-            if (inputState.inputEvents.keysDown[Input.Keys.UP])
-                deltaY -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (inputState.inputEvents.keysDown[Input.Keys.DOWN])
-                deltaY += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (inputState.inputEvents.keysDown[Input.Keys.LEFT])
-                deltaX -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (inputState.inputEvents.keysDown[Input.Keys.RIGHT])
-                deltaX += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonUp) deltaY -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonDown) deltaY += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonLeft) deltaX -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonRight) deltaX += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
         } else {
             inputState.keyMouseControlSpeedUp = 0;
             // Magnet

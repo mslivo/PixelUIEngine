@@ -1399,17 +1399,17 @@ public class API {
         private boolean mouseDisabled = false;
         private float keyMouseControlCursorSpeed = 4.0f;
         private boolean keyMouseControlMagnetModeEnabled = true;
-        private int keyMouseControlButtonUp = Input.Keys.UP;
-        private int keyMouseControlButtonDown = Input.Keys.DOWN;
-        private int keyMouseControlButtonLeft = Input.Keys.LEFT;
-        private int keyMouseControlButtonRight = Input.Keys.RIGHT;
-        private int keyMouseControlButtonMouse1 = Input.Keys.CONTROL_LEFT;
-        private int keyMouseControlButtonMouse2 = Input.Keys.CONTROL_RIGHT;
-        private int keyMouseControlButtonMouse3 = Input.Keys.UNKNOWN;
-        private int keyMouseControlButtonMouse4 = Input.Keys.UNKNOWN;
-        private int keyMouseControlButtonMouse5 = Input.Keys.UNKNOWN;
-        private int keyMouseControlButtonScrollUp = Input.Keys.PAGE_UP;
-        private int keyMouseControlButtonScrollDown = Input.Keys.PAGE_DOWN;
+        private int[] keyMouseControlButtonsUp = new int[]{Input.Keys.UP};
+        private int[] keyMouseControlButtonsDown =  new int[]{Input.Keys.DOWN};
+        private int[] keyMouseControlButtonsLeft = new int[]{ Input.Keys.LEFT};
+        private int[] keyMouseControlButtonsRight =  new int[]{Input.Keys.RIGHT};
+        private int[] keyMouseControlButtonsMouse1 =  new int[]{Input.Keys.CONTROL_LEFT};
+        private int[] keyMouseControlButtonsMouse2 =  new int[]{Input.Keys.CONTROL_RIGHT};
+        private int[] keyMouseControlButtonsMouse3 =  new int[]{Input.Keys.UNKNOWN};
+        private int[] keyMouseControlButtonsMouse4 =  new int[]{Input.Keys.UNKNOWN};
+        private int[] keyMouseControlButtonsMouse5 = new int[]{ Input.Keys.UNKNOWN};
+        private int[] keyMouseControlButtonsScrollUp = new int[]{ Input.Keys.PAGE_UP};
+        private int[] keyMouseControlButtonsScrollDown =  new int[]{Input.Keys.PAGE_DOWN};
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
@@ -1497,36 +1497,92 @@ public class API {
             this.mouseDisabled = mouseDisabled;
         }
 
-        public int getKeyMouseControlButtonMouse2() {
-            return keyMouseControlButtonMouse2;
+        public int[] getKeyMouseControlButtonsMouse2() {
+            return keyMouseControlButtonsMouse2;
         }
 
-        public void setKeyMouseControlButtonMouse2(int keyMouseControlButtonMouse2) {
-            this.keyMouseControlButtonMouse2 = keyMouseControlButtonMouse2;
+        public void setKeyMouseControlButtonsMouse2(int[] keyMouseControlButtonsMouse2) {
+            this.keyMouseControlButtonsMouse2 = keyMouseControlButtonsMouse2;
         }
 
-        public int getKeyMouseControlButtonMouse3() {
-            return keyMouseControlButtonMouse3;
+        public int[] getKeyMouseControlButtonsMouse3() {
+            return keyMouseControlButtonsMouse3;
         }
 
-        public void setKeyMouseControlButtonMouse3(int keyMouseControlButtonMouse3) {
-            this.keyMouseControlButtonMouse3 = keyMouseControlButtonMouse3;
+        public void setKeyMouseControlButtonsMouse3(int[] keyMouseControlButtonsMouse3) {
+            this.keyMouseControlButtonsMouse3 = keyMouseControlButtonsMouse3;
         }
 
-        public int getKeyMouseControlButtonMouse4() {
-            return keyMouseControlButtonMouse4;
+        public int[] getKeyMouseControlButtonsMouse4() {
+            return keyMouseControlButtonsMouse4;
         }
 
-        public void setKeyMouseControlButtonMouse4(int keyMouseControlButtonMouse4) {
-            this.keyMouseControlButtonMouse4 = keyMouseControlButtonMouse4;
+        public void setKeyMouseControlButtonsMouse4(int[] keyMouseControlButtonsMouse4) {
+            this.keyMouseControlButtonsMouse4 = keyMouseControlButtonsMouse4;
         }
 
-        public int getKeyMouseControlButtonMouse5() {
-            return keyMouseControlButtonMouse5;
+        public int[] getKeyMouseControlButtonsMouse5() {
+            return keyMouseControlButtonsMouse5;
         }
 
-        public void setKeyMouseControlButtonMouse5(int keyMouseControlButtonMouse5) {
-            this.keyMouseControlButtonMouse5 = keyMouseControlButtonMouse5;
+        public void setKeyMouseControlButtonsMouse5(int[] keyMouseControlButtonsMouse5) {
+            this.keyMouseControlButtonsMouse5 = keyMouseControlButtonsMouse5;
+        }
+
+        public int[] getKeyMouseControlButtonsUp() {
+            return keyMouseControlButtonsUp;
+        }
+
+        public void setKeyMouseControlButtonsUp(int[] keyMouseControlButtonsUp) {
+            this.keyMouseControlButtonsUp = keyMouseControlButtonsUp;
+        }
+
+        public int[] getKeyMouseControlButtonsDown() {
+            return keyMouseControlButtonsDown;
+        }
+
+        public void setKeyMouseControlButtonsDown(int[] keyMouseControlButtonsDown) {
+            this.keyMouseControlButtonsDown = keyMouseControlButtonsDown;
+        }
+
+        public int[] getKeyMouseControlButtonsLeft() {
+            return keyMouseControlButtonsLeft;
+        }
+
+        public void setKeyMouseControlButtonsLeft(int[] keyMouseControlButtonsLeft) {
+            this.keyMouseControlButtonsLeft = keyMouseControlButtonsLeft;
+        }
+
+        public int[] getKeyMouseControlButtonsRight() {
+            return keyMouseControlButtonsRight;
+        }
+
+        public void setKeyMouseControlButtonsRight(int[] keyMouseControlButtonsRight) {
+            this.keyMouseControlButtonsRight = keyMouseControlButtonsRight;
+        }
+
+        public int[] getKeyMouseControlButtonsMouse1() {
+            return keyMouseControlButtonsMouse1;
+        }
+
+        public void setKeyMouseControlButtonsMouse1(int[] keyMouseControlButtonsMouse1) {
+            this.keyMouseControlButtonsMouse1 = keyMouseControlButtonsMouse1;
+        }
+
+        public int[] getKeyMouseControlButtonsScrollUp() {
+            return keyMouseControlButtonsScrollUp;
+        }
+
+        public void setKeyMouseControlButtonsScrollUp(int[] keyMouseControlButtonsScrollUp) {
+            this.keyMouseControlButtonsScrollUp = keyMouseControlButtonsScrollUp;
+        }
+
+        public int[] getKeyMouseControlButtonsScrollDown() {
+            return keyMouseControlButtonsScrollDown;
+        }
+
+        public void setKeyMouseControlButtonsScrollDown(int[] keyMouseControlButtonsScrollDown) {
+            this.keyMouseControlButtonsScrollDown = keyMouseControlButtonsScrollDown;
         }
 
         public CMediaFont getTooltipDefaultFont() {
@@ -1687,61 +1743,6 @@ public class API {
             this.keyMouseControlMagnetModeEnabled = keyMouseControlMagnetModeEnabled;
         }
 
-        public int getKeyMouseControlButtonUp() {
-            return keyMouseControlButtonUp;
-        }
-
-        public void setKeyMouseControlButtonUp(int keyMouseControlButtonUp) {
-            this.keyMouseControlButtonUp = keyMouseControlButtonUp;
-        }
-
-        public int getKeyMouseControlButtonDown() {
-            return keyMouseControlButtonDown;
-        }
-
-        public void setKeyMouseControlButtonDown(int keyMouseControlButtonDown) {
-            this.keyMouseControlButtonDown = keyMouseControlButtonDown;
-        }
-
-        public int getKeyMouseControlButtonLeft() {
-            return keyMouseControlButtonLeft;
-        }
-
-        public void setKeyMouseControlButtonLeft(int keyMouseControlButtonLeft) {
-            this.keyMouseControlButtonLeft = keyMouseControlButtonLeft;
-        }
-
-        public int getKeyMouseControlButtonRight() {
-            return keyMouseControlButtonRight;
-        }
-
-        public void setKeyMouseControlButtonRight(int keyMouseControlButtonRight) {
-            this.keyMouseControlButtonRight = keyMouseControlButtonRight;
-        }
-
-        public int getKeyMouseControlButtonMouse1() {
-            return keyMouseControlButtonMouse1;
-        }
-
-        public void setKeyMouseControlButtonMouse1(int keyMouseControlButtonMouse1) {
-            this.keyMouseControlButtonMouse1 = keyMouseControlButtonMouse1;
-        }
-
-        public int getKeyMouseControlButtonScrollUp() {
-            return keyMouseControlButtonScrollUp;
-        }
-
-        public void setKeyMouseControlButtonScrollUp(int keyMouseControlButtonScrollUp) {
-            this.keyMouseControlButtonScrollUp = keyMouseControlButtonScrollUp;
-        }
-
-        public int getKeyMouseControlButtonScrollDown() {
-            return keyMouseControlButtonScrollDown;
-        }
-
-        public void setKeyMouseControlButtonScrollDown(int keyMouseControlButtonScrollDown) {
-            this.keyMouseControlButtonScrollDown = keyMouseControlButtonScrollDown;
-        }
 
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -1776,17 +1777,17 @@ public class API {
             setKeyMouseControlEnabled(config.isKeyMouseControlEnabled());
             setKeyMouseControlCursorSpeed(config.getKeyMouseControlCursorSpeed());
             setKeyMouseControlMagnetModeEnabled(config.isKeyMouseControlMagnetModeEnabled());
-            setKeyMouseControlButtonUp(config.getKeyMouseControlButtonUp());
-            setKeyMouseControlButtonDown(config.getKeyMouseControlButtonDown());
-            setKeyMouseControlButtonLeft(config.getKeyMouseControlButtonLeft());
-            setKeyMouseControlButtonRight(config.getKeyMouseControlButtonRight());
-            setKeyMouseControlButtonMouse1(config.getKeyMouseControlButtonMouse1());
-            setKeyMouseControlButtonMouse2(config.getKeyMouseControlButtonMouse2());
-            setKeyMouseControlButtonMouse3(config.getKeyMouseControlButtonMouse3());
-            setKeyMouseControlButtonMouse4(config.getKeyMouseControlButtonMouse4());
-            setKeyMouseControlButtonMouse5(config.getKeyMouseControlButtonMouse5());
-            setKeyMouseControlButtonScrollDown(config.getKeyMouseControlButtonScrollDown());
-            setKeyMouseControlButtonScrollUp(config.getKeyMouseControlButtonScrollUp());
+            setKeyMouseControlButtonsUp(config.getKeyMouseControlButtonsUp());
+            setKeyMouseControlButtonsDown(config.getKeyMouseControlButtonsDown());
+            setKeyMouseControlButtonsLeft(config.getKeyMouseControlButtonsLeft());
+            setKeyMouseControlButtonsRight(config.getKeyMouseControlButtonsRight());
+            setKeyMouseControlButtonsMouse1(config.getKeyMouseControlButtonsMouse1());
+            setKeyMouseControlButtonsMouse2(config.getKeyMouseControlButtonsMouse2());
+            setKeyMouseControlButtonsMouse3(config.getKeyMouseControlButtonsMouse3());
+            setKeyMouseControlButtonsMouse4(config.getKeyMouseControlButtonsMouse4());
+            setKeyMouseControlButtonsMouse5(config.getKeyMouseControlButtonsMouse5());
+            setKeyMouseControlButtonsScrollDown(config.getKeyMouseControlButtonsScrollDown());
+            setKeyMouseControlButtonsScrollUp(config.getKeyMouseControlButtonsScrollUp());
             setMouseDisabled(config.isMouseDisabled());
         }
 
