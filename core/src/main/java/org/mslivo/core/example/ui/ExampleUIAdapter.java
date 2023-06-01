@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.game_engine.EngineInput;
 import org.mslivo.core.engine.game_engine.EngineOutput;
 import org.mslivo.core.engine.game_engine.GameEngine;
@@ -68,6 +69,7 @@ public class ExampleUIAdapter implements UIAdapter {
         api.camera.moveAbs(api.resolutionWidth()/2, api.resolutionHeight()/2);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
+        api.config.setKeyMouseControlEnabled(true);
     }
 
     @Override
@@ -79,7 +81,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
         // Create Inputs
         if (api.input.keyDown()) {
-            gameEngine.input(new EngineInput(0,"TestInput"));
+            //api.input.setMousePosition(MathUtils.random(0,200),MathUtils.random(0,200));
         }
     }
 

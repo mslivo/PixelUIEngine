@@ -32,7 +32,7 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
-import org.mslivo.core.engine.ui_engine.misc.ControlMode;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.util.ArrayDeque;
@@ -163,7 +163,7 @@ public class InputState {
 
     /* #################### Control #################### */
 
-    public ControlMode controlMode;
+    public MouseControlMode mouseControlMode;
 
     public GridPoint2 mouse;
 
@@ -187,11 +187,11 @@ public class InputState {
 
     public Vector2 vector2_unproject;
 
-    public int mouseXBeforeKeyboardCtrl, mouseYBeforeKeyboardCtrl;
+    public GridPoint2 keyMouseControlMouseBefore;
 
-    public long keyBoardCtrlLastMouseClick;
-    public float keyBoardCtrlSpeedUp;
-    public boolean[] keyBoardCtrlIsMouseButtonDown;
+    public long keyMouseControlLastMouseClick;
+    public float keyMouseControlSpeedUp;
+    public boolean[] keyMouseControlIsMouseButtonDown;
 
     /* #################### Misc. ####################  */
 

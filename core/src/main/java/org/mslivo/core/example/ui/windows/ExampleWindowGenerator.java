@@ -91,11 +91,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
                 0, null, true, window.height - 4, false);
 
-
         api.windows.addComponents(window, tabBarComponents.toArray(new Component[]{}));
 
-        api.config.setKeyBoardControlEnabled(true);
-        api.config.setMouseControlEnabled(true);
         return window;
     }
 
@@ -258,7 +255,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn1 = api.components.button.textButton.create(3, 3, 4, 2, "Toggle", new ButtonAction() {
             @Override
             public void onToggle(boolean value) {
-                api.input.setMousePosition(100,100);
+                api.input.setKeyMouseControlPosition(100,100);
             }
         }, null, ButtonMode.TOGGLE);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);

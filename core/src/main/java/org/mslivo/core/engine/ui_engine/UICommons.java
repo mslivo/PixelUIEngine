@@ -21,7 +21,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.misc.ControlMode;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 
 class UICommons {
@@ -97,7 +97,7 @@ class UICommons {
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
         boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x,inputState.mouse_gui.y);
-        if(success && inputState.controlMode == ControlMode.KEYBOARD){
+        if(success && inputState.mouseControlMode == MouseControlMode.KEYBOARD){
             // keyboard mode: move mouse onto the opened menu
             inputState.mouse_gui.x += UIEngine.TILE_SIZE_2;
             inputState.mouse_gui.y -= UIEngine.TILE_SIZE_2;
