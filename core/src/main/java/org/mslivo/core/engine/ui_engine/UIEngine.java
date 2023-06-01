@@ -1202,18 +1202,27 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private boolean isAnyKeyboardControlButtonDown() {
-        return inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonUp()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonDown()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonLeft()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonRight()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse1()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse2()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse3()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse4()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse5()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonScrollUp()] ||
-                inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonScrollDown()
-                        ];
+        return keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsUp()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsDown()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsLeft()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsRight()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse1()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse2()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse3()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse4()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse5()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollUp()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollDown());
+    }
+
+
+    private boolean keyMouseControlAnyKeyDown(int[] keys){
+        if(keys != null) {
+            for (int i = 0; i < keys.length; i++) {
+                if (inputState.inputEvents.keysDown[keys[i]]) return true;
+            }
+        }
+        return false;
     }
 
     private void updateMouseControlKeyboard() {
@@ -1221,17 +1230,17 @@ public class UIEngine<T extends UIAdapter> {
             return; // Stop Keyboard control if the user wants to type into a textfield
         int deltaX = 0;
         int deltaY = 0;
-        boolean buttonLeft = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonLeft()];
-        boolean buttonRight = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonRight()];
-        boolean buttonUp = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonUp()];
-        boolean buttonDown = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonDown()];
-        boolean buttonMouse1Down = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse1()];
-        boolean buttonMouse2Down = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse2()];
-        boolean buttonMouse3Down = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse3()];
-        boolean buttonMouse4Down = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse4()];
-        boolean buttonMouse5Down = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonMouse5()];
-        boolean buttonScrolledUp = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonScrollUp()];
-        boolean buttonScrolledDown = inputState.inputEvents.keysDown[api.config.getKeyMouseControlButtonScrollDown()];
+        boolean buttonLeft = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsLeft());
+        boolean buttonRight = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsRight());
+        boolean buttonUp = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsUp());
+        boolean buttonDown = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsDown());
+        boolean buttonMouse1Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse1());
+        boolean buttonMouse2Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse2());
+        boolean buttonMouse3Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse3());
+        boolean buttonMouse4Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse4());
+        boolean buttonMouse5Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse5());
+        boolean buttonScrolledUp = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollUp());
+        boolean buttonScrolledDown = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollDown());
         //
         boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
 
