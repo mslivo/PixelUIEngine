@@ -70,6 +70,7 @@ public class ExampleUIAdapter implements UIAdapter {
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setKeyMouseControlEnabled(true);
+
     }
 
     @Override

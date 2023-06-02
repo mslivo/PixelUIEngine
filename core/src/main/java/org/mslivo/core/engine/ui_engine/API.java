@@ -1396,7 +1396,7 @@ public class API {
 
     public static class _Config {
         private boolean keyMouseControlEnabled = false;
-        private boolean mouseDisabled = false;
+        private boolean mouseControlEnabled = true;
         private float keyMouseControlCursorSpeed = 4.0f;
         private boolean keyMouseControlMagnetModeEnabled = true;
         private int[] keyMouseControlButtonsUp = new int[]{Input.Keys.UP};
@@ -1489,12 +1489,12 @@ public class API {
             this.gameViewportDefaultUpdateTime = Tools.Calc.lowerBounds(gameViewportDefaultUpdateTime, 0);
         }
 
-        public boolean isMouseDisabled() {
-            return mouseDisabled;
+        public boolean isMouseControlEnabled() {
+            return mouseControlEnabled;
         }
 
-        public void setMouseDisabled(boolean mouseDisabled) {
-            this.mouseDisabled = mouseDisabled;
+        public void setMouseControlEnabled(boolean mouseControlEnabled) {
+            this.mouseControlEnabled = mouseControlEnabled;
         }
 
         public int[] getKeyMouseControlButtonsMouse2() {
@@ -1788,7 +1788,7 @@ public class API {
             setKeyMouseControlButtonsMouse5(config.getKeyMouseControlButtonsMouse5());
             setKeyMouseControlButtonsScrollDown(config.getKeyMouseControlButtonsScrollDown());
             setKeyMouseControlButtonsScrollUp(config.getKeyMouseControlButtonsScrollUp());
-            setMouseDisabled(config.isMouseDisabled());
+            setMouseControlEnabled(config.isMouseControlEnabled());
         }
 
 

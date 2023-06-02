@@ -1,6 +1,7 @@
 [ ] clear issues on linux
 
-[ ] api functions: move to cursor to lower / upper nearest visible component
+[ ] api functions:  keymousecontrol cursor to nearest visible component
+
 [x] UICommons notificatons
 [x] window & notifcations -> addedToScreen boolean
 [x] combobitems inherit color

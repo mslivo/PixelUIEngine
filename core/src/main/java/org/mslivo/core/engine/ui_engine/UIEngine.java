@@ -1177,8 +1177,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateMouseControlMode() {
-        if(!api.config.isMouseDisabled()) {
-            if (api.config.isKeyMouseControlEnabled()) {
+        if(!api.config.isMouseControlEnabled() && !api.config.isKeyMouseControlEnabled()){
+            inputState.mouseControlMode = MouseControlMode.DISABLED;
+        }else {
+            if (api.config.isMouseControlEnabled() && api.config.isKeyMouseControlEnabled()) {
+                // Switch between two modes
                 switch (inputState.mouseControlMode) {
                     case MOUSE -> {
                         if (isAnyKeyboardControlButtonDown()) {
@@ -1193,11 +1196,11 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                 }
-            } else {
+            } else if (api.config.isMouseControlEnabled() && !api.config.isKeyMouseControlEnabled()) {
                 inputState.mouseControlMode = MouseControlMode.MOUSE;
+            } else if (api.config.isKeyMouseControlEnabled() && !api.config.isMouseControlEnabled()) {
+                inputState.mouseControlMode = MouseControlMode.KEYBOARD;
             }
-        }else{
-            inputState.mouseControlMode = MouseControlMode.DISABLED;
         }
     }
 
