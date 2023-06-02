@@ -249,10 +249,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.keyMouseControlMouseBefore = new GridPoint2(0, 0);
-        newInputState.keyMouseControlLastMouseClick = 0;
-        newInputState.keyMouseControlSpeedUp = 0f;
-        newInputState.keyMouseControlIsMouseButtonDown = new boolean[]{false, false, false, false, false};
+        newInputState.keyBoardMouseControlMouseBefore = new GridPoint2(0, 0);
+        newInputState.keyBoardMouseControlLastMouseClick = 0;
+        newInputState.keyBoardMouseControlSpeedUp = 0f;
+        newInputState.keyBoardMouseControlIsMouseButtonDown = new boolean[]{false, false, false, false, false};
 
         // ---- Misc
         newInputState.animation_timer_gui = 0f;
@@ -1189,13 +1189,13 @@ public class UIEngine<T extends UIAdapter> {
                     switch (inputState.currentControlMode) {
                         case MOUSE -> {
                             if (isAnyKeyboardControlButtonDown()) {
-                                inputState.keyMouseControlMouseBefore.x = Gdx.input.getX();
-                                inputState.keyMouseControlMouseBefore.y = Gdx.input.getY();
+                                inputState.keyBoardMouseControlMouseBefore.x = Gdx.input.getX();
+                                inputState.keyBoardMouseControlMouseBefore.y = Gdx.input.getY();
                                 inputState.currentControlMode = MouseControlMode.KEYBOARD;
                             }
                         }
                         case KEYBOARD -> {
-                            if (Gdx.input.getX() != inputState.keyMouseControlMouseBefore.x || Gdx.input.getY() != inputState.keyMouseControlMouseBefore.y) {
+                            if (Gdx.input.getX() != inputState.keyBoardMouseControlMouseBefore.x || Gdx.input.getY() != inputState.keyBoardMouseControlMouseBefore.y) {
                                 inputState.currentControlMode = MouseControlMode.MOUSE;
                             }
                         }
@@ -1250,13 +1250,13 @@ public class UIEngine<T extends UIAdapter> {
 
 
         if (moveButtonPressed) {
-            inputState.keyMouseControlSpeedUp = inputState.keyMouseControlSpeedUp < 1f ? inputState.keyMouseControlSpeedUp + 0.25f : inputState.keyMouseControlSpeedUp;
-            if (buttonUp) deltaY -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonDown) deltaY += api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonLeft) deltaX -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonRight) deltaX += api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            inputState.keyBoardMouseControlSpeedUp = inputState.keyBoardMouseControlSpeedUp < 1f ? inputState.keyBoardMouseControlSpeedUp + 0.25f : inputState.keyBoardMouseControlSpeedUp;
+            if (buttonUp) deltaY -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardMouseControlSpeedUp;
+            if (buttonDown) deltaY += api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardMouseControlSpeedUp;
+            if (buttonLeft) deltaX -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardMouseControlSpeedUp;
+            if (buttonRight) deltaX += api.config.getKeyBoardControlCursorSpeed() * inputState.keyBoardMouseControlSpeedUp;
         } else {
-            inputState.keyMouseControlSpeedUp = 0;
+            inputState.keyBoardMouseControlSpeedUp = 0;
             // Magnet
             if (api.config.isKeyBoardControlMagnetModeEnabled()) {
                 boolean magnetPossible = false;
@@ -1402,18 +1402,18 @@ public class UIEngine<T extends UIAdapter> {
                 case 4 -> buttonMouse5Down;
                 default -> throw new IllegalStateException("Unexpected value: " + i);
             };
-            if (inputState.keyMouseControlIsMouseButtonDown[i] != buttonMouseXDown) {
-                inputState.keyMouseControlIsMouseButtonDown[i] = buttonMouseXDown;
-                if (inputState.keyMouseControlIsMouseButtonDown[i]) {
+            if (inputState.keyBoardMouseControlIsMouseButtonDown[i] != buttonMouseXDown) {
+                inputState.keyBoardMouseControlIsMouseButtonDown[i] = buttonMouseXDown;
+                if (inputState.keyBoardMouseControlIsMouseButtonDown[i]) {
                     inputState.inputEvents.mouseDown = true;
                     inputState.inputEvents.mouseDownButtons.add(i);
                     anyButtonChanged = true;
                     if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.keyMouseControlLastMouseClick) < DOUBLECLICK_TIME_MS) {
+                        if ((System.currentTimeMillis() - inputState.keyBoardMouseControlLastMouseClick) < DOUBLECLICK_TIME_MS) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
-                        inputState.keyMouseControlLastMouseClick = System.currentTimeMillis();
+                        inputState.keyBoardMouseControlLastMouseClick = System.currentTimeMillis();
                     }
 
                 } else {
@@ -1422,7 +1422,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                 }
             }
-            inputState.inputEvents.mouseButtonsDown[i] = inputState.keyMouseControlIsMouseButtonDown[i];
+            inputState.inputEvents.mouseButtonsDown[i] = inputState.keyBoardMouseControlIsMouseButtonDown[i];
         }
         if (!anyButtonChanged) {
             inputState.inputEvents.mouseDown = false;
@@ -1438,7 +1438,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseDragged = false;
             draggedLoop:
             for (int i = 0; i <= 4; i++) {
-                if (inputState.keyMouseControlIsMouseButtonDown[i]) {
+                if (inputState.keyBoardMouseControlIsMouseButtonDown[i]) {
                     inputState.inputEvents.mouseDragged = true;
                     inputState.inputEvents.mouseMoved = false;
                     break draggedLoop;
