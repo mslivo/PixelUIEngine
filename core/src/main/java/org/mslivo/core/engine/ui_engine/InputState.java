@@ -101,9 +101,8 @@ public class InputState {
     public ArrayList<Notification> notifications;
 
     public ArrayList<HotKey> hotKeys;
-
-    public boolean guiFrozen;
-
+    public boolean uiKeyInteractionsDisabled;
+    public boolean uiMouseInteractionsDisabled;
     public ArrayList<GameViewPort> gameViewPorts;
 
     public ArrayList<UpdateAction> singleUpdateActions;
@@ -163,7 +162,7 @@ public class InputState {
 
     /* #################### Control #################### */
 
-    public MouseControlMode mouseControlMode;
+    public MouseControlMode currentControlMode;
 
     public GridPoint2 mouse;
 

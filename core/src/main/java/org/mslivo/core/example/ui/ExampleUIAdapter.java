@@ -2,11 +2,8 @@ package org.mslivo.core.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
-import org.mslivo.core.engine.game_engine.EngineInput;
 import org.mslivo.core.engine.game_engine.EngineOutput;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
@@ -17,6 +14,7 @@ import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
 import org.mslivo.core.example.ui.media.ExampleBaseMedia;
@@ -69,7 +67,7 @@ public class ExampleUIAdapter implements UIAdapter {
         api.camera.moveAbs(api.resolutionWidth()/2, api.resolutionHeight()/2);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
-        api.config.setKeyMouseControlEnabled(true);
+        api.config.setMouseControlMode(MouseControlMode.MOUSE_KEYBOARD);
 
     }
 

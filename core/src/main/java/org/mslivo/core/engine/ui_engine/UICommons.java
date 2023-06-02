@@ -49,7 +49,7 @@ class UICommons {
         inputState.lastActiveWindow = window;
     }
 
-    static boolean component_isHiddenByTab(Component component){
+    static boolean component_isHiddenByTab(Component component) {
         if (component.addedToTab == null) return false;
         Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
         if (selectedTab != null && selectedTab == component.addedToTab) {
@@ -86,7 +86,8 @@ class UICommons {
         notification.addedToScreen = true;
         inputState.notifications.add(notification);
         // Remove first if too many
-        if (inputState.notifications.size() > notificationsMax) notification_removeFromScreen(inputState, inputState.notifications.get(0));
+        if (inputState.notifications.size() > notificationsMax)
+            notification_removeFromScreen(inputState, inputState.notifications.get(0));
     }
 
     static void notification_removeFromScreen(InputState inputState, Notification notification) {
@@ -96,8 +97,8 @@ class UICommons {
     }
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
-        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x,inputState.mouse_gui.y);
-        if(success && inputState.mouseControlMode == MouseControlMode.KEYBOARD){
+        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x, inputState.mouse_gui.y);
+        if (success && inputState.currentControlMode == MouseControlMode.KEYBOARD) {
             // keyboard mode: move mouse onto the opened menu
             inputState.mouse_gui.x += UIEngine.TILE_SIZE_2;
             inputState.mouse_gui.y -= UIEngine.TILE_SIZE_2;
@@ -115,7 +116,7 @@ class UICommons {
         contextMenu.x = inputState.mouse_gui.x;
         contextMenu.y = inputState.mouse_gui.y;
         int textwidth = 0;
-        for(int i=0;i<contextMenu.items.size();i++){
+        for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
             int w = mediaManager.textWidth(contextMenuItem.font, contextMenuItem.text);
             if (contextMenuItem.icon != null) w = w + UIEngine.TILE_SIZE;
@@ -123,15 +124,15 @@ class UICommons {
         }
         inputState.displayedContextMenuWidth = (textwidth + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE;
         inputState.openContextMenu = contextMenu;
-        if(inputState.openContextMenu.contextMenuAction != null) inputState.openContextMenu.contextMenuAction.onOpen();
+        if (inputState.openContextMenu.contextMenuAction != null) inputState.openContextMenu.contextMenuAction.onOpen();
         return true;
     }
 
     static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
-        if(contextMenu_isOpen(contextMenu, inputState)) {
+        if (contextMenu_isOpen(contextMenu, inputState)) {
             inputState.openContextMenu = null;
             inputState.displayedContextMenuWidth = 0;
-            if(contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
+            if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
         }
     }
 
@@ -219,7 +220,7 @@ class UICommons {
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
         if (textField.textFieldAction != null) {
             textField.contentValid = textField.textFieldAction.isContentValid(content);
-        }else{
+        } else {
             textField.contentValid = true;
         }
     }
@@ -393,13 +394,13 @@ class UICommons {
         inputState.listDrag_Item = null;
 
         // Textfield
-        if(inputState.focusedTextField != null) UICommons.textField_unFocus(inputState, inputState.focusedTextField);
+        if (inputState.focusedTextField != null) UICommons.textField_unFocus(inputState, inputState.focusedTextField);
 
         // ComboBox
-        if(inputState.openComboBox != null) UICommons.comboBox_close(inputState.openComboBox, inputState);
+        if (inputState.openComboBox != null) UICommons.comboBox_close(inputState.openComboBox, inputState);
 
         // ContextMenu
-        if(inputState.openContextMenu != null) UICommons.contextMenu_close(inputState.openContextMenu, inputState);
+        if (inputState.openContextMenu != null) UICommons.contextMenu_close(inputState.openContextMenu, inputState);
     }
 
     static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
@@ -449,16 +450,15 @@ class UICommons {
         }
     }
 
-    static void list_setMultiSelect(List list, boolean multiSelect){
+    static void list_setMultiSelect(List list, boolean multiSelect) {
         // Clear selecteditem/items after mode switch
         list.multiSelect = multiSelect;
-        if(multiSelect){
+        if (multiSelect) {
             list.selectedItem = null;
-        }else{
+        } else {
             list.selectedItems.clear();
         }
     }
-
 
 
     static void knob_turnKnob(Knob knob, float newValue, float amount) {
@@ -481,7 +481,7 @@ class UICommons {
         return inventory.inventoryAction != null && inventory.inventoryAction.canDragIntoScreen();
     }
 
-    static boolean list_canDragIntoList(InputState inputState,List list) {
+    static boolean list_canDragIntoList(InputState inputState, List list) {
         if (list == null) return false;
         if (inputState.listDrag_List != null) {
             if (inputState.listDrag_List == list) return true; // into itself
@@ -497,7 +497,7 @@ class UICommons {
         }
     }
 
-    static void tabBar_updateItemInfoAtMousePosition(InputState inputState, TabBar tabBar){
+    static void tabBar_updateItemInfoAtMousePosition(InputState inputState, TabBar tabBar) {
         int x_bar = UICommons.component_getAbsoluteX(tabBar);
         int y_bar = UICommons.component_getAbsoluteY(tabBar);
 

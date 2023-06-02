@@ -210,7 +210,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.focusedTextField = null;
         newInputState.notifications = new ArrayList<>();
         newInputState.hotKeys = new ArrayList<>();
-        newInputState.guiFrozen = false;
+        newInputState.uiKeyInteractionsDisabled = false;
+        newInputState.uiMouseInteractionsDisabled = false;
         newInputState.gameViewPorts = new ArrayList<>();
         newInputState.singleUpdateActions = new ArrayList<>();
         newInputState.singleUpdateActionsRemoveQ = new ArrayDeque<>();
@@ -240,7 +241,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.openComboBox = null;
 
         // ----- Controls
-        newInputState.mouseControlMode = MouseControlMode.KEYBOARD;
+        newInputState.currentControlMode = MouseControlMode.KEYBOARD;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
         newInputState.mouse = new GridPoint2(0, 0);
         newInputState.mouse_delta = new GridPoint2(0, 0);
@@ -250,7 +251,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.keyMouseControlMouseBefore = new GridPoint2(0,0);
+        newInputState.keyMouseControlMouseBefore = new GridPoint2(0, 0);
         newInputState.keyMouseControlLastMouseClick = 0;
         newInputState.keyMouseControlSpeedUp = 0f;
         newInputState.keyMouseControlIsMouseButtonDown = new boolean[]{false, false, false, false, false};
@@ -284,7 +285,7 @@ public class UIEngine<T extends UIAdapter> {
         // GUI
         this.updateMouse();
         this.updateLastGUIMouseHover(); // Determine object that is targeted by cursor
-        if (!this.inputState.guiFrozen) this.updateGUI(); // Main GUI Update happen here
+        this.updateGUI(); // Main GUI Update happen here
         this.updateGameCamera();
         this.updateMouseCursor();
 
@@ -297,6 +298,8 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateKeyInteractions() {
+        if (this.inputState.uiKeyInteractionsDisabled) return;
+
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
                 TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
@@ -323,7 +326,7 @@ public class UIEngine<T extends UIAdapter> {
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
 
                         }
-                    }else {
+                    } else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             if (focusedTextField.content.length() < focusedTextField.contentMaxLength) {
                                 String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
@@ -354,7 +357,7 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.content.length());
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
-                    } else if(keyDownKeyCode == Input.Keys.ENTER){
+                    } else if (keyDownKeyCode == Input.Keys.ENTER) {
                         UICommons.textField_unFocus(inputState, focusedTextField);
                         if (focusedTextField.textFieldAction != null)
                             focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
@@ -406,6 +409,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateMouseInteractions() {
+        if (this.inputState.uiMouseInteractionsDisabled) return;
+
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseClick = true;
             if (inputState.lastGUIMouseHover != null) {
@@ -579,7 +584,7 @@ public class UIEngine<T extends UIAdapter> {
                                         comboBoxItem.comboBoxItemAction.onSelect();
                                     if (combobox.comboBoxAction != null)
                                         combobox.comboBoxAction.onItemSelected(comboBoxItem);
-                                    if (inputState.mouseControlMode == MouseControlMode.KEYBOARD) {
+                                    if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
                                         // keyboard mode: move mouse back to combobox on item select
                                         inputState.mouse_gui.y = UICommons.component_getAbsoluteY(combobox) + TILE_SIZE_2;
                                     }
@@ -896,7 +901,7 @@ public class UIEngine<T extends UIAdapter> {
                 float amount = -(inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
                 float newValue = knob.turned + amount;
                 UICommons.knob_turnKnob(knob, newValue, amount);
-                if (inputState.mouseControlMode == MouseControlMode.KEYBOARD) {
+                if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
                     // keyboard mode: keep mouse position steady
                     inputState.mouse_gui.y += inputState.mouse_delta.y;
                 }
@@ -970,9 +975,9 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateGUI() {
 
-        updateKeyInteractions();
-
         updateMouseInteractions();
+
+        updateKeyInteractions();
 
         updateButtonHoldActions();
 
@@ -1145,10 +1150,9 @@ public class UIEngine<T extends UIAdapter> {
 
         updateMouseControlMode();
 
-        switch (inputState.mouseControlMode) {
+        switch (inputState.currentControlMode) {
             case MOUSE -> updateMouseControlMouse();
             case KEYBOARD -> updateMouseControlKeyboard();
-            case DISABLED -> updateMouseControlDisabled();
         }
 
         // Translate MouseXGUI/MouseYGUI to Game X/Y
@@ -1165,7 +1169,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.inputEvents.mouseDown = false;
         inputState.inputEvents.mouseDownButtons.clear();
         inputState.inputEvents.mouseDoubleClick = false;
-        for(int i=0;i<inputState.inputEvents.mouseButtonsDown.length;i++){
+        for (int i = 0; i < inputState.inputEvents.mouseButtonsDown.length; i++) {
             inputState.inputEvents.mouseButtonsDown[i] = false;
         }
 
@@ -1177,50 +1181,49 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateMouseControlMode() {
-        if(!api.config.isMouseControlEnabled() && !api.config.isKeyMouseControlEnabled()){
-            inputState.mouseControlMode = MouseControlMode.DISABLED;
-        }else {
-            if (api.config.isMouseControlEnabled() && api.config.isKeyMouseControlEnabled()) {
-                // Switch between two modes
-                switch (inputState.mouseControlMode) {
-                    case MOUSE -> {
-                        if (isAnyKeyboardControlButtonDown()) {
-                            inputState.keyMouseControlMouseBefore.x = Gdx.input.getX();
-                            inputState.keyMouseControlMouseBefore.y = Gdx.input.getY();
-                            inputState.mouseControlMode = MouseControlMode.KEYBOARD;
+        if (api.config.getMouseControlMode() == null) {
+            inputState.currentControlMode = MouseControlMode.MOUSE;
+        } else {
+            switch (api.config.getMouseControlMode()) {
+                case MOUSE -> inputState.currentControlMode = MouseControlMode.MOUSE;
+                case KEYBOARD -> inputState.currentControlMode = MouseControlMode.KEYBOARD;
+                case MOUSE_KEYBOARD -> {
+                    switch (inputState.currentControlMode) {
+                        case MOUSE -> {
+                            if (isAnyKeyboardControlButtonDown()) {
+                                inputState.keyMouseControlMouseBefore.x = Gdx.input.getX();
+                                inputState.keyMouseControlMouseBefore.y = Gdx.input.getY();
+                                inputState.currentControlMode = MouseControlMode.KEYBOARD;
+                            }
                         }
-                    }
-                    case KEYBOARD -> {
-                        if (Gdx.input.getX() != inputState.keyMouseControlMouseBefore.x || Gdx.input.getY() != inputState.keyMouseControlMouseBefore.y) {
-                            inputState.mouseControlMode = MouseControlMode.MOUSE;
+                        case KEYBOARD -> {
+                            if (Gdx.input.getX() != inputState.keyMouseControlMouseBefore.x || Gdx.input.getY() != inputState.keyMouseControlMouseBefore.y) {
+                                inputState.currentControlMode = MouseControlMode.MOUSE;
+                            }
                         }
                     }
                 }
-            } else if (api.config.isMouseControlEnabled() && !api.config.isKeyMouseControlEnabled()) {
-                inputState.mouseControlMode = MouseControlMode.MOUSE;
-            } else if (api.config.isKeyMouseControlEnabled() && !api.config.isMouseControlEnabled()) {
-                inputState.mouseControlMode = MouseControlMode.KEYBOARD;
             }
         }
     }
 
     private boolean isAnyKeyboardControlButtonDown() {
-        return keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsUp()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsDown()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsLeft()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsRight()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse1()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse2()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse3()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse4()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse5()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollUp()) ||
-                keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollDown());
+        return keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsUp()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsDown()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsLeft()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsRight()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse1()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse2()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse3()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse4()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse5()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsScrollUp()) ||
+                keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsScrollDown());
     }
 
 
-    private boolean keyMouseControlAnyKeyDown(int[] keys){
-        if(keys != null) {
+    private boolean keyMouseControlAnyKeyDown(int[] keys) {
+        if (keys != null) {
             for (int i = 0; i < keys.length; i++) {
                 if (inputState.inputEvents.keysDown[keys[i]]) return true;
             }
@@ -1233,31 +1236,31 @@ public class UIEngine<T extends UIAdapter> {
             return; // Stop Keyboard control if the user wants to type into a textfield
         int deltaX = 0;
         int deltaY = 0;
-        boolean buttonLeft = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsLeft());
-        boolean buttonRight = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsRight());
-        boolean buttonUp = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsUp());
-        boolean buttonDown = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsDown());
-        boolean buttonMouse1Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse1());
-        boolean buttonMouse2Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse2());
-        boolean buttonMouse3Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse3());
-        boolean buttonMouse4Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse4());
-        boolean buttonMouse5Down = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsMouse5());
-        boolean buttonScrolledUp = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollUp());
-        boolean buttonScrolledDown = keyMouseControlAnyKeyDown(api.config.getKeyMouseControlButtonsScrollDown());
+        boolean buttonLeft = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsLeft());
+        boolean buttonRight = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsRight());
+        boolean buttonUp = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsUp());
+        boolean buttonDown = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsDown());
+        boolean buttonMouse1Down = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse1());
+        boolean buttonMouse2Down = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse2());
+        boolean buttonMouse3Down = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse3());
+        boolean buttonMouse4Down = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse4());
+        boolean buttonMouse5Down = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsMouse5());
+        boolean buttonScrolledUp = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsScrollUp());
+        boolean buttonScrolledDown = keyMouseControlAnyKeyDown(api.config.getKeyBoardControlButtonsScrollDown());
         //
         boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
 
 
         if (moveButtonPressed) {
             inputState.keyMouseControlSpeedUp = inputState.keyMouseControlSpeedUp < 1f ? inputState.keyMouseControlSpeedUp + 0.25f : inputState.keyMouseControlSpeedUp;
-            if (buttonUp) deltaY -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonDown) deltaY += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonLeft) deltaX -= api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
-            if (buttonRight) deltaX += api.config.getKeyMouseControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonUp) deltaY -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonDown) deltaY += api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonLeft) deltaX -= api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
+            if (buttonRight) deltaX += api.config.getKeyBoardControlCursorSpeed() * inputState.keyMouseControlSpeedUp;
         } else {
             inputState.keyMouseControlSpeedUp = 0;
             // Magnet
-            if (api.config.isKeyMouseControlMagnetModeEnabled()) {
+            if (api.config.isKeyBoardControlMagnetModeEnabled()) {
                 boolean magnetPossible = false;
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.modalWindow != null) {
@@ -1488,8 +1491,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
 
         // Set to final
-        inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x-inputState.mouse_gui.x;
-        inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y-inputState.mouse_gui.y;
+        inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x - inputState.mouse_gui.x;
+        inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y - inputState.mouse_gui.y;
         inputState.mouse_gui.x = (int) inputState.vector_fboCursor.x;
         inputState.mouse_gui.y = (int) inputState.vector_fboCursor.y;
     }
@@ -1806,8 +1809,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_gui.begin();
         render_batchSetColorWhite(1f);
 
-        if (inputState.modalWindow != null || inputState.guiFrozen) render_enableGrayScaleShader(true);
-
+        if (inputState.modalWindow != null ) render_enableGrayScaleShader(true);
 
         /* Draw Screen Components */
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
