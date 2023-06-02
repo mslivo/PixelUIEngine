@@ -210,8 +210,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.focusedTextField = null;
         newInputState.notifications = new ArrayList<>();
         newInputState.hotKeys = new ArrayList<>();
-        newInputState.uiKeyInteractionsDisabled = false;
-        newInputState.uiMouseInteractionsDisabled = false;
         newInputState.gameViewPorts = new ArrayList<>();
         newInputState.singleUpdateActions = new ArrayList<>();
         newInputState.singleUpdateActionsRemoveQ = new ArrayDeque<>();
@@ -298,7 +296,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateKeyInteractions() {
-        if (this.inputState.uiKeyInteractionsDisabled) return;
+        if (api.config.isUiKeyInteractionsDisabled()) return;
 
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
@@ -409,7 +407,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateMouseInteractions() {
-        if (this.inputState.uiMouseInteractionsDisabled) return;
+        if (api.config.isUiMouseInteractionsDisabled()) return;
 
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseClick = true;

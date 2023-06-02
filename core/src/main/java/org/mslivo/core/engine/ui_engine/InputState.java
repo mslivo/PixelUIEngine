@@ -101,8 +101,6 @@ public class InputState {
     public ArrayList<Notification> notifications;
 
     public ArrayList<HotKey> hotKeys;
-    public boolean uiKeyInteractionsDisabled;
-    public boolean uiMouseInteractionsDisabled;
     public ArrayList<GameViewPort> gameViewPorts;
 
     public ArrayList<UpdateAction> singleUpdateActions;

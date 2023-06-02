@@ -1159,24 +1159,6 @@ public class API {
         return new ArrayList<>(inputState.screenComponents);
     }
 
-
-
-    public void setUIMouseInteractionsDisabled(boolean disabled){
-        inputState.uiMouseInteractionsDisabled = disabled;
-    }
-    public void isUIMouseInteractionsDisabled(boolean disabled){
-        inputState.uiMouseInteractionsDisabled = disabled;
-    }
-
-    public void setUIKeyInteractionsDisabled(boolean disabled){
-        inputState.uiKeyInteractionsDisabled = disabled;
-    }
-
-    public void isUIKeyInteractionsDisabled(boolean disabled){
-        inputState.uiKeyInteractionsDisabled = disabled;
-    }
-
-
     public Window getModalWindow() {
         return inputState.modalWindow;
     }
@@ -1391,6 +1373,8 @@ public class API {
     }
 
     public static class _Config {
+        private boolean uiKeyInteractionsDisabled = false;
+        private boolean uiMouseInteractionsDisabled = false;
         private MouseControlMode mouseControlMode;
         private float keyBoardControlCursorSpeed = 4.0f;
         private boolean keyBoardControlMagnetModeEnabled = true;
@@ -1730,6 +1714,21 @@ public class API {
             this.keyBoardControlMagnetModeEnabled = keyBoardControlMagnetModeEnabled;
         }
 
+        public boolean isUiKeyInteractionsDisabled() {
+            return uiKeyInteractionsDisabled;
+        }
+
+        public void setUiKeyInteractionsDisabled(boolean uiKeyInteractionsDisabled) {
+            this.uiKeyInteractionsDisabled = uiKeyInteractionsDisabled;
+        }
+
+        public boolean isUiMouseInteractionsDisabled() {
+            return uiMouseInteractionsDisabled;
+        }
+
+        public void setUiMouseInteractionsDisabled(boolean uiMouseInteractionsDisabled) {
+            this.uiMouseInteractionsDisabled = uiMouseInteractionsDisabled;
+        }
 
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -1775,6 +1774,8 @@ public class API {
             setKeyBoardControlButtonsScrollDown(config.getKeyBoardControlButtonsScrollDown());
             setKeyBoardControlButtonsScrollUp(config.getKeyBoardControlButtonsScrollUp());
             setMouseControlMode(config.getMouseControlMode());
+            setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
+            setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
         }
 
 
