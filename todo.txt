@@ -1,6 +1,7 @@
-[ ] clear issues on linux
+[x] clear issues on linux
 
 [ ] api functions:  keymousecontrol cursor to nearest visible component
+[ ] gamepad support
 
 [x] UICommons notificatons
 [x] window & notifcations -> addedToScreen boolean

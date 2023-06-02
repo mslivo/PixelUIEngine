@@ -1428,7 +1428,6 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseUp = false;
             inputState.inputEvents.mouseDoubleClick = false;
             inputState.inputEvents.mouseDownButtons.clear();
-            ;
             inputState.inputEvents.mouseUpButtons.clear();
         }
 
