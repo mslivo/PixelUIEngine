@@ -1373,22 +1373,22 @@ public class API {
     }
 
     public static class _Config {
-        private boolean uiKeyInteractionsDisabled = false;
-        private boolean uiMouseInteractionsDisabled = false;
-        private MouseControlMode mouseControlMode;
-        private float keyBoardControlCursorSpeed = 4.0f;
-        private boolean keyBoardControlMagnetModeEnabled = true;
-        private int[] keyBoardControlButtonsUp = new int[]{Input.Keys.UP};
-        private int[] keyBoardControlButtonsDown = new int[]{Input.Keys.DOWN};
-        private int[] keyBoardControlButtonsLeft = new int[]{Input.Keys.LEFT};
-        private int[] keyBoardControlButtonsRight = new int[]{Input.Keys.RIGHT};
-        private int[] keyBoardControlButtonsMouse1 = new int[]{Input.Keys.CONTROL_LEFT};
-        private int[] keyBoardControlButtonsMouse2 = new int[]{Input.Keys.CONTROL_RIGHT};
-        private int[] keyBoardControlButtonsMouse3 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsMouse4 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsMouse5 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsScrollUp = new int[]{Input.Keys.PAGE_UP};
-        private int[] keyBoardControlButtonsScrollDown = new int[]{Input.Keys.PAGE_DOWN};
+        private boolean hardwareMouseEnabled;
+
+        private boolean keyboardMouseEnabled;
+        private float keyboardMouseCursorSpeed = 4.0f;
+        private boolean keyboardMouseMagnetModeEnabled = true;
+        private int[] keyboardMouseButtonsUp = new int[]{Input.Keys.UP};
+        private int[] keyboardMouseButtonsDown = new int[]{Input.Keys.DOWN};
+        private int[] keyboardMouseButtonsLeft = new int[]{Input.Keys.LEFT};
+        private int[] keyboardMouseButtonsRight = new int[]{Input.Keys.RIGHT};
+        private int[] keyboardMouseButtonsMouse1 = new int[]{Input.Keys.CONTROL_LEFT};
+        private int[] keyboardMouseButtonsMouse2 = new int[]{Input.Keys.CONTROL_RIGHT};
+        private int[] keyboardMouseButtonsMouse3 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyboardMouseButtonsMouse4 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyboardMouseButtonsMouse5 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyboardMouseButtonsScrollUp = new int[]{Input.Keys.PAGE_UP};
+        private int[] keyboardMouseButtonsScrollDown = new int[]{Input.Keys.PAGE_DOWN};
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
@@ -1411,6 +1411,9 @@ public class API {
         private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
+
+        private boolean uiKeyInteractionsDisabled = false;
+        private boolean uiMouseInteractionsDisabled = false;
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -1468,100 +1471,109 @@ public class API {
             this.gameViewportDefaultUpdateTime = Tools.Calc.lowerBounds(gameViewportDefaultUpdateTime, 0);
         }
 
-        public MouseControlMode getMouseControlMode() {
-            return mouseControlMode;
+
+        public int[] getKeyboardMouseButtonsMouse2() {
+            return keyboardMouseButtonsMouse2;
         }
 
-        public void setMouseControlMode(MouseControlMode mouseControlMode) {
-            this.mouseControlMode = mouseControlMode;
+        public void setKeyboardMouseButtonsMouse2(int[] keyboardMouseButtonsMouse2) {
+            this.keyboardMouseButtonsMouse2 = keyboardMouseButtonsMouse2;
         }
 
-        public int[] getKeyBoardControlButtonsMouse2() {
-            return keyBoardControlButtonsMouse2;
+        public int[] getKeyboardMouseButtonsMouse3() {
+            return keyboardMouseButtonsMouse3;
         }
 
-        public void setKeyBoardControlButtonsMouse2(int[] keyBoardControlButtonsMouse2) {
-            this.keyBoardControlButtonsMouse2 = keyBoardControlButtonsMouse2;
+        public void setKeyboardMouseButtonsMouse3(int[] keyboardMouseButtonsMouse3) {
+            this.keyboardMouseButtonsMouse3 = keyboardMouseButtonsMouse3;
         }
 
-        public int[] getKeyBoardControlButtonsMouse3() {
-            return keyBoardControlButtonsMouse3;
+        public int[] getKeyboardMouseButtonsMouse4() {
+            return keyboardMouseButtonsMouse4;
         }
 
-        public void setKeyBoardControlButtonsMouse3(int[] keyBoardControlButtonsMouse3) {
-            this.keyBoardControlButtonsMouse3 = keyBoardControlButtonsMouse3;
+        public void setKeyboardMouseButtonsMouse4(int[] keyboardMouseButtonsMouse4) {
+            this.keyboardMouseButtonsMouse4 = keyboardMouseButtonsMouse4;
         }
 
-        public int[] getKeyBoardControlButtonsMouse4() {
-            return keyBoardControlButtonsMouse4;
+        public int[] getKeyboardMouseButtonsMouse5() {
+            return keyboardMouseButtonsMouse5;
         }
 
-        public void setKeyBoardControlButtonsMouse4(int[] keyBoardControlButtonsMouse4) {
-            this.keyBoardControlButtonsMouse4 = keyBoardControlButtonsMouse4;
+        public void setKeyboardMouseButtonsMouse5(int[] keyboardMouseButtonsMouse5) {
+            this.keyboardMouseButtonsMouse5 = keyboardMouseButtonsMouse5;
         }
 
-        public int[] getKeyBoardControlButtonsMouse5() {
-            return keyBoardControlButtonsMouse5;
+        public int[] getKeyboardMouseButtonsUp() {
+            return keyboardMouseButtonsUp;
         }
 
-        public void setKeyBoardControlButtonsMouse5(int[] keyBoardControlButtonsMouse5) {
-            this.keyBoardControlButtonsMouse5 = keyBoardControlButtonsMouse5;
-        }
-
-        public int[] getKeyBoardControlButtonsUp() {
-            return keyBoardControlButtonsUp;
-        }
-
-        public void setKeyBoardControlButtonsUp(int[] keyBoardControlButtonsUp) {
-            this.keyBoardControlButtonsUp = keyBoardControlButtonsUp;
+        public void setKeyboardMouseButtonsUp(int[] keyboardMouseButtonsUp) {
+            this.keyboardMouseButtonsUp = keyboardMouseButtonsUp;
         }
 
         public int[] getKeyBoardControlButtonsDown() {
-            return keyBoardControlButtonsDown;
+            return keyboardMouseButtonsDown;
         }
 
         public void setKeyBoardControlButtonsDown(int[] keyBoardControlButtonsDown) {
-            this.keyBoardControlButtonsDown = keyBoardControlButtonsDown;
+            this.keyboardMouseButtonsDown = keyBoardControlButtonsDown;
         }
 
-        public int[] getKeyBoardControlButtonsLeft() {
-            return keyBoardControlButtonsLeft;
+        public int[] getKeyboardMouseButtonsLeft() {
+            return keyboardMouseButtonsLeft;
         }
 
-        public void setKeyBoardControlButtonsLeft(int[] keyBoardControlButtonsLeft) {
-            this.keyBoardControlButtonsLeft = keyBoardControlButtonsLeft;
+        public void setKeyboardMouseButtonsLeft(int[] keyboardMouseButtonsLeft) {
+            this.keyboardMouseButtonsLeft = keyboardMouseButtonsLeft;
         }
 
-        public int[] getKeyBoardControlButtonsRight() {
-            return keyBoardControlButtonsRight;
+        public int[] getKeyboardMouseButtonsRight() {
+            return keyboardMouseButtonsRight;
         }
 
-        public void setKeyBoardControlButtonsRight(int[] keyBoardControlButtonsRight) {
-            this.keyBoardControlButtonsRight = keyBoardControlButtonsRight;
+        public void setKeyboardMouseButtonsRight(int[] keyboardMouseButtonsRight) {
+            this.keyboardMouseButtonsRight = keyboardMouseButtonsRight;
         }
 
-        public int[] getKeyBoardControlButtonsMouse1() {
-            return keyBoardControlButtonsMouse1;
+        public boolean isHardwareMouseEnabled() {
+            return hardwareMouseEnabled;
         }
 
-        public void setKeyBoardControlButtonsMouse1(int[] keyBoardControlButtonsMouse1) {
-            this.keyBoardControlButtonsMouse1 = keyBoardControlButtonsMouse1;
+        public void setHardwareMouseEnabled(boolean hardwareMouseEnabled) {
+            this.hardwareMouseEnabled = hardwareMouseEnabled;
         }
 
-        public int[] getKeyBoardControlButtonsScrollUp() {
-            return keyBoardControlButtonsScrollUp;
+        public int[] getKeyboardMouseButtonsDown() {
+            return keyboardMouseButtonsDown;
         }
 
-        public void setKeyBoardControlButtonsScrollUp(int[] keyBoardControlButtonsScrollUp) {
-            this.keyBoardControlButtonsScrollUp = keyBoardControlButtonsScrollUp;
+        public void setKeyboardMouseButtonsDown(int[] keyboardMouseButtonsDown) {
+            this.keyboardMouseButtonsDown = keyboardMouseButtonsDown;
         }
 
-        public int[] getKeyBoardControlButtonsScrollDown() {
-            return keyBoardControlButtonsScrollDown;
+        public int[] getKeyboardMouseButtonsMouse1() {
+            return keyboardMouseButtonsMouse1;
         }
 
-        public void setKeyBoardControlButtonsScrollDown(int[] keyBoardControlButtonsScrollDown) {
-            this.keyBoardControlButtonsScrollDown = keyBoardControlButtonsScrollDown;
+        public void setKeyboardMouseButtonsMouse1(int[] keyboardMouseButtonsMouse1) {
+            this.keyboardMouseButtonsMouse1 = keyboardMouseButtonsMouse1;
+        }
+
+        public int[] getKeyboardMouseButtonsScrollUp() {
+            return keyboardMouseButtonsScrollUp;
+        }
+
+        public void setKeyboardMouseButtonsScrollUp(int[] keyboardMouseButtonsScrollUp) {
+            this.keyboardMouseButtonsScrollUp = keyboardMouseButtonsScrollUp;
+        }
+
+        public int[] getKeyboardMouseButtonsScrollDown() {
+            return keyboardMouseButtonsScrollDown;
+        }
+
+        public void setKeyboardMouseButtonsScrollDown(int[] keyboardMouseButtonsScrollDown) {
+            this.keyboardMouseButtonsScrollDown = keyboardMouseButtonsScrollDown;
         }
 
         public CMediaFont getTooltipDefaultFont() {
@@ -1580,6 +1592,14 @@ public class API {
         public void setDefaultFont(CMediaFont defaultFont) {
             if (defaultFont == null) return;
             this.defaultFont = defaultFont;
+        }
+
+        public boolean isKeyboardMouseEnabled() {
+            return keyboardMouseEnabled;
+        }
+
+        public void setKeyboardMouseEnabled(boolean keyboardMouseEnabled) {
+            this.keyboardMouseEnabled = keyboardMouseEnabled;
         }
 
         public float getDragAlpha() {
@@ -1698,20 +1718,20 @@ public class API {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
 
-        public float getKeyBoardControlCursorSpeed() {
-            return keyBoardControlCursorSpeed;
+        public float getKeyboardMouseCursorSpeed() {
+            return keyboardMouseCursorSpeed;
         }
 
-        public void setKeyBoardControlCursorSpeed(float keyBoardControlCursorSpeed) {
-            this.keyBoardControlCursorSpeed = keyBoardControlCursorSpeed;
+        public void setKeyboardMouseCursorSpeed(float keyboardMouseCursorSpeed) {
+            this.keyboardMouseCursorSpeed = keyboardMouseCursorSpeed;
         }
 
-        public boolean isKeyBoardControlMagnetModeEnabled() {
-            return keyBoardControlMagnetModeEnabled;
+        public boolean isKeyboardMouseMagnetModeEnabled() {
+            return keyboardMouseMagnetModeEnabled;
         }
 
-        public void setKeyBoardControlMagnetModeEnabled(boolean keyBoardControlMagnetModeEnabled) {
-            this.keyBoardControlMagnetModeEnabled = keyBoardControlMagnetModeEnabled;
+        public void setKeyboardMouseMagnetModeEnabled(boolean keyboardMouseMagnetModeEnabled) {
+            this.keyboardMouseMagnetModeEnabled = keyboardMouseMagnetModeEnabled;
         }
 
         public boolean isUiKeyInteractionsDisabled() {
@@ -1760,20 +1780,23 @@ public class API {
             setTextFieldDefaultAllowedCharacters(config.getTextFieldDefaultAllowedCharacters());
             setTooltipFadeInTime(config.getTooltipFadeInTime());
             setTooltipFadeInDelayTime(config.getTooltipFadeInDelayTime());
-            setKeyBoardControlCursorSpeed(config.getKeyBoardControlCursorSpeed());
-            setKeyBoardControlMagnetModeEnabled(config.isKeyBoardControlMagnetModeEnabled());
-            setKeyBoardControlButtonsUp(config.getKeyBoardControlButtonsUp());
+
+            setHardwareMouseEnabled(config.isHardwareMouseEnabled());
+            setKeyboardMouseEnabled(config.isKeyboardMouseEnabled());
+            setKeyboardMouseCursorSpeed(config.getKeyboardMouseCursorSpeed());
+            setKeyboardMouseMagnetModeEnabled(config.isKeyboardMouseMagnetModeEnabled());
+            setKeyboardMouseButtonsUp(config.getKeyboardMouseButtonsUp());
             setKeyBoardControlButtonsDown(config.getKeyBoardControlButtonsDown());
-            setKeyBoardControlButtonsLeft(config.getKeyBoardControlButtonsLeft());
-            setKeyBoardControlButtonsRight(config.getKeyBoardControlButtonsRight());
-            setKeyBoardControlButtonsMouse1(config.getKeyBoardControlButtonsMouse1());
-            setKeyBoardControlButtonsMouse2(config.getKeyBoardControlButtonsMouse2());
-            setKeyBoardControlButtonsMouse3(config.getKeyBoardControlButtonsMouse3());
-            setKeyBoardControlButtonsMouse4(config.getKeyBoardControlButtonsMouse4());
-            setKeyBoardControlButtonsMouse5(config.getKeyBoardControlButtonsMouse5());
-            setKeyBoardControlButtonsScrollDown(config.getKeyBoardControlButtonsScrollDown());
-            setKeyBoardControlButtonsScrollUp(config.getKeyBoardControlButtonsScrollUp());
-            setMouseControlMode(config.getMouseControlMode());
+            setKeyboardMouseButtonsLeft(config.getKeyboardMouseButtonsLeft());
+            setKeyboardMouseButtonsRight(config.getKeyboardMouseButtonsRight());
+            setKeyboardMouseButtonsMouse1(config.getKeyboardMouseButtonsMouse1());
+            setKeyboardMouseButtonsMouse2(config.getKeyboardMouseButtonsMouse2());
+            setKeyboardMouseButtonsMouse3(config.getKeyboardMouseButtonsMouse3());
+            setKeyboardMouseButtonsMouse4(config.getKeyboardMouseButtonsMouse4());
+            setKeyboardMouseButtonsMouse5(config.getKeyboardMouseButtonsMouse5());
+            setKeyboardMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
+            setKeyboardMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
+
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
         }
@@ -1962,7 +1985,7 @@ public class API {
             return inputState.inputEvents.mouseScrolledAmount;
         }
 
-        public void setKeyMouseControlPosition(int x, int y) {
+        public void setKeyboardMousePosition(int x, int y) {
             if (inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
             inputState.mouse_gui.x = x;
             inputState.mouse_gui.y = y;

@@ -186,9 +186,10 @@ public class InputState {
 
     public GridPoint2 keyBoardMouseControlMouseBefore;
 
-    public long keyBoardMouseControlLastMouseClick;
-    public float keyBoardMouseControlSpeedUp;
-    public boolean[] keyBoardMouseControlIsMouseButtonDown;
+    public long keyBoardMouseLastMouseClick;
+    public float keyBoardMouseSpeedUp;
+    public boolean[] keyBoardMouseIsMouseButtonDown;
+    public boolean[] keyBoardTranslatedKeysDown;
 
     /* #################### Misc. ####################  */
 

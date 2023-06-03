@@ -1,7 +1,7 @@
 [x] clear issues on linux
-
+[ ] controller support
+[ ] onscreen keyboard
 [ ] api functions:  keymousecontrol cursor to nearest visible component
-[ ] textfield -> onscreen touch-/mouse keyboard`?`?
 [ ] gamepad support
 [x] UICommons notificatons
 [x] window & notifcations -> addedToScreen boolean
