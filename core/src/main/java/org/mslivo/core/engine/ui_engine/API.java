@@ -52,9 +52,9 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 
 import java.awt.*;
 import java.net.URI;
@@ -620,11 +620,11 @@ public class API {
         }
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, 0,Integer.MAX_VALUE, true,0);
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, 0);
         }
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true,0);
+            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, 0);
         }
 
         public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int wndMinWidth) {
@@ -646,7 +646,7 @@ public class API {
                 okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        if(inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                        if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                         removeCurrentModalWindow();
                     }
                 });
@@ -659,9 +659,9 @@ public class API {
                 @Override
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
-                        if(inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                        if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                         removeCurrentModalWindow();
-                    }else{
+                    } else {
                         components.textField.focus(inputTextField);
                     }
                 }
@@ -1285,7 +1285,7 @@ public class API {
         return new ArrayList<>(inputState.screenComponents.stream().filter(component -> name.equals(component.name)).toList());
     }
 
-    public Component findScreenComponentByName( String name) {
+    public Component findScreenComponentByName(String name) {
         if (name == null) return null;
         ArrayList<Component> result = findScreenComponentsByName(name);
         return result.size() > 0 ? result.get(0) : null;
@@ -1379,16 +1379,16 @@ public class API {
         private float keyBoardControlCursorSpeed = 4.0f;
         private boolean keyBoardControlMagnetModeEnabled = true;
         private int[] keyBoardControlButtonsUp = new int[]{Input.Keys.UP};
-        private int[] keyBoardControlButtonsDown =  new int[]{Input.Keys.DOWN};
-        private int[] keyBoardControlButtonsLeft = new int[]{ Input.Keys.LEFT};
-        private int[] keyBoardControlButtonsRight =  new int[]{Input.Keys.RIGHT};
-        private int[] keyBoardControlButtonsMouse1 =  new int[]{Input.Keys.CONTROL_LEFT};
-        private int[] keyBoardControlButtonsMouse2 =  new int[]{Input.Keys.CONTROL_RIGHT};
-        private int[] keyBoardControlButtonsMouse3 =  new int[]{Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsMouse4 =  new int[]{Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsMouse5 = new int[]{ Input.Keys.UNKNOWN};
-        private int[] keyBoardControlButtonsScrollUp = new int[]{ Input.Keys.PAGE_UP};
-        private int[] keyBoardControlButtonsScrollDown =  new int[]{Input.Keys.PAGE_DOWN};
+        private int[] keyBoardControlButtonsDown = new int[]{Input.Keys.DOWN};
+        private int[] keyBoardControlButtonsLeft = new int[]{Input.Keys.LEFT};
+        private int[] keyBoardControlButtonsRight = new int[]{Input.Keys.RIGHT};
+        private int[] keyBoardControlButtonsMouse1 = new int[]{Input.Keys.CONTROL_LEFT};
+        private int[] keyBoardControlButtonsMouse2 = new int[]{Input.Keys.CONTROL_RIGHT};
+        private int[] keyBoardControlButtonsMouse3 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyBoardControlButtonsMouse4 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyBoardControlButtonsMouse5 = new int[]{Input.Keys.UNKNOWN};
+        private int[] keyBoardControlButtonsScrollUp = new int[]{Input.Keys.PAGE_UP};
+        private int[] keyBoardControlButtonsScrollDown = new int[]{Input.Keys.PAGE_DOWN};
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
@@ -1804,11 +1804,11 @@ public class API {
         }
 
         public String lastGUIMouseHoverName() {
-            if(inputState.lastGUIMouseHover != null){
-                if(inputState.lastGUIMouseHover instanceof Component){
-                    return ((Component)inputState.lastGUIMouseHover).name;
-                }else if(inputState.lastGUIMouseHover instanceof Window){
-                    return ((Window)inputState.lastGUIMouseHover).name;
+            if (inputState.lastGUIMouseHover != null) {
+                if (inputState.lastGUIMouseHover instanceof Component) {
+                    return ((Component) inputState.lastGUIMouseHover).name;
+                } else if (inputState.lastGUIMouseHover instanceof Window) {
+                    return ((Window) inputState.lastGUIMouseHover).name;
                 }
             }
             return "";
@@ -1963,7 +1963,7 @@ public class API {
         }
 
         public void setKeyMouseControlPosition(int x, int y) {
-            if(inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
+            if (inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
             inputState.mouse_gui.x = x;
             inputState.mouse_gui.y = y;
             inputState.lastGUIMouseHover = null;
@@ -2281,6 +2281,7 @@ public class API {
             setName(window, "");
             setData(window, null);
             setEnforceScreenBounds(window, config.getWindowsDefaultEnforceScreenBounds());
+            setFoldable(window, true);
             window.components = new ArrayList<>();
             window.font = config.defaultFont;
             window.messageReceiverActions = new ArrayList<>();
@@ -2289,6 +2290,7 @@ public class API {
             addComponents(window, components);
             return window;
         }
+
 
         public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
             if (window == null || messageReceiverAction == null) return;
@@ -2351,6 +2353,11 @@ public class API {
         public boolean isAddedToScreen(Window window) {
             if (window == null) return false;
             return window.addedToScreen;
+        }
+
+        public void setFoldable(Window window, boolean foldable) {
+            if (window == null) return;
+            window.foldable = foldable;
         }
 
         private void setColorFunction(Window window, FColor color, int setColorMode, Class[] classes,
@@ -3433,7 +3440,7 @@ public class API {
                     return create(x, y, width, height, image, arrayIndex, buttonAction, ButtonMode.DEFAULT, 0, 0);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction,  ButtonMode buttonMode) {
+                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode) {
                     return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, 0, 0);
                 }
 

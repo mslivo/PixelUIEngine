@@ -34,6 +34,8 @@ public class Window {
 
     public boolean folded;
 
+    public boolean foldable;
+
     public boolean moveAble;
 
     public boolean hasTitleBar;
