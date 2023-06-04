@@ -46,6 +46,8 @@ public class InputState {
 
     public ViewportMode viewportMode;
 
+    public boolean gamePadSupport;
+
 
     /* #################### Graphics: Game #################### */
     public SpriteBatch spriteBatch_game;

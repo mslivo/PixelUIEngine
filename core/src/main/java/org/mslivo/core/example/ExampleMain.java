@@ -88,7 +88,7 @@ public class ExampleMain extends ApplicationAdapter {
                 this.UIAdapter,
                 this.mediaManager,
                 ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight,
-                ExampleMainConstants.viewportMode);
+                ExampleMainConstants.viewportMode, true);
         Tools.logDone();
     }
 

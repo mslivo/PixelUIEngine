@@ -95,14 +95,14 @@ public class UIEngine<T extends UIAdapter> {
         return uiAdapter;
     }
 
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode) {
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, boolean gamePadSupport) {
         if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize IREngine: invalid parameters");
         }
         this.uiAdapter = uiAdapter;
         this.mediaManager = mediaManager;
         /* Setup */
-        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode);
+        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode, gamePadSupport);
         this.api = new API(this.inputState, mediaManager);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
         render_glClear();
@@ -141,7 +141,7 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode) {
+    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, boolean gamePadSupport) {
         InputState newInputState = new InputState();
 
         //  ----- Parameters
@@ -149,7 +149,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.internalResolutionWidth = Tools.Calc.lowerBounds(internalResolutionWidth, TILE_SIZE * 2);
         newInputState.internalResolutionHeight = Tools.Calc.lowerBounds(internalResolutionHeight, TILE_SIZE * 2);
         newInputState.viewportMode = viewportMode;
-
+        newInputState.gamePadSupport = gamePadSupport;
         // -----  Game
         newInputState.spriteBatch_game = new SpriteBatch(8191);
         newInputState.spriteBatch_game.setBlendFunction(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
@@ -266,7 +266,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.camera_frustum = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_frustum.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.inputEvents = new InputEvents();
-        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents);
+        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents, newInputState.gamePadSupport);
 
         newInputState.lastActiveWindow = null;
         newInputState.itemInfo = new int[]{0, 0};

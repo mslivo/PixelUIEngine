@@ -14,11 +14,15 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     private long lastClickTime;
 
-    public UIEngineInputProcessor(InputEvents inputEvents) {
+    private boolean gamePadSupport;
+    public UIEngineInputProcessor(InputEvents inputEvents, boolean gamePadSupport) {
         this.inputEvents = inputEvents;
         this.lastClickTime = System.currentTimeMillis();
+        this.gamePadSupport = gamePadSupport;
         Gdx.input.setInputProcessor(this);
-        Controllers.addListener(this);
+        if(gamePadSupport) {
+            Controllers.addListener(this);
+        }
     }
 
     @Override
@@ -86,16 +90,19 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public void connected(Controller controller) {
+        if(!gamePadSupport) return;
         this.inputEvents.gamePadConnected = true;
     }
 
     @Override
     public void disconnected(Controller controller) {
+        if(!gamePadSupport) return;
         this.inputEvents.gamePadDisconnected = true;
     }
 
     @Override
     public boolean buttonDown(Controller controller, int button) {
+        if(!gamePadSupport) return false;
         int keyCode = gamePadMapButtonToKeyCode(controller.getMapping(), button);
         this.inputEvents.gamePadButtonDown = true;
         this.inputEvents.gamePadButtonDownKeyCodes.add(keyCode);
@@ -105,6 +112,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public boolean buttonUp(Controller controller, int button) {
+        if(!gamePadSupport) return false;
         int keyCode = gamePadMapButtonToKeyCode(controller.getMapping(), button);
         this.inputEvents.gamePadButtonUp = true;
         this.inputEvents.gamePadButtonUpKeyCodes.add(keyCode);
@@ -114,6 +122,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public boolean axisMoved(Controller controller, int axis, float amount) {
+        if(!gamePadSupport) return false;
         ControllerMapping mapping = controller.getMapping();
 
         if(axis == mapping.axisLeftX){
