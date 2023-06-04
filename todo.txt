@@ -1,8 +1,8 @@
-[x] clear issues on linux
-[ ] controller support
+[ ] gamepad support (+ mouse control mode)
 [ ] onscreen keyboard
 [ ] api functions:  keymousecontrol cursor to nearest visible component
-[ ] gamepad support
+
+[x] clear issues on linux
 [x] UICommons notificatons
 [x] window & notifcations -> addedToScreen boolean
 [x] combobitems inherit color

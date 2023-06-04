@@ -80,7 +80,7 @@ public class Tools {
             custom.append(" | ").append(String.format("%1$10s", customValue));
         }
         Tools.log(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
-                String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM");
+                String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM"+custom);
     }
 
     public static class Colors {

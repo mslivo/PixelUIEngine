@@ -114,7 +114,7 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Out
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.logBenchmark("Render: " + profile_time_render + "ms");
+            Tools.logBenchmark("UI: " + profile_time_gui + "ms","Render: " + profile_time_render + "ms");
             timer_debug_info = System.currentTimeMillis();
         }
     }

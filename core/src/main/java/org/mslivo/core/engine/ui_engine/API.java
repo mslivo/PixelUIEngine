@@ -51,6 +51,7 @@ import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
@@ -1373,22 +1374,38 @@ public class API {
     }
 
     public static class _Config {
-        private boolean hardwareMouseEnabled;
 
+        private boolean hardwareMouseEnabled;
         private boolean keyboardMouseEnabled;
-        private float keyboardMouseCursorSpeed = 4.0f;
-        private boolean keyboardMouseMagnetModeEnabled = true;
-        private int[] keyboardMouseButtonsUp = new int[]{Input.Keys.UP};
-        private int[] keyboardMouseButtonsDown = new int[]{Input.Keys.DOWN};
-        private int[] keyboardMouseButtonsLeft = new int[]{Input.Keys.LEFT};
-        private int[] keyboardMouseButtonsRight = new int[]{Input.Keys.RIGHT};
-        private int[] keyboardMouseButtonsMouse1 = new int[]{Input.Keys.CONTROL_LEFT};
-        private int[] keyboardMouseButtonsMouse2 = new int[]{Input.Keys.CONTROL_RIGHT};
-        private int[] keyboardMouseButtonsMouse3 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyboardMouseButtonsMouse4 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyboardMouseButtonsMouse5 = new int[]{Input.Keys.UNKNOWN};
-        private int[] keyboardMouseButtonsScrollUp = new int[]{Input.Keys.PAGE_UP};
-        private int[] keyboardMouseButtonsScrollDown = new int[]{Input.Keys.PAGE_DOWN};
+        private int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
+        private int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
+        private int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
+        private int[] keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
+        private int[] keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
+        private int[] keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.CONTROL_RIGHT};
+        private int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.UNKNOWN};
+        private int[] keyboardMouseButtonsMouse4 = new int[]{KeyCode.Key.UNKNOWN};
+        private int[] keyboardMouseButtonsMouse5 = new int[]{KeyCode.Key.UNKNOWN};
+        private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
+        private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
+
+
+        private boolean gamePadMouseEnabled = false;
+
+        private float gamePadMouseSensitivity = 0.4f;
+        private boolean gamePadMouseStickLeftEnabled = true;
+        private boolean gamePadMouseStickRightEnabled = false;
+        private int[] gamePadMouseButtonsMouse1 = new int[]{KeyCode.GamePad.A};
+        private int[] gamePadMouseButtonsMouse2 = new int[]{KeyCode.GamePad.B};
+        private int[] gamePadMouseButtonsMouse3 = new int[]{KeyCode.GamePad.X};
+        private int[] gamePadMouseButtonsMouse4 = new int[]{KeyCode.GamePad.Y};
+        private int[] gamePadMouseButtonsMouse5 = new int[]{};
+        private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.L1};
+        private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.L2};
+
+        private float simulatedMouseCursorSpeed = 4.0f;
+
+        private boolean simulatedMouseMagnetModeEnabled = true;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private FColor windowsDefaultColor = Tools.Colors.WHITE;
         private FColor componentsDefaultColor = Tools.Colors.WHITE;
@@ -1434,6 +1451,14 @@ public class API {
         public void setWindowsDefaultColor(FColor windowsDefaultColor) {
             if (windowsDefaultColor == null) return;
             this.windowsDefaultColor = Tools.Colors.create(windowsDefaultColor);
+        }
+
+        public float getGamePadMouseSensitivity() {
+            return gamePadMouseSensitivity;
+        }
+
+        public void setGamePadMouseSensitivity(float gamePadMouseSensitivity) {
+            this.gamePadMouseSensitivity = gamePadMouseSensitivity;
         }
 
         public FColor getComponentsDefaultColor() {
@@ -1718,20 +1743,20 @@ public class API {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
 
-        public float getKeyboardMouseCursorSpeed() {
-            return keyboardMouseCursorSpeed;
+        public float getSimulatedMouseCursorSpeed() {
+            return simulatedMouseCursorSpeed;
         }
 
-        public void setKeyboardMouseCursorSpeed(float keyboardMouseCursorSpeed) {
-            this.keyboardMouseCursorSpeed = keyboardMouseCursorSpeed;
+        public void setSimulatedMouseCursorSpeed(float simulatedMouseCursorSpeed) {
+            this.simulatedMouseCursorSpeed = simulatedMouseCursorSpeed;
         }
 
-        public boolean isKeyboardMouseMagnetModeEnabled() {
-            return keyboardMouseMagnetModeEnabled;
+        public boolean isSimulatedMouseMagnetModeEnabled() {
+            return simulatedMouseMagnetModeEnabled;
         }
 
-        public void setKeyboardMouseMagnetModeEnabled(boolean keyboardMouseMagnetModeEnabled) {
-            this.keyboardMouseMagnetModeEnabled = keyboardMouseMagnetModeEnabled;
+        public void setSimulatedMouseMagnetModeEnabled(boolean simulatedMouseMagnetModeEnabled) {
+            this.simulatedMouseMagnetModeEnabled = simulatedMouseMagnetModeEnabled;
         }
 
         public boolean isUiKeyInteractionsDisabled() {
@@ -1750,11 +1775,121 @@ public class API {
             this.uiMouseInteractionsDisabled = uiMouseInteractionsDisabled;
         }
 
+        public boolean isGamePadMouseEnabled() {
+            return gamePadMouseEnabled;
+        }
+
+        public void setGamePadMouseEnabled(boolean gamePadMouseEnabled) {
+            this.gamePadMouseEnabled = gamePadMouseEnabled;
+        }
+
+        public boolean isGamePadMouseStickLeftEnabled() {
+            return gamePadMouseStickLeftEnabled;
+        }
+
+        public void setGamePadMouseStickLeftEnabled(boolean gamePadMouseStickLeftEnabled) {
+            this.gamePadMouseStickLeftEnabled = gamePadMouseStickLeftEnabled;
+        }
+
+        public boolean isGamePadMouseStickRightEnabled() {
+            return gamePadMouseStickRightEnabled;
+        }
+
+        public void setGamePadMouseStickRightEnabled(boolean gamePadMouseStickRightEnabled) {
+            this.gamePadMouseStickRightEnabled = gamePadMouseStickRightEnabled;
+        }
+
+        public int[] getGamePadMouseButtonsMouse1() {
+            return gamePadMouseButtonsMouse1;
+        }
+
+        public void setGamePadMouseButtonsMouse1(int[] gamePadMouseButtonsMouse1) {
+            this.gamePadMouseButtonsMouse1 = gamePadMouseButtonsMouse1;
+        }
+
+        public int[] getGamePadMouseButtonsMouse2() {
+            return gamePadMouseButtonsMouse2;
+        }
+
+        public void setGamePadMouseButtonsMouse2(int[] gamePadMouseButtonsMouse2) {
+            this.gamePadMouseButtonsMouse2 = gamePadMouseButtonsMouse2;
+        }
+
+        public int[] getGamePadMouseButtonsMouse3() {
+            return gamePadMouseButtonsMouse3;
+        }
+
+        public void setGamePadMouseButtonsMouse3(int[] gamePadMouseButtonsMouse3) {
+            this.gamePadMouseButtonsMouse3 = gamePadMouseButtonsMouse3;
+        }
+
+        public int[] getGamePadMouseButtonsMouse4() {
+            return gamePadMouseButtonsMouse4;
+        }
+
+        public void setGamePadMouseButtonsMouse4(int[] gamePadMouseButtonsMouse4) {
+            this.gamePadMouseButtonsMouse4 = gamePadMouseButtonsMouse4;
+        }
+
+        public int[] getGamePadMouseButtonsMouse5() {
+            return gamePadMouseButtonsMouse5;
+        }
+
+        public void setGamePadMouseButtonsMouse5(int[] gamePadMouseButtonsMouse5) {
+            this.gamePadMouseButtonsMouse5 = gamePadMouseButtonsMouse5;
+        }
+
+        public int[] getGamePadMouseButtonsScrollUp() {
+            return gamePadMouseButtonsScrollUp;
+        }
+
+        public void setGamePadMouseButtonsScrollUp(int[] gamePadMouseButtonsScrollUp) {
+            this.gamePadMouseButtonsScrollUp = gamePadMouseButtonsScrollUp;
+        }
+
+        public int[] getGamePadMouseButtonsScrollDown() {
+            return gamePadMouseButtonsScrollDown;
+        }
+
+        public void setGamePadMouseButtonsScrollDown(int[] gamePadMouseButtonsScrollDown) {
+            this.gamePadMouseButtonsScrollDown = gamePadMouseButtonsScrollDown;
+        }
+
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                     ' ', '_', '.', ',', '!', '?'));
+        }
+
+        public int[][] getKeyboardMouseButtons(){
+            final int buttons[][] = new int[][]{
+                    getKeyboardMouseButtonsUp(),
+                    getKeyBoardControlButtonsDown(),
+                    getKeyboardMouseButtonsLeft(),
+                    getKeyboardMouseButtonsRight(),
+                    getKeyboardMouseButtonsMouse1(),
+                    getKeyboardMouseButtonsMouse2(),
+                    getKeyboardMouseButtonsMouse3(),
+                    getKeyboardMouseButtonsMouse4(),
+                    getKeyboardMouseButtonsMouse5(),
+                    getKeyboardMouseButtonsScrollUp(),
+                    getKeyboardMouseButtonsScrollDown()
+            };
+            return buttons;
+        }
+
+        public int[][] getGamepadMouseButtons(){
+            final int buttons[][] = new int[][]{
+                    getGamePadMouseButtonsMouse1(),
+                    getGamePadMouseButtonsMouse2(),
+                    getGamePadMouseButtonsMouse3(),
+                    getGamePadMouseButtonsMouse4(),
+                    getGamePadMouseButtonsMouse5(),
+                    getGamePadMouseButtonsScrollUp(),
+                    getGamePadMouseButtonsScrollDown()
+            };
+            return buttons;
         }
 
         public void loadConfig(_Config config) {
@@ -1782,9 +1917,8 @@ public class API {
             setTooltipFadeInDelayTime(config.getTooltipFadeInDelayTime());
 
             setHardwareMouseEnabled(config.isHardwareMouseEnabled());
+
             setKeyboardMouseEnabled(config.isKeyboardMouseEnabled());
-            setKeyboardMouseCursorSpeed(config.getKeyboardMouseCursorSpeed());
-            setKeyboardMouseMagnetModeEnabled(config.isKeyboardMouseMagnetModeEnabled());
             setKeyboardMouseButtonsUp(config.getKeyboardMouseButtonsUp());
             setKeyBoardControlButtonsDown(config.getKeyBoardControlButtonsDown());
             setKeyboardMouseButtonsLeft(config.getKeyboardMouseButtonsLeft());
@@ -1797,6 +1931,20 @@ public class API {
             setKeyboardMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setKeyboardMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
 
+            setGamePadMouseEnabled(config.isGamePadMouseEnabled());
+            setGamePadMouseStickLeftEnabled(config.isGamePadMouseStickLeftEnabled());
+            setGamePadMouseStickRightEnabled(config.isGamePadMouseStickRightEnabled());
+            setGamePadMouseButtonsMouse1(config.getKeyboardMouseButtonsMouse1());
+            setGamePadMouseButtonsMouse2(config.getKeyboardMouseButtonsMouse2());
+            setGamePadMouseButtonsMouse3(config.getKeyboardMouseButtonsMouse3());
+            setGamePadMouseButtonsMouse4(config.getKeyboardMouseButtonsMouse4());
+            setGamePadMouseButtonsMouse5(config.getKeyboardMouseButtonsMouse5());
+            setGamePadMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
+            setGamePadMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
+            setGamePadMouseSensitivity(config.getGamePadMouseSensitivity());
+
+            setSimulatedMouseMagnetModeEnabled(config.isSimulatedMouseMagnetModeEnabled());
+            setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
         }
@@ -1820,8 +1968,6 @@ public class API {
             return false;
         }
 
-        /* Events */
-
         public Object lastGUIMouseHover() {
             return inputState.lastGUIMouseHover;
         }
@@ -1835,6 +1981,44 @@ public class API {
                 }
             }
             return "";
+        }
+
+        public void setKeyboardMousePosition(int x, int y) {
+            if (inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
+            inputState.mouse_gui.x = x;
+            inputState.mouse_gui.y = y;
+            inputState.lastGUIMouseHover = null;
+        }
+
+
+        /* ---- MOUSE EVENTS --- */
+
+        public boolean mouseDown() {
+            return inputState.inputEvents.mouseDown;
+        }
+
+        public boolean mouseDoubleClick() {
+            return inputState.inputEvents.mouseDoubleClick;
+        }
+
+        public boolean mouseUp() {
+            return inputState.inputEvents.mouseUp;
+        }
+
+        public boolean mouseDragged() {
+            return inputState.inputEvents.mouseDragged;
+        }
+
+        public boolean mouseMoved() {
+            return inputState.inputEvents.mouseMoved;
+        }
+
+        public boolean mouseScrolled() {
+            return inputState.inputEvents.mouseScrolled;
+        }
+
+        public float mouseScrolledAmount() {
+            return inputState.inputEvents.mouseScrolledAmount;
         }
 
         public int mouseXGUI() {
@@ -1861,92 +2045,6 @@ public class API {
             return inputState.mouse_delta.y;
         }
 
-        public boolean keyDown() {
-            return inputState.inputEvents.keyDown;
-        }
-
-        public boolean keyUp() {
-            return inputState.inputEvents.keyUp;
-        }
-
-        public boolean keyTyped() {
-            return inputState.inputEvents.keyTyped;
-        }
-
-        public boolean mouseDown() {
-            return inputState.inputEvents.mouseDown;
-        }
-
-        public boolean mouseDoubleClick() {
-            return inputState.inputEvents.mouseDoubleClick;
-        }
-
-        public boolean mouseUp() {
-            return inputState.inputEvents.mouseUp;
-        }
-
-        public boolean mouseDragged() {
-            return inputState.inputEvents.mouseDragged;
-        }
-
-        public boolean mouseMoved() {
-            return inputState.inputEvents.mouseMoved;
-        }
-
-        public boolean mouseScrolled() {
-            return inputState.inputEvents.mouseScrolled;
-        }
-
-        /* Key Up */
-
-        public ArrayList<Integer> keyUpKeys() {
-            return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
-        }
-
-        public boolean keyUpKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
-            }
-            return false;
-        }
-
-        public boolean isKeyUp(int keyCode) {
-            return !inputState.inputEvents.keysDown[keyCode];
-        }
-
-
-        /* Key Down */
-
-        public ArrayList<Integer> keyDownKeys() {
-            return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
-        }
-
-        public boolean keyDownKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
-            }
-            return false;
-        }
-
-        public boolean isKeyDown(int keyCode) {
-            return inputState.inputEvents.keysDown[keyCode];
-        }
-
-        /* Character Typed */
-
-        public boolean keyTypedCharacter(Character character) {
-            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) {
-                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
-            }
-            return false;
-        }
-
-        public ArrayList<Character> keyTypedCharacters() {
-            return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
-        }
-
-
-        /* Mouse Up */
         public ArrayList<Integer> mouseUpButtons() {
             return new ArrayList<>(inputState.inputEvents.mouseUpButtons);
         }
@@ -1961,8 +2059,6 @@ public class API {
         public boolean isMouseButtonUp(int button) {
             return !inputState.inputEvents.mouseButtonsDown[button];
         }
-
-        /* Mouse Down */
 
         public ArrayList<Integer> mouseDownButtons() {
             return new ArrayList<>(inputState.inputEvents.mouseDownButtons);
@@ -1979,18 +2075,110 @@ public class API {
             return inputState.inputEvents.mouseButtonsDown[button];
         }
 
-        /* Other */
+        /* ---- KEYBOARD EVENTS --- */
 
-        public float mouseScrolledAmount() {
-            return inputState.inputEvents.mouseScrolledAmount;
+        public boolean keyDown() {
+            return inputState.inputEvents.keyDown;
         }
 
-        public void setKeyboardMousePosition(int x, int y) {
-            if (inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
-            inputState.mouse_gui.x = x;
-            inputState.mouse_gui.y = y;
-            inputState.lastGUIMouseHover = null;
+        public boolean keyUp() {
+            return inputState.inputEvents.keyUp;
         }
+
+        public boolean keyTyped() {
+            return inputState.inputEvents.keyTyped;
+        }
+
+        public ArrayList<Integer> keyDownKeys() {
+            return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
+        }
+
+        public boolean keyDownKey(int keyCode) {
+            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) {
+                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean isKeyDown(int keyCode) {
+            return inputState.inputEvents.keysDown[keyCode];
+        }
+
+        public boolean keyTypedCharacter(Character character) {
+            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) {
+                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
+            }
+            return false;
+        }
+
+        public ArrayList<Character> keyTypedCharacters() {
+            return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
+        }
+
+        public ArrayList<Integer> keyUpKeys() {
+            return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
+        }
+
+        public boolean keyUpKey(int keyCode) {
+            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) {
+                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean isKeyUp(int keyCode) {
+            return !inputState.inputEvents.keysDown[keyCode];
+        }
+
+        /* ---- GAMEPAD EVENTS --- */
+        public boolean gamePadDown(){ return inputState.inputEvents.gamePadButtonDown;}
+
+        public ArrayList<Integer> gamePadDownButtons(){ return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);}
+
+        public boolean gamePadDownButton(int keyCode){
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++) {
+                if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean gamePadIsButtonDown(int keyCode){return inputState.inputEvents.gamePadButtonsDown[keyCode];}
+
+        public boolean gamePadUp(){ return inputState.inputEvents.gamePadButtonUp;}
+
+        public ArrayList<Integer> gamePadUpButtons(){ return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);}
+
+        public boolean gamePadUpButton(int keyCode){
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++) {
+                if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
+            }
+            return false;
+        }
+
+        public boolean gamePadIsButtonUp(int keyCode){return !inputState.inputEvents.gamePadButtonsDown[keyCode];}
+
+        public boolean gamePadConnected(){return inputState.inputEvents.gamePadConnected;}
+
+        public boolean gamePadDisconnected(){return inputState.inputEvents.gamePadDisconnected;}
+
+        public boolean gamePadLeftXMoved(){return inputState.inputEvents.gamePadLeftXMoved;}
+
+        public boolean gamePadLeftYMoved(){return inputState.inputEvents.gamePadLeftYMoved;}
+
+        public boolean gamePadLeftMoved(){return gamePadLeftXMoved() || gamePadLeftYMoved();
+        }
+        public float gamePadLeftX(){return inputState.inputEvents.gamePadLeftX;}
+        public float gamePadLeftY(){return inputState.inputEvents.gamePadLeftY;}
+
+        public boolean gamePadRightXMoved(){return inputState.inputEvents.gamePadRightXMoved;}
+
+        public boolean gamePadRightYMoved(){return inputState.inputEvents.gamePadRightYMoved;}
+
+        public boolean gamePadRightMoved(){return gamePadRightXMoved() || gamePadRightYMoved();}
+
+
+        public float gamePadRightX(){return inputState.inputEvents.gamePadRightX;}
+        public float gamePadRightY(){return inputState.inputEvents.gamePadRightY;}
     }
 
     public class _Notification {

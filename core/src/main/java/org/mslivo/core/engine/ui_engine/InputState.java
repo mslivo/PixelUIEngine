@@ -184,12 +184,16 @@ public class InputState {
 
     public Vector2 vector2_unproject;
 
-    public GridPoint2 keyBoardMouseControlMouseBefore;
+    public GridPoint2 simulatedMousePositionBefore;
 
     public long keyBoardMouseLastMouseClick;
-    public float keyBoardMouseSpeedUp;
+    public float siumlatedMouseSpeedUp;
     public boolean[] keyBoardMouseIsMouseButtonDown;
     public boolean[] keyBoardTranslatedKeysDown;
+
+    public Vector2 gamePadTranslatedStickLeft;
+    public Vector2 gamePadTranslatedStickRight;
+    public boolean[] gamePadTranslatedButtonsDown;
 
     /* #################### Misc. ####################  */
 

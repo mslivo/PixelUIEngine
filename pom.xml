@@ -8,6 +8,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<gdx.version>1.11.0</gdx.version>
+		<gdx-controllers.version>2.0.1</gdx-controllers.version>
 	</properties>
 
 	<dependencyManagement>
@@ -31,6 +32,20 @@
 				<artifactId>gdx-platform</artifactId>
 				<version>${gdx.version}</version>
 				<classifier>natives-desktop</classifier>
+			</dependency>
+
+			<!-- Controller support -->
+
+			<dependency>
+				<groupId>com.badlogicgames.gdx-controllers</groupId>
+				<artifactId>gdx-controllers-core</artifactId>
+				<version>${gdx-controllers.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.badlogicgames.gdx-controllers</groupId>
+				<artifactId>gdx-controllers-desktop</artifactId>
+				<version>${gdx-controllers.version}</version>
 			</dependency>
 
 		</dependencies>

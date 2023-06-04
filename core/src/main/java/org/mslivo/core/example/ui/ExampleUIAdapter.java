@@ -13,8 +13,8 @@ import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
 import org.mslivo.core.example.ui.media.ExampleBaseMedia;
@@ -64,21 +64,22 @@ public class ExampleUIAdapter implements UIAdapter {
                 api.closeAllWindows();
             }
         }));
-        api.camera.moveAbs(api.resolutionWidth()/2, api.resolutionHeight()/2);
+        api.camera.moveAbs(api.resolutionWidth() / 2, api.resolutionHeight() / 2);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setHardwareMouseEnabled(true);
-        api.config.setKeyboardMouseEnabled(true);
-
-
+        api.config.setKeyboardMouseEnabled(false);
+        api.config.setGamePadMouseEnabled(true);
+        api.config.setGamePadMouseStickRightEnabled(true);
     }
 
     @Override
     public void update() {
         // Process Outputs
-        while (gameEngine.outputAvailable()){
+        while (gameEngine.outputAvailable()) {
             EngineOutput engineOutput = gameEngine.processOutput();
         }
+
 
         // Create Inputs
         // gameEngine.input(new EngineInput(0,"TestInput"));
