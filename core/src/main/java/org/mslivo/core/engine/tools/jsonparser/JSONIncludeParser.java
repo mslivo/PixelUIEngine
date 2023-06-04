@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class JSONIncludeParser {
@@ -17,9 +18,46 @@ public class JSONIncludeParser {
 
     private static final String INCLUDE_TRIM = "//INCLUDE_TRIM ";
 
-    record IncludeInfo(String includeFile, boolean trim) {
+    static final class IncludeInfo {
+        private final String includeFile;
+        private final boolean trim;
 
-    }
+        IncludeInfo(String includeFile, boolean trim) {
+            this.includeFile = includeFile;
+            this.trim = trim;
+        }
+
+        public String includeFile() {
+            return includeFile;
+        }
+
+        public boolean trim() {
+            return trim;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (IncludeInfo) obj;
+            return Objects.equals(this.includeFile, that.includeFile) &&
+                    this.trim == that.trim;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(includeFile, trim);
+        }
+
+        @Override
+        public String toString() {
+            return "IncludeInfo[" +
+                    "includeFile=" + includeFile + ", " +
+                    "trim=" + trim + ']';
+        }
+
+
+        }
 
     private static IncludeInfo findIncludeInfo(String line){
         String prepare = line.trim();
