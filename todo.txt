@@ -1,5 +1,6 @@
 [ ] replace with KeyCode
-[ ] gamepad support (+ mouse control mode)
+[ ] translate mouse according to joystick sensitivity
+[x] gamepad support (+ mouse control mode)
 [ ] onscreen keyboard
 [ ] api functions:  keymousecontrol cursor to nearest visible component
 

@@ -68,7 +68,7 @@ public class ExampleUIAdapter implements UIAdapter {
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setHardwareMouseEnabled(true);
-        api.config.setKeyboardMouseEnabled(false);
+        api.config.setKeyboardMouseEnabled(true);
         api.config.setGamePadMouseEnabled(true);
         api.config.setGamePadMouseStickRightEnabled(true);
     }
