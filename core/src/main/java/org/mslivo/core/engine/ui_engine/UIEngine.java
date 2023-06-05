@@ -1287,7 +1287,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void gamePadMouseTranslateAndClearEvents() {
-        int keys[][] = api.config.getKeyboardMouseButtons();
+        int keys[][] = api.config.getGamepadMouseButtons();
 
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i < keys.length; i++) {

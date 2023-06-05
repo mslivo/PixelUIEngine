@@ -1,3 +1,4 @@
+[ ] replace with KeyCode
 [ ] gamepad support (+ mouse control mode)
 [ ] onscreen keyboard
 [ ] api functions:  keymousecontrol cursor to nearest visible component
