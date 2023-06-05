@@ -1204,7 +1204,6 @@ public class UIEngine<T extends UIAdapter> {
                                 inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
                                 inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
                                 inputState.currentControlMode = MouseControlMode.KEYBOARD;
-                                System.out.println("KEYBOARD");
                             }
                         }
                         if (gamePadMouse) {
@@ -1212,7 +1211,6 @@ public class UIEngine<T extends UIAdapter> {
                                 inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
                                 inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
                                 inputState.currentControlMode = MouseControlMode.GAMEPAD;
-                                System.out.println("GAMEPAD");
                             }
                         }
                     }
@@ -1220,13 +1218,11 @@ public class UIEngine<T extends UIAdapter> {
                         if (hardwareMouse) {
                             if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
                                 inputState.currentControlMode = MouseControlMode.HARDWARE_MOUSE;
-                                System.out.println("HARDWARE_MOUSE");
                             }
                         }
                         if (gamePadMouse) {
                             if (gamePadMouseDetectUse()) {
                                 inputState.currentControlMode = MouseControlMode.GAMEPAD;
-                                System.out.println("GAMEPAD");
                             }
                         }
                     }
@@ -1234,13 +1230,11 @@ public class UIEngine<T extends UIAdapter> {
                         if (hardwareMouse) {
                             if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
                                 inputState.currentControlMode = MouseControlMode.HARDWARE_MOUSE;
-                                System.out.println("HARDWARE_MOUSE");
                             }
                         }
                         if (keyboardMouse) {
                             if (keyboardMouseDetectUse()) {
                                 inputState.currentControlMode = MouseControlMode.KEYBOARD;
-                                System.out.println("KEYBOARD");
                             }
                         }
                     }
