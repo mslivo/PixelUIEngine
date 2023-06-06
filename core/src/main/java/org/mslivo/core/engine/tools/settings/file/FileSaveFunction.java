@@ -14,11 +14,11 @@ public class FileSaveFunction implements SaveFunction {
     private static final String EXTENSION = ".properties";
 
     @Override
-    public void saveSettings(String propertiesName, Properties properties) {
-        Path fileName = Path.of(propertiesName + EXTENSION);
+    public void saveSettings(String settingsFile, Properties properties) {
+        Path fileName = Path.of(settingsFile + EXTENSION);
         try {
             if (Tools.File.makeSureDirectoryExists(fileName.getParent())) {
-                properties.store(Files.newOutputStream(Path.of(propertiesName + ".properties")), null);
+                properties.store(Files.newOutputStream(Path.of(settingsFile + ".properties")), null);
             }
         } catch (IOException e) {
             throw new SettingsException(e);

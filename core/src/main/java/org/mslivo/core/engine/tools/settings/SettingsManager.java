@@ -21,8 +21,8 @@ public class SettingsManager {
 
     private final LoadFunction loadFunction;
 
-    public SettingsManager(String settingsName) throws SettingsException {
-        this(settingsName,new FileSaveFunction(), new FileLoadFunction());
+    public SettingsManager(String settingsFile) throws SettingsException {
+        this(settingsFile,new FileSaveFunction(), new FileLoadFunction());
         this.init();
     }
 
@@ -202,7 +202,12 @@ public class SettingsManager {
     }
 
     public static <T extends Enum<T>> boolean isValidEnum(String value, Class<T> enumClass) {
-        return Enum.valueOf(enumClass, value) != null;
+        try{
+            Enum.valueOf(enumClass, value);
+            return true;
+        }catch (IllegalArgumentException e){
+            return false;
+        }
     }
 
     ;
@@ -225,12 +230,15 @@ public class SettingsManager {
 
     public <T extends Enum<T>> T getEnum(String name, Class<T> enumClass) {
         SettingsEntry settingsEntry = entries.get(name);
-        if (settingsEntry != null) return Enum.valueOf(enumClass, this.properties.getProperty(settingsEntry.name()));
+        if (settingsEntry != null){
+            try {
+                return Enum.valueOf(enumClass, this.properties.getProperty(settingsEntry.name()));
+            }catch (IllegalArgumentException e){
+                return null;
+            }
+        }
         return null;
     }
-
-    ;
-
 
     public String[] getStringList(String name) {
         SettingsEntry settingsEntry = entries.get(name);

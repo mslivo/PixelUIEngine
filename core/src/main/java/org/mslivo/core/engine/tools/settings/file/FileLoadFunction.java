@@ -15,8 +15,8 @@ public class FileLoadFunction implements LoadFunction {
     private static final String EXTENSION = ".properties";
 
     @Override
-    public void loadSettings(String propertiesName, Properties properties) {
-        Path fileName = Path.of(propertiesName+EXTENSION);
+    public void loadSettings(String settingsFile, Properties properties) {
+        Path fileName = Path.of(settingsFile+EXTENSION);
 
         if (Files.exists(fileName) && Files.isRegularFile(fileName)) {
             try {
