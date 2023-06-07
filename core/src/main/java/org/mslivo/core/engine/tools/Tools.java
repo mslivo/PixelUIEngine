@@ -37,7 +37,7 @@ public class Tools {
 
     private static boolean debugEnabled = false;
 
-    private static float skipFrameAccumulator;
+    private static float skipFrameAccumulator = 0f;
 
     private static String timestamp() {
         return sdf.format(new Date());
