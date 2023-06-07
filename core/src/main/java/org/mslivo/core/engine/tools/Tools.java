@@ -83,6 +83,19 @@ public class Tools {
                 String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM"+custom);
     }
 
+    public static void throttleFrameRate(int desiredFPS){
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        float frame_duration = (1f/desiredFPS);
+        if(deltaTime < frame_duration){
+            float sleepTime = frame_duration-deltaTime;
+            try {
+                Thread.sleep((long) (sleepTime*1000));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static class Colors {
         public static final FColor WHITE = new FColor(1, 1, 1, 1);
         public static final FColor BLACK = new FColor(0, 0, 0, 1);
@@ -423,13 +436,6 @@ public class Tools {
 
         public static boolean chance(double probability) {
             return MathUtils.random(0f, 1f) < probability;
-        }
-
-
-        public static boolean shouldRun(int ticksPerSecond, long lastRun) {
-            long nanoPerTick = 1000000000L / ticksPerSecond; // convert ticks per second to nanoseconds per tick
-            long currentTime = System.nanoTime();
-            return (currentTime - lastRun) >= nanoPerTick;
         }
 
         public static float min(float... values) {
