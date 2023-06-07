@@ -37,6 +37,8 @@ public class Tools {
 
     private static boolean debugEnabled = false;
 
+    private static float skipFrameAccumulator;
+
     private static String timestamp() {
         return sdf.format(new Date());
     }
@@ -83,18 +85,17 @@ public class Tools {
                 String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM"+custom);
     }
 
-    public static void throttleFrameRate(int desiredFPS){
-        float deltaTime = Gdx.graphics.getDeltaTime();
-        float frame_duration = (1f/desiredFPS);
-        if(deltaTime < frame_duration){
-            float sleepTime = frame_duration-deltaTime;
-            try {
-                Thread.sleep((long) (sleepTime*1000));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public static boolean skipFrame(int desiredFPS){
+        float TIME_STEP = (1f / (float)desiredFPS);
+        skipFrameAccumulator += Gdx.graphics.getDeltaTime();
+        if(skipFrameAccumulator < TIME_STEP){
+            return true;
+        }else{
+            while (skipFrameAccumulator >= TIME_STEP) skipFrameAccumulator -= TIME_STEP;
+            return false;
         }
     }
+
 
     public static class Colors {
         public static final FColor WHITE = new FColor(1, 1, 1, 1);
