@@ -91,7 +91,7 @@ public class Tools {
         if(skipFrameAccumulator < TIME_STEP){
             return true;
         }else{
-            while (skipFrameAccumulator >= TIME_STEP) skipFrameAccumulator -= TIME_STEP;
+            skipFrameAccumulator -= TIME_STEP;
             return false;
         }
     }
