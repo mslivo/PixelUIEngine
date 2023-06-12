@@ -13,7 +13,7 @@ public class SettingsManager {
 
     private final Properties backUp;
 
-    private final String settingsName;
+    private final String settingsFile;
 
     private final HashMap<String, SettingsEntry> entries;
 
@@ -27,20 +27,20 @@ public class SettingsManager {
     }
 
 
-    public SettingsManager(String settingsName, SaveFunction saveFunction, LoadFunction loadFunction) throws SettingsException {
+    public SettingsManager(String settingsFile, SaveFunction saveFunction, LoadFunction loadFunction) throws SettingsException {
         this.entries = new HashMap<>();
         this.properties = new Properties();
         this.backUp = new Properties();
-        this.settingsName = Tools.Text.validString(settingsName);
+        this.settingsFile = Tools.Text.validString(settingsFile);
         this.saveFunction = saveFunction;
         this.loadFunction = loadFunction;
         this.init();
     }
 
     public void init() {
-        loadFunction.loadSettings(settingsName, properties);
+        loadFunction.loadSettings(settingsFile, properties);
         validateAllProperties();
-        saveFunction.saveSettings(settingsName, properties);
+        saveFunction.saveSettings(settingsFile, properties);
     }
 
 
@@ -49,7 +49,7 @@ public class SettingsManager {
             this.properties.clear();
             backUp.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
             validateAllProperties();
-            saveFunction.saveSettings(settingsName, properties);
+            saveFunction.saveSettings(settingsFile, properties);
             discardBackup();
         }
     }
@@ -98,7 +98,7 @@ public class SettingsManager {
                 // already loaded
                 validateProperty(settingsEntry.name());
             }
-            saveFunction.saveSettings(settingsName, properties);
+            saveFunction.saveSettings(settingsFile, properties);
         }
     }
 
@@ -107,7 +107,7 @@ public class SettingsManager {
         if (settingsEntry != null) {
             properties.remove(settingsEntry.name());
             entries.remove(settingsEntry.name());
-            saveFunction.saveSettings(settingsName, properties);
+            saveFunction.saveSettings(settingsFile, properties);
         }
     }
 
@@ -279,7 +279,7 @@ public class SettingsManager {
             properties.setProperty(settingsEntry.name(), value);
             validateProperty(settingsEntry.name());
             if (oldValue != null && !oldValue.equals(value)) {
-                saveFunction.saveSettings(settingsName, properties);
+                saveFunction.saveSettings(settingsFile, properties);
             }
         }
     }
