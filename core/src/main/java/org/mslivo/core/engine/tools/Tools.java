@@ -35,6 +35,8 @@ public class Tools {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
+    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.GERMAN);
+
     private static boolean debugEnabled = false;
 
     private static float skipFrameAccumulator = 0f;
@@ -252,11 +254,11 @@ public class Tools {
         }
 
         public static String formatNumber(int number){
-            return NumberFormat.getNumberInstance(Locale.GERMAN).format(number);
+            return numberFormat.format(number);
         }
 
         public static String formatNumber(long number){
-            return NumberFormat.getNumberInstance(Locale.GERMAN).format(number);
+            return numberFormat.format(number);
         }
 
         public static String format2Decimal(float decimal) {
