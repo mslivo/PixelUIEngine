@@ -15,10 +15,13 @@ public class FileSaveFunction implements SaveFunction {
 
     @Override
     public void saveSettings(String settingsFile, Properties properties) {
-        Path fileName = Path.of(settingsFile + EXTENSION);
+        String fileString = settingsFile;
+        if(!settingsFile.endsWith(EXTENSION)) fileString += EXTENSION;
+
+        Path file = Path.of(fileString);
         try {
-            if (Tools.File.makeSureDirectoryExists(fileName.getParent())) {
-                properties.store(Files.newOutputStream(Path.of(settingsFile + ".properties")), null);
+            if (Tools.File.makeSureDirectoryExists(file.getParent())) {
+                properties.store(Files.newOutputStream(file), null);
             }
         } catch (IOException e) {
             throw new SettingsException(e);
