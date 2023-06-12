@@ -16,11 +16,13 @@ public class FileLoadFunction implements LoadFunction {
 
     @Override
     public void loadSettings(String settingsFile, Properties properties) {
-        Path fileName = Path.of(settingsFile+EXTENSION);
+        String fileString = settingsFile;
+        if(!settingsFile.endsWith(EXTENSION)) fileString += EXTENSION;
 
-        if (Files.exists(fileName) && Files.isRegularFile(fileName)) {
+        Path file = Path.of(fileString);
+        if (Files.exists(file) && Files.isRegularFile(file)) {
             try {
-                properties.load(Files.newInputStream(fileName));
+                properties.load(Files.newInputStream(file));
             } catch (IOException e) {
                 throw new SettingsException(e);
             }
