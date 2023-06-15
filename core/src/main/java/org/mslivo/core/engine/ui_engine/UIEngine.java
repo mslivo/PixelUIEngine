@@ -176,8 +176,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
         // ----- UpScaler
-        newInputState.factor_upScale = determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
-        newInputState.textureFilter_upScale = determineUpscaleTextureFilter(viewportMode);
+        newInputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
+        newInputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
         newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
         newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(newInputState.textureFilter_upScale, newInputState.textureFilter_upScale);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
@@ -186,14 +186,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
-        newInputState.viewport_screen = switch (viewportMode) {
-            case FIT ->
-                    new FitViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
-            case PIXEL_PERFECT ->
-                    new PixelPerfectViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen, 1);
-            case STRETCH ->
-                    new StretchViewport(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, newInputState.camera_screen);
-        };
+        newInputState.viewport_screen = UICommons.viewport_createViewport(viewportMode,newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         // -----  GUI

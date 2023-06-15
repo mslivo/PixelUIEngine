@@ -41,6 +41,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
 import org.mslivo.core.example.ui.media.ExampleBaseMedia;
@@ -304,8 +305,19 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setColor(textBtn4, Tools.Colors.GRAY_BRIGHT);
         api.components.button.centerContent(textBtn4);
 
-        api.windows.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4});
-        api.components.tabBar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4});
+        TextButton textBtn5 = api.components.button.textButton.create(10, 9, 8, 1, "Viewport", new ButtonAction() {
+            @Override
+            public void onRelease() {
+                switch (api.viewportMode()){
+                    case PIXEL_PERFECT -> api.setViewportMode(ViewportMode.FIT);
+                    case FIT -> api.setViewportMode(ViewportMode.STRETCH);
+                    case STRETCH -> api.setViewportMode(ViewportMode.PIXEL_PERFECT);
+                }
+            }
+        });
+
+        api.windows.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5});
+        api.components.tabBar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5});
 
         // Image Buttons Tab
 

@@ -21,6 +21,8 @@ public class LauncherMain {
         config.setTitle(appTitle);
         config.setDecorated(true);
         config.setMaximized(true);
+        config.setForegroundFPS(60);
+        config.useVsync(false);
         config.setWindowPosition(-1, -1);
         config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
 

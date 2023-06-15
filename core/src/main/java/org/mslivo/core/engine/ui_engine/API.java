@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -56,6 +57,7 @@ import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.awt.*;
 import java.net.URI;
@@ -2959,6 +2961,29 @@ public class API {
 
     public int resolutionHeight() {
         return inputState.internalResolutionHeight;
+    }
+
+    public ViewportMode viewportMode(){
+        return inputState.viewportMode;
+    }
+
+    public void setViewportMode(ViewportMode viewportMode){
+        if(viewportMode == null || viewportMode == inputState.viewportMode) return;
+        inputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
+        // frameBuffer_upScale
+        inputState.frameBuffer_upScale.dispose();
+        inputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.factor_upScale, inputState.internalResolutionHeight * inputState.factor_upScale, false);
+        inputState.frameBuffer_upScale.getColorBufferTexture().setFilter(inputState.textureFilter_upScale, inputState.textureFilter_upScale);
+        // texture_upScale
+        inputState.texture_upScale.getTexture().dispose();
+        inputState.texture_upScale = new TextureRegion(inputState.frameBuffer_upScale.getColorBufferTexture());
+        inputState.texture_upScale.flip(false, true);
+        // viewport_screen
+        inputState.viewport_screen = UICommons.viewport_createViewport(viewportMode,inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        // viewportMode
+        inputState.viewportMode = viewportMode;
     }
 
     public class _Camera {

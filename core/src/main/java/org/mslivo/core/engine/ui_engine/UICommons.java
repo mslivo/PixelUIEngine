@@ -1,6 +1,12 @@
 package org.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.gui.Window;
@@ -22,9 +28,48 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
+import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 class UICommons {
+
+    static int viewport_determineUpscaleFactor(ViewportMode viewportMode, int internalResolutionWidth, int internalResolutionHeight){
+        switch (viewportMode) {
+            case PIXEL_PERFECT -> {
+                return 1;
+            }
+            case FIT, STRETCH -> {
+                int upSampling = 1;
+                int testWidth = Gdx.graphics.getDisplayMode().width;
+                int testHeight = Gdx.graphics.getDisplayMode().height;
+                while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
+                    upSampling++;
+                }
+                return upSampling;
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + viewportMode);
+        }
+    }
+
+    static Viewport viewport_createViewport(ViewportMode viewportMode, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight){
+        return switch (viewportMode) {
+            case FIT ->
+                    new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+            case PIXEL_PERFECT ->
+                    new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
+            case STRETCH ->
+                    new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+        };
+    }
+
+    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(ViewportMode viewportMode) {
+        return switch (viewportMode) {
+            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
+            case FIT, STRETCH -> Texture.TextureFilter.Linear;
+        };
+    }
 
     static void window_bringToFront(InputState inputState, Window window) {
         if (inputState.windows.size() == 1) return;
