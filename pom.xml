@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<gdx.version>1.11.0</gdx.version>
-		<gdx-controllers.version>2.0.1</gdx-controllers.version>
+		<gdx-controllers.version>2.2.3</gdx-controllers.version>
 	</properties>
 
 	<dependencyManagement>
