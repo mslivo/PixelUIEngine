@@ -1,6 +1,7 @@
 package org.mslivo.core.engine.tools.particles;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaAnimation;
@@ -9,6 +10,7 @@ import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.particles.particle.Particle;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -94,8 +96,17 @@ public class ParticleSystem<P extends Particle> {
             batch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case TEXT -> {
-                    if (particle.text != null && particle.font != null)
-                        mediaManager.drawCMediaFont(batch, particle.font, particle.x, particle.y, particle.text);
+                    if (particle.text != null && particle.font != null) {
+                        BitmapFont font = mediaManager.getCMediaFont(particle.font);
+                        float bak_r = font.getColor().r;
+                        float bak_g = font.getColor().g;
+                        float bak_b = font.getColor().b;
+                        float bak_a = font.getColor().a;
+                        // performance: dont use mediamanager
+                        font.setColor(particle.r,particle.g,particle.b,particle.a);
+                        font.draw(batch, particle.text, (particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y));
+                        font.setColor(bak_r, bak_g,bak_b,bak_a);
+                    }
                 }
                 case IMAGE -> {
                     mediaManager.drawCMediaImageScale(batch, (CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
