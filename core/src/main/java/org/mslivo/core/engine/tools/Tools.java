@@ -16,9 +16,11 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.function.BiFunction;
 
 public class Tools {
@@ -34,8 +36,6 @@ public class Tools {
     private static final DecimalFormat decimalFormat_6decimal = new DecimalFormat("#.######");
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
-
-    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.GERMAN);
 
     private static boolean debugEnabled = false;
 
@@ -84,15 +84,15 @@ public class Tools {
             custom.append(" | ").append(String.format("%1$10s", customValue));
         }
         Tools.log(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
-                String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM"+custom);
+                String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM" + custom);
     }
 
-    public static boolean skipFrame(int desiredFPS){
-        float TIME_STEP = (1f / (float)desiredFPS);
+    public static boolean skipFrame(int desiredFPS) {
+        float TIME_STEP = (1f / (float) desiredFPS);
         skipFrameAccumulator += Gdx.graphics.getDeltaTime();
-        if(skipFrameAccumulator < TIME_STEP){
+        if (skipFrameAccumulator < TIME_STEP) {
             return true;
-        }else{
+        } else {
             skipFrameAccumulator -= TIME_STEP;
             return false;
         }
@@ -253,12 +253,23 @@ public class Tools {
             return text.split("\n");
         }
 
-        public static String formatNumber(int number){
-            return numberFormat.format(number);
+        public static String formatNumber(int number) {
+            return formatNumber((long)number);
         }
 
-        public static String formatNumber(long number){
-            return numberFormat.format(number);
+        public static String formatNumber(long number) {
+            StringBuilder formattedNumber = new StringBuilder();
+            String numberString = String.valueOf(number);
+            int length = numberString.length();
+
+            for (int i = 0; i < length; i++) {
+                if (i > 0 && (length - i) % 3 == 0) {
+                    formattedNumber.append(".");
+                }
+                formattedNumber.append(numberString.charAt(i));
+            }
+
+            return formattedNumber.toString();
         }
 
         public static String format2Decimal(float decimal) {
@@ -619,46 +630,46 @@ public class Tools {
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
-        public static float percentAboveThreshold(long value, long max, int threshold){
+        public static float percentAboveThreshold(long value, long max, int threshold) {
             value = Tools.Calc.upperBounds(value, max);
-            if(value > threshold){
-                long above = value-threshold;
-                float divisor = (max-threshold);
-                return divisor > 0 ? (above/divisor) : 0f;
-            }else{
+            if (value > threshold) {
+                long above = value - threshold;
+                float divisor = (max - threshold);
+                return divisor > 0 ? (above / divisor) : 0f;
+            } else {
                 return 0f;
             }
         }
 
-        public static float percentBelowThreshold(long value, long min, int threshold){
+        public static float percentBelowThreshold(long value, long min, int threshold) {
             value = Tools.Calc.lowerBounds(value, min);
-            if(value < threshold){
-                long below = threshold-value;
-                float divisor = (threshold-min);
-                return divisor > 0 ? (below/divisor) : 0f;
-            }else{
+            if (value < threshold) {
+                long below = threshold - value;
+                float divisor = (threshold - min);
+                return divisor > 0 ? (below / divisor) : 0f;
+            } else {
                 return 0f;
             }
         }
 
-        public static float percentAboveThreshold(float value, float max, float threshold){
+        public static float percentAboveThreshold(float value, float max, float threshold) {
             value = Tools.Calc.upperBounds(value, max);
-            if(value > threshold){
-                float above = value-threshold;
-                float divisor = (max-threshold);
-                return divisor > 0 ? (above/divisor) : 0f;
-            }else{
+            if (value > threshold) {
+                float above = value - threshold;
+                float divisor = (max - threshold);
+                return divisor > 0 ? (above / divisor) : 0f;
+            } else {
                 return 0f;
             }
         }
 
-        public static float percentBelowThreshold(float value, float min, float threshold){
+        public static float percentBelowThreshold(float value, float min, float threshold) {
             value = Tools.Calc.lowerBounds(value, min);
-            if(value < threshold){
-                float below = threshold-value;
-                float divisor = (threshold-min);
-                return divisor > 0 ? (below/divisor) : 0f;
-            }else{
+            if (value < threshold) {
+                float below = threshold - value;
+                float divisor = (threshold - min);
+                return divisor > 0 ? (below / divisor) : 0f;
+            } else {
                 return 0f;
             }
         }
@@ -739,7 +750,7 @@ public class Tools {
         }
 
         public static float inBounds01(float value) {
-            return Calc.inBounds(value,0f,1f);
+            return Calc.inBounds(value, 0f, 1f);
         }
 
         public static double inBounds(double value, double lower, double upper) {
@@ -806,7 +817,7 @@ public class Tools {
     public static class Reflection {
         /* Dont use these if you target HTML */
 
-        public static boolean gameEngine_checkDataObjectValid(Class checkClass){
+        public static boolean gameEngine_checkDataObjectValid(Class checkClass) {
             if (Collection.class.isAssignableFrom(checkClass)) return false;
             if (!String.class.isAssignableFrom(checkClass)) return false;
             if (!Serializable.class.isAssignableFrom(checkClass)) return true;
@@ -847,14 +858,14 @@ public class Tools {
             return prepareList.toArray(new CMedia[]{});
         }
 
-        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object){
+        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object) {
             return mediaManager_prepareCMediaFromObject(object, 3);
         }
 
-        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object, int scanDepthMax){
+        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object, int scanDepthMax) {
             ArrayList<CMedia> prepareList = new ArrayList<>();
             try {
-                mediaManager_prepareCMediaFromObjectResolve(object, scanDepthMax,1, prepareList);
+                mediaManager_prepareCMediaFromObjectResolve(object, scanDepthMax, 1, prepareList);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new CMedia[]{};
@@ -888,17 +899,17 @@ public class Tools {
                     } else if (fieldObject.getClass() == ArrayList.class) {
                         ArrayList arrayList = (ArrayList) fieldObject;
                         for (Object arrayListItem : arrayList) {
-                            mediaManager_prepareCMediaFromObjectResolve(arrayListItem, scanDepthMax, currentDepth+1, prepareList);
+                            mediaManager_prepareCMediaFromObjectResolve(arrayListItem, scanDepthMax, currentDepth + 1, prepareList);
                         }
                     } else if (field.getType().isArray()) {
                         if (field.getType().getName().startsWith("[L") || field.getType().getName().startsWith("[[L")) {
                             Object[] arrayObjects = (Object[]) fieldObject;
                             for (Object arrayObject : arrayObjects) {
-                                mediaManager_prepareCMediaFromObjectResolve(arrayObject, scanDepthMax, currentDepth+1, prepareList);
+                                mediaManager_prepareCMediaFromObjectResolve(arrayObject, scanDepthMax, currentDepth + 1, prepareList);
                             }
                         }
                     } else {
-                        mediaManager_prepareCMediaFromObjectResolve(fieldObject, scanDepthMax, currentDepth+1, prepareList);
+                        mediaManager_prepareCMediaFromObjectResolve(fieldObject, scanDepthMax, currentDepth + 1, prepareList);
                     }
                 }
             }
