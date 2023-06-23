@@ -1693,8 +1693,8 @@ public class UIEngine<T extends UIAdapter> {
     private void updateHardwareMouseControl() {
         // --- GUI CURSOR ---
         // ScreenCursor To WorldCursor
-        inputState.vector2_unproject.x = Gdx.input.getX();
-        inputState.vector2_unproject.y = Gdx.input.getY();
+        inputState.vector2_unproject.x = Tools.Calc.inBounds(Gdx.input.getX(),0,Gdx.graphics.getWidth());;
+        inputState.vector2_unproject.y = Tools.Calc.inBounds(Gdx.input.getY(),0,Gdx.graphics.getHeight());
         inputState.viewport_screen.unproject(inputState.vector2_unproject);
         // WorldCursor to  FBOCursor
         inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
