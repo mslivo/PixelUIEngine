@@ -328,6 +328,14 @@ public class Tools {
             return string == null ? new String[]{} : string;
         }
 
+        public static String truncateString(String input, int maxLength) {
+            if (input.length() <= maxLength) {
+                return input;
+            } else {
+                return input.substring(0, maxLength);
+            }
+        }
+
     }
 
     public static class File {
