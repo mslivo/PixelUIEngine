@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 /*
- * Particle System for Managing Classes that Extend Particle
+ * Particle System must be extended and implemented
  */
 public abstract class ParticleSystem {
 
