@@ -61,26 +61,10 @@ public abstract class ParticleSystem {
                 deleteQueue.add(particle);
             }
         }
-        // remove sorted indexes in reverse order
-        Particle particle;
-        while ((particle = deleteQueue.poll()) != null) {
-            removeParticleFromSystem(particle);
-        }
+        deleteQueuedParticles();
     }
 
-    private void addParticleToSystem(Particle particle) {
-        createParticle(particle);
-        particles.add(particle);
-        return;
-    }
 
-    private void removeParticleFromSystem(Particle particle) {
-        destroyParticle(particle);
-        particles.remove(particle);
-        if (useObjectPool) {
-            freePool.add(particle);
-        }
-    }
 
     private Particle particleNew(ParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaGFX appearance, CMediaFont font, String text, float animation_offset, boolean visible, Object customData) {
         if (!canAddParticle()) return null;
@@ -112,14 +96,34 @@ public abstract class ParticleSystem {
         return particle;
     }
 
+    private void deleteQueuedParticles(){
+        Particle deleteParticle;
+        while ((deleteParticle = deleteQueue.poll()) != null) {
+            removeParticleFromSystem(deleteParticle);
+        }
+    }
+
+    private void addParticleToSystem(Particle particle) {
+        createParticle(particle);
+        particles.add(particle);
+        return;
+    }
+
+    private void removeParticleFromSystem(Particle particle) {
+        destroyParticle(particle);
+        particles.remove(particle);
+        if (useObjectPool) {
+            freePool.add(particle);
+        }
+    }
 
     public void forEveryParticle(Consumer<Particle> consumer) {
         for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
     }
 
     public void removeAllParticles() {
-        particles.clear();
-        deleteQueue.clear();
+        deleteQueue.addAll(particles);
+        deleteQueuedParticles();
     }
 
     public int getParticleCount() {
@@ -131,7 +135,7 @@ public abstract class ParticleSystem {
     }
 
     public int canAddParticleAmount() {
-        return particleLimit - this.particles.size();
+        return particleLimit - particles.size();
     }
 
     public void render(SpriteBatch batch) {
@@ -176,8 +180,7 @@ public abstract class ParticleSystem {
     }
 
     public void shutdown() {
-        this.deleteQueue.clear();
-        this.particles.clear();
+        removeAllParticles();
     }
 
     public abstract boolean updateParticle(Particle particle, int index);
