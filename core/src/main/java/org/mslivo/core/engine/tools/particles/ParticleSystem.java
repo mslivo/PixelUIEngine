@@ -43,7 +43,7 @@ public abstract class ParticleSystem {
 
         // Initialize pool
         if (this.useObjectPool) {
-            freePool = new ArrayDeque<>();
+            freePool = new ArrayDeque<>(particleLimit);
             for (int i = 0; i < particleLimit; i++) {
                 freePool.add(new Particle());
             }
