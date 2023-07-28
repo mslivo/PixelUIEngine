@@ -378,6 +378,10 @@ public class API {
         }
 
         public Text text_CreateClickableURL(int x, int y, String text, String url) {
+            return text_CreateClickableURL(x, y, text, url, GUIBaseMedia.FONT_BLACK, GUIBaseMedia.FONT_WHITE);
+        }
+
+        public Text text_CreateClickableURL(int x, int y, String text, String url, CMediaFont font, CMediaFont fontHover) {
             return text_CreateClickableText(x, y, new String[]{text}, new Consumer<Integer>() {
                 @Override
                 public void accept(Integer integer) {
@@ -387,10 +391,14 @@ public class API {
                         e.printStackTrace();
                     }
                 }
-            });
+            }, font, fontHover);
         }
 
         public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick) {
+            return text_CreateClickableText(x, y, text, onClick, GUIBaseMedia.FONT_BLACK, GUIBaseMedia.FONT_WHITE);
+        }
+
+        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick, CMediaFont font, CMediaFont fontHover) {
             Text hlText = components.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
             components.text.setTextAction(hlText, new TextAction() {
                 @Override
@@ -409,9 +417,9 @@ public class API {
                             hlText.width * UIEngine.TILE_SIZE,
                             hlText.height * UIEngine.TILE_SIZE
                     )) {
-                        components.text.setFont(hlText, GUIBaseMedia.FONT_WHITE);
+                        components.text.setFont(hlText, fontHover);
                     } else {
-                        components.text.setFont(hlText, GUIBaseMedia.FONT_BLACK);
+                        components.text.setFont(hlText, font);
                     }
                 }
             });
@@ -1864,7 +1872,7 @@ public class API {
                     ' ', '_', '.', ',', '!', '?'));
         }
 
-        public int[][] getKeyboardMouseButtons(){
+        public int[][] getKeyboardMouseButtons() {
             final int buttons[][] = new int[][]{
                     getKeyboardMouseButtonsUp(),
                     getKeyBoardControlButtonsDown(),
@@ -1881,7 +1889,7 @@ public class API {
             return buttons;
         }
 
-        public int[][] getGamepadMouseButtons(){
+        public int[][] getGamepadMouseButtons() {
             final int buttons[][] = new int[][]{
                     getGamePadMouseButtonsMouse1(),
                     getGamePadMouseButtonsMouse2(),
@@ -2133,54 +2141,92 @@ public class API {
         }
 
         /* ---- GAMEPAD EVENTS --- */
-        public boolean gamePadDown(){ return inputState.inputEvents.gamePadButtonDown;}
+        public boolean gamePadDown() {
+            return inputState.inputEvents.gamePadButtonDown;
+        }
 
-        public ArrayList<Integer> gamePadDownButtons(){ return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);}
+        public ArrayList<Integer> gamePadDownButtons() {
+            return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
+        }
 
-        public boolean gamePadDownButton(int keyCode){
+        public boolean gamePadDownButton(int keyCode) {
             for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++) {
                 if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
             }
             return false;
         }
 
-        public boolean gamePadIsButtonDown(int keyCode){return inputState.inputEvents.gamePadButtonsDown[keyCode];}
+        public boolean gamePadIsButtonDown(int keyCode) {
+            return inputState.inputEvents.gamePadButtonsDown[keyCode];
+        }
 
-        public boolean gamePadUp(){ return inputState.inputEvents.gamePadButtonUp;}
+        public boolean gamePadUp() {
+            return inputState.inputEvents.gamePadButtonUp;
+        }
 
-        public ArrayList<Integer> gamePadUpButtons(){ return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);}
+        public ArrayList<Integer> gamePadUpButtons() {
+            return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
+        }
 
-        public boolean gamePadUpButton(int keyCode){
+        public boolean gamePadUpButton(int keyCode) {
             for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++) {
                 if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
             }
             return false;
         }
 
-        public boolean gamePadIsButtonUp(int keyCode){return !inputState.inputEvents.gamePadButtonsDown[keyCode];}
-
-        public boolean gamePadConnected(){return inputState.inputEvents.gamePadConnected;}
-
-        public boolean gamePadDisconnected(){return inputState.inputEvents.gamePadDisconnected;}
-
-        public boolean gamePadLeftXMoved(){return inputState.inputEvents.gamePadLeftXMoved;}
-
-        public boolean gamePadLeftYMoved(){return inputState.inputEvents.gamePadLeftYMoved;}
-
-        public boolean gamePadLeftMoved(){return gamePadLeftXMoved() || gamePadLeftYMoved();
+        public boolean gamePadIsButtonUp(int keyCode) {
+            return !inputState.inputEvents.gamePadButtonsDown[keyCode];
         }
-        public float gamePadLeftX(){return inputState.inputEvents.gamePadLeftX;}
-        public float gamePadLeftY(){return inputState.inputEvents.gamePadLeftY;}
 
-        public boolean gamePadRightXMoved(){return inputState.inputEvents.gamePadRightXMoved;}
+        public boolean gamePadConnected() {
+            return inputState.inputEvents.gamePadConnected;
+        }
 
-        public boolean gamePadRightYMoved(){return inputState.inputEvents.gamePadRightYMoved;}
+        public boolean gamePadDisconnected() {
+            return inputState.inputEvents.gamePadDisconnected;
+        }
 
-        public boolean gamePadRightMoved(){return gamePadRightXMoved() || gamePadRightYMoved();}
+        public boolean gamePadLeftXMoved() {
+            return inputState.inputEvents.gamePadLeftXMoved;
+        }
+
+        public boolean gamePadLeftYMoved() {
+            return inputState.inputEvents.gamePadLeftYMoved;
+        }
+
+        public boolean gamePadLeftMoved() {
+            return gamePadLeftXMoved() || gamePadLeftYMoved();
+        }
+
+        public float gamePadLeftX() {
+            return inputState.inputEvents.gamePadLeftX;
+        }
+
+        public float gamePadLeftY() {
+            return inputState.inputEvents.gamePadLeftY;
+        }
+
+        public boolean gamePadRightXMoved() {
+            return inputState.inputEvents.gamePadRightXMoved;
+        }
+
+        public boolean gamePadRightYMoved() {
+            return inputState.inputEvents.gamePadRightYMoved;
+        }
+
+        public boolean gamePadRightMoved() {
+            return gamePadRightXMoved() || gamePadRightYMoved();
+        }
 
 
-        public float gamePadRightX(){return inputState.inputEvents.gamePadRightX;}
-        public float gamePadRightY(){return inputState.inputEvents.gamePadRightY;}
+        public float gamePadRightX() {
+            return inputState.inputEvents.gamePadRightX;
+        }
+
+        public float gamePadRightY() {
+            return inputState.inputEvents.gamePadRightY;
+        }
     }
 
     public class _Notification {
@@ -2963,12 +3009,12 @@ public class API {
         return inputState.internalResolutionHeight;
     }
 
-    public ViewportMode viewportMode(){
+    public ViewportMode viewportMode() {
         return inputState.viewportMode;
     }
 
-    public void setViewportMode(ViewportMode viewportMode){
-        if(viewportMode == null || viewportMode == inputState.viewportMode) return;
+    public void setViewportMode(ViewportMode viewportMode) {
+        if (viewportMode == null || viewportMode == inputState.viewportMode) return;
         inputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         inputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
         // frameBuffer_upScale
@@ -2980,7 +3026,7 @@ public class API {
         inputState.texture_upScale = new TextureRegion(inputState.frameBuffer_upScale.getColorBufferTexture());
         inputState.texture_upScale.flip(false, true);
         // viewport_screen
-        inputState.viewport_screen = UICommons.viewport_createViewport(viewportMode,inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.viewport_screen = UICommons.viewport_createViewport(viewportMode, inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // viewportMode
         inputState.viewportMode = viewportMode;
