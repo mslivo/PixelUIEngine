@@ -657,8 +657,10 @@ public class API {
                 okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
-                        removeCurrentModalWindow();
+                        if(inputTextField.content.length() > minInputLength) {
+                            if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                            removeCurrentModalWindow();
+                        }
                     }
                 });
                 componentsList.add(okBtn);
