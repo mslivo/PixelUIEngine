@@ -1427,6 +1427,9 @@ public class API {
         private float dragAlpha = 0.8f;
         private int buttonHoldTimer = 8;
         private float knobSensitivity = 1f;
+
+
+        private float scrollBarSensitivity = 1f;
         private boolean foldWindowsOnDoubleClick = true;
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
@@ -1660,6 +1663,15 @@ public class API {
         public void setKnobSensitivity(float knobSensitivity) {
             this.knobSensitivity = Tools.Calc.inBounds(knobSensitivity, 0f, 1f);
         }
+
+        public float getScrollBarSensitivity() {
+            return scrollBarSensitivity;
+        }
+
+        public void setScrollBarSensitivity(float scrollBarSensitivity) {
+            this.scrollBarSensitivity = scrollBarSensitivity;
+        }
+
 
         public boolean isFoldWindowsOnDoubleClick() {
             return foldWindowsOnDoubleClick;
@@ -1914,6 +1926,7 @@ public class API {
             setDragAlpha(config.getDragAlpha());
             setButtonHoldTimer(config.getButtonHoldTimer());
             setKnobSensitivity(config.getKnobSensitivity());
+            setScrollBarSensitivity(config.getScrollBarSensitivity());
             setFoldWindowsOnDoubleClick(config.isFoldWindowsOnDoubleClick());
             setNotificationsMax(config.getNotificationsMax());
             setNotificationsDefaultDisplayTime(config.getNotificationsDefaultDisplayTime());

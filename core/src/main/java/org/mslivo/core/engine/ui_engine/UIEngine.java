@@ -12,8 +12,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -58,7 +56,10 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.*;
+import org.mslivo.core.engine.ui_engine.misc.FColor;
+import org.mslivo.core.engine.ui_engine.misc.GrayScaleShader;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -186,7 +187,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
-        newInputState.viewport_screen = UICommons.viewport_createViewport(viewportMode,newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.viewport_screen = UICommons.viewport_createViewport(viewportMode, newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         // -----  GUI
@@ -930,14 +931,14 @@ public class UIEngine<T extends UIAdapter> {
                     UICommons.knob_turnKnob(knop, newValue, amount);
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                     ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount);
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
                     scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
                     if (scrollBarHorizontal.scrollBarAction != null) {
                         scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
                     }
                 } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                     ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount);
+                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
                     scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
                     if (scrollBarVertical.scrollBarAction != null) {
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
@@ -1693,8 +1694,9 @@ public class UIEngine<T extends UIAdapter> {
     private void updateHardwareMouseControl() {
         // --- GUI CURSOR ---
         // ScreenCursor To WorldCursor
-        inputState.vector2_unproject.x = Tools.Calc.inBounds(Gdx.input.getX(),0,Gdx.graphics.getWidth());;
-        inputState.vector2_unproject.y = Tools.Calc.inBounds(Gdx.input.getY(),0,Gdx.graphics.getHeight());
+        inputState.vector2_unproject.x = Tools.Calc.inBounds(Gdx.input.getX(), 0, Gdx.graphics.getWidth());
+        ;
+        inputState.vector2_unproject.y = Tools.Calc.inBounds(Gdx.input.getY(), 0, Gdx.graphics.getHeight());
         inputState.viewport_screen.unproject(inputState.vector2_unproject);
         // WorldCursor to  FBOCursor
         inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
