@@ -258,11 +258,11 @@ public class MusicPlayer {
     public void setMuted(boolean muted) {
         if(!this.muted && muted){
             this.muteVolume = this.volume;
-            setVolume(0f);
+            this.volume = 0f;
         }
         if(this.muted && !muted){
-            setVolume(this.muteVolume);
-            this.muteVolume = 0;
+            this.volume = this.muteVolume;
+            this.muteVolume = 0f;
         }
         this.muted = muted;
     }
