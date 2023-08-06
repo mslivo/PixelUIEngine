@@ -221,12 +221,16 @@ public class MusicPlayer {
         this.playMode = PLAYMODE_SEQUENTIAL;
     }
 
-    public void setVolume(float volume){
-        this.volume = Tools.Calc.inBounds(volume,0f,1f);
+    public void setVolume(float volume) {
+        if(this.muted){
+            this.muteVolume = Tools.Calc.inBounds(volume, 0f, 1f);
+        }else{
+            this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
+        }
     }
 
-    public float getVolume(){
-        return this.volume;
+    public float volume() {
+        return this.muted ? this.muteVolume : volume;
     }
 
     public void play(){
