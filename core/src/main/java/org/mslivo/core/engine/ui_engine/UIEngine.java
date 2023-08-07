@@ -1503,7 +1503,7 @@ public class UIEngine<T extends UIAdapter> {
                                     xTab += tab.width;
                                 }
                             } else if (inputState.lastGUIMouseHover instanceof Button button) {
-                                magnet_x = UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
+                                magnet_x = inputState.mouse_gui.x; // UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
                                 magnet_y = UICommons.component_getAbsoluteY(button) + (button.height * UIEngine.TILE_SIZE_2);
                                 magnetActive = true;
                             }
