@@ -1,10 +1,8 @@
 package org.mslivo.core.engine.ui_engine.input;
 
-import com.badlogic.gdx.utils.ObjectIntMap;
-
 public class KeyCode {
 
-    static public class GamePad {
+    public static class GamePad {
         public static final int A = 0;
         public static final int B = 1;
         public static final int X = 2;
@@ -22,14 +20,46 @@ public class KeyCode {
         public static final int START = 14;
         public static final int BACK = 15;
 
+        public static String keyName(int keycode) {
+            return switch (keycode) {
+                case A -> "A";
+                case B -> "B";
+                case X -> "X";
+                case Y -> "Y";
+                case L1 -> "L1";
+                case L2 -> "L2";
+                case R1 -> "R1";
+                case R2 -> "R2";
+                case DPAD_UP -> "DPAD Up";
+                case DPAD_DOWN -> "DPAD Down";
+                case DPAD_LEFT -> "DPAD Left";
+                case DPAD_RIGHT -> "DPAD Right";
+                case STICK_LEFT -> "Stick L";
+                case STICK_RIGHT -> "Stick R";
+                case START -> "Start";
+                case BACK -> "Back";
+                default -> null;
+            };
+        }
     }
 
-    static public class Mouse {
+    public static class Mouse {
         public static final int LEFT = 0;
         public static final int RIGHT = 1;
         public static final int MIDDLE = 2;
         public static final int BACK = 3;
         public static final int FORWARD = 4;
+
+        public static String keyName(int keycode) {
+            return switch (keycode) {
+                case LEFT -> "Left";
+                case RIGHT -> "Right";
+                case MIDDLE -> "Middle";
+                case BACK -> "Back";
+                case FORWARD -> "Forward";
+                default -> "";
+            };
+        }
     }
 
     /**
@@ -37,7 +67,7 @@ public class KeyCode {
      *
      * @author mzechner
      */
-    static public class Key {
+    public static class Key {
         public static final int ANY_KEY = -1;
         public static final int NUM_0 = 7;
         public static final int NUM_1 = 8;
@@ -174,7 +204,6 @@ public class KeyCode {
         public static final int BUTTON_START = 108;
         public static final int BUTTON_SELECT = 109;
         public static final int BUTTON_MODE = 110;
-
         public static final int NUMPAD_0 = 144;
         public static final int NUMPAD_1 = 145;
         public static final int NUMPAD_2 = 146;
@@ -185,7 +214,6 @@ public class KeyCode {
         public static final int NUMPAD_7 = 151;
         public static final int NUMPAD_8 = 152;
         public static final int NUMPAD_9 = 153;
-
         public static final int NUMPAD_DIVIDE = 154;
         public static final int NUMPAD_MULTIPLY = 155;
         public static final int NUMPAD_SUBTRACT = 156;
@@ -197,25 +225,6 @@ public class KeyCode {
         public static final int NUMPAD_LEFT_PAREN = 162;
         public static final int NUMPAD_RIGHT_PAREN = 163;
         public static final int NUM_LOCK = 143;
-
-// public static final int BACKTICK = 0;
-// public static final int TILDE = 0;
-// public static final int UNDERSCORE = 0;
-// public static final int DOT = 0;
-// public static final int BREAK = 0;
-// public static final int PIPE = 0;
-// public static final int EXCLAMATION = 0;
-// public static final int QUESTIONMARK = 0;
-
-        // ` | VK_BACKTICK
-// ~ | VK_TILDE
-// : | VK_COLON
-// _ | VK_UNDERSCORE
-// . | VK_DOT
-// (break) | VK_BREAK
-// | | VK_PIPE
-// ! | VK_EXCLAMATION
-// ? | VK_QUESTION
         public static final int COLON = 243;
         public static final int F1 = 131;
         public static final int F2 = 132;
@@ -241,380 +250,183 @@ public class KeyCode {
         public static final int F22 = 192;
         public static final int F23 = 193;
         public static final int F24 = 194;
-
         public static final int MAX_KEYCODE = 255;
 
-        /**
-         * @return a human readable representation of the keycode. The returned value can be used in
-         * {@link com.badlogic.gdx.Input.Keys#valueOf(String)}
-         */
-        public static String toString(int keycode) {
-            if (keycode < 0) throw new IllegalArgumentException("keycode cannot be negative, keycode: " + keycode);
-            if (keycode > MAX_KEYCODE)
-                throw new IllegalArgumentException("keycode cannot be greater than 255, keycode: " + keycode);
-            switch (keycode) {
+        public static String keyName(int keycode) {
+            return switch (keycode) {
                 // META* variables should not be used with this method.
-                case UNKNOWN:
-                    return "Unknown";
-                case SOFT_LEFT:
-                    return "Soft Left";
-                case SOFT_RIGHT:
-                    return "Soft Right";
-                case HOME:
-                    return "Home";
-                case BACK:
-                    return "Back";
-                case CALL:
-                    return "Call";
-                case ENDCALL:
-                    return "End Call";
-                case NUM_0:
-                    return "0";
-                case NUM_1:
-                    return "1";
-                case NUM_2:
-                    return "2";
-                case NUM_3:
-                    return "3";
-                case NUM_4:
-                    return "4";
-                case NUM_5:
-                    return "5";
-                case NUM_6:
-                    return "6";
-                case NUM_7:
-                    return "7";
-                case NUM_8:
-                    return "8";
-                case NUM_9:
-                    return "9";
-                case STAR:
-                    return "*";
-                case POUND:
-                    return "#";
-                case UP:
-                    return "Up";
-                case DOWN:
-                    return "Down";
-                case LEFT:
-                    return "Left";
-                case RIGHT:
-                    return "Right";
-                case CENTER:
-                    return "Center";
-                case VOLUME_UP:
-                    return "Volume Up";
-                case VOLUME_DOWN:
-                    return "Volume Down";
-                case POWER:
-                    return "Power";
-                case CAMERA:
-                    return "Camera";
-                case CLEAR:
-                    return "Clear";
-                case A:
-                    return "A";
-                case B:
-                    return "B";
-                case C:
-                    return "C";
-                case D:
-                    return "D";
-                case E:
-                    return "E";
-                case F:
-                    return "F";
-                case G:
-                    return "G";
-                case H:
-                    return "H";
-                case I:
-                    return "I";
-                case J:
-                    return "J";
-                case K:
-                    return "K";
-                case L:
-                    return "L";
-                case M:
-                    return "M";
-                case N:
-                    return "N";
-                case O:
-                    return "O";
-                case P:
-                    return "P";
-                case Q:
-                    return "Q";
-                case R:
-                    return "R";
-                case S:
-                    return "S";
-                case T:
-                    return "T";
-                case U:
-                    return "U";
-                case V:
-                    return "V";
-                case W:
-                    return "W";
-                case X:
-                    return "X";
-                case Y:
-                    return "Y";
-                case Z:
-                    return "Z";
-                case COMMA:
-                    return ",";
-                case PERIOD:
-                    return ".";
-                case ALT_LEFT:
-                    return "L-Alt";
-                case ALT_RIGHT:
-                    return "R-Alt";
-                case SHIFT_LEFT:
-                    return "L-Shift";
-                case SHIFT_RIGHT:
-                    return "R-Shift";
-                case TAB:
-                    return "Tab";
-                case SPACE:
-                    return "Space";
-                case SYM:
-                    return "SYM";
-                case EXPLORER:
-                    return "Explorer";
-                case ENVELOPE:
-                    return "Envelope";
-                case ENTER:
-                    return "Enter";
-                case DEL:
-                    return "Delete"; // also BACKSPACE
-                case GRAVE:
-                    return "`";
-                case MINUS:
-                    return "-";
-                case EQUALS:
-                    return "=";
-                case LEFT_BRACKET:
-                    return "[";
-                case RIGHT_BRACKET:
-                    return "]";
-                case BACKSLASH:
-                    return "\\";
-                case SEMICOLON:
-                    return ";";
-                case APOSTROPHE:
-                    return "'";
-                case SLASH:
-                    return "/";
-                case AT:
-                    return "@";
-                case NUM:
-                    return "Num";
-                case HEADSETHOOK:
-                    return "Headset Hook";
-                case FOCUS:
-                    return "Focus";
-                case PLUS:
-                    return "Plus";
-                case MENU:
-                    return "Menu";
-                case NOTIFICATION:
-                    return "Notification";
-                case SEARCH:
-                    return "Search";
-                case MEDIA_PLAY_PAUSE:
-                    return "Play/Pause";
-                case MEDIA_STOP:
-                    return "Stop Media";
-                case MEDIA_NEXT:
-                    return "Next Media";
-                case MEDIA_PREVIOUS:
-                    return "Prev Media";
-                case MEDIA_REWIND:
-                    return "Rewind";
-                case MEDIA_FAST_FORWARD:
-                    return "Fast Forward";
-                case MUTE:
-                    return "Mute";
-                case PAGE_UP:
-                    return "Page Up";
-                case PAGE_DOWN:
-                    return "Page Down";
-                case PICTSYMBOLS:
-                    return "PICTSYMBOLS";
-                case SWITCH_CHARSET:
-                    return "SWITCH_CHARSET";
-                case BUTTON_A:
-                    return "A Button";
-                case BUTTON_B:
-                    return "B Button";
-                case BUTTON_C:
-                    return "C Button";
-                case BUTTON_X:
-                    return "X Button";
-                case BUTTON_Y:
-                    return "Y Button";
-                case BUTTON_Z:
-                    return "Z Button";
-                case BUTTON_L1:
-                    return "L1 Button";
-                case BUTTON_R1:
-                    return "R1 Button";
-                case BUTTON_L2:
-                    return "L2 Button";
-                case BUTTON_R2:
-                    return "R2 Button";
-                case BUTTON_THUMBL:
-                    return "Left Thumb";
-                case BUTTON_THUMBR:
-                    return "Right Thumb";
-                case BUTTON_START:
-                    return "Start";
-                case BUTTON_SELECT:
-                    return "Select";
-                case BUTTON_MODE:
-                    return "Button Mode";
-                case FORWARD_DEL:
-                    return "Forward Delete";
-                case CONTROL_LEFT:
-                    return "L-Ctrl";
-                case CONTROL_RIGHT:
-                    return "R-Ctrl";
-                case ESCAPE:
-                    return "Escape";
-                case END:
-                    return "End";
-                case INSERT:
-                    return "Insert";
-                case NUMPAD_0:
-                    return "Numpad 0";
-                case NUMPAD_1:
-                    return "Numpad 1";
-                case NUMPAD_2:
-                    return "Numpad 2";
-                case NUMPAD_3:
-                    return "Numpad 3";
-                case NUMPAD_4:
-                    return "Numpad 4";
-                case NUMPAD_5:
-                    return "Numpad 5";
-                case NUMPAD_6:
-                    return "Numpad 6";
-                case NUMPAD_7:
-                    return "Numpad 7";
-                case NUMPAD_8:
-                    return "Numpad 8";
-                case NUMPAD_9:
-                    return "Numpad 9";
-                case COLON:
-                    return ":";
-                case F1:
-                    return "F1";
-                case F2:
-                    return "F2";
-                case F3:
-                    return "F3";
-                case F4:
-                    return "F4";
-                case F5:
-                    return "F5";
-                case F6:
-                    return "F6";
-                case F7:
-                    return "F7";
-                case F8:
-                    return "F8";
-                case F9:
-                    return "F9";
-                case F10:
-                    return "F10";
-                case F11:
-                    return "F11";
-                case F12:
-                    return "F12";
-                case F13:
-                    return "F13";
-                case F14:
-                    return "F14";
-                case F15:
-                    return "F15";
-                case F16:
-                    return "F16";
-                case F17:
-                    return "F17";
-                case F18:
-                    return "F18";
-                case F19:
-                    return "F19";
-                case F20:
-                    return "F20";
-                case F21:
-                    return "F21";
-                case F22:
-                    return "F22";
-                case F23:
-                    return "F23";
-                case F24:
-                    return "F24";
-                case NUMPAD_DIVIDE:
-                    return "Num /";
-                case NUMPAD_MULTIPLY:
-                    return "Num *";
-                case NUMPAD_SUBTRACT:
-                    return "Num -";
-                case NUMPAD_ADD:
-                    return "Num +";
-                case NUMPAD_DOT:
-                    return "Num .";
-                case NUMPAD_COMMA:
-                    return "Num ,";
-                case NUMPAD_ENTER:
-                    return "Num Enter";
-                case NUMPAD_EQUALS:
-                    return "Num =";
-                case NUMPAD_LEFT_PAREN:
-                    return "Num (";
-                case NUMPAD_RIGHT_PAREN:
-                    return "Num )";
-                case NUM_LOCK:
-                    return "Num Lock";
-                case CAPS_LOCK:
-                    return "Caps Lock";
-                case SCROLL_LOCK:
-                    return "Scroll Lock";
-                case PAUSE:
-                    return "Pause";
-                case PRINT_SCREEN:
-                    return "Print";
-                // BUTTON_CIRCLE unhandled, as it conflicts with the more likely to be pressed F12
-                default:
+                case UNKNOWN -> "Unknown";
+                case SOFT_LEFT -> "Soft Left";
+                case SOFT_RIGHT -> "Soft Right";
+                case HOME -> "Home";
+                case BACK -> "Back";
+                case CALL -> "Call";
+                case ENDCALL -> "End Call";
+                case NUM_0 -> "0";
+                case NUM_1 -> "1";
+                case NUM_2 -> "2";
+                case NUM_3 -> "3";
+                case NUM_4 -> "4";
+                case NUM_5 -> "5";
+                case NUM_6 -> "6";
+                case NUM_7 -> "7";
+                case NUM_8 -> "8";
+                case NUM_9 -> "9";
+                case STAR -> "*";
+                case POUND -> "#";
+                case UP -> "Up";
+                case DOWN -> "Down";
+                case LEFT -> "Left";
+                case RIGHT -> "Right";
+                case CENTER -> "Center";
+                case VOLUME_UP -> "Volume Up";
+                case VOLUME_DOWN -> "Volume Down";
+                case POWER -> "Power";
+                case CAMERA -> "Camera";
+                case CLEAR -> "Clear";
+                case A -> "A";
+                case B -> "B";
+                case C -> "C";
+                case D -> "D";
+                case E -> "E";
+                case F -> "F";
+                case G -> "G";
+                case H -> "H";
+                case I -> "I";
+                case J -> "J";
+                case K -> "K";
+                case L -> "L";
+                case M -> "M";
+                case N -> "N";
+                case O -> "O";
+                case P -> "P";
+                case Q -> "Q";
+                case R -> "R";
+                case S -> "S";
+                case T -> "T";
+                case U -> "U";
+                case V -> "V";
+                case W -> "W";
+                case X -> "X";
+                case Y -> "Y";
+                case Z -> "Z";
+                case COMMA -> ",";
+                case PERIOD -> ".";
+                case ALT_LEFT -> "L-Alt";
+                case ALT_RIGHT -> "R-Alt";
+                case SHIFT_LEFT -> "L-Shift";
+                case SHIFT_RIGHT -> "R-Shift";
+                case TAB -> "Tab";
+                case SPACE -> "Space";
+                case SYM -> "SYM";
+                case EXPLORER -> "Explorer";
+                case ENVELOPE -> "Envelope";
+                case ENTER -> "Enter";
+                case DEL -> "Delete"; // also BACKSPACE
+                case GRAVE -> "`";
+                case MINUS -> "-";
+                case EQUALS -> "=";
+                case LEFT_BRACKET -> "[";
+                case RIGHT_BRACKET -> "]";
+                case BACKSLASH -> "\\";
+                case SEMICOLON -> ";";
+                case APOSTROPHE -> "'";
+                case SLASH -> "/";
+                case AT -> "@";
+                case NUM -> "Num";
+                case HEADSETHOOK -> "Headset Hook";
+                case FOCUS -> "Focus";
+                case PLUS -> "Plus";
+                case MENU -> "Menu";
+                case NOTIFICATION -> "Notification";
+                case SEARCH -> "Search";
+                case MEDIA_PLAY_PAUSE -> "Play/Pause";
+                case MEDIA_STOP -> "Stop Media";
+                case MEDIA_NEXT -> "Next Media";
+                case MEDIA_PREVIOUS -> "Prev Media";
+                case MEDIA_REWIND -> "Rewind";
+                case MEDIA_FAST_FORWARD -> "Fast Forward";
+                case MUTE -> "Mute";
+                case PAGE_UP -> "Page Up";
+                case PAGE_DOWN -> "Page Down";
+                case PICTSYMBOLS -> "PICTSYMBOLS";
+                case SWITCH_CHARSET -> "SWITCH_CHARSET";
+                case BUTTON_A -> "A Button";
+                case BUTTON_B -> "B Button";
+                case BUTTON_C -> "C Button";
+                case BUTTON_X -> "X Button";
+                case BUTTON_Y -> "Y Button";
+                case BUTTON_Z -> "Z Button";
+                case BUTTON_L1 -> "L1 Button";
+                case BUTTON_R1 -> "R1 Button";
+                case BUTTON_L2 -> "L2 Button";
+                case BUTTON_R2 -> "R2 Button";
+                case BUTTON_THUMBL -> "Left Thumb";
+                case BUTTON_THUMBR -> "Right Thumb";
+                case BUTTON_START -> "Start";
+                case BUTTON_SELECT -> "Select";
+                case BUTTON_MODE -> "Button Mode";
+                case FORWARD_DEL -> "Forward Delete";
+                case CONTROL_LEFT -> "L-Ctrl";
+                case CONTROL_RIGHT -> "R-Ctrl";
+                case ESCAPE -> "Escape";
+                case END -> "End";
+                case INSERT -> "Insert";
+                case NUMPAD_0 -> "Numpad 0";
+                case NUMPAD_1 -> "Numpad 1";
+                case NUMPAD_2 -> "Numpad 2";
+                case NUMPAD_3 -> "Numpad 3";
+                case NUMPAD_4 -> "Numpad 4";
+                case NUMPAD_5 -> "Numpad 5";
+                case NUMPAD_6 -> "Numpad 6";
+                case NUMPAD_7 -> "Numpad 7";
+                case NUMPAD_8 -> "Numpad 8";
+                case NUMPAD_9 -> "Numpad 9";
+                case COLON -> ":";
+                case F1 -> "F1";
+                case F2 -> "F2";
+                case F3 -> "F3";
+                case F4 -> "F4";
+                case F5 -> "F5";
+                case F6 -> "F6";
+                case F7 -> "F7";
+                case F8 -> "F8";
+                case F9 -> "F9";
+                case F10 -> "F10";
+                case F11 -> "F11";
+                case F12 -> "F12";
+                case F13 -> "F13";
+                case F14 -> "F14";
+                case F15 -> "F15";
+                case F16 -> "F16";
+                case F17 -> "F17";
+                case F18 -> "F18";
+                case F19 -> "F19";
+                case F20 -> "F20";
+                case F21 -> "F21";
+                case F22 -> "F22";
+                case F23 -> "F23";
+                case F24 -> "F24";
+                case NUMPAD_DIVIDE -> "Num /";
+                case NUMPAD_MULTIPLY -> "Num *";
+                case NUMPAD_SUBTRACT -> "Num -";
+                case NUMPAD_ADD -> "Num +";
+                case NUMPAD_DOT -> "Num .";
+                case NUMPAD_COMMA -> "Num ,";
+                case NUMPAD_ENTER -> "Num Enter";
+                case NUMPAD_EQUALS -> "Num =";
+                case NUMPAD_LEFT_PAREN -> "Num (";
+                case NUMPAD_RIGHT_PAREN -> "Num )";
+                case NUM_LOCK -> "Num Lock";
+                case CAPS_LOCK -> "Caps Lock";
+                case SCROLL_LOCK -> "Scroll Lock";
+                case PAUSE -> "Pause";
+                case PRINT_SCREEN -> "Print";
+                default ->
                     // key name not found
-                    return null;
-            }
-        }
-
-        private static ObjectIntMap<String> keyNames;
-
-        /**
-         * @param keyname the keyname returned by the {@link com.badlogic.gdx.Input.Keys#toString(int)} method
-         * @return the int keycode
-         */
-        public static int valueOf(String keyname) {
-            if (keyNames == null) initializeKeyNames();
-            return keyNames.get(keyname, -1);
-        }
-
-        /**
-         * lazily intialized in {@link com.badlogic.gdx.Input.Keys#valueOf(String)}
-         */
-        private static void initializeKeyNames() {
-            keyNames = new ObjectIntMap<String>();
-            for (int i = 0; i < 256; i++) {
-                String name = toString(i);
-                if (name != null) keyNames.put(name, i);
-            }
+                        null;
+            };
         }
     }
 }
+
