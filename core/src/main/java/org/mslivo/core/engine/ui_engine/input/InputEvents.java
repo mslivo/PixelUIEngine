@@ -85,7 +85,7 @@ public class InputEvents {
         gamePadButtonUp = false;
         gamePadButtonDownKeyCodes = new ArrayList<>();
         gamePadButtonUpKeyCodes = new ArrayList<>();
-        gamePadButtonsDown = new boolean[15];
+        gamePadButtonsDown = new boolean[16];
     }
 
     public void reset() {
