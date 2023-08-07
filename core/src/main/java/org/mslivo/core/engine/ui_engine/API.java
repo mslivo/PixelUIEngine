@@ -1389,6 +1389,7 @@ public class API {
 
         private boolean hardwareMouseEnabled;
         private boolean keyboardMouseEnabled;
+
         private int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
         private int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
         private int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};

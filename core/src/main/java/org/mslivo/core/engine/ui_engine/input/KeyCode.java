@@ -30,10 +30,10 @@ public class KeyCode {
                 case L2 -> "L2";
                 case R1 -> "R1";
                 case R2 -> "R2";
-                case DPAD_UP -> "DPAD Up";
-                case DPAD_DOWN -> "DPAD Down";
-                case DPAD_LEFT -> "DPAD Left";
-                case DPAD_RIGHT -> "DPAD Right";
+                case DPAD_UP -> "Dpad Up";
+                case DPAD_DOWN -> "Dpad Down";
+                case DPAD_LEFT -> "Dpad Left";
+                case DPAD_RIGHT -> "Dpad Right";
                 case STICK_LEFT -> "Stick L";
                 case STICK_RIGHT -> "Stick R";
                 case START -> "Start";
