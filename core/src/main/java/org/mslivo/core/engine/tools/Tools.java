@@ -75,13 +75,13 @@ public class Tools {
         }
 
         public static void error(Exception e, Path errorFile) {
-            System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET+e.getLocalizedMessage());
+            System.err.print(Text.ANSI_RED + timestamp() + Text.ANSI_RESET);
             e.printStackTrace(System.err);
             if(errorFile != null && errorFile.toString().trim().length() > 0) {
                 try {
                     FileWriter fileWriter = new FileWriter(errorFile.toString(), true);
                     PrintWriter printWriter = new PrintWriter(fileWriter);
-                    printWriter.write(timestamp()+e.getLocalizedMessage()+System.lineSeparator());
+                    printWriter.write(timestamp());
                     e.printStackTrace(printWriter);
                     printWriter.close();
                 } catch (IOException ex) {
