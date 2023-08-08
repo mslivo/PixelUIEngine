@@ -77,7 +77,7 @@ public class Tools {
         public static void error(Exception e, Path errorFile) {
             System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET+e.getLocalizedMessage());
             e.printStackTrace(System.err);
-            if(errorFile != null) {
+            if(errorFile != null && errorFile.toString().trim().length() > 0) {
                 try {
                     FileWriter fileWriter = new FileWriter(errorFile.toString(), true);
                     PrintWriter printWriter = new PrintWriter(fileWriter);
@@ -92,7 +92,7 @@ public class Tools {
 
         public static void error(String msg, Path errorFile) {
             System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
-            if(errorFile != null) {
+            if(errorFile != null && errorFile.toString().trim().length() > 0) {
                 try {
                     BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(errorFile.toString(), true));
                     bufferedWriter.write( timestamp() + msg+System.lineSeparator());
