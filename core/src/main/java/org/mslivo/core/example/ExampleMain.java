@@ -55,41 +55,41 @@ public class ExampleMain extends ApplicationAdapter {
         final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/example/test.data");
         ExampleData exampleData = new ExampleData();
         try {
-            Tools.logInProgress("Writing DataFile");
-            Tools.logDone();
+            Tools.Log.inProgress("Writing DataFile");
+            Tools.Log.done();
             Tools.File.writeObjectToFile(exampleData, DATA_FILE);
-            Tools.logInProgress("Loading DataFile");
+            Tools.Log.inProgress("Loading DataFile");
             this.data = (ExampleData) Tools.File.readObjectFromFile(DATA_FILE);
-            Tools.logDone();
+            Tools.Log.done();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private void bootEngine() {
-        Tools.logInProgress("Loading Assets");
+        Tools.Log.inProgress("Loading Assets");
         this.mediaManager = new MediaManager();
 
         this.mediaManager.prepareGUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
 
-        Tools.logDone();
+        Tools.Log.done();
         // Engine
-        Tools.logInProgress("Starting Engine Subsystem");
+        Tools.Log.inProgress("Starting Engine Subsystem");
         this.engineAdapter = new ExampleEngineAdapter();
         this.gameEngine = new GameEngine<>(this.engineAdapter, this.data);
 
-        Tools.logDone();
+        Tools.Log.done();
         // Input/Render
-        Tools.logInProgress("Starting UI Subsystem");
+        Tools.Log.inProgress("Starting UI Subsystem");
         this.UIAdapter = new ExampleUIAdapter(this.gameEngine);
         this.uiEngine = new UIEngine<>(
                 this.UIAdapter,
                 this.mediaManager,
                 ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight,
                 ExampleMainConstants.viewportMode, true);
-        Tools.logDone();
+        Tools.Log.done();
     }
 
 
@@ -114,16 +114,16 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Out
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.logBenchmark("UI: " + profile_time_gui + "ms","Render: " + profile_time_render + "ms");
+            Tools.Log.benchmark("UI: " + profile_time_gui + "ms","Render: " + profile_time_render + "ms");
             timer_debug_info = System.currentTimeMillis();
         }
     }
 
     @Override
     public void dispose() {
-        Tools.logInProgress("Shutting down...");
+        Tools.Log.benchmark("Shutting down...");
         this.shutdownEngine();
-        Tools.logDone();
+        Tools.Log.done();
         Gdx.app.exit();
         System.exit(0);
     }

@@ -7,10 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.CMedia;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
@@ -37,55 +34,11 @@ public class Tools {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
-    private static boolean debugEnabled = false;
+
 
     private static float skipFrameAccumulator = 0f;
 
-    private static String timestamp() {
-        return sdf.format(new Date());
-    }
 
-    public static void log(String msg) {
-        System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + msg);
-    }
-
-    public static void log(String msg, Object values) {
-        System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + String.format(msg, values));
-    }
-
-    public static void logError(String msg) {
-        System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
-    }
-
-    public static void logError(Exception e) {
-        System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + e.getLocalizedMessage());
-    }
-
-    public static void enableDebugLog(boolean enabled) {
-        debugEnabled = enabled;
-    }
-
-    public static void logDebug(String msg) {
-        if (!debugEnabled) return;
-        System.out.println(Text.ANSI_PURPLE + timestamp() + Text.ANSI_RESET + msg);
-    }
-
-    public static void logInProgress(String what) {
-        System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + what);
-    }
-
-    public static void logDone() {
-        System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + "Done.");
-    }
-
-    public static void logBenchmark(String... customValues) {
-        StringBuilder custom = new StringBuilder();
-        for (String customValue : customValues) {
-            custom.append(" | ").append(String.format("%1$10s", customValue));
-        }
-        Tools.log(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
-                String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM" + custom);
-    }
 
     public static boolean skipFrame(int desiredFPS) {
         float TIME_STEP = (1f / (float) desiredFPS);
@@ -98,6 +51,63 @@ public class Tools {
         }
     }
 
+    public static class Log {
+
+        private static String timestamp() {
+            return sdf.format(new Date());
+        }
+
+        public static void benchmark(String... customValues) {
+            StringBuilder custom = new StringBuilder();
+            for (String customValue : customValues) {
+                custom.append(" | ").append(String.format("%1$10s", customValue));
+            }
+            Tools.Log.message(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
+                    String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM" + custom);
+        }
+
+        public static void message(String msg) {
+            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + msg);
+        }
+
+        public static void message(String msg, Object values) {
+            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + String.format(msg, values));
+        }
+
+        public static void error(String msg, Path errorFile) {
+            System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
+            if(errorFile != null) {
+                try {
+                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(errorFile.toString(), true));
+                    bufferedWriter.write(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
+                    bufferedWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public static void error(String msg) {
+            error(msg, null);
+        }
+
+        public static void error(Exception e) {
+            error(e.toString(), null);
+        }
+
+        public static void error(Exception e, Path errorFile) {
+            error(e.toString(), errorFile);
+        }
+
+        public static void inProgress(String what) {
+            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + what);
+        }
+
+        public static void done() {
+            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + "Done.");
+        }
+
+    }
 
     public static class Colors {
         public static final FColor WHITE = new FColor(1, 1, 1, 1);
@@ -239,7 +249,6 @@ public class Tools {
         public static final String ANSI_PURPLE = "\u001B[35m";
         public static final String ANSI_CYAN = "\u001B[36m";
         public static final String ANSI_WHITE = "\u001B[37m";
-
         public static final String ANSI_BACK_BLACK = "\u001B[40m";
         public static final String ANSI_BACK_RED = "\u001B[41m";
         public static final String ANSI_BACK_GREEN = "\u001B[42m";
@@ -254,7 +263,7 @@ public class Tools {
         }
 
         public static String formatNumber(int number) {
-            return formatNumber((long)number);
+            return formatNumber((long) number);
         }
 
         public static String formatNumber(long number) {
@@ -380,7 +389,7 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.logError(e);
+                Tools.Log.error(e);
                 return false;
             }
         }
