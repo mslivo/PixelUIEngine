@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -1394,7 +1395,7 @@ public class API {
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter) {
+    public void openOnScreenTextInput(int x, int y, BooleanSupplier onConfirm, Character selectedCharacter) {
         openOnScreenTextInput(x, y,
                 onConfirm, selectedCharacter,
                 config.onScreenTextInputDefaultLCCharacters,
@@ -1403,7 +1404,7 @@ public class API {
     }
 
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+    public void openOnScreenTextInput(int x, int y, BooleanSupplier onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
         openOnScreenTextInput(x, y, onConfirm,
                 selectedCharacter,
                 charactersLC,
@@ -1411,7 +1412,7 @@ public class API {
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+    public void openOnScreenTextInput(int x, int y, BooleanSupplier onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
         if (inputState.openOnScreenTextInput != null) return;
         // Check for Length and ISO Control Except special characters

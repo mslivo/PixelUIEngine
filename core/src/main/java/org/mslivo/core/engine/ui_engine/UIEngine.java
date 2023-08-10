@@ -1287,10 +1287,8 @@ public class UIEngine<T extends UIAdapter> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
                 }
                 case '\n'->{
-                    inputState.openOnScreenTextInput = null;
-                    if(onScreenTextInput.onConfirm != null){
-                        onScreenTextInput.onConfirm.run();
-                    }
+                    boolean close  =onScreenTextInput.onConfirm != null ? onScreenTextInput.onConfirm.getAsBoolean() : true;
+                    inputState.openOnScreenTextInput = close ? null : inputState.openOnScreenTextInput;
                 }
                 default -> {
                     inputState.inputEvents.keyTyped = true;

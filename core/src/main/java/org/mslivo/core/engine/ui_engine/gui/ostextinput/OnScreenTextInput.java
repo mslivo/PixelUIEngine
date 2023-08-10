@@ -3,6 +3,8 @@ package org.mslivo.core.engine.ui_engine.gui.ostextinput;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 
+import java.util.function.BooleanSupplier;
+
 public class OnScreenTextInput {
 
     /**
@@ -18,7 +20,7 @@ public class OnScreenTextInput {
     public CMediaFont font;
     public int selectedIndex;
     public boolean upperCase;
-    public Runnable onConfirm;
+    public BooleanSupplier onConfirm;
 
     public FColor color;
 }
