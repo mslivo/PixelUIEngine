@@ -183,7 +183,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         } else if (button == 5){
             return KeyCode.GamePad.HOME;
         }else {
-            return -1;
+            return KeyCode.GamePad.UNKNOWN;
         }
     }
 

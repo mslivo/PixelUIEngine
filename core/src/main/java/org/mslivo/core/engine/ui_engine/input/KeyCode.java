@@ -20,6 +20,8 @@ public class KeyCode {
         public static final int START = 14;
         public static final int BACK = 15;
         public static final int HOME = 16;
+        public static final int UNKNOWN = 17;
+
         public static String keyName(int keycode) {
             return switch (keycode) {
                 case A -> "A";
@@ -39,6 +41,7 @@ public class KeyCode {
                 case START -> "Start";
                 case BACK -> "Back";
                 case HOME -> "Home";
+                case UNKNOWN -> "Unknown";
                 default -> null;
             };
         }
