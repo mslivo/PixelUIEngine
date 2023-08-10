@@ -176,15 +176,15 @@ class UICommons {
         inputState.displayedContextMenuWidth = 0;
 
         // OnScreen Keyboard
-        inputState.openOnScreenTextInput = null;
-        inputState.osTextInputConfirmPressed = false;
-        inputState.osTextInputKeyBoardGamePadLeft = false;
-        inputState.osTextInputKeyBoardGamePadRight = false;
-        inputState.osTextInputScrollTimer = 0;
-        inputState.osTextInputScrollTime = 0;
-        inputState.osTextInputScrollStage = 0;
-        inputState.osTextInputTranslatedMouseLeftDown = false;
-        inputState.osTextInputUnlock = false;
+        inputState.openMouseTextInput = null;
+        inputState.mTextInputConfirmPressed = false;
+        inputState.mTextInputKeyBoardGamePadLeft = false;
+        inputState.mTextInputKeyBoardGamePadRight = false;
+        inputState.mTextInputScrollTimer = 0;
+        inputState.mTextInputScrollTime = 0;
+        inputState.mTextInputScrollSpeed = 0;
+        inputState.mTextInputTranslatedMouseLeftDown = false;
+        inputState.mTextInputUnlock = false;
     }
 
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {

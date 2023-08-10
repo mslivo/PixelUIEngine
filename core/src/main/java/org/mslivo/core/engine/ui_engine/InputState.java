@@ -157,16 +157,16 @@ public class InputState {
 
     public int displayedContextMenuWidth;
 
-    public OnScreenTextInput openOnScreenTextInput;
-    public int osTextInputMouseX;
-    public boolean osTextInputConfirmPressed;
-    public boolean osTextInputKeyBoardGamePadLeft;
-    public boolean osTextInputKeyBoardGamePadRight;
-    public int osTextInputScrollTimer;
-    public int osTextInputScrollTime;
-    public int osTextInputScrollStage;
-    public boolean osTextInputTranslatedMouseLeftDown;
-    public boolean osTextInputUnlock;
+    public OnScreenTextInput openMouseTextInput;
+    public int mTextInputMouseX;
+    public boolean mTextInputConfirmPressed;
+    public boolean mTextInputKeyBoardGamePadLeft;
+    public boolean mTextInputKeyBoardGamePadRight;
+    public int mTextInputScrollTimer;
+    public int mTextInputScrollTime;
+    public int mTextInputScrollSpeed;
+    public boolean mTextInputTranslatedMouseLeftDown;
+    public boolean mTextInputUnlock;
     /* #################### OnScreenTextInput #################### */
 
 

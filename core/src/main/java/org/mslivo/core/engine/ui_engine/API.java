@@ -50,7 +50,7 @@ import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInputConfirmAction;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputConfirmAction;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -1486,47 +1486,47 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    private OnScreenTextInputConfirmAction defaultOnScreenTextInputConfirmAction() {
-        return new OnScreenTextInputConfirmAction() {
+    private MouseTextInputConfirmAction defaultMouseTextInputConfirmAction() {
+        return new MouseTextInputConfirmAction() {
         };
     }
 
-    public void openOnScreenTextInput(int x, int y) {
-        openOnScreenTextInput(x, y, defaultOnScreenTextInputConfirmAction(),
+    public void openMouseTextInput(int x, int y) {
+        openMouseTextInput(x, y, defaultMouseTextInputConfirmAction(),
                 null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm) {
-        openOnScreenTextInput(x, y,
+    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm) {
+        openMouseTextInput(x, y,
                 onConfirm, null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm, Character selectedCharacter) {
-        openOnScreenTextInput(x, y,
+    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter) {
+        openMouseTextInput(x, y,
                 onConfirm, selectedCharacter,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
 
-    public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
-        openOnScreenTextInput(x, y, onConfirm,
+    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+        openMouseTextInput(x, y, onConfirm,
                 selectedCharacter,
                 charactersLC,
                 charactersUC,
-                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
-        if (inputState.openOnScreenTextInput != null) return;
+        if (inputState.openMouseTextInput != null) return;
         // Check for Length and ISO Control Except special characters
         if (charactersLC.length != charactersUC.length) return;
         for (int i = 0; i < charactersLC.length; i++) {
@@ -1562,13 +1562,13 @@ public class API {
         onScreenTextInput.x = x - 6;
         onScreenTextInput.y = y - 12;
         onScreenTextInput.color = color;
-        inputState.osTextInputMouseX = Gdx.input.getX();
-        inputState.osTextInputUnlock = false;
-        inputState.openOnScreenTextInput = onScreenTextInput;
+        inputState.mTextInputMouseX = Gdx.input.getX();
+        inputState.mTextInputUnlock = false;
+        inputState.openMouseTextInput = onScreenTextInput;
     }
 
-    public void closeOnScreenTextInput() {
-        inputState.openOnScreenTextInput = null;
+    public void closeMouseTextInput() {
+        inputState.openMouseTextInput = null;
     }
 
     public static class _Config {
@@ -1646,7 +1646,7 @@ public class API {
                 , '\t', '\b', '\n'};
 
 
-        private CMediaFont onScreenTextInputDefaultFont = GUIBaseMedia.FONT_BLACK;
+        private CMediaFont mouseTextInputDefaultFont = GUIBaseMedia.FONT_BLACK;
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -2096,12 +2096,12 @@ public class API {
             this.defaultUpperCaseCharacters = defaultUpperCaseCharacters;
         }
 
-        public CMediaFont getOnScreenTextInputDefaultFont() {
-            return onScreenTextInputDefaultFont;
+        public CMediaFont getMouseTextInputDefaultFont() {
+            return mouseTextInputDefaultFont;
         }
 
-        public void setOnScreenTextInputDefaultFont(CMediaFont onScreenTextInputDefaultFont) {
-            this.onScreenTextInputDefaultFont = onScreenTextInputDefaultFont;
+        public void setMouseTextInputDefaultFont(CMediaFont mouseTextInputDefaultFont) {
+            this.mouseTextInputDefaultFont = mouseTextInputDefaultFont;
         }
 
         public _Config() {
@@ -2200,7 +2200,7 @@ public class API {
 
             setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());
             setDefaultUpperCaseCharacters(config.getDefaultUpperCaseCharacters());
-            setOnScreenTextInputDefaultFont(config.getOnScreenTextInputDefaultFont());
+            setMouseTextInputDefaultFont(config.getMouseTextInputDefaultFont());
         }
 
 

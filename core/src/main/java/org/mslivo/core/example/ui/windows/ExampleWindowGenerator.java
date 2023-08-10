@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInputConfirmAction;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputConfirmAction;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -257,10 +257,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
             @Override
             public void onFocus() {
-                    api.openOnScreenTextInput(
+                    api.openMouseTextInput(
                             api.components.getAbsoluteX(osKeyBoardTextInput),
                             api.components.getAbsoluteY(osKeyBoardTextInput)
-                            , new OnScreenTextInputConfirmAction() {
+                            , new MouseTextInputConfirmAction() {
                                 @Override
                                 public boolean confirmPressed() {
                                     api.components.textField.unFocus(osKeyBoardTextInput);
