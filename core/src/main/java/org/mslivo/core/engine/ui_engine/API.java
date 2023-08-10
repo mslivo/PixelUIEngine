@@ -1457,7 +1457,7 @@ public class API {
         } else {
             onScreenTextInput.selectedIndex = 0;
         }
-        onScreenTextInput.x = x;
+        onScreenTextInput.x = x-6;
         onScreenTextInput.y = y - 12;
         onScreenTextInput.color = color;
         inputState.osTextInputMouseX = Gdx.input.getX();
