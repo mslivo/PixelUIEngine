@@ -171,10 +171,7 @@ public class InputState {
     public int osTextInputScrollTimer ;
     public int osTextInputScrollTime ;
     public int osTextInputScrollStage ;
-
     public boolean osTextInputTranslatedMouseLeftDown;
-
-    public int osTextInputConfirmPressedTimer;
 
     /* #################### Control #################### */
 

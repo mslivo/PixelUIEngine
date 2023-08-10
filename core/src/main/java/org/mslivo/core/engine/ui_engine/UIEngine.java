@@ -186,7 +186,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.osTextInputScrollTime = 0;
         newInputState.osTextInputScrollStage = 0;
         newInputState.osTextInputTranslatedMouseLeftDown = false;
-        newInputState.osTextInputConfirmPressedTimer = 0;
 
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
@@ -1169,14 +1168,12 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-
     private boolean updateOnScreenTextInputControl() {
         if (inputState.openOnScreenTextInput == null) return false;
         OnScreenTextInput onScreenTextInput = inputState.openOnScreenTextInput;
 
         int scrollDirection = 0;
         boolean confirmPressed = false;
-        boolean confirmKeyBoardGamePad = false;
         boolean leftKeyBoardGamePad = false;
         boolean rightKeyBoardGamePad = false;
         switch (inputState.currentControlMode) {
@@ -1190,8 +1187,8 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.osTextInputMouseX = Gdx.input.getX();
                 }
 
-                if(inputState.inputEvents.mouseDown){
-                    if(inputState.inputEvents.mouseDownButtons.contains(KeyCode.Mouse.LEFT)) {
+                if (inputState.inputEvents.mouseDown) {
+                    if (inputState.inputEvents.mouseDownButtons.contains(KeyCode.Mouse.LEFT)) {
                         // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
                         inputState.inputEvents.mouseDownButtons.remove(KeyCode.Mouse.LEFT);
@@ -1200,8 +1197,8 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.osTextInputTranslatedMouseLeftDown = true;
                     }
                 }
-                if(inputState.inputEvents.mouseUp){
-                    if(inputState.inputEvents.mouseUpButtons.contains(KeyCode.Mouse.LEFT)) {
+                if (inputState.inputEvents.mouseUp) {
+                    if (inputState.inputEvents.mouseUpButtons.contains(KeyCode.Mouse.LEFT)) {
                         // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(KeyCode.Mouse.LEFT);
                         inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size() > 0;
@@ -1277,17 +1274,11 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
         if (inputState.osTextInputConfirmPressed) {
-            inputState.osTextInputConfirmPressedTimer++;
             if (!confirmPressed) {
-                if(inputState.osTextInputConfirmPressedTimer < 20) {
-                    confirmCharacter = true;
-                }
+                confirmCharacter = true;
                 inputState.osTextInputConfirmPressed = false;
-                inputState.osTextInputConfirmPressedTimer = 0;
             }
         }
-
-
 
         char[] characters = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
 
@@ -2269,18 +2260,18 @@ public class UIEngine<T extends UIAdapter> {
 
         render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase, inputState.osTextInputConfirmPressed);
         render_batchSetColor(onScreenTextInput.color.r, onScreenTextInput.color.g, onScreenTextInput.color.b, 1f);
-        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x-1, onScreenTextInput.y-1);
+        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x - 1, onScreenTextInput.y - 1);
         render_batchSetColorWhite(1f);
     }
 
     private void render_drawOnScreenTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
         int pressedIndex = pressed ? 1 : 0;
-        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y,pressedIndex);
+        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
-            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y,pressedIndex);
+            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
         }
         if (c == '\t') {
-            render_drawCMediaGFX(upperCase ? GUIBaseMedia.GUI_OSTEXTINPUT_UPPERCASE : GUIBaseMedia.GUI_OSTEXTINPUT_LOWERCASE, x, y,pressedIndex);
+            render_drawCMediaGFX(upperCase ? GUIBaseMedia.GUI_OSTEXTINPUT_UPPERCASE : GUIBaseMedia.GUI_OSTEXTINPUT_LOWERCASE, x, y, pressedIndex);
         }
         if (c == '\b') {
             render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
