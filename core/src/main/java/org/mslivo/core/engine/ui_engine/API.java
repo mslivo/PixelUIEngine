@@ -1387,40 +1387,40 @@ public class API {
     }
 
     public void openOnScreenTextInput(int x, int y) {
-        openOnScreenTextInput(x,y,null,
+        openOnScreenTextInput(x, y, null,
+                null,
                 config.onScreenTextInputDefaultLCCharacters,
                 config.onScreenTextInputDefaultUCCharacters,
-                null,
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm) {
-        openOnScreenTextInput(x,y,onConfirm,
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter) {
+        openOnScreenTextInput(x, y,
+                onConfirm, selectedCharacter,
                 config.onScreenTextInputDefaultLCCharacters,
                 config.onScreenTextInputDefaultUCCharacters,
-                null,
-                config.onScreenTextInputDefaultFont,Tools.Colors.BLACK);
+                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC) {
-        openOnScreenTextInput(x,y,onConfirm,
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+        openOnScreenTextInput(x, y, onConfirm,
+                selectedCharacter,
                 charactersLC,
                 charactersUC,
-                null,
-                config.onScreenTextInputDefaultFont , Tools.Colors.BLACK);
+                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC, Character selectedCharacter, CMediaFont font, FColor color) {
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
-        if(inputState.openOnScreenTextInput != null) return;
+        if (inputState.openOnScreenTextInput != null) return;
         // Check for Length and ISO Control Except special characters
-        if(charactersLC.length != charactersUC.length) return;
-        for(int i=0;i<charactersLC.length;i++){
-            if(Character.isISOControl(charactersLC[i]) &&
-                    !(charactersLC[i]=='\n' || charactersLC[i]=='\b'|| charactersLC[i]=='\t')) return;
-            if(Character.isISOControl(charactersUC[i]) &&
-                    !(charactersUC[i]=='\n' || charactersUC[i]=='\b'|| charactersUC[i]=='\t')) return;
+        if (charactersLC.length != charactersUC.length) return;
+        for (int i = 0; i < charactersLC.length; i++) {
+            if (Character.isISOControl(charactersLC[i]) &&
+                    !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) return;
+            if (Character.isISOControl(charactersUC[i]) &&
+                    !(charactersUC[i] == '\n' || charactersUC[i] == '\b' || charactersUC[i] == '\t')) return;
         }
         OnScreenTextInput onScreenTextInput = new OnScreenTextInput();
         onScreenTextInput.charactersLC = charactersLC;
@@ -1428,23 +1428,23 @@ public class API {
         onScreenTextInput.font = font;
         onScreenTextInput.onConfirm = onConfirm;
         onScreenTextInput.upperCase = false;
-        if(selectedCharacter != null){
-            for(int i=0;i<charactersLC.length;i++){
-                if(selectedCharacter == charactersLC[i]){
+        if (selectedCharacter != null) {
+            for (int i = 0; i < charactersLC.length; i++) {
+                if (selectedCharacter == charactersLC[i]) {
                     onScreenTextInput.selectedIndex = i;
                     break;
                 }
-                if(selectedCharacter == charactersUC[i]){
+                if (selectedCharacter == charactersUC[i]) {
                     onScreenTextInput.selectedIndex = i;
                     onScreenTextInput.upperCase = true;
                     break;
                 }
             }
-        }else {
+        } else {
             onScreenTextInput.selectedIndex = 0;
         }
         onScreenTextInput.x = x;
-        onScreenTextInput.y = y-12;
+        onScreenTextInput.y = y - 12;
         onScreenTextInput.color = color;
         inputState.osTextInputMouseX = Gdx.input.getX();
         inputState.openOnScreenTextInput = onScreenTextInput;
@@ -1508,21 +1508,21 @@ public class API {
         private boolean uiMouseInteractionsDisabled = false;
         private char[] onScreenTextInputDefaultLCCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
-                'g', 'h', 'i', 'j', 'k','l',
-                'm','n', 'o','p','q','r',
-                's','t', 'u','v','w',
-                'x','y','z',
-                '!','?','.'
-                ,'\t','\b','\n'};
+                'g', 'h', 'i', 'j', 'k', 'l',
+                'm', 'n', 'o', 'p', 'q', 'r',
+                's', 't', 'u', 'v', 'w',
+                'x', 'y', 'z',
+                '!', '?', '.'
+                , '\t', '\b', '\n'};
 
         private char[] onScreenTextInputDefaultUCCharacters = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F',
-                'G', 'H', 'I', 'J','K', 'L',
-                'M','N', 'O','P','Q','R',
-                'S','T', 'U','V','W',
-                'X','Y','Z',
-                '!','?','.'
-                ,'\t','\b','\n'};
+                'G', 'H', 'I', 'J', 'K', 'L',
+                'M', 'N', 'O', 'P', 'Q', 'R',
+                'S', 'T', 'U', 'V', 'W',
+                'X', 'Y', 'Z',
+                '!', '?', '.'
+                , '\t', '\b', '\n'};
 
 
         private CMediaFont onScreenTextInputDefaultFont = GUIBaseMedia.FONT_BLACK;
@@ -2123,7 +2123,7 @@ public class API {
             inputState.lastGUIMouseHover = null;
         }
 
-        public MouseControlMode currentMouseControlMode(){
+        public MouseControlMode currentMouseControlMode() {
             return inputState.currentControlMode;
         }
 

@@ -250,7 +250,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                 public void run() {
                                     api.components.textField.unFocus(osKeyBoardTextInput);
                                 }
-                            });
+                            },null
+                            );
                 }
             }
         });
