@@ -778,7 +778,10 @@ public class API {
                 @Override
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
-                        finalOkBtn.buttonAction.onRelease();
+                        if (inputTextField.content.length() >= minInputLength) {
+                            if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                            removeCurrentModalWindow();
+                        }
                     } else {
                         components.textField.focus(inputTextField);
                     }
