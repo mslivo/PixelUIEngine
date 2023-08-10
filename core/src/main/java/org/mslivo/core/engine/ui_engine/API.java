@@ -674,7 +674,7 @@ public class API {
             int wnd_height = 6;
             if (showOKButton) wnd_height++;
             if (showTouchInputs) {
-                wnd_height += 2;
+                wnd_height += (wnd_width % 2 == 0 ? 3 : 1);
                 int ixt = 0;
                 for (int i = 0; i < lowerCaseCharacters.length; i++) {
                     ixt+=2;

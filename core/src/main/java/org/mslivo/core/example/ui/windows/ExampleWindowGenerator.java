@@ -242,7 +242,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 },1,20,
                         api.config.getDefaultLowerCaseCharacters(),
                         api.config.getDefaultUpperCaseCharacters(),
-                        19
+                        14
                         ));
             }
         });
