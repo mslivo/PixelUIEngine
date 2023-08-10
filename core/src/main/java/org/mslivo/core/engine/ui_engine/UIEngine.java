@@ -1292,7 +1292,7 @@ public class UIEngine<T extends UIAdapter> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
                 }
                 case '\n' -> {
-                    boolean close = onScreenTextInput.onConfirm != null ? onScreenTextInput.onConfirm.confirmPressed() : true;
+                    boolean close = onScreenTextInput.confirmAction != null ? onScreenTextInput.confirmAction.confirmPressed() : true;
                     inputState.openOnScreenTextInput = close ? null : inputState.openOnScreenTextInput;
                 }
                 default -> {
@@ -1300,7 +1300,9 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.inputEvents.keyTypedCharacters.add(c);
                 }
             }
-
+            if(onScreenTextInput.confirmAction != null){
+                onScreenTextInput.confirmAction.onEnterCharacter(c);
+            }
         }
 
         return true;

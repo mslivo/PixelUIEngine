@@ -1443,7 +1443,7 @@ public class API {
         onScreenTextInput.charactersLC = charactersLC;
         onScreenTextInput.charactersUC = charactersUC;
         onScreenTextInput.font = font;
-        onScreenTextInput.onConfirm = onConfirm;
+        onScreenTextInput.confirmAction = onConfirm;
         onScreenTextInput.upperCase = false;
         if (selectedCharacter != null) {
             for (int i = 0; i < charactersLC.length; i++) {

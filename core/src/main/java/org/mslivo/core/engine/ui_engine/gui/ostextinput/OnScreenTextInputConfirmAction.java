@@ -11,4 +11,8 @@ public interface OnScreenTextInputConfirmAction {
     default boolean confirmPressed(){
         return true;
     }
+
+    default void onEnterCharacter(char c){
+        return;
+    }
 }
