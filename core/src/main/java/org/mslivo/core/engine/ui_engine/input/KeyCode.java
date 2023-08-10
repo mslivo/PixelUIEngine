@@ -19,7 +19,6 @@ public class KeyCode {
         public static final int STICK_RIGHT = 13;
         public static final int START = 14;
         public static final int BACK = 15;
-
         public static final int HOME = 16;
         public static String keyName(int keycode) {
             return switch (keycode) {
@@ -39,6 +38,7 @@ public class KeyCode {
                 case STICK_RIGHT -> "Stick R";
                 case START -> "Start";
                 case BACK -> "Back";
+                case HOME -> "Home";
                 default -> null;
             };
         }
