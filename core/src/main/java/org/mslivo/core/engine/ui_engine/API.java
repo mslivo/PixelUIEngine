@@ -49,6 +49,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -657,7 +658,7 @@ public class API {
                 okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        if(inputTextField.content.length() > minInputLength) {
+                        if (inputTextField.content.length() > minInputLength) {
                             if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                             removeCurrentModalWindow();
                         }
@@ -1385,6 +1386,53 @@ public class API {
         return inputState.lastActiveWindow;
     }
 
+    public void openOnScreenTextInput(int x, int y) {
+        openOnScreenTextInput(x,y,null,
+                config.onScreenTextInputDefaultLCCharacters,
+                config.onScreenTextInputDefaultUCCharacters,
+                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+    }
+
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm) {
+        openOnScreenTextInput(x,y,onConfirm,
+                config.onScreenTextInputDefaultLCCharacters,
+                config.onScreenTextInputDefaultUCCharacters,
+                config.onScreenTextInputDefaultFont,Tools.Colors.BLACK);
+    }
+
+
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC) {
+        openOnScreenTextInput(x,y,onConfirm,
+                charactersLC,
+                charactersUC,
+                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+    }
+
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+        if (charactersLC == null || charactersUC == null || font == null) return;
+        if(inputState.openOnScreenTextInput != null) return;
+        // Check for Length and ISO Control Except special characters
+        if(charactersLC.length != charactersUC.length) return;
+        for(int i=0;i<charactersLC.length;i++){
+            if(Character.isISOControl(charactersLC[i]) &&
+                    !(charactersLC[i]=='\n' || charactersLC[i]=='\b'|| charactersLC[i]=='\t')) return;
+            if(Character.isISOControl(charactersUC[i]) &&
+                    !(charactersUC[i]=='\n' || charactersUC[i]=='\b'|| charactersUC[i]=='\t')) return;
+        }
+        OnScreenTextInput onScreenTextInput = new OnScreenTextInput();
+        onScreenTextInput.charactersLC = charactersLC;
+        onScreenTextInput.charactersUC = charactersUC;
+        onScreenTextInput.font = font;
+        onScreenTextInput.onConfirm = onConfirm;
+        onScreenTextInput.selectedIndex = 0;
+        onScreenTextInput.upperCase = false;
+        onScreenTextInput.x = x;
+        onScreenTextInput.y = y-12;
+        onScreenTextInput.color = color;
+        inputState.osTextInputMouseX = Gdx.input.getX();
+        inputState.openOnScreenTextInput = onScreenTextInput;
+    }
+
     public static class _Config {
 
         private boolean hardwareMouseEnabled;
@@ -1401,10 +1449,7 @@ public class API {
         private int[] keyboardMouseButtonsMouse5 = new int[]{KeyCode.Key.UNKNOWN};
         private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
         private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
-
-
         private boolean gamePadMouseEnabled = false;
-
         private float gamePadMouseSensitivity = 0.4f;
         private boolean gamePadMouseStickLeftEnabled = true;
         private boolean gamePadMouseStickRightEnabled = false;
@@ -1430,8 +1475,6 @@ public class API {
         private float dragAlpha = 0.8f;
         private int buttonHoldTimer = 8;
         private float knobSensitivity = 1f;
-
-
         private float scrollBarSensitivity = 1f;
         private boolean foldWindowsOnDoubleClick = true;
         private int notificationsMax = 20;
@@ -1444,9 +1487,28 @@ public class API {
         private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
-
         private boolean uiKeyInteractionsDisabled = false;
         private boolean uiMouseInteractionsDisabled = false;
+        private char[] onScreenTextInputDefaultLCCharacters = new char[]{
+                'a', 'b', 'c', 'd', 'e', 'f',
+                'g', 'h', 'i', 'j', 'k','l',
+                'm','n', 'o','p','q','r',
+                's','t', 'u','v','w',
+                'x','y','z',
+                '!','?','.'
+                ,'\t','\b','\n'};
+
+        private char[] onScreenTextInputDefaultUCCharacters = new char[]{
+                'A', 'B', 'C', 'D', 'E', 'F',
+                'G', 'H', 'I', 'J','K', 'L',
+                'M','N', 'O','P','Q','R',
+                'S','T', 'U','V','W',
+                'X','Y','Z',
+                '!','?','.'
+                ,'\t','\b','\n'};
+
+
+        private CMediaFont onScreenTextInputDefaultFont = GUIBaseMedia.FONT_BLACK;
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -1880,6 +1942,30 @@ public class API {
             this.gamePadMouseButtonsScrollDown = gamePadMouseButtonsScrollDown;
         }
 
+        public char[] getOnScreenTextInputDefaultLCCharacters() {
+            return onScreenTextInputDefaultLCCharacters;
+        }
+
+        public void setOnScreenTextInputDefaultLCCharacters(char[] onScreenTextInputDefaultLCCharacters) {
+            this.onScreenTextInputDefaultLCCharacters = onScreenTextInputDefaultLCCharacters;
+        }
+
+        public char[] getOnScreenTextInputDefaultUCCharacters() {
+            return onScreenTextInputDefaultUCCharacters;
+        }
+
+        public void setOnScreenTextInputDefaultUCCharacters(char[] onScreenTextInputDefaultUCCharacters) {
+            this.onScreenTextInputDefaultUCCharacters = onScreenTextInputDefaultUCCharacters;
+        }
+
+        public CMediaFont getOnScreenTextInputDefaultFont() {
+            return onScreenTextInputDefaultFont;
+        }
+
+        public void setOnScreenTextInputDefaultFont(CMediaFont onScreenTextInputDefaultFont) {
+            this.onScreenTextInputDefaultFont = onScreenTextInputDefaultFont;
+        }
+
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -1973,6 +2059,10 @@ public class API {
             setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
+
+            setOnScreenTextInputDefaultLCCharacters(config.getOnScreenTextInputDefaultLCCharacters());
+            setOnScreenTextInputDefaultUCCharacters(config.getOnScreenTextInputDefaultUCCharacters());
+            setOnScreenTextInputDefaultFont(config.getOnScreenTextInputDefaultFont());
         }
 
 
@@ -2014,6 +2104,10 @@ public class API {
             inputState.mouse_gui.x = x;
             inputState.mouse_gui.y = y;
             inputState.lastGUIMouseHover = null;
+        }
+
+        public MouseControlMode currentMouseControlMode(){
+            return inputState.currentControlMode;
         }
 
 

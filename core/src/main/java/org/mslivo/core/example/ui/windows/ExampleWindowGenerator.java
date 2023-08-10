@@ -2,6 +2,7 @@ package org.mslivo.core.example.ui.windows;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
@@ -41,6 +42,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
@@ -151,7 +153,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setColor1And2(scrollBarHorizontalB, Tools.Colors.BLUE_BRIGHT);
 
 
-        TextField textField = api.components.textField.create(18, 12, 10, "", null, 128);
+        TextField textField = api.components.textField.create(18, 11, 10, "", null, 128);
         Button notiBtn = api.components.button.textButton.create(18, 9, 10, 2, "Notification");
         api.components.button.centerContent(notiBtn);
         api.components.addUpdateAction(notiBtn, new UpdateAction() {
@@ -235,9 +237,26 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         GameViewPort gameViewPort = api.components.gameViewPort.create(29, 9, 4, 4, 100, 100, 1);
 
+        TextField osKeyBoardTextInput = api.components.textField.create(18, 13, 10, "", null, 128);
+        api.components.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
+            @Override
+            public void onFocus() {
+                if(api.input.currentMouseControlMode() == MouseControlMode.GAMEPAD || api.input.currentMouseControlMode() == MouseControlMode.KEYBOARD) {
+                    api.openOnScreenTextInput(
+                            api.components.getAbsoluteX(osKeyBoardTextInput),
+                            api.components.getAbsoluteY(osKeyBoardTextInput)
+                            , new Runnable() {
+                                @Override
+                                public void run() {
+                                    api.components.textField.unFocus(osKeyBoardTextInput);
+                                }
+                            });
+                }
+            }
+        });
 
-        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle});
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle}));
+        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput});
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput}));
 
 
         return components;
@@ -373,6 +392,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.windows.addComponents(window, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
         api.components.tabBar.tab.addTabComponents(tabImageButton, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
 
+
+
         /* Text / Image / Seperator */
 
         Tab tabTextImage = api.components.tabBar.tab.create("Text/Image");
@@ -390,6 +411,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.windows.addComponents(window, separatorHorizontal.toArray(new Component[]{}));
         api.components.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
         api.components.tabBar.tab.addTabComponents(tabTextImage, separatorHorizontal.toArray(new Component[]{}));
+
+
+
 
         // Tab Bar
 
