@@ -665,8 +665,12 @@ public class API {
         }
 
         private Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
-            if (showTouchInputs && (lowerCaseCharacters == null || upperCaseCharacters == null)) return null;
-            if (showTouchInputs && (lowerCaseCharacters.length != upperCaseCharacters.length)) return null;
+            int maxCharacters = 0;
+            if (showTouchInputs){
+                if(lowerCaseCharacters == null || upperCaseCharacters == null) return null;
+                maxCharacters = Math.min(lowerCaseCharacters.length, upperCaseCharacters.length);
+            }
+
             showOKButton = showTouchInputs ? true : showOKButton;
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Tools.Calc.lowerBounds(windowMinWidth, 11);
@@ -676,7 +680,7 @@ public class API {
             if (showTouchInputs) {
                 wnd_height += (wnd_width % 2 == 0 ? 3 : 1);
                 int ixt = 0;
-                for (int i = 0; i < lowerCaseCharacters.length; i++) {
+                for (int i = 0; i < maxCharacters; i++) {
                     ixt += 2;
                     if (ixt > (wnd_width - 2)) {
                         wnd_height += 2;
@@ -715,7 +719,7 @@ public class API {
             if (showTouchInputs) {
                 int ix = 0;
                 int iy = wnd_height - 4;
-                for (int i = 0; i < lowerCaseCharacters.length; i++) {
+                for (int i = 0; i < maxCharacters; i++) {
                     char cl = lowerCaseCharacters[i];
                     char cu = upperCaseCharacters[i];
                     if (cl == '\t' || cu == '\t') {
@@ -1529,7 +1533,8 @@ public class API {
         if (inputState.openMouseTextInput != null) return;
         // Check for Length and ISO Control Except special characters
         if (charactersLC.length != charactersUC.length) return;
-        for (int i = 0; i < charactersLC.length; i++) {
+        int maxCharacters = Math.min(charactersLC.length,charactersUC.length);
+        for (int i = 0; i < maxCharacters; i++) {
             if (Character.isISOControl(charactersLC[i]) &&
                     !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) {
                 return;
@@ -1545,7 +1550,7 @@ public class API {
         onScreenTextInput.confirmAction = onConfirm;
         onScreenTextInput.upperCase = false;
         if (selectedCharacter != null) {
-            for (int i = 0; i < charactersLC.length; i++) {
+            for (int i = 0; i < maxCharacters; i++) {
                 if (selectedCharacter == charactersLC[i]) {
                     onScreenTextInput.selectedIndex = i;
                     break;
@@ -2094,10 +2099,11 @@ public class API {
         }
 
         public _Config() {
-            this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                    ' ', '_', '.', ',', '!', '?'));
+            int maxCharacters = Math.min(defaultLowerCaseCharacters.length,defaultUpperCaseCharacters.length);
+            for(int i=0;i<maxCharacters;i++){
+                this.textFieldDefaultAllowedCharacters.add(defaultLowerCaseCharacters[i]);
+                this.textFieldDefaultAllowedCharacters.add(defaultUpperCaseCharacters[i]);
+            }
         }
 
         public int[][] getKeyboardMouseButtons() {
