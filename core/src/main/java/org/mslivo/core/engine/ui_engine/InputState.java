@@ -174,6 +174,8 @@ public class InputState {
 
     public boolean osTextInputTranslatedMouseLeftDown;
 
+    public int osTextInputConfirmPressedTimer;
+
     /* #################### Control #################### */
 
     public MouseControlMode currentControlMode;

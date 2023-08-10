@@ -185,7 +185,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.osTextInputScrollTimer = 0;
         newInputState.osTextInputScrollTime = 0;
         newInputState.osTextInputScrollStage = 0;
-
+        newInputState.osTextInputTranslatedMouseLeftDown = false;
+        newInputState.osTextInputConfirmPressedTimer = 0;
 
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
@@ -1168,6 +1169,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
+
     private boolean updateOnScreenTextInputControl() {
         if (inputState.openOnScreenTextInput == null) return false;
         OnScreenTextInput onScreenTextInput = inputState.openOnScreenTextInput;
@@ -1275,11 +1277,16 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
         if (inputState.osTextInputConfirmPressed) {
+            inputState.osTextInputConfirmPressedTimer++;
             if (!confirmPressed) {
-                confirmCharacter = true;
+                if(inputState.osTextInputConfirmPressedTimer < 20) {
+                    confirmCharacter = true;
+                }
                 inputState.osTextInputConfirmPressed = false;
+                inputState.osTextInputConfirmPressedTimer = 0;
             }
         }
+
 
 
         char[] characters = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
