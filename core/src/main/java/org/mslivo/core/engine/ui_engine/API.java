@@ -49,8 +49,8 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputConfirmAction;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -677,9 +677,9 @@ public class API {
                 wnd_height += (wnd_width % 2 == 0 ? 3 : 1);
                 int ixt = 0;
                 for (int i = 0; i < lowerCaseCharacters.length; i++) {
-                    ixt+=2;
-                    if(ixt > (wnd_width-2)){
-                        wnd_height+=2;
+                    ixt += 2;
+                    if (ixt > (wnd_width - 2)) {
+                        wnd_height += 2;
                         ixt = 0;
                     }
                 }
@@ -737,7 +737,7 @@ public class API {
                                     public void onRelease() {
                                         if (inputTextField.content.length() > 0) {
                                             components.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
-                                            components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                                            components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                                         }
                                     }
                                 }, ButtonMode.DEFAULT);
@@ -747,7 +747,7 @@ public class API {
                             @Override
                             public void onRelease() {
                                 components.textField.setContent(inputTextField, inputTextField.content + cl);
-                                components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                                components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
                         componentsList.add(charButtonLC);
@@ -756,7 +756,7 @@ public class API {
                             @Override
                             public void onRelease() {
                                 components.textField.setContent(inputTextField, inputTextField.content + cu);
-                                components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                                components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
                         componentsList.add(charButtonUC);
@@ -2962,7 +2962,7 @@ public class API {
 
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            UICommons.component_removeFromWindow(component, window,inputState);
+            UICommons.component_removeFromWindow(component, window, inputState);
         }
 
         public void removeComponents(Window window, Component[] components) {

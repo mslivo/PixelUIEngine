@@ -1780,9 +1780,6 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateGamePadMouseControl() {
 
-        if (inputState.focusedTextField != null)
-            return; // Stop Keyboard control if the user wants to type into a textfield
-
         // Swallow & Translate Gamepad Events
         boolean[] translatedButtons = inputState.gamePadTranslatedButtonsDown;
         boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
