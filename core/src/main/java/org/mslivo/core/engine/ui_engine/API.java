@@ -1449,6 +1449,9 @@ public class API {
         inputState.osTextInputMouseX = Gdx.input.getX();
         inputState.openOnScreenTextInput = onScreenTextInput;
     }
+    public void closeOnScreenTextInput(){
+        inputState.openOnScreenTextInput = null;
+    }
 
     public static class _Config {
 
