@@ -157,8 +157,6 @@ public class InputState {
 
     public int displayedContextMenuWidth;
 
-
-    /* #################### OnScreenTextInput #################### */
     public OnScreenTextInput openOnScreenTextInput;
     public int osTextInputMouseX;
     public boolean osTextInputConfirmPressed;
@@ -169,6 +167,8 @@ public class InputState {
     public int osTextInputScrollStage;
     public boolean osTextInputTranslatedMouseLeftDown;
     public boolean osTextInputUnlock;
+    /* #################### OnScreenTextInput #################### */
+
 
     /* #################### Control #################### */
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
