@@ -1390,6 +1390,7 @@ public class API {
         openOnScreenTextInput(x,y,null,
                 config.onScreenTextInputDefaultLCCharacters,
                 config.onScreenTextInputDefaultUCCharacters,
+                null,
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
@@ -1397,6 +1398,7 @@ public class API {
         openOnScreenTextInput(x,y,onConfirm,
                 config.onScreenTextInputDefaultLCCharacters,
                 config.onScreenTextInputDefaultUCCharacters,
+                null,
                 config.onScreenTextInputDefaultFont,Tools.Colors.BLACK);
     }
 
@@ -1405,10 +1407,11 @@ public class API {
         openOnScreenTextInput(x,y,onConfirm,
                 charactersLC,
                 charactersUC,
-                config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
+                null,
+                config.onScreenTextInputDefaultFont , Tools.Colors.BLACK);
     }
 
-    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+    public void openOnScreenTextInput(int x, int y, Runnable onConfirm, char[] charactersLC, char[] charactersUC, Character selectedCharacter, CMediaFont font, FColor color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
         if(inputState.openOnScreenTextInput != null) return;
         // Check for Length and ISO Control Except special characters
@@ -1424,8 +1427,22 @@ public class API {
         onScreenTextInput.charactersUC = charactersUC;
         onScreenTextInput.font = font;
         onScreenTextInput.onConfirm = onConfirm;
-        onScreenTextInput.selectedIndex = 0;
         onScreenTextInput.upperCase = false;
+        if(selectedCharacter != null){
+            for(int i=0;i<charactersLC.length;i++){
+                if(selectedCharacter == charactersLC[i]){
+                    onScreenTextInput.selectedIndex = i;
+                    break;
+                }
+                if(selectedCharacter == charactersUC[i]){
+                    onScreenTextInput.selectedIndex = i;
+                    onScreenTextInput.upperCase = true;
+                    break;
+                }
+            }
+        }else {
+            onScreenTextInput.selectedIndex = 0;
+        }
         onScreenTextInput.x = x;
         onScreenTextInput.y = y-12;
         onScreenTextInput.color = color;
