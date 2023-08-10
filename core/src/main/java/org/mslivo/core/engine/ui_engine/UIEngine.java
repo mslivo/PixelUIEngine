@@ -1133,15 +1133,18 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.currentControlMode != MouseControlMode.DISABLED) {
             // Translate Keys
             switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {
-                }
+                case HARDWARE_MOUSE -> {}
                 case GAMEPAD -> gamePadMouseTranslateAndClearEvents();
                 case KEYBOARD -> keyboardMouseTranslateAndClearEvents();
                 case DISABLED -> throw new RuntimeException();
             }
 
             // Update OnScreenTextinput or Mouse Cursor
-            if (!this.updateMouseTextInputControl()) {
+            if(inputState.openMouseTextInput != null){
+                // Translate to Text Input
+                updateMouseTextInputControl();
+            }else{
+                // Translate to Cursor
                 switch (inputState.currentControlMode) {
                     case HARDWARE_MOUSE -> updateHardwareMouseControl();
                     case KEYBOARD -> updateKeyBoardMouseControl();
@@ -1150,9 +1153,8 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
         } else {
-            chockAllMouseEvents();
+            chokeAllMouseEvents();
         }
-
 
         // Translate MouseXGUI/MouseYGUI to Game X/Y
         updateGUIMouseBounds();
@@ -1160,8 +1162,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private boolean updateMouseTextInputControl() {
-        if (inputState.openMouseTextInput == null) return false;
+    private void updateMouseTextInputControl() {
+        if (inputState.openMouseTextInput == null) return;
         OnScreenTextInput onScreenTextInput = inputState.openMouseTextInput;
 
         int scrollDirection = 0;
@@ -1320,10 +1322,10 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        return true;
+        return;
     }
 
-    private void chockAllMouseEvents() {
+    private void chokeAllMouseEvents() {
         // clear all mouse inputs
         inputState.inputEvents.mouseMoved = false;
         inputState.inputEvents.mouseDragged = false;
