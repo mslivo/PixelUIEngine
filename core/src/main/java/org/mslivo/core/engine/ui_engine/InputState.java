@@ -164,14 +164,15 @@ public class InputState {
     // OnScreenTextInput
     public OnScreenTextInput openOnScreenTextInput;
 
-    public int osTextInputMouseX = 0;
-    public boolean osTextInputConfirmPressed = false;
-    public boolean osTextInputLeftPressed = false;
-    public boolean osTextInputRightPressed = false;
-    public int osTextInputScrollTimer = 0;
-    public int osTextInputScrollTime = 0;
-    public int osTextInputScrollStage = 0;
+    public int osTextInputMouseX;
+    public boolean osTextInputConfirmPressed ;
+    public boolean osTextInputKeyBoardGamePadLeft;
+    public boolean osTextInputKeyBoardGamePadRight;
+    public int osTextInputScrollTimer ;
+    public int osTextInputScrollTime ;
+    public int osTextInputScrollStage ;
 
+    public boolean osTextInputTranslatedMouseLeftDown;
 
     /* #################### Control #################### */
 
@@ -205,7 +206,6 @@ public class InputState {
     public float siumlatedMouseSpeedUp;
     public boolean[] keyBoardMouseIsMouseButtonDown;
     public boolean[] keyBoardTranslatedKeysDown;
-
     public Vector2 gamePadTranslatedStickLeft;
     public Vector2 gamePadTranslatedStickRight;
     public boolean[] gamePadTranslatedButtonsDown;

@@ -59,10 +59,11 @@ public class GUIBaseMedia {
     public static final CMediaImage GUI_NOTIFICATION_BAR = MediaManager.create_CMediaImage(guiDirectory + "notification_bar.png");
     public static final CMediaArray GUI_CHECKBOX_CHECKBOX = MediaManager.create_CMediaArray(guiDirectory + "checkbox.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_CHECKBOX_RADIO = MediaManager.create_CMediaArray(guiDirectory + "radio.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static final CMediaImage GUI_OSTEXTINPUT_CHARACTER = MediaManager.create_CMediaImage(guiDirectory + "ostextinput_character.png");
-    public static final CMediaImage GUI_OSTEXTINPUT_CONFIRM = MediaManager.create_CMediaImage(guiDirectory + "ostextinput_confirm.png");
-    public static final CMediaImage GUI_OSTEXTINPUT_DELETE = MediaManager.create_CMediaImage(guiDirectory + "ostextinput_delete.png");
-    public static final CMediaArray GUI_OSTEXTINPUT_CASE = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_case.png",12,12);
+    public static final CMediaArray GUI_OSTEXTINPUT_CHARACTER = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_character.png",12,12);
+    public static final CMediaArray GUI_OSTEXTINPUT_CONFIRM = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_confirm.png",12,12);
+    public static final CMediaArray GUI_OSTEXTINPUT_DELETE = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_delete.png",12,12);
+    public static final CMediaArray GUI_OSTEXTINPUT_LOWERCASE = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_lowercase.png",12,12);
+    public static final CMediaArray GUI_OSTEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(guiDirectory + "ostextinput_uppercase.png",12,12);
     public static final CMediaImage GUI_OSTEXTINPUT_SELECTED = MediaManager.create_CMediaImage(guiDirectory + "ostextinput_selected.png");
     //Cursors
     public static final CMediaCursor GUI_CURSOR_ARROW = MediaManager.create_CMediaCursor("gui/cursors/arrow.png", 16, 16);
@@ -154,7 +155,8 @@ public class GUIBaseMedia {
             GUI_COLOR_SELECTOR_OVERLAY,
             GUI_OSTEXTINPUT_CHARACTER,
             GUI_OSTEXTINPUT_CONFIRM,
-            GUI_OSTEXTINPUT_CASE,
+            GUI_OSTEXTINPUT_UPPERCASE,
+            GUI_OSTEXTINPUT_LOWERCASE,
             GUI_OSTEXTINPUT_DELETE,
             GUI_OSTEXTINPUT_SELECTED,
             FONT_BLACK,

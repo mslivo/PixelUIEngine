@@ -180,8 +180,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.displayedContextMenuWidth = 0;
         newInputState.openOnScreenTextInput = null;
         newInputState.osTextInputConfirmPressed = false;
-        newInputState.osTextInputLeftPressed = false;
-        newInputState.osTextInputRightPressed = false;
+        newInputState.osTextInputKeyBoardGamePadLeft = false;
+        newInputState.osTextInputKeyBoardGamePadRight = false;
         newInputState.osTextInputScrollTimer = 0;
         newInputState.osTextInputScrollTime = 0;
         newInputState.osTextInputScrollStage = 0;
@@ -1173,7 +1173,7 @@ public class UIEngine<T extends UIAdapter> {
         OnScreenTextInput onScreenTextInput = inputState.openOnScreenTextInput;
 
         int scrollDirection = 0;
-        boolean confirmCharacter = false;
+        boolean confirmPressed = false;
         boolean confirmKeyBoardGamePad = false;
         boolean leftKeyBoardGamePad = false;
         boolean rightKeyBoardGamePad = false;
@@ -1187,20 +1187,35 @@ public class UIEngine<T extends UIAdapter> {
                     scrollDirection = -1;
                     inputState.osTextInputMouseX = Gdx.input.getX();
                 }
-                if (inputState.inputEvents.mouseDown && inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT]) {
 
-                    confirmCharacter = true;
-
-                    // Choke Events
-                    inputState.inputEvents.mouseDown = false;
-                    inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
-                    inputState.inputEvents.mouseDownButtons.remove(KeyCode.Mouse.LEFT);
+                if(inputState.inputEvents.mouseDown){
+                    if(inputState.inputEvents.mouseDownButtons.contains(KeyCode.Mouse.LEFT)) {
+                        // Choke Events
+                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
+                        inputState.inputEvents.mouseDownButtons.remove(KeyCode.Mouse.LEFT);
+                        inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size() > 0;
+                        // Translate
+                        inputState.osTextInputTranslatedMouseLeftDown = true;
+                    }
                 }
+                if(inputState.inputEvents.mouseUp){
+                    if(inputState.inputEvents.mouseUpButtons.contains(KeyCode.Mouse.LEFT)) {
+                        // Choke Events
+                        inputState.inputEvents.mouseUpButtons.remove(KeyCode.Mouse.LEFT);
+                        inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size() > 0;
+                        // Translate
+                        inputState.osTextInputTranslatedMouseLeftDown = false;
+                    }
+                }
+
+                confirmPressed = inputState.osTextInputTranslatedMouseLeftDown;
+
             }
             case KEYBOARD -> {
                 leftKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsLeft());
                 rightKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsRight());
-                confirmKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
+                confirmPressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
+
             }
             case GAMEPAD -> {
                 boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
@@ -1208,42 +1223,34 @@ public class UIEngine<T extends UIAdapter> {
                 final float sensitivity = 0.4f;
                 leftKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
                 rightKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
-                confirmKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
+                confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
             }
         }
 
         if (inputState.currentControlMode == MouseControlMode.GAMEPAD || inputState.currentControlMode == MouseControlMode.KEYBOARD) {
             if (leftKeyBoardGamePad) {
-                if (inputState.osTextInputLeftPressed == false) {
+                if (inputState.osTextInputKeyBoardGamePadLeft == false) {
                     scrollDirection = -1;
-                    inputState.osTextInputLeftPressed = true;
+                    inputState.osTextInputKeyBoardGamePadLeft = true;
                 }
             } else {
-                inputState.osTextInputLeftPressed = false;
+                inputState.osTextInputKeyBoardGamePadLeft = false;
             }
             if (rightKeyBoardGamePad) {
-                if (inputState.osTextInputRightPressed == false) {
+                if (inputState.osTextInputKeyBoardGamePadRight == false) {
                     scrollDirection = 1;
-                    inputState.osTextInputRightPressed = true;
+                    inputState.osTextInputKeyBoardGamePadRight = true;
                 }
             } else {
-                inputState.osTextInputRightPressed = false;
-            }
-            if (confirmKeyBoardGamePad) {
-                if (inputState.osTextInputConfirmPressed == false) {
-                    confirmCharacter = true;
-                    inputState.osTextInputConfirmPressed = true;
-                }
-            } else {
-                inputState.osTextInputConfirmPressed = false;
+                inputState.osTextInputKeyBoardGamePadRight = false;
             }
 
             // Continue Scroll
             if (leftKeyBoardGamePad || rightKeyBoardGamePad) {
                 inputState.osTextInputScrollTimer++;
                 if (inputState.osTextInputScrollTimer > inputState.osTextInputScrollTime) {
-                    inputState.osTextInputLeftPressed = false;
-                    inputState.osTextInputRightPressed = false;
+                    inputState.osTextInputKeyBoardGamePadLeft = false;
+                    inputState.osTextInputKeyBoardGamePadRight = false;
                     inputState.osTextInputScrollTimer = 0;
                     inputState.osTextInputScrollStage++;
                     if (inputState.osTextInputScrollStage >= 3) {
@@ -1261,12 +1268,26 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
+        boolean confirmCharacter = false;
+        if (confirmPressed) {
+            if (!inputState.osTextInputConfirmPressed) {
+                inputState.osTextInputConfirmPressed = true;
+            }
+        }
+        if (inputState.osTextInputConfirmPressed) {
+            if (!confirmPressed) {
+                confirmCharacter = true;
+                inputState.osTextInputConfirmPressed = false;
+            }
+        }
+
 
         char[] characters = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
 
         if (inputState.inputEvents.keyTyped) {
             char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
-            findCharLoop:for (int i = 0; i < onScreenTextInput.charactersLC.length; i++) {
+            findCharLoop:
+            for (int i = 0; i < onScreenTextInput.charactersLC.length; i++) {
                 if (onScreenTextInput.charactersLC[i] == typedChar) {
                     onScreenTextInput.selectedIndex = i;
                     onScreenTextInput.upperCase = false;
@@ -1300,7 +1321,7 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.inputEvents.keyTypedCharacters.add(c);
                 }
             }
-            if(onScreenTextInput.confirmAction != null){
+            if (onScreenTextInput.confirmAction != null) {
                 onScreenTextInput.confirmAction.onEnterCharacter(c);
             }
         }
@@ -2228,33 +2249,34 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase, false);
             }
         }
         // Right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase, false);
             }
         }
 
-        render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase);
+        render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase, inputState.osTextInputConfirmPressed);
         render_batchSetColor(onScreenTextInput.color.r, onScreenTextInput.color.g, onScreenTextInput.color.b, 1f);
-        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x, onScreenTextInput.y);
+        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x-1, onScreenTextInput.y-1);
         render_batchSetColorWhite(1f);
     }
 
-    private void render_drawOnScreenTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase) {
-        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y);
+    private void render_drawOnScreenTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
+        int pressedIndex = pressed ? 1 : 0;
+        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y,pressedIndex);
         if (c == '\n') {
-            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y);
+            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y,pressedIndex);
         }
         if (c == '\t') {
-            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CASE, x, y, upperCase ? 1 : 0);
+            render_drawCMediaGFX(upperCase ? GUIBaseMedia.GUI_OSTEXTINPUT_UPPERCASE : GUIBaseMedia.GUI_OSTEXTINPUT_LOWERCASE, x, y,pressedIndex);
         }
         if (c == '\b') {
-            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y);
+            render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
         } else {
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2, y + 2);
         }
