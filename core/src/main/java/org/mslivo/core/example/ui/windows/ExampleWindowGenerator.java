@@ -2,7 +2,6 @@ package org.mslivo.core.example.ui.windows;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
@@ -43,7 +42,6 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 import org.mslivo.core.example.data.ExampleData;
 import org.mslivo.core.example.engine.ExampleEngineAdapter;
@@ -51,6 +49,7 @@ import org.mslivo.core.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class ExampleWindowGenerator extends WindowGenerator {
 
@@ -218,7 +217,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal2 = api.components.button.textButton.create(28, 4, 5, 1, "Modal 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.preConfigured.modal_CreateMessageRequester("Caption", new String[]{"Modal 2 Example Text"}, null));
+                api.addWindowAsModal(api.preConfigured.modal_CreateMessageModal("Caption", new String[]{"Modal 2 Example Text"}, null));
             }
         });
 
@@ -227,10 +226,26 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Button modal3 = api.components.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.preConfigured.modal_CreateColorRequester("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
+                api.addWindowAsModal(api.preConfigured.modal_CreateColorModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
             }
         });
 
+
+        Button modal4 = api.components.button.textButton.create(28, 2, 5, 1, "Modal 4", new ButtonAction() {
+            @Override
+            public void onRelease() {
+                api.addWindowAsModal(api.preConfigured.modal_CreateTouchTextInputModal("Caption", "Input Please", "", new Consumer<String>() {
+                    @Override
+                    public void accept(String s) {
+
+                    }
+                },1,20,
+                        api.config.getDefaultLowerCaseCharacters(),
+                        api.config.getDefaultUpperCaseCharacters(),
+                        19
+                        ));
+            }
+        });
 
         CheckBox checkBox = api.components.checkBox.create(10, 1, "CheckBox");
 
@@ -257,8 +272,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput});
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput}));
+        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput});
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput}));
 
 
         return components;
@@ -288,7 +303,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn3 = api.components.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.preConfigured.modal_CreateTextInput("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notifications.create(s))));
+                api.addWindowAsModal(api.preConfigured.modal_CreateTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notifications.create(s))));
             }
         });
 

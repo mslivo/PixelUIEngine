@@ -34,7 +34,7 @@ import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 class UICommons {
 
-    static int viewport_determineUpscaleFactor(ViewportMode viewportMode, int internalResolutionWidth, int internalResolutionHeight){
+    static int viewport_determineUpscaleFactor(ViewportMode viewportMode, int internalResolutionWidth, int internalResolutionHeight) {
         switch (viewportMode) {
             case PIXEL_PERFECT -> {
                 return 1;
@@ -53,14 +53,12 @@ class UICommons {
         }
     }
 
-    static Viewport viewport_createViewport(ViewportMode viewportMode, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight){
+    static Viewport viewport_createViewport(ViewportMode viewportMode, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
         return switch (viewportMode) {
-            case FIT ->
-                    new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+            case FIT -> new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
             case PIXEL_PERFECT ->
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
-            case STRETCH ->
-                    new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+            case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
         };
     }
 
@@ -90,8 +88,6 @@ class UICommons {
             inputState.windows.remove(window);
             inputState.windows.add(index, window);
         }
-
-        inputState.lastActiveWindow = window;
     }
 
     static boolean component_isHiddenByTab(Component component) {
@@ -112,19 +108,74 @@ class UICommons {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         inputState.windows.add(window);
+        resetGUITemporaryReferences(inputState);
         if (window.windowAction != null) window.windowAction.onAdd();
     }
 
     static void window_removeFromScreen(InputState inputState, Window window) {
         if (!window.addedToScreen) return;
-        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
-        if (inputState.lastActiveWindow == window) inputState.lastActiveWindow = null;
         if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         window.addedToScreen = false;
         inputState.windows.remove(window);
+        resetGUITemporaryReferences(inputState);
         if (window.windowAction != null) window.windowAction.onRemove();
     }
 
+    static void resetGUITemporaryReferences(InputState inputState) {
+        // Window
+        inputState.draggedWindow = null;
+        inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
+
+        // Buton
+        inputState.pressedButton = null;
+        inputState.pressedButton_timer_hold = 0;
+
+        // Scrollbar
+        inputState.scrolledScrollBarVertical = null;
+        inputState.scrolledScrollBarHorizontal = null;
+
+        // ToolTip
+        inputState.tooltip = null;
+        inputState.tooltip_fadeIn_pct = 0f;
+        inputState.tooltip_wait_delay = false;
+        inputState.tooltip_delay_timer = 0;
+        inputState.tooltip_fadeIn_timer = 0;
+        inputState.tooltip_lastHoverObject = null;
+        inputState.gameToolTip = null;
+
+        // Knob
+        inputState.turnedKnob = null;
+
+        // Map
+        inputState.pressedMap = null;
+
+        // Viewport
+        inputState.pressedGameViewPort = null;
+
+        // Inventory
+        inputState.inventoryDrag_Inventory = null;
+        inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
+        inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
+        inputState.inventoryDrag_Item = null;
+
+        // List
+        inputState.listDrag_List = null;
+        inputState.listDrag_from_index = 0;
+        inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
+        inputState.listDrag_Item = null;
+
+        // Textfield
+        inputState.focusedTextField = null;
+
+        // ComboBox
+        inputState.openComboBox = null;
+
+        // ContextMenu
+        inputState.openContextMenu = null;
+        inputState.displayedContextMenuWidth = 0;
+
+    }
 
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
         if (notification.addedToScreen) return;
@@ -261,12 +312,15 @@ class UICommons {
     }
 
     static void textField_setContent(TextField textField, String content) {
-        textField.content = Tools.Text.validString(content);
-        textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
-        if (textField.textFieldAction != null) {
-            textField.contentValid = textField.textFieldAction.isContentValid(content);
-        } else {
-            textField.contentValid = true;
+        if (content.length() <= textField.contentMaxLength) {
+            textField.content = Tools.Text.validString(content);
+            textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
+            if (textField.textFieldAction != null) {
+                textField.contentValid = textField.textFieldAction.isContentValid(content);
+                textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
+            } else {
+                textField.contentValid = true;
+            }
         }
     }
 
@@ -274,39 +328,47 @@ class UICommons {
     static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        component_setCommonReferences(component, inputState);
+        component_setReferences(component, inputState);
         component.addedToWindow = window;
         window.components.add(component);
-    }
-
-    static void component_removeFromWindow(Component component, InputState inputState, Window window) {
-        if (component.addedToWindow == window) {
-            component_removeCommonReferences(component, inputState);
-            component.addedToWindow.components.remove(component);
-            component.addedToWindow = null;
-        }
+        resetGUITemporaryReferences(inputState);
     }
 
     static void component_addToScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        component_setCommonReferences(component, inputState);
+        component_setReferences(component, inputState);
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
+        resetGUITemporaryReferences(inputState);
     }
 
     static void component_removeFromScreen(Component component, InputState inputState) {
+        if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
-        component_removeCommonReferences(component, inputState);
+        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        component_removeReferences(component, inputState);
         component.addedToScreen = true;
         inputState.screenComponents.remove(component);
+        resetGUITemporaryReferences(inputState);
     }
 
-    private static void component_setCommonReferences(Component component, InputState inputState) {
+    static void component_removeFromWindow(Component component, Window window, InputState inputState) {
+        if (component.addedToWindow != window) return;
+        if (component.addedToScreen) return;
+        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        component_removeReferences(component, inputState);
+        component.addedToWindow = null;
+        component.addedToWindow.components.remove(component);
+        resetGUITemporaryReferences(inputState);
+    }
+
+
+    private static void component_setReferences(Component component, InputState inputState) {
         if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
     }
 
-    private static void component_removeCommonReferences(Component component, InputState inputState) {
+    private static void component_removeReferences(Component component, InputState inputState) {
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
         if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
@@ -395,58 +457,6 @@ class UICommons {
         toolTip.images.remove(toolTipImage);
     }
 
-
-    static void resetGUITempVariables(InputState inputState) {
-        // Window
-        inputState.draggedWindow = null;
-        inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
-        // Buton
-        inputState.pressedButton = null;
-        inputState.pressedButton_timer_hold = 0;
-
-        // Scrollbar
-        inputState.scrolledScrollBarVertical = null;
-        inputState.scrolledScrollBarHorizontal = null;
-
-        // ToolTip
-        inputState.tooltip = null;
-        inputState.tooltip_fadeIn_pct = 0f;
-        inputState.tooltip_wait_delay = false;
-        inputState.tooltip_delay_timer = 0;
-        inputState.tooltip_fadeIn_timer = 0;
-        inputState.tooltip_lastHoverObject = null;
-        inputState.gameToolTip = null;
-
-        // Knob
-        inputState.turnedKnob = null;
-
-        // Map
-        inputState.pressedMap = null;
-
-        // Viewport
-        inputState.pressedGameViewPort = null;
-
-        // Inventory
-        inputState.inventoryDrag_Inventory = null;
-        inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
-        inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
-        inputState.inventoryDrag_Item = null;
-
-        // List
-        inputState.listDrag_List = null;
-        inputState.listDrag_from_index = 0;
-        inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
-        inputState.listDrag_Item = null;
-
-        // Textfield
-        if (inputState.focusedTextField != null) UICommons.textField_unFocus(inputState, inputState.focusedTextField);
-
-        // ComboBox
-        if (inputState.openComboBox != null) UICommons.comboBox_close(inputState.openComboBox, inputState);
-
-        // ContextMenu
-        if (inputState.openContextMenu != null) UICommons.contextMenu_close(inputState.openContextMenu, inputState);
-    }
 
     static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;

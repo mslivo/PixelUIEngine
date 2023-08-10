@@ -530,11 +530,11 @@ public class API {
             return returnComponents;
         }
 
-        public Window modal_CreateColorRequester(String caption, Consumer<FColor> selectColorFunction, FColor initColor) {
-            return modal_CreateColorRequester(caption, selectColorFunction, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
+        public Window modal_CreateColorModal(String caption, Consumer<FColor> selectColorFunction, FColor initColor) {
+            return modal_CreateColorModal(caption, selectColorFunction, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
         }
 
-        public Window modal_CreateColorRequester(String caption, Consumer<FColor> selectColorFunction, FColor initColor, CMediaImage colors) {
+        public Window modal_CreateColorModal(String caption, Consumer<FColor> selectColorFunction, FColor initColor, CMediaImage colors) {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
@@ -632,34 +632,75 @@ public class API {
             return modal;
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, 0);
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, false, null, null, 11);
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-            return modal_CreateTextInput(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, 0);
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, false, null, null, 11);
         }
 
-        public Window modal_CreateTextInput(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int wndMinWidth) {
-            final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, Tools.Calc.lowerBounds(wndMinWidth, 8));
-            final int HEIGHT = showOKButton ? 6 : 5;
-            originalText = originalText != null ? originalText : "";
-            Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
-            Text textC = components.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, 11);
+        }
 
-            TextField inputTextField = components.textField.create(0, showOKButton ? 2 : 1, WIDTH - 1, originalText, null, maxInputLength);
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int windowMinWidth) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, windowMinWidth);
+        }
 
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, config.defaultLowerCaseCharacters, config.defaultUpperCaseCharacters, 11);
+        }
+
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, config.defaultLowerCaseCharacters, config.defaultUpperCaseCharacters, 11);
+        }
+
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, 11);
+        }
+
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
+            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, windowMinWidth);
+        }
+
+        private Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
+            if (showTouchInputs && (lowerCaseCharacters == null || upperCaseCharacters == null)) return null;
+            if (showTouchInputs && (lowerCaseCharacters.length != upperCaseCharacters.length)) return null;
+            showOKButton = showTouchInputs ? true : showOKButton;
+            originalText = Tools.Text.validString(originalText);
+            windowMinWidth = Tools.Calc.lowerBounds(windowMinWidth, 11);
+            int wnd_width = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(config.defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, windowMinWidth);
+            int wnd_height = 6;
+            if (showOKButton) wnd_height++;
+            if (showTouchInputs) {
+                wnd_height += 2;
+                int ixt = 0;
+                for (int i = 0; i < lowerCaseCharacters.length; i++) {
+                    ixt+=2;
+                    if(ixt > (wnd_width-2)){
+                        wnd_height+=2;
+                        ixt = 0;
+                    }
+                }
+
+            }
+
+            Window modalWnd = windows.create(0, 0, wnd_width, wnd_height, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
             ArrayList<Component> componentsList = new ArrayList<>();
-            componentsList.add(textC);
-            componentsList.add(inputTextField);
 
+            Text textC = components.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
+            componentsList.add(textC);
+
+            TextField inputTextField = components.textField.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
+            componentsList.add(inputTextField);
 
             Button okBtn = null;
             if (showOKButton) {
-                okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+                okBtn = components.button.textButton.create(0, 0, wnd_width - 1, 1, "OK", new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        if (inputTextField.content.length() > minInputLength) {
+                        if (inputTextField.content.length() >= minInputLength) {
                             if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                             removeCurrentModalWindow();
                         }
@@ -668,14 +709,76 @@ public class API {
                 componentsList.add(okBtn);
             }
 
+
+            ArrayList<Button> lowerCaseButtonsList = new ArrayList<>();
+            ArrayList<Button> upperCaseButtonsList = new ArrayList<>();
+            if (showTouchInputs) {
+                int ix = 0;
+                int iy = wnd_height - 4;
+                for (int i = 0; i < lowerCaseCharacters.length; i++) {
+                    char cl = lowerCaseCharacters[i];
+                    char cu = upperCaseCharacters[i];
+                    if (cl == '\t' || cu == '\t') {
+                        ImageButton caseButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
+                                new ButtonAction() {
+                                    @Override
+                                    public void onToggle(boolean value) {
+                                        for (int i2 = 0; i2 < lowerCaseButtonsList.size(); i2++)
+                                            components.setVisible(lowerCaseButtonsList.get(i2), !value);
+                                        for (int i2 = 0; i2 < upperCaseButtonsList.size(); i2++)
+                                            components.setVisible(upperCaseButtonsList.get(i2), value);
+                                    }
+                                }, ButtonMode.TOGGLE);
+                        componentsList.add(caseButton);
+                    } else if (cl == '\b' || cu == '\b') {
+                        ImageButton delButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
+                                new ButtonAction() {
+                                    @Override
+                                    public void onRelease() {
+                                        if (inputTextField.content.length() > 0) {
+                                            components.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
+                                            components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                                        }
+                                    }
+                                }, ButtonMode.DEFAULT);
+                        componentsList.add(delButton);
+                    } else if (!Character.isISOControl(cl) && !Character.isISOControl(cu)) {
+                        TextButton charButtonLC = components.button.textButton.create(ix, iy, 2, 2, String.valueOf(cl), new ButtonAction() {
+                            @Override
+                            public void onRelease() {
+                                components.textField.setContent(inputTextField, inputTextField.content + cl);
+                                components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                            }
+                        });
+                        componentsList.add(charButtonLC);
+                        lowerCaseButtonsList.add(charButtonLC);
+                        TextButton charButtonUC = components.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
+                            @Override
+                            public void onRelease() {
+                                components.textField.setContent(inputTextField, inputTextField.content + cu);
+                                components.textField.setMarkerPosition(inputTextField,inputTextField.content.length());
+                            }
+                        });
+                        componentsList.add(charButtonUC);
+                        components.setVisible(charButtonUC, false);
+                        upperCaseButtonsList.add(charButtonUC);
+                    }
+
+                    ix += 2;
+                    if (ix >= (wnd_width - 2)) {
+                        ix = 0;
+                        iy -= 2;
+                    }
+                }
+            }
+
+
             Button finalOkBtn = okBtn;
             components.textField.setTextFieldAction(inputTextField, new TextFieldAction() {
-
                 @Override
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
-                        if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
-                        removeCurrentModalWindow();
+                        finalOkBtn.buttonAction.onRelease();
                     } else {
                         components.textField.focus(inputTextField);
                     }
@@ -683,7 +786,7 @@ public class API {
 
                 @Override
                 public void onContentChange(String newContent, boolean valid) {
-                    if (finalOkBtn != null) components.setDisabled(finalOkBtn, valid);
+                    if (finalOkBtn != null) components.setDisabled(finalOkBtn, !valid);
                 }
 
                 @Override
@@ -701,17 +804,19 @@ public class API {
             Component[] componentArr = componentsList.toArray(new Component[]{});
             components.setOffset(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             components.setOffset(inputTextField, UIEngine.TILE_SIZE / 2, 0);
-            windows.addComponents(modal, componentArr);
-            windows.setWindowAction(modal, new WindowAction() {
+            windows.addComponents(modalWnd, componentArr);
+            windows.setWindowAction(modalWnd, new WindowAction() {
                 @Override
                 public void onAdd() {
                     components.textField.focus(inputTextField);
                 }
             });
-            return modal;
+            inputTextField.textFieldAction.onContentChange(originalText, inputTextField.textFieldAction.isContentValid(originalText));
+
+            return modalWnd;
         }
 
-        public Window modal_CreateMessageRequester(String caption, String[] lines, Runnable closeFunction) {
+        public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (String line : lines) {
                 int len = mediaManager.textWidth(config.defaultFont, line);
@@ -1200,7 +1305,6 @@ public class API {
 
     public void removeAllWindows() {
         removeWindows(inputState.windows.toArray(new Window[]{}));
-        UICommons.resetGUITempVariables(inputState);
     }
 
     public boolean closeWindow(Window window) {
@@ -1225,13 +1329,11 @@ public class API {
 
     public void closeAllWindows() {
         closeWindows(inputState.windows.toArray(new Window[]{}));
-        UICommons.resetGUITempVariables(inputState);
     }
 
     public void addWindowAsModal(Window modalWindow) {
         if (modalWindow == null) return;
         if (inputState.modalWindow == null) {
-            UICommons.resetGUITempVariables(inputState);
             windows.setAlwaysOnTop(modalWindow, true);
             windows.setVisible(modalWindow, true);
             windows.setFolded(modalWindow, false);
@@ -1292,7 +1394,6 @@ public class API {
 
     public void removeAllScreenComponents() {
         removeScreenComponents(inputState.screenComponents.toArray(new Component[]{}));
-        UICommons.resetGUITempVariables(inputState);
     }
 
     public ArrayList<Component> findScreenComponentsByName(String name) {
@@ -1310,7 +1411,6 @@ public class API {
         removeAllWindows();
         removeAllScreenComponents();
         removeAllNotifications();
-        UICommons.resetGUITempVariables(inputState);
     }
 
     public void setMouseTool(MouseTool mouseTool) {
@@ -1383,10 +1483,6 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    public Window getLastActiveWindow() {
-        return inputState.lastActiveWindow;
-    }
-
     private OnScreenTextInputConfirmAction defaultOnScreenTextInputConfirmAction() {
         return new OnScreenTextInputConfirmAction() {
         };
@@ -1395,24 +1491,24 @@ public class API {
     public void openOnScreenTextInput(int x, int y) {
         openOnScreenTextInput(x, y, defaultOnScreenTextInputConfirmAction(),
                 null,
-                config.onScreenTextInputDefaultLCCharacters,
-                config.onScreenTextInputDefaultUCCharacters,
+                config.defaultLowerCaseCharacters,
+                config.defaultUpperCaseCharacters,
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
     public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm) {
         openOnScreenTextInput(x, y,
                 onConfirm, null,
-                config.onScreenTextInputDefaultLCCharacters,
-                config.onScreenTextInputDefaultUCCharacters,
+                config.defaultLowerCaseCharacters,
+                config.defaultUpperCaseCharacters,
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
     public void openOnScreenTextInput(int x, int y, OnScreenTextInputConfirmAction onConfirm, Character selectedCharacter) {
         openOnScreenTextInput(x, y,
                 onConfirm, selectedCharacter,
-                config.onScreenTextInputDefaultLCCharacters,
-                config.onScreenTextInputDefaultUCCharacters,
+                config.defaultLowerCaseCharacters,
+                config.defaultUpperCaseCharacters,
                 config.onScreenTextInputDefaultFont, Tools.Colors.BLACK);
     }
 
@@ -1464,6 +1560,7 @@ public class API {
         onScreenTextInput.y = y - 12;
         onScreenTextInput.color = color;
         inputState.osTextInputMouseX = Gdx.input.getX();
+        inputState.osTextInputUnlock = false;
         inputState.openOnScreenTextInput = onScreenTextInput;
     }
 
@@ -1527,7 +1624,7 @@ public class API {
         private int tooltipFadeInDelayTime = 25;
         private boolean uiKeyInteractionsDisabled = false;
         private boolean uiMouseInteractionsDisabled = false;
-        private char[] onScreenTextInputDefaultLCCharacters = new char[]{
+        private char[] defaultLowerCaseCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
                 'm', 'n', 'o', 'p', 'q', 'r',
@@ -1536,7 +1633,7 @@ public class API {
                 '!', '?', '.'
                 , '\t', '\b', '\n'};
 
-        private char[] onScreenTextInputDefaultUCCharacters = new char[]{
+        private char[] defaultUpperCaseCharacters = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F',
                 'G', 'H', 'I', 'J', 'K', 'L',
                 'M', 'N', 'O', 'P', 'Q', 'R',
@@ -1980,20 +2077,20 @@ public class API {
             this.gamePadMouseButtonsScrollDown = gamePadMouseButtonsScrollDown;
         }
 
-        public char[] getOnScreenTextInputDefaultLCCharacters() {
-            return onScreenTextInputDefaultLCCharacters;
+        public char[] getDefaultLowerCaseCharacters() {
+            return defaultLowerCaseCharacters;
         }
 
-        public void setOnScreenTextInputDefaultLCCharacters(char[] onScreenTextInputDefaultLCCharacters) {
-            this.onScreenTextInputDefaultLCCharacters = onScreenTextInputDefaultLCCharacters;
+        public void setDefaultLowerCaseCharacters(char[] defaultLowerCaseCharacters) {
+            this.defaultLowerCaseCharacters = defaultLowerCaseCharacters;
         }
 
-        public char[] getOnScreenTextInputDefaultUCCharacters() {
-            return onScreenTextInputDefaultUCCharacters;
+        public char[] getDefaultUpperCaseCharacters() {
+            return defaultUpperCaseCharacters;
         }
 
-        public void setOnScreenTextInputDefaultUCCharacters(char[] onScreenTextInputDefaultUCCharacters) {
-            this.onScreenTextInputDefaultUCCharacters = onScreenTextInputDefaultUCCharacters;
+        public void setDefaultUpperCaseCharacters(char[] defaultUpperCaseCharacters) {
+            this.defaultUpperCaseCharacters = defaultUpperCaseCharacters;
         }
 
         public CMediaFont getOnScreenTextInputDefaultFont() {
@@ -2098,8 +2195,8 @@ public class API {
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
 
-            setOnScreenTextInputDefaultLCCharacters(config.getOnScreenTextInputDefaultLCCharacters());
-            setOnScreenTextInputDefaultUCCharacters(config.getOnScreenTextInputDefaultUCCharacters());
+            setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());
+            setDefaultUpperCaseCharacters(config.getDefaultUpperCaseCharacters());
             setOnScreenTextInputDefaultFont(config.getOnScreenTextInputDefaultFont());
         }
 
@@ -2874,7 +2971,7 @@ public class API {
 
         public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
-            UICommons.component_removeFromWindow(component, inputState, window);
+            UICommons.component_removeFromWindow(component, window,inputState);
         }
 
         public void removeComponents(Window window, Component[] components) {

@@ -74,6 +74,10 @@ public class GUIBaseMedia {
     public static final CMediaImage GUI_ICON_INFORMATION = MediaManager.create_CMediaImage(guiDirectory + "icons/information.png");
     public static final CMediaImage GUI_ICON_QUESTION = MediaManager.create_CMediaImage(guiDirectory + "icons/question.png");
     public static final CMediaImage GUI_ICON_EXTEND = MediaManager.create_CMediaImage(guiDirectory + "icons/extend.png");
+
+    public static final CMediaImage GUI_ICON_KEY_DELETE = MediaManager.create_CMediaImage(guiDirectory + "icons/delete.png");
+    public static final CMediaImage GUI_ICON_KEY_CASE = MediaManager.create_CMediaImage(guiDirectory + "icons/case.png");
+
     // Shapes
     public static final CMediaImage GUI_SHAPE_RECT = MediaManager.create_CMediaImage(guiDirectory + "shape_rect.png");
     public static final CMediaImage GUI_SHAPE_DIAMOND = MediaManager.create_CMediaImage(guiDirectory + "shape_diamond.png");
@@ -144,6 +148,8 @@ public class GUIBaseMedia {
             GUI_ICON_INFORMATION,
             GUI_ICON_QUESTION,
             GUI_ICON_EXTEND,
+            GUI_ICON_KEY_DELETE,
+            GUI_ICON_KEY_CASE,
             GUI_SHAPE_RECT,
             GUI_SHAPE_DIAMOND,
             GUI_SHAPE_OVAL,

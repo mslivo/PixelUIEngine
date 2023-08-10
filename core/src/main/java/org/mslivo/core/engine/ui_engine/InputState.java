@@ -110,14 +110,10 @@ public class InputState {
 
     public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
-    /* #################### GUI: Temporary Switches #################### */
-
+    /* #################### GUI: Temporary References #################### */
     public Window draggedWindow;
-
     public GridPoint2 draggedWindow_offset;
-
     public Button pressedButton;
-
     public int pressedButton_timer_hold;
 
     public ScrollBarVertical scrolledScrollBarVertical;
@@ -161,20 +157,21 @@ public class InputState {
 
     public int displayedContextMenuWidth;
 
-    // OnScreenTextInput
-    public OnScreenTextInput openOnScreenTextInput;
 
+    /* #################### OnScreenTextInput #################### */
+    public OnScreenTextInput openOnScreenTextInput;
     public int osTextInputMouseX;
-    public boolean osTextInputConfirmPressed ;
+    public boolean osTextInputConfirmPressed;
     public boolean osTextInputKeyBoardGamePadLeft;
     public boolean osTextInputKeyBoardGamePadRight;
-    public int osTextInputScrollTimer ;
-    public int osTextInputScrollTime ;
-    public int osTextInputScrollStage ;
+    public int osTextInputScrollTimer;
+    public int osTextInputScrollTime;
+    public int osTextInputScrollStage;
     public boolean osTextInputTranslatedMouseLeftDown;
+    public boolean osTextInputUnlock;
 
     /* #################### Control #################### */
-
+    public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
     public MouseControlMode currentControlMode;
 
     public GridPoint2 mouse;
@@ -182,8 +179,6 @@ public class InputState {
     public GridPoint2 mouse_gui;
 
     public GridPoint2 mouse_delta;
-
-    public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
 
     public CMediaCursor cursor;
 
@@ -223,8 +218,6 @@ public class InputState {
 
     public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;
-
-    public Window lastActiveWindow;
 
     public int[] itemInfo;
 

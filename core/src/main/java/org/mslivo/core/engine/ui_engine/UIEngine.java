@@ -186,6 +186,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.osTextInputScrollTime = 0;
         newInputState.osTextInputScrollStage = 0;
         newInputState.osTextInputTranslatedMouseLeftDown = false;
+        newInputState.osTextInputUnlock = false;
 
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
@@ -254,7 +255,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.inputEvents = new InputEvents();
         newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents, newInputState.gamePadSupport);
 
-        newInputState.lastActiveWindow = null;
         newInputState.itemInfo = new int[]{0, 0};
         newInputState.itemInfoValid = false;
 
@@ -293,34 +293,26 @@ public class UIEngine<T extends UIAdapter> {
                     Character keyTypedCharacter = inputState.inputEvents.keyTypedCharacters.get(ic);
                     if (keyTypedCharacter == '\b') { // BACKSPACE
                         if (!focusedTextField.content.isEmpty() && focusedTextField.markerPosition > 0) {
-
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition - 1) + focusedTextField.content.substring(focusedTextField.markerPosition);
                             UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
                             UICommons.textField_setContent(inputState.focusedTextField, newContent);
-
                             if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-
                         }
                     } else if (keyTypedCharacter == '\u007F') { // DEL
                         if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
-
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
                             UICommons.textField_setContent(focusedTextField, newContent);
-
                             if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-
                         }
                     } else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
-                            if (focusedTextField.content.length() < focusedTextField.contentMaxLength) {
-                                String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
-                                UICommons.textField_setContent(focusedTextField, newContent);
-                                UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
-                                if (focusedTextField.textFieldAction != null)
-                                    focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                            }
+                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
+                            UICommons.textField_setContent(focusedTextField, newContent);
+                            UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
+                            if (focusedTextField.textFieldAction != null)
+                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                         }
                     }
 
@@ -1264,6 +1256,14 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.osTextInputScrollTimer = 0;
                 inputState.osTextInputScrollTime = 20;
                 inputState.osTextInputScrollStage = 0;
+            }
+        }
+
+        if (!inputState.osTextInputUnlock) {
+            if (confirmPressed) {
+                confirmPressed = false;
+            } else {
+                inputState.osTextInputUnlock = true;
             }
         }
 
@@ -3239,8 +3239,6 @@ public class UIEngine<T extends UIAdapter> {
         inputState.screenComponents.clear();
         inputState.notifications.clear();
         inputState.gameViewPorts.clear();
-        UICommons.resetGUITempVariables(inputState);
-
 
         // GFX
         inputState.spriteBatch_game.dispose();
