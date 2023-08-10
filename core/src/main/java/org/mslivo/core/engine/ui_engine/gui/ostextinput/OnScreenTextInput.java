@@ -20,7 +20,7 @@ public class OnScreenTextInput {
     public CMediaFont font;
     public int selectedIndex;
     public boolean upperCase;
-    public BooleanSupplier onConfirm;
+    public OnScreenTextInputConfirmAction onConfirm;
 
     public FColor color;
 }

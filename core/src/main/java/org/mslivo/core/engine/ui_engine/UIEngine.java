@@ -1138,10 +1138,11 @@ public class UIEngine<T extends UIAdapter> {
 
         updateMouseControlMode();
 
-        if(inputState.currentControlMode != MouseControlMode.DISABLED){
+        if (inputState.currentControlMode != MouseControlMode.DISABLED) {
             // Translate Keys
             switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {}
+                case HARDWARE_MOUSE -> {
+                }
                 case GAMEPAD -> gamePadMouseTranslateAndClearEvents();
                 case KEYBOARD -> keyboardMouseTranslateAndClearEvents();
                 case DISABLED -> throw new RuntimeException();
@@ -1156,7 +1157,7 @@ public class UIEngine<T extends UIAdapter> {
                     case DISABLED -> throw new RuntimeException();
                 }
             }
-        }else{
+        } else {
             chockAllMouseEvents();
         }
 
@@ -1165,8 +1166,6 @@ public class UIEngine<T extends UIAdapter> {
         updateGUIMouseBounds();
         updateGameMouseXY();
     }
-
-
 
 
     private boolean updateOnScreenTextInputControl() {
@@ -1181,16 +1180,16 @@ public class UIEngine<T extends UIAdapter> {
         switch (inputState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - inputState.osTextInputMouseX;
-                if(deltaX > 12) {
+                if (deltaX > 12) {
                     scrollDirection = 1;
                     inputState.osTextInputMouseX = Gdx.input.getX();
-                }else if(deltaX < -12){
+                } else if (deltaX < -12) {
                     scrollDirection = -1;
                     inputState.osTextInputMouseX = Gdx.input.getX();
                 }
-                if(inputState.inputEvents.mouseDown && inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT]){
+                if (inputState.inputEvents.mouseDown && inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT]) {
 
-                        confirmCharacter = true;
+                    confirmCharacter = true;
 
                     // Choke Events
                     inputState.inputEvents.mouseDown = false;
@@ -1213,7 +1212,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        if(inputState.currentControlMode == MouseControlMode.GAMEPAD || inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+        if (inputState.currentControlMode == MouseControlMode.GAMEPAD || inputState.currentControlMode == MouseControlMode.KEYBOARD) {
             if (leftKeyBoardGamePad) {
                 if (inputState.osTextInputLeftPressed == false) {
                     scrollDirection = -1;
@@ -1228,34 +1227,34 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.osTextInputRightPressed = true;
                 }
             } else {
-                inputState. osTextInputRightPressed = false;
+                inputState.osTextInputRightPressed = false;
             }
-            if(confirmKeyBoardGamePad){
-                if(inputState.osTextInputConfirmPressed == false){
+            if (confirmKeyBoardGamePad) {
+                if (inputState.osTextInputConfirmPressed == false) {
                     confirmCharacter = true;
                     inputState.osTextInputConfirmPressed = true;
                 }
-            }else{
+            } else {
                 inputState.osTextInputConfirmPressed = false;
             }
 
             // Continue Scroll
-            if(leftKeyBoardGamePad || rightKeyBoardGamePad){
+            if (leftKeyBoardGamePad || rightKeyBoardGamePad) {
                 inputState.osTextInputScrollTimer++;
-                if(inputState.osTextInputScrollTimer > inputState.osTextInputScrollTime){
+                if (inputState.osTextInputScrollTimer > inputState.osTextInputScrollTime) {
                     inputState.osTextInputLeftPressed = false;
                     inputState.osTextInputRightPressed = false;
-                    inputState.osTextInputScrollTimer  = 0;
+                    inputState.osTextInputScrollTimer = 0;
                     inputState.osTextInputScrollStage++;
-                    if(inputState.osTextInputScrollStage >= 3){
+                    if (inputState.osTextInputScrollStage >= 3) {
                         inputState.osTextInputScrollTime = 2;
-                    }else if(inputState.osTextInputScrollStage >= 2){
+                    } else if (inputState.osTextInputScrollStage >= 2) {
                         inputState.osTextInputScrollTime = 5;
-                    }else if(inputState.osTextInputScrollStage >= 1){
+                    } else if (inputState.osTextInputScrollStage >= 1) {
                         inputState.osTextInputScrollTime = 10;
                     }
                 }
-            }else{
+            } else {
                 inputState.osTextInputScrollTimer = 0;
                 inputState.osTextInputScrollTime = 20;
                 inputState.osTextInputScrollStage = 0;
@@ -1265,10 +1264,10 @@ public class UIEngine<T extends UIAdapter> {
 
         char[] characters = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
 
-        if(inputState.inputEvents.keyTyped){
-            char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size()-1);
-            for(int i=0;i<characters.length;i++){
-                if(characters[i] == typedChar){
+        if (inputState.inputEvents.keyTyped) {
+            char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
+            for (int i = 0; i < characters.length; i++) {
+                if (characters[i] == typedChar) {
                     onScreenTextInput.selectedIndex = i;
                     break;
                 }
@@ -1276,18 +1275,18 @@ public class UIEngine<T extends UIAdapter> {
         }
         onScreenTextInput.selectedIndex = Tools.Calc.inBounds(onScreenTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
 
-        if(confirmCharacter){
+        if (confirmCharacter) {
             char c = characters[onScreenTextInput.selectedIndex];
-            switch (c){
+            switch (c) {
                 case '\b' -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add('\b');
                 }
-                case '\t'->{
+                case '\t' -> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
                 }
-                case '\n'->{
-                    boolean close  =onScreenTextInput.onConfirm != null ? onScreenTextInput.onConfirm.getAsBoolean() : true;
+                case '\n' -> {
+                    boolean close = onScreenTextInput.onConfirm != null ? onScreenTextInput.onConfirm.confirmPressed() : true;
                     inputState.openOnScreenTextInput = close ? null : inputState.openOnScreenTextInput;
                 }
                 default -> {
@@ -1757,7 +1756,7 @@ public class UIEngine<T extends UIAdapter> {
     private void updateGamePadMouseControl() {
 
         if (inputState.focusedTextField != null)
-        return; // Stop Keyboard control if the user wants to type into a textfield
+            return; // Stop Keyboard control if the user wants to type into a textfield
 
         // Swallow & Translate Gamepad Events
         boolean[] translatedButtons = inputState.gamePadTranslatedButtonsDown;
@@ -1787,7 +1786,7 @@ public class UIEngine<T extends UIAdapter> {
     private void updateKeyBoardMouseControl() {
 
         if (inputState.focusedTextField != null)
-        return; // Stop Keyboard control if the user wants to type into a textfield
+            return; // Stop Keyboard control if the user wants to type into a textfield
 
 
         // Swallow & Translate keyboard events
@@ -2221,19 +2220,19 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - (i * 1*(i*1)), onScreenTextInput.upperCase);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase);
             }
         }
         // Right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - (i * 1 *(i*1)), onScreenTextInput.upperCase);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase);
             }
         }
 
         render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase);
-        render_batchSetColor(onScreenTextInput.color.r,onScreenTextInput.color.g,onScreenTextInput.color.b,1f);
+        render_batchSetColor(onScreenTextInput.color.r, onScreenTextInput.color.g, onScreenTextInput.color.b, 1f);
         render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x, onScreenTextInput.y);
         render_batchSetColorWhite(1f);
     }
@@ -2242,11 +2241,13 @@ public class UIEngine<T extends UIAdapter> {
         render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y);
         if (c == '\n') {
             render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y);
-        }if (c == '\t') {
+        }
+        if (c == '\t') {
             render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CASE, x, y, upperCase ? 1 : 0);
-        } if (c == '\b') {
+        }
+        if (c == '\b') {
             render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y);
-        }  else {
+        } else {
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2, y + 2);
         }
     }

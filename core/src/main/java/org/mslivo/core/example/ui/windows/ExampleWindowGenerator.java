@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInputConfirmAction;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -245,10 +246,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
                     api.openOnScreenTextInput(
                             api.components.getAbsoluteX(osKeyBoardTextInput),
                             api.components.getAbsoluteY(osKeyBoardTextInput)
-                            , new Runnable() {
+                            , new OnScreenTextInputConfirmAction() {
                                 @Override
-                                public void run() {
+                                public boolean confirmPressed() {
                                     api.components.textField.unFocus(osKeyBoardTextInput);
+                                    return true;
                                 }
                             },null
                             );
