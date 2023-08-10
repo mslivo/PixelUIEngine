@@ -1266,11 +1266,17 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inputEvents.keyTyped) {
             char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
-            for (int i = 0; i < characters.length; i++) {
-                if (characters[i] == typedChar) {
+            findCharLoop:for (int i = 0; i < onScreenTextInput.charactersLC.length; i++) {
+                if (onScreenTextInput.charactersLC[i] == typedChar) {
                     onScreenTextInput.selectedIndex = i;
-                    break;
+                    onScreenTextInput.upperCase = false;
+                    break findCharLoop;
+                } else if (onScreenTextInput.charactersUC[i] == typedChar) {
+                    onScreenTextInput.selectedIndex = i;
+                    onScreenTextInput.upperCase = true;
+                    break findCharLoop;
                 }
+
             }
         }
         onScreenTextInput.selectedIndex = Tools.Calc.inBounds(onScreenTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));

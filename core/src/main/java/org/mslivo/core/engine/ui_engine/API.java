@@ -68,7 +68,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -1388,8 +1387,9 @@ public class API {
         return inputState.lastActiveWindow;
     }
 
-    private OnScreenTextInputConfirmAction defaultOnScreenTextInputConfirmAction(){
-        return new OnScreenTextInputConfirmAction(){};
+    private OnScreenTextInputConfirmAction defaultOnScreenTextInputConfirmAction() {
+        return new OnScreenTextInputConfirmAction() {
+        };
     }
 
     public void openOnScreenTextInput(int x, int y) {
@@ -1432,9 +1432,12 @@ public class API {
         if (charactersLC.length != charactersUC.length) return;
         for (int i = 0; i < charactersLC.length; i++) {
             if (Character.isISOControl(charactersLC[i]) &&
-                    !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) return;
-            if (Character.isISOControl(charactersUC[i]) &&
-                    !(charactersUC[i] == '\n' || charactersUC[i] == '\b' || charactersUC[i] == '\t')) return;
+                    !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) {
+                return;
+            } else if (Character.isISOControl(charactersUC[i]) &&
+                    !(charactersUC[i] == '\n' || charactersUC[i] == '\b' || charactersUC[i] == '\t')) {
+                return;
+            }
         }
         OnScreenTextInput onScreenTextInput = new OnScreenTextInput();
         onScreenTextInput.charactersLC = charactersLC;
@@ -1457,13 +1460,14 @@ public class API {
         } else {
             onScreenTextInput.selectedIndex = 0;
         }
-        onScreenTextInput.x = x-6;
+        onScreenTextInput.x = x - 6;
         onScreenTextInput.y = y - 12;
         onScreenTextInput.color = color;
         inputState.osTextInputMouseX = Gdx.input.getX();
         inputState.openOnScreenTextInput = onScreenTextInput;
     }
-    public void closeOnScreenTextInput(){
+
+    public void closeOnScreenTextInput() {
         inputState.openOnScreenTextInput = null;
     }
 
@@ -2501,7 +2505,8 @@ public class API {
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for (ContextMenuItem contextMenuItem : contextMenuItems) addContextMenuItem(contextMenu, contextMenuItem);
+            for (ContextMenuItem contextMenuItem : contextMenuItems)
+                addContextMenuItem(contextMenu, contextMenuItem);
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -3202,7 +3207,8 @@ public class API {
             }
             for (GameViewPort gameViewPort : inputState.gameViewPorts) {
                 setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
-                if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) return true;
+                if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f))
+                    return true;
             }
             return false;
         }
