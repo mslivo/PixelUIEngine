@@ -1173,10 +1173,10 @@ public class UIEngine<T extends UIAdapter> {
         switch (inputState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
-                if (deltaX > 12) {
+                if (deltaX > 6) {
                     scrollDirection = 1;
                     inputState.mTextInputMouseX = Gdx.input.getX();
-                } else if (deltaX < -12) {
+                } else if (deltaX < -6) {
                     scrollDirection = -1;
                     inputState.mTextInputMouseX = Gdx.input.getX();
                 }
@@ -2245,14 +2245,14 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase, false);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - ((i *i)/2), onScreenTextInput.upperCase, false);
             }
         }
         // Right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - (i * 1 * (i * 1)), onScreenTextInput.upperCase, false);
+                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - ((i *i)/2), onScreenTextInput.upperCase, false);
             }
         }
 
@@ -2274,7 +2274,8 @@ public class UIEngine<T extends UIAdapter> {
         if (c == '\b') {
             render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
         } else {
-            render_drawFont(font, String.valueOf(c), 1.0f, x + 2, y + 2);
+            int offset = pressed ? 1 : 0;
+            render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2-offset);
         }
     }
 

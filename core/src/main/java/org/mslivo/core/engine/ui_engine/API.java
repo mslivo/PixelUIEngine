@@ -1496,7 +1496,7 @@ public class API {
                 null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
+                config.defaultFont, Tools.Colors.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm) {
@@ -1504,7 +1504,7 @@ public class API {
                 onConfirm, null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
+                config.defaultFont, Tools.Colors.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter) {
@@ -1512,7 +1512,7 @@ public class API {
                 onConfirm, selectedCharacter,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
+                config.defaultFont, Tools.Colors.BLACK);
     }
 
 
@@ -1521,7 +1521,7 @@ public class API {
                 selectedCharacter,
                 charactersLC,
                 charactersUC,
-                config.mouseTextInputDefaultFont, Tools.Colors.BLACK);
+                config.defaultFont, Tools.Colors.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
@@ -1644,9 +1644,6 @@ public class API {
                 'X', 'Y', 'Z',
                 '!', '?', '.'
                 , '\t', '\b', '\n'};
-
-
-        private CMediaFont mouseTextInputDefaultFont = GUIBaseMedia.FONT_BLACK;
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -2096,14 +2093,6 @@ public class API {
             this.defaultUpperCaseCharacters = defaultUpperCaseCharacters;
         }
 
-        public CMediaFont getMouseTextInputDefaultFont() {
-            return mouseTextInputDefaultFont;
-        }
-
-        public void setMouseTextInputDefaultFont(CMediaFont mouseTextInputDefaultFont) {
-            this.mouseTextInputDefaultFont = mouseTextInputDefaultFont;
-        }
-
         public _Config() {
             this.textFieldDefaultAllowedCharacters.addAll(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -2200,7 +2189,6 @@ public class API {
 
             setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());
             setDefaultUpperCaseCharacters(config.getDefaultUpperCaseCharacters());
-            setMouseTextInputDefaultFont(config.getMouseTextInputDefaultFont());
         }
 
 
