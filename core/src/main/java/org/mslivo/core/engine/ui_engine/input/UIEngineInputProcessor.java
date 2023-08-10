@@ -180,7 +180,9 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
             return KeyCode.GamePad.START;
         } else if (button == mapping.buttonBack) {
             return KeyCode.GamePad.BACK;
-        } else {
+        } else if (button == 5){
+            return KeyCode.GamePad.HOME;
+        }else {
             return -1;
         }
     }
