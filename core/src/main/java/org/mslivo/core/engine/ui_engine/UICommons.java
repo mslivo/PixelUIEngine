@@ -304,7 +304,6 @@ class UICommons {
 
     static void textField_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
         textField.markerPosition = Tools.Calc.inBounds(position, 0, textField.content.length());
-
         if (textField.markerPosition < textField.offset) {
             while (textField.markerPosition < textField.offset) {
                 textField.offset--;
@@ -338,7 +337,7 @@ class UICommons {
     static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        component_setReferences(component, inputState);
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
         component.addedToWindow = window;
         window.components.add(component);
         resetGUITemporaryReferences(inputState);
@@ -347,7 +346,7 @@ class UICommons {
     static void component_addToScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        component_setReferences(component, inputState);
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
         resetGUITemporaryReferences(inputState);
@@ -357,7 +356,8 @@ class UICommons {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
         if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
-        component_removeReferences(component, inputState);
+        if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
         component.addedToScreen = true;
         inputState.screenComponents.remove(component);
         resetGUITemporaryReferences(inputState);
@@ -367,21 +367,11 @@ class UICommons {
         if (component.addedToWindow != window) return;
         if (component.addedToScreen) return;
         if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
-        component_removeReferences(component, inputState);
+        if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
+        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
         component.addedToWindow = null;
         component.addedToWindow.components.remove(component);
         resetGUITemporaryReferences(inputState);
-    }
-
-
-    private static void component_setReferences(Component component, InputState inputState) {
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
-    }
-
-    private static void component_removeReferences(Component component, InputState inputState) {
-        if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
-        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
     }
 
 
