@@ -159,8 +159,7 @@ public class InputState {
 
     public OnScreenTextInput openMouseTextInput;
     public int mTextInputMouseX;
-    public boolean mTextInputConfirmPressed;
-    public boolean mTextInputChangeCasePressed;
+    public boolean mTextInputConfirmPressed, mTextInputChangeCasePressed,mTextInputDeletePressed;
     public boolean mTextInputKeyBoardGamePadLeft;
     public boolean mTextInputKeyBoardGamePadRight;
     public int mTextInputScrollTimer;

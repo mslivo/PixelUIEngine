@@ -180,6 +180,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.displayedContextMenuWidth = 0;
         newInputState.openMouseTextInput = null;
         newInputState.mTextInputConfirmPressed = false;
+        newInputState.mTextInputChangeCasePressed = false;
+        newInputState.mTextInputDeletePressed = false;
         newInputState.mTextInputKeyBoardGamePadLeft = false;
         newInputState.mTextInputKeyBoardGamePadRight = false;
         newInputState.mTextInputScrollTimer = 0;
@@ -1172,6 +1174,7 @@ public class UIEngine<T extends UIAdapter> {
         int scrollDirection = 0;
         boolean confirmPressed = false;
         boolean changeCasePressed = false;
+        boolean deletePressed = false;
         boolean leftKeyBoardGamePad = false;
         boolean rightKeyBoardGamePad = false;
         switch (inputState.currentControlMode) {
@@ -1187,7 +1190,6 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.inputEvents.mouseDown) {
                     int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
                     int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
-
                     if(indexOfLeft != -1){
                         // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
@@ -1216,19 +1218,31 @@ public class UIEngine<T extends UIAdapter> {
                     if(indexOfRight != -1){
                         // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(indexOfRight);
-                        // Translate
                         inputState.mTextInputTranslatedMouse2Down = false;
                     }
                     inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size() > 0;
                 }
                 confirmPressed = inputState.mTextInputTranslatedMouse1Down;
-                changeCasePressed = inputState.mTextInputTranslatedMouse2Down;
+                deletePressed = inputState.mTextInputTranslatedMouse2Down;
+                // Change Case
+                if(inputState.inputEvents.mouseScrolled){
+                    if(inputState.inputEvents.mouseScrolledAmount > 0 && onScreenTextInput.upperCase) changeCasePressed = true;
+                    if(inputState.inputEvents.mouseScrolledAmount < 0 && !onScreenTextInput.upperCase) changeCasePressed = true;
+                    inputState.inputEvents.mouseScrolled = false;
+                    inputState.inputEvents.mouseScrolledAmount = 0f;
+                }
+
             }
             case KEYBOARD -> {
                 leftKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsLeft());
                 rightKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsRight());
                 confirmPressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
-                changeCasePressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse2());
+                deletePressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse2());
+                if(isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollUp())){
+                    changeCasePressed = !onScreenTextInput.upperCase;
+                }else if(isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollDown())){
+                    changeCasePressed = onScreenTextInput.upperCase;
+                }
             }
             case GAMEPAD -> {
                 boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
@@ -1237,7 +1251,12 @@ public class UIEngine<T extends UIAdapter> {
                 leftKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
                 rightKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
                 confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
-                changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
+                deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
+                if(isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollUp())){
+                    changeCasePressed = !onScreenTextInput.upperCase;
+                }else if(isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollDown())){
+                    changeCasePressed = onScreenTextInput.upperCase;
+                }
             }
         }
 
@@ -1293,18 +1312,27 @@ public class UIEngine<T extends UIAdapter> {
 
         // Confirm Character / Change Case
         boolean confirmCharacter = false;
+        boolean changeCase = false;
+        boolean deleteCharacter = false;
         if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
         if(!confirmPressed && inputState.mTextInputConfirmPressed){
             confirmCharacter = true;
             inputState.mTextInputConfirmPressed = false;
         }
-        boolean changeCase = false;
+
         if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
         if(!changeCasePressed && inputState.mTextInputChangeCasePressed){
+            confirmCharacter = true;
             changeCase = true;
             inputState.mTextInputChangeCasePressed = false;
         }
 
+        if (deletePressed && !inputState.mTextInputDeletePressed) inputState.mTextInputDeletePressed = true;
+        if(!deletePressed && inputState.mTextInputDeletePressed){
+            confirmCharacter = true;
+            deleteCharacter = true;
+            inputState.mTextInputDeletePressed = false;
+        }
 
         // Set Index
         if (inputState.inputEvents.keyTyped) {
@@ -1326,8 +1354,15 @@ public class UIEngine<T extends UIAdapter> {
             onScreenTextInput.selectedIndex = Tools.Calc.inBounds(onScreenTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
 
-        if (confirmCharacter) {
-            char c = characters[onScreenTextInput.selectedIndex];
+        if(confirmCharacter){
+            char c;
+            if(changeCase){
+                c = '\t';
+            }else if(deleteCharacter){
+                c = '\b';
+            }else{
+                c = characters[onScreenTextInput.selectedIndex];
+            }
             switch (c) {
                 case '\b' -> {
                     inputState.inputEvents.keyTyped = true;
@@ -1343,15 +1378,14 @@ public class UIEngine<T extends UIAdapter> {
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
+                    if (onScreenTextInput.confirmAction != null) onScreenTextInput.confirmAction.onEnterCharacter(c);
                 }
             }
-            if (onScreenTextInput.confirmAction != null) {
-                onScreenTextInput.confirmAction.onEnterCharacter(c);
-            }
+
+
         }
-        if(changeCase){
-            onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
-        }
+
+
 
         return;
     }

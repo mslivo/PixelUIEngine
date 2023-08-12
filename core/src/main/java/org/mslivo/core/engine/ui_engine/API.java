@@ -1587,7 +1587,7 @@ public class API {
         private int[] keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
         private int[] keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
         private int[] keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.CONTROL_RIGHT};
-        private int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.UNKNOWN};
+        private int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.TAB};
         private int[] keyboardMouseButtonsMouse4 = new int[]{KeyCode.Key.UNKNOWN};
         private int[] keyboardMouseButtonsMouse5 = new int[]{KeyCode.Key.UNKNOWN};
         private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
@@ -1601,8 +1601,8 @@ public class API {
         private int[] gamePadMouseButtonsMouse3 = new int[]{KeyCode.GamePad.X};
         private int[] gamePadMouseButtonsMouse4 = new int[]{KeyCode.GamePad.Y};
         private int[] gamePadMouseButtonsMouse5 = new int[]{};
-        private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.L1};
-        private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.L2};
+        private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
+        private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
 
         private float simulatedMouseCursorSpeed = 4.0f;
 
