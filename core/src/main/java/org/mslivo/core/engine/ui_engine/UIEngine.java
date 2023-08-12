@@ -1378,11 +1378,10 @@ public class UIEngine<T extends UIAdapter> {
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
-                    if (onScreenTextInput.confirmAction != null) onScreenTextInput.confirmAction.onEnterCharacter(c);
+
                 }
             }
-
-
+            if (onScreenTextInput.confirmAction != null) onScreenTextInput.confirmAction.onEnterCharacter(c);
         }
 
 
