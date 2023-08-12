@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputConfirmAction;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
@@ -260,9 +260,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
                     api.openMouseTextInput(
                             api.components.getAbsoluteX(osKeyBoardTextInput),
                             api.components.getAbsoluteY(osKeyBoardTextInput)
-                            , new MouseTextInputConfirmAction() {
+                            , new MouseTextInputAction() {
                                 @Override
-                                public boolean confirmPressed() {
+                                public boolean onConfirm() {
                                     api.components.textField.unFocus(osKeyBoardTextInput);
                                     return true;
                                 }

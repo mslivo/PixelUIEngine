@@ -49,7 +49,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputConfirmAction;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
@@ -1490,8 +1490,8 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    private MouseTextInputConfirmAction defaultMouseTextInputConfirmAction() {
-        return new MouseTextInputConfirmAction() {
+    private MouseTextInputAction defaultMouseTextInputConfirmAction() {
+        return new MouseTextInputAction() {
         };
     }
 
@@ -1503,7 +1503,7 @@ public class API {
                 config.defaultFont, Tools.Colors.BLACK);
     }
 
-    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm) {
+    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm) {
         openMouseTextInput(x, y,
                 onConfirm, null,
                 config.defaultLowerCaseCharacters,
@@ -1511,7 +1511,7 @@ public class API {
                 config.defaultFont, Tools.Colors.BLACK);
     }
 
-    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter) {
+    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
         openMouseTextInput(x, y,
                 onConfirm, selectedCharacter,
                 config.defaultLowerCaseCharacters,
@@ -1520,7 +1520,7 @@ public class API {
     }
 
 
-    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
         openMouseTextInput(x, y, onConfirm,
                 selectedCharacter,
                 charactersLC,
@@ -1528,7 +1528,7 @@ public class API {
                 config.defaultFont, Tools.Colors.BLACK);
     }
 
-    public void openMouseTextInput(int x, int y, MouseTextInputConfirmAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
         if (inputState.openMouseTextInput != null) return;
         // Check for Length and ISO Control Except special characters
@@ -1547,7 +1547,7 @@ public class API {
         onScreenTextInput.charactersLC = charactersLC;
         onScreenTextInput.charactersUC = charactersUC;
         onScreenTextInput.font = font;
-        onScreenTextInput.confirmAction = onConfirm;
+        onScreenTextInput.mouseTextInputAction = onConfirm;
         onScreenTextInput.upperCase = false;
         if (selectedCharacter != null) {
             for (int i = 0; i < maxCharacters; i++) {

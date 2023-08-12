@@ -1367,21 +1367,23 @@ public class UIEngine<T extends UIAdapter> {
                 case '\b' -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add('\b');
+                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onDelete();
                 }
                 case '\t' -> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
+                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onChangeCase();
                 }
                 case '\n' -> {
-                    boolean close = onScreenTextInput.confirmAction != null ? onScreenTextInput.confirmAction.confirmPressed() : true;
+                    boolean close = onScreenTextInput.mouseTextInputAction != null ? onScreenTextInput.mouseTextInputAction.onConfirm() : true;
                     inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
                 }
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
-
+                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onEnterCharacter(c);
                 }
             }
-            if (onScreenTextInput.confirmAction != null) onScreenTextInput.confirmAction.onEnterCharacter(c);
+
         }
 
 

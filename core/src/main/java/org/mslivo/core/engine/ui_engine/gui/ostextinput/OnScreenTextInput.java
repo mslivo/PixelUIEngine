@@ -18,7 +18,7 @@ public class OnScreenTextInput {
     public CMediaFont font;
     public int selectedIndex;
     public boolean upperCase;
-    public MouseTextInputConfirmAction confirmAction;
+    public MouseTextInputAction mouseTextInputAction;
 
     public FColor color;
 }
