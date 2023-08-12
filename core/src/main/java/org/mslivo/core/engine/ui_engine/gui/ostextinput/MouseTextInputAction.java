@@ -9,7 +9,7 @@ public interface MouseTextInputAction {
 
     default void onEnterCharacter(char c){return;}
 
-    default void onChangeCase(){return;}
+    default void onChangeCase(boolean upperCase){return;}
     default void onDelete(){return;}
 
 }

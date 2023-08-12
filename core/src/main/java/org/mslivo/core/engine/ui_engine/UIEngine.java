@@ -1371,7 +1371,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case '\t' -> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
-                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onChangeCase();
+                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onChangeCase(onScreenTextInput.upperCase);
                 }
                 case '\n' -> {
                     boolean close = onScreenTextInput.mouseTextInputAction != null ? onScreenTextInput.mouseTextInputAction.onConfirm() : true;
