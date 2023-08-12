@@ -178,12 +178,13 @@ class UICommons {
         // OnScreen Keyboard
         inputState.openMouseTextInput = null;
         inputState.mTextInputConfirmPressed = false;
+        inputState.mTextInputChangeCasePressed = false;
         inputState.mTextInputKeyBoardGamePadLeft = false;
         inputState.mTextInputKeyBoardGamePadRight = false;
         inputState.mTextInputScrollTimer = 0;
         inputState.mTextInputScrollTime = 0;
         inputState.mTextInputScrollSpeed = 0;
-        inputState.mTextInputTranslatedMouseLeftDown = false;
+        inputState.mTextInputTranslatedMouse1Down = false;
         inputState.mTextInputUnlock = false;
     }
 
