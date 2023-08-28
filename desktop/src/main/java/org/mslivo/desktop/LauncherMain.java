@@ -18,6 +18,7 @@ public class LauncherMain {
 
         config.setResizable(true);
         config.setWindowedMode(ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight);
+        config.setWindowSizeLimits(ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight, -1,-1);
         config.setTitle(appTitle);
         config.setDecorated(true);
         config.setMaximized(true);
