@@ -1924,9 +1924,9 @@ public class UIEngine<T extends UIAdapter> {
     private void updateHardwareMouseControl() {
         // --- GUI CURSOR ---
         // ScreenCursor To WorldCursor
-        inputState.vector2_unproject.x = Tools.Calc.inBounds(Gdx.input.getX(), 0, Gdx.graphics.getWidth());
-        ;
-        inputState.vector2_unproject.y = Tools.Calc.inBounds(Gdx.input.getY(), 0, Gdx.graphics.getHeight());
+        inputState.vector2_unproject.x = Gdx.input.getX();
+        inputState.vector2_unproject.y = Gdx.input.getY();
+
         inputState.viewport_screen.unproject(inputState.vector2_unproject);
         // WorldCursor to  FBOCursor
         inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
@@ -1937,8 +1937,8 @@ public class UIEngine<T extends UIAdapter> {
         // Set to final
         inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x - inputState.mouse_gui.x;
         inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y - inputState.mouse_gui.y;
-        inputState.mouse_gui.x = (int) inputState.vector_fboCursor.x;
-        inputState.mouse_gui.y = (int) inputState.vector_fboCursor.y;
+        inputState.mouse_gui.x = Tools.Calc.inBounds((int) inputState.vector_fboCursor.x,0,inputState.internalResolutionWidth);
+        inputState.mouse_gui.y = Tools.Calc.inBounds((int) inputState.vector_fboCursor.y,0,inputState.internalResolutionHeight);
     }
 
     private void updateLastGUIMouseHover() {
