@@ -1416,59 +1416,72 @@ public class UIEngine<T extends UIAdapter> {
         boolean keyboardMouse = api.config.isKeyboardMouseEnabled();
         boolean gamePadMouse = api.config.isGamePadMouseEnabled();
 
+        MouseControlMode nextControlMode = null;
+
         if (!hardwareMouse && !keyboardMouse && !gamePadMouse) {
-            inputState.currentControlMode = MouseControlMode.DISABLED;
+            nextControlMode = MouseControlMode.DISABLED;
         } else {
             if (hardwareMouse && !keyboardMouse && !gamePadMouse) {
-                inputState.currentControlMode = MouseControlMode.HARDWARE_MOUSE;
+                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
             } else if (keyboardMouse && !gamePadMouse && !hardwareMouse) {
-                inputState.currentControlMode = MouseControlMode.KEYBOARD;
+                nextControlMode = MouseControlMode.KEYBOARD;
             } else if (gamePadMouse && !hardwareMouse && !keyboardMouse) {
-                inputState.currentControlMode = MouseControlMode.GAMEPAD;
+                nextControlMode = MouseControlMode.GAMEPAD;
             } else {
                 switch (inputState.currentControlMode) {
                     case HARDWARE_MOUSE -> {
                         if (keyboardMouse) {
-                            if (keyboardMouseDetectUse()) {
-                                inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
-                                inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
-                                inputState.currentControlMode = MouseControlMode.KEYBOARD;
-                            }
+                            if (keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
                         }
                         if (gamePadMouse) {
-                            if (gamePadMouseDetectUse()) {
-                                inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
-                                inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
-                                inputState.currentControlMode = MouseControlMode.GAMEPAD;
-                            }
+                            if (gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
                         }
                     }
                     case KEYBOARD -> {
                         if (hardwareMouse) {
                             if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
-                                inputState.currentControlMode = MouseControlMode.HARDWARE_MOUSE;
+                                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
                             }
                         }
                         if (gamePadMouse) {
                             if (gamePadMouseDetectUse()) {
-                                inputState.currentControlMode = MouseControlMode.GAMEPAD;
+                                nextControlMode = MouseControlMode.GAMEPAD;
                             }
                         }
                     }
                     case GAMEPAD -> {
                         if (hardwareMouse) {
                             if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
-                                inputState.currentControlMode = MouseControlMode.HARDWARE_MOUSE;
+                                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
                             }
                         }
                         if (keyboardMouse) {
                             if (keyboardMouseDetectUse()) {
-                                inputState.currentControlMode = MouseControlMode.KEYBOARD;
+                                nextControlMode = MouseControlMode.KEYBOARD;
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Set Next ControlMode
+        if(nextControlMode != null && nextControlMode != inputState.currentControlMode){
+            switch (inputState.currentControlMode){
+                case HARDWARE_MOUSE -> {
+                    inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
+                    inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
+                }
+                case KEYBOARD -> {
+                    for(int i= 0; i < inputState.keyBoardTranslatedKeysDown.length;i++) inputState.keyBoardTranslatedKeysDown[i] = false;
+                }
+                case GAMEPAD -> {
+                    for(int i= 0; i < inputState.gamePadTranslatedButtonsDown.length;i++) inputState.gamePadTranslatedButtonsDown[i] = false;
+                    inputState.gamePadTranslatedStickLeft.set(0f,0f);
+                    inputState.gamePadTranslatedStickRight.set(0f,0f);
+                }
+            }
+            inputState.currentControlMode = nextControlMode;
         }
     }
 
