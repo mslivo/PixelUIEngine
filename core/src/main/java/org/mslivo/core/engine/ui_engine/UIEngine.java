@@ -291,7 +291,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
-                TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
+              TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size(); ic++) {
                     Character keyTypedCharacter = inputState.inputEvents.keyTypedCharacters.get(ic);
                     if (keyTypedCharacter == '\b') { // BACKSPACE
@@ -309,7 +309,11 @@ public class UIEngine<T extends UIAdapter> {
                             if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                         }
-                    } else {
+                    } else if (keyTypedCharacter == '\n') { // Enter
+                        UICommons.textField_unFocus(inputState, focusedTextField);
+                        if (focusedTextField.textFieldAction != null)
+                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
+                    } else  {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
                             UICommons.textField_setContent(focusedTextField, newContent);
@@ -338,10 +342,6 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.content.length());
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
-                    } else if (keyDownKeyCode == Input.Keys.ENTER) {
-                        UICommons.textField_unFocus(inputState, focusedTextField);
-                        if (focusedTextField.textFieldAction != null)
-                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                     }
                 }
 
@@ -1190,14 +1190,14 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.inputEvents.mouseDown) {
                     int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
                     int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
-                    if(indexOfLeft != -1){
+                    if (indexOfLeft != -1) {
                         // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
                         inputState.inputEvents.mouseDownButtons.remove(indexOfLeft);
                         // Translate
                         inputState.mTextInputTranslatedMouse1Down = true;
                     }
-                    if(indexOfRight != -1){
+                    if (indexOfRight != -1) {
                         // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.RIGHT] = false;
                         inputState.inputEvents.mouseDownButtons.remove(indexOfRight);
@@ -1209,13 +1209,13 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.inputEvents.mouseUp) {
                     int indexOfLeft = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.LEFT);
                     int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
-                    if(indexOfLeft != -1){
+                    if (indexOfLeft != -1) {
                         // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(indexOfLeft);
                         // Translate
                         inputState.mTextInputTranslatedMouse1Down = false;
                     }
-                    if(indexOfRight != -1){
+                    if (indexOfRight != -1) {
                         // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(indexOfRight);
                         inputState.mTextInputTranslatedMouse2Down = false;
@@ -1225,9 +1225,11 @@ public class UIEngine<T extends UIAdapter> {
                 confirmPressed = inputState.mTextInputTranslatedMouse1Down;
                 deletePressed = inputState.mTextInputTranslatedMouse2Down;
                 // Change Case
-                if(inputState.inputEvents.mouseScrolled){
-                    if(inputState.inputEvents.mouseScrolledAmount > 0 && onScreenTextInput.upperCase) changeCasePressed = true;
-                    if(inputState.inputEvents.mouseScrolledAmount < 0 && !onScreenTextInput.upperCase) changeCasePressed = true;
+                if (inputState.inputEvents.mouseScrolled) {
+                    if (inputState.inputEvents.mouseScrolledAmount > 0 && onScreenTextInput.upperCase)
+                        changeCasePressed = true;
+                    if (inputState.inputEvents.mouseScrolledAmount < 0 && !onScreenTextInput.upperCase)
+                        changeCasePressed = true;
                     inputState.inputEvents.mouseScrolled = false;
                     inputState.inputEvents.mouseScrolledAmount = 0f;
                 }
@@ -1238,9 +1240,9 @@ public class UIEngine<T extends UIAdapter> {
                 rightKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsRight());
                 confirmPressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse2());
-                if(isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollUp())){
+                if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollUp())) {
                     changeCasePressed = !onScreenTextInput.upperCase;
-                }else if(isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollDown())){
+                } else if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollDown())) {
                     changeCasePressed = onScreenTextInput.upperCase;
                 }
             }
@@ -1252,9 +1254,9 @@ public class UIEngine<T extends UIAdapter> {
                 rightKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
                 confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
-                if(isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollUp())){
+                if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollUp())) {
                     changeCasePressed = !onScreenTextInput.upperCase;
-                }else if(isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollDown())){
+                } else if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollDown())) {
                     changeCasePressed = onScreenTextInput.upperCase;
                 }
             }
@@ -1315,20 +1317,20 @@ public class UIEngine<T extends UIAdapter> {
         boolean changeCase = false;
         boolean deleteCharacter = false;
         if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
-        if(!confirmPressed && inputState.mTextInputConfirmPressed){
+        if (!confirmPressed && inputState.mTextInputConfirmPressed) {
             confirmCharacter = true;
             inputState.mTextInputConfirmPressed = false;
         }
 
         if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
-        if(!changeCasePressed && inputState.mTextInputChangeCasePressed){
+        if (!changeCasePressed && inputState.mTextInputChangeCasePressed) {
             confirmCharacter = true;
             changeCase = true;
             inputState.mTextInputChangeCasePressed = false;
         }
 
         if (deletePressed && !inputState.mTextInputDeletePressed) inputState.mTextInputDeletePressed = true;
-        if(!deletePressed && inputState.mTextInputDeletePressed){
+        if (!deletePressed && inputState.mTextInputDeletePressed) {
             confirmCharacter = true;
             deleteCharacter = true;
             inputState.mTextInputDeletePressed = false;
@@ -1350,28 +1352,30 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
             }
-        }else if(scrollDirection != 0) {
+        } else if (scrollDirection != 0) {
             onScreenTextInput.selectedIndex = Tools.Calc.inBounds(onScreenTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
 
-        if(confirmCharacter){
+        if (confirmCharacter) {
             char c;
-            if(changeCase){
+            if (changeCase) {
                 c = '\t';
-            }else if(deleteCharacter){
+            } else if (deleteCharacter) {
                 c = '\b';
-            }else{
+            } else {
                 c = characters[onScreenTextInput.selectedIndex];
             }
             switch (c) {
                 case '\b' -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add('\b');
-                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onDelete();
+                    if (onScreenTextInput.mouseTextInputAction != null)
+                        onScreenTextInput.mouseTextInputAction.onDelete();
                 }
                 case '\t' -> {
                     onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
-                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onChangeCase(onScreenTextInput.upperCase);
+                    if (onScreenTextInput.mouseTextInputAction != null)
+                        onScreenTextInput.mouseTextInputAction.onChangeCase(onScreenTextInput.upperCase);
                 }
                 case '\n' -> {
                     boolean close = onScreenTextInput.mouseTextInputAction != null ? onScreenTextInput.mouseTextInputAction.onConfirm() : true;
@@ -1380,12 +1384,12 @@ public class UIEngine<T extends UIAdapter> {
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
-                    if (onScreenTextInput.mouseTextInputAction != null) onScreenTextInput.mouseTextInputAction.onEnterCharacter(c);
+                    if (onScreenTextInput.mouseTextInputAction != null)
+                        onScreenTextInput.mouseTextInputAction.onEnterCharacter(c);
                 }
             }
 
         }
-
 
 
         return;
@@ -1466,19 +1470,21 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Set Next ControlMode
-        if(nextControlMode != null && nextControlMode != inputState.currentControlMode){
-            switch (inputState.currentControlMode){
+        if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
+            switch (inputState.currentControlMode) {
                 case HARDWARE_MOUSE -> {
                     inputState.simulatedMousePositionBefore.x = Gdx.input.getX();
                     inputState.simulatedMousePositionBefore.y = Gdx.input.getY();
                 }
                 case KEYBOARD -> {
-                    for(int i= 0; i < inputState.keyBoardTranslatedKeysDown.length;i++) inputState.keyBoardTranslatedKeysDown[i] = false;
+                    for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
+                        inputState.keyBoardTranslatedKeysDown[i] = false;
                 }
                 case GAMEPAD -> {
-                    for(int i= 0; i < inputState.gamePadTranslatedButtonsDown.length;i++) inputState.gamePadTranslatedButtonsDown[i] = false;
-                    inputState.gamePadTranslatedStickLeft.set(0f,0f);
-                    inputState.gamePadTranslatedStickRight.set(0f,0f);
+                    for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
+                        inputState.gamePadTranslatedButtonsDown[i] = false;
+                    inputState.gamePadTranslatedStickLeft.set(0f, 0f);
+                    inputState.gamePadTranslatedStickRight.set(0f, 0f);
                 }
             }
             inputState.currentControlMode = nextControlMode;
@@ -1950,8 +1956,8 @@ public class UIEngine<T extends UIAdapter> {
         // Set to final
         inputState.mouse_delta.x = (int) inputState.vector_fboCursor.x - inputState.mouse_gui.x;
         inputState.mouse_delta.y = (int) inputState.vector_fboCursor.y - inputState.mouse_gui.y;
-        inputState.mouse_gui.x = Tools.Calc.inBounds((int) inputState.vector_fboCursor.x,0,inputState.internalResolutionWidth);
-        inputState.mouse_gui.y = Tools.Calc.inBounds((int) inputState.vector_fboCursor.y,0,inputState.internalResolutionHeight);
+        inputState.mouse_gui.x = Tools.Calc.inBounds((int) inputState.vector_fboCursor.x, 0, inputState.internalResolutionWidth);
+        inputState.mouse_gui.y = Tools.Calc.inBounds((int) inputState.vector_fboCursor.y, 0, inputState.internalResolutionHeight);
     }
 
     private void updateLastGUIMouseHover() {
