@@ -256,6 +256,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextField osKeyBoardTextInput = api.components.textField.create(18, 13, 10, "", null, 128);
         api.components.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
             @Override
+            public void onEnter(String content, boolean valid) {
+                api.closeMouseTextInput();
+            }
+
+            @Override
             public void onFocus() {
                     api.openMouseTextInput(
                             api.components.getAbsoluteX(osKeyBoardTextInput),
@@ -268,7 +273,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                 }
                             },null
                             );
-
+                    api.components.textField.setMarkerPosition(osKeyBoardTextInput, osKeyBoardTextInput.content.length());
             }
         });
 

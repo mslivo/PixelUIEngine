@@ -291,7 +291,7 @@ public class UIEngine<T extends UIAdapter> {
 
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
-              TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
+                TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size(); ic++) {
                     Character keyTypedCharacter = inputState.inputEvents.keyTypedCharacters.get(ic);
                     if (keyTypedCharacter == '\b') { // BACKSPACE
@@ -310,10 +310,10 @@ public class UIEngine<T extends UIAdapter> {
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                         }
                     } else if (keyTypedCharacter == '\n') { // Enter
-                        UICommons.textField_unFocus(inputState, focusedTextField);
                         if (focusedTextField.textFieldAction != null)
                             focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
-                    } else  {
+                        UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
+                    } else {
                         if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
                             UICommons.textField_setContent(focusedTextField, newContent);
@@ -607,30 +607,28 @@ public class UIEngine<T extends UIAdapter> {
 
                     } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
                         TextField textField = (TextField) inputState.lastGUIMouseHover;
-
-                        // Set Focus
-                        UICommons.textField_focus(inputState, textField);
                         // Set Marker to mouse position
-                        int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(inputState.focusedTextField);
-                        char[] fieldContent = inputState.focusedTextField.content.substring(inputState.focusedTextField.offset).toCharArray();
+                        int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
+                        char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
                         String testString = "";
                         boolean found = false;
                         charLoop:
                         for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
-                            if (mediaManager.textWidth(inputState.focusedTextField.font, testString) > mouseX) {
-                                UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField,
-                                        inputState.focusedTextField.offset + i);
+                            if (mediaManager.textWidth(textField.font, testString) > mouseX) {
+                                UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                        textField.offset + i);
                                 found = true;
                                 break charLoop;
                             }
                         }
                         if (!found) {
                             // Set to end
-                            UICommons.textField_setMarkerPosition(mediaManager, inputState.focusedTextField,
-                                    inputState.focusedTextField.offset + fieldContent.length);
+                            UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                    textField.offset + fieldContent.length);
                         }
-
+                        // Set Focus
+                        UICommons.textField_focus(inputState, textField);
                     } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
                         Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
                         int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
@@ -1434,36 +1432,19 @@ public class UIEngine<T extends UIAdapter> {
             } else {
                 switch (inputState.currentControlMode) {
                     case HARDWARE_MOUSE -> {
-                        if (keyboardMouse) {
-                            if (keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
-                        }
-                        if (gamePadMouse) {
-                            if (gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
-                        }
+                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
+                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
                     }
                     case KEYBOARD -> {
-                        if (hardwareMouse) {
-                            if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
-                                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
-                            }
-                        }
-                        if (gamePadMouse) {
-                            if (gamePadMouseDetectUse()) {
-                                nextControlMode = MouseControlMode.GAMEPAD;
-                            }
-                        }
+                        if (hardwareMouse && (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y))
+                            nextControlMode = MouseControlMode.HARDWARE_MOUSE;
+
+                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
                     }
                     case GAMEPAD -> {
-                        if (hardwareMouse) {
-                            if (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y) {
-                                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
-                            }
-                        }
-                        if (keyboardMouse) {
-                            if (keyboardMouseDetectUse()) {
-                                nextControlMode = MouseControlMode.KEYBOARD;
-                            }
-                        }
+                        if (hardwareMouse && (Gdx.input.getX() != inputState.simulatedMousePositionBefore.x || Gdx.input.getY() != inputState.simulatedMousePositionBefore.y))
+                            nextControlMode = MouseControlMode.HARDWARE_MOUSE;
+                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
                     }
                 }
             }
