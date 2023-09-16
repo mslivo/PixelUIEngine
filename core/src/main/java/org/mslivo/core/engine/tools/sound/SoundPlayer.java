@@ -124,8 +124,8 @@ public class SoundPlayer {
     }
 
     public void shutdown() {
-        playedSounds.clear();
         stopAllSounds();
+        playedSounds.clear();
     }
 
 }
