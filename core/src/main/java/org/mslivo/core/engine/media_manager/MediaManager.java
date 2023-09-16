@@ -124,7 +124,7 @@ public class MediaManager {
         for (int i = 0; i < imageData.size(); i++) {
             CMedia imageMedia = imageData.get(i);
             String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
-            Texture texture = new Texture(Tools.File.findResource(DIR_GRAPHICS + textureFileName), false);
+            Texture texture = new Texture(Tools.File.findResource(textureFileName), false);
             TextureData textureData = texture.getTextureData();
             textureData.prepare();
             pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
@@ -163,7 +163,7 @@ public class MediaManager {
                 medias_animations.put(cMediaAnimation, animation);
             } else if (imageMedia.getClass() == CMediaFont.class) {
                 CMediaFont cMediaFont = (CMediaFont) imageMedia;
-                BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(DIR_GRAPHICS + cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
+                BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
                 medias_fonts.put(cMediaFont, bitmapFont);
             }
 
@@ -178,13 +178,13 @@ public class MediaManager {
             if (soundMedia.getClass() == CMediaSound.class) {
                 if (!loadedMediaList.contains(soundMedia.file)) {
                     CMediaSound cMediaSound = (CMediaSound) soundMedia;
-                    Sound sound = Gdx.audio.newSound(Tools.File.findResource(DIR_SOUND_FX + cMediaSound.file));
+                    Sound sound = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
                     medias_sounds.put(cMediaSound, sound);
                 }
             } else if (soundMedia.getClass() == CMediaMusic.class) {
                 if (!loadedMediaList.contains(soundMedia.file)) {
                     CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
-                    Music music = Gdx.audio.newMusic(Tools.File.findResource(DIR_MUSIC + soundMedia.file));
+                    Music music = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
                     medias_music.put(cMediaMusic, music);
                 }
             }
