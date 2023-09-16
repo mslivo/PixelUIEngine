@@ -246,7 +246,7 @@ public class MusicPlayer {
     }
 
     public void shutdown(){
-        this.stop();
+        if(playCurrent.isPlaying()) playCurrent.stop();
         this.playCurrent = null;
         this.mediaManager = null;
         this.playlist.clear();
