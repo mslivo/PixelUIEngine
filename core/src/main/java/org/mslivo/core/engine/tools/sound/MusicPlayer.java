@@ -168,6 +168,7 @@ public class MusicPlayer {
 
                         CMediaMusic nextTrack = playlist.get(playListPosition);
                         playCurrent = mediaManager.getCMediaMusic(nextTrack);
+                        playCurrent.play();
                         if(playCurrent != null) {
                             playCurrentFileName = nextTrack.file;
                             playCurrent.setVolume(volume);
