@@ -16,64 +16,44 @@ public class SoundPlayer {
 
     private final MediaManager mediaManager;
 
-    private float muteVolume;
-
-    private boolean muted;
-
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
     }
     public SoundPlayer(MediaManager mediaManager, int range2D) {
         this.mediaManager = mediaManager;
         this.volume = 1f;
-        this.muted = false;
-        this.muteVolume = 0;
         setRange2D(range2D);
     }
 
     public float volume() {
-        return this.muted ? this.muteVolume : volume;
+        return volume;
     }
 
     public void setVolume(float volume) {
-        if(this.muted){
-            this.muteVolume = Tools.Calc.inBounds(volume, 0f, 1f);
-        }else{
-            this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
-        }
+        this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
     }
 
     private void setRange2D(int range2D) {
         this.range = Tools.Calc.lowerBounds(range2D, 1);
     }
 
-    private boolean isMutedOrVolumeZero(float volume){
-        if(this.muted) return true;
-        return (volume*this.volume) <= 0;
-    }
-
     public long playSound(CMediaSound cMediaSound, float volume, float pan, float pitch) {
-        if(isMutedOrVolumeZero(volume)) return -1;
         return mediaManager.playCMediaSound(cMediaSound, volume * this.volume, pan, pitch);
     }
 
     public long playSound(CMediaSound cMediaSound, float volume, float pan) {
-        if(isMutedOrVolumeZero(volume)) return -1;
         return playSound(cMediaSound, volume, pan, 1);
     }
 
     public long playSound(CMediaSound cMediaSound, float volume) {
-        if(isMutedOrVolumeZero(volume)) return -1;
         return playSound(cMediaSound, volume, 0, 1);
     }
 
     public long playSound(CMediaSound cMediaSound) {
-        if(isMutedOrVolumeZero(volume)) return -1;
         return playSound(cMediaSound, 1, 0, 1);
     }
 
     public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch) {
-        if(isMutedOrVolumeZero(volume)) return -1;
         float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.distancef(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
         playVolume = playVolume * volume * this.volume;
         float pan = 0;
@@ -86,12 +66,10 @@ public class SoundPlayer {
     }
 
     public void playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
-        if(isMutedOrVolumeZero(volume)) return;
         playSound2D(cMediaSound, position_x, position_y, volume, 1);
     }
 
     public void playSound2D(CMediaSound cMediaSound, float position_x, float position_y) {
-        if(isMutedOrVolumeZero(volume)) return;
         playSound2D(cMediaSound, position_x, position_y, 1, 1);
     }
 
@@ -99,17 +77,6 @@ public class SoundPlayer {
         mediaManager.getCMediaSound(cMediaSound).setVolume(id, this.volume*volume);
     }
 
-    public void setMuted(boolean muted) {
-        if(!this.muted && muted){
-            this.muteVolume = this.volume;
-            this.volume = 0f;
-        }
-        if(this.muted && !muted){
-            this.volume = this.muteVolume;
-            this.muteVolume = 0f;
-        }
-        this.muted = muted;
-    }
     public void update() {
         update(0,0);
     }
