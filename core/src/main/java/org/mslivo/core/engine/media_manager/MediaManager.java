@@ -84,6 +84,10 @@ public class MediaManager {
         return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, null, Texture.TextureFilter.Nearest);
     }
 
+    public boolean loadAssets(LoadProgress progress) {
+        return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, progress, Texture.TextureFilter.Nearest);
+    }
+
     public boolean loadAssets(LoadProgress progress, Texture.TextureFilter textureFilter) {
         return loadAssets(DEFAULT_PAGE_WIDTH, DEFAULT_PAGE_HEIGHT, progress, textureFilter);
     }
