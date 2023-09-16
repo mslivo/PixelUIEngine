@@ -11,9 +11,7 @@ public class SoundPlayer {
 
     private int range;
     private float volume;
-
     private float camera_x, camera_y;
-
     private final MediaManager mediaManager;
 
     public SoundPlayer(MediaManager mediaManager) {
@@ -37,8 +35,32 @@ public class SoundPlayer {
         this.range = Tools.Calc.lowerBounds(range2D, 1);
     }
 
+    public void stopSound(CMediaSound cMediaSound){
+        mediaManager.getCMediaSound(cMediaSound).stop();
+    }
+
+    public void stopSound(CMediaSound cMediaSound, long id){
+        mediaManager.getCMediaSound(cMediaSound).stop(id);
+    }
+
+    public void pauseSound(CMediaSound cMediaSound){
+        mediaManager.getCMediaSound(cMediaSound).pause();
+    }
+
+    public void pauseSound(CMediaSound cMediaSound, long id){
+        mediaManager.getCMediaSound(cMediaSound).pause(id);
+    }
+    public void resumeSound(CMediaSound cMediaSound){
+        mediaManager.getCMediaSound(cMediaSound).resume();
+    }
+
+    public void resumeSound(CMediaSound cMediaSound, long id){
+        mediaManager.getCMediaSound(cMediaSound).resume(id);
+    }
+
     public long playSound(CMediaSound cMediaSound, float volume, float pan, float pitch) {
-        return mediaManager.playCMediaSound(cMediaSound, volume * this.volume, pan, pitch);
+        long id = mediaManager.playCMediaSound(cMediaSound, volume * this.volume, pan, pitch);
+        return id;
     }
 
     public long playSound(CMediaSound cMediaSound, float volume, float pan) {
@@ -62,7 +84,8 @@ public class SoundPlayer {
         } else if (camera_x < position_x) {
             pan = Tools.Calc.inBounds((position_x - camera_x) / (float) range, 0, 1);
         }
-        return mediaManager.playCMediaSound(cMediaSound, playVolume * this.volume, pan, pitch);
+        long id = mediaManager.playCMediaSound(cMediaSound, playVolume * this.volume, pan, pitch);
+        return id;
     }
 
     public void playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
@@ -73,7 +96,7 @@ public class SoundPlayer {
         playSound2D(cMediaSound, position_x, position_y, 1, 1);
     }
 
-    public void setPlayingSoundVolume(CMediaSound cMediaSound, long id, float volume){
+    public void setSoundVolume(CMediaSound cMediaSound, long id, float volume){
         mediaManager.getCMediaSound(cMediaSound).setVolume(id, this.volume*volume);
     }
 
