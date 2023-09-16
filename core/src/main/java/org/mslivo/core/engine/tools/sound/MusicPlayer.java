@@ -23,7 +23,7 @@ public class MusicPlayer {
 
     private final ArrayList<CMediaMusic> playlist;
 
-    private MediaManager mediaManager;
+    private final MediaManager mediaManager;
 
     private Music playCurrent;
 
@@ -248,7 +248,7 @@ public class MusicPlayer {
     public void shutdown(){
         if(playCurrent != null && playCurrent.isPlaying()) playCurrent.stop();
         this.playCurrent = null;
-        this.mediaManager = null;
+        this.playCurrentFileName = "";
         this.playlist.clear();
         this.randomHistory.clear();
     }
