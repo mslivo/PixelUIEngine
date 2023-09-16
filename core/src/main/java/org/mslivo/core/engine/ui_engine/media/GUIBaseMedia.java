@@ -66,8 +66,8 @@ public class GUIBaseMedia {
     public static final CMediaArray GUI_OSTEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "ostextinput_uppercase.png",12,12);
     public static final CMediaImage GUI_OSTEXTINPUT_SELECTED = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "ostextinput_selected.png");
     //Cursors
-    public static final CMediaCursor GUI_CURSOR_ARROW = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"/cursors/arrow.png", 16, 16);
-    public static final CMediaCursor GUI_CURSOR_TRANSPARENT = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"/cursors/transparent.png", 16, 16);
+    public static final CMediaCursor GUI_CURSOR_ARROW = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"cursors/arrow.png", 16, 16);
+    public static final CMediaCursor GUI_CURSOR_TRANSPARENT = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"cursors/transparent.png", 16, 16);
     // Icons
     public static final CMediaImage GUI_ICON_CLOSE = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "icons/close.png");
     public static final CMediaImage GUI_ICON_COLOR = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "icons/color.png");
