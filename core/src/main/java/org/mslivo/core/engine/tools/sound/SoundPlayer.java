@@ -3,6 +3,11 @@ package org.mslivo.core.engine.tools.sound;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaSound;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.example.ui.media.ExampleBaseMedia;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 /*
  * Plays sounds and automatically adjusts volume to distance
@@ -13,6 +18,7 @@ public class SoundPlayer {
     private float volume;
     private float camera_x, camera_y;
     private final MediaManager mediaManager;
+    HashSet<CMediaSound> playedSounds = new HashSet<>();
 
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
@@ -20,6 +26,7 @@ public class SoundPlayer {
     public SoundPlayer(MediaManager mediaManager, int range2D) {
         this.mediaManager = mediaManager;
         this.volume = 1f;
+        this.playedSounds = new HashSet<>();
         setRange2D(range2D);
     }
 
@@ -59,6 +66,7 @@ public class SoundPlayer {
     }
 
     public long playSound(CMediaSound cMediaSound, float volume, float pan, float pitch) {
+        playedSounds.add(cMediaSound);
         long id = mediaManager.playCMediaSound(cMediaSound, volume * this.volume, pan, pitch);
         return id;
     }
@@ -84,6 +92,7 @@ public class SoundPlayer {
         } else if (camera_x < position_x) {
             pan = Tools.Calc.inBounds((position_x - camera_x) / (float) range, 0, 1);
         }
+        playedSounds.add(cMediaSound);
         long id = mediaManager.playCMediaSound(cMediaSound, playVolume * this.volume, pan, pitch);
         return id;
     }
@@ -100,6 +109,11 @@ public class SoundPlayer {
         mediaManager.getCMediaSound(cMediaSound).setVolume(id, this.volume*volume);
     }
 
+    public void stopAllSounds(){
+        CMediaSound[] playedSoundsArray = (CMediaSound[]) playedSounds.toArray();
+        for(CMediaSound playedSound : playedSoundsArray) mediaManager.getCMediaSound(playedSound).stop();
+    }
+
     public void update() {
         update(0,0);
     }
@@ -110,6 +124,7 @@ public class SoundPlayer {
     }
 
     public void shutdown() {
+        stopAllSounds();
     }
 
 }
