@@ -110,7 +110,7 @@ public class SoundPlayer {
     }
 
     public void stopAllSounds(){
-        CMediaSound[] playedSoundsArray = (CMediaSound[]) playedSounds.toArray();
+        CMediaSound[] playedSoundsArray = (CMediaSound[]) playedSounds.toArray(new CMediaSound[]{});
         for(CMediaSound playedSound : playedSoundsArray) mediaManager.getCMediaSound(playedSound).stop();
     }
 
