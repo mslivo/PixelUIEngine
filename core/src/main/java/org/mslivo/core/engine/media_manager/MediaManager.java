@@ -704,8 +704,23 @@ public class MediaManager {
         return getCMediaSound(cMedia).play(volume, 1, pan);
     }
 
-    public long playCMediaSound(CMediaSound cMedia, float volume, float pan, float pitch) {
+    public long playCMediaSound(CMediaSound cMedia, float volume, float pitch, float pan) {
         return getCMediaSound(cMedia).play(volume, pitch, pan);
+    }
+
+    public long loopCMediaSound(CMediaSound cMediaSound){
+        return loopCMediaSound(cMediaSound,1, 1, 0);
+    }
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume){
+        return loopCMediaSound(cMediaSound,volume, 1, 0);
+    }
+
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch){
+        return loopCMediaSound(cMediaSound, volume, pitch, 0);
+    }
+
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch, float pan){
+        return getCMediaSound(cMediaSound).loop(volume, pitch, pan);
     }
 
     public Sound getCMediaSound(CMediaSound cMedia) {
