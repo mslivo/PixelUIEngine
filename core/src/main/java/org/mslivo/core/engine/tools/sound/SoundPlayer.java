@@ -18,7 +18,7 @@ public class SoundPlayer {
     private float volume;
     private float camera_x, camera_y;
     private final MediaManager mediaManager;
-    HashSet<CMediaSound> playedSounds = new HashSet<>();
+    HashSet<CMediaSound> playedSounds;
 
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
@@ -110,7 +110,7 @@ public class SoundPlayer {
     }
 
     public void stopAllSounds(){
-        CMediaSound[] playedSoundsArray = (CMediaSound[]) playedSounds.toArray(new CMediaSound[]{});
+        CMediaSound[] playedSoundsArray = playedSounds.toArray(new CMediaSound[]{});
         for(CMediaSound playedSound : playedSoundsArray) mediaManager.getCMediaSound(playedSound).stop();
     }
 
