@@ -73,11 +73,11 @@ public class Tools {
         }
 
         public static void error(String msg) {
-            System.err.println(Text.ANSI_RED + timestamp() + "error occured" + msg + Text.ANSI_RESET);
+            System.err.println(Text.ANSI_RED + timestamp() + "error:" + msg + Text.ANSI_RESET);
         }
 
         public static void error(Exception e) {
-            System.err.println(Text.ANSI_RED + timestamp() + "exception occured" + Text.ANSI_RESET);
+            System.err.println(Text.ANSI_RED + timestamp() + "exception" + Text.ANSI_RESET);
             e.printStackTrace();
         }
 
