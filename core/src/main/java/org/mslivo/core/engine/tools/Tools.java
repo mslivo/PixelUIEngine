@@ -63,7 +63,7 @@ public class Tools {
                 custom.append(" | ").append(String.format("%1$10s", customValue));
             }
             Tools.Log.message(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
-                    String.format("%1$6s", (Runtime.getRuntime().totalMemory() / (1024 * 1024))) + "MB RAM" + custom);
+                    String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))) + "MB RAM" + custom);
         }
 
         public static void message(String msg) {
