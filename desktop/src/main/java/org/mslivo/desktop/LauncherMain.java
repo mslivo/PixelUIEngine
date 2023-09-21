@@ -5,7 +5,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.example.ExampleMain;
 import org.mslivo.core.example.ExampleMainConstants;
-import org.mslivo.core.example.data.ExampleData;
 
 import java.nio.file.Path;
 
@@ -33,7 +32,7 @@ public class LauncherMain {
         try {
             new Lwjgl3Application(new ExampleMain(), config);
         }catch (Exception e){
-            Tools.Log.exceptionToFile(e, Path.of("exception.log"));
+            Tools.Log.toFile(e, Path.of("exception.log"));
         }
     }
 }

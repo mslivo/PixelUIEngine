@@ -35,9 +35,7 @@ public class Tools {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
 
-
     private static float skipFrameAccumulator = 0f;
-
 
 
     public static boolean skipFrame(int desiredFPS) {
@@ -75,15 +73,26 @@ public class Tools {
         }
 
         public static void error(String msg) {
-            System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
+            System.err.println(Text.ANSI_RED + timestamp() + "error occured" + msg + Text.ANSI_RESET);
         }
 
         public static void error(Exception e) {
-            error(e.getLocalizedMessage());
+            System.err.println(Text.ANSI_RED + timestamp() + "exception occured" + Text.ANSI_RESET);
             e.printStackTrace();
         }
 
-        public static void exceptionToFile(Exception e, Path file){
+        public static void toFile(String message, Path file) {
+            try {
+                FileWriter fileWriter = new FileWriter(file.toString(), true);
+                PrintWriter printWriter = new PrintWriter(fileWriter);
+                printWriter.write(timestamp() + message);
+                printWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public static void toFile(Exception e, Path file) {
             try {
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);
