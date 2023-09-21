@@ -1,9 +1,7 @@
 package org.mslivo.core.engine.tools.particles;
 
-public interface CustomDataProvider<D> {
+public interface ParticleDataProvider<D> {
 
     D provideNewInstance();
-
-    void setValues(D customData);
 
 }

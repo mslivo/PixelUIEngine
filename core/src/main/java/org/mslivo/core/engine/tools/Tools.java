@@ -80,6 +80,7 @@ public class Tools {
 
         public static void error(Exception e) {
             error(e.getLocalizedMessage());
+            e.printStackTrace();
         }
 
         public static void exceptionToFile(Exception e, Path file){

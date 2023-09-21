@@ -1,7 +1,6 @@
 package org.mslivo.core.engine.tools.particles.particle;
 
 import org.mslivo.core.engine.media_manager.media.*;
-import org.mslivo.core.engine.tools.particles.ParticleSystem;
 
 public class Particle<D> {
     public ParticleType type;
@@ -17,6 +16,6 @@ public class Particle<D> {
     public String text;
     public float animation_offset;
     public boolean visible;
-    public D customData;
+    public D data;
 
 }
