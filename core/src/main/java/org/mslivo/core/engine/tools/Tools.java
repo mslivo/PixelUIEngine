@@ -74,41 +74,24 @@ public class Tools {
             System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + String.format(msg, values));
         }
 
-        public static void error(Exception e, Path errorFile) {
-            System.err.print(Text.ANSI_RED + timestamp() + Text.ANSI_RESET);
-            e.printStackTrace(System.err);
-            if(errorFile != null && errorFile.toString().trim().length() > 0) {
-                try {
-                    FileWriter fileWriter = new FileWriter(errorFile.toString(), true);
-                    PrintWriter printWriter = new PrintWriter(fileWriter);
-                    printWriter.write(timestamp());
-                    e.printStackTrace(printWriter);
-                    printWriter.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        public static void error(String msg, Path errorFile) {
-            System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
-            if(errorFile != null && errorFile.toString().trim().length() > 0) {
-                try {
-                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(errorFile.toString(), true));
-                    bufferedWriter.write( timestamp() + msg+System.lineSeparator());
-                    bufferedWriter.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
         public static void error(String msg) {
-            error(msg, null);
+            System.err.println(Text.ANSI_RED + timestamp() + Text.ANSI_RESET + msg);
         }
 
         public static void error(Exception e) {
-            error(e.toString(), null);
+            error(e.getLocalizedMessage());
+        }
+
+        public static void exceptionToFile(Exception e, Path file){
+            try {
+                FileWriter fileWriter = new FileWriter(file.toString(), true);
+                PrintWriter printWriter = new PrintWriter(fileWriter);
+                printWriter.write(timestamp());
+                e.printStackTrace(printWriter);
+                printWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
 
