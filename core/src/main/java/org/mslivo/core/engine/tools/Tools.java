@@ -77,7 +77,7 @@ public class Tools {
         }
 
         public static void error(Exception e) {
-            System.err.println(Text.ANSI_RED + timestamp() + "exception" + Text.ANSI_RESET);
+            System.err.println(Text.ANSI_RED + timestamp() + e.getClass().getSimpleName() + Text.ANSI_RESET);
             e.printStackTrace();
         }
 
