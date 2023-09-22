@@ -1473,16 +1473,15 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private boolean keyboardMouseDetectUse() {
-        int keys[][] = api.config.getKeyboardMouseButtons();
-        for (int i = 0; i < keys.length; i++) {
-            for (int i2 = 0; i2 < keys[i].length; i2++) {
-                if (keys[i] != null) {
-                    if (inputState.inputEvents.keysDown[keys[i][i2]]) return true;
-                }
+        for (int i = 0; i <= 10; i++) {
+            int[] buttons = keyboardMouseButtons(i);
+            for (int i2 = 0; i2 < buttons.length; i2++) {
+                if (buttons != null && inputState.inputEvents.keysDown[buttons[i2]]) return true;
             }
         }
         return false;
     }
+
 
     private boolean gamePadMouseDetectUse() {
         if (api.config.isGamePadMouseStickLeftEnabled()) {
@@ -1497,26 +1496,54 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.inputEvents.gamePadRightX > api.config.getGamePadMouseSensitivity();
             }
         }
-        int keys[][] = api.config.getGamepadMouseButtons();
-        for (int i = 0; i < keys.length; i++) {
-            for (int i2 = 0; i2 < keys[i].length; i2++) {
-                if (keys[i] != null) {
-                    if (inputState.inputEvents.gamePadButtonsDown[keys[i][i2]]) return true;
-                }
+
+        for (int i = 0; i <= 6; i++) {
+            int[] buttons = gamePadMouseButtons(i);
+            for (int i2 = 0; i2 < buttons.length; i2++) {
+                if (buttons != null && inputState.inputEvents.gamePadButtonsDown[buttons[i2]]) return true;
             }
         }
-
         return false;
     }
 
-    private void gamePadMouseTranslateAndClearEvents() {
-        int keys[][] = api.config.getGamepadMouseButtons();
+    private int[] keyboardMouseButtons(int index) {
+        return switch (index) {
+            case 0 -> api.config.getKeyboardMouseButtonsUp();
+            case 1 -> api.config.getKeyBoardControlButtonsDown();
+            case 2 -> api.config.getKeyboardMouseButtonsLeft();
+            case 3 -> api.config.getKeyboardMouseButtonsRight();
+            case 4 -> api.config.getKeyboardMouseButtonsMouse1();
+            case 5 -> api.config.getKeyboardMouseButtonsMouse2();
+            case 6 -> api.config.getKeyboardMouseButtonsMouse3();
+            case 7 -> api.config.getKeyboardMouseButtonsMouse4();
+            case 8 -> api.config.getKeyboardMouseButtonsMouse5();
+            case 9 -> api.config.getKeyboardMouseButtonsScrollUp();
+            case 10 -> api.config.getKeyboardMouseButtonsScrollDown();
+            default -> throw new IllegalStateException("Unexpected value: " + index);
+        };
+    }
 
+
+    private int[] gamePadMouseButtons(int index) {
+        return switch (index) {
+            case 0 -> api.config.getGamePadMouseButtonsMouse1();
+            case 1 -> api.config.getGamePadMouseButtonsMouse2();
+            case 2 -> api.config.getGamePadMouseButtonsMouse3();
+            case 3 -> api.config.getGamePadMouseButtonsMouse4();
+            case 4 -> api.config.getGamePadMouseButtonsMouse5();
+            case 5 -> api.config.getGamePadMouseButtonsScrollUp();
+            case 6 -> api.config.getGamePadMouseButtonsScrollDown();
+            default -> throw new IllegalStateException("Unexpected value: " + index);
+        };
+    }
+
+    private void gamePadMouseTranslateAndClearEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
-        for (int i = 0; i < keys.length; i++) {
-            for (int i2 = 0; i2 < keys[i].length; i2++) {
-                if (keys[i] != null) {
-                    int keyCode = keys[i][i2];
+        for (int i = 0; i <= 6; i++) {
+            int buttons[] = gamePadMouseButtons(i);
+            if (buttons != null) {
+                for (int i2 = 0; i2 < buttons.length; i2++) {
+                    int keyCode = buttons[i2];
                     if (inputState.inputEvents.gamePadButtonDown) {
                         ArrayList<Integer> downKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
                         for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
@@ -1578,13 +1605,12 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void keyboardMouseTranslateAndClearEvents() {
-        int keys[][] = api.config.getKeyboardMouseButtons();
-
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
-        for (int i = 0; i < keys.length; i++) {
-            for (int i2 = 0; i2 < keys[i].length; i2++) {
-                if (keys[i] != null) {
-                    int keyCode = keys[i][i2];
+        for (int i = 0; i <= 10; i++) {
+            int[] buttons = keyboardMouseButtons(i);
+            if (buttons != null) {
+                for (int i2 = 0; i2 < buttons.length; i2++) {
+                    int keyCode = buttons[i2];
                     if (inputState.inputEvents.keyDown) {
                         ArrayList<Integer> downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
                         for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {

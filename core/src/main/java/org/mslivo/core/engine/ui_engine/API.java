@@ -2106,36 +2106,6 @@ public class API {
             }
         }
 
-        public int[][] getKeyboardMouseButtons() {
-            final int buttons[][] = new int[][]{
-                    getKeyboardMouseButtonsUp(),
-                    getKeyBoardControlButtonsDown(),
-                    getKeyboardMouseButtonsLeft(),
-                    getKeyboardMouseButtonsRight(),
-                    getKeyboardMouseButtonsMouse1(),
-                    getKeyboardMouseButtonsMouse2(),
-                    getKeyboardMouseButtonsMouse3(),
-                    getKeyboardMouseButtonsMouse4(),
-                    getKeyboardMouseButtonsMouse5(),
-                    getKeyboardMouseButtonsScrollUp(),
-                    getKeyboardMouseButtonsScrollDown()
-            };
-            return buttons;
-        }
-
-        public int[][] getGamepadMouseButtons() {
-            final int buttons[][] = new int[][]{
-                    getGamePadMouseButtonsMouse1(),
-                    getGamePadMouseButtonsMouse2(),
-                    getGamePadMouseButtonsMouse3(),
-                    getGamePadMouseButtonsMouse4(),
-                    getGamePadMouseButtonsMouse5(),
-                    getGamePadMouseButtonsScrollUp(),
-                    getGamePadMouseButtonsScrollDown()
-            };
-            return buttons;
-        }
-
         public void loadConfig(_Config config) {
             setWindowsDefaultEnforceScreenBounds(config.getWindowsDefaultEnforceScreenBounds());
             setWindowsDefaultColor(config.getWindowsDefaultColor());
