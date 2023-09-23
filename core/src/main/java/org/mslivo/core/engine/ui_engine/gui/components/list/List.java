@@ -7,9 +7,9 @@ import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class List extends Component {
+public class List<T> extends Component {
 
-    public ArrayList items;
+    public ArrayList<T> items;
 
     public float scrolled;
 
@@ -17,11 +17,11 @@ public class List extends Component {
 
     public CMediaFont font;
 
-    public Object selectedItem; // singleselect
+    public T selectedItem; // singleselect
 
     public boolean multiSelect;
 
-    public HashSet<Object> selectedItems; // multiselect
+    public HashSet<T> selectedItems; // multiselect
 
     public boolean dragEnabled;
 
