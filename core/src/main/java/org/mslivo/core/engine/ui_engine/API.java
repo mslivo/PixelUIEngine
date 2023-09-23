@@ -497,7 +497,7 @@ public class API {
                         scrolledLast = list.scrolled;
                     }
                     // disable scrollbar
-                    if (list.items.size() <= list.height) {
+                    if (list.items != null && list.items.size() <= list.height) {
                         components.setDisabled(scrollBarVertical, true);
                         components.scrollBar.setScrolled(scrollBarVertical, 1f);
                     } else {
