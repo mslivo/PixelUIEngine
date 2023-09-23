@@ -2565,7 +2565,7 @@ public class UIEngine<T extends UIAdapter> {
             int line_width = mediaManager.textWidth(tooltip.font, line);
             if (line_width > text_width_max) text_width_max = line_width;
         }
-        int tooltip_width = (text_width_max + (TILE_SIZE * 2)) / TILE_SIZE;
+        int tooltip_width = MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float)TILE_SIZE);
         int tooltip_height = tooltip.lines.length;
 
         tooltip_width = Tools.Calc.lowerBounds(tooltip_width, tooltip.minWidth);
