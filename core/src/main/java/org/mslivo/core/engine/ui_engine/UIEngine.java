@@ -2568,8 +2568,8 @@ public class UIEngine<T extends UIAdapter> {
         int tooltip_width = (text_width_max + (TILE_SIZE * 2)) / TILE_SIZE;
         int tooltip_height = tooltip.lines.length;
 
-        tooltip_width = Tools.Calc.lowerBounds(tooltip_width, 1);
-        tooltip_height = Tools.Calc.lowerBounds(tooltip_height, 1);
+        tooltip_width = Tools.Calc.lowerBounds(tooltip_width, tooltip.minWidth);
+        tooltip_height = Tools.Calc.lowerBounds(tooltip_height, tooltip.minHeight);
 
         int tooltip_x = 0;
         int tooltip_y = 0;

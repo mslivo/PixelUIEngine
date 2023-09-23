@@ -16,7 +16,7 @@ public class ToolTip {
     public float color_r, color_g, color_b, color_a;
 
     public ToolTipAction toolTipAction;
-
+    public int minWidth, minHeight;
     public ArrayList<ToolTipImage> images;
 
 }

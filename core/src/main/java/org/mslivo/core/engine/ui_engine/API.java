@@ -3120,26 +3120,33 @@ public class API {
 
 
         public ToolTip create(String[] lines) {
-            return create(lines, true, config.tooltipDefaultColor, defaultToolTipAction(), null, config.tooltipDefaultFont);
+            return create(lines, true, defaultToolTipAction(), null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
+
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
-            return create(lines, displayFistLineAsTitle, config.tooltipDefaultColor, defaultToolTipAction(), null, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, FColor color) {
-            return create(lines, displayFistLineAsTitle, color, defaultToolTipAction(), null, config.tooltipDefaultFont);
+
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
+            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, FColor color, ToolTipAction toolTipAction) {
-            return create(lines, displayFistLineAsTitle, color, toolTipAction, null, config.tooltipDefaultFont);
+
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images) {
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, FColor color, ToolTipAction toolTipAction, ToolTipImage[] images) {
-            return create(lines, displayFistLineAsTitle, color, toolTipAction, images, config.tooltipDefaultFont);
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight) {
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth,minHeight,config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, FColor color, ToolTipAction toolTipAction, ToolTipImage[] images, CMediaFont font) {
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color) {
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth,minHeight,color, config.tooltipDefaultFont);
+        }
+
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color, CMediaFont font) {
             ToolTip tooltip = new ToolTip();
             tooltip.images = new ArrayList<>();
             setDisplayFistLineAsTitle(tooltip, displayFistLineAsTitle);
@@ -3147,6 +3154,7 @@ public class API {
             setColor(tooltip, color);
             setToolTipAction(tooltip, toolTipAction);
             setFont(tooltip, font);
+            setSizeMin(tooltip, mindWidth, minHeight);
             addToolTipImages(tooltip, images);
             return tooltip;
         }
@@ -3192,6 +3200,12 @@ public class API {
         public void setLines(ToolTip tooltip, String[] lines) {
             if (tooltip == null) return;
             tooltip.lines = Tools.Text.validString(lines);
+        }
+
+        public void setSizeMin(ToolTip tooltip, int minWidth, int minHeight) {
+            if (tooltip == null) return;
+            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth, 1);
+            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
         }
 
         public void setColor(ToolTip tooltip, FColor color) {
