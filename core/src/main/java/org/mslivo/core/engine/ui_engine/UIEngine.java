@@ -906,7 +906,8 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.lastGUIMouseHover != null) {
                 if (inputState.lastGUIMouseHover.getClass() == List.class) {
                     List list = (List) inputState.lastGUIMouseHover;
-                    float amount = (1 / (float) Tools.Calc.lowerBounds(list.items.size(), 1)) * inputState.inputEvents.mouseScrolledAmount;
+                    int size = list.items != null ? list.items.size() : 0;
+                    float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
                     list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
                     if (list.listAction != null) {
                         list.listAction.onScrolled(list.scrolled);
