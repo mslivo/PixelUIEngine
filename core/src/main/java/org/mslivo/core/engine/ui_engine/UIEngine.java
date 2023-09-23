@@ -2628,7 +2628,8 @@ public class UIEngine<T extends UIAdapter> {
 
 
         // Draw
-        render_batchSetColor(tooltip.color_r, tooltip.color_g, tooltip.color_b, tooltip.color_a * inputState.tooltip_fadeIn_pct);
+        float alpha = tooltip.color_a * inputState.tooltip_fadeIn_pct;
+        render_batchSetColor(tooltip.color_r, tooltip.color_g, tooltip.color_b, alpha);
 
         // Lines
         switch (direction) {
@@ -2678,7 +2679,7 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
             render_batchSaveColor();
-            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, toolTipImage.color_a);
+            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
             render_drawCMediaGFX(toolTipImage.image, tooltip_x + toolTipImage.x, tooltip_y + toolTipImage.y);
             render_batchLoadColor();
         }
