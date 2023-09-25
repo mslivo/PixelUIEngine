@@ -140,9 +140,6 @@ public class SettingsManager {
         set(name, enumValue.name());
     }
 
-    ;
-
-
     public boolean getBoolean(String name) {
         SettingsEntry settingsEntry = entries.get(name);
         int value = 0;
@@ -249,7 +246,6 @@ public class SettingsManager {
     public void setStringList(String name, String[] values) {
         SettingsEntry settingsEntry = entries.get(name);
         if (settingsEntry != null) set(name, String.join(";", values));
-
     }
 
     private void validateAllProperties() {
