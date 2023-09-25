@@ -3984,22 +3984,22 @@ public class API {
         public class _CheckBox {
 
             public CheckBox create(int x, int y, String text) {
-                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, null, false);
+                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, false, null);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle) {
-                return create(x, y, text, checkBoxStyle, null, null, false);
+                return create(x, y, text, checkBoxStyle, null, false, null);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, null, false);
+                return create(x, y, text, checkBoxStyle, checkBoxAction, false, null);
             }
 
-            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, CMediaFont font) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, font, false);
+            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction,boolean checked) {
+                return create(x, y, text, checkBoxStyle, checkBoxAction, checked, null);
             }
 
-            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, CMediaFont font, boolean checked) {
+            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
                 CheckBox checkBox = new CheckBox();
                 setComponentInitValues(checkBox);
                 setColor(checkBox, Tools.Colors.WHITE);

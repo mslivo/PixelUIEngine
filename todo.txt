@@ -1,8 +1,8 @@
-[ ] replace with KeyCode
-[ ] translate mouse according to joystick sensitivity
+[x] replace with KeyCode
+[x] translate mouse according to joystick sensitivity
 [x] gamepad support (+ mouse control mode)
-[ ] onscreen keyboard
-[ ] api functions:  keymousecontrol cursor to nearest visible component
+[x] onscreen keyboard
+
 
 [x] clear issues on linux
 [x] UICommons notificatons
