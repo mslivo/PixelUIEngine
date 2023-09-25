@@ -5,10 +5,10 @@ public abstract class ScrollBarAction extends CommonActions {
     public void onScrolled(float scrolled) {
     }
 
-    public void onPress() {
+    public void onPress(float scrolled) {
     }
 
-    public void onRelease() {
+    public void onRelease(float scrolled) {
     }
 
 

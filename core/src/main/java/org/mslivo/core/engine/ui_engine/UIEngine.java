@@ -510,13 +510,13 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                         ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
                         scrollBarVertical.buttonPressed = true;
-                        if (scrollBarVertical.scrollBarAction != null) scrollBarVertical.scrollBarAction.onPress();
+                        if (scrollBarVertical.scrollBarAction != null) scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
                         inputState.scrolledScrollBarVertical = scrollBarVertical;
                     } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                         ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
                         scrollBarHorizontal.buttonPressed = true;
                         inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
-                        if (scrollBarHorizontal.scrollBarAction != null) scrollBarHorizontal.scrollBarAction.onPress();
+                        if (scrollBarHorizontal.scrollBarAction != null) scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
                         UICommons.list_updateItemInfoAtMousePosition(inputState, list);
@@ -742,14 +742,14 @@ public class UIEngine<T extends UIAdapter> {
                 ScrollBarVertical scrolledBarVertical = inputState.scrolledScrollBarVertical;
                 scrolledBarVertical.buttonPressed = false;
                 if (scrolledBarVertical.scrollBarAction != null)
-                    scrolledBarVertical.scrollBarAction.onRelease();
+                    scrolledBarVertical.scrollBarAction.onRelease(scrolledBarVertical.scrolled);
                 inputState.scrolledScrollBarVertical = null;
             }
             if (inputState.scrolledScrollBarHorizontal != null) {
                 ScrollBarHorizontal scrolledBarHorizontal = inputState.scrolledScrollBarHorizontal;
                 scrolledBarHorizontal.buttonPressed = false;
                 if (scrolledBarHorizontal.scrollBarAction != null)
-                    scrolledBarHorizontal.scrollBarAction.onRelease();
+                    scrolledBarHorizontal.scrollBarAction.onRelease(scrolledBarHorizontal.scrolled);
                 inputState.scrolledScrollBarHorizontal = null;
             }
             if (inputState.turnedKnob != null) {
