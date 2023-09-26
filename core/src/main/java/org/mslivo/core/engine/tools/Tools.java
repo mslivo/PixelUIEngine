@@ -477,12 +477,12 @@ public class Tools {
 
         public static boolean chance(int oneIn) {
             oneIn = lowerBounds(oneIn,1);
-            return MathUtils.random(1, oneIn) == 0;
+            return MathUtils.random(1, oneIn) == 1;
         }
 
         public static boolean chance(long oneIn) {
             oneIn = lowerBounds(oneIn,1);
-            return MathUtils.random(1, oneIn) == 0;
+            return MathUtils.random(1, oneIn) == 1;
         }
 
         public static float min(float... values) {
