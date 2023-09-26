@@ -475,6 +475,16 @@ public class Tools {
             return MathUtils.random(0f, 1f) < probability;
         }
 
+        public static boolean chance(int oneIn) {
+            oneIn = lowerBounds(oneIn,1);
+            return MathUtils.random(1, oneIn) == 0;
+        }
+
+        public static boolean chance(long oneIn) {
+            oneIn = lowerBounds(oneIn,1);
+            return MathUtils.random(1, oneIn) == 0;
+        }
+
         public static float min(float... values) {
             float sum = Float.MAX_VALUE;
             for (float f : values) {
