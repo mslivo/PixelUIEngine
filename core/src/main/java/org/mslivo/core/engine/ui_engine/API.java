@@ -257,7 +257,8 @@ public class API {
 
 
         private void searchItems(List list, ArrayList searchList, ArrayList resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
-            for (Object item : searchList) {
+            for (int i = 0; i < searchList.size(); i++) {
+                Object item = searchList.get(i);
                 if (searchArrayLists && item instanceof ArrayList) {
                     searchItems(list, (ArrayList) item, resultList, searchText, searchTooltips, searchArrayLists);
                 } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
@@ -266,8 +267,8 @@ public class API {
                     ToolTip tooltip = list.listAction.toolTip(item);
                     if (tooltip != null) {
                         linesLoop:
-                        for (String line : tooltip.lines) {
-                            if (line.trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                        for (int i2 = 0; i2 < tooltip.lines.length; i2++) {
+                            if (tooltip.lines[i] != null && tooltip.lines[i].trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                                 resultList.add(item);
                                 break linesLoop;
                             }
@@ -302,12 +303,15 @@ public class API {
             if (text != null) {
                 ArrayList<String> textList = new ArrayList<>();
                 int pixelWidth = ((width - 1) * UIEngine.TILE_SIZE);
-                for (String s : text) {
-                    if (s.trim().length() > 0) {
-                        String[] split = s.split(" ");
+                for (int i = 0; i < text.length; i++) {
+                    String textLine = text[i];
+                    textLine = Tools.Text.validString(textLine);
+                    if (textLine.trim().length() > 0) {
+                        String[] split = textLine.split(" ");
                         if (split.length > 0) {
                             StringBuilder currentLine = new StringBuilder();
-                            for (String value : split) {
+                            for (int i2 = 0; i2 < split.length; i2++) {
+                                String value = split[i2];
                                 if (mediaManager.textWidth(config.getDefaultFont(), currentLine + value + " ") >= pixelWidth) {
                                     textList.add(currentLine.toString());
                                     currentLine = new StringBuilder(value + " ");
@@ -459,19 +463,19 @@ public class API {
         }
 
         public void checkbox_MakeExclusive(CheckBox[] checkboxes, Consumer<CheckBox> checkedFunction) {
-            for (CheckBox checkbox : checkboxes) {
-                components.checkBox.setCheckBoxAction(checkbox, new CheckBoxAction() {
+            if (checkboxes == null || checkedFunction == null) return;
+            for (int i = 0; i < checkboxes.length; i++) {
+                int iF = i;
+                components.checkBox.setCheckBoxAction(checkboxes[i], new CheckBoxAction() {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
-                            for (CheckBox checkbox2 : checkboxes) {
-                                if (checkbox2 != checkbox) components.checkBox.setChecked(checkbox2, false);
-                            }
-                            checkedFunction.accept(checkbox);
+                            for (CheckBox checkbox2 : checkboxes)
+                                if (checkbox2 != checkboxes[iF]) components.checkBox.setChecked(checkbox2, false);
+                            checkedFunction.accept(checkboxes[iF]);
                         } else {
-                            components.checkBox.setChecked(checkbox, true);
+                            components.checkBox.setChecked(checkboxes[iF], true);
                         }
-
                     }
                 });
             }
@@ -666,8 +670,8 @@ public class API {
 
         private Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
             int maxCharacters = 0;
-            if (showTouchInputs){
-                if(lowerCaseCharacters == null || upperCaseCharacters == null) return null;
+            if (showTouchInputs) {
+                if (lowerCaseCharacters == null || upperCaseCharacters == null) return null;
                 maxCharacters = Math.min(lowerCaseCharacters.length, upperCaseCharacters.length);
             }
 
@@ -825,11 +829,9 @@ public class API {
 
         public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
-            for (String line : lines) {
-                int len = mediaManager.textWidth(config.defaultFont, line);
-                if (len > longest) {
-                    longest = len;
-                }
+            for (int i=0;i<lines.length;i++) {
+                int len = mediaManager.textWidth(config.defaultFont, lines[i]);
+                if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
@@ -1145,28 +1147,24 @@ public class API {
 
         private void updateExtendableTabBarButton(TabBar tabBar, ImageButton extendButton) {
             ArrayList<Tab> invisibleTabs = new ArrayList<>();
-            for (Tab tab : tabBar.tabs) {
-                if (!components.tabBar.isTabVisible(tabBar, tab)) {
-                    invisibleTabs.add(tab);
-                }
-            }
+            for (int i=0;i<tabBar.tabs.size();i++) if (!components.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
             if (invisibleTabs.size() > 0) {
                 components.button.setButtonAction(extendButton, new ButtonAction() {
                     @Override
                     public void onRelease() {
                         ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
-                        for (Tab tab : invisibleTabs) {
-                            contextMenuItems.add(contextMenu.item.create(tab.title, new ContextMenuItemAction() {
+                        for (int i2=0;i2<invisibleTabs.size();i2++) {
+                            Tab invisibleTab = invisibleTabs.get(i2);
+                            contextMenuItems.add(contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
                                 @Override
                                 public void onSelect() {
-                                    components.tabBar.removeTab(tabBar, tab);
-                                    components.tabBar.addTab(tabBar, tab, 0);
+                                    components.tabBar.removeTab(tabBar, invisibleTab);
+                                    components.tabBar.addTab(tabBar, invisibleTab, 0);
                                     components.tabBar.selectTab(tabBar, 0);
                                     updateExtendableTabBarButton(tabBar, extendButton);
                                 }
-                            }, tab.icon));
+                            }, invisibleTab.icon));
                         }
-
                         ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         openContextMenu(selectTabMenu);
                     }
@@ -1203,7 +1201,7 @@ public class API {
 
     public void addNotifications(Notification[] notifications) {
         if (notifications == null) return;
-        for (Notification notification : notifications) addNotification(notification);
+        for (int i=0;i<notifications.length;i++) addNotification(notifications[i]);
     }
 
     public void removeNotification(Notification notification) {
@@ -1213,7 +1211,7 @@ public class API {
 
     public void removeNotifications(Notification[] notifications) {
         if (notifications == null) return;
-        for (Notification notification : notifications) removeNotification(notification);
+        for (int i=0;i<notifications.length;i++)removeNotification(notifications[i]);
     }
 
     public void removeAllNotifications() {
@@ -1222,7 +1220,10 @@ public class API {
 
     public ArrayList<Notification> findNotificationsByName(String name) {
         if (name == null) return new ArrayList<>();
-        return new ArrayList<>(inputState.notifications.stream().filter(notification -> name.equals(notification.name)).toList());
+        ArrayList<Notification> result = new ArrayList<>();
+        for (int i = 0; i < inputState.notifications.size(); i++)
+            if (name.equals(inputState.notifications.get(i).name)) result.add(inputState.notifications.get(i));
+        return result;
     }
 
     public Notification findNotificationByName(String name) {
@@ -1297,7 +1298,7 @@ public class API {
 
     public void addWindows(Window[] windows) {
         if (windows == null) return;
-        for (Window window : windows) addWindow(window);
+        for (int i=0;i<windows.length;i++) addWindow(windows[i]);
     }
 
     public void removeWindow(Window window) {
@@ -1307,7 +1308,7 @@ public class API {
 
     public void removeWindows(Window[] windows) {
         if (windows == null) return;
-        for (Window window : windows) removeWindow(window);
+        for (int i=0;i<windows.length;i++) removeWindow(windows[i]);
     }
 
     public void removeAllWindows() {
@@ -1331,7 +1332,7 @@ public class API {
 
     public void closeWindows(Window[] windows) {
         if (windows == null) return;
-        for (Window window : windows) closeWindow(window);
+        for (int i=0;i<windows.length;i++)  closeWindow(windows[i]);
     }
 
     public void closeAllWindows() {
@@ -1386,7 +1387,7 @@ public class API {
 
     public void addScreenComponents(Component[] components) {
         if (components == null) return;
-        for (Component component : components) addScreenComponent(component);
+        for (int i=0;i<components.length;i++) addScreenComponent(components[i]);
     }
 
     public void removeScreenComponent(Component component) {
@@ -1396,7 +1397,7 @@ public class API {
 
     public void removeScreenComponents(Component[] components) {
         if (components == null) return;
-        for (Component component : components) removeScreenComponent(component);
+        for (int i=0;i<components.length;i++)  removeScreenComponent(components[i]);
     }
 
     public void removeAllScreenComponents() {
@@ -1405,7 +1406,10 @@ public class API {
 
     public ArrayList<Component> findScreenComponentsByName(String name) {
         if (name == null) return new ArrayList<>();
-        return new ArrayList<>(inputState.screenComponents.stream().filter(component -> name.equals(component.name)).toList());
+        ArrayList<Component> result = new ArrayList<>();
+        for (int i = 0; i < inputState.screenComponents.size(); i++)
+            if (name.equals(inputState.screenComponents.get(i).name)) result.add(inputState.screenComponents.get(i));
+        return result;
     }
 
     public Component findScreenComponentByName(String name) {
@@ -1450,7 +1454,7 @@ public class API {
 
     public void addHotKeys(HotKey[] hotKeys) {
         if (hotKeys == null) return;
-        for (HotKey hotKey : hotKeys) addHotKey(hotKey);
+        for (int i = 0; i < hotKeys.length; i++) addHotKey(hotKeys[i]);
     }
 
     public void removeHotKey(HotKey hotKey) {
@@ -1460,7 +1464,7 @@ public class API {
 
     public void removeHotKeys(HotKey[] hotKeys) {
         if (hotKeys == null) return;
-        for (HotKey hotKey : hotKeys) removeHotKey(hotKey);
+        for (int i = 0; i < hotKeys.length; i++) removeHotKey(hotKeys[i]);
     }
 
     public void removeAllHotKeys() {
@@ -1469,7 +1473,10 @@ public class API {
 
     public ArrayList<HotKey> findHotKeysByName(String name) {
         if (name == null) return new ArrayList<>();
-        return new ArrayList<>(inputState.hotKeys.stream().filter(hotKey -> name.equals(hotKey)).toList());
+        ArrayList<HotKey> result = new ArrayList<>();
+        for (int i = 0; i < inputState.hotKeys.size(); i++)
+            if (name.equals(inputState.hotKeys.get(i).name)) result.add(inputState.hotKeys.get(i));
+        return result;
     }
 
     public HotKey findHotKeyByName(String name) {
@@ -1481,7 +1488,10 @@ public class API {
 
     public ArrayList<Window> findWindowsByName(String name) {
         if (name == null) return new ArrayList<>();
-        return new ArrayList<>(inputState.windows.stream().filter(window -> name.equals(window.name)).toList());
+        ArrayList<Window> result = new ArrayList<>();
+        for (int i = 0; i < inputState.windows.size(); i++)
+            if (name.equals(inputState.windows.get(i).name)) result.add(inputState.windows.get(i));
+        return result;
     }
 
     public Window findWindowByName(String name) {
@@ -1533,7 +1543,7 @@ public class API {
         if (inputState.openMouseTextInput != null) return;
         // Check for Length and ISO Control Except special characters
         if (charactersLC.length != charactersUC.length) return;
-        int maxCharacters = Math.min(charactersLC.length,charactersUC.length);
+        int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
         for (int i = 0; i < maxCharacters; i++) {
             if (Character.isISOControl(charactersLC[i]) &&
                     !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) {
@@ -1638,7 +1648,7 @@ public class API {
                 'm', 'n', 'o', 'p', 'q', 'r',
                 's', 't', 'u', 'v', 'w',
                 'x', 'y', 'z',
-                '0', '1', '2','3', '4', '5','6', '7', '8','9'
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
                 , '\t', '\b', '\n'};
 
         private char[] defaultUpperCaseCharacters = new char[]{
@@ -1647,7 +1657,7 @@ public class API {
                 'M', 'N', 'O', 'P', 'Q', 'R',
                 'S', 'T', 'U', 'V', 'W',
                 'X', 'Y', 'Z',
-                '!', '?','.','+','-','=','&','%','*','$'
+                '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
                 , '\t', '\b', '\n'};
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
@@ -2099,8 +2109,8 @@ public class API {
         }
 
         public _Config() {
-            int maxCharacters = Math.min(defaultLowerCaseCharacters.length,defaultUpperCaseCharacters.length);
-            for(int i=0;i<maxCharacters;i++){
+            int maxCharacters = Math.min(defaultLowerCaseCharacters.length, defaultUpperCaseCharacters.length);
+            for (int i = 0; i < maxCharacters; i++) {
                 this.textFieldDefaultAllowedCharacters.add(defaultLowerCaseCharacters[i]);
                 this.textFieldDefaultAllowedCharacters.add(defaultUpperCaseCharacters[i]);
             }
@@ -2272,9 +2282,7 @@ public class API {
         }
 
         public boolean mouseUpButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++) {
-                if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++) if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
             return false;
         }
 
@@ -2287,9 +2295,7 @@ public class API {
         }
 
         public boolean mouseDownButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++) {
-                if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++) if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
             return false;
         }
 
@@ -2316,9 +2322,7 @@ public class API {
         }
 
         public boolean keyDownKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2327,9 +2331,7 @@ public class API {
         }
 
         public boolean keyTypedCharacter(Character character) {
-            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) {
-                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
             return false;
         }
 
@@ -2342,9 +2344,7 @@ public class API {
         }
 
         public boolean keyUpKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2362,9 +2362,7 @@ public class API {
         }
 
         public boolean gamePadDownButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2381,9 +2379,7 @@ public class API {
         }
 
         public boolean gamePadUpButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++) {
-                if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
-            }
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2569,8 +2565,7 @@ public class API {
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for (ContextMenuItem contextMenuItem : contextMenuItems)
-                addContextMenuItem(contextMenu, contextMenuItem);
+            for (int i=0;i<contextMenuItems.length;i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -2580,8 +2575,8 @@ public class API {
 
         public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for (ContextMenuItem contextMenuItem : contextMenuItems)
-                removeContextMenuItem(contextMenu, contextMenuItem);
+            for (int i=0;i<contextMenuItems.length;i++)
+                removeContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
         public void removeAllContextMenuItems(ContextMenu contextMenu) {
@@ -2591,7 +2586,10 @@ public class API {
 
         public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return new ArrayList<>();
-            return new ArrayList(contextMenu.items.stream().filter(contextMenuItem -> name.equals(contextMenuItem)).toList());
+            ArrayList<ContextMenuItem> result = new ArrayList<>();
+            for (int i = 0; i < contextMenu.items.size(); i++)
+                if (name.equals(contextMenu.items.get(i).name)) result.add(contextMenu.items.get(i));
+            return result;
         }
 
         public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
@@ -2771,8 +2769,7 @@ public class API {
 
         public void addMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
-            for (MessageReceiverAction messageReceiverAction : messageReceiverActions)
-                addMessageReceiverAction(window, messageReceiverAction);
+            for (int i=0;i<messageReceiverActions.length;i++) addMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
         public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
@@ -2782,8 +2779,7 @@ public class API {
 
         public void removeMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
-            for (MessageReceiverAction messageReceiverAction : messageReceiverActions)
-                removeMessageReceiverAction(window, messageReceiverAction);
+            for (int i=0;i<messageReceiverActions.length;i++)  removeMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
         public void removeAllMessageReceiverActions(Window window) {
@@ -2836,22 +2832,23 @@ public class API {
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
             if (classes == null) classes = new Class[]{};
             if (windowColor) setColor(window, color);
-            for (Component component : window.components) {
-                boolean match = switch (setColorMode) {
-                    // 1 = INCLUDE Mode
-                    case 1 -> Arrays.stream(classes).anyMatch(componentClass -> componentClass == component.getClass());
-                    // 2 = EXCEPT Mode
-                    case 2 ->
-                            Arrays.stream(classes).noneMatch(componentClass -> componentClass == component.getClass());
-                    default -> throw new IllegalStateException("Unexpected value: " + setColorMode);
-                };
+            for (int i = 0; i < window.components.size(); i++) {
+                Component component = window.components.get(i);
+                boolean match = setColorMode == 1 ? false : true;
+                classLoop:
+                for (int i2 = 0; i2 < classes.length; i2++) {
+                    if (classes[i2] == component.getClass()) {
+                        match = setColorMode == 1 ? true : false;
+                        break classLoop;
+                    }
+                }
                 if (match) {
                     if (componentColor1) components.setColor(component, color);
                     if (componentColor2) components.setColor2(component, color);
                     if (component.getClass() == ComboBox.class) {
                         ComboBox comboBox = (ComboBox) component;
-                        for (ComboBoxItem comboBoxItem : comboBox.items)
-                            components.comboBox.item.setColor(comboBoxItem, color);
+                        for (int i2=0;i2<comboBox.items.size();i2++)
+                            components.comboBox.item.setColor(comboBox.items.get(i2), color);
                     }
                 }
             }
@@ -2898,11 +2895,17 @@ public class API {
 
         public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
             if (window == null) return;
-
-            for (Component component : window.components) {
-                if (inclusions != null && Arrays.stream(inclusions).anyMatch(inclusionClass -> inclusionClass == component.getClass())) {
-                    if (setColor1) components.setColor(component, color);
-                    if (setColor2) components.setColor2(component, color);
+            if (inclusions != null) {
+                for (int i = 0; i < window.components.size(); i++) {
+                    Component component = window.components.get(i);
+                    classLoop:
+                    for (int i2 = 0; i2 < inclusions.length; i2++) {
+                        if (component.getClass() == inclusions[i2]) {
+                            if (setColor1) components.setColor(component, color);
+                            if (setColor2) components.setColor2(component, color);
+                            break classLoop;
+                        }
+                    }
                 }
             }
 
@@ -2933,7 +2936,7 @@ public class API {
 
         public void addComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
-            for (Component component : components) addComponent(window, component);
+            for (int i = 0; i < components.length; i++) addComponent(window, components[i]);
         }
 
         public void removeComponent(Window window, Component component) {
@@ -2943,7 +2946,7 @@ public class API {
 
         public void removeComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
-            for (Component component : components) removeComponent(window, component);
+            for (int i = 0; i < components.length; i++) removeComponent(window, components[i]);
         }
 
         public void removeAllComponents(Window window) {
@@ -2953,7 +2956,10 @@ public class API {
 
         public ArrayList<Component> findComponentsByName(Window window, String name) {
             if (window == null || name == null) return new ArrayList<>();
-            return new ArrayList<>(window.components.stream().filter(component -> name.equals(component.name)).toList());
+            ArrayList<Component> result = new ArrayList<>();
+            for (int i = 0; i < window.components.size(); i++)
+                if (name.equals(window.components.get(i).name)) result.add(window.components.get(i));
+            return result;
         }
 
         public Component findComponentByName(Window window, String name) {
@@ -2985,7 +2991,7 @@ public class API {
 
         public void addUpdateActions(Window window, UpdateAction[] updateActions) {
             if (window == null || updateActions == null) return;
-            for (UpdateAction updateAction : updateActions) addUpdateAction(window, updateAction);
+            for (int i = 0; i < updateActions.length; i++) addUpdateAction(window, updateActions[i]);
         }
 
         public void removeUpdateAction(Window window, UpdateAction updateAction) {
@@ -2995,7 +3001,7 @@ public class API {
 
         public void removeUpdateActions(Window window, UpdateAction[] updateActions) {
             if (window == null || updateActions == null) return;
-            for (UpdateAction updateAction : updateActions) removeUpdateAction(window, updateAction);
+            for (int i = 0; i < updateActions.length; i++) removeUpdateAction(window, updateActions[i]);
         }
 
         public void removeAllUpdateActions(Window window) {
@@ -3120,30 +3126,30 @@ public class API {
 
 
         public ToolTip create(String[] lines) {
-            return create(lines, true, defaultToolTipAction(), null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
+            return create(lines, true, defaultToolTipAction(), null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
-            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, 1,1,config.tooltipDefaultColor, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth,minHeight,config.tooltipDefaultColor, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth,minHeight,color, config.tooltipDefaultFont);
+            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, color, config.tooltipDefaultFont);
         }
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color, CMediaFont font) {
@@ -3164,9 +3170,9 @@ public class API {
             UICommons.toolTip_addToolTipImage(toolTip, toolTipImage);
         }
 
-        public void addToolTipImages(ToolTip toolTip, ToolTipImage[] images) {
-            if (toolTip == null || images == null) return;
-            for (ToolTipImage toolTipImage : images) addToolTipImage(toolTip, toolTipImage);
+        public void addToolTipImages(ToolTip toolTip, ToolTipImage[] toolTipImages) {
+            if (toolTip == null || toolTipImages == null) return;
+            for (int i = 0; i < toolTipImages.length; i++) addToolTipImage(toolTip, toolTipImages[i]);
         }
 
         public void removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
@@ -3176,7 +3182,7 @@ public class API {
 
         public void removeToolTipImages(ToolTip toolTip, ToolTipImage[] toolTipImages) {
             if (toolTip == null || toolTipImages == null) return;
-            for (ToolTipImage toolTipImage : toolTipImages) removeToolTipImage(toolTip, toolTipImage);
+            for (int i = 0; i < toolTipImages.length; i++) removeToolTipImage(toolTip, toolTipImages[i]);
         }
 
         public void removeAllToolTipImages(ToolTip toolTip) {
@@ -3270,7 +3276,8 @@ public class API {
             if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) {
                 return true;
             }
-            for (GameViewPort gameViewPort : inputState.gameViewPorts) {
+            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
+                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
                 setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
                 if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
             }
@@ -3283,7 +3290,8 @@ public class API {
             if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
                 return true;
             }
-            for (GameViewPort gameViewPort : inputState.gameViewPorts) {
+            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
+                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
                 setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
                 if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f))
                     return true;
@@ -3296,7 +3304,8 @@ public class API {
             if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) {
                 return true;
             }
-            for (GameViewPort gameViewPort : inputState.gameViewPorts) {
+            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
+                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
                 setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
                 if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             }
@@ -3455,9 +3464,7 @@ public class API {
 
         public void setOffset(Component[] components, int x, int y) {
             if (components == null) return;
-            for (Component component : components) {
-                setOffset(component, x, y);
-            }
+            for (int i = 0; i < components.length; i++) setOffset(components[i], x, y);
         }
 
         public void setDisabled(Component component, boolean disabled) {
@@ -3467,9 +3474,7 @@ public class API {
 
         public void setDisabled(Component[] components, boolean disabled) {
             if (components == null) return;
-            for (Component component : components) {
-                setDisabled(component, disabled);
-            }
+            for (int i = 0; i < components.length; i++) setDisabled(components, disabled);
         }
 
         public void addUpdateAction(Component component, UpdateAction updateAction) {
@@ -3479,7 +3484,7 @@ public class API {
 
         public void addUpdateActions(Component component, UpdateAction[] updateActions) {
             if (component == null || updateActions == null) return;
-            for (UpdateAction updateAction : updateActions) addUpdateAction(component, updateAction);
+            for (int i = 0; i < updateActions.length; i++) addUpdateAction(component, updateActions[i]);
         }
 
         public void removeUpdateAction(Component component, UpdateAction updateAction) {
@@ -3489,7 +3494,7 @@ public class API {
 
         public void removeUpdateActions(Component component, UpdateAction[] updateActions) {
             if (component == null || updateActions == null) return;
-            for (UpdateAction updateAction : updateActions) removeUpdateAction(component, updateAction);
+            for (int i = 0; i < updateActions.length; i++) removeUpdateAction(component, updateActions[i]);
         }
 
         public void removeAllUpdateActions(Component component) {
@@ -3521,7 +3526,7 @@ public class API {
 
         public void setColor(Component[] components, FColor color) {
             if (components == null) return;
-            for (Component component : components) setColor(component, color);
+            for (int i = 0; i < components.length; i++) setColor(components[i], color);
         }
 
         public void setColor(Component component, FColor color) {
@@ -3539,7 +3544,7 @@ public class API {
 
         public void setColor2(Component[] components, FColor color2) {
             if (components == null) return;
-            for (Component component : components) setColor2(component, color2);
+            for (int i = 0; i < components.length; i++) setColor2(components[i], color2);
         }
 
         public void setColor2(Component component, FColor color) {
@@ -3563,9 +3568,9 @@ public class API {
 
         public void setColor1And2(Component[] components, FColor color) {
             if (components == null) return;
-            for (Component component : components) {
-                setColor(component, color);
-                setColor2(component, color);
+            for (int i = 0; i < components.length; i++) {
+                setColor(components[i], color);
+                setColor2(components[i], color);
             }
         }
 
@@ -3576,7 +3581,7 @@ public class API {
 
         public void setAlpha(Component[] components, float alpha) {
             if (components == null) return;
-            for (Component component : components) setAlpha(component, alpha);
+            for (int i = 0; i < components.length; i++) setAlpha(components[i], alpha);
         }
 
         private void setComponentInitValues(Component component) {
@@ -3610,7 +3615,7 @@ public class API {
 
         public void setVisible(Component[] components, boolean visible) {
             if (components == null) return;
-            for (Component component : components) setVisible(component, visible);
+            for (int i = 0; i < components.length; i++) setVisible(components[i], visible);
         }
 
         public int getAbsoluteX(Component component) {
@@ -3807,9 +3812,8 @@ public class API {
             }
 
             public void setPressed(Button[] buttons, boolean pressed) {
-                for (Button button : buttons) {
-                    setPressed(button, pressed);
-                }
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) setPressed(buttons[i], pressed);
             }
 
             public void setButtonMode(Button button, ButtonMode buttonMode) {
@@ -3826,9 +3830,7 @@ public class API {
 
             public void setOffsetContent(Button[] buttons, int x, int y) {
                 if (buttons == null) return;
-                for (Button button : buttons) {
-                    setOffsetContent(button, x, y);
-                }
+                for (int i = 0; i < buttons.length; i++) setOffsetContent(buttons[i], x, y);
             }
 
             private void setButtonValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
@@ -3839,9 +3841,8 @@ public class API {
             }
 
             public void centerContent(Button[] buttons) {
-                for (Button button : buttons) {
-                    centerContent(button);
-                }
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) centerContent(buttons[i]);
             }
 
             public void disableAndRemoveAction(Button button) {
@@ -3850,9 +3851,8 @@ public class API {
             }
 
             public void disableAndRemoveAction(Button[] buttons) {
-                for (Button button : buttons) {
-                    disableAndRemoveAction(button);
-                }
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) disableAndRemoveAction(buttons[i]);
             }
 
             public void centerContent(Button button) {
@@ -3995,7 +3995,7 @@ public class API {
                 return create(x, y, text, checkBoxStyle, checkBoxAction, false, null);
             }
 
-            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction,boolean checked) {
+            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked) {
                 return create(x, y, text, checkBoxStyle, checkBoxAction, checked, null);
             }
 
@@ -4152,7 +4152,7 @@ public class API {
 
             public void addTabs(TabBar tabBar, Tab[] tabs) {
                 if (tabBar == null || tabs == null) return;
-                for (Tab tab : tabs) addTab(tabBar, tab);
+                for (int i = 0; i < tabs.length; i++) addTab(tabBar, tabs[i]);
             }
 
             public void removeTab(TabBar tabBar, Tab tab) {
@@ -4162,7 +4162,7 @@ public class API {
 
             public void removeTabs(TabBar tabBar, Tab[] tabs) {
                 if (tabBar == null || tabs == null) return;
-                for (Tab tab : tabs) removeTab(tabBar, tab);
+                for (int i = 0; i < tabs.length; i++) removeTab(tabBar, tabs[i]);
             }
 
             public void removeAllTabs(TabBar tabBar) {
@@ -4172,7 +4172,10 @@ public class API {
 
             public ArrayList<Tab> findTabsByName(TabBar tabBar, String name) {
                 if (tabBar == null || name == null) return new ArrayList<>();
-                return new ArrayList<>(tabBar.tabs.stream().filter(tab1 -> name.equals(tab1.name)).toList());
+                ArrayList<Tab> result = new ArrayList<>();
+                for (int i = 0; i < tabBar.tabs.size(); i++)
+                    if (name.equals(tabBar.tabs.get(i).name)) result.add(tabBar.tabs.get(i));
+                return result;
             }
 
             public Tab findTabByName(TabBar tabBar, String name) {
@@ -4184,20 +4187,17 @@ public class API {
             public boolean isTabVisible(TabBar tabBar, Tab tab) {
                 if (tabBar == null || tab == null) return false;
                 int xOffset = 0;
-                for (Tab tabB : tabBar.tabs) {
-                    xOffset += tabB.width;
-                    if (tabB == tab) {
-                        return xOffset <= tabBar.width;
-                    }
+                for (int i = 0; i < tabBar.tabs.size(); i++) {
+                    xOffset += tabBar.tabs.get(i).width;
+                    if (tabBar.tabs.get(i) == tab) return xOffset <= tabBar.width;
                 }
                 return false;
             }
 
             public int getTabsWidth(TabBar tabBar) {
+                if (tabBar == null) return 0;
                 int width = 0;
-                for (Tab tab : tabBar.tabs) {
-                    width += tab.width;
-                }
+                for (int i = 0; i < tabBar.tabs.size(); i++) width += tabBar.tabs.get(i).width;
                 return width;
             }
 
@@ -4273,7 +4273,7 @@ public class API {
                 public void setTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
                     removeAllTabComponents(tab);
-                    for (Component component : components) addTabComponent(tab, component);
+                    for (int i = 0; i < components.length; i++) addTabComponent(tab, components[i]);
                 }
 
                 public void addTabComponent(Tab tab, Component component) {
@@ -4283,7 +4283,7 @@ public class API {
 
                 public void addTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
-                    for (Component component : components) addTabComponent(tab, component);
+                    for (int i = 0; i < components.length; i++) addTabComponent(tab, components[i]);
                 }
 
                 public void removeTabComponent(Tab tab, Component component) {
@@ -4293,7 +4293,7 @@ public class API {
 
                 public void removeTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
-                    for (Component component : components) removeTabComponent(tab, component);
+                    for (int i = 0; i < components.length; i++) removeTabComponent(tab, components[i]);
                 }
 
                 public void removeAllTabComponents(Tab tab) {
@@ -4629,7 +4629,7 @@ public class API {
 
             public void addMapOverlays(Map map, MapOverlay[] mapOverlays) {
                 if (map == null || mapOverlays == null) return;
-                for (MapOverlay mapOverlay : mapOverlays) addMapOverlay(map, mapOverlay);
+                for (int i = 0; i < mapOverlays.length; i++) addMapOverlay(map, mapOverlays[i]);
             }
 
             public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
@@ -4639,7 +4639,7 @@ public class API {
 
             public void removeMapOverlays(Map map, MapOverlay[] mapOverlays) {
                 if (map == null || mapOverlays == null) return;
-                for (MapOverlay mapOverlay : mapOverlays) removeMapOverlay(map, mapOverlay);
+                for (int i = 0; i < mapOverlays.length; i++) removeMapOverlay(map, mapOverlays[i]);
             }
 
             public void removeAllMapOverlays(Map map) {
@@ -4649,7 +4649,10 @@ public class API {
 
             public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
                 if (map == null || name == null) return new ArrayList<>();
-                return new ArrayList<>(map.mapOverlays.stream().filter(mapOverlay1 -> name.equals(mapOverlay1.name)).toList());
+                ArrayList<MapOverlay> result = new ArrayList<>();
+                for (int i = 0; i < map.mapOverlays.size(); i++)
+                    if (name.equals(map.mapOverlays.get(i).name)) result.add(map.mapOverlays.get(i));
+                return result;
             }
 
             public MapOverlay findMapOverlayByName(Map map, String name) {
@@ -4825,10 +4828,9 @@ public class API {
                 updateSize(text);
             }
 
-            public void setFont(Text[] textComponents, CMediaFont font) {
-                for (Text text : textComponents) {
-                    setFont(text, font);
-                }
+            public void setFont(Text[] text, CMediaFont font) {
+                if (text == null) return;
+                for (int i = 0; i < text.length; i++) setFont(text[i], font);
             }
 
             public void setFont(Text text, CMediaFont font) {
@@ -4839,8 +4841,8 @@ public class API {
             private void updateSize(Text text) {
                 if (text == null) return;
                 int width = 0;
-                for (String line : text.lines) {
-                    int widthT = mediaManager.textWidth(text.font, line);
+                for (int i = 0; i < text.lines.length; i++) {
+                    int widthT = mediaManager.textWidth(text.font, text.lines[i]);
                     if (widthT > width) width = widthT;
                 }
                 width = width / UIEngine.TILE_SIZE;
@@ -4967,7 +4969,7 @@ public class API {
 
             public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
                 if (comboBox == null || comboBoxItems == null) return;
-                for (ComboBoxItem comboBoxItem : comboBoxItems) addComboBoxItem(comboBox, comboBoxItem);
+                for (int i = 0; i < comboBoxItems.length; i++) addComboBoxItem(comboBox, comboBoxItems[i]);
             }
 
             public void removeComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
@@ -4977,7 +4979,7 @@ public class API {
 
             public void removeComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
                 if (comboBox == null || comboBoxItems == null) return;
-                for (ComboBoxItem comboBoxItem : comboBoxItems) removeComboBoxItem(comboBox, comboBoxItem);
+                for (int i = 0; i < comboBoxItems.length; i++) removeComboBoxItem(comboBox, comboBoxItems[i]);
             }
 
             public void removeAllComboBoxItems(ComboBox comboBox) {
@@ -5007,9 +5009,9 @@ public class API {
 
             public void setSelectedItemByText(ComboBox comboBox, String text) {
                 if (comboBox == null || text == null) return;
-                for (ComboBoxItem comboBoxItem : comboBox.items) {
-                    if (comboBoxItem.text.equals(text)) {
-                        setSelectedItem(comboBox, comboBoxItem);
+                for (int i = 0; i < comboBox.items.size(); i++) {
+                    if (comboBox.items.get(i).text.equals(text)) {
+                        setSelectedItem(comboBox, comboBox.items.get(i));
                         return;
                     }
                 }
@@ -5283,11 +5285,8 @@ public class API {
                 if (list == null || selectedItems == null) return;
                 if (!list.multiSelect) return;
                 list.selectedItems.clear();
-                for (Object item : selectedItems) {
-                    if (item != null) {
-                        list.selectedItems.add(item);
-                    }
-                }
+                for (int i = 0; i < selectedItems.length; i++)
+                    if (selectedItems[i] != null) list.selectedItems.add(selectedItems[i]);
             }
 
 
