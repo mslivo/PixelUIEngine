@@ -46,7 +46,7 @@ public abstract class ParticleSystem<T> {
     public void update() {
         if (particles.size() == 0) return;
         for (int i = 0; i < particles.size(); i++) {
-            Particle<T>particle = particles.get(i);
+            Particle<T> particle = particles.get(i);
             if (!updateParticle(particle, i)) {
                 deleteQueue.add(particle);
             }
@@ -54,7 +54,7 @@ public abstract class ParticleSystem<T> {
         deleteQueuedParticles();
     }
 
-    private Particle<T>particleNew(ParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaGFX appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
+    private Particle<T> particleNew(ParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaGFX appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
         if (!canAddParticle()) return null;
         Particle<T> particle = particlePool.size() > 0 ? particlePool.pop() : new Particle<T>();
         particle.type = type;
@@ -75,30 +75,30 @@ public abstract class ParticleSystem<T> {
         particle.text = text;
         particle.animation_offset = animation_offset;
         particle.visible = visible;
-        if(this.particleDataProvider != null){
-            if(particle.data == null) particle.data = particleDataProvider.provideNewInstance();
-        }else{
+        if (this.particleDataProvider != null) {
+            if (particle.data == null) particle.data = particleDataProvider.provideNewInstance();
+        } else {
             particle.data = null;
         }
         return particle;
     }
 
     private void deleteQueuedParticles() {
-        Particle<T>deleteParticle;
+        Particle<T> deleteParticle;
         while ((deleteParticle = deleteQueue.poll()) != null) {
             removeParticleFromSystem(deleteParticle);
         }
     }
 
-    private void addParticleToSystem(Particle<T>particle) {
-        if(particle == null) return;
+    private void addParticleToSystem(Particle<T> particle) {
+        if (particle == null) return;
         onParticleCreate(particle);
         particles.add(particle);
         return;
     }
 
-    private void removeParticleFromSystem(Particle<T>particle) {
-        if(particle == null) return;
+    private void removeParticleFromSystem(Particle<T> particle) {
+        if (particle == null) return;
         onParticleDestroy(particle);
         particles.remove(particle);
         // add back to pool
@@ -133,7 +133,7 @@ public abstract class ParticleSystem<T> {
     public void render(SpriteBatch batch, float animation_timer) {
         if (particles.size() == 0) return;
         for (int i = 0; i < particles.size(); i++) {
-            Particle<T>particle = particles.get(i);
+            Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
             batch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
@@ -171,27 +171,26 @@ public abstract class ParticleSystem<T> {
         removeAllParticles();
     }
 
-    public abstract boolean updateParticle(Particle<T> particle, int index);
+    protected abstract boolean updateParticle(Particle<T> particle, int index);
 
-    public abstract void onParticleCreate(Particle<T> particle);
+    protected abstract void onParticleCreate(Particle<T> particle);
 
-    public abstract void onParticleDestroy(Particle<T> particle);
-
+    protected abstract void onParticleDestroy(Particle<T> particle);
 
     /* ------- Cursor ------- */
-    public Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y) {
+    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y) {
         Particle<T> particle = particleNew(ParticleType.CURSOR, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaCursor, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a) {
+    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a) {
         Particle<T> particle = particleNew(ParticleType.CURSOR, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaCursor, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
+    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
         Particle<T> particle = particleNew(ParticleType.CURSOR, x, y, r, g, b, a, 0f, 1f, 1f, 0, origin_x, origin_y, cMediaCursor, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
@@ -199,19 +198,19 @@ public abstract class ParticleSystem<T> {
 
     /* ------- Font ------- */
 
-    public Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y) {
+    protected Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y) {
         Particle<T> particle = particleNew(ParticleType.FONT, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a) {
+    protected Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a) {
         Particle<T> particle = particleNew(ParticleType.FONT, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
+    protected Particle<T> addParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
         Particle<T> particle = particleNew(ParticleType.FONT, x, y, r, g, b, a, 0f, 1f, 1f, 0, origin_x, origin_y, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
@@ -219,19 +218,19 @@ public abstract class ParticleSystem<T> {
 
     /* ------- Image ------- */
 
-    public Particle<T> addParticle(CMediaImage cMediaImage, float x, float y) {
+    protected Particle<T> addParticle(CMediaImage cMediaImage, float x, float y) {
         Particle<T> particle = particleNew(ParticleType.IMAGE, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaImage, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a) {
+    protected Particle<T> addParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a) {
         Particle<T> particle = particleNew(ParticleType.IMAGE, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0, 0, cMediaImage, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
+    protected Particle<T> addParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
         Particle<T> particle = particleNew(ParticleType.IMAGE, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaImage, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
@@ -239,19 +238,19 @@ public abstract class ParticleSystem<T> {
 
     /* ------- Animation ------- */
 
-    public Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y) {
+    protected Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y) {
         Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a) {
+    protected Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a) {
         Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
+    protected Particle<T> addParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
         Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
@@ -259,20 +258,20 @@ public abstract class ParticleSystem<T> {
 
     /* ------- Array ------- */
 
-    public Particle<T> addParticle(CMediaArray cMediaArray, int array_index, float x, float y) {
+    protected Particle<T> addParticle(CMediaArray cMediaArray, int array_index, float x, float y) {
         Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T> addParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a) {
+    protected Particle<T> addParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a) {
         Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, r, g, b, a, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
-    public Particle<T>addParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
-        Particle<T>particle = particleNew(ParticleType.ARRAY, x, y, r, g, b, a, rotation, scaleX, scaleY, array_index, origin_x, origin_y, cMediaArray, null, null, 0, true);
+    protected Particle<T> addParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
+        Particle<T> particle = particleNew(ParticleType.ARRAY, x, y, r, g, b, a, rotation, scaleX, scaleY, array_index, origin_x, origin_y, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
