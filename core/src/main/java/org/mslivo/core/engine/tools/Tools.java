@@ -14,10 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class Tools {
@@ -409,7 +406,12 @@ public class Tools {
         }
 
         public static Object readObjectFromFile(Path file) throws Exception {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(Files.newInputStream(file))) {
+            return readObjectFromFile(file, null);
+        }
+
+
+        public static Object readObjectFromFile(Path file, HashMap<String, String> classReplacements) throws Exception {
+            try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(Files.newInputStream(file), classReplacements)) {
                 Object ret = objectInputStream.readObject();
                 objectInputStream.close();
                 return ret;
@@ -422,6 +424,39 @@ public class Tools {
             return Gdx.files.internal(path);
         }
 
+        private static class HackedObjectInputStream extends ObjectInputStream {
+
+            private final HashMap<String, String> classReplacements;
+
+            public HackedObjectInputStream(final InputStream stream, HashMap<String, String> classReplacements) throws IOException {
+                super(stream);
+                this.classReplacements = classReplacements;
+            }
+
+            @Override
+            protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
+                ObjectStreamClass resultClassDescriptor = super.readClassDescriptor();
+                if(classReplacements == null) return resultClassDescriptor;
+
+                // Replace Class
+                String cName = resultClassDescriptor.getName();
+                if (classReplacements.get(cName) != null) {
+                    resultClassDescriptor = ObjectStreamClass.lookup(Class.forName(classReplacements.get(cName)));
+                } else if (cName.startsWith("[")) {
+                    // Replace Arrays of Class
+                    int arraySizeI = 0;
+                    while (arraySizeI < cName.length() && cName.charAt(arraySizeI) == '[') arraySizeI++;
+                    String realCName = cName.substring(arraySizeI + 1, cName.length() - 1);
+                    if (classReplacements.get(realCName) != null){
+                        Class newClass = Class.forName(realCName);
+                        for (int i = 0; i < arraySizeI; i++) newClass = newClass.arrayType();
+                        resultClassDescriptor = ObjectStreamClass.lookup(newClass);
+                    }
+                }
+                return resultClassDescriptor;
+            }
+
+        }
 
     }
 
@@ -476,12 +511,12 @@ public class Tools {
         }
 
         public static boolean chance(int oneIn) {
-            oneIn = lowerBounds(oneIn,1);
+            oneIn = lowerBounds(oneIn, 1);
             return MathUtils.random(1, oneIn) == 1;
         }
 
         public static boolean chance(long oneIn) {
-            oneIn = lowerBounds(oneIn,1);
+            oneIn = lowerBounds(oneIn, 1);
             return MathUtils.random(1, oneIn) == 1;
         }
 
