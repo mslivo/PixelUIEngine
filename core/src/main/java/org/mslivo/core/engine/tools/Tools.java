@@ -447,8 +447,8 @@ public class Tools {
                     int arraySizeI = 0;
                     while (arraySizeI < cName.length() && cName.charAt(arraySizeI) == '[') arraySizeI++;
                     String realCName = cName.substring(arraySizeI + 1, cName.length() - 1);
-                    if (classReplacements.get(classReplacements.get(realCName)) != null){
-                        Class newClass = Class.forName(realCName);
+                    if (classReplacements.get(realCName) != null){
+                        Class newClass = Class.forName(classReplacements.get(realCName));
                         for (int i = 0; i < arraySizeI; i++) newClass = newClass.arrayType();
                         resultClassDescriptor = ObjectStreamClass.lookup(newClass);
                     }
