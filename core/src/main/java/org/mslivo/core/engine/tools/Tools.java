@@ -692,11 +692,6 @@ public class Tools {
             }
         }
 
-        public static long applyRandomness(long value, float randomness) {
-            if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
-            return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
-        }
 
         public static float percentAboveThreshold(long value, long max, int threshold) {
             value = Tools.Calc.upperBounds(value, max);
@@ -743,17 +738,27 @@ public class Tools {
         }
 
         public static int applyRandomness(int value, float randomness) {
-            return (int) applyRandomness((long) value, randomness);
+            if (randomness == 0) return value;
+            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
+        }
+
+        public static long applyRandomness(long value, float randomness) {
+            if (randomness == 0) return value;
+            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
+        }
+
+        public static float applyRandomness(float value, float randomness) {
+            if (randomness == 0) return value;
+            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            return value * MathUtils.random((1 - randomness), (1 + randomness));
         }
 
         public static double applyRandomness(double value, float randomness) {
             if (randomness == 0) return value;
             randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
             return value * MathUtils.random((1 - randomness), (1 + randomness));
-        }
-
-        public static float applyRandomness(float value, float randomness) {
-            return (float) applyRandomness((double) value, randomness);
         }
 
         public static long applyPercent(long value, float percent) {
@@ -763,18 +768,21 @@ public class Tools {
         }
 
         public static int applyPercent(int value, float percent) {
-            return (int) applyPercent((long) value, percent);
+            if (percent == 0) return value;
+            value += MathUtils.round(value * percent);
+            return value;
         }
 
-
-        public static double applyPercent(double value, float percent) {
+        public static float applyPercent(float value, float percent) {
             if (percent == 0) return value;
             value += (value * percent);
             return value;
         }
 
-        public static float applyPercent(float value, float percent) {
-            return (float) applyPercent((double) value, percent);
+        public static double applyPercent(double value, float percent) {
+            if (percent == 0) return value;
+            value += (value * percent);
+            return value;
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
