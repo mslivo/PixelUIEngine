@@ -20,7 +20,6 @@
 			<artifactId>gdx-backend-lwjgl3</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.badlogicgames.gdx-controllers</groupId>
 			<artifactId>gdx-controllers-core</artifactId>
@@ -49,18 +48,17 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<excludes>
+						<!-- Remove Examples -->
+						<exclude>org/mslivo/core/example/**</exclude>
+						<exclude>sprites/example/**</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
