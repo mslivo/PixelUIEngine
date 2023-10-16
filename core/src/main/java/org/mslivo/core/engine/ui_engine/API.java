@@ -829,7 +829,7 @@ public class API {
 
         public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
-            for (int i=0;i<lines.length;i++) {
+            for (int i = 0; i < lines.length; i++) {
                 int len = mediaManager.textWidth(config.defaultFont, lines[i]);
                 if (len > longest) longest = len;
             }
@@ -1147,13 +1147,14 @@ public class API {
 
         private void updateExtendableTabBarButton(TabBar tabBar, ImageButton extendButton) {
             ArrayList<Tab> invisibleTabs = new ArrayList<>();
-            for (int i=0;i<tabBar.tabs.size();i++) if (!components.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
+            for (int i = 0; i < tabBar.tabs.size(); i++)
+                if (!components.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
             if (invisibleTabs.size() > 0) {
                 components.button.setButtonAction(extendButton, new ButtonAction() {
                     @Override
                     public void onRelease() {
                         ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
-                        for (int i2=0;i2<invisibleTabs.size();i2++) {
+                        for (int i2 = 0; i2 < invisibleTabs.size(); i2++) {
                             Tab invisibleTab = invisibleTabs.get(i2);
                             contextMenuItems.add(contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
                                 @Override
@@ -1201,7 +1202,7 @@ public class API {
 
     public void addNotifications(Notification[] notifications) {
         if (notifications == null) return;
-        for (int i=0;i<notifications.length;i++) addNotification(notifications[i]);
+        for (int i = 0; i < notifications.length; i++) addNotification(notifications[i]);
     }
 
     public void removeNotification(Notification notification) {
@@ -1211,7 +1212,7 @@ public class API {
 
     public void removeNotifications(Notification[] notifications) {
         if (notifications == null) return;
-        for (int i=0;i<notifications.length;i++)removeNotification(notifications[i]);
+        for (int i = 0; i < notifications.length; i++) removeNotification(notifications[i]);
     }
 
     public void removeAllNotifications() {
@@ -1298,7 +1299,7 @@ public class API {
 
     public void addWindows(Window[] windows) {
         if (windows == null) return;
-        for (int i=0;i<windows.length;i++) addWindow(windows[i]);
+        for (int i = 0; i < windows.length; i++) addWindow(windows[i]);
     }
 
     public void removeWindow(Window window) {
@@ -1308,7 +1309,7 @@ public class API {
 
     public void removeWindows(Window[] windows) {
         if (windows == null) return;
-        for (int i=0;i<windows.length;i++) removeWindow(windows[i]);
+        for (int i = 0; i < windows.length; i++) removeWindow(windows[i]);
     }
 
     public void removeAllWindows() {
@@ -1332,7 +1333,7 @@ public class API {
 
     public void closeWindows(Window[] windows) {
         if (windows == null) return;
-        for (int i=0;i<windows.length;i++)  closeWindow(windows[i]);
+        for (int i = 0; i < windows.length; i++) closeWindow(windows[i]);
     }
 
     public void closeAllWindows() {
@@ -1387,7 +1388,7 @@ public class API {
 
     public void addScreenComponents(Component[] components) {
         if (components == null) return;
-        for (int i=0;i<components.length;i++) addScreenComponent(components[i]);
+        for (int i = 0; i < components.length; i++) addScreenComponent(components[i]);
     }
 
     public void removeScreenComponent(Component component) {
@@ -1397,7 +1398,7 @@ public class API {
 
     public void removeScreenComponents(Component[] components) {
         if (components == null) return;
-        for (int i=0;i<components.length;i++)  removeScreenComponent(components[i]);
+        for (int i = 0; i < components.length; i++) removeScreenComponent(components[i]);
     }
 
     public void removeAllScreenComponents() {
@@ -2282,7 +2283,8 @@ public class API {
         }
 
         public boolean mouseUpButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++) if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++)
+                if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
             return false;
         }
 
@@ -2295,7 +2297,8 @@ public class API {
         }
 
         public boolean mouseDownButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++) if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++)
+                if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
             return false;
         }
 
@@ -2322,7 +2325,8 @@ public class API {
         }
 
         public boolean keyDownKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++)
+                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2331,7 +2335,8 @@ public class API {
         }
 
         public boolean keyTypedCharacter(Character character) {
-            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++) if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++)
+                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
             return false;
         }
 
@@ -2344,7 +2349,8 @@ public class API {
         }
 
         public boolean keyUpKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++)
+                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2362,7 +2368,8 @@ public class API {
         }
 
         public boolean gamePadDownButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++)
+                if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2379,7 +2386,8 @@ public class API {
         }
 
         public boolean gamePadUpButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++) if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
+            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++)
+                if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
             return false;
         }
 
@@ -2565,7 +2573,7 @@ public class API {
 
         public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for (int i=0;i<contextMenuItems.length;i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
+            for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
         public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -2575,7 +2583,7 @@ public class API {
 
         public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
-            for (int i=0;i<contextMenuItems.length;i++)
+            for (int i = 0; i < contextMenuItems.length; i++)
                 removeContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
@@ -2769,7 +2777,8 @@ public class API {
 
         public void addMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
-            for (int i=0;i<messageReceiverActions.length;i++) addMessageReceiverAction(window, messageReceiverActions[i]);
+            for (int i = 0; i < messageReceiverActions.length; i++)
+                addMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
         public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
@@ -2779,7 +2788,8 @@ public class API {
 
         public void removeMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
-            for (int i=0;i<messageReceiverActions.length;i++)  removeMessageReceiverAction(window, messageReceiverActions[i]);
+            for (int i = 0; i < messageReceiverActions.length; i++)
+                removeMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
         public void removeAllMessageReceiverActions(Window window) {
@@ -2847,7 +2857,7 @@ public class API {
                     if (componentColor2) components.setColor2(component, color);
                     if (component.getClass() == ComboBox.class) {
                         ComboBox comboBox = (ComboBox) component;
-                        for (int i2=0;i2<comboBox.items.size();i2++)
+                        for (int i2 = 0; i2 < comboBox.items.size(); i2++)
                             components.comboBox.item.setColor(comboBox.items.get(i2), color);
                     }
                 }
@@ -3868,11 +3878,11 @@ public class API {
                     if (textButton.text == null) return;
                     int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
 
-                    int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + iconWidth;
+                    int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
                     int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
-                    setOffsetContent(textButton,
-                            (((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2) + 1,
-                            (((textButton.height * UIEngine.TILE_SIZE) - contentHeight) / 2) - ((UIEngine.TILE_SIZE / 2) - 3));
+                    int xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
+                    int yOffset = (((textButton.height * UIEngine.TILE_SIZE) - contentHeight) / 2) - ((UIEngine.TILE_SIZE / 2) - 3);
+                    setOffsetContent(textButton,xOffset,yOffset);
 
                 }
             }
