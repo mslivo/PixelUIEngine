@@ -84,11 +84,14 @@ public class ExampleWindowGenerator extends WindowGenerator {
         /* Slider */
         ArrayList<Component> components_tab3 = createTab3(window);
 
+        /* Font */
+        ArrayList<Component> components_tab4 = createTab4(window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
         tabs.add(api.components.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE, components_tab1.toArray(new Component[]{})));
         tabs.add(api.components.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN, components_tab2.toArray(new Component[]{})));
         tabs.add(api.components.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, components_tab3.toArray(new Component[]{})));
+        tabs.add(api.components.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, components_tab4.toArray(new Component[]{})));
 
 
         ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
@@ -99,6 +102,19 @@ public class ExampleWindowGenerator extends WindowGenerator {
         return window;
     }
 
+
+    private ArrayList<Component> createTab4(Window window) {
+        Text text1 = api.components.text.create(2,10,new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
+        Text text2 = api.components.text.create(2,9,new String[]{"abcdefghijklmnopqrstuvwxyz"});
+        Text text3 = api.components.text.create(2,8,new String[]{"0123456789"});
+        Text text4 = api.components.text.create(2,7,new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
+        Text text5 = api.components.text.create(2,6,new String[]{"ÀÁÂÃÈÉÊÌÍÎÑÒÓÔÕÙÚÛÜÇ"});
+        Text text6 = api.components.text.create(2,5,new String[]{"àáâãèéêìíîñòóôõùúûüç"});
+
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1,text2,text3,text4,text5,text6));
+        api.windows.addComponents(window, components.toArray(new Component[]{}));
+        return components;
+    }
 
     private ArrayList<Component> createTab3(Window window) {
 
@@ -277,10 +293,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        api.windows.addComponents(window, new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput});
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(new Component[]{gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput}));
-
-
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle,osKeyBoardTextInput));
+        api.windows.addComponents(window, components.toArray(new Component[]{}));
         return components;
     }
 
