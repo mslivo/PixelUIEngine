@@ -3867,23 +3867,23 @@ public class API {
 
             public void centerContent(Button button) {
                 if (button == null) return;
+                int xOffset;
+                int yOffset;
                 if (button.getClass() == ImageButton.class) {
                     ImageButton imageButton = (ImageButton) button;
                     if (imageButton.image == null) return;
-                    setOffsetContent(imageButton,
-                            ((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2,
-                            ((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2);
+                    xOffset = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
+                    yOffset = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
+                    setOffsetContent(imageButton,xOffset,yOffset);
                 } else if (button.getClass() == TextButton.class) {
                     TextButton textButton = (TextButton) button;
                     if (textButton.text == null) return;
                     int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
-
                     int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
                     int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
-                    int xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-                    int yOffset = (((textButton.height * UIEngine.TILE_SIZE) - contentHeight) / 2) - ((UIEngine.TILE_SIZE / 2) - 3);
-                    setOffsetContent(textButton,xOffset,yOffset);
-
+                    xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
+                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - UIEngine.TILE_SIZE_2 - 3;
+                    setOffsetContent(textButton, xOffset, yOffset);
                 }
             }
 
