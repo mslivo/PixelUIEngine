@@ -262,7 +262,10 @@ public class Tools {
         public static final String ANSI_BACK_WHITE = "\u001B[47m";
 
         public static String[] toArray(String text) {
-            return text.split("\n");
+            return toArray(text, false);
+        }
+        public static String[] toArray(String text, boolean splitLines) {
+            return splitLines ? text.split(System.lineSeparator()) : new String[]{text};
         }
 
         public static String formatNumber(int number) {
@@ -329,7 +332,7 @@ public class Tools {
         }
 
         public static String customChar(int number) {
-            return (Character.toString((char) (127 + number)));
+            return (Character.toString((char) (500 + number)));
         }
 
         public static String validString(String string) {
