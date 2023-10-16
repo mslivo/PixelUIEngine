@@ -3882,8 +3882,9 @@ public class API {
                     int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
                     int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
                     xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - UIEngine.TILE_SIZE_2 - 3;
+                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 1;
                     setOffsetContent(textButton, xOffset, yOffset);
+
                 }
             }
 
