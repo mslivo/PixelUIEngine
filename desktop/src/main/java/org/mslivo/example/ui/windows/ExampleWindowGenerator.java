@@ -1,4 +1,4 @@
-package org.mslivo.core.example.ui.windows;
+package org.mslivo.example.ui.windows;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
@@ -43,9 +43,9 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
-import org.mslivo.core.example.data.ExampleData;
-import org.mslivo.core.example.engine.ExampleEngineAdapter;
-import org.mslivo.core.example.ui.media.ExampleBaseMedia;
+import org.mslivo.example.data.ExampleData;
+import org.mslivo.example.engine.ExampleEngineAdapter;
+import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -53,7 +53,6 @@
 				<configuration>
 					<excludes>
 						<!-- Remove Examples -->
-						<exclude>org/mslivo/core/example/**</exclude>
 						<exclude>sprites/example/**</exclude>
 					</excludes>
 				</configuration>

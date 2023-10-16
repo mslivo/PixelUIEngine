@@ -1,4 +1,4 @@
-package org.mslivo.core.example.ui;
+package org.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,12 +13,11 @@ import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.example.data.ExampleData;
-import org.mslivo.core.example.engine.ExampleEngineAdapter;
-import org.mslivo.core.example.ui.media.ExampleBaseMedia;
-import org.mslivo.core.example.ui.windows.ExampleWindowGenerator;
+import org.mslivo.example.data.ExampleData;
+import org.mslivo.example.engine.ExampleEngineAdapter;
+import org.mslivo.example.ui.media.ExampleBaseMedia;
+import org.mslivo.example.ui.windows.ExampleWindowGenerator;
 
 public class ExampleUIAdapter implements UIAdapter {
 

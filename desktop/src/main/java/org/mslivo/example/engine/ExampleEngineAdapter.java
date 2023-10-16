@@ -1,13 +1,10 @@
-package org.mslivo.core.example.engine;
+package org.mslivo.example.engine;
 
 import org.mslivo.core.engine.game_engine.EngineInput;
-import org.mslivo.core.engine.game_engine.EngineOutput;
 import org.mslivo.core.engine.game_engine.GameEngineAdapter;
 import org.mslivo.core.engine.game_engine.Output;
 import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
-import org.mslivo.core.example.data.ExampleData;
-
-import java.util.function.Consumer;
+import org.mslivo.example.data.ExampleData;
 
 public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LThreadPoolUpdater {
 

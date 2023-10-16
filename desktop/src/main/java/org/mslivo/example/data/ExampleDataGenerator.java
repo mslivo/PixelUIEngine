@@ -1,4 +1,4 @@
-package org.mslivo.core.example.data;
+package org.mslivo.example.data;
 
 
 /**

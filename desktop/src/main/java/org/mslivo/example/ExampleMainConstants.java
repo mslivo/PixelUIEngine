@@ -1,4 +1,4 @@
-package org.mslivo.core.example;
+package org.mslivo.example;
 
 
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;

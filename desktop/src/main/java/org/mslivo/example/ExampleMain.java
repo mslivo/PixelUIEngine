@@ -1,4 +1,4 @@
-package org.mslivo.core.example;
+package org.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -7,11 +7,10 @@ import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIEngine;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.example.data.ExampleData;
-import org.mslivo.core.example.engine.ExampleEngineAdapter;
-import org.mslivo.core.example.ui.ExampleUIAdapter;
-import org.mslivo.core.example.ui.media.ExampleBaseMedia;
+import org.mslivo.example.data.ExampleData;
+import org.mslivo.example.engine.ExampleEngineAdapter;
+import org.mslivo.example.ui.ExampleUIAdapter;
+import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.nio.file.Path;
 
@@ -52,7 +51,7 @@ public class ExampleMain extends ApplicationAdapter {
 
 
     private void writeAndReadExampleDataFile() {
-        final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/example/test.data");
+        final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/org/mslivo/example/test.data");
         ExampleData exampleData = new ExampleData();
         try {
             Tools.Log.inProgress("Writing DataFile");
