@@ -2,7 +2,7 @@
 UI-System on top of LibGDX which provides tiny 8x8-tile based Windows and Components suited for low-resolution games. This library is used in the game [Sandtrix](https://www.sandtrix.net).
 
 ![](screenshot.png)
-## Components:
+## Components
 - Button
 - Checkbox
 - Combobox
@@ -18,16 +18,20 @@ UI-System on top of LibGDX which provides tiny 8x8-tile based Windows and Compon
 - Tabbars & Tabs
 - Textfield
 - GameViewPort
-- ToolTips
 
 Additionaly this Engine provides the following functionality:
-- Asset-Loading
-- Viewport handling / upscaling
+- ToolTips
+- Context Menus
+- Notifications
+- Keyboard mouse control mode
+- Gamepad mouse control mode & Gamepad text input
+- Viewport handling / Pixel-art upscaling
+- Asset-Management
+- Input handling
 - Particle system
-- Settings storage/loading system
-- 2D Sound player
+- Settings storage/loading
+- Sound player
 - Music player
-- Gamepad/Input handling
 - Utility classes
 
 ## Overview
