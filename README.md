@@ -37,7 +37,7 @@ Basic example producing the UI in the screenshot above providing a typical setup
 ### core/ ... /engine.media_manager
 
 This asset manager uses assets in the form of an internal CMedia descriptor format.
-These assets can then be loaded at once and used/drawn via the mediamanager. 
+These assets can then be loaded at once and used/drawn via the MediaManager.
 
 The assets for the UI are contained in GUIBaseMedia and need to be loaded alongside your own assets for the UI to work.
 
@@ -54,7 +54,7 @@ This package contains classes that integrate seamlessly with the Engine and use 
 
 #### core/ ... /engine.tools.game_engine
 
-Provides a basic framework for a game engine with input /output handling.
+Provides a basic framework for a game engine with input/output handling.
 
 #### core/ ... /engine.tools.jsonparser
 
@@ -62,7 +62,7 @@ A json parser which supports include files via JSON comments.
 
 #### core/ ... /engine.tools.lthreadpool
 
-User for iterating over large lists in threads.
+Used for iterating over large lists in threads.
 
 #### core/ ... /engine.tools.particles
 
@@ -70,8 +70,8 @@ A particle system using the MediaManager and CMedia graphics formats.
 
 #### core/ ... /engine.tools.settings
 
-A failsafe Settings/Options manager which support validation and default values.
-Implementations for reading/writing java properties files are provided.
+A failsafe settings/options manager which supports validation and default values.
+Implementations for reading/writing java .properties files are provided.
 
 #### core/ ... /engine.tools.sound.SoundPlayer
 
