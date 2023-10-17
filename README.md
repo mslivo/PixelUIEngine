@@ -12,7 +12,7 @@ This library is used in the game [Sandtrix](https://www.sandtrix.net).
 
 ### Components
 - Button
-- Checkbox
+- Checkbox / Radiobox
 - Combobox
 - Image
 - Text
@@ -32,10 +32,11 @@ This library is used in the game [Sandtrix](https://www.sandtrix.net).
 - Context Menus
 - Notifications
 - Modals
-- List/Inventory Drag & Drop
+- List/Inventory drag & drop
 - Keyboard mouse control mode
-- Gamepad mouse control mode & Gamepad text input
-- Viewport handling / Pixel-art upscaling
+- Gamepad mouse control mode
+- Gamepad & Touchscreen text input
+- Viewport handling / Pixel-Art upscaling
 - Asset-Management
 - Input handling
 - Particle system
