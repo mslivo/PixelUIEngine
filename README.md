@@ -32,6 +32,7 @@ This library is used in the game [Sandtrix](https://www.sandtrix.net).
 - Context Menus
 - Notifications
 - Modals
+- Hotkeys
 - List/Inventory drag & drop
 - Keyboard mouse control mode
 - Gamepad mouse control mode
