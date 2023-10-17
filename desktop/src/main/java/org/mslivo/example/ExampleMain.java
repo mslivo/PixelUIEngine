@@ -77,13 +77,13 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void render() {
 
-        // 1. Update UI Engine -> Gather Input -> Process Output
+        // 1. Update UI Engine -> Gather Input & Process Output
         if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
             profile_time_gui = System.currentTimeMillis();
             this.uiEngine.update();
             profile_time_gui = System.currentTimeMillis() - profile_time_gui;
         }
-        // 2. Update Game Engine -> Process Input -> Create Output
+        // 2. Update Game Engine -> Process Input & Create Output
         if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
             profile_time_engine = System.currentTimeMillis();
             this.gameEngine.update();
