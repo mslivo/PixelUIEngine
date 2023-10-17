@@ -1,10 +1,6 @@
-package org.mslivo.core.engine.game_engine;
+package org.mslivo.core.engine.tools.game_engine;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
-import java.util.Collection;
 
 /**
  * Modifies Data Structure 1 step forward.

@@ -1,8 +1,8 @@
 package org.mslivo.example.engine;
 
-import org.mslivo.core.engine.game_engine.EngineInput;
-import org.mslivo.core.engine.game_engine.GameEngineAdapter;
-import org.mslivo.core.engine.game_engine.Output;
+import org.mslivo.core.engine.tools.game_engine.EngineInput;
+import org.mslivo.core.engine.tools.game_engine.GameEngineAdapter;
+import org.mslivo.core.engine.tools.game_engine.Output;
 import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
 import org.mslivo.example.data.ExampleData;
 

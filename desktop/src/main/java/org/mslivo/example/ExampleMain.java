@@ -2,7 +2,7 @@ package org.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import org.mslivo.core.engine.game_engine.GameEngine;
+import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIAdapter;

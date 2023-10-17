@@ -2,7 +2,7 @@ package org.mslivo.example.ui.windows;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
-import org.mslivo.core.engine.game_engine.GameEngine;
+import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
