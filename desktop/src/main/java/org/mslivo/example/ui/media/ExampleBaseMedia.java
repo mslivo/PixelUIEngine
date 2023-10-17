@@ -8,7 +8,7 @@ import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class ExampleBaseMedia {
-    private static final String DIR_EXAMPLE_GRAPHICS = MediaManager.DIR_GRAPHICS+ "example/";
+    private static final String DIR_EXAMPLE_GRAPHICS = MediaManager.DIR_GRAPHICS + "example/";
     public static final CMediaAnimation GUI_ICON_BUTTON_ANIM_EXAMPLE = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE, 0.1f);
     public static final CMediaArray GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY = MediaManager.create_CMediaArray(DIR_EXAMPLE_GRAPHICS + "example_array.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE);
     public static final CMediaImage GUI_ICON_EXAMPLE_1 = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_icon_1.png");
@@ -37,7 +37,6 @@ public class ExampleBaseMedia {
             GUI_ICON_EXAMPLE_WINDOW,
             GUI_ICON_EXAMPLE_ANIMATION_2,
             GUI_BACKGROUND
-
     };
 
 }

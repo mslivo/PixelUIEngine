@@ -6,7 +6,7 @@ import org.mslivo.core.engine.tools.game_engine.Output;
 import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
 import org.mslivo.example.data.ExampleData;
 
-public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LThreadPoolUpdater {
+public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData> {
 
     private ExampleData data;
 
@@ -35,8 +35,4 @@ public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LTh
 
     }
 
-    @Override
-    public void updateFromThread(Object object, int index) {
-
-    }
 }
