@@ -1,6 +1,6 @@
 # PixelUI Engine
 UI-System on top of LibGDX which provides tiny 8x8-tile based Windows and Components.
-![](img/screenshot.png)
+![](screenshot.png)
 ## Components:
 - Button
 - Checkbox
