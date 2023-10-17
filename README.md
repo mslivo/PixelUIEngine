@@ -9,7 +9,6 @@ This library is used in the game [Sandtrix](https://www.sandtrix.net).
 ![](screenshot_2.png)
 ![](screenshot_3.png)
 ![](screenshot_4.png)
-![](screenshot_5.png)
 
 ### Components
 - Button
@@ -44,6 +43,7 @@ This library is used in the game [Sandtrix](https://www.sandtrix.net).
 - Sound player
 - Music player
 - Utility classes
+- High performance, low library size (~370kb)
 
 ## Overview
 ### desktop/ ... /example
