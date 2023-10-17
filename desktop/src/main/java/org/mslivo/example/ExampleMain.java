@@ -74,20 +74,20 @@ public class ExampleMain extends ApplicationAdapter {
     }
 
 
+    long run = 0;
+    long notrun = 0;
     @Override
     public void render() {
-
-        // 1. Update UI Engine -> Gather Input & Process Output
         if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+            // 1. Update UI Engine -> Gather Input & Process Output
             profile_time_gui = System.currentTimeMillis();
             this.uiEngine.update();
             profile_time_gui = System.currentTimeMillis() - profile_time_gui;
-        }
-        // 2. Update Game Engine -> Process Input & Create Output
-        if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+            // 2. Update Game Engine -> Process Input & Create Output
             profile_time_engine = System.currentTimeMillis();
             this.gameEngine.update();
             profile_time_engine = System.currentTimeMillis() - profile_time_engine;
+            run++;
         }
 
         // 3. Render Everything
