@@ -437,14 +437,14 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.components.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        ArrayList<Component> separatorHorizontal = api.preConfigured.image_CreateSeparatorHorizontal(12, 9, 13);
+
 
         Text text2 = api.components.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
 
         api.windows.addComponents(window, new Component[]{image1, text, text2});
-        api.windows.addComponents(window, separatorHorizontal.toArray(new Component[]{}));
+
         api.components.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
-        api.components.tabBar.tab.addTabComponents(tabTextImage, separatorHorizontal.toArray(new Component[]{}));
+
 
 
         // Tab Bar
