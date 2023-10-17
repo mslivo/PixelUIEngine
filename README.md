@@ -1,5 +1,5 @@
 # PixelUI Engine
-UI-System on top of LibGDX which provides tiny 8x8-tile based Windows and Components suited for low-resolution games.
+UI-System on top of LibGDX which provides tiny 8x8-tile based Windows and Components suited for low-resolution games. This library is used in the game [Sandtrix](https://www.sandtrix.net).
 
 ![](screenshot.png)
 ## Components:
