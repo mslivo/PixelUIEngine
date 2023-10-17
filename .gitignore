@@ -16,3 +16,4 @@
 *.class
 *.log
 *.iml
+/dev/
