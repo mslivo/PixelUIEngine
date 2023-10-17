@@ -42,6 +42,7 @@ public class SoundPlayer {
     public long playSound(CMediaSound cMediaSound) {
         return playSoundInternal(cMediaSound, 1, 1, 0, false);
     }
+
     public long playSound(CMediaSound cMediaSound, float volume) {
         return playSoundInternal(cMediaSound, volume, 1, 0, false);
     }
@@ -57,6 +58,7 @@ public class SoundPlayer {
     public long loopSound(CMediaSound cMediaSound) {
         return playSoundInternal(cMediaSound, 1, 1, 0, true);
     }
+
     public long loopSound(CMediaSound cMediaSound, float volume) {
         return playSoundInternal(cMediaSound, volume, 1, 0, true);
     }
@@ -72,9 +74,11 @@ public class SoundPlayer {
     public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y) {
         return playSound2DInternal(cMediaSound, position_x, position_y, 1, 1, false);
     }
+
     public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
         return playSound2DInternal(cMediaSound, position_x, position_y, volume, 1, false);
     }
+
     public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch) {
         return playSound2DInternal(cMediaSound, position_x, position_y, volume, pitch, false);
     }
@@ -82,9 +86,11 @@ public class SoundPlayer {
     public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y) {
         return playSound2DInternal(cMediaSound, position_x, position_y, 1, 1, true);
     }
+
     public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
         return playSound2DInternal(cMediaSound, position_x, position_y, volume, 1, true);
     }
+
     public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch) {
         return playSound2DInternal(cMediaSound, position_x, position_y, volume, pitch, true);
     }
@@ -96,7 +102,7 @@ public class SoundPlayer {
     }
 
     private long playSound2DInternal(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch, boolean loop) {
-        float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.distancef(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
+        float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.Tiles.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
         playVolume = playVolume * volume * this.volume;
         float pan = 0;
         if (camera_x > position_x) {
@@ -110,8 +116,8 @@ public class SoundPlayer {
     }
 
     public void stopAllSounds() {
-        CMediaSound[] playedSoundsArray = playedSounds.toArray(new CMediaSound[]{});
-        for (CMediaSound playedSound : playedSoundsArray) mediaManager.getCMediaSound(playedSound).stop();
+        CMediaSound[] playedSoundsArray = playedSounds.toArray(new CMediaSound[playedSounds.size()]);
+        for (int i = 0; i < playedSoundsArray.length; i++) mediaManager.getCMediaSound(playedSoundsArray[i]).stop();
     }
 
     public void update() {

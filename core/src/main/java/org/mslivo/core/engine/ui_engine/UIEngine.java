@@ -408,7 +408,7 @@ public class UIEngine<T extends UIAdapter> {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (api.config.isFoldWindowsOnDoubleClick() && mouseDownButton == Input.Buttons.LEFT) {
-                            if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
+                            if (window.hasTitleBar && window.foldable && Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
                                 window.folded = !window.folded;
                                 if (window.windowAction != null) {
                                     if (window.folded) {
@@ -555,7 +555,7 @@ public class UIEngine<T extends UIAdapter> {
 
                         if (UICommons.comboBox_isOpen(combobox, inputState)) {
                             for (int i = 0; i < combobox.items.size(); i++) {
-                                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                                         UICommons.component_getParentWindowX(combobox) + (combobox.x * TILE_SIZE) + combobox.offset_x,
                                         UICommons.component_getParentWindowY(combobox) + (combobox.y * TILE_SIZE) + combobox.offset_y - (i * TILE_SIZE) - TILE_SIZE,
                                         combobox.width * TILE_SIZE,
@@ -1682,7 +1682,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (inputState.lastGUIMouseHover.getClass() == Window.class) {
                         Window window = (Window) inputState.lastGUIMouseHover;
                         if (window.moveAble && window.hasTitleBar && window.visible) {
-                            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                            if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                                     window.x, window.y + (window.height - 1) * UIEngine.TILE_SIZE,
                                     window.width * UIEngine.TILE_SIZE,
                                     UIEngine.TILE_SIZE)
@@ -1751,7 +1751,7 @@ public class UIEngine<T extends UIAdapter> {
                                 int xTab = tabBar.tabOffset;
                                 for (int i = 0; i < tabBar.tabs.size(); i++) {
                                     Tab tab = tabBar.tabs.get(i);
-                                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                    if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                                             UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE),
                                             UICommons.component_getAbsoluteY(tabBar),
                                             tab.width * UIEngine.TILE_SIZE,
@@ -2013,8 +2013,8 @@ public class UIEngine<T extends UIAdapter> {
         if (uiObject == null) return;
         CommonActions commonActions = getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseClick(button);
-        if (uiObject instanceof Component) {
-            executeOnMouseClickCommonAction(((Component) uiObject).addedToWindow, button);
+        if (uiObject instanceof Component component) {
+            executeOnMouseClickCommonAction(component.addedToWindow, button);
         }
     }
 
@@ -2023,8 +2023,8 @@ public class UIEngine<T extends UIAdapter> {
         if (uiObject == null) return;
         CommonActions commonActions = getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseDoubleClick(button);
-        if (uiObject instanceof Component) {
-            executeOnMouseDoubleClickCommonAction(((Component) uiObject).addedToWindow, button);
+        if (uiObject instanceof Component component) {
+            executeOnMouseDoubleClickCommonAction(component.addedToWindow, button);
         }
     }
 
@@ -2032,8 +2032,8 @@ public class UIEngine<T extends UIAdapter> {
         if (uiObject == null) return;
         CommonActions commonActions = getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseScroll(scrolled);
-        if (uiObject instanceof Component) {
-            executeOnMouseScrollCommonAction(((Component) uiObject).addedToWindow, scrolled);
+        if (uiObject instanceof Component component) {
+            executeOnMouseScrollCommonAction(component.addedToWindow, scrolled);
         }
     }
 
@@ -2118,7 +2118,7 @@ public class UIEngine<T extends UIAdapter> {
         // Notification Collision
         for (int i = 0; i < inputState.notifications.size(); i++) {
             Notification notification = inputState.notifications.get(i);
-            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+            if (notification.notificationAction != null && Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                     0, inputState.internalResolutionWidth - ((i + 1) * TILE_SIZE),
                     inputState.internalResolutionWidth, TILE_SIZE)) {
                 return notification;
@@ -2128,7 +2128,7 @@ public class UIEngine<T extends UIAdapter> {
         // Context Menu Item collision
         if (inputState.openContextMenu != null) {
             for (int i = 0; i < inputState.openContextMenu.items.size(); i++) {
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, inputState.openContextMenu.x, inputState.openContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, inputState.openContextMenu.x, inputState.openContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                     return inputState.openContextMenu.items.get(i);
                 }
             }
@@ -2136,7 +2136,7 @@ public class UIEngine<T extends UIAdapter> {
 
         // Combobox Open Menu collision
         if (inputState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * TILE_SIZE), inputState.openComboBox.width * TILE_SIZE, (inputState.openComboBox.items.size() * TILE_SIZE))) {
+            if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * TILE_SIZE), inputState.openComboBox.width * TILE_SIZE, (inputState.openComboBox.items.size() * TILE_SIZE))) {
                 return inputState.openComboBox;
             }
         }
@@ -2152,7 +2152,7 @@ public class UIEngine<T extends UIAdapter> {
             int wndWidth = UICommons.window_getRealWidth(window);
             int wndHeight = UICommons.window_getRealHeight(window);
 
-            boolean collidesWithWindow = Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, wndX, wndY, wndWidth, wndHeight);
+            boolean collidesWithWindow = Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
                 for (int ic = window.components.size() - 1; ic >= 0; ic--) {
                     Component component = window.components.get(ic);
@@ -2178,7 +2178,7 @@ public class UIEngine<T extends UIAdapter> {
         if (component.disabled) return false;
         if (UICommons.component_isHiddenByTab(component)) return false;
 
-        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
+        if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
             inputState.lastGUIMouseHover = component;
             return true;
         }
@@ -2489,7 +2489,7 @@ public class UIEngine<T extends UIAdapter> {
                     for (int ix = 0; ix < width; ix++) {
                         int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                         CMediaArray cMenuTexture;
-                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
+                        if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
                             cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
                         } else {
                             cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST;
@@ -2528,7 +2528,7 @@ public class UIEngine<T extends UIAdapter> {
                 for (int ix = 0; ix < width; ix++) {
                     int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     CMediaArray cMenuTexture;
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                    if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
                     } else {
                         cMenuTexture = GUIBaseMedia.GUI_CONTEXT_MENU;

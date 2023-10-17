@@ -56,8 +56,9 @@ public class SettingsManager {
 
     public void createBackup() {
         this.backUp.clear();
-        for (Object propertyO : this.properties.keySet()) {
-            String property = (String) propertyO;
+        String[] properties = this.properties.keySet().toArray(new String[this.properties.size()]);
+        for (int i=0;i<properties.length;i++) {
+            String property =  properties[i];
             this.backUp.setProperty(property, this.properties.getProperty(property));
         }
     }
@@ -119,8 +120,9 @@ public class SettingsManager {
     }
 
     public void setAllToDefault() {
-        for (String setting : entries.keySet()) {
-            setToDefault(setting);
+        String[] entries = this.entries.keySet().toArray(new String[this.entries.size()]);
+        for (int i=0;i<entries.length;i++) {
+            setToDefault(entries[i]);
         }
     }
 
@@ -249,8 +251,9 @@ public class SettingsManager {
     }
 
     private void validateAllProperties() {
-        for (String name : entries.keySet()) {
-            validateProperty(name);
+        String[] entries = this.entries.keySet().toArray(new String[this.entries.size()]);
+        for (int i=0;i<entries.length;i++) {
+            validateProperty(entries[i]);
         }
     }
 

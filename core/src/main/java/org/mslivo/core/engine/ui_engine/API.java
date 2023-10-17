@@ -256,8 +256,8 @@ public class API {
         private void searchItems(List list, ArrayList searchList, ArrayList resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
             for (int i = 0; i < searchList.size(); i++) {
                 Object item = searchList.get(i);
-                if (searchArrayLists && item instanceof ArrayList) {
-                    searchItems(list, (ArrayList) item, resultList, searchText, searchTooltips, searchArrayLists);
+                if (searchArrayLists && item instanceof ArrayList itemList) {
+                    searchItems(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
                 } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                     resultList.add(item);
                 } else if (searchTooltips) {
@@ -412,7 +412,7 @@ public class API {
             components.addUpdateAction(hlText, new UpdateAction(0) {
                 @Override
                 public void onUpdate() {
-                    if (Tools.Calc.pointRectsCollide(
+                    if (Tools.Calc.Tiles.pointRectsCollide(
                             input.mouseXGUI(),
                             input.mouseYGUI(),
                             components.getAbsoluteX(hlText),
@@ -467,8 +467,9 @@ public class API {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
-                            for (CheckBox checkbox2 : checkboxes)
-                                if (checkbox2 != checkboxes[iF]) components.checkBox.setChecked(checkbox2, false);
+                            for (int i = 0; i < checkboxes.length; i++)
+                                if (checkboxes[i] != checkboxes[iF])
+                                    components.checkBox.setChecked(checkboxes[i], false);
                             checkedFunction.accept(checkboxes[iF]);
                         } else {
                             components.checkBox.setChecked(checkboxes[iF], true);

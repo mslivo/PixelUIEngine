@@ -55,9 +55,9 @@ public class Tools {
 
         public static void benchmark(String... customValues) {
             StringBuilder custom = new StringBuilder();
-            for (String customValue : customValues) {
-                custom.append(" | ").append(String.format("%1$10s", customValue));
-            }
+            for (int i = 0; i < customValues.length; i++)
+                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
+
             Tools.Log.message(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
                     String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))) + "MB RAM" + custom);
         }
@@ -116,7 +116,6 @@ public class Tools {
     public static class Colors {
         public static final FColor WHITE = new FColor(1, 1, 1, 1);
         public static final FColor BLACK = new FColor(0, 0, 0, 1);
-
         public static final FColor TRANSPARENT = new FColor(0, 0, 0, 0);
         public static final FColor GREEN_BRIGHT = new FColor(0.18039216f, 0.8f, 0.44313726f, 1f);
         public static final FColor GREEN_DARK = new FColor(0.15294118f, 0.68235296f, 0.3764706f, 1f);
@@ -152,10 +151,10 @@ public class Tools {
 
         public static FColor create(float r, float g, float b, float a) {
             return new FColor(
-                    Calc.inBounds(r, 0f, 1f),
-                    Calc.inBounds(g, 0f, 1f),
-                    Calc.inBounds(b, 0f, 1f),
-                    Calc.inBounds(a, 0f, 1f));
+                    Tools.Calc.inBounds(r, 0f, 1f),
+                    Tools.Calc.inBounds(g, 0f, 1f),
+                    Tools.Calc.inBounds(b, 0f, 1f),
+                    Tools.Calc.inBounds(a, 0f, 1f));
         }
 
         public static FColor create(FColor fColor) {
@@ -167,16 +166,16 @@ public class Tools {
         }
 
         public static FColor createDarker(FColor color, float amount) {
-            float r = Calc.inBounds(color.r - (color.r * amount), 0f, 1f);
-            float g = Calc.inBounds(color.g - (color.g * amount), 0f, 1f);
-            float b = Calc.inBounds(color.b - (color.b * amount), 0f, 1f);
+            float r = Tools.Calc.inBounds(color.r - (color.r * amount), 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g - (color.g * amount), 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b - (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
         public static FColor createBrighter(FColor color, float amount) {
-            float r = Calc.inBounds(color.r + (color.r * amount), 0f, 1f);
-            float g = Calc.inBounds(color.g + (color.g * amount), 0f, 1f);
-            float b = Calc.inBounds(color.b + (color.b * amount), 0f, 1f);
+            float r = Tools.Calc.inBounds(color.r + (color.r * amount), 0f, 1f);
+            float g = Tools.Calc.inBounds(color.g + (color.g * amount), 0f, 1f);
+            float b = Tools.Calc.inBounds(color.b + (color.b * amount), 0f, 1f);
             return create(r, g, b, color.a);
         }
 
@@ -471,86 +470,152 @@ public class Tools {
 
     public static class Calc {
 
-        public static Object selectRandom(ArrayList arrayList) {
-            if (arrayList.size() > 0) {
-                return arrayList.get(MathUtils.random(0, arrayList.size() - 1));
-            } else {
-                return null;
-            }
-        }
+        public static class Tiles {
 
-        public static int selectRandomProbabilities(int... values) {
-            int sum = 0;
-            for (int value : values) {
-                sum += value;
-            }
-            float[] probabilities = new float[values.length];
+            private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
 
-            for (int i = 0; i < values.length; i++) {
-                if (sum == 0) {
-                    probabilities[i] = 1f / (float) values.length;
-                } else {
-                    probabilities[i] = values[i] / (float) sum;
+            private static void doInRadiusInternal(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+                for (int iy = -radius; iy <= radius; iy++) {
+                    for (int ix = -radius; ix <= radius; ix++) {
+                        if ((ix * ix) + (iy * iy) <= (radius * radius)) {
+                            if (!tileFunction.apply(x + ix, y + iy)) {
+                                return;
+                            }
+                        }
+                    }
                 }
             }
 
-            return selectRandomProbabilitiesPercent(probabilities);
-        }
+            public static void doInRadius(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+                ArrayList<Long> cached = doInRadiusCache.get(radius);
+                if (cached == null) {
+                    cached = new ArrayList<>();
+                    ArrayList<Long> finalCached = cached;
+                    doInRadius(0, 0, radius, (x1, y1) -> {
+                        finalCached.add(
+                                (((long) x1) << 32) | (y1 & 0xffffffffL));
+                        return true;
+                    });
+                    doInRadiusCache.put(radius, cached);
+                }
 
-        public static int selectRandomProbabilitiesPercent(float... probabilities) {
-            if (probabilities.length == 0) return -1;
-            float random = MathUtils.random();
-            float cumulativeProbability = 0f;
-            for (int i = 0; i < probabilities.length; i++) {
-                cumulativeProbability += probabilities[i];
-                if (random <= cumulativeProbability) {
-                    return i;
+                for (Long positions : cached) {
+                    if (!tileFunction.apply(
+                            x + ((int) (positions >> 32)),
+                            y + positions.intValue())
+                    ) {
+                        return;
+                    }
                 }
             }
-            return -1; // probabilities must add up to 1f!
-        }
 
+            public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
+                for (int x = x1 - 1; x <= x1 + 1; x++) {
+                    yloop:
+                    for (int y = y1 - 1; y <= y1 + 1; y++) {
+                        if (x == x1 && y == y1) continue yloop; // middle
+                        if (!diagonal) {
+                            if (x == (x1 - 1) && y == (y1 - 1)) continue yloop;
+                            if (x == (x1 + 1) && y == (y1 + 1)) continue yloop;
+                            if (x == (x1 - 1) && y == (y1 + 1)) continue yloop;
+                            if (x == (x1 + 1) && y == (y1 - 1)) continue yloop;
+                        }
+                        if (x >= 0 && y >= 0 && x < map_size && y < map_size) {
+                            if (x == x2 && y == y2) {
+                                return true;
+                            }
+                        }
+                    }
 
-        public static boolean chance(float probability) {
-            return MathUtils.random(0f, 1f) < probability;
-        }
-
-        public static boolean chance(double probability) {
-            return MathUtils.random(0f, 1f) < probability;
-        }
-
-        public static boolean chance(int oneIn) {
-            oneIn = lowerBounds(oneIn, 1);
-            return MathUtils.random(1, oneIn) == 1;
-        }
-
-        public static boolean chance(long oneIn) {
-            oneIn = lowerBounds(oneIn, 1);
-            return MathUtils.random(1, oneIn) == 1;
-        }
-
-        public static float min(float... values) {
-            float sum = Float.MAX_VALUE;
-            for (float f : values) {
-                if (f < sum) sum = f;
+                }
+                return false;
             }
+
+            public static int distance(int x1, int y1, int x2, int y2) {
+                return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
+            }
+
+            public static float distance(float x1, float y1, float x2, float y2) {
+                return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            }
+
+            public static boolean isInDistance(int x1, int y1, int x2, int y2, int radius) {
+                return distance(x1, y1, x2, y2) <= radius;
+            }
+
+            public static boolean isInDistance(float x1, float y1, float x2, float y2, float radius) {
+                return distance(x1, y1, x2, y2) <= radius;
+            }
+
+            public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
+                return (MathUtils.atan2((y1 - y2), (x1 - x2))) + MathUtils.PI;
+            }
+
+            public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
+                return Bx + Bw > Ax &&
+                        By + Bh > Ay &&
+                        Ax + Aw > Bx &&
+                        Ay + Ah > By;
+            }
+
+            public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
+                return Bx + Bw > Ax &&
+                        By + Bh > Ay &&
+                        Ax + Aw > Bx &&
+                        Ay + Ah > By;
+            }
+
+            public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
+                return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+            }
+
+            public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
+                return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+            }
+
+            public static float toIsoX(float cart_X, float cart_Y) {
+                return cart_X - cart_Y;
+            }
+
+            public static float toIsoY(float cart_X, float cart_Y) {
+                return (cart_X + cart_Y) / 2;
+            }
+
+            public static int toIsoX(int cart_X, int cart_Y) {
+                return cart_X - cart_Y;
+            }
+
+            public static int toIsoY(int cart_X, int cart_Y) {
+                return (cart_X + cart_Y) / 2;
+            }
+
+            public static int toCartX(int iso_X, int iso_Y) {
+                return (2 * iso_Y + iso_X) / 2;
+            }
+
+            public static float toCartX(float iso_X, float iso_Y) {
+                return (2 * iso_Y + iso_X) / 2;
+            }
+
+            public static float toCartY(float iso_X, float iso_Y) {
+                return (2 * iso_Y - iso_X) / 2;
+            }
+
+            public static int toCartY(int iso_X, int iso_Y) {
+                return (2 * iso_Y - iso_X) / 2;
+            }
+
+        }
+
+        public static float maxOfValues(float... values) {
+            float sum = 0;
+            for (float f : values) if (f > sum) sum = f;
             return sum;
         }
 
-        public static float sinPos(float radians) {
-            return MathUtils.sin(radians) * 0.5f + 0.5f;
-        }
-
-        public static float cosPos(float radians) {
-            return MathUtils.cos(radians) * 0.5f + 0.5f;
-        }
-
-
-        public static float max(float... values) {
-            float sum = 0;
-            for (float f : values) {
-                if (f > sum) sum = f;
-            }
+        public static float minOfValues(float... values) {
+            float sum = Float.MAX_VALUE;
+            for (float f : values) if (f < sum) sum = f;
             return sum;
         }
 
@@ -567,7 +632,6 @@ public class Tools {
             }
             return sum;
         }
-
 
         public static float average(float... values) {
             float sum = 0;
@@ -593,114 +657,6 @@ public class Tools {
             ret[1] = (int) longValue;
             return ret;
         }
-
-        public static boolean mapXValid(int x, int map_width) {
-            if (x < 0 || x <= (map_width - 1)) return false;
-            return true;
-        }
-
-        public static boolean mapYValid(int y, int map_height) {
-            if (y < 0 || y <= (map_height - 1)) return false;
-            return true;
-        }
-
-        public static boolean mapXYValid(int x, int y, int map_width, int map_height) {
-            if (x < 0 || x <= (map_width - 1) || y < 0 || y <= (map_height - 1)) return false;
-            return true;
-        }
-
-        public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
-            for (int x = x1 - 1; x <= x1 + 1; x++) {
-                yloop:
-                for (int y = y1 - 1; y <= y1 + 1; y++) {
-                    if (x == x1 && y == y1) continue yloop; // middle
-                    if (!diagonal) {
-                        if (x == (x1 - 1) && y == (y1 - 1)) continue yloop;
-                        if (x == (x1 + 1) && y == (y1 + 1)) continue yloop;
-                        if (x == (x1 - 1) && y == (y1 + 1)) continue yloop;
-                        if (x == (x1 + 1) && y == (y1 - 1)) continue yloop;
-                    }
-                    if (x >= 0 && y >= 0 && x < map_size && y < map_size) {
-                        if (x == x2 && y == y2) {
-                            return true;
-                        }
-                    }
-                }
-
-            }
-            return false;
-        }
-
-        public static float toIsoX(float cart_X, float cart_Y) {
-            return cart_X - cart_Y;
-        }
-
-        public static float toIsoY(float cart_X, float cart_Y) {
-            return (cart_X + cart_Y) / 2;
-        }
-
-        public static int toIsoX(int cart_X, int cart_Y) {
-            return cart_X - cart_Y;
-        }
-
-        public static int toIsoY(int cart_X, int cart_Y) {
-            return (cart_X + cart_Y) / 2;
-        }
-
-        public static int toCartX(int iso_X, int iso_Y) {
-            return (2 * iso_Y + iso_X) / 2;
-        }
-
-        public static float toCartX(float iso_X, float iso_Y) {
-            return (2 * iso_Y + iso_X) / 2;
-        }
-
-        public static float toCartY(float iso_X, float iso_Y) {
-            return (2 * iso_Y - iso_X) / 2;
-        }
-
-        public static int toCartY(int iso_X, int iso_Y) {
-            return (2 * iso_Y - iso_X) / 2;
-        }
-
-        private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
-
-        public static void doInRadiusCached(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
-            ArrayList<Long> cached = doInRadiusCache.get(radius);
-            if (cached == null) {
-                cached = new ArrayList<>();
-                ArrayList<Long> finalCached = cached;
-                doInRadius(0, 0, radius, (x1, y1) -> {
-                    finalCached.add(
-                            (((long) x1) << 32) | (y1 & 0xffffffffL));
-                    return true;
-                });
-                doInRadiusCache.put(radius, cached);
-            }
-
-            for (Long positions : cached) {
-                if (!tileFunction.apply(
-                        x + ((int) (positions >> 32)),
-                        y + positions.intValue())
-                ) {
-                    return;
-                }
-            }
-
-        }
-
-        public static void doInRadius(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
-            for (int iy = -radius; iy <= radius; iy++) {
-                for (int ix = -radius; ix <= radius; ix++) {
-                    if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!tileFunction.apply(x + ix, y + iy)) {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
 
         public static float percentAboveThreshold(long value, long max, int threshold) {
             value = Tools.Calc.upperBounds(value, max);
@@ -764,12 +720,6 @@ public class Tools {
             return value * MathUtils.random((1 - randomness), (1 + randomness));
         }
 
-        public static double applyRandomness(double value, float randomness) {
-            if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
-            return value * MathUtils.random((1 - randomness), (1 + randomness));
-        }
-
         public static long applyPercent(long value, float percent) {
             if (percent == 0) return value;
             value += MathUtils.round(value * percent);
@@ -788,131 +738,117 @@ public class Tools {
             return value;
         }
 
-        public static double applyPercent(double value, float percent) {
-            if (percent == 0) return value;
-            value += (value * percent);
-            return value;
-        }
-
-        public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-            return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
-        }
-
-        public static int distance(int x1, int y1, int x2, int y2) {
-            return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
-        }
-
-        public static float distancef(float x1, float y1, float x2, float y2) {
-            return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        }
-
-        public static boolean isInRadius(int x1, int y1, int x2, int y2, int radius) {
-            return distance(x1, y1, x2, y2) <= radius;
-        }
-
-        public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
-            return (MathUtils.atan2((y1 - y2), (x1 - x2))) + MathUtils.PI;
-        }
-
-        public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw > Ax &&
-                    By + Bh > Ay &&
-                    Ax + Aw > Bx &&
-                    Ay + Ah > By;
-        }
-
-        public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
-            return Bx + Bw > Ax &&
-                    By + Bh > Ay &&
-                    Ax + Aw > Bx &&
-                    Ay + Ah > By;
-        }
-
         public static float inBounds(float value, float lower, float upper) {
-            if (value < lower) value = lower;
-            if (value > upper) value = upper;
-            return value;
-        }
-
-        public static float inBounds01(float value) {
-            return Calc.inBounds(value, 0f, 1f);
+            return value < lower ? lower : (value > upper ? upper : value);
         }
 
         public static double inBounds(double value, double lower, double upper) {
-            if (value < lower) value = lower;
-            if (value > upper) value = upper;
-            return value;
-        }
-
-
-        public static double upperBounds(double value, double upper) {
-            if (value > upper) value = upper;
-            return value;
-        }
-
-
-        public static double lowerBounds(double value, double lower) {
-            if (value < lower) value = lower;
-            return value;
-        }
-
-        public static int lowerBounds(int value, int lower) {
-            if (value < lower) value = lower;
-            return value;
-        }
-
-        public static float lowerBounds(float value, float lower) {
-            if (value < lower) value = lower;
-            return value;
-        }
-
-        public static long lowerBounds(long value, long lower) {
-            if (value < lower) value = lower;
-            return value;
-        }
-
-        public static long upperBounds(long value, long upper) {
-            if (value > upper) value = upper;
-            return value;
-        }
-
-        public static float upperBounds(float value, float upper) {
-            if (value > upper) value = upper;
-            return value;
-        }
-
-        public static int upperBounds(int value, int upper) {
-            if (value > upper) value = upper;
-            return value;
+            return value < lower ? lower : (value > upper ? upper : value);
         }
 
         public static long inBounds(long value, long lower, long upper) {
-            if (value < lower) value = lower;
-            if (value > upper) value = upper;
-            return value;
+            return value < lower ? lower : (value > upper ? upper : value);
         }
 
         public static int inBounds(int value, int lower, int upper) {
-            if (value < lower) value = lower;
-            if (value > upper) value = upper;
-            return value;
+            return value < lower ? lower : (value > upper ? upper : value);
+        }
+
+        public static float inBounds01(float value) {
+            return Tools.Calc.inBounds(value, 0f, 1f);
+        }
+
+        public static double upperBounds(double value, double upper) {
+            return value > upper ? upper : value;
+        }
+
+        public static long upperBounds(long value, long upper) {
+            return value > upper ? upper : value;
+        }
+
+        public static float upperBounds(float value, float upper) {
+            return value > upper ? upper : value;
+        }
+
+        public static int upperBounds(int value, int upper) {
+            return value > upper ? upper : value;
+        }
+
+        public static double lowerBounds(double value, double lower) {
+            return value < lower ? lower : value;
+        }
+
+        public static int lowerBounds(int value, int lower) {
+            return value < lower ? lower : value;
+        }
+
+        public static float lowerBounds(float value, float lower) {
+            return value < lower ? lower : value;
+        }
+
+        public static long lowerBounds(long value, long lower) {
+            return value < lower ? lower : value;
+        }
+
+        public static Object selectRandom(List list) {
+            return list.get(MathUtils.random(0, list.size() - 1));
+        }
+
+        public static int selectRandom(int... probabilities) {
+            int sum = 0;
+            for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
+            float[] probabilitiesF = new float[probabilities.length];
+            for (int i = 0; i < probabilitiesF.length; i++) {
+                probabilitiesF[i] = sum == 0 ? (1f / (float) probabilitiesF.length) : (probabilities[i] / (float) sum);
+            }
+
+            return selectRandom(probabilitiesF);
+        }
+
+        public static int selectRandom(float... probabilities) {
+            if (probabilities.length == 0) return -1;
+            float random = MathUtils.random(0f, 1f);
+            float cumulativeProbability = 0f;
+            for (int i = 0; i < probabilities.length; i++) {
+                cumulativeProbability += probabilities[i];
+                if (random <= cumulativeProbability) return i;
+            }
+            return -1; // probabilities must add up to 1f!
+        }
+
+        public static boolean chance(float probability) {
+            return MathUtils.random(0f, 1f) < probability;
+        }
+
+        public static boolean chance(double probability) {
+            return MathUtils.random(0f, 1f) < probability;
+        }
+
+        public static boolean chance(int oneIn) {
+            oneIn = lowerBounds(oneIn, 1);
+            return MathUtils.random(1, oneIn) == 1;
+        }
+
+        public static boolean chance(long oneIn) {
+            oneIn = lowerBounds(oneIn, 1);
+            return MathUtils.random(1, oneIn) == 1;
         }
     }
 
     public static class Reflection {
         /* Dont use these if you target HTML */
-
-        public static boolean gameEngine_checkDataObjectValid(Class checkClass) {
+        public static boolean checkDataObjectGuidelines(Class checkClass) {
             if (Collection.class.isAssignableFrom(checkClass)) return false;
             if (!String.class.isAssignableFrom(checkClass)) return false;
             if (!Serializable.class.isAssignableFrom(checkClass)) return true;
             if (checkClass.getDeclaredMethods().length != 0) return true;
-            for (Field field : checkClass.getDeclaredFields()) {
-                if (!Modifier.isPublic(field.getModifiers())) {
+            Field[] fields = checkClass.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                if (!Modifier.isPublic(fields[i].getModifiers())) {
                     return true;
                 } else {
-                    if (!field.getType().isPrimitive()) {
-                        if (gameEngine_checkDataObjectValid(field.getType())) {
+                    if (!fields[i].getType().isPrimitive()) {
+                        if (checkDataObjectGuidelines(fields[i].getType())) {
                             return true;
                         }
                     }
@@ -921,45 +857,43 @@ public class Tools {
             return false;
         }
 
-        public static CMedia[] mediaManager_prepareCMediaFromStaticClass(Class loadFromClass) {
+        public static CMedia[] scanStaticClassForCMedia(Class loadFromClass) {
             ArrayList<CMedia> prepareList = new ArrayList<>();
-            for (Field field : loadFromClass.getFields()) {
+            Field[] fields = loadFromClass.getFields();
+            for (int i = 0; i < fields.length; i++) {
                 CMedia cMedia = null;
                 try {
-                    if (field.getType().isArray()) {
-                        CMedia[] medias = (CMedia[]) field.get(null);
+                    if (fields[i].getType().isArray()) {
+                        CMedia[] medias = (CMedia[]) fields[i].get(null);
                         prepareList.addAll(Arrays.asList(medias));
                     } else {
-                        cMedia = (CMedia) field.get(null);
+                        cMedia = (CMedia) fields[i].get(null);
                         prepareList.add(cMedia);
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     return prepareList.toArray(new CMedia[]{});
                 }
-
             }
-
             return prepareList.toArray(new CMedia[]{});
         }
 
-        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object) {
-            return mediaManager_prepareCMediaFromObject(object, 3);
+        public static CMedia[] scanObjectForCMedia(Object object) {
+            return scanObjectForCMedia(object, 3);
         }
 
-        public static CMedia[] mediaManager_prepareCMediaFromObject(Object object, int scanDepthMax) {
+        public static CMedia[] scanObjectForCMedia(Object object, int scanDepthMax) {
             ArrayList<CMedia> prepareList = new ArrayList<>();
             try {
-                mediaManager_prepareCMediaFromObjectResolve(object, scanDepthMax, 1, prepareList);
+                scanObjectForCMedia(object, scanDepthMax, 1, prepareList);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new CMedia[]{};
             }
-
             return prepareList.toArray(new CMedia[]{});
         }
 
-        private static void mediaManager_prepareCMediaFromObjectResolve(Object object, int scanDepthMax, int currentDepth, ArrayList<CMedia> prepareList) {
+        private static void scanObjectForCMedia(Object object, int scanDepthMax, int currentDepth, ArrayList<CMedia> prepareList) {
             if (object == null) return;
             if (object.getClass().getPackageName().startsWith("java")) return;
             if (currentDepth > scanDepthMax) return;
@@ -969,10 +903,11 @@ public class Tools {
                 return;
             }
 
-            for (Field field : object.getClass().getFields()) {
+            Field[] fields = object.getClass().getFields();
+            for (int i=0;i<fields.length;i++) {
                 Object fieldObject = null;
                 try {
-                    fieldObject = field.get(object);
+                    fieldObject = fields[i].get(object);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     return;
@@ -983,24 +918,21 @@ public class Tools {
                         prepareList.add(cMedia);
                     } else if (fieldObject.getClass() == ArrayList.class) {
                         ArrayList arrayList = (ArrayList) fieldObject;
-                        for (Object arrayListItem : arrayList) {
-                            mediaManager_prepareCMediaFromObjectResolve(arrayListItem, scanDepthMax, currentDepth + 1, prepareList);
+                        for (int i2=0;i2<arrayList.size();i2++) {
+                            scanObjectForCMedia(arrayList.get(i2), scanDepthMax, currentDepth + 1, prepareList);
                         }
-                    } else if (field.getType().isArray()) {
-                        if (field.getType().getName().startsWith("[L") || field.getType().getName().startsWith("[[L")) {
+                    } else if (fields[i].getType().isArray()) {
+                        if (fields[i].getType().getName().matches("\\[+L")) {
                             Object[] arrayObjects = (Object[]) fieldObject;
-                            for (Object arrayObject : arrayObjects) {
-                                mediaManager_prepareCMediaFromObjectResolve(arrayObject, scanDepthMax, currentDepth + 1, prepareList);
+                            for (int i2=0;i2<arrayObjects.length;i2++) {
+                                scanObjectForCMedia(arrayObjects[i2], scanDepthMax, currentDepth + 1, prepareList);
                             }
                         }
                     } else {
-                        mediaManager_prepareCMediaFromObjectResolve(fieldObject, scanDepthMax, currentDepth + 1, prepareList);
+                        scanObjectForCMedia(fieldObject, scanDepthMax, currentDepth + 1, prepareList);
                     }
                 }
             }
         }
-
-
     }
-
 }

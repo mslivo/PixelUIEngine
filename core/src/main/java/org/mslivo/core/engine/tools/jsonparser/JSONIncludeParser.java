@@ -57,15 +57,15 @@ public class JSONIncludeParser {
         }
 
 
-        }
+    }
 
-    private static IncludeInfo findIncludeInfo(String line){
+    private static IncludeInfo findIncludeInfo(String line) {
         String prepare = line.trim();
-        if(prepare.startsWith(INCLUDE)){
+        if (prepare.startsWith(INCLUDE)) {
             return new IncludeInfo(line.substring(INCLUDE.length()), false);
-        }else if(prepare.startsWith(INCLUDE_TRIM)){
-            return new IncludeInfo(line.substring(INCLUDE_TRIM.length()),  true);
-        }else{
+        } else if (prepare.startsWith(INCLUDE_TRIM)) {
+            return new IncludeInfo(line.substring(INCLUDE_TRIM.length()), true);
+        } else {
             return null;
         }
     }
@@ -78,19 +78,17 @@ public class JSONIncludeParser {
             FileHandle fileHandle = Gdx.files.internal(basePath + fileName);
             fileContent = fileHandle.readString();
         } else if (inputFileMode == InputFileMode.EXTERNAL) {
-            fileContent =  Files.readString(Path.of(basePath + fileName));
+            fileContent = Files.readString(Path.of(basePath + fileName));
         }
         String[] fileContentSplit = fileContent.split(System.lineSeparator());
-        for(String line : fileContentSplit){
-            line = line.trim();
-            if(!line.isEmpty()){
-                lines.add(line);
-            }
+        for (int i = 0; i < fileContentSplit.length; i++) {
+            String line = fileContentSplit[i].trim();
+            if (!line.isEmpty()) lines.add(line);
         }
 
-        if(include) {
+        if (include) {
             // Remove braces
-            if(trimInclude) {
+            if (trimInclude) {
                 lines.remove(0);
                 lines.remove(lines.size() - 1);
             }
@@ -98,11 +96,11 @@ public class JSONIncludeParser {
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
                 IncludeInfo includeInfo = findIncludeInfo(line);
-                if(includeInfo != null){
+                if (includeInfo != null) {
                     String incFile = includeInfo.includeFile;
                     String currentdir = new File(fileName).getParent();
                     String incSyntax = includeInfo.trim ? INCLUDE_TRIM : INCLUDE;
-                    lines.set(i,incSyntax+currentdir+"\\"+incFile);
+                    lines.set(i, incSyntax + currentdir + "\\" + incFile);
                 }
 
             }
@@ -124,7 +122,7 @@ public class JSONIncludeParser {
         fileName = jsonFile.getName();
 
         // Read Base File
-        ArrayList<String> lines = getFileContent(basePath, fileName, false,false, inputFileMode);
+        ArrayList<String> lines = getFileContent(basePath, fileName, false, false, inputFileMode);
 
 
         // Parse includes
@@ -133,11 +131,11 @@ public class JSONIncludeParser {
             String line = lines.get(i);
 
             IncludeInfo includeInfo = findIncludeInfo(line);
-            if(includeInfo != null){
-                lines.set(i,"");
+            if (includeInfo != null) {
+                lines.set(i, "");
                 removeIndexes.add(i);
-                ArrayList<String> includeLines = getFileContent(basePath,includeInfo.includeFile, true, includeInfo.trim, inputFileMode);
-                if(includeLines.size() > 0) {
+                ArrayList<String> includeLines = getFileContent(basePath, includeInfo.includeFile, true, includeInfo.trim, inputFileMode);
+                if (includeLines.size() > 0) {
                     for (int i2 = includeLines.size() - 1; i2 >= 0; i2--) {
                         String incLine = includeLines.get(i2);
                         lines.add(i + 1, incLine);
@@ -149,17 +147,13 @@ public class JSONIncludeParser {
 
         // remove empty
         Integer index;
-        while ((index = removeIndexes.pollLast()) != null){
-            lines.remove((int)index);
+        while ((index = removeIndexes.pollLast()) != null) {
+            lines.remove((int) index);
         }
 
-        for (String line : lines) {
-            result.append(line).append(System.lineSeparator());
-        }
-
+        for (int i = 0; i < lines.size(); i++) result.append(lines.get(i)).append(System.lineSeparator());
         return result.toString();
     }
-
 
 
 }

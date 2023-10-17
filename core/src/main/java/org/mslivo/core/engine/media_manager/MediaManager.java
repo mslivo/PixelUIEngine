@@ -257,31 +257,24 @@ public class MediaManager {
     public boolean unloadAndReset() {
         if (!loaded) return false;
         // Images
-        if (textureAtlas != null) {
-            this.textureAtlas.dispose();
-        }
-        // Sounds
-        for (CMediaSound cMediaSound : medias_sounds.keySet()) {
-            medias_sounds.get(cMediaSound).dispose();
-        }
-        this.medias_sounds.clear();
-        for (CMediaMusic cMediaMusic : medias_music.keySet()) {
-            medias_music.get(cMediaMusic).dispose();
-        }
-        this.medias_music.clear();
-        // Fonts
-        for (CMediaFont cMediaFont : medias_fonts.keySet()) {
-            medias_fonts.get(cMediaFont).dispose();
-        }
-
-        this.medias_fonts.clear();
+        if (textureAtlas != null) this.textureAtlas.dispose();
+        textureAtlas = null;
         this.medias_cursors.clear();
         this.medias_images.clear();
         this.medias_arrays.clear();
         this.medias_animations.clear();
+        // Sounds
+        for (CMediaSound cMediaSound : medias_sounds.keySet()) medias_sounds.get(cMediaSound).dispose();
+        this.medias_sounds.clear();
+        //Music
+        for (CMediaMusic cMediaMusic : medias_music.keySet()) medias_music.get(cMediaMusic).dispose();
+        this.medias_music.clear();
+        // Fonts
+        for (CMediaFont cMediaFont : medias_fonts.keySet()) medias_fonts.get(cMediaFont).dispose();
+        this.medias_fonts.clear();
+
         this.loadedMediaList.clear();
         this.loadMediaList.clear();
-
         this.loaded = false;
         return true;
     }
@@ -347,10 +340,6 @@ public class MediaManager {
         cMediaArray.frameLength = frameLength;
         return cMediaArray;
     }
-
-
-
-
 
 
     /* -----  CMediaGFX ----- */
@@ -708,18 +697,19 @@ public class MediaManager {
         return getCMediaSound(cMedia).play(volume, pitch, pan);
     }
 
-    public long loopCMediaSound(CMediaSound cMediaSound){
-        return loopCMediaSound(cMediaSound,1, 1, 0);
-    }
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume){
-        return loopCMediaSound(cMediaSound,volume, 1, 0);
+    public long loopCMediaSound(CMediaSound cMediaSound) {
+        return loopCMediaSound(cMediaSound, 1, 1, 0);
     }
 
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch){
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume) {
+        return loopCMediaSound(cMediaSound, volume, 1, 0);
+    }
+
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch) {
         return loopCMediaSound(cMediaSound, volume, pitch, 0);
     }
 
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch, float pan){
+    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch, float pan) {
         return getCMediaSound(cMediaSound).loop(volume, pitch, pan);
     }
 

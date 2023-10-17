@@ -15,7 +15,6 @@ public class ExampleLauncherMain {
 
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 
-
         config.setResizable(true);
         config.setWindowedMode(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT);
         config.setWindowSizeLimits(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, -1, -1);

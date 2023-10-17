@@ -568,7 +568,7 @@ class UICommons {
             }
 
             int tabHeight = tabBar.bigIconMode ? (UIEngine.TILE_SIZE * 2) : UIEngine.TILE_SIZE;
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
+            if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
                 inputState.itemInfo[0] = i;
                 inputState.itemInfoValid = true;
                 return;
@@ -592,7 +592,7 @@ class UICommons {
                 int itemIndex = itemFrom + iy;
                 if (itemIndex < list.items.size()) {
                     int itemOffsetY = ((list.height - 1) - iy);
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                    if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                             x_list, y_list + itemOffsetY * UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE)) {
                         inputState.itemInfo[0] = itemIndex;
                         inputState.itemInfo[1] = itemOffsetY;
