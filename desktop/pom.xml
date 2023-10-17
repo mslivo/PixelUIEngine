@@ -44,6 +44,9 @@
 			<resource>
 				<directory>../assets</directory>
 			</resource>
+			<resource>
+				<directory>assets_example</directory>
+			</resource>
 		</resources>
 
 		<plugins>
