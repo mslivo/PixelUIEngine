@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.BiFunction;
 
+/**
+ * Utility Class
+ */
 public class Tools {
 
     private static final DecimalFormat decimalFormat_2decimal = new DecimalFormat("#.##");
@@ -31,18 +34,16 @@ public class Tools {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
-
     private static float skipFrameAccumulator = 0f;
 
-
-    public static boolean skipFrame(int desiredFPS) {
-        float TIME_STEP = (1f / (float) desiredFPS);
+    public static boolean runStep(int updatesPerSecond) {
+        float TIME_STEP = (1f / (float) updatesPerSecond);
         skipFrameAccumulator += Gdx.graphics.getDeltaTime();
         if (skipFrameAccumulator < TIME_STEP) {
-            return true;
+            return false;
         } else {
             skipFrameAccumulator -= TIME_STEP;
-            return false;
+            return true;
         }
     }
 
@@ -262,8 +263,13 @@ public class Tools {
         public static final String ANSI_BACK_WHITE = "\u001B[47m";
 
         public static String[] toArray(String text) {
-            return toArray(text, false);
+            return toArray(text, true);
         }
+
+        public static String[] toArray(String... text) {
+            return text;
+        }
+
         public static String[] toArray(String text, boolean splitLines) {
             return splitLines ? text.split(System.lineSeparator()) : new String[]{text};
         }
@@ -439,7 +445,7 @@ public class Tools {
             @Override
             protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                 ObjectStreamClass resultClassDescriptor = super.readClassDescriptor();
-                if(classReplacements == null) return resultClassDescriptor;
+                if (classReplacements == null) return resultClassDescriptor;
 
                 // Replace Class
                 String cName = resultClassDescriptor.getName();
@@ -450,7 +456,7 @@ public class Tools {
                     int arraySizeI = 0;
                     while (arraySizeI < cName.length() && cName.charAt(arraySizeI) == '[') arraySizeI++;
                     String realCName = cName.substring(arraySizeI + 1, cName.length() - 1);
-                    if (classReplacements.get(realCName) != null){
+                    if (classReplacements.get(realCName) != null) {
                         Class newClass = Class.forName(classReplacements.get(realCName));
                         for (int i = 0; i < arraySizeI; i++) newClass = newClass.arrayType();
                         resultClassDescriptor = ObjectStreamClass.lookup(newClass);

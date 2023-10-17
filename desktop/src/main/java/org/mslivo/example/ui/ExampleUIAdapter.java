@@ -47,7 +47,7 @@ public class ExampleUIAdapter implements UIAdapter {
         TextButton createExampleWindowButton = api.components.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.windows.createFromGenerator(ExampleWindowGenerator.class, "Example Window", gameEngine, mediaManager));
+                api.addWindow(api.windows.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
             }
         }, null, ButtonMode.DEFAULT);
 

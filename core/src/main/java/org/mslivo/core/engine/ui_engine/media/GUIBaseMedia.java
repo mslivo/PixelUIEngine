@@ -40,7 +40,7 @@ public class GUIBaseMedia {
     public static final CMediaArray GUI_TOOLTIP = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "tooltip.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaImage GUI_TOOLTIP_LINE_X = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "tooltip_line_x.png");
     public static final CMediaImage GUI_TOOLTIP_LINE_Y = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "tooltip_line_y.png");
-    public static final CMediaArray GUI_TOOLTIP_TITLE = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "tooltip_title.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray GUI_TOOLTIP_TITLE = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "tooltip_title.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE+2);
     public static final CMediaArray GUI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "context_menu.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_CONTEXT_MENU_SELECTED = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "context_menu_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_TEXTFIELD = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "textfield.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);

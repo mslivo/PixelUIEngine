@@ -26,9 +26,8 @@ public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData>, LTh
 
     @Override
     public void update() {
-        /* Main Loop: modify data, produce outputs */
-        //output.add(new EngineOutput(0,"TestOutput"));
-
+        // Main Loop: modify data & produce outputs
+        // output.add(new EngineOutput(0,"TestOutput"));
     }
 
     @Override

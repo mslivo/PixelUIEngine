@@ -85,13 +85,11 @@ public class UIEngine<T extends UIAdapter> {
 
     /* Constants */
     public static final int TILE_SIZE = 8;
-
+    public static final float TILE_SIZE_F = TILE_SIZE;
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
-
+    public static final float TILE_SIZE_F2 = TILE_SIZE / 2;
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
-
     public static final int DOUBLECLICK_TIME_MS = 180;
-
     public static final int COLORSTACK_SIZE = 8;
 
     public T getAdapter() {
@@ -2565,11 +2563,17 @@ public class UIEngine<T extends UIAdapter> {
             int line_width = mediaManager.textWidth(tooltip.font, line);
             if (line_width > text_width_max) text_width_max = line_width;
         }
-        int tooltip_width = MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float)TILE_SIZE);
-        int tooltip_height = tooltip.lines.length;
 
-        tooltip_width = Tools.Calc.lowerBounds(tooltip_width, tooltip.minWidth);
-        tooltip_height = Tools.Calc.lowerBounds(tooltip_height, tooltip.minHeight);
+        int tooltip_width = Tools.Calc.lowerBounds(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float)TILE_SIZE), tooltip.minWidth);
+        int tooltip_height = Tools.Calc.lowerBounds(tooltip.lines.length, tooltip.minHeight);
+
+        for(int i=0;i<tooltip.images.size();i++){
+            ToolTipImage toolTipImage = tooltip.images.get(i);
+            int imageWidthMin = toolTipImage.x+MathUtils.ceil(mediaManager.imageWidth(toolTipImage.image)/UIEngine.TILE_SIZE_F);
+            int imageHeightMin = toolTipImage.y+MathUtils.ceil(mediaManager.imageHeight(toolTipImage.image)/UIEngine.TILE_SIZE_F);
+            if(imageWidthMin > tooltip_width) tooltip_width = imageWidthMin;
+            if(imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
+        }
 
         int tooltip_x = 0;
         int tooltip_y = 0;
@@ -2666,12 +2670,17 @@ public class UIEngine<T extends UIAdapter> {
 
         //Text
         for (int ty = 0; ty < tooltip_height; ty++) {
-            String lineTxt = tooltip.lines[tooltip.lines.length - ty - 1];
-            if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
-                int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
-                render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x + ((tooltip_width / 2) * TILE_SIZE) - (text_width / 2), tooltip_y + (ty * TILE_SIZE), 0, 1);
-            } else {
-                render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 1);
+            int lineIndex = tooltip_height-ty-1;
+            if(lineIndex < tooltip.lines.length){
+                String lineTxt = tooltip.lines[lineIndex];
+                if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
+                    int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
+                    int text_x = tooltip_x + MathUtils.round((tooltip_width*TILE_SIZE)/2f) - MathUtils.round(text_width/2f);
+                    int text_y = tooltip_y + (ty * TILE_SIZE);
+                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct,  text_x, text_y , 1, 2);
+                } else {
+                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 2);
+                }
             }
         }
 
@@ -2680,7 +2689,9 @@ public class UIEngine<T extends UIAdapter> {
             ToolTipImage toolTipImage = tooltip.images.get(i);
             render_batchSaveColor();
             render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
-            render_drawCMediaGFX(toolTipImage.image, tooltip_x + toolTipImage.x, tooltip_y + toolTipImage.y);
+            int toolTipImageX = tooltip_x+(toolTipImage.x*UIEngine.TILE_SIZE);
+            int toolTipImageY = tooltip_y+(toolTipImage.y*UIEngine.TILE_SIZE);
+            render_drawCMediaGFX(toolTipImage.image, toolTipImageX, toolTipImageY);
             render_batchLoadColor();
         }
 

@@ -65,7 +65,6 @@ import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -102,12 +101,10 @@ public class API {
     public final _PreConfigured preConfigured = new _PreConfigured();
     private final InputState inputState;
     private final MediaManager mediaManager;
-    private final HashMap<Class, WindowGenerator> windowGeneratorCache;
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
         this.mediaManager = mediaManager;
-        this.windowGeneratorCache = new HashMap<>();
     }
 
 
@@ -2923,21 +2920,10 @@ public class API {
         }
 
 
-        public Window createFromGenerator(Class windowGeneratorClass, Object... p) {
-            if (windowGeneratorClass == null) return null;
-            WindowGenerator windowGenerator = windowGeneratorCache.get(windowGeneratorClass);
-            if (windowGenerator == null) {
-                try {
-                    windowGenerator = (WindowGenerator) windowGeneratorClass.getDeclaredConstructor(API.class).newInstance(API.this);
-                } catch (Exception e) {
-                    return null;
-                }
-                windowGeneratorCache.put(windowGeneratorClass, windowGenerator);
-            }
-
-            return windowGenerator.create(p);
+        public Window createFromGenerator(WindowGenerator windowGenerator, Object... params) {
+            if (windowGenerator == null) return null;
+            return windowGenerator.create(params);
         }
-
 
         public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
@@ -3091,14 +3077,14 @@ public class API {
 
         public class _ToolTipImage {
 
-            public ToolTipImage create(CMediaGFX image, int offset_x, int offset_y) {
-                return create(image, offset_x, offset_y, Tools.Colors.WHITE);
+            public ToolTipImage create(CMediaGFX image, int x, int y) {
+                return create(image, x, y, Tools.Colors.WHITE);
             }
 
-            public ToolTipImage create(CMediaGFX image, int offset_x, int offset_y, FColor color) {
+            public ToolTipImage create(CMediaGFX image, int x, int y, FColor color) {
                 ToolTipImage toolTipImage = new ToolTipImage();
                 setImage(toolTipImage, image);
-                setPosition(toolTipImage, offset_x, offset_y);
+                setPosition(toolTipImage, x, y);
                 setColor(toolTipImage, color);
                 return toolTipImage;
             }
@@ -3207,10 +3193,6 @@ public class API {
         public void setDisplayFistLineAsTitle(ToolTip tooltip, boolean firstLineIsTitle) {
             if (tooltip == null) return;
             tooltip.displayFistLineAsTitle = firstLineIsTitle;
-        }
-
-        public void setLines2(ToolTip tooltip, String... lines) {
-            setLines(tooltip, lines);
         }
 
         public void setLines(ToolTip tooltip, String[] lines) {
@@ -3874,7 +3856,7 @@ public class API {
                     if (imageButton.image == null) return;
                     xOffset = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
                     yOffset = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
-                    setOffsetContent(imageButton,xOffset,yOffset);
+                    setOffsetContent(imageButton, xOffset, yOffset);
                 } else if (button.getClass() == TextButton.class) {
                     TextButton textButton = (TextButton) button;
                     if (textButton.text == null) return;
@@ -3882,7 +3864,7 @@ public class API {
                     int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
                     int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
                     xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 1;
+                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
                     setOffsetContent(textButton, xOffset, yOffset);
 
                 }

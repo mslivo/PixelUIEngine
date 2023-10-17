@@ -6,10 +6,9 @@ import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 public class ExampleMainConstants {
 
     private ExampleMainConstants(){}
-
-    public static final int internalResolutionWidth = 640;
-    public static  final int internalResolutionHeight = 480;
-
-    public static final ViewportMode viewportMode = ViewportMode.PIXEL_PERFECT;
+    public static final int UPDATE_RATE = 60;
+    public static final int INTERNAL_RESOLUTION_WIDTH = 640;
+    public static  final int INTERNAL_RESOLUTION_HEIGHT = 480;
+    public static final ViewportMode VIEWPORT_MODE = ViewportMode.PIXEL_PERFECT;
 
 }

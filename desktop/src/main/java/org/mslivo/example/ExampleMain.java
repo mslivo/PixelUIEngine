@@ -8,11 +8,10 @@ import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.example.data.ExampleData;
+import org.mslivo.example.data.ExampleDataGenerator;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.ExampleUIAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
-
-import java.nio.file.Path;
 
 public class ExampleMain extends ApplicationAdapter {
 
@@ -43,51 +42,34 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void create() {
 
-        this.writeAndReadExampleDataFile();
-
         this.bootEngine();
 
     }
 
-
-    private void writeAndReadExampleDataFile() {
-        final Path DATA_FILE = Path.of(System.getProperty("user.home") + "/org/mslivo/example/test.data");
-        ExampleData exampleData = new ExampleData();
-        try {
-            Tools.Log.inProgress("Writing DataFile");
-            Tools.Log.done();
-            Tools.File.writeObjectToFile(exampleData, DATA_FILE);
-            Tools.Log.inProgress("Loading DataFile");
-            this.data = (ExampleData) Tools.File.readObjectFromFile(DATA_FILE);
-            Tools.Log.done();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void bootEngine() {
+        // Load Assets
         Tools.Log.inProgress("Loading Assets");
         this.mediaManager = new MediaManager();
-
         this.mediaManager.prepareGUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
-
         Tools.Log.done();
+
         // Engine
-        Tools.Log.inProgress("Starting Engine Subsystem");
+        Tools.Log.inProgress("Starting Engine");
+        this.data = ExampleDataGenerator.create_exampleData();
         this.engineAdapter = new ExampleEngineAdapter();
         this.gameEngine = new GameEngine<>(this.engineAdapter, this.data);
-
         Tools.Log.done();
+
         // Input/Render
-        Tools.Log.inProgress("Starting UI Subsystem");
+        Tools.Log.inProgress("Starting UI");
         this.UIAdapter = new ExampleUIAdapter(this.gameEngine);
         this.uiEngine = new UIEngine<>(
                 this.UIAdapter,
                 this.mediaManager,
-                ExampleMainConstants.internalResolutionWidth, ExampleMainConstants.internalResolutionHeight,
-                ExampleMainConstants.viewportMode, true);
+                ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                ExampleMainConstants.VIEWPORT_MODE, true);
         Tools.Log.done();
     }
 
@@ -95,25 +77,28 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void render() {
 
-        // Update UI Engine / Gather Input / Process Output
-        profile_time_gui = System.currentTimeMillis();
-        this.uiEngine.update();
-        profile_time_gui = System.currentTimeMillis() - profile_time_gui;
+        // 1. Update UI Engine -> Gather Input -> Process Output
+        if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+            profile_time_gui = System.currentTimeMillis();
+            this.uiEngine.update();
+            profile_time_gui = System.currentTimeMillis() - profile_time_gui;
+        }
+        // 2. Update Game Engine -> Process Input -> Create Output
+        if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+            profile_time_engine = System.currentTimeMillis();
+            this.gameEngine.update();
+            profile_time_engine = System.currentTimeMillis() - profile_time_engine;
+        }
 
-        // Update Game Engine / Process Input / Create Output
-        profile_time_engine = System.currentTimeMillis();
-        this.gameEngine.update();
-        profile_time_engine = System.currentTimeMillis() - profile_time_engine;
-
-        // Render Everything
+        // 3. Render Everything
         profile_time_render = System.currentTimeMillis();
         this.uiEngine.render();
         profile_time_render = System.currentTimeMillis() - profile_time_render;
 
 
-        // Debug Out
+        // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.Log.benchmark("UI: " + profile_time_gui + "ms","Render: " + profile_time_render + "ms");
+            Tools.Log.benchmark("UI: " + profile_time_gui + "ms", "Render: " + profile_time_render + "ms");
             timer_debug_info = System.currentTimeMillis();
         }
     }
