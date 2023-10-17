@@ -1541,7 +1541,7 @@ public class UIEngine<T extends UIAdapter> {
     private void gamePadMouseTranslateAndClearEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 6; i++) {
-            int buttons[] = gamePadMouseButtons(i);
+            int[] buttons = gamePadMouseButtons(i);
             if (buttons != null) {
                 for (int i2 = 0; i2 < buttons.length; i2++) {
                     int keyCode = buttons[i2];
@@ -1550,7 +1550,7 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             if (downKeyCodes.get(ikc) == keyCode) {
                                 downKeyCodes.remove(ikc);
-                                inputState.inputEvents.gamePadButtonDown = downKeyCodes.size() > 0;
+                                inputState.inputEvents.gamePadButtonDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.gamePadButtonsDown[keyCode] = false;
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = true;
                             }
@@ -1561,7 +1561,7 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             if (upKeyCodes.get(ikc) == keyCode) {
                                 upKeyCodes.remove(ikc);
-                                inputState.inputEvents.gamePadButtonUp = upKeyCodes.size() > 0;
+                                inputState.inputEvents.gamePadButtonUp = !upKeyCodes.isEmpty();
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = false;
                             }
                         }
@@ -1617,7 +1617,7 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             if (downKeyCodes.get(ikc) == keyCode) {
                                 downKeyCodes.remove(ikc);
-                                inputState.inputEvents.keyDown = downKeyCodes.size() > 0;
+                                inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.keysDown[keyCode] = false;
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = true;
                             }
@@ -1628,7 +1628,7 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             if (upKeyCodes.get(ikc) == keyCode) {
                                 upKeyCodes.remove(ikc);
-                                inputState.inputEvents.keyUp = upKeyCodes.size() > 0;
+                                inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = false;
                             }
                         }
@@ -1652,13 +1652,13 @@ public class UIEngine<T extends UIAdapter> {
 
             float moveSpeed = api.config.getSimulatedMouseCursorSpeed() * inputState.siumlatedMouseSpeedUp;
             if (buttonUp)
-                deltaY -= moveSpeed;
+                deltaY -= MathUtils.round(moveSpeed);
             if (buttonDown)
-                deltaY += moveSpeed;
+                deltaY += MathUtils.round(moveSpeed);
             if (buttonLeft)
-                deltaX -= moveSpeed;
+                deltaX -= MathUtils.round(moveSpeed);
             if (buttonRight)
-                deltaX += moveSpeed;
+                deltaX += MathUtils.round(moveSpeed);
         } else {
             inputState.siumlatedMouseSpeedUp = 0;
             // Magnet
@@ -1986,7 +1986,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case SCROLL -> {
                     if (System.currentTimeMillis() - notification.timer > 500) {
-                        notification.scroll += api.config.getNotificationsScrollSpeed();
+                        notification.scroll += MathUtils.round(api.config.getNotificationsScrollSpeed());
                         if (notification.scroll >= notification.scrollMax) {
                             notification.state = STATE_NOTIFICATION.DISPLAY;
                             notification.timer = System.currentTimeMillis();
