@@ -330,7 +330,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
                 api.openContextMenu(api.contextMenu.create(
                         new ContextMenuItem[]{
-                                api.contextMenu.item.create("Item 1", new ContextMenuItemAction() {
+                                api.contextMenu.item.create("Item 1y", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notifications.create("1"));

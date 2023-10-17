@@ -508,13 +508,15 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
                         ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
                         scrollBarVertical.buttonPressed = true;
-                        if (scrollBarVertical.scrollBarAction != null) scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
+                        if (scrollBarVertical.scrollBarAction != null)
+                            scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
                         inputState.scrolledScrollBarVertical = scrollBarVertical;
                     } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
                         ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
                         scrollBarHorizontal.buttonPressed = true;
                         inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
-                        if (scrollBarHorizontal.scrollBarAction != null) scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
+                        if (scrollBarHorizontal.scrollBarAction != null)
+                            scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
                     } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
                         List list = (List) inputState.lastGUIMouseHover;
                         UICommons.list_updateItemInfoAtMousePosition(inputState, list);
@@ -2460,12 +2462,12 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private int render_get9TilesCMediaIndex(int x, int y, int width, int height) {
-        if (x == 0 && y == 0) return 6;
-        if (x == width - 1 && y == 0) return 8;
-        if (x == 0 && y == (height - 1)) return 0;
-        if (x == width - 1 && y == (height - 1)) return 2;
-        if (y == 0) return 7;
-        if (y == (height - 1)) return 1;
+        if (x == 0 && y == 0) return 0;
+        if (x == width - 1 && y == 0) return 2;
+        if (x == 0 && y == (height - 1)) return 6;
+        if (x == width - 1 && y == (height - 1)) return 8;
+        if (y == 0) return 1;
+        if (y == (height - 1)) return 7;
         if (x == 0) return 3;
         if (x == width - 1) return 5;
         return 4;
@@ -2502,7 +2504,7 @@ public class UIEngine<T extends UIAdapter> {
                 /* Text */
                 for (int i = 0; i < combobox.items.size(); i++) {
                     ComboBoxItem comboBoxItem = combobox.items.get(i);
-                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, comboBoxItem.icon, comboBoxItem.iconIndex, (combobox.width * TILE_SIZE));
+                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 2, comboBoxItem.icon, comboBoxItem.iconIndex, (combobox.width * TILE_SIZE));
                 }
             }
 
@@ -2541,7 +2543,7 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextMenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, item.icon, item.iconIndex, (width) * TILE_SIZE);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 2, item.icon, item.iconIndex, (width) * TILE_SIZE);
             }
 
         }
@@ -2564,15 +2566,15 @@ public class UIEngine<T extends UIAdapter> {
             if (line_width > text_width_max) text_width_max = line_width;
         }
 
-        int tooltip_width = Tools.Calc.lowerBounds(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float)TILE_SIZE), tooltip.minWidth);
+        int tooltip_width = Tools.Calc.lowerBounds(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float) TILE_SIZE), tooltip.minWidth);
         int tooltip_height = Tools.Calc.lowerBounds(tooltip.lines.length, tooltip.minHeight);
 
-        for(int i=0;i<tooltip.images.size();i++){
+        for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
-            int imageWidthMin = toolTipImage.x+MathUtils.ceil(mediaManager.imageWidth(toolTipImage.image)/UIEngine.TILE_SIZE_F);
-            int imageHeightMin = toolTipImage.y+MathUtils.ceil(mediaManager.imageHeight(toolTipImage.image)/UIEngine.TILE_SIZE_F);
-            if(imageWidthMin > tooltip_width) tooltip_width = imageWidthMin;
-            if(imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
+            int imageWidthMin = toolTipImage.x + MathUtils.ceil(mediaManager.imageWidth(toolTipImage.image) / UIEngine.TILE_SIZE_F);
+            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.imageHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F);
+            if (imageWidthMin > tooltip_width) tooltip_width = imageWidthMin;
+            if (imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
         }
 
         int tooltip_x = 0;
@@ -2670,14 +2672,14 @@ public class UIEngine<T extends UIAdapter> {
 
         //Text
         for (int ty = 0; ty < tooltip_height; ty++) {
-            int lineIndex = tooltip_height-ty-1;
-            if(lineIndex < tooltip.lines.length){
+            int lineIndex = tooltip_height - ty - 1;
+            if (lineIndex < tooltip.lines.length) {
                 String lineTxt = tooltip.lines[lineIndex];
                 if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
                     int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
-                    int text_x = tooltip_x + MathUtils.round((tooltip_width*TILE_SIZE)/2f) - MathUtils.round(text_width/2f);
+                    int text_x = tooltip_x + MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
                     int text_y = tooltip_y + (ty * TILE_SIZE);
-                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct,  text_x, text_y , 1, 2);
+                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, text_x, text_y, 1, 2);
                 } else {
                     render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 2);
                 }
@@ -2689,8 +2691,8 @@ public class UIEngine<T extends UIAdapter> {
             ToolTipImage toolTipImage = tooltip.images.get(i);
             render_batchSaveColor();
             render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
-            int toolTipImageX = tooltip_x+(toolTipImage.x*UIEngine.TILE_SIZE);
-            int toolTipImageY = tooltip_y+(toolTipImage.y*UIEngine.TILE_SIZE);
+            int toolTipImageX = tooltip_x + (toolTipImage.x * UIEngine.TILE_SIZE);
+            int toolTipImageY = tooltip_y + (toolTipImage.y * UIEngine.TILE_SIZE);
             render_drawCMediaGFX(toolTipImage.image, toolTipImageX, toolTipImageY);
             render_batchLoadColor();
         }
