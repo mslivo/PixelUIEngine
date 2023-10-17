@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mslivo</groupId>
-		<artifactId>guiengine</artifactId>
+		<artifactId>pixeluiengine</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>guiengine-desktop</artifactId>
+	<artifactId>pixeluiengine-desktop</artifactId>
 
 	<packaging>jar</packaging>
 	<properties>
@@ -18,7 +18,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mslivo</groupId>
-			<artifactId>guiengine-core</artifactId>
+			<artifactId>pixeluiengine-core</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
