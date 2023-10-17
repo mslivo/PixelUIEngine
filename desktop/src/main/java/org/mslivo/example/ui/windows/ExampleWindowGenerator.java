@@ -103,14 +103,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
     private ArrayList<Component> createTab4(Window window) {
-        Text text1 = api.components.text.create(2, 10, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
-        Text text2 = api.components.text.create(2, 9, new String[]{"abcdefghijklmnopqrstuvwxyz"});
-        Text text3 = api.components.text.create(2, 8, new String[]{"0123456789"});
-        Text text4 = api.components.text.create(2, 7, new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
-        Text text5 = api.components.text.create(2, 6, new String[]{"ÀÁÂÃÈÉÊÌÍÎÑÒÓÔÕÙÚÛÜÇ"});
-        Text text6 = api.components.text.create(2, 5, new String[]{"àáâãèéêìíîñòóôõùúûüç"});
+        Text text1 = api.components.text.create(2, 5, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
+        Text text2 = api.components.text.create(2, 4, new String[]{"abcdefghijklmnopqrstuvwxyz"});
+        Text text3 = api.components.text.create(2, 3, new String[]{"0123456789"});
+        Text text4 = api.components.text.create(2, 2, new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
+        Text text5 = api.components.text.create(2, 1, new String[]{"pPqQwyg"});
 
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5, text6));
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
         api.windows.addComponents(window, components.toArray(new Component[]{}));
         return components;
     }
