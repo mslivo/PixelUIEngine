@@ -73,9 +73,6 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.Log.done();
     }
 
-
-    long run = 0;
-    long notrun = 0;
     @Override
     public void render() {
         if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
@@ -87,7 +84,6 @@ public class ExampleMain extends ApplicationAdapter {
             profile_time_engine = System.currentTimeMillis();
             this.gameEngine.update();
             profile_time_engine = System.currentTimeMillis() - profile_time_engine;
-            run++;
         }
 
         // 3. Render Everything
@@ -105,7 +101,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        Tools.Log.benchmark("Shutting down...");
+        Tools.Log.inProgress("Shutting down...");
         this.shutdownEngine();
         Tools.Log.done();
         Gdx.app.exit();
