@@ -558,7 +558,7 @@ public class API {
             components.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    selectColorFunction.accept(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b));
+                    selectColorFunction.accept(FColor.create(ok.color_r, ok.color_g, ok.color_b));
                     removeCurrentModalWindow();
                 }
             });
@@ -616,7 +616,7 @@ public class API {
                         }
                         if (x != xLast || y != yLast) {
                             components.setColor(ok, components.map.getPixelColor(colorMap, x, y - 1));
-                            components.button.textButton.setFont(ok, Tools.Colors.getBrightness(Tools.Colors.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
+                            components.button.textButton.setFont(ok,FColor.getBrightness(FColor.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
                             components.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
@@ -864,14 +864,14 @@ public class API {
         public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
             BiFunction<Long, Long, FColor> colorFunction = (value, lastValue) -> {
                 if (value > lastValue) {
-                    return Tools.Colors.GREEN_BRIGHT;
+                    return FColor.GREEN_BRIGHT;
                 } else if (value < lastValue) {
-                    return Tools.Colors.RED_BRIGHT;
+                    return FColor.RED_BRIGHT;
                 } else {
-                    return Tools.Colors.ORANGE_BRIGHT;
+                    return FColor.ORANGE_BRIGHT;
                 }
             };
-            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Tools.Colors.WHITE, colorFunction, null, true);
+            return map_drawGraph(map, itemCount, 1, 1, getIndexValue,FColor.WHITE, colorFunction, null, true);
         }
 
         public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, BiFunction<Long, Long, FColor> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
@@ -915,7 +915,7 @@ public class API {
 
 
             // Draw Background
-            FColor colorBackGroundDarker = Tools.Colors.createDarker(colorBackGround, 0.02f);
+            FColor colorBackGroundDarker =FColor.createDarker(colorBackGround, 0.02f);
             for (int iy = 0; iy < mapHeight; iy++) {
                 FColor color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
@@ -942,8 +942,8 @@ public class API {
             int lastIndex = -1;
             final float SHADING = 0.1f;
             FColor color = colorFunction.apply(lastValue, valueBefore);
-            FColor colorBrighter = Tools.Colors.createBrighter(color, SHADING);
-            FColor colorDarker = Tools.Colors.createDarker(color, SHADING);
+            FColor colorBrighter =FColor.createBrighter(color, SHADING);
+            FColor colorDarker =FColor.createDarker(color, SHADING);
             drawLoop:
             for (int ix = 0; ix < mapWidth; ix++) {
                 int index = indexAtPosition[ix];
@@ -956,8 +956,8 @@ public class API {
                 boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
                 if (index != lastIndex) {
                     color = colorFunction.apply(value, lastValue);
-                    colorBrighter = Tools.Colors.createBrighter(color, SHADING);
-                    colorDarker = Tools.Colors.createDarker(color, SHADING);
+                    colorBrighter =FColor.createBrighter(color, SHADING);
+                    colorDarker =FColor.createDarker(color, SHADING);
                     indexChange = true;
                     lastIndex = index;
                 }
@@ -1509,7 +1509,7 @@ public class API {
                 null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont, Tools.Colors.BLACK);
+                config.defaultFont,FColor.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm) {
@@ -1517,7 +1517,7 @@ public class API {
                 onConfirm, null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont, Tools.Colors.BLACK);
+                config.defaultFont,FColor.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
@@ -1525,7 +1525,7 @@ public class API {
                 onConfirm, selectedCharacter,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont, Tools.Colors.BLACK);
+                config.defaultFont,FColor.BLACK);
     }
 
 
@@ -1534,7 +1534,7 @@ public class API {
                 selectedCharacter,
                 charactersLC,
                 charactersUC,
-                config.defaultFont, Tools.Colors.BLACK);
+                config.defaultFont,FColor.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
@@ -1617,9 +1617,9 @@ public class API {
 
         private boolean simulatedMouseMagnetModeEnabled = true;
         private boolean windowsDefaultEnforceScreenBounds = false;
-        private FColor windowsDefaultColor = Tools.Colors.WHITE;
-        private FColor componentsDefaultColor = Tools.Colors.WHITE;
-        private FColor tooltipDefaultColor = Tools.Colors.WHITE;
+        private FColor windowsDefaultColor =FColor.WHITE;
+        private FColor componentsDefaultColor =FColor.WHITE;
+        private FColor tooltipDefaultColor =FColor.WHITE;
         private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_ARROW;
         private int gameViewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
@@ -1632,7 +1632,7 @@ public class API {
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
         private CMediaFont notificationsDefaultFont = GUIBaseMedia.FONT_WHITE;
-        private FColor notificationsDefaultColor = Tools.Colors.GRAY_DARK;
+        private FColor notificationsDefaultColor =FColor.GRAY_DARK;
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
@@ -1677,7 +1677,7 @@ public class API {
 
         public void setWindowsDefaultColor(FColor windowsDefaultColor) {
             if (windowsDefaultColor == null) return;
-            this.windowsDefaultColor = Tools.Colors.create(windowsDefaultColor);
+            this.windowsDefaultColor =FColor.create(windowsDefaultColor);
         }
 
         public float getGamePadMouseSensitivity() {
@@ -1694,7 +1694,7 @@ public class API {
 
         public void setComponentsDefaultColor(FColor componentsDefaultColor) {
             if (componentsDefaultColor == null) return;
-            this.componentsDefaultColor = Tools.Colors.create(componentsDefaultColor);
+            this.componentsDefaultColor =FColor.create(componentsDefaultColor);
         }
 
         public FColor getTooltipDefaultColor() {
@@ -1703,7 +1703,7 @@ public class API {
 
         public void setTooltipDefaultColor(FColor tooltipDefaultColor) {
             if (tooltipDefaultColor == null) return;
-            this.tooltipDefaultColor = Tools.Colors.create(tooltipDefaultColor);
+            this.tooltipDefaultColor =FColor.create(tooltipDefaultColor);
         }
 
         public CMediaCursor getCursorGui() {
@@ -1926,7 +1926,7 @@ public class API {
 
         public void setNotificationsDefaultColor(FColor notificationsDefaultColor) {
             if (notificationsDefaultColor == null) return;
-            this.notificationsDefaultColor = Tools.Colors.create(notificationsDefaultColor);
+            this.notificationsDefaultColor =FColor.create(notificationsDefaultColor);
         }
 
         public int getNotificationsFadeoutTime() {
@@ -3079,7 +3079,7 @@ public class API {
         public class _ToolTipImage {
 
             public ToolTipImage create(CMediaGFX image, int x, int y) {
-                return create(image, x, y, Tools.Colors.WHITE);
+                return create(image, x, y,FColor.WHITE);
             }
 
             public ToolTipImage create(CMediaGFX image, int x, int y, FColor color) {
@@ -3670,7 +3670,7 @@ public class API {
                 setCamZoom(gameViewPort, camZoom);
                 setUpdateTime(gameViewPort, updateTime);
                 setGameViewPortAction(gameViewPort, gameViewPortAction);
-                setColor(gameViewPort, Tools.Colors.WHITE);
+                setColor(gameViewPort,FColor.WHITE);
                 return gameViewPort;
             }
 
@@ -3956,7 +3956,7 @@ public class API {
                     setSize(imageButton, width, height);
                     setImage(imageButton, image);
                     setArrayIndex(imageButton, arrayIndex);
-                    setColor2(imageButton, Tools.Colors.WHITE);
+                    setColor2(imageButton,FColor.WHITE);
                     centerContent(imageButton);
                     return imageButton;
                 }
@@ -3996,7 +3996,7 @@ public class API {
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
                 CheckBox checkBox = new CheckBox();
                 setComponentInitValues(checkBox);
-                setColor(checkBox, Tools.Colors.WHITE);
+                setColor(checkBox,FColor.WHITE);
                 setPosition(checkBox, x, y);
                 setSize(checkBox, 1, 1);
                 setText(checkBox, text);
@@ -4452,7 +4452,7 @@ public class API {
                 textField.offset = 0;
 
                 setComponentInitValues(textField);
-                setColor(textField, Tools.Colors.WHITE);
+                setColor(textField,FColor.WHITE);
                 setPosition(textField, x, y);
                 setSize(textField, width, 1);
                 setFont(textField, font);
@@ -4539,7 +4539,7 @@ public class API {
                 Map map = new Map();
                 map.mapOverlays = new ArrayList<>();
                 setComponentInitValues(map);
-                setColor(map, Tools.Colors.WHITE);
+                setColor(map,FColor.WHITE);
                 map.pMap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
                 setPosition(map, x, y);
                 setSize(map, width, height);
@@ -4561,7 +4561,7 @@ public class API {
 
             public FColor getPixelColor(Map map, int x, int y) {
                 if (map == null) return null;
-                return Tools.Colors.createFromInt(map.pMap.getPixel(x, y));
+                return FColor.createFromInt(map.pMap.getPixel(x, y));
             }
 
             public void clearMap(Map map, FColor fColor) {
@@ -4657,11 +4657,11 @@ public class API {
 
             public class _MapOverlay {
                 public MapOverlay create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y, false, Tools.Colors.WHITE, 0);
+                    return create(image, x, y, false,FColor.WHITE, 0);
                 }
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut) {
-                    return create(image, x, y, fadeOut, Tools.Colors.WHITE, 0);
+                    return create(image, x, y, fadeOut,FColor.WHITE, 0);
                 }
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, FColor color) {
@@ -4761,7 +4761,7 @@ public class API {
                 setEndless(knob, endless);
                 setTurned(knob, turned);
                 setKnobAction(knob, knobAction);
-                setColor2(knob, Tools.Colors.BLACK);
+                setColor2(knob,FColor.BLACK);
                 return knob;
             }
 
@@ -4872,7 +4872,7 @@ public class API {
                 setImage(imageC, image);
                 setArrayIndex(imageC, arrayIndex);
                 setAnimationOffset(imageC, animation_offset);
-                setColor(imageC, Tools.Colors.WHITE);
+                setColor(imageC,FColor.WHITE);
                 setImageAction(imageC, imageAction);
                 return imageC;
             }

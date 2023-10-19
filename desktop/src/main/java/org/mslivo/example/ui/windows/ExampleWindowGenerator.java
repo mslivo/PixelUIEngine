@@ -132,17 +132,17 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         };
         api.components.knob.setKnobAction(knob, knobAction);
-        api.components.setColor(knob, Tools.Colors.BLUE_BRIGHT);
+        api.components.setColor(knob,FColor.BLUE_BRIGHT);
 
         Knob knobe = api.components.knob.create(4, 5, null, true);
-        api.components.setColor(knobe, Tools.Colors.RED_BRIGHT);
+        api.components.setColor(knobe,FColor.RED_BRIGHT);
 
         // Shape
-        Shape oval = api.components.shape.create(11, 3, 4, 4, ShapeType.OVAL, Tools.Colors.GREEN_BRIGHT);
+        Shape oval = api.components.shape.create(11, 3, 4, 4, ShapeType.OVAL,FColor.GREEN_BRIGHT);
 
-        Shape rect = api.components.shape.create(11, 8, 2, 2, ShapeType.RECT, Tools.Colors.YELLOW_DARK);
+        Shape rect = api.components.shape.create(11, 8, 2, 2, ShapeType.RECT,FColor.YELLOW_DARK);
 
-        Shape triangle = api.components.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN, Tools.Colors.NAVY_BLUE_DARK);
+        Shape triangle = api.components.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN,FColor.NAVY_BLUE_DARK);
 
         ScrollBarHorizontal scrollBarHorizontalR = api.components.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
@@ -150,21 +150,21 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 oval.color_r = scrolled;
             }
         }, oval.color_r);
-        api.components.setColor1And2(scrollBarHorizontalR, Tools.Colors.RED_BRIGHT);
+        api.components.setColor1And2(scrollBarHorizontalR,FColor.RED_BRIGHT);
         ScrollBarHorizontal scrollBarHorizontalG = api.components.scrollBar.horizontalScrollbar.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color_g = scrolled;
             }
         }, oval.color_g);
-        api.components.setColor1And2(scrollBarHorizontalG, Tools.Colors.GREEN_BRIGHT);
+        api.components.setColor1And2(scrollBarHorizontalG,FColor.GREEN_BRIGHT);
         ScrollBarHorizontal scrollBarHorizontalB = api.components.scrollBar.horizontalScrollbar.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color_b = scrolled;
             }
         }, oval.color_b);
-        api.components.setColor1And2(scrollBarHorizontalB, Tools.Colors.BLUE_BRIGHT);
+        api.components.setColor1And2(scrollBarHorizontalB,FColor.BLUE_BRIGHT);
 
 
         TextField textField = api.components.textField.create(18, 11, 10, "", null, 128);
@@ -179,7 +179,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.button.setButtonAction(notiBtn, new ButtonAction() {
             @Override
             public void onRelease() {
-                Notification notification = api.notifications.create(textField.content, Tools.Colors.createRandom());
+                Notification notification = api.notifications.create(textField.content,FColor.createRandom());
 
                 api.notifications.setNotificationAction(notification, new NotificationAction() {
                     @Override
@@ -195,8 +195,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        ProgressBar progressBar = api.components.progressBar.create(18, 3, 8, 0, true, true, GUIBaseMedia.FONT_WHITE, Tools.Colors.BLUE_BRIGHT);
-        api.components.setColor2(progressBar, Tools.Colors.RED_DARK);
+        ProgressBar progressBar = api.components.progressBar.create(18, 3, 8, 0, true, true, GUIBaseMedia.FONT_WHITE,FColor.BLUE_BRIGHT);
+        api.components.setColor2(progressBar,FColor.RED_DARK);
 
         ScrollBarHorizontal pgScrollbar = api.components.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {
             @Override
@@ -211,9 +211,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ArrayList<ComboBoxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
         ComboBox comboBox = api.components.comboBox.create(25, 7, 6, new ComboBoxItem[]{
-                api.components.comboBox.item.create("One", null, null, Tools.Colors.RED_BRIGHT),
-                api.components.comboBox.item.create("Two", null, null, Tools.Colors.YELLOW_BRIGHT),
-                api.components.comboBox.item.create("Three", null, null, Tools.Colors.GREEN_BRIGHT),
+                api.components.comboBox.item.create("One", null, null,FColor.RED_BRIGHT),
+                api.components.comboBox.item.create("Two", null, null,FColor.YELLOW_BRIGHT),
+                api.components.comboBox.item.create("Three", null, null,FColor.GREEN_BRIGHT),
 
         });
 
@@ -314,7 +314,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         }, null, ButtonMode.TOGGLE);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);
         api.components.button.centerContent(textBtn1);
-        api.components.setColor(textBtn1, Tools.Colors.BLUE_BRIGHT);
+        api.components.setColor(textBtn1, FColor.BLUE_BRIGHT);
 
 
         TextButton textBtn3 = api.components.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
@@ -355,7 +355,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                         , null, 1f));
             }
         }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1);
-        api.components.setColor(textBtn4, Tools.Colors.GRAY_BRIGHT);
+        api.components.setColor(textBtn4,FColor.GRAY_BRIGHT);
         api.components.button.centerContent(textBtn4);
 
         TextButton textBtn5 = api.components.button.textButton.create(10, 9, 8, 1, "Viewport", new ButtonAction() {
@@ -403,10 +403,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.button.centerContent(imageButton5);
         api.components.button.centerContent(imageButton6);
 
-        api.components.setColor(imageButton3, Tools.Colors.GREEN_BRIGHT);
-        api.components.setColor(imageButton4, Tools.Colors.BLUE_BRIGHT);
-        api.components.setColor(imageButton5, Tools.Colors.YELLOW_BRIGHT);
-        api.components.setColor(imageButton6, Tools.Colors.ORANGE_BRIGHT);
+        api.components.setColor(imageButton3,FColor.GREEN_BRIGHT);
+        api.components.setColor(imageButton4,FColor.BLUE_BRIGHT);
+        api.components.setColor(imageButton5,FColor.YELLOW_BRIGHT);
+        api.components.setColor(imageButton6,FColor.ORANGE_BRIGHT);
 
         ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), true, null, null, 3, 4);
 
@@ -489,7 +489,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public FColor cellColor(ListItem listItem) {
-                return listItem.text.endsWith("3") || listItem.text.endsWith("5") ? Tools.Colors.BLUE_BRIGHT : null;
+                return listItem.text.endsWith("3") || listItem.text.endsWith("5") ?FColor.BLUE_BRIGHT : null;
             }
 
             @Override
