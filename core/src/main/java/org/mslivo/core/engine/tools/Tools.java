@@ -711,6 +711,16 @@ public class Tools {
             oneIn = lowerBounds(oneIn, 1);
             return MathUtils.random(1, oneIn) == 1;
         }
+
+        public static Object chooseRandom(Object[] array){
+            if(array==null || array.length == 0) return null;
+            return array[MathUtils.random(0,array.length-1)];
+        }
+
+        public static Object chooseRandom(List list){
+            if(list==null || list.size() == 0) return null;
+            return list.get(MathUtils.random(0,list.size()-1));
+        }
     }
 
     public static class Reflection {
