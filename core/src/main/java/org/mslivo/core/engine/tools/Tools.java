@@ -5,7 +5,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.CMedia;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -712,12 +711,12 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
-        public static Object chooseRandom(Object[] array){
+        public static <T> T chooseRandom(T[] array){
             if(array==null || array.length == 0) return null;
             return array[MathUtils.random(0,array.length-1)];
         }
 
-        public static Object chooseRandom(List list){
+        public static <T> T chooseRandom(List<T> list){
             if(list==null || list.size() == 0) return null;
             return list.get(MathUtils.random(0,list.size()-1));
         }
