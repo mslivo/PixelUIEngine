@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Align;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
+import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -657,8 +657,8 @@ public class MediaManager {
         setCMediaFontColor(font, 1, 1, 1, 1);
     }
 
-    public void setCMediaFontColor(CMediaFont font, FColor fColor) {
-        setCMediaFontColor(font, fColor.r, fColor.g, fColor.b, fColor.a);
+    public void setCMediaFontColor(CMediaFont font, Color color) {
+        setCMediaFontColor(font, color.r, color.g, color.b, color.a);
     }
 
     public void setCMediaFontColor(CMediaFont font, float r, float g, float b, float a) {

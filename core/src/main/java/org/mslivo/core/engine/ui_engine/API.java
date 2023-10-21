@@ -56,7 +56,6 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
@@ -82,7 +81,7 @@ import java.util.function.Function;
 
     - Color related functions are provided like:
         - setColor(X, float r, float g, float b, float a)
-        - setColor(X, FColor color) -> setColor(X, float r, float g, float b, float a)
+        - setColor(X, Color color) -> setColor(X, float r, float g, float b, float a)
 
  */
 public class API {
@@ -532,11 +531,11 @@ public class API {
             return returnComponents;
         }
 
-        public Window modal_CreateColorModal(String caption, Consumer<FColor> selectColorFunction, FColor initColor) {
+        public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
             return modal_CreateColorModal(caption, selectColorFunction, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
         }
 
-        public Window modal_CreateColorModal(String caption, Consumer<FColor> selectColorFunction, FColor initColor, CMediaImage colors) {
+        public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
@@ -558,7 +557,7 @@ public class API {
             components.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    selectColorFunction.accept(FColor.create(ok.color_r, ok.color_g, ok.color_b));
+                    selectColorFunction.accept(new Color(ok.color_r, ok.color_g, ok.color_b, 1f));
                     removeCurrentModalWindow();
                 }
             });
@@ -603,7 +602,8 @@ public class API {
                 }
             });
             components.addUpdateAction(colorMap, new UpdateAction(10, true) {
-                int xLast = 0, yLast = 0;
+                int xLast = -1, yLast = -1;
+                Color currentColor = new Color();
 
                 @Override
                 public void onUpdate() {
@@ -615,8 +615,10 @@ public class API {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            components.setColor(ok, components.map.getPixelColor(colorMap, x, y - 1));
-                            components.button.textButton.setFont(ok,FColor.getBrightness(FColor.create(ok.color_r, ok.color_g, ok.color_b)) < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
+                            currentColor = components.map.getPixelColor(colorMap, x, y - 1);
+                            components.setColor(ok, currentColor);
+                            float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
+                            components.button.textButton.setFont(ok, colorBrightness < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
                             components.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
@@ -862,19 +864,19 @@ public class API {
         }
 
         public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
-            BiFunction<Long, Long, FColor> colorFunction = (value, lastValue) -> {
+            BiFunction<Long, Long, Color> colorFunction = (value, lastValue) -> {
                 if (value > lastValue) {
-                    return FColor.GREEN_BRIGHT;
+                    return Color.GREEN;
                 } else if (value < lastValue) {
-                    return FColor.RED_BRIGHT;
+                    return Color.RED;
                 } else {
-                    return FColor.ORANGE_BRIGHT;
+                    return Color.ORANGE;
                 }
             };
-            return map_drawGraph(map, itemCount, 1, 1, getIndexValue,FColor.WHITE, colorFunction, null, true);
+            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Color.WHITE, colorFunction, null, true);
         }
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, FColor colorBackGround, BiFunction<Long, Long, FColor> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, Color colorBackGround, BiFunction<Long, Long, Color> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -915,9 +917,9 @@ public class API {
 
 
             // Draw Background
-            FColor colorBackGroundDarker =FColor.createDarker(colorBackGround, 0.02f);
+            Color colorBackGroundDarker = colorBackGround.sub(0.02f,0.02f,0.02f,0f).cpy();
             for (int iy = 0; iy < mapHeight; iy++) {
-                FColor color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
+                Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
                     components.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
                 }
@@ -941,9 +943,9 @@ public class API {
             long lastValue = valueBefore;
             int lastIndex = -1;
             final float SHADING = 0.1f;
-            FColor color = colorFunction.apply(lastValue, valueBefore);
-            FColor colorBrighter =FColor.createBrighter(color, SHADING);
-            FColor colorDarker =FColor.createDarker(color, SHADING);
+            Color color = colorFunction.apply(lastValue, valueBefore);
+            Color colorBrighter = color.add(SHADING,SHADING,SHADING,0f).cpy();
+            Color colorDarker = color.sub(SHADING, SHADING,SHADING,0f).cpy();
             drawLoop:
             for (int ix = 0; ix < mapWidth; ix++) {
                 int index = indexAtPosition[ix];
@@ -956,8 +958,8 @@ public class API {
                 boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
                 if (index != lastIndex) {
                     color = colorFunction.apply(value, lastValue);
-                    colorBrighter =FColor.createBrighter(color, SHADING);
-                    colorDarker =FColor.createDarker(color, SHADING);
+                    colorBrighter = color.add(SHADING,SHADING,SHADING,0f).cpy();
+                    colorDarker = color.sub(SHADING, SHADING,SHADING,0f).cpy();
                     indexChange = true;
                     lastIndex = index;
                 }
@@ -1509,7 +1511,7 @@ public class API {
                 null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont,FColor.BLACK);
+                config.defaultFont, Color.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm) {
@@ -1517,7 +1519,7 @@ public class API {
                 onConfirm, null,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont,FColor.BLACK);
+                config.defaultFont, Color.BLACK);
     }
 
     public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
@@ -1525,7 +1527,7 @@ public class API {
                 onConfirm, selectedCharacter,
                 config.defaultLowerCaseCharacters,
                 config.defaultUpperCaseCharacters,
-                config.defaultFont,FColor.BLACK);
+                config.defaultFont, Color.BLACK);
     }
 
 
@@ -1534,10 +1536,10 @@ public class API {
                 selectedCharacter,
                 charactersLC,
                 charactersUC,
-                config.defaultFont,FColor.BLACK);
+                config.defaultFont, Color.BLACK);
     }
 
-    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, FColor color) {
+    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, Color color) {
         if (charactersLC == null || charactersUC == null || font == null) return;
         if (inputState.openMouseTextInput != null) return;
         // Check for Length and ISO Control Except special characters
@@ -1575,7 +1577,10 @@ public class API {
         }
         onScreenTextInput.x = x - 6;
         onScreenTextInput.y = y - 12;
-        onScreenTextInput.color = color;
+        onScreenTextInput.color_r = color.r;
+        onScreenTextInput.color_g = color.g;
+        onScreenTextInput.color_b = color.b;
+        onScreenTextInput.color_a = color.a;
         inputState.mTextInputMouseX = Gdx.input.getX();
         inputState.mTextInputUnlock = false;
         inputState.openMouseTextInput = onScreenTextInput;
@@ -1586,10 +1591,8 @@ public class API {
     }
 
     public static class _Config {
-
         private boolean hardwareMouseEnabled;
         private boolean keyboardMouseEnabled;
-
         private int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
         private int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
         private int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
@@ -1612,14 +1615,12 @@ public class API {
         private int[] gamePadMouseButtonsMouse5 = new int[]{};
         private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
         private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
-
         private float simulatedMouseCursorSpeed = 4.0f;
-
         private boolean simulatedMouseMagnetModeEnabled = true;
         private boolean windowsDefaultEnforceScreenBounds = false;
-        private FColor windowsDefaultColor =FColor.WHITE;
-        private FColor componentsDefaultColor =FColor.WHITE;
-        private FColor tooltipDefaultColor =FColor.WHITE;
+        private Color windowsDefaultColor = Color.WHITE.cpy();
+        private Color componentsDefaultColor = Color.WHITE.cpy();
+        private Color tooltipDefaultColor = Color.WHITE.cpy();
         private CMediaCursor cursorGui = GUIBaseMedia.GUI_CURSOR_ARROW;
         private int gameViewportDefaultUpdateTime = 200;
         private CMediaFont tooltipDefaultFont = GUIBaseMedia.FONT_BLACK;
@@ -1632,7 +1633,7 @@ public class API {
         private int notificationsMax = 20;
         private int notificationsDefaultDisplayTime = 3000;
         private CMediaFont notificationsDefaultFont = GUIBaseMedia.FONT_WHITE;
-        private FColor notificationsDefaultColor =FColor.GRAY_DARK;
+        private Color notificationsDefaultColor = Color.DARK_GRAY.cpy();
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
@@ -1671,13 +1672,13 @@ public class API {
             this.windowsDefaultEnforceScreenBounds = windowsDefaultEnforceScreenBounds;
         }
 
-        public FColor getWindowsDefaultColor() {
+        public Color getWindowsDefaultColor() {
             return windowsDefaultColor;
         }
 
-        public void setWindowsDefaultColor(FColor windowsDefaultColor) {
+        public void setWindowsDefaultColor(Color windowsDefaultColor) {
             if (windowsDefaultColor == null) return;
-            this.windowsDefaultColor =FColor.create(windowsDefaultColor);
+            this.windowsDefaultColor = windowsDefaultColor;
         }
 
         public float getGamePadMouseSensitivity() {
@@ -1688,22 +1689,22 @@ public class API {
             this.gamePadMouseSensitivity = gamePadMouseSensitivity;
         }
 
-        public FColor getComponentsDefaultColor() {
+        public Color getComponentsDefaultColor() {
             return componentsDefaultColor;
         }
 
-        public void setComponentsDefaultColor(FColor componentsDefaultColor) {
+        public void setComponentsDefaultColor(Color componentsDefaultColor) {
             if (componentsDefaultColor == null) return;
-            this.componentsDefaultColor =FColor.create(componentsDefaultColor);
+            this.componentsDefaultColor = componentsDefaultColor;
         }
 
-        public FColor getTooltipDefaultColor() {
+        public Color getTooltipDefaultColor() {
             return tooltipDefaultColor;
         }
 
-        public void setTooltipDefaultColor(FColor tooltipDefaultColor) {
+        public void setTooltipDefaultColor(Color tooltipDefaultColor) {
             if (tooltipDefaultColor == null) return;
-            this.tooltipDefaultColor =FColor.create(tooltipDefaultColor);
+            this.tooltipDefaultColor = tooltipDefaultColor;
         }
 
         public CMediaCursor getCursorGui() {
@@ -1886,7 +1887,6 @@ public class API {
             this.scrollBarSensitivity = scrollBarSensitivity;
         }
 
-
         public boolean isFoldWindowsOnDoubleClick() {
             return foldWindowsOnDoubleClick;
         }
@@ -1920,13 +1920,13 @@ public class API {
             this.notificationsDefaultFont = notificationsDefaultFont;
         }
 
-        public FColor getNotificationsDefaultColor() {
+        public Color getNotificationsDefaultColor() {
             return notificationsDefaultColor;
         }
 
-        public void setNotificationsDefaultColor(FColor notificationsDefaultColor) {
+        public void setNotificationsDefaultColor(Color notificationsDefaultColor) {
             if (notificationsDefaultColor == null) return;
-            this.notificationsDefaultColor =FColor.create(notificationsDefaultColor);
+            this.notificationsDefaultColor = notificationsDefaultColor;
         }
 
         public int getNotificationsFadeoutTime() {
@@ -2139,9 +2139,7 @@ public class API {
             setTextFieldDefaultAllowedCharacters(config.getTextFieldDefaultAllowedCharacters());
             setTooltipFadeInTime(config.getTooltipFadeInTime());
             setTooltipFadeInDelayTime(config.getTooltipFadeInDelayTime());
-
             setHardwareMouseEnabled(config.isHardwareMouseEnabled());
-
             setKeyboardMouseEnabled(config.isKeyboardMouseEnabled());
             setKeyboardMouseButtonsUp(config.getKeyboardMouseButtonsUp());
             setKeyBoardControlButtonsDown(config.getKeyBoardControlButtonsDown());
@@ -2154,7 +2152,6 @@ public class API {
             setKeyboardMouseButtonsMouse5(config.getKeyboardMouseButtonsMouse5());
             setKeyboardMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setKeyboardMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
-
             setGamePadMouseEnabled(config.isGamePadMouseEnabled());
             setGamePadMouseStickLeftEnabled(config.isGamePadMouseStickLeftEnabled());
             setGamePadMouseStickRightEnabled(config.isGamePadMouseStickRightEnabled());
@@ -2166,12 +2163,10 @@ public class API {
             setGamePadMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setGamePadMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
             setGamePadMouseSensitivity(config.getGamePadMouseSensitivity());
-
             setSimulatedMouseMagnetModeEnabled(config.isSimulatedMouseMagnetModeEnabled());
             setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
-
             setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());
             setDefaultUpperCaseCharacters(config.getDefaultUpperCaseCharacters());
         }
@@ -2448,19 +2443,19 @@ public class API {
             return create(text, config.notificationsDefaultColor, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, FColor color) {
+        public Notification create(String text, Color color) {
             return create(text, color, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, FColor color, CMediaFont font) {
+        public Notification create(String text, Color color, CMediaFont font) {
             return create(text, color, font, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, FColor color, CMediaFont font, int displayTime) {
+        public Notification create(String text, Color color, CMediaFont font, int displayTime) {
             return create(text, color, font, displayTime, null);
         }
 
-        public Notification create(String text, FColor color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
+        public Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
             Notification notification = new Notification();
             setText(notification, text);
             setDisplayTime(notification, displayTime);
@@ -2503,7 +2498,7 @@ public class API {
             notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
         }
 
-        public void setColor(Notification notification, FColor color) {
+        public void setColor(Notification notification, Color color) {
             if (notification == null || color == null) return;
             setColor(notification, color.r, color.g, color.b, color.a);
         }
@@ -2623,11 +2618,11 @@ public class API {
                 return create(text, contextMenuItemAction, icon, config.componentsDefaultColor, null);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
                 return create(text, contextMenuItemAction, icon, color, null);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, FColor color, CMediaFont font) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
                 setText(contextMenuItem, text);
                 setFont(contextMenuItem, font);
@@ -2652,7 +2647,7 @@ public class API {
                 contextMenuItem.data = data;
             }
 
-            public void setColor(ContextMenuItem contextMenuItem, FColor color) {
+            public void setColor(ContextMenuItem contextMenuItem, Color color) {
                 if (contextMenuItem == null || color == null) return;
                 setColor(contextMenuItem, color.r, color.b, color.g);
             }
@@ -2736,11 +2731,11 @@ public class API {
             return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, config.windowsDefaultColor, null);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components, FColor color) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components, Color color) {
             return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, color, null);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible, WindowAction windowAction, Component[] components, FColor color, CMediaFont font) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible, WindowAction windowAction, Component[] components, Color color, CMediaFont font) {
             Window window = new Window();
             setPosition(window, x, y);
             setSize(window, width, height);
@@ -2836,7 +2831,7 @@ public class API {
             window.foldable = foldable;
         }
 
-        private void setColorFunction(Window window, FColor color, int setColorMode, Class[] classes,
+        private void setColorFunction(Window window, Color color, int setColorMode, Class[] classes,
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
             if (classes == null) classes = new Class[]{};
             if (windowColor) setColor(window, color);
@@ -2862,33 +2857,33 @@ public class API {
             }
         }
 
-        public void setColorEverything(Window window, FColor color) {
+        public void setColorEverything(Window window, Color color) {
             setColorFunction(window, color, 2, null,
                     true, true, true, true);
         }
 
-        public void setColorEverything(Window window, FColor color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverything(Window window, Color color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorFunction(window, color, 2, null,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
-        public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions) {
+        public void setColorEverythingExcept(Window window, Color color, Class[] exceptions) {
             setColorFunction(window, color, 2, exceptions,
                     true, true, true, true);
         }
 
-        public void setColorEverythingExcept(Window window, FColor color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverythingExcept(Window window, Color color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorFunction(window, color, 2, exceptions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
 
-        public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions) {
             setColorFunction(window, color, 1, inclusions,
                     true, true, true, true);
         }
 
-        public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorFunction(window, color, 1, inclusions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
@@ -2901,7 +2896,7 @@ public class API {
             return UICommons.window_getRealHeight(window);
         }
 
-        public void setColorEverythingInclude(Window window, FColor color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
             if (window == null) return;
             if (inclusions != null) {
                 for (int i = 0; i < window.components.size(); i++) {
@@ -3016,7 +3011,7 @@ public class API {
             window.data = data;
         }
 
-        public void setColor(Window window, FColor color) {
+        public void setColor(Window window, Color color) {
             if (window == null || color == null) return;
             setColor(window, color.r, color.g, color.b, color.a);
         }
@@ -3079,10 +3074,10 @@ public class API {
         public class _ToolTipImage {
 
             public ToolTipImage create(CMediaGFX image, int x, int y) {
-                return create(image, x, y,FColor.WHITE);
+                return create(image, x, y, Color.WHITE);
             }
 
-            public ToolTipImage create(CMediaGFX image, int x, int y, FColor color) {
+            public ToolTipImage create(CMediaGFX image, int x, int y, Color color) {
                 ToolTipImage toolTipImage = new ToolTipImage();
                 setImage(toolTipImage, image);
                 setPosition(toolTipImage, x, y);
@@ -3101,7 +3096,7 @@ public class API {
                 toolTipImage.y = y;
             }
 
-            public void setColor(ToolTipImage toolTipImage, FColor color) {
+            public void setColor(ToolTipImage toolTipImage, Color color) {
                 if (toolTipImage == null) return;
                 setColor(toolTipImage, color.r, color.g, color.b, color.a);
             }
@@ -3145,11 +3140,11 @@ public class API {
             return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color) {
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color) {
             return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, color, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, FColor color, CMediaFont font) {
+        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color, CMediaFont font) {
             ToolTip tooltip = new ToolTip();
             tooltip.images = new ArrayList<>();
             setDisplayFistLineAsTitle(tooltip, displayFistLineAsTitle);
@@ -3207,7 +3202,7 @@ public class API {
             tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
         }
 
-        public void setColor(ToolTip tooltip, FColor color) {
+        public void setColor(ToolTip tooltip, Color color) {
             if (tooltip == null || color == null) return;
             setColor(tooltip, color.r, color.g, color.b, color.a);
         }
@@ -3517,12 +3512,12 @@ public class API {
             setSize(component, width, height);
         }
 
-        public void setColor(Component[] components, FColor color) {
+        public void setColor(Component[] components, Color color) {
             if (components == null) return;
             for (int i = 0; i < components.length; i++) setColor(components[i], color);
         }
 
-        public void setColor(Component component, FColor color) {
+        public void setColor(Component component, Color color) {
             if (component == null || color == null) return;
             setColor(component, color.r, color.g, color.b, color.a);
         }
@@ -3535,12 +3530,12 @@ public class API {
             component.color_a = a;
         }
 
-        public void setColor2(Component[] components, FColor color2) {
+        public void setColor2(Component[] components, Color color2) {
             if (components == null) return;
             for (int i = 0; i < components.length; i++) setColor2(components[i], color2);
         }
 
-        public void setColor2(Component component, FColor color) {
+        public void setColor2(Component component, Color color) {
             if (component == null || color == null) return;
             setColor2(component, color.r, color.g, color.b, color.a);
         }
@@ -3553,13 +3548,13 @@ public class API {
             component.color2_a = a;
         }
 
-        public void setColor1And2(Component component, FColor color) {
+        public void setColor1And2(Component component, Color color) {
             if (component == null) return;
             setColor(component, color);
             setColor2(component, color);
         }
 
-        public void setColor1And2(Component[] components, FColor color) {
+        public void setColor1And2(Component[] components, Color color) {
             if (components == null) return;
             for (int i = 0; i < components.length; i++) {
                 setColor(components[i], color);
@@ -3670,7 +3665,7 @@ public class API {
                 setCamZoom(gameViewPort, camZoom);
                 setUpdateTime(gameViewPort, updateTime);
                 setGameViewPortAction(gameViewPort, gameViewPortAction);
-                setColor(gameViewPort,FColor.WHITE);
+                setColor(gameViewPort, Color.WHITE);
                 return gameViewPort;
             }
 
@@ -3725,7 +3720,7 @@ public class API {
                 return create(x, y, width, 0f, progressText, progressText2Decimal, font, null);
             }
 
-            public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font, FColor color) {
+            public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font, Color color) {
                 ProgressBar progressBar = new ProgressBar();
                 setComponentInitValues(progressBar);
                 setPosition(progressBar, x, y);
@@ -3766,7 +3761,7 @@ public class API {
                 return create(x, y, width, height, shapeType, config.getComponentsDefaultColor());
             }
 
-            public Shape create(int x, int y, int width, int height, ShapeType shapeType, FColor color) {
+            public Shape create(int x, int y, int width, int height, ShapeType shapeType, Color color) {
                 Shape shape = new Shape();
                 setComponentInitValues(shape);
                 setPosition(shape, x, y);
@@ -3956,7 +3951,7 @@ public class API {
                     setSize(imageButton, width, height);
                     setImage(imageButton, image);
                     setArrayIndex(imageButton, arrayIndex);
-                    setColor2(imageButton,FColor.WHITE);
+                    setColor2(imageButton, Color.WHITE);
                     centerContent(imageButton);
                     return imageButton;
                 }
@@ -3996,7 +3991,7 @@ public class API {
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
                 CheckBox checkBox = new CheckBox();
                 setComponentInitValues(checkBox);
-                setColor(checkBox,FColor.WHITE);
+                setColor(checkBox, Color.WHITE);
                 setPosition(checkBox, x, y);
                 setSize(checkBox, 1, 1);
                 setText(checkBox, text);
@@ -4452,7 +4447,7 @@ public class API {
                 textField.offset = 0;
 
                 setComponentInitValues(textField);
-                setColor(textField,FColor.WHITE);
+                setColor(textField, Color.WHITE);
                 setPosition(textField, x, y);
                 setSize(textField, width, 1);
                 setFont(textField, font);
@@ -4539,7 +4534,7 @@ public class API {
                 Map map = new Map();
                 map.mapOverlays = new ArrayList<>();
                 setComponentInitValues(map);
-                setColor(map,FColor.WHITE);
+                setColor(map, Color.WHITE);
                 map.pMap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
                 setPosition(map, x, y);
                 setSize(map, width, height);
@@ -4559,13 +4554,13 @@ public class API {
                 map.texture = new Texture(map.pMap);
             }
 
-            public FColor getPixelColor(Map map, int x, int y) {
+            public Color getPixelColor(Map map, int x, int y) {
                 if (map == null) return null;
-                return FColor.createFromInt(map.pMap.getPixel(x, y));
+                return new Color(map.pMap.getPixel(x, y));
             }
 
-            public void clearMap(Map map, FColor fColor) {
-                clearMap(map, fColor);
+            public void clearMap(Map map, Color Color) {
+                clearMap(map, Color);
             }
 
             public void clearMap(Map map, float r, float g, float b, float a) {
@@ -4576,8 +4571,8 @@ public class API {
                 }
             }
 
-            public void drawPixel(Map map, int x, int y, FColor fColor) {
-                drawPixel(map, x, y, fColor.r, fColor.g, fColor.b, fColor.a);
+            public void drawPixel(Map map, int x, int y, Color Color) {
+                drawPixel(map, x, y, Color.r, Color.g, Color.b, Color.a);
             }
 
             public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
@@ -4586,8 +4581,8 @@ public class API {
                 map.pMap.drawPixel(x, y);
             }
 
-            public void drawLine(Map map, int x1, int y1, int x2, int y2, FColor fColor) {
-                drawLine(map, x1, y1, x2, y2, fColor.r, fColor.g, fColor.b, fColor.a);
+            public void drawLine(Map map, int x1, int y1, int x2, int y2, Color Color) {
+                drawLine(map, x1, y1, x2, y2, Color.r, Color.g, Color.b, Color.a);
             }
 
             public void drawLine(Map map, int x1, int y1, int x2, int y2, float r, float g, float b, float a) {
@@ -4596,8 +4591,8 @@ public class API {
                 map.pMap.drawLine(x1, y1, x2, y2);
             }
 
-            public void drawRect(Map map, int x1, int y1, int width, int height, FColor fColor) {
-                drawRect(map, x1, y1, width, height, fColor.r, fColor.g, fColor.b, fColor.a);
+            public void drawRect(Map map, int x1, int y1, int width, int height, Color Color) {
+                drawRect(map, x1, y1, width, height, Color.r, Color.g, Color.b, Color.a);
             }
 
             public void drawRect(Map map, int x1, int y1, int width, int height, float r, float g, float b, float a) {
@@ -4606,8 +4601,8 @@ public class API {
                 map.pMap.drawRectangle(x1, y1, width, height);
             }
 
-            public void drawCircle(Map map, int x, int y, int radius, FColor fColor) {
-                drawCircle(map, x, y, radius, fColor.r, fColor.g, fColor.b, fColor.a);
+            public void drawCircle(Map map, int x, int y, int radius, Color Color) {
+                drawCircle(map, x, y, radius, Color.r, Color.g, Color.b, Color.a);
             }
 
             public void drawCircle(Map map, int x, int y, int radius, float r, float g, float b, float a) {
@@ -4657,18 +4652,18 @@ public class API {
 
             public class _MapOverlay {
                 public MapOverlay create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y, false,FColor.WHITE, 0);
+                    return create(image, x, y, false, Color.WHITE, 0);
                 }
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut) {
-                    return create(image, x, y, fadeOut,FColor.WHITE, 0);
+                    return create(image, x, y, fadeOut, Color.WHITE, 0);
                 }
 
-                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, FColor color) {
+                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, Color color) {
                     return create(image, x, y, fadeOut, color, 0);
                 }
 
-                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, FColor color, int arrayIndex) {
+                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, Color color, int arrayIndex) {
                     MapOverlay mapOverlay = new MapOverlay();
                     setFadeOutTime(mapOverlay, config.mapOverlayDefaultFadeoutTime);
                     setImage(mapOverlay, image);
@@ -4704,7 +4699,7 @@ public class API {
                     mapOverlay.image = image;
                 }
 
-                public void setColor(MapOverlay mapOverlay, FColor color) {
+                public void setColor(MapOverlay mapOverlay, Color color) {
                     setColor(mapOverlay, color.r, color.b, color.g, color.a);
                 }
 
@@ -4761,7 +4756,7 @@ public class API {
                 setEndless(knob, endless);
                 setTurned(knob, turned);
                 setKnobAction(knob, knobAction);
-                setColor2(knob,FColor.BLACK);
+                setColor2(knob, Color.BLACK);
                 return knob;
             }
 
@@ -4872,7 +4867,7 @@ public class API {
                 setImage(imageC, image);
                 setArrayIndex(imageC, arrayIndex);
                 setAnimationOffset(imageC, animation_offset);
-                setColor(imageC,FColor.WHITE);
+                setColor(imageC, Color.WHITE);
                 setImageAction(imageC, imageAction);
                 return imageC;
             }
@@ -5044,11 +5039,11 @@ public class API {
                     return create(text, defaultComboBoxItem(), icon, config.componentsDefaultColor, null);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, FColor color) {
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
                     return create(text, defaultComboBoxItem(), icon, color, null);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, FColor color, CMediaFont font) {
+                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {
                     ComboBoxItem comboBoxItem = new ComboBoxItem();
                     setText(comboBoxItem, text);
                     setFont(comboBoxItem, font);
@@ -5073,7 +5068,7 @@ public class API {
                     comboBoxItem.data = data;
                 }
 
-                public void setColor(ComboBoxItem comboBoxItem, FColor color) {
+                public void setColor(ComboBoxItem comboBoxItem, Color color) {
                     if (comboBoxItem == null || color == null) return;
                     comboBoxItem.color_r = color.r;
                     comboBoxItem.color_g = color.g;

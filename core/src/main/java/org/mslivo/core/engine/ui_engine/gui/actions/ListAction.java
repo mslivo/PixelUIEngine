@@ -1,6 +1,6 @@
 package org.mslivo.core.engine.ui_engine.gui.actions;
 
-import org.mslivo.core.engine.ui_engine.misc.FColor;
+import com.badlogic.gdx.graphics.Color;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
@@ -51,7 +51,7 @@ public abstract class ListAction<T> extends CommonActions {
         return false;
     }
 
-    public FColor cellColor(T listItem) {
+    public Color cellColor(T listItem) {
         return null;
     }
 

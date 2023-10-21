@@ -1,7 +1,7 @@
 package org.mslivo.core.engine.ui_engine.gui.ostextinput;
 
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
+import com.badlogic.gdx.graphics.Color;
 
 public class OnScreenTextInput {
 
@@ -20,5 +20,5 @@ public class OnScreenTextInput {
     public boolean upperCase;
     public MouseTextInputAction mouseTextInputAction;
 
-    public FColor color;
+    public float color_r,color_g,color_b,color_a;
 }

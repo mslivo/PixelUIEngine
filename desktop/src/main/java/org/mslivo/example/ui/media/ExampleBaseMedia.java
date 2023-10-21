@@ -21,7 +21,7 @@ public class ExampleBaseMedia {
     public static final CMediaImage GUI_ICON_EXAMPLE_BULLET_ORANGE = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_bullet_orange.png");
     public static final CMediaImage GUI_ICON_EXAMPLE_WINDOW = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_icon_window.png");
     public static final CMediaAnimation GUI_ICON_EXAMPLE_ANIMATION_2 = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8, 0.1f);
-    public static final CMediaAnimation GUI_BACKGROUND = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 32, 32, 0.2f);
+    public static final CMediaAnimation GUI_BACKGROUND = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 16, 16, 0.2f);
 
     public static CMedia[] ALL = new CMedia[]{
             GUI_ICON_BUTTON_ANIM_EXAMPLE,

@@ -92,8 +92,8 @@ public class ExampleUIAdapter implements UIAdapter {
 
         // Draw game based on data
         batch.begin();
-        for (int x = 0; x < api.resolutionWidth(); x += 32) {
-            for (int y = 0; y < api.resolutionHeight(); y += 32) {
+        for (int x = 0; x < api.resolutionWidth(); x += 16) {
+            for (int y = 0; y < api.resolutionHeight(); y += 16) {
                 mediaManager.drawCMediaAnimation(batch, ExampleBaseMedia.GUI_BACKGROUND,
                         x, y, animation_timer);
             }

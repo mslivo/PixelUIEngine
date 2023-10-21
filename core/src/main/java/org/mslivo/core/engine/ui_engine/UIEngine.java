@@ -58,7 +58,7 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.FColor;
+import com.badlogic.gdx.graphics.Color;
 import org.mslivo.core.engine.ui_engine.misc.GrayScaleShader;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
@@ -2327,27 +2327,29 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawOnScreenTextInput() {
         if (inputState.openMouseTextInput == null) return;
         OnScreenTextInput onScreenTextInput = inputState.openMouseTextInput;
+        render_batchSetColorWhite(onScreenTextInput.color_a);
         final int CHARACTERS = 4;
-
         char[] chars = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
-        // Left
 
+        // 4 to the left
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
                 render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - ((i * i) / 2), onScreenTextInput.upperCase, false);
             }
         }
-        // Right
+        // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = onScreenTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
                 render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - ((i * i) / 2), onScreenTextInput.upperCase, false);
             }
         }
-
+        // 1 in center
         render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase, inputState.mTextInputConfirmPressed);
-        render_batchSetColor(onScreenTextInput.color.r, onScreenTextInput.color.g, onScreenTextInput.color.b, 1f);
+
+        // Selection
+        render_batchSetColor(onScreenTextInput.color_r, onScreenTextInput.color_g, onScreenTextInput.color_b, onScreenTextInput.color_a);
         render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x - 1, onScreenTextInput.y - 1);
         render_batchSetColorWhite(1f);
     }
@@ -2873,7 +2875,7 @@ public class UIEngine<T extends UIAdapter> {
                 boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
 
                 // Cell
-                FColor cellColor = null;
+                Color cellColor = null;
                 if (list.listAction != null && list.items != null) {
                     if (itemIndex < list.items.size()) {
                         cellColor = list.listAction.cellColor(item);
@@ -3034,7 +3036,7 @@ public class UIEngine<T extends UIAdapter> {
                         render_batchSaveColor();
 
                         // Draw Cell
-                        FColor cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[ix][iy], ix, iy) : null;
+                        Color cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[ix][iy], ix, iy) : null;
                         if (cellColor != null) {
                             render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
                         } else {
