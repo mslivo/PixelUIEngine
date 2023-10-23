@@ -2927,7 +2927,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, combobox.selectedItem.icon, combobox.selectedItem.iconIndex, (combobox.width - 2) * TILE_SIZE);
+                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 2, combobox.selectedItem.icon, combobox.selectedItem.iconIndex, (combobox.width - 2) * TILE_SIZE);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;
