@@ -379,8 +379,8 @@ public class API {
             return result;
         }
 
-        public Text text_CreateClickableURL(int x, int y, String[] text, String url) {
-            return text_CreateClickableURL(x, y, url, text, GUIBaseMedia.FONT_BLACK, text, GUIBaseMedia.FONT_BLACK);
+        public Text text_CreateClickableURL(int x, int y, String url) {
+            return text_CreateClickableURL(x, y, url, Tools.Text.toArray(url), GUIBaseMedia.FONT_BLACK, Tools.Text.toArray(url), GUIBaseMedia.FONT_BLACK);
         }
 
         public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
