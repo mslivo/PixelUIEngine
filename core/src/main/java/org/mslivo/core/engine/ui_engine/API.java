@@ -379,12 +379,12 @@ public class API {
             return result;
         }
 
-        public Text text_CreateClickableURL(int x, int y, String text, String url) {
-            return text_CreateClickableURL(x, y, text, url, GUIBaseMedia.FONT_BLACK, GUIBaseMedia.FONT_WHITE);
+        public Text text_CreateClickableURL(int x, int y, String[] text, String url) {
+            return text_CreateClickableURL(x, y, url, text, GUIBaseMedia.FONT_BLACK, text, GUIBaseMedia.FONT_BLACK);
         }
 
-        public Text text_CreateClickableURL(int x, int y, String text, String url, CMediaFont font, CMediaFont fontHover) {
-            return text_CreateClickableText(x, y, new String[]{text}, new Consumer<Integer>() {
+        public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
+            return text_CreateClickableText(x, y, text, font, new Consumer<Integer>() {
                 @Override
                 public void accept(Integer integer) {
                     try {
@@ -393,14 +393,15 @@ public class API {
                         e.printStackTrace();
                     }
                 }
-            }, font, fontHover);
+            }, textHover, fontHover);
         }
 
-        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick) {
-            return text_CreateClickableText(x, y, text, onClick, GUIBaseMedia.FONT_BLACK, GUIBaseMedia.FONT_WHITE);
+
+        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, Consumer<Integer> onClick) {
+            return text_CreateClickableText(x, y, text, font, onClick, text, font);
         }
 
-        public Text text_CreateClickableText(int x, int y, String[] text, Consumer<Integer> onClick, CMediaFont font, CMediaFont fontHover) {
+        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, Consumer<Integer> onClick, String[] textHover, CMediaFont fontHover) {
             Text hlText = components.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
             components.text.setTextAction(hlText, new TextAction() {
                 @Override
@@ -420,8 +421,10 @@ public class API {
                             hlText.height * UIEngine.TILE_SIZE
                     )) {
                         components.text.setFont(hlText, fontHover);
+                        components.text.setLines(hlText, textHover);
                     } else {
                         components.text.setFont(hlText, font);
+                        components.text.setLines(hlText, text);
                     }
                 }
             });
@@ -917,7 +920,7 @@ public class API {
 
 
             // Draw Background
-            Color colorBackGroundDarker = colorBackGround.sub(0.02f,0.02f,0.02f,0f).cpy();
+            Color colorBackGroundDarker = colorBackGround.sub(0.02f, 0.02f, 0.02f, 0f).cpy();
             for (int iy = 0; iy < mapHeight; iy++) {
                 Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
@@ -944,8 +947,8 @@ public class API {
             int lastIndex = -1;
             final float SHADING = 0.1f;
             Color color = colorFunction.apply(lastValue, valueBefore);
-            Color colorBrighter = color.add(SHADING,SHADING,SHADING,0f).cpy();
-            Color colorDarker = color.sub(SHADING, SHADING,SHADING,0f).cpy();
+            Color colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
+            Color colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
             drawLoop:
             for (int ix = 0; ix < mapWidth; ix++) {
                 int index = indexAtPosition[ix];
@@ -958,8 +961,8 @@ public class API {
                 boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
                 if (index != lastIndex) {
                     color = colorFunction.apply(value, lastValue);
-                    colorBrighter = color.add(SHADING,SHADING,SHADING,0f).cpy();
-                    colorDarker = color.sub(SHADING, SHADING,SHADING,0f).cpy();
+                    colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
+                    colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
                     indexChange = true;
                     lastIndex = index;
                 }
