@@ -8,14 +8,49 @@ import java.util.ArrayDeque;
  * - Appends Outputs to output list
  */
 public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
+    class EngineIO {
+        private int type;
+        private Object[] params;
+    }
 
     private final A adapter;
     private final D data;
-    private final ArrayDeque<EngineInput> inputs;
-
-    private final ArrayDeque<EngineOutput> outputs;
+    private final ArrayDeque<EngineIO> inputs;
+    private final ArrayDeque<EngineIO> inputPool;
+    private final ArrayDeque<EngineIO> outputs;
+    private final ArrayDeque<EngineIO> outputPool;
+    private int outputType;
+    private Object[] outputParams;
     private long lastUpdateTime;
     private long ticks;
+
+    public GameEngine(A adapter, D data) {
+        if (data == null || adapter == null) {
+            throw new GameEngineException("Cannot initialize GameEngine: invalid parameters");
+        }
+
+        this.data = data;
+        this.inputs = new ArrayDeque<>();
+        this.inputPool = new ArrayDeque<>();
+        this.outputs = new ArrayDeque<>();
+        this.outputPool = new ArrayDeque<>();
+        this.lastUpdateTime = 0;
+        this.outputType = -1;
+        this.outputParams = null;
+        // Start
+        this.adapter = adapter;
+
+        Output output = new Output() {
+            @Override
+            public void add(int type, Object... params) {
+                EngineIO engineIO = outputPool.isEmpty() ? new EngineIO() : outputPool.poll() ;
+                engineIO.type = type;
+                engineIO.params = params;
+                outputs.add(engineIO);
+            }
+        };
+        this.adapter.init(this.data, output);
+    }
 
     public long getTicks() {
         return ticks;
@@ -25,21 +60,54 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
         return lastUpdateTime;
     }
 
-    public void input(EngineInput input) {
-        inputs.add(input);
+    public void input(int type, Object... params) {
+        EngineIO engineIO = inputPool.isEmpty() ?  new EngineIO() : inputPool.poll();
+        engineIO.type = type;
+        engineIO.params = params;
+        inputs.add(engineIO);
     }
 
     public boolean outputAvailable() {
-        return this.outputs.size() > 0;
+        return !this.outputs.isEmpty();
     }
 
-    public EngineOutput processOutput(){
-        return this.outputs.pollFirst();
+    public boolean nextOutput(){
+        if(outputAvailable()){
+            EngineIO engineIO = outputs.poll();
+            outputType = engineIO.type;
+            outputParams = engineIO.params;
+            outputPool.add(engineIO);
+            return true;
+        }else{
+            this.outputType = -1;
+            this.outputParams = null;
+            return false;
+        }
     }
 
     public void clearOutputs() {
+        outputPool.addAll(this.outputs);
         this.outputs.clear();
+        this.outputType = -1;
+        this.outputParams = null;
     }
+
+    public int getOutputType() {
+        return outputType;
+    }
+
+    public Object[] getOutputParams() {
+        return outputParams;
+    }
+
+    public int getOutputParamsSize() {
+        return outputParams != null ? outputParams.length : 0;
+    }
+
+    public Object getOutputParam(int index) {
+        return (outputParams != null && index < outputParams.length) ? outputParams[index] : null;
+    }
+
 
     public A getAdapter() {
         return adapter;
@@ -49,33 +117,13 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
         return data;
     }
 
-    public GameEngine(A adapter, D data) {
-        if (data == null || adapter == null) {
-            throw new GameEngineException("Cannot initialize GameEngine: invalid parameters");
-        }
-
-        this.data = data;
-        this.inputs = new ArrayDeque<>();
-        this.outputs = new ArrayDeque<>();
-        this.lastUpdateTime = 0;
-        // Start
-        this.adapter = adapter;
-
-        Output output = new Output() {
-            @Override
-            public void add(EngineOutput engineOutput) {
-                outputs.add(engineOutput);
-            }
-        };
-        this.adapter.init(this.data, output);
-    }
-
     public void update() {
         adapter.beforeInputs();
         // Process Inputs
-        EngineInput engineInput = null;
-        while ((engineInput = this.inputs.pollFirst()) != null) {
-            adapter.processInput(engineInput);
+        EngineIO engineIO = null;
+        while ((engineIO = this.inputs.pollFirst()) != null) {
+            adapter.processInput(engineIO.type, engineIO.params);
+            inputPool.add(engineIO);
         }
         inputs.clear();
         // Update Engine

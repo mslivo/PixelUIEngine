@@ -1,9 +1,7 @@
 package org.mslivo.example.engine;
 
-import org.mslivo.core.engine.tools.game_engine.EngineInput;
 import org.mslivo.core.engine.tools.game_engine.GameEngineAdapter;
 import org.mslivo.core.engine.tools.game_engine.Output;
-import org.mslivo.core.engine.tools.lthreadpool.LThreadPoolUpdater;
 import org.mslivo.example.data.ExampleData;
 
 public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData> {
@@ -17,9 +15,10 @@ public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData> {
         this.output = output;
     }
 
+
     @Override
-    public void processInput(EngineInput engineInput) {
-        switch (engineInput.type()) {
+    public void processInput(int type, Object[] params) {
+        switch (type) {
 
         }
     }
@@ -34,5 +33,6 @@ public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData> {
     public void shutdown() {
 
     }
+
 
 }

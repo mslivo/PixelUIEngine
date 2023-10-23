@@ -10,6 +10,6 @@ public interface GameEngineAdapter<D> {
 
     void shutdown();
 
-    void processInput(EngineInput engineInput);
+    void processInput(int type, Object[] params);
 
 }

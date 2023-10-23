@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import org.mslivo.core.engine.tools.game_engine.EngineOutput;
-import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
+import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
@@ -75,10 +74,10 @@ public class ExampleUIAdapter implements UIAdapter {
     @Override
     public void update() {
         // Process Outputs
-        while (gameEngine.outputAvailable()) {
-            EngineOutput engineOutput = gameEngine.processOutput();
+        while (gameEngine.nextOutput()) {
+            int type = gameEngine.getOutputType();
+            Object[] params = gameEngine.getOutputParams();
         }
-
 
         // Create Inputs
         // gameEngine.input(new EngineInput(0,"TestInput"));
