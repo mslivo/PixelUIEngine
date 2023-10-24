@@ -2810,7 +2810,7 @@ public class UIEngine<T extends UIAdapter> {
             int textHeight = ((text.height - 1) * TILE_SIZE);
             if (text.lines != null && text.lines.length > 0) {
                 for (int i = 0; i < text.lines.length; i++) {
-                    render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 1);
+                    render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 2);
                 }
             }
         } else if (component.getClass() == ScrollBarVertical.class) {
