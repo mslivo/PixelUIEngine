@@ -49,6 +49,7 @@ import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class ExampleWindowGenerator extends WindowGenerator {
@@ -103,11 +104,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
 
     private ArrayList<Component> createTab4(Window window) {
-        Text text1 = api.components.text.create(2, 5, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
-        Text text2 = api.components.text.create(2, 4, new String[]{"abcdefghijklmnopqrstuvwxyz"});
-        Text text3 = api.components.text.create(2, 3, new String[]{"0123456789"});
-        Text text4 = api.components.text.create(2, 2, new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
-        Text text5 = api.components.text.create(2, 1, new String[]{"pPqQwyg"});
+        Text text1 = api.components.text.create(2, 6, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
+        Text text2 = api.components.text.create(2, 5, new String[]{"abcdefghijklmnopqrstuvwxyz"});
+        Text text3 = api.components.text.create(2, 4, new String[]{"0123456789"});
+        Text text4 = api.components.text.create(2, 3, new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
+        Text text5 = api.components.text.create(2, 2, new String[]{"pPqQwyg"});
 
         ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
         api.windows.addComponents(window, components.toArray(new Component[]{}));
@@ -167,7 +168,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setColor1And2(scrollBarHorizontalB, Color.BLUE);
 
 
-        TextField textField = api.components.textField.create(18, 11, 10, "", null, 128);
+        HashSet<Character> allowedCharacters = new HashSet<>();
+        for(int i=0;i<255;i++) allowedCharacters.add((char)i);
+        TextField textField = api.components.textField.create(18, 11, 10, "", null, 128,allowedCharacters);
         Button notiBtn = api.components.button.textButton.create(18, 9, 10, 2, "Notification");
         api.components.button.centerContent(notiBtn);
         api.components.addUpdateAction(notiBtn, new UpdateAction() {

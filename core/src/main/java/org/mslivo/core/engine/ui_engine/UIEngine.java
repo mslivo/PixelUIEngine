@@ -2506,7 +2506,7 @@ public class UIEngine<T extends UIAdapter> {
                 /* Text */
                 for (int i = 0; i < combobox.items.size(); i++) {
                     ComboBoxItem comboBoxItem = combobox.items.get(i);
-                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 2, comboBoxItem.icon, comboBoxItem.iconIndex, (combobox.width * TILE_SIZE));
+                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, comboBoxItem.icon, comboBoxItem.iconIndex, (combobox.width * TILE_SIZE));
                 }
             }
 
@@ -2545,7 +2545,7 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextMenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 2, item.icon, item.iconIndex, (width) * TILE_SIZE);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, item.icon, item.iconIndex, (width) * TILE_SIZE);
             }
 
         }
@@ -2681,9 +2681,9 @@ public class UIEngine<T extends UIAdapter> {
                     int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
                     int text_x = tooltip_x + MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
                     int text_y = tooltip_y + (ty * TILE_SIZE);
-                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, text_x, text_y, 1, 2);
+                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
                 } else {
-                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 2);
+                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 1);
                 }
             }
         }
@@ -2744,7 +2744,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 2, window.icon, window.iconIndex, (window.width - 1) * TILE_SIZE);
+            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, window.icon, window.iconIndex, (window.width - 1) * TILE_SIZE);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2791,7 +2791,7 @@ public class UIEngine<T extends UIAdapter> {
             if (button.getClass() == TextButton.class) {
                 TextButton textButton = (TextButton) button;
                 if (textButton.text != null) {
-                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, textButton.icon, textButton.iconArrayIndex, (button.width) * TILE_SIZE);
+                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 1, textButton.icon, textButton.iconArrayIndex, (button.width) * TILE_SIZE);
                 }
             } else if (button.getClass() == ImageButton.class) {
                 ImageButton imageButton = (ImageButton) button;
@@ -2927,7 +2927,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 2, combobox.selectedItem.icon, combobox.selectedItem.iconIndex, (combobox.width - 2) * TILE_SIZE);
+                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, combobox.selectedItem.icon, combobox.selectedItem.iconIndex, (combobox.width - 2) * TILE_SIZE);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;
@@ -3157,7 +3157,7 @@ public class UIEngine<T extends UIAdapter> {
             if (progressBar.progressText) {
                 String percentTxt = progressBar.progressText2Decimal ? UICommons.progressBar_getProgressText2Decimal(progressBar.progress) : UICommons.progressBar_getProgressText(progressBar.progress);
                 int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (mediaManager.textWidth(progressBar.font, percentTxt) / 2);
-                render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 2);
+                render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 1);
             }
 
 
@@ -3205,7 +3205,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 // Text
                 String text = dragList.listAction.text(dragItem);
-                render_drawFont(dragList.font, text, dragList.color_a, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, 2, 2,
+                render_drawFont(dragList.font, text, dragList.color_a, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, 2, 1,
                         dragList.listAction.icon(dragItem), dragList.listAction.iconArrayIndex(dragItem), (dragList.width * TILE_SIZE));
             }
         }
