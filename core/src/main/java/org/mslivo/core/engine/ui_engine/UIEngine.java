@@ -2791,7 +2791,7 @@ public class UIEngine<T extends UIAdapter> {
             if (button.getClass() == TextButton.class) {
                 TextButton textButton = (TextButton) button;
                 if (textButton.text != null) {
-                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 1, textButton.icon, textButton.iconArrayIndex, (button.width) * TILE_SIZE);
+                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, textButton.icon, textButton.iconArrayIndex, (button.width) * TILE_SIZE);
                 }
             } else if (button.getClass() == ImageButton.class) {
                 ImageButton imageButton = (ImageButton) button;
