@@ -2810,7 +2810,7 @@ public class UIEngine<T extends UIAdapter> {
             int textHeight = ((text.height - 1) * TILE_SIZE);
             if (text.lines != null && text.lines.length > 0) {
                 for (int i = 0; i < text.lines.length; i++) {
-                    render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 2);
+                    render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 1);
                 }
             }
         } else if (component.getClass() == ScrollBarVertical.class) {
@@ -3168,7 +3168,7 @@ public class UIEngine<T extends UIAdapter> {
 
             render_drawCMediaGFX(tex, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
 
-            render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 2);
+            render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
 
         } else if (component.getClass() == GameViewPort.class) {
             GameViewPort gameViewPort = (GameViewPort) component;
