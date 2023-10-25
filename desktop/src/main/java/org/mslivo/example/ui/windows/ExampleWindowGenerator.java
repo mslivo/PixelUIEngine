@@ -716,6 +716,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
     private void moveToList(ArrayList fromList, int fromIndex, ArrayList toList, int toIndex) {
         Object object = fromList.get(fromIndex);
+        if(fromList == toList && toIndex == toList.size()) toIndex--;
         fromList.remove(fromIndex);
         toList.add(toIndex, object);
     }

@@ -524,7 +524,9 @@ public class UIEngine<T extends UIAdapter> {
                         List list = (List) inputState.lastGUIMouseHover;
                         UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                         Object selectedListItem = null;
-                        if (inputState.itemInfo_listValid) selectedListItem = list.items.get(inputState.itemInfo_listIndex);
+                        if(inputState.itemInfo_listValid){
+                            selectedListItem =  (inputState.itemInfo_listIndex < list.items.size()) ? list.items.get(inputState.itemInfo_listIndex) : null;
+                        }
                         if (selectedListItem != null) {
                             if (list.multiSelect) {
                                 if (list.selectedItems.contains(selectedListItem)) {
@@ -552,7 +554,6 @@ public class UIEngine<T extends UIAdapter> {
                             }
                             if (list.listAction != null) list.listAction.onItemSelected(null);
                         }
-
                     } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
                         ComboBox combobox = (ComboBox) inputState.lastGUIMouseHover;
 
