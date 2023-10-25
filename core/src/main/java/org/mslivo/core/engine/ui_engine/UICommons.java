@@ -569,41 +569,49 @@ class UICommons {
 
             int tabHeight = tabBar.bigIconMode ? (UIEngine.TILE_SIZE * 2) : UIEngine.TILE_SIZE;
             if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
-                inputState.itemInfo[0] = i;
-                inputState.itemInfoValid = true;
+                inputState.itemInfo_tabBarTabIndex = i;
+                inputState.itemInfo_tabBarValid = true;
                 return;
             }
             tabXOffset = tabXOffset + tabWidth;
         }
 
 
-        inputState.itemInfo[0] = 0;
-        inputState.itemInfoValid = false;
+        inputState.itemInfo_tabBarTabIndex = 0;
+        inputState.itemInfo_tabBarValid = false;
         return;
     }
 
     static void list_updateItemInfoAtMousePosition(InputState inputState, List list) {
-        if (list.items != null && list.items.size() > 0 && list.listAction != null) {
+        if (list.items != null && list.listAction != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
             itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
             int x_list = UICommons.component_getAbsoluteX(list);
             int y_list = UICommons.component_getAbsoluteY(list);
+            // insert between other items
             for (int iy = 0; iy < list.height; iy++) {
                 int itemIndex = itemFrom + iy;
                 if (itemIndex < list.items.size()) {
                     int itemOffsetY = ((list.height - 1) - iy);
                     if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
                             x_list, y_list + itemOffsetY * UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE)) {
-                        inputState.itemInfo[0] = itemIndex;
-                        inputState.itemInfo[1] = itemOffsetY;
-                        inputState.itemInfoValid = true;
+                        inputState.itemInfo_listIndex = itemIndex;
+                        inputState.itemInfo_listValid = true;
                         return;
                     }
                 }
             }
+            // Insert at end
+            if(Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,x_list, y_list, UIEngine.TILE_SIZE*list.width, UIEngine.TILE_SIZE*list.height)){
+                inputState.itemInfo_listIndex = list.items.size();
+                inputState.itemInfo_listValid = true;
+                return;
+            }
+
         }
-        inputState.itemInfo[0] = inputState.itemInfo[1] = 0;
-        inputState.itemInfoValid = false;
+
+        inputState.itemInfo_listIndex = 0;
+        inputState.itemInfo_listValid = false;
         return;
     }
 
@@ -614,13 +622,13 @@ class UICommons {
         int inv_to_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
         int inv_to_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
         if (UICommons.inventory_positionValid(inventory, inv_to_x, inv_to_y)) {
-            inputState.itemInfo[0] = inv_to_x;
-            inputState.itemInfo[1] = inv_to_y;
-            inputState.itemInfoValid = true;
+            inputState.itemInfo_inventoryPos.x = inv_to_x;
+            inputState.itemInfo_inventoryPos.y = inv_to_y;
+            inputState.itemInfo_inventoryValid = true;
             return;
         }
-        inputState.itemInfo[0] = inputState.itemInfo[1] = 0;
-        inputState.itemInfoValid = false;
+        inputState.itemInfo_inventoryPos.set(0,0);
+        inputState.itemInfo_inventoryValid = false;
         return;
     }
 

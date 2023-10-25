@@ -221,7 +221,13 @@ public class InputState {
     public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;
 
-    public int[] itemInfo;
 
-    public boolean itemInfoValid;
+    public int itemInfo_listIndex;
+    public GridPoint2 itemInfo_inventoryPos;
+
+    public int itemInfo_tabBarTabIndex;
+    public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_inventoryValid;
+
+
+
 }

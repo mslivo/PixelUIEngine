@@ -507,6 +507,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 api.addNotification(api.notifications.create("Selected: " + (listItem.text)));
             }
 
+            @Override
+            public ToolTip toolTip(ListItem listItem) {
+                return api.toolTip.create(Tools.Text.toArray(listItem.text));
+            }
         };
         api.components.list.setListAction(list1, list1Action);
 
@@ -552,6 +556,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 api.addNotification(api.notifications.create("Selected: " + (listItem.text)));
             }
 
+            @Override
+            public ToolTip toolTip(ListItem listItem) {
+                return api.toolTip.create(Tools.Text.toArray(listItem.text));
+            }
         };
         api.components.list.setListAction(list2, list2Action);
 
@@ -761,15 +769,14 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
     private void addRandomItemsToList(ArrayList list, String prefix) {
         int rnd;
-        rnd = MathUtils.random(1, 10);
+        rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
-            list.add(new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_1));
-        rnd = MathUtils.random(1, 10);
-        for (int i = 1; i <= rnd; i++)
-            list.add(new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_2));
-        rnd = MathUtils.random(1, 10);
-        for (int i = 1; i <= rnd; i++)
-            list.add(new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_3));
+            list.add(new ListItem(prefix + "Item " + i, switch (MathUtils.random(1,3)){
+                case 1 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_1;
+                case 2 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_2;
+                case 3 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_3;
+                default -> throw new IllegalStateException("Unexpected value: " + MathUtils.random(1, 3));
+            }));
     }
 
 
