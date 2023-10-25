@@ -2930,7 +2930,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1,combobox.width - 2 * TILE_SIZE, combobox.selectedItem.icon, combobox.selectedItem.iconIndex);
+                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1,(combobox.width - 1) * TILE_SIZE, combobox.selectedItem.icon, combobox.selectedItem.iconIndex);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;
@@ -3100,7 +3100,7 @@ public class UIEngine<T extends UIAdapter> {
 
             topBorder = tabBar.width - tabXOffset;
 
-            // Top Border
+            // Top Border Top
             for (int ix = 0; ix < topBorder; ix++) {
                 render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
             }
@@ -3116,7 +3116,6 @@ public class UIEngine<T extends UIAdapter> {
                     render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
                     render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
                 }
-
             }
 
         } else if (component instanceof Shape shape) {

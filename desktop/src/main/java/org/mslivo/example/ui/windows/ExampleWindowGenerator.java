@@ -266,9 +266,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        CheckBox checkBox = api.components.checkBox.create(10, 1, "CheckBox");
+        CheckBox checkBox = api.components.checkBox.create(10, 2, "CheckBox");
 
-        CheckBox checkBox2 = api.components.checkBox.create(20, 1, "Radio", CheckBoxStyle.RADIO);
+        CheckBox checkBox2 = api.components.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
 
         GameViewPort gameViewPort = api.components.gameViewPort.create(29, 9, 4, 4, 100, 100, 1);
 
