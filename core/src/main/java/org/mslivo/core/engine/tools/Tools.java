@@ -368,7 +368,7 @@ public class Tools {
                 if (cached == null) {
                     cached = new ArrayList<>();
                     ArrayList<Long> finalCached = cached;
-                    doInRadius(0, 0, radius, (x1, y1) -> {
+                    doInRadiusInternal(0, 0, radius, (x1, y1) -> {
                         finalCached.add(
                                 (((long) x1) << 32) | (y1 & 0xffffffffL));
                         return true;
