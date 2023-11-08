@@ -2,11 +2,11 @@ package org.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.tools.game_engine.GameEngine;
+import org.mslivo.core.engine.tools.transitions.FadeTransition;
 import org.mslivo.core.engine.tools.transitions.TransitionManager;
-import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.data.ExampleDataGenerator;
@@ -16,13 +16,11 @@ import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 public class ExampleMain extends ApplicationAdapter {
 
-
     enum STATE {
         RUN, TRANSITION
     }
 
     private STATE state;
-
     private TransitionManager transitionManager;
     /* Subsystems */
 
@@ -30,8 +28,8 @@ public class ExampleMain extends ApplicationAdapter {
     private ExampleData data;
     public ExampleEngineAdapter engineAdapter;
     private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
-    public ExampleUIAdapter UIAdapter;
     private UIEngine<ExampleUIAdapter> uiEngine;
+    private UIEngine<ExampleUIAdapter> uiEngine_transition;
 
     /* --- */
 
@@ -71,9 +69,8 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Input/Render
         Tools.Log.inProgress("Starting UI");
-        this.UIAdapter = new ExampleUIAdapter(this.gameEngine);
         this.uiEngine = new UIEngine<>(
-                this.UIAdapter,
+                new ExampleUIAdapter(this.gameEngine),
                 this.mediaManager,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.VIEWPORT_MODE, true);
@@ -82,9 +79,9 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void render() {
-        switch (state){
+        switch (state) {
             case RUN -> {
-                if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+                if (Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
                     // 1. Update UI Engine -> Gather Input & Process Output
                     profile_time_gui = System.currentTimeMillis();
                     this.uiEngine.update();
@@ -101,25 +98,35 @@ public class ExampleMain extends ApplicationAdapter {
                 profile_time_render = System.currentTimeMillis() - profile_time_render;
 
 
-                // Check for transition
-                if(this.uiEngine.getAdapter().isStartTransition()){
+                // Check for transition + Reset
+                if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.transitionManager = new TransitionManager();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine);
-                    this.uiEngine.getAdapter().setStartTransition(false);
+                    this.uiEngine_transition = new UIEngine<>(
+                            new ExampleUIAdapter(this.gameEngine),
+                            this.mediaManager,
+                            ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                            ExampleMainConstants.VIEWPORT_MODE, true);
+                    this.uiEngine_transition.update();
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     state = STATE.TRANSITION;
                     return;
                 }
 
             }
             case TRANSITION -> {
-                if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+                if (Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
                     boolean finished = this.transitionManager.update();
-                    if(finished){
+                    if (finished) {
+                        // Replace with new UIEngine after Reset
+                        this.uiEngine.shutdown();
                         this.transitionManager.shutdown();
+                        this.uiEngine = this.uiEngine_transition;
+                        this.uiEngine_transition = null;
                         this.state = STATE.RUN;
+                    } else {
+                        transitionManager.render();
                     }
                 }
-                transitionManager.render();
             }
         }
 

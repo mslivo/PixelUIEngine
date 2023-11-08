@@ -34,6 +34,7 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.util.ArrayDeque;
@@ -61,7 +62,7 @@ public class InputState {
 
     public int camera_width, camera_height;
 
-    public FrameBuffer frameBuffer_game;
+    public NestedFrameBuffer frameBuffer_game;
 
 
     /* #################### Graphics: GUI #################### */
@@ -71,7 +72,7 @@ public class InputState {
 
     public OrthographicCamera camera_gui;
 
-    public FrameBuffer frameBuffer_gui;
+    public NestedFrameBuffer frameBuffer_gui;
 
     /* #################### Graphics: Upscaling #################### */
 
@@ -80,7 +81,7 @@ public class InputState {
 
     public Texture.TextureFilter textureFilter_upScale;
 
-    public FrameBuffer frameBuffer_upScale;
+    public NestedFrameBuffer frameBuffer_upScale;
 
 
     /* #################### Graphics: Screen #################### */

@@ -29,18 +29,18 @@ public class ExampleUIAdapter implements UIAdapter {
     private final ExampleData data;
 
     private float animation_timer;
-    private boolean startTransition;
+    private boolean resetPressed;
 
     public ExampleUIAdapter(GameEngine<ExampleEngineAdapter, ExampleData> gameEngine) {
         this.gameEngine = gameEngine;
         this.data = gameEngine.getData();
     }
 
-    public void setStartTransition(boolean startTransition) {
-        this.startTransition = startTransition;
+    public void setResetPressed(boolean resetPressed) {
+        this.resetPressed = resetPressed;
     }
-    public boolean isStartTransition() {
-        return startTransition;
+    public boolean isResetPressed() {
+        return resetPressed;
     }
 
 
@@ -65,10 +65,10 @@ public class ExampleUIAdapter implements UIAdapter {
         createExampleWindowButton.buttonAction.onRelease();
 
         // Transition Btn
-        TextButton transitionBtn = api.components.button.textButton.create(0, 2, 10, 2, "Transition", new ButtonAction() {
+        TextButton transitionBtn = api.components.button.textButton.create(0, 2, 10, 2, "Reset", new ButtonAction() {
             @Override
             public void onRelease() {
-                startTransition = true;
+                resetPressed = true;
             }
         });
         api.components.button.centerContent(transitionBtn);
@@ -124,7 +124,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
     @Override
     public void shutdown() {
-        mediaManager.shutdown();
+
     }
 
 

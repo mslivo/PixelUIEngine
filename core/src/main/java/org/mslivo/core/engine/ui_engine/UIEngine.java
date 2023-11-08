@@ -60,6 +60,7 @@ import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GrayScaleShader;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.util.ArrayDeque;
@@ -143,7 +144,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.camera_game.setToOrtho(false, newInputState.camera_width, newInputState.camera_height);
         newInputState.camera_game.position.set(newInputState.camera_x, newInputState.camera_y, newInputState.camera_z);
         newInputState.camera_game.zoom = newInputState.camera_zoom;
-        newInputState.frameBuffer_game = new FrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
+        newInputState.frameBuffer_game = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
         newInputState.frameBuffer_game.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_game = new TextureRegion(newInputState.frameBuffer_game.getColorBufferTexture());
         newInputState.texture_game.flip(false, true);
@@ -153,14 +154,14 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_gui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
         newInputState.camera_gui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_gui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.frameBuffer_gui = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
+        newInputState.frameBuffer_gui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
         newInputState.frameBuffer_gui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
         // ----- UpScaler
         newInputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
         newInputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
-        newInputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
+        newInputState.frameBuffer_upScale = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
         newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(newInputState.textureFilter_upScale, newInputState.textureFilter_upScale);
         newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
         newInputState.texture_upScale.flip(false, true);

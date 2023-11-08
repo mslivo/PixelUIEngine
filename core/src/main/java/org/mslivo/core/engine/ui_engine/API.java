@@ -58,6 +58,7 @@ import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
 
 import java.awt.*;
@@ -3243,7 +3244,7 @@ public class API {
         inputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
         // frameBuffer_upScale
         inputState.frameBuffer_upScale.dispose();
-        inputState.frameBuffer_upScale = new FrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.factor_upScale, inputState.internalResolutionHeight * inputState.factor_upScale, false);
+        inputState.frameBuffer_upScale = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.factor_upScale, inputState.internalResolutionHeight * inputState.factor_upScale, false);
         inputState.frameBuffer_upScale.getColorBufferTexture().setFilter(inputState.textureFilter_upScale, inputState.textureFilter_upScale);
         // texture_upScale
         inputState.texture_upScale.getTexture().dispose();
