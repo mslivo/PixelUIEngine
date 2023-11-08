@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import org.mslivo.core.engine.tools.game_engine.GameEngine;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.tools.transitions.TransitionManager;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.example.data.ExampleData;
@@ -15,14 +16,22 @@ import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 public class ExampleMain extends ApplicationAdapter {
 
+
+    enum STATE {
+        RUN, TRANSITION
+    }
+
+    private STATE state;
+
+    private TransitionManager transitionManager;
     /* Subsystems */
 
     private MediaManager mediaManager;
     private ExampleData data;
     public ExampleEngineAdapter engineAdapter;
     private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
-    public UIAdapter UIAdapter;
-    private UIEngine<UIAdapter> uiEngine;
+    public ExampleUIAdapter UIAdapter;
+    private UIEngine<ExampleUIAdapter> uiEngine;
 
     /* --- */
 
@@ -31,7 +40,6 @@ public class ExampleMain extends ApplicationAdapter {
     private long timer_debug_info;
 
     public ExampleMain() {
-
     }
 
     @Override
@@ -41,9 +49,8 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void create() {
-
+        this.state = STATE.RUN;
         this.bootEngine();
-
     }
 
     private void bootEngine() {
@@ -75,22 +82,46 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void render() {
-        if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
-            // 1. Update UI Engine -> Gather Input & Process Output
-            profile_time_gui = System.currentTimeMillis();
-            this.uiEngine.update();
-            profile_time_gui = System.currentTimeMillis() - profile_time_gui;
-            // 2. Update Game Engine -> Process Input & Create Output
-            profile_time_engine = System.currentTimeMillis();
-            this.gameEngine.update();
-            profile_time_engine = System.currentTimeMillis() - profile_time_engine;
+        switch (state){
+            case RUN -> {
+                if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+                    // 1. Update UI Engine -> Gather Input & Process Output
+                    profile_time_gui = System.currentTimeMillis();
+                    this.uiEngine.update();
+                    profile_time_gui = System.currentTimeMillis() - profile_time_gui;
+                    // 2. Update Game Engine -> Process Input & Create Output
+                    profile_time_engine = System.currentTimeMillis();
+                    this.gameEngine.update();
+                    profile_time_engine = System.currentTimeMillis() - profile_time_engine;
+                }
+
+                // 3. Render Everything
+                profile_time_render = System.currentTimeMillis();
+                this.uiEngine.render();
+                profile_time_render = System.currentTimeMillis() - profile_time_render;
+
+
+                // Check for transition
+                if(this.uiEngine.getAdapter().isStartTransition()){
+                    this.transitionManager = new TransitionManager();
+                    this.transitionManager.init(this.uiEngine, this.uiEngine);
+                    this.uiEngine.getAdapter().setStartTransition(false);
+                    state = STATE.TRANSITION;
+                    return;
+                }
+
+            }
+            case TRANSITION -> {
+                if(Tools.runStep(ExampleMainConstants.UPDATE_RATE)) {
+                    boolean finished = this.transitionManager.update();
+                    if(finished){
+                        this.transitionManager.shutdown();
+                        this.state = STATE.RUN;
+                    }
+                }
+                transitionManager.render();
+            }
         }
-
-        // 3. Render Everything
-        profile_time_render = System.currentTimeMillis();
-        this.uiEngine.render();
-        profile_time_render = System.currentTimeMillis() - profile_time_render;
-
 
         // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {

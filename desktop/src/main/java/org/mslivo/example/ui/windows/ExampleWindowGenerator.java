@@ -595,7 +595,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text + "\nAn item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
             }
 
             @Override
@@ -635,7 +635,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text + "\nAn item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
             }
 
             @Override
@@ -674,7 +674,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text + "\nAn item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
             }
 
             @Override
@@ -701,13 +701,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.inventory.setInventoryAction(inventory3, inventoryAction3);
         api.windows.addComponent(window, inventory3);
 
-        components.add(list1);
-        components.add(list1ScrollBar);
-        components.add(list2);
-        components.add(list2ScrollBar);
-        components.add(inventory1);
-        components.add(inventory2);
-        components.add(inventory3);
+        components.addAll(Arrays.asList(new Component[]{
+                list1,list1ScrollBar,list2,list2ScrollBar,inventory1,inventory2,inventory3
+        }));
 
         return components;
 

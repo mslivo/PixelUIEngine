@@ -29,12 +29,20 @@ public class ExampleUIAdapter implements UIAdapter {
     private final ExampleData data;
 
     private float animation_timer;
-
+    private boolean startTransition;
 
     public ExampleUIAdapter(GameEngine<ExampleEngineAdapter, ExampleData> gameEngine) {
         this.gameEngine = gameEngine;
         this.data = gameEngine.getData();
     }
+
+    public void setStartTransition(boolean startTransition) {
+        this.startTransition = startTransition;
+    }
+    public boolean isStartTransition() {
+        return startTransition;
+    }
+
 
     @Override
     public void init(API api, MediaManager mediaManager) {
@@ -42,7 +50,7 @@ public class ExampleUIAdapter implements UIAdapter {
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
 
-        // Init GUI
+        // Example Wnd Button
         TextButton createExampleWindowButton = api.components.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
@@ -56,6 +64,18 @@ public class ExampleUIAdapter implements UIAdapter {
         createExampleWindowButton.buttonAction.onPress();
         createExampleWindowButton.buttonAction.onRelease();
 
+        // Transition Btn
+        TextButton transitionBtn = api.components.button.textButton.create(0, 2, 10, 2, "Transition", new ButtonAction() {
+            @Override
+            public void onRelease() {
+                startTransition = true;
+            }
+        });
+        api.components.button.centerContent(transitionBtn);
+        api.addScreenComponent(transitionBtn);
+
+
+        // HotKey
         api.addHotKey(api.hotkey.create(new int[]{Input.Keys.ESCAPE}, new HotKeyAction() {
             @Override
             public void onPress() {
