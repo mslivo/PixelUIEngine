@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.tools.Tools;
@@ -60,12 +59,16 @@ public class TransitionManager {
         viewport_screen.update(screenWidth, screenHeight, true);
 
         // Capture Buffers
-        frameBuffer_from.begin();
-        from.render();
-        frameBuffer_from.end();
-        frameBuffer_to.begin();
-        to.render();
-        frameBuffer_to.end();
+        if(from != null) {
+            frameBuffer_from.begin();
+            from.render();
+            frameBuffer_from.end();
+        }
+        if(to != null) {
+            frameBuffer_to.begin();
+            to.render();
+            frameBuffer_to.end();
+        }
         this.transition.init(screenWidth, screenHeight);
         this.initialized = true;
     }

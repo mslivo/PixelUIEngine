@@ -99,8 +99,12 @@ This player supports playing sound in a 2D space with automatic volume/pan adjus
 #### core/ ... /engine.tools.sound.MusicPlayer
 
 A Musicplayer using the MediaManager and CMedia music format.
-This player works like regular player application with playlists, pause/resume etc.
+[This player works like regular player application with playlists, pause/resume etc.
 
-#### core/ ... /engine.tools.Tools
+#### core/ ... /engine.tools.transitions.TransitionManager
+
+A tool to create Transition effects when switching between two UIEngine instances
+
+#### core/ ... /engine.tools.Tools]()
 
 Static helper & math functions.
