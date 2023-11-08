@@ -19,7 +19,7 @@ public class FallOutTransition implements Transition {
 
         ySpeed -= 0.5f;
         yTo += ySpeed;
-        if(yTo < -16) ySpeed = -16;
+        if(yTo < -24) ySpeed = -24;
         return yTo <= -height;
     }
 
