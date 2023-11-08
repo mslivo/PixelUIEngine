@@ -3,7 +3,7 @@ package org.mslivo.core.engine.tools.transitions;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class FallTransition implements Transition {
+public class FallInTransition implements Transition {
     private float yTo;
     private float ySpeed;
     private int bounce;

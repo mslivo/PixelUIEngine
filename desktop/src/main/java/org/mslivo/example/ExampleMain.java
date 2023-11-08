@@ -2,11 +2,11 @@ package org.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.game_engine.GameEngine;
-import org.mslivo.core.engine.tools.transitions.FadeTransition;
-import org.mslivo.core.engine.tools.transitions.TransitionManager;
+import org.mslivo.core.engine.tools.transitions.*;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.data.ExampleDataGenerator;
@@ -107,7 +107,13 @@ public class ExampleMain extends ApplicationAdapter {
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.VIEWPORT_MODE, true);
                     this.uiEngine_transition.update();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
+                    Transition transition = switch (MathUtils.random(1, 3)) {
+                        case 1 -> new FadeTransition();
+                        case 2 -> new FallInTransition();
+                        case 3 -> new FallOutTransition();
+                        default -> throw new IllegalStateException("Unexpected value");
+                    };
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, transition);
                     state = STATE.TRANSITION;
                     return;
                 }
