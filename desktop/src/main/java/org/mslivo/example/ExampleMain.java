@@ -103,7 +103,8 @@ public class ExampleMain extends ApplicationAdapter {
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.VIEWPORT_MODE, true);
                     this.uiEngine_transition.update();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FallOutTransition());
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FallInTransition());
+                    this.transitionManager.render();
                     state = STATE.TRANSITION;
                     return;
                 }
@@ -118,10 +119,10 @@ public class ExampleMain extends ApplicationAdapter {
                         this.uiEngine = this.uiEngine_transition;
                         this.uiEngine_transition = null;
                         this.state = STATE.RUN;
-                    } else {
-                        transitionManager.render();
+                        return;
                     }
                 }
+                transitionManager.render();
             }
         }
 

@@ -24,9 +24,11 @@ public class TransitionManager {
     private Transition transition;
     private int transitionSpeed;
     private boolean initialized;
+    private boolean finished;
     private int screenWidth, screenHeight;
 
     public TransitionManager() {
+        this.finished = true;
         this.initialized = false;
     }
 
@@ -78,13 +80,17 @@ public class TransitionManager {
         }
         this.transition.init(screenWidth, screenHeight);
         this.initialized = true;
+        this.finished = false;
     }
 
     public boolean update() {
         if (!initialized) return true;
+        if (this.finished) return true;
         for (int i = 0; i < this.transitionSpeed; i++) {
-            boolean finished = this.transition.update();
-            if (finished) return true;
+            if(this.transition.update()){
+                this.finished = true;
+                return true;
+            }
         }
         return false;
     }
@@ -106,9 +112,21 @@ public class TransitionManager {
         this.batch_screen = null;
         if (frameBuffer_to != null) frameBuffer_from.getColorBufferTexture().dispose();
         this.frameBuffer_to = null;
+        this.texture_to = null;
         if (frameBuffer_from != null) frameBuffer_from.getColorBufferTexture().dispose();
         this.frameBuffer_from = null;
+        this.texture_from = null;
+        this.camera_screen = null;
+        this.viewport_screen = null;
         this.initialized = false;
+        this.finished = true;
     }
 
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
 }
