@@ -2,7 +2,6 @@ package org.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.game_engine.GameEngine;
@@ -47,11 +46,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void create() {
-        this.state = STATE.RUN;
-        this.bootEngine();
-    }
-
-    private void bootEngine() {
+        this.transitionManager = new TransitionManager();
         // Load Assets
         Tools.Log.inProgress("Loading Assets");
         this.mediaManager = new MediaManager();
@@ -75,6 +70,8 @@ public class ExampleMain extends ApplicationAdapter {
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.VIEWPORT_MODE, true);
         Tools.Log.done();
+
+        this.state = STATE.RUN;
     }
 
     @Override
@@ -100,20 +97,13 @@ public class ExampleMain extends ApplicationAdapter {
 
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
-                    this.transitionManager = new TransitionManager();
                     this.uiEngine_transition = new UIEngine<>(
                             new ExampleUIAdapter(this.gameEngine),
                             this.mediaManager,
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.VIEWPORT_MODE, true);
                     this.uiEngine_transition.update();
-                    Transition transition = switch (MathUtils.random(1, 3)) {
-                        case 1 -> new FadeTransition();
-                        case 2 -> new FallInTransition();
-                        case 3 -> new FallOutTransition();
-                        default -> throw new IllegalStateException("Unexpected value");
-                    };
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, transition);
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FallOutTransition());
                     state = STATE.TRANSITION;
                     return;
                 }
@@ -125,7 +115,6 @@ public class ExampleMain extends ApplicationAdapter {
                     if (finished) {
                         // Replace with new UIEngine after Reset
                         this.uiEngine.shutdown();
-                        this.transitionManager.shutdown();
                         this.uiEngine = this.uiEngine_transition;
                         this.uiEngine_transition = null;
                         this.state = STATE.RUN;
@@ -156,6 +145,7 @@ public class ExampleMain extends ApplicationAdapter {
         this.uiEngine.shutdown();
         this.gameEngine.shutdown();
         this.mediaManager.shutdown();
+        this.transitionManager.shutdown();
     }
 
 

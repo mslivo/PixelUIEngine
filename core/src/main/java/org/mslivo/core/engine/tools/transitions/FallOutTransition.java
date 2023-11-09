@@ -11,12 +11,12 @@ public class FallOutTransition implements Transition {
     public void init(int screenWidth, int screenHeight) {
         this.yTo = 0;
         this.height = screenHeight;
-        this.ySpeed = 12;
+        this.ySpeed = 8;
     }
 
     @Override
     public boolean update() {
-        ySpeed -= 0.5f;
+        ySpeed -= 0.4f;
         yTo += ySpeed;
         return yTo <= -height;
     }

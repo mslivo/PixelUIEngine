@@ -24,6 +24,7 @@ public class TransitionManager {
     private Transition transition;
     private int transitionSpeed;
     private boolean initialized;
+    private int screenWidth, screenHeight;
 
     public TransitionManager() {
         this.initialized = false;
@@ -34,37 +35,43 @@ public class TransitionManager {
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
-        this.shutdown();
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
         this.transition = transition == null ? new FadeTransition() : transition;
-        this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed,1,10);
-        // From
-        frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, screenWidth, screenHeight, false);
-        frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        texture_from = new TextureRegion(frameBuffer_from.getColorBufferTexture());
-        texture_from.flip(false, true);
-        // To
-        frameBuffer_to = new NestedFrameBuffer(Pixmap.Format.RGBA8888, screenWidth, screenHeight, false);
-        frameBuffer_to.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        texture_to = new TextureRegion(frameBuffer_to.getColorBufferTexture());
-        texture_to.flip(false, true);
-        // Screen
-        batch_screen = new SpriteBatch(8191);
-        camera_screen = new OrthographicCamera(screenWidth, screenHeight);
-        camera_screen.setToOrtho(false);
-        camera_screen.update();
-        camera_screen.position.set(screenWidth / 2, screenHeight / 2, 1f);
-        viewport_screen = new StretchViewport(screenWidth, screenHeight,camera_screen);
-        viewport_screen.update(screenWidth, screenHeight, true);
+        this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
+
+        boolean createNew = this.screenWidth != screenWidth || this.screenHeight != screenHeight;
+        if (createNew) {
+            if (frameBuffer_from != null) frameBuffer_from.dispose();
+            frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, screenWidth, screenHeight, false);
+            frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            texture_from = new TextureRegion(frameBuffer_from.getColorBufferTexture());
+            texture_from.flip(false, true);
+
+            if (frameBuffer_to != null) frameBuffer_to.dispose();
+            frameBuffer_to = new NestedFrameBuffer(Pixmap.Format.RGBA8888, screenWidth, screenHeight, false);
+            frameBuffer_to.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            texture_to = new TextureRegion(frameBuffer_to.getColorBufferTexture());
+            texture_to.flip(false, true);
+
+            batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
+            camera_screen = new OrthographicCamera(screenWidth, screenHeight);
+            camera_screen.setToOrtho(false);
+            camera_screen.update();
+            camera_screen.position.set(screenWidth / 2, screenHeight / 2, 1f);
+            viewport_screen = new StretchViewport(screenWidth, screenHeight, camera_screen);
+            viewport_screen.update(screenWidth, screenHeight, true);
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
+        }
 
         // Capture Buffers
-        if(from != null) {
+        if (from != null) {
             frameBuffer_from.begin();
             from.render();
             frameBuffer_from.end();
         }
-        if(to != null) {
+        if (to != null) {
             frameBuffer_to.begin();
             to.render();
             frameBuffer_to.end();
@@ -75,9 +82,9 @@ public class TransitionManager {
 
     public boolean update() {
         if (!initialized) return true;
-        for(int i=0;i<this.transitionSpeed;i++) {
-           boolean finished = this.transition.update();
-           if(finished) return true;
+        for (int i = 0; i < this.transitionSpeed; i++) {
+            boolean finished = this.transition.update();
+            if (finished) return true;
         }
         return false;
     }
@@ -96,8 +103,11 @@ public class TransitionManager {
 
     public void shutdown() {
         if (batch_screen != null) batch_screen.dispose();
+        this.batch_screen = null;
         if (frameBuffer_to != null) frameBuffer_from.getColorBufferTexture().dispose();
-        if (frameBuffer_from != null) frameBuffer_to.getColorBufferTexture().dispose();
+        this.frameBuffer_to = null;
+        if (frameBuffer_from != null) frameBuffer_from.getColorBufferTexture().dispose();
+        this.frameBuffer_from = null;
         this.initialized = false;
     }
 
