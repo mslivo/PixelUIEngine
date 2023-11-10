@@ -29,6 +29,7 @@ public class TransitionManager {
     private boolean initialized;
     private boolean finished;
     private int screenWidth, screenHeight;
+    private UIEngine from, to;
 
     public TransitionManager() {
         this.finished = true;
@@ -42,11 +43,15 @@ public class TransitionManager {
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
         int screenWidth = Tools.Calc.lowerBounds(Gdx.graphics.getWidth(),1);
         int screenHeight = Tools.Calc.lowerBounds(Gdx.graphics.getHeight(),1);
+        this.from = from;
+        this.to = to;
         this.transition = transition == null ? new FadeTransition() : transition;
         this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
 
         boolean createNew = this.screenWidth != screenWidth || this.screenHeight != screenHeight;
         if (createNew) {
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
             if (frameBuffer_from != null) frameBuffer_from.dispose();
             frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, screenWidth, screenHeight, false);
             frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -62,13 +67,8 @@ public class TransitionManager {
             batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
             camera_screen = new OrthographicCamera(screenWidth, screenHeight);
             camera_screen.setToOrtho(false);
-            camera_screen.update();
-            camera_screen.position.set(screenWidth / 2, screenHeight / 2, 1f);
-
             viewport_screen = new ScreenViewport(camera_screen);
             viewport_screen.update(screenWidth, screenHeight, true);
-            this.screenWidth = screenWidth;
-            this.screenHeight = screenHeight;
         }
 
         // Capture Buffers
@@ -109,6 +109,8 @@ public class TransitionManager {
             batch_screen.setProjectionMatrix(camera_screen.combined);
             this.transition.render(batch_screen, texture_from, texture_to);
         }
+        // Render Viewport black bars
+
     }
 
     public void shutdown() {
@@ -122,6 +124,8 @@ public class TransitionManager {
         this.texture_from = null;
         this.camera_screen = null;
         this.viewport_screen = null;
+        this.from = null;
+        this.to = null;
         this.initialized = false;
         this.finished = true;
     }

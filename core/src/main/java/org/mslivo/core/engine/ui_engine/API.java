@@ -3657,7 +3657,7 @@ public class API {
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, Integer updateTime, GameViewPortAction gameViewPortAction) {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
-                gameViewPort.frameBuffer = new FrameBuffer(Pixmap.Format.RGB888, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, false);
+                gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, false);
                 Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
                 texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
                 gameViewPort.textureRegion = new TextureRegion(texture, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE);
