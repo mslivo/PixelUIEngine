@@ -3361,5 +3361,16 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.shutdown();
     }
 
-
+    public int getInternalResolutionWidth(){
+        return inputState.internalResolutionWidth;
+    }
+    public int getInternalResolutionHeight(){
+        return inputState.internalResolutionHeight;
+    }
+    public ViewportMode getViewportMode(){
+        return inputState.viewportMode;
+    }
+    public boolean isGamePadSupport(){
+        return inputState.gamePadSupport;
+    }
 }

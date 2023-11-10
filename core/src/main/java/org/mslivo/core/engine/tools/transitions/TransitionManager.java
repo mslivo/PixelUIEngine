@@ -7,11 +7,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.misc.PixelPerfectViewport;
 
 public class TransitionManager {
     private NestedFrameBuffer frameBuffer_from;
@@ -37,8 +40,8 @@ public class TransitionManager {
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
-        int screenWidth = Gdx.graphics.getWidth();
-        int screenHeight = Gdx.graphics.getHeight();
+        int screenWidth = Tools.Calc.lowerBounds(Gdx.graphics.getWidth(),1);
+        int screenHeight = Tools.Calc.lowerBounds(Gdx.graphics.getHeight(),1);
         this.transition = transition == null ? new FadeTransition() : transition;
         this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
 
@@ -61,7 +64,8 @@ public class TransitionManager {
             camera_screen.setToOrtho(false);
             camera_screen.update();
             camera_screen.position.set(screenWidth / 2, screenHeight / 2, 1f);
-            viewport_screen = new StretchViewport(screenWidth, screenHeight, camera_screen);
+
+            viewport_screen = new ScreenViewport(camera_screen);
             viewport_screen.update(screenWidth, screenHeight, true);
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
@@ -101,8 +105,8 @@ public class TransitionManager {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // Render Transition
         {
-            batch_screen.setProjectionMatrix(camera_screen.combined);
             viewport_screen.apply();
+            batch_screen.setProjectionMatrix(camera_screen.combined);
             this.transition.render(batch_screen, texture_from, texture_to);
         }
     }
