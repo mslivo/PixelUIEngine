@@ -11,11 +11,12 @@ public class ZoomOutTransition implements Transition {
     private int screenHeight;
 
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 1f;
         this.zoomAcc = 0.02f;
+        return TRANSITION_MODE.TO_FIRST;
     }
 
     @Override
@@ -26,10 +27,7 @@ public class ZoomOutTransition implements Transition {
     }
 
     @Override
-    public void render(SpriteBatch batch, TextureRegion texture_from, TextureRegion texture_to) {
-        batch.begin();
-        batch.setColor(Color.WHITE);
-        batch.draw(texture_to, 0, 0);
+    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
         if(zoom > 0.1f) {
             batch.draw(texture_from,
                     MathUtils.round(screenWidth * (1f - zoom) * 0.5f),
@@ -37,8 +35,12 @@ public class ZoomOutTransition implements Transition {
                     MathUtils.round(screenWidth * zoom),
                     MathUtils.round(screenHeight * zoom));
         }
-        batch.end();
     }
 
+    @Override
+    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
+        batch.setColor(Color.WHITE);
+        batch.draw(texture_to, 0, 0);
+    }
 
 }

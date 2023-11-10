@@ -11,11 +11,12 @@ public class ZoomInTransition implements Transition {
     private int screenWidth;
     private int screenHeight;
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 0f;
         this.zoomAcc = 0.02f;
+        return TRANSITION_MODE.TO_FIRST;
     }
 
     @Override
@@ -26,23 +27,15 @@ public class ZoomInTransition implements Transition {
     }
 
     @Override
-    public void render(SpriteBatch batch, TextureRegion texture_from, TextureRegion texture_to) {
-        batch.begin();
-
-        batch.setColor(Color.WHITE);
-        batch.draw(texture_to, 0, 0);
-
+    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
         batch.setColor(1f,1f,1f,1f-zoom);
         batch.draw(texture_from, -screenWidth*(zoom/2f),-screenHeight*(zoom/2f),screenWidth*(zoom+1), screenHeight*(zoom+1));
-        /*
-        int x = -MathUtils.round(screenWidth*zoom);
-        int y = -MathUtils.round(screenHeight*zoom);
-        batch.draw(texture_from, x, y,screenWidth*zoom*2,screenHeight*zoom*2);
-*/
-
-
-        batch.end();
     }
 
+    @Override
+    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
+        batch.setColor(Color.WHITE);
+        batch.draw(texture_to, 0, 0);
+    }
 
 }

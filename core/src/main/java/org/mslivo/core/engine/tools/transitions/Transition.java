@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public interface Transition {
 
-    void init(int screenWidth, int screenHeight);
+    TRANSITION_MODE init(int screenWidth, int screenHeight);
 
     boolean update();
 
-    void render(SpriteBatch batch, TextureRegion texture_from, TextureRegion texture_to);
+    void renderFrom(SpriteBatch batch, TextureRegion texture_from);
+    void renderTo(SpriteBatch batch, TextureRegion texture_to);
+
 }

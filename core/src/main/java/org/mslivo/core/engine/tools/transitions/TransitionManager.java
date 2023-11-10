@@ -1,20 +1,14 @@
 package org.mslivo.core.engine.tools.transitions;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.PixelPerfectViewport;
 
 public class TransitionManager {
     private NestedFrameBuffer frameBuffer_from;
@@ -30,6 +24,8 @@ public class TransitionManager {
     private boolean finished;
     private int screenWidth, screenHeight;
     private UIEngine from, to;
+    private TRANSITION_MODE transitionMode;
+    private static final Texture pixel = new Texture("sprites/gui/pixel.png");
 
     public TransitionManager() {
         this.finished = true;
@@ -41,8 +37,8 @@ public class TransitionManager {
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
-        int screenWidth = Tools.Calc.lowerBounds(Gdx.graphics.getWidth(),1);
-        int screenHeight = Tools.Calc.lowerBounds(Gdx.graphics.getHeight(),1);
+        int screenWidth = Tools.Calc.lowerBounds(Gdx.graphics.getWidth(), 1);
+        int screenHeight = Tools.Calc.lowerBounds(Gdx.graphics.getHeight(), 1);
         this.from = from;
         this.to = to;
         this.transition = transition == null ? new FadeTransition() : transition;
@@ -82,7 +78,8 @@ public class TransitionManager {
             to.render();
             frameBuffer_to.end();
         }
-        this.transition.init(screenWidth, screenHeight);
+        transitionMode = this.transition.init(screenWidth, screenHeight);
+        if (transitionMode == null) transitionMode = TRANSITION_MODE.FROM_FIRST;
         this.initialized = true;
         this.finished = false;
     }
@@ -91,7 +88,7 @@ public class TransitionManager {
         if (!initialized) return true;
         if (this.finished) return true;
         for (int i = 0; i < this.transitionSpeed; i++) {
-            if(this.transition.update()){
+            if (this.transition.update()) {
                 this.finished = true;
                 return true;
             }
@@ -107,10 +104,36 @@ public class TransitionManager {
         {
             viewport_screen.apply();
             batch_screen.setProjectionMatrix(camera_screen.combined);
-            this.transition.render(batch_screen, texture_from, texture_to);
-        }
-        // Render Viewport black bars
 
+            batch_screen.begin();
+            switch (transitionMode) {
+                case FROM_FIRST -> {
+                    this.transition.renderFrom(batch_screen, texture_from);
+                    drawViewportBlackBars(batch_screen, from.getViewPortScreenX(), from.getViewPortScreenY(), from.getViewPortScreenWidth(), from.getViewPortScreenHeight());
+                    this.transition.renderTo(batch_screen, texture_to);
+                    drawViewportBlackBars(batch_screen, to.getViewPortScreenX(), to.getViewPortScreenY(), to.getViewPortScreenWidth(), to.getViewPortScreenHeight());
+                }
+                case TO_FIRST -> {
+                    this.transition.renderTo(batch_screen, texture_to);
+                    drawViewportBlackBars(batch_screen, to.getViewPortScreenX(), to.getViewPortScreenY(), to.getViewPortScreenWidth(), to.getViewPortScreenHeight());
+                    this.transition.renderFrom(batch_screen, texture_from);
+                    drawViewportBlackBars(batch_screen, from.getViewPortScreenX(), from.getViewPortScreenY(), from.getViewPortScreenWidth(), from.getViewPortScreenHeight());
+                }
+            }
+            batch_screen.end();
+        }
+
+    }
+
+    private void drawViewportBlackBars(SpriteBatch batch, int viewPortScreenX, int viewPortScreenY, int viewPortScreenWidth, int viewPortScreenHeight) {
+        batch_screen.setColor(Color.BLACK);
+        int ysum = viewPortScreenY + viewPortScreenHeight;
+        int xsum = viewPortScreenX + viewPortScreenWidth;
+        batch.draw(pixel, 0, 0, viewPortScreenX, screenHeight);
+        batch.draw(pixel, 0, 0, screenWidth, viewPortScreenY);
+        batch.draw(pixel, 0, ysum, screenWidth, (screenHeight - ysum));
+        batch.draw(pixel, xsum, 0, (screenWidth - xsum), screenHeight);
+        batch_screen.setColor(Color.WHITE);
     }
 
     public void shutdown() {

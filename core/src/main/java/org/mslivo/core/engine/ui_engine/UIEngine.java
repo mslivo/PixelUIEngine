@@ -3371,8 +3371,17 @@ public class UIEngine<T extends UIAdapter> {
     public ViewportMode getViewportMode(){
         return inputState.viewportMode;
     }
-    public Viewport getViewPort(){
-        return inputState.viewport_screen;
+    public int getViewPortScreenX(){
+        return inputState.viewport_screen.getScreenX();
+    }
+    public int getViewPortScreenY(){
+        return inputState.viewport_screen.getScreenY();
+    }
+    public int getViewPortScreenWidth(){
+        return inputState.viewport_screen.getScreenWidth();
+    }
+    public int getViewPortScreenHeight(){
+        return inputState.viewport_screen.getScreenHeight();
     }
     public boolean isGamePadSupport(){
         return inputState.gamePadSupport;

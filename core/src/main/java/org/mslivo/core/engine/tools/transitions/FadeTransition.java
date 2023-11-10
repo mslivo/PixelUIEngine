@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.tools.transitions;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.tools.Tools;
@@ -9,9 +10,10 @@ public class FadeTransition implements Transition {
     private float fadeIn;
 
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
+        return TRANSITION_MODE.FROM_FIRST;
     }
 
     @Override
@@ -28,19 +30,23 @@ public class FadeTransition implements Transition {
     }
 
     @Override
-    public void render(SpriteBatch batch, TextureRegion texture_from, TextureRegion texture_to) {
-        batch.begin();
+    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
+        batch.setColor(Color.WHITE);
         if(this.fadeOut < 1f){
             float color = Tools.Calc.inBounds(1f-fadeOut,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_from, 0, 0);
-        }else if(this.fadeIn <= 1f){
+        }
+    }
+
+    @Override
+    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
+        batch.setColor(Color.WHITE);
+        if(this.fadeOut >= 1 && this.fadeIn <= 1f){
             float color = Tools.Calc.inBounds(fadeIn,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_to, 0, 0);
         }
-        batch.end();
     }
-
 
 }

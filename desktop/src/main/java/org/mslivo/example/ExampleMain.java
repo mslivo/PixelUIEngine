@@ -103,7 +103,7 @@ public class ExampleMain extends ApplicationAdapter {
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.VIEWPORT_MODE, true);
                     this.uiEngine_transition.update();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FallOutTransition());
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     this.transitionManager.render();
                     state = STATE.TRANSITION;
                     return;
