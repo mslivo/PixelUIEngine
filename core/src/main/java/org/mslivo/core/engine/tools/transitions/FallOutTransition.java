@@ -20,7 +20,6 @@ public class FallOutTransition implements Transition {
     @Override
     public boolean update() {
         ySpeed -= screenHeight /1400f;
-        if(ySpeed <= -24) ySpeed = -24;
         yTo += ySpeed;
         return yTo <= -screenHeight;
     }
