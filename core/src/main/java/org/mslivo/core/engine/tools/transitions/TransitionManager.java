@@ -34,15 +34,21 @@ public class TransitionManager {
         this.initialized = false;
     }
 
+    public void init(UIEngine from, UIEngine to) {
+        this.init(from, to, null, 1);
+    }
+
     public void init(UIEngine from, UIEngine to, Transition transition) {
         this.init(from, to, transition, 1);
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
+        if(from == null) throw new RuntimeException("UIEngine from is null");
+        if(to == null) throw new RuntimeException("UIEngine to is null");
         if (from.getInternalResolutionWidth() != to.getInternalResolutionWidth())
-            throw new RuntimeException("getInternalResolutionWidth does not match");
+            throw new RuntimeException("UIEngine internalResolutionWidth does not match");
         if (from.getInternalResolutionHeight() != to.getInternalResolutionHeight())
-            throw new RuntimeException("getInternalResolutionHeight does not match");
+            throw new RuntimeException("UIEngine internalResolutionHeight does not match");
         if (from.getViewportMode() != to.getViewportMode()) throw new RuntimeException("viewportMode does not match");
         int resolutionWidth = from.getInternalResolutionWidth();
         int resolutionHeight = from.getInternalResolutionHeight();
