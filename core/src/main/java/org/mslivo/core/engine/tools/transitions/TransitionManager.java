@@ -151,16 +151,14 @@ public class TransitionManager {
         if (batch_screen != null) batch_screen.dispose();
         this.batch_screen = null;
         if (frameBuffer_to != null) {
-            texture_to.getTexture().dispose();
-            this.texture_to = null;
             frameBuffer_to.dispose();
-            this.frameBuffer_to = null;
+            frameBuffer_to = null;
+            texture_to = null;
         }
         if (frameBuffer_from != null) {
-            texture_from.getTexture().dispose();
-            this.texture_from = null;
             frameBuffer_from.dispose();
-            this.frameBuffer_from = null;
+            frameBuffer_from = null;
+            texture_from = null;
         }
         this.camera_screen = null;
         this.viewport_screen = null;
