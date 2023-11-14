@@ -1,7 +1,6 @@
 package org.mslivo.core.engine.tools.transitions;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -28,7 +27,6 @@ public class TransitionManager {
     private boolean finished;
     private int resolutionWidth, resolutionHeight;
     private ViewportMode viewportMode;
-    private UIEngine from, to;
     private TRANSITION_MODE transitionMode;
 
     public TransitionManager() {
@@ -49,8 +47,6 @@ public class TransitionManager {
         int resolutionWidth = from.getInternalResolutionWidth();
         int resolutionHeight = from.getInternalResolutionHeight();
         ViewportMode viewportMode = from.getViewportMode();
-        this.from = from;
-        this.to = to;
         this.transition = transition == null ? new FadeTransition() : transition;
         this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
         boolean createNew = this.resolutionWidth != resolutionWidth || this.resolutionHeight != resolutionHeight || this.viewportMode != viewportMode;
@@ -71,14 +67,16 @@ public class TransitionManager {
             texture_to = new TextureRegion(frameBuffer_to.getColorBufferTexture());
             texture_to.flip(false, true);
 
-            batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
             camera_screen = new OrthographicCamera(resolutionWidth, resolutionHeight);
             camera_screen.setToOrtho(false);
             viewport_screen = createViewport(viewportMode, camera_screen, resolutionWidth, resolutionHeight);
         }
 
         // PixmapIO.writePNG(new FileHandle("E:\\from.png"),Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+
+
         // Capture Buffers
+        batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
         batch_screen.setColor(Color.WHITE);
         viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
@@ -146,16 +144,23 @@ public class TransitionManager {
     public void shutdown() {
         if (batch_screen != null) batch_screen.dispose();
         this.batch_screen = null;
-        if (frameBuffer_to != null) frameBuffer_from.getColorBufferTexture().dispose();
-        this.frameBuffer_to = null;
-        this.texture_to = null;
-        if (frameBuffer_from != null) frameBuffer_from.getColorBufferTexture().dispose();
-        this.frameBuffer_from = null;
-        this.texture_from = null;
+        if (frameBuffer_to != null) {
+            texture_to.getTexture().dispose();
+            this.texture_to = null;
+            frameBuffer_to.dispose();
+            this.frameBuffer_to = null;
+        }
+        if (frameBuffer_from != null) {
+            texture_from.getTexture().dispose();
+            this.texture_from = null;
+            frameBuffer_from.dispose();
+            this.frameBuffer_from = null;
+        }
         this.camera_screen = null;
         this.viewport_screen = null;
-        this.from = null;
-        this.to = null;
+        this.resolutionWidth = -1;
+        this.resolutionHeight = -1;
+        this.viewportMode = null;
         this.initialized = false;
         this.finished = true;
     }
