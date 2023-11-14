@@ -484,6 +484,22 @@ public class Tools {
 
         }
 
+        /*public static int findHighestPowerOf2(int number) {
+            // If the input number is already a power of 2, return it
+            if ((number & (number - 1)) == 0) {
+                return number;
+            }
+
+            // Find the position of the most significant bit
+            int msbPosition = 0;
+            while ((1 << msbPosition) < number) {
+                msbPosition++;
+            }
+
+            // Calculate and return the higher power of 2
+            return 1 << msbPosition;
+        }*/
+
         public static float maxOfValues(float... values) {
             float sum = 0;
             for (float f : values) if (f > sum) sum = f;

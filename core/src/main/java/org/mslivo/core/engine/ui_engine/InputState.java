@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
@@ -74,22 +73,13 @@ public class InputState {
 
     public NestedFrameBuffer frameBuffer_gui;
 
-    /* #################### Graphics: Upscaling #################### */
-
-    public TextureRegion texture_upScale;
-    public int factor_upScale;
-
-    public Texture.TextureFilter textureFilter_upScale;
-
-    public NestedFrameBuffer frameBuffer_upScale;
-
-
     /* #################### Graphics: Screen #################### */
-
+    public int upscaleFactor_screen;
+    public TextureRegion texture_screen;
+    public Texture.TextureFilter textureFilter_screen;
+    public NestedFrameBuffer frameBuffer_screen;
     public SpriteBatch spriteBatch_screen;
-
     public Viewport viewport_screen;
-
     public OrthographicCamera camera_screen;
 
     /* #################### GUI: Added Elements #################### */

@@ -31,22 +31,25 @@ public class FadeTransition implements Transition {
 
     @Override
     public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        batch.setColor(Color.WHITE);
         if(this.fadeOut < 1f){
             float color = Tools.Calc.inBounds(1f-fadeOut,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_from, 0, 0);
+        }else {
+            batch.setColor(Color.WHITE);
         }
     }
 
     @Override
     public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
-        batch.setColor(Color.WHITE);
         if(this.fadeOut >= 1 && this.fadeIn <= 1f){
             float color = Tools.Calc.inBounds(fadeIn,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_to, 0, 0);
+        }else{
+            batch.setColor(Color.WHITE);
         }
+
     }
 
 }

@@ -6,13 +6,11 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -160,12 +158,12 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
         // ----- UpScaler
-        newInputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
-        newInputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
-        newInputState.frameBuffer_upScale = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.factor_upScale, newInputState.internalResolutionHeight * newInputState.factor_upScale, false);
-        newInputState.frameBuffer_upScale.getColorBufferTexture().setFilter(newInputState.textureFilter_upScale, newInputState.textureFilter_upScale);
-        newInputState.texture_upScale = new TextureRegion(newInputState.frameBuffer_upScale.getColorBufferTexture());
-        newInputState.texture_upScale.flip(false, true);
+        newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
+        newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
+        newInputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.upscaleFactor_screen, newInputState.internalResolutionHeight * newInputState.upscaleFactor_screen, false);
+        newInputState.frameBuffer_screen.getColorBufferTexture().setFilter(newInputState.textureFilter_screen, newInputState.textureFilter_screen);
+        newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
+        newInputState.texture_screen.flip(false, true);
         // ----- Screen
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -2193,6 +2191,9 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void render() {
+        render(false);
+    }
+    public void render(boolean frameBuffersOnly) {
 
         // Draw Game
         {
@@ -2221,20 +2222,22 @@ public class UIEngine<T extends UIAdapter> {
 
 
         {
+            // Draw to Upscale Buffer
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
-            // Render to Upscaled Buffer
-            inputState.frameBuffer_upScale.begin();
+            inputState.frameBuffer_screen.begin();
             this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
                     inputState.texture_game, inputState.texture_gui,
                     inputState.internalResolutionWidth, inputState.internalResolutionHeight
             );
-            inputState.frameBuffer_upScale.end();
-            // Render Final Screen
-            inputState.viewport_screen.apply();
-            render_glClear();
-            inputState.spriteBatch_screen.begin();
-            inputState.spriteBatch_screen.draw(inputState.texture_upScale, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-            inputState.spriteBatch_screen.end();
+            inputState.frameBuffer_screen.end();
+            // Draw to Screen
+            if(!frameBuffersOnly) {
+                inputState.viewport_screen.apply();
+                render_glClear();
+                inputState.spriteBatch_screen.begin();
+                inputState.spriteBatch_screen.draw(inputState.texture_screen, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+                inputState.spriteBatch_screen.end();
+            }
         }
 
 
@@ -3353,7 +3356,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.texture_game.getTexture().dispose();
         inputState.texture_gui.getTexture().dispose();
         if (inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH) {
-            inputState.texture_upScale.getTexture().dispose();
+            inputState.texture_screen.getTexture().dispose();
         }
         inputState.grayScaleShader.dispose();
 
@@ -3385,5 +3388,17 @@ public class UIEngine<T extends UIAdapter> {
     }
     public boolean isGamePadSupport(){
         return inputState.gamePadSupport;
+    }
+
+    public TextureRegion getTextureScreen(){
+        return inputState.texture_screen;
+    }
+
+    public TextureRegion getTextureGame(){
+        return inputState.texture_game;
+    }
+
+    public TextureRegion getTextureGUI(){
+        return inputState.texture_game;
     }
 }

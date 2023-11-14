@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
@@ -3240,16 +3239,16 @@ public class API {
 
     public void setViewportMode(ViewportMode viewportMode) {
         if (viewportMode == null || viewportMode == inputState.viewportMode) return;
-        inputState.factor_upScale = UICommons.viewport_determineUpscaleFactor(viewportMode, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.textureFilter_upScale = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
+        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewportMode, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
         // frameBuffer_upScale
-        inputState.frameBuffer_upScale.dispose();
-        inputState.frameBuffer_upScale = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.factor_upScale, inputState.internalResolutionHeight * inputState.factor_upScale, false);
-        inputState.frameBuffer_upScale.getColorBufferTexture().setFilter(inputState.textureFilter_upScale, inputState.textureFilter_upScale);
+        inputState.frameBuffer_screen.dispose();
+        inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.upscaleFactor_screen, inputState.internalResolutionHeight * inputState.upscaleFactor_screen, false);
+        inputState.frameBuffer_screen.getColorBufferTexture().setFilter(inputState.textureFilter_screen, inputState.textureFilter_screen);
         // texture_upScale
-        inputState.texture_upScale.getTexture().dispose();
-        inputState.texture_upScale = new TextureRegion(inputState.frameBuffer_upScale.getColorBufferTexture());
-        inputState.texture_upScale.flip(false, true);
+        inputState.texture_screen.getTexture().dispose();
+        inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
+        inputState.texture_screen.flip(false, true);
         // viewport_screen
         inputState.viewport_screen = UICommons.viewport_createViewport(viewportMode, inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
