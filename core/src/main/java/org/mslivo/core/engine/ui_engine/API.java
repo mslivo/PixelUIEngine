@@ -4810,11 +4810,7 @@ public class API {
                 text.textAction = textAction;
             }
 
-            public void setLines2(Text text, String... lines) {
-                setLines(text, lines);
-            }
-
-            public void setLines(Text text, String[] lines) {
+            public void setLines(Text text, String... lines) {
                 if (text == null) return;
                 text.lines = Tools.Text.validString(lines);
                 updateSize(text);
