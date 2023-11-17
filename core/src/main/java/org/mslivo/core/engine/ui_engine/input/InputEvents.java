@@ -3,7 +3,7 @@ package org.mslivo.core.engine.ui_engine.input;
 import java.util.ArrayList;
 
 public class InputEvents {
-
+    public InputMethod lastUsedInputMethod;
     /* --- Hardware Mouse --- */
     public boolean mouseDown;
     public boolean mouseDoubleClick;
@@ -27,7 +27,6 @@ public class InputEvents {
 
 
     /* --- GamePad --- */
-
     public boolean gamePadConnected;
     public boolean gamePadDisconnected;
     public boolean gamePadLeftXMoved;
@@ -44,19 +43,10 @@ public class InputEvents {
     public boolean gamePadButtonUp;
     public ArrayList<Integer> gamePadButtonDownKeyCodes;
     public ArrayList<Integer> gamePadButtonUpKeyCodes;
-
     public final boolean[] gamePadButtonsDown;
 
     public InputEvents() {
-        // Keyboard
-        keyDown = false;
-        keyUp = false;
-        keyTyped = false;
-        keyUpKeyCodes = new ArrayList<>();
-        keyDownKeyCodes = new ArrayList<>();
-        keyTypedCharacters = new ArrayList<>();
-        keysDown = new boolean[256];
-        mouseUpButtons = new ArrayList<>();
+        lastUsedInputMethod = InputMethod.NONE;
         // Mouse
         mouseDownButtons = new ArrayList<>();
         mouseDown = false;
@@ -67,20 +57,26 @@ public class InputEvents {
         mouseDoubleClick = false;
         mouseScrolledAmount = -1;
         mouseButtonsDown = new boolean[5];
+        // Keyboard
+        keyDown = false;
+        keyUp = false;
+        keyTyped = false;
+        keyUpKeyCodes = new ArrayList<>();
+        keyDownKeyCodes = new ArrayList<>();
+        keyTypedCharacters = new ArrayList<>();
+        keysDown = new boolean[256];
+        mouseUpButtons = new ArrayList<>();
         // GamePad
         gamePadConnected = false;
         gamePadDisconnected = false;
-
         gamePadLeftXMoved = false;
         gamePadLeftYMoved = false;
         gamePadLeftX = 0f;
         gamePadLeftY = 0f;
-
         gamePadRightXMoved = false;
         gamePadRightYMoved = false;
         gamePadRightX = 0f;
         gamePadRightY = 0f;
-
         gamePadButtonDown = false;
         gamePadButtonUp = false;
         gamePadButtonDownKeyCodes = new ArrayList<>();

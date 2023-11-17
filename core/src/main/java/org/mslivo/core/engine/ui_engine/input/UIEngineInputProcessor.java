@@ -30,6 +30,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.keyDown = true;
         this.inputEvents.keyDownKeyCodes.add(keycode);
         this.inputEvents.keysDown[keycode] = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.KEYBOARD;
         return false;
     }
 
@@ -38,6 +39,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.keyUp = true;
         this.inputEvents.keyUpKeyCodes.add(keycode);
         this.inputEvents.keysDown[keycode] = false;
+        this.inputEvents.lastUsedInputMethod = InputMethod.KEYBOARD;
         return false;
     }
 
@@ -45,6 +47,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
     public boolean keyTyped(char character) {
         this.inputEvents.keyTyped = true;
         this.inputEvents.keyTypedCharacters.add(character);
+        this.inputEvents.lastUsedInputMethod = InputMethod.KEYBOARD;
         return false;
     }
 
@@ -57,6 +60,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
             this.inputEvents.mouseDoubleClick = true;
         }
         lastClickTime = System.currentTimeMillis();
+        this.inputEvents.lastUsedInputMethod = InputMethod.HARDWARE_MOUSE;
         return false;
     }
 
@@ -65,6 +69,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.mouseUp = true;
         this.inputEvents.mouseUpButtons.add(button);
         this.inputEvents.mouseButtonsDown[button] = false;
+        this.inputEvents.lastUsedInputMethod = InputMethod.HARDWARE_MOUSE;
         return false;
     }
 
@@ -76,12 +81,14 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         this.inputEvents.mouseDragged = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.HARDWARE_MOUSE;
         return false;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         this.inputEvents.mouseMoved = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.HARDWARE_MOUSE;
         return false;
     }
 
@@ -89,6 +96,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
     public boolean scrolled(float amountX, float amountY) {
         this.inputEvents.mouseScrolled = true;
         this.inputEvents.mouseScrolledAmount = amountY;
+        this.inputEvents.lastUsedInputMethod = InputMethod.HARDWARE_MOUSE;
         return false;
     }
 
@@ -97,12 +105,14 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
     public void connected(Controller controller) {
         if(!gamePadSupport) return;
         this.inputEvents.gamePadConnected = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
     }
 
     @Override
     public void disconnected(Controller controller) {
         if(!gamePadSupport) return;
         this.inputEvents.gamePadDisconnected = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
     }
 
     @Override
@@ -112,6 +122,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.gamePadButtonDown = true;
         this.inputEvents.gamePadButtonDownKeyCodes.add(keyCode);
         this.inputEvents.gamePadButtonsDown[keyCode] = true;
+        this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
         return false;
     }
 
@@ -122,6 +133,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.gamePadButtonUp = true;
         this.inputEvents.gamePadButtonUpKeyCodes.add(keyCode);
         this.inputEvents.gamePadButtonsDown[keyCode] = false;
+        this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
         return false;
     }
 
@@ -144,6 +156,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
             this.inputEvents.gamePadRightY = -amount;
         }
 
+        this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
         return false;
     }
 

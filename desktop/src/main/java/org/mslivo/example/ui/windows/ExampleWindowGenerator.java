@@ -314,7 +314,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn1 = api.components.button.textButton.create(3, 3, 6, 2, "Toggle", new ButtonAction() {
             @Override
             public void onToggle(boolean value) {
-                api.input.setKeyboardMousePosition(100, 100);
+                api.input.setMousePosition(100, 100);
             }
         }, null, ButtonMode.TOGGLE);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);

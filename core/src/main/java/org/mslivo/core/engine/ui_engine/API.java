@@ -53,6 +53,7 @@ import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
@@ -2208,8 +2209,8 @@ public class API {
             return "";
         }
 
-        public void setKeyboardMousePosition(int x, int y) {
-            if (inputState.currentControlMode != MouseControlMode.KEYBOARD) return;
+        public void setMousePosition(int x, int y) {
+            if (inputState.currentControlMode != MouseControlMode.HARDWARE_MOUSE) return;
             inputState.mouse_gui.x = x;
             inputState.mouse_gui.y = y;
             inputState.lastGUIMouseHover = null;
@@ -2219,7 +2220,9 @@ public class API {
             return inputState.currentControlMode;
         }
 
-
+        public InputMethod lastUsedInputMethod(){
+            return inputState.inputEvents.lastUsedInputMethod;
+        }
         /* ---- MOUSE EVENTS --- */
 
         public boolean mouseDown() {
