@@ -33,8 +33,8 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
-import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.tools.game_engine.GameEngine;
+import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;

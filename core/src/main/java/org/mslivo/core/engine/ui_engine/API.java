@@ -58,8 +58,8 @@ import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
-import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 import java.awt.*;
 import java.net.URI;

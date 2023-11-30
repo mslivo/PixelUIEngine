@@ -1,10 +1,9 @@
 package org.mslivo.core.engine.ui_engine.gui.components.viewport;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import org.mslivo.core.engine.ui_engine.gui.actions.GameViewPortAction;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.misc.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 
 public class GameViewPort extends Component {
 

@@ -376,7 +376,8 @@ public class Tools {
                     doInRadiusCache.put(radius, cached);
                 }
 
-                for (Long positions : cached) {
+                for (int i=0;i<cached.size();i++) {
+                    Long positions = cached.get(i);
                     if (!tileFunction.apply(
                             x + ((int) (positions >> 32)),
                             y + positions.intValue())

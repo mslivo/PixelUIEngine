@@ -1,7 +1,7 @@
 package org.mslivo.example;
 
 
-import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 public class ExampleMainConstants {
 

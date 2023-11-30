@@ -28,9 +28,9 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
-import org.mslivo.core.engine.ui_engine.misc.PixelPerfectViewport;
+import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
-import org.mslivo.core.engine.ui_engine.misc.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 class UICommons {
 

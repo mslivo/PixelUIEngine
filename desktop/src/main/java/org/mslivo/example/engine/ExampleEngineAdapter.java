@@ -1,7 +1,7 @@
 package org.mslivo.example.engine;
 
-import org.mslivo.core.engine.tools.game_engine.GameEngineAdapter;
-import org.mslivo.core.engine.tools.game_engine.Output;
+import org.mslivo.core.engine.tools.engine.GameEngineAdapter;
+import org.mslivo.core.engine.tools.engine.Output;
 import org.mslivo.example.data.ExampleData;
 
 public class ExampleEngineAdapter implements GameEngineAdapter<ExampleData> {

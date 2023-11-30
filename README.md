@@ -70,41 +70,41 @@ The UIEngine then passes a API Object into the Adapter on init() from which all 
 These are not needed for the UI to work.
 This package contains classes that integrate seamlessly with the Engine and use the internal formats.
 
-#### core/ ... /engine.tools.game_engine
+#### core.engine.tools/ ... GameEngine
 
 Provides a basic framework for a game engine with input/output handling.
 
-#### core/ ... /engine.tools.jsonparser
+#### core.engine.tools/ ... JsonInlcudeParser
 
 A json parser which supports include files via JSON comments.
 
-#### core/ ... /engine.tools.lthreadpool
+#### core.engine.tools/ ... ListThreadUpdater
 
 Used for iterating over large lists in threads.
 
-#### core/ ... /engine.tools.particles
+#### core.engine.tools/ ... ParticleSystem
 
 A particle system using the MediaManager and CMedia graphics formats.
 
-#### core/ ... /engine.tools.settings
+#### core.engine.tools/ ... SettingsManager
 
 A failsafe settings/options manager which supports validation and default values.
 Implementations for reading/writing java .properties files are provided.
 
-#### core/ ... /engine.tools.sound.SoundPlayer
+#### core.engine.tools/ ... SoundPlayer
 
 A Soundplayer using the MediaManager and CMedia sound format.
 This player supports playing sound in a 2D space with automatic volume/pan adjustment.
 
-#### core/ ... /engine.tools.sound.MusicPlayer
+#### core.engine.tools/ ... MusicPlayer
 
 A Musicplayer using the MediaManager and CMedia music format.
 [This player works like regular player application with playlists, pause/resume etc.
 
-#### core/ ... /engine.tools.transitions.TransitionManager
+#### core.engine.tools/ ... TransitionManager
 
 A tool to create Transition effects when switching between two UIEngine instances
 
-#### core/ ... /engine.tools.Tools]()
+#### core.engine.tools/ ... Tools
 
 Static helper & math functions.
