@@ -5,12 +5,12 @@ import java.util.Objects;
 public final class SettingsEntry {
     private final String name;
     private final String defaultValue;
-    private final ValidateFunction validateFunction;
+    private final ValueValidator valueValidator;
 
-    public SettingsEntry(String name, String defaultValue, ValidateFunction validateFunction) {
+    public SettingsEntry(String name, String defaultValue, ValueValidator valueValidator) {
         this.name = name;
         this.defaultValue = defaultValue;
-        this.validateFunction = validateFunction;
+        this.valueValidator = valueValidator;
     }
 
     public String name() {
@@ -21,8 +21,8 @@ public final class SettingsEntry {
         return defaultValue;
     }
 
-    public ValidateFunction validateFunction() {
-        return validateFunction;
+    public ValueValidator validateFunction() {
+        return valueValidator;
     }
 
     @Override
@@ -32,12 +32,12 @@ public final class SettingsEntry {
         var that = (SettingsEntry) obj;
         return Objects.equals(this.name, that.name) &&
                 Objects.equals(this.defaultValue, that.defaultValue) &&
-                Objects.equals(this.validateFunction, that.validateFunction);
+                Objects.equals(this.valueValidator, that.valueValidator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, defaultValue, validateFunction);
+        return Objects.hash(name, defaultValue, valueValidator);
     }
 
     @Override
@@ -45,7 +45,7 @@ public final class SettingsEntry {
         return "SettingsEntry[" +
                 "name=" + name + ", " +
                 "defaultValue=" + defaultValue + ", " +
-                "validateFunction=" + validateFunction + ']';
+                "validateFunction=" + valueValidator + ']';
     }
 
 

@@ -1,8 +1,7 @@
 package org.mslivo.core.engine.tools.save.settings;
 
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.save.settings.functions.FileLoadFunction;
-import org.mslivo.core.engine.tools.save.settings.functions.FileSaveFunction;
+import org.mslivo.core.engine.tools.save.settings.persistor.FileSettingsPersistor;
 
 import java.util.HashMap;
 import java.util.Properties;
@@ -17,30 +16,27 @@ public class SettingsManager {
 
     private final HashMap<String, SettingsEntry> entries;
 
-    private final SaveFunction saveFunction;
+    private final SettingsPersistor settingsPersistor;
 
-    private final LoadFunction loadFunction;
-
-    public SettingsManager(String settingsFile) throws SettingsException {
-        this(settingsFile, new FileSaveFunction(), new FileLoadFunction());
+    public SettingsManager(String path) throws SettingsException {
+        this(path, new FileSettingsPersistor());
         this.init();
     }
 
 
-    public SettingsManager(String settingsFile, SaveFunction saveFunction, LoadFunction loadFunction) throws SettingsException {
+    public SettingsManager(String path, SettingsPersistor settingsPersistor) throws SettingsException {
         this.entries = new HashMap<>();
         this.properties = new Properties();
         this.backUp = new Properties();
-        this.settingsFile = Tools.Text.validString(settingsFile);
-        this.saveFunction = saveFunction;
-        this.loadFunction = loadFunction;
+        this.settingsFile = Tools.Text.validString(path);
+        this.settingsPersistor = settingsPersistor;
         this.init();
     }
 
     public void init() {
-        loadFunction.loadSettings(settingsFile, properties);
+        settingsPersistor.loadSettings(settingsFile, properties);
         validateAllProperties();
-        saveFunction.saveSettings(settingsFile, properties);
+        settingsPersistor.saveSettings(settingsFile, properties);
     }
 
 
@@ -49,7 +45,7 @@ public class SettingsManager {
             this.properties.clear();
             backUp.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
             validateAllProperties();
-            saveFunction.saveSettings(settingsFile, properties);
+            settingsPersistor.saveSettings(settingsFile, properties);
             discardBackup();
         }
     }
@@ -89,9 +85,9 @@ public class SettingsManager {
         this.backUp.clear();
     }
 
-    public void addSetting(String name, String defaultValue, ValidateFunction validateFunction) {
+    public void addSetting(String name, String defaultValue, ValueValidator valueValidator) {
         if (entries.get(name) == null) {
-            SettingsEntry settingsEntry = new SettingsEntry(name, defaultValue, validateFunction);
+            SettingsEntry settingsEntry = new SettingsEntry(name, defaultValue, valueValidator);
             entries.put(settingsEntry.name(), settingsEntry);
             if (properties.getProperty(settingsEntry.name()) == null) {
                 properties.setProperty(settingsEntry.name(), settingsEntry.defaultValue());
@@ -99,7 +95,7 @@ public class SettingsManager {
                 // already loaded
                 validateProperty(settingsEntry.name());
             }
-            saveFunction.saveSettings(settingsFile, properties);
+            settingsPersistor.saveSettings(settingsFile, properties);
         }
     }
 
@@ -108,7 +104,7 @@ public class SettingsManager {
         if (settingsEntry != null) {
             properties.remove(settingsEntry.name());
             entries.remove(settingsEntry.name());
-            saveFunction.saveSettings(settingsFile, properties);
+            settingsPersistor.saveSettings(settingsFile, properties);
         }
     }
 
@@ -278,7 +274,7 @@ public class SettingsManager {
             properties.setProperty(settingsEntry.name(), value);
             validateProperty(settingsEntry.name());
             if (oldValue != null && !oldValue.equals(value)) {
-                saveFunction.saveSettings(settingsFile, properties);
+                settingsPersistor.saveSettings(settingsFile, properties);
             }
         }
     }
