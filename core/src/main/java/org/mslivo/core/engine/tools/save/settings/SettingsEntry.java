@@ -23,7 +23,7 @@ public final class SettingsEntry {
         return defaultValue;
     }
 
-    public ValueValidator validateFunction() {
+    public ValueValidator valueValidator() {
         return valueValidator;
     }
 

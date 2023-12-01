@@ -1,7 +1,6 @@
 package org.mslivo.core.engine.tools.save.settings.persistor;
 
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.save.settings.SettingsPersistor;
 import org.mslivo.core.engine.tools.save.settings.SettingsException;
 
 import java.io.IOException;

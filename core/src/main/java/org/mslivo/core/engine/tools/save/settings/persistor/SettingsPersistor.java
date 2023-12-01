@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.save.settings;
+package org.mslivo.core.engine.tools.save.settings.persistor;
 
 import java.util.Properties;
 

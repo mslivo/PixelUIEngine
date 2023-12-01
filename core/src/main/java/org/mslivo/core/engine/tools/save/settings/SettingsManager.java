@@ -2,6 +2,7 @@ package org.mslivo.core.engine.tools.save.settings;
 
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.save.settings.persistor.FileSettingsPersistor;
+import org.mslivo.core.engine.tools.save.settings.persistor.SettingsPersistor;
 import org.mslivo.core.engine.tools.save.settings.validator.StringValueValidator;
 import org.mslivo.core.engine.tools.save.settings.validator.ValueValidator;
 
@@ -140,7 +141,7 @@ public class SettingsManager {
     private void validateProperty(String name) {
         SettingsEntry settingsEntry = entries.get(name);
         if (settingsEntry != null) {
-            if (!settingsEntry.validateFunction().isValueValid(properties.getProperty(name))) {
+            if (!settingsEntry.valueValidator().isValueValid(properties.getProperty(name))) {
                 this.properties.setProperty(name, settingsEntry.defaultValue());
             }
         }
