@@ -18,11 +18,11 @@ public class NumberValueValidator implements ValueValidator {
 
     @Override
     public boolean isValueValid(String value) {
-        if(!SettingsManager.isValidNumber(value)) return false;
+        if (!SettingsManager.isValidNumber(value)) return false;
         try {
             int v = Integer.parseInt(value);
             return v >= rangeFrom && v <= rangeTo;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
