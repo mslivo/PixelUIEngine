@@ -1886,11 +1886,11 @@ public class UIEngine<T extends UIAdapter> {
         boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
         boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
 
-        final float sensitivity = api.config.getGamePadMouseJoystickDeadZone();
-        boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
-        boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
-        boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.y > sensitivity);
-        boolean buttonDown = (stickLeft && inputState.gamePadTranslatedStickLeft.y < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.y < -sensitivity);
+        float joystickDeadZone = api.config.getGamePadMouseJoystickDeadZone();
+        boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x < -joystickDeadZone);
+        boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x > joystickDeadZone);
+        boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y > joystickDeadZone);
+        boolean buttonDown = (stickLeft && inputState.gamePadTranslatedStickLeft.y < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y < -joystickDeadZone);
         boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse1());
         boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse2());
         boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse3());
