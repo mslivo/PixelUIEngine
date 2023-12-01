@@ -2220,7 +2220,7 @@ public class API {
             return inputState.currentControlMode;
         }
 
-        public InputMethod lastUsedInputMethod(){
+        public InputMethod lastUsedInputMethod() {
             return inputState.inputEvents.lastUsedInputMethod;
         }
         /* ---- MOUSE EVENTS --- */
@@ -2393,55 +2393,55 @@ public class API {
         public boolean gamePadIsButtonUp(int keyCode) {
             return !inputState.inputEvents.gamePadButtonsDown[keyCode];
         }
-
         public boolean gamePadConnected() {
             return inputState.inputEvents.gamePadConnected;
         }
-
         public boolean gamePadDisconnected() {
             return inputState.inputEvents.gamePadDisconnected;
         }
-
         public boolean gamePadLeftXMoved() {
             return inputState.inputEvents.gamePadLeftXMoved;
         }
-
         public boolean gamePadLeftYMoved() {
             return inputState.inputEvents.gamePadLeftYMoved;
         }
-
         public boolean gamePadLeftMoved() {
             return gamePadLeftXMoved() || gamePadLeftYMoved();
         }
-
         public float gamePadLeftX() {
             return inputState.inputEvents.gamePadLeftX;
         }
-
         public float gamePadLeftY() {
             return inputState.inputEvents.gamePadLeftY;
         }
-
         public boolean gamePadRightXMoved() {
             return inputState.inputEvents.gamePadRightXMoved;
         }
-
         public boolean gamePadRightYMoved() {
             return inputState.inputEvents.gamePadRightYMoved;
         }
-
         public boolean gamePadRightMoved() {
             return gamePadRightXMoved() || gamePadRightYMoved();
         }
-
-
         public float gamePadRightX() {
             return inputState.inputEvents.gamePadRightX;
         }
-
         public float gamePadRightY() {
             return inputState.inputEvents.gamePadRightY;
         }
+        public boolean gamePadLeftTriggerMoved() {
+            return inputState.inputEvents.gamePadLeftTriggerMoved;
+        }
+        public float gamePadLeftTrigger() {
+            return inputState.inputEvents.gamePadLeftTrigger;
+        }
+        public boolean gamePadRightTriggerMoved() {
+            return inputState.inputEvents.gamePadRightTriggerMoved;
+        }
+        public float gamePadRightTrigger() {
+            return inputState.inputEvents.gamePadRightTrigger;
+        }
+
     }
 
     public class _Notification {

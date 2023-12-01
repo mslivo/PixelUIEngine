@@ -6,6 +6,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.ControllerMapping;
 import com.badlogic.gdx.controllers.Controllers;
+import com.studiohartman.jamepad.ControllerAxis;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor, ControllerListener {
@@ -140,22 +141,35 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
     @Override
     public boolean axisMoved(Controller controller, int axis, float amount) {
         if(!gamePadSupport) return false;
-        ControllerMapping mapping = controller.getMapping();
-
-        if(axis == mapping.axisLeftX){
-            this.inputEvents.gamePadLeftXMoved = true;
-            this.inputEvents.gamePadLeftX = amount;
-        }else if(axis == mapping.axisLeftY){
-            this.inputEvents.gamePadLeftYMoved = true;
-            this.inputEvents.gamePadLeftY = -amount;
-        }else if(axis == mapping.axisRightX){
-            this.inputEvents.gamePadRightXMoved = true;
-            this.inputEvents.gamePadRightX = amount;
-        }else if(axis == mapping.axisRightY){
-            this.inputEvents.gamePadRightYMoved = true;
-            this.inputEvents.gamePadRightY = -amount;
+        ControllerAxis controllerAxis = axis < ControllerAxis.values().length ? ControllerAxis.values()[axis] : null;
+        if(controllerAxis != null){
+            switch (controllerAxis){
+                case LEFTX -> {
+                    this.inputEvents.gamePadLeftXMoved = true;
+                    this.inputEvents.gamePadLeftX = amount;
+                }
+                case LEFTY -> {
+                    this.inputEvents.gamePadLeftYMoved = true;
+                    this.inputEvents.gamePadLeftY = -amount;
+                }
+                case RIGHTX -> {
+                    this.inputEvents.gamePadRightXMoved = true;
+                    this.inputEvents.gamePadRightX = amount;
+                }
+                case RIGHTY -> {
+                    this.inputEvents.gamePadRightYMoved = true;
+                    this.inputEvents.gamePadRightY = -amount;
+                }
+                case TRIGGERLEFT -> {
+                    this.inputEvents.gamePadLeftTriggerMoved = true;
+                    this.inputEvents.gamePadLeftTrigger = amount;
+                }
+                case TRIGGERRIGHT -> {
+                    this.inputEvents.gamePadRightTriggerMoved = true;
+                    this.inputEvents.gamePadRightTrigger = amount;
+                }
+            }
         }
-
         this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
         return false;
     }

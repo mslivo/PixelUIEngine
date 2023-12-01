@@ -31,14 +31,16 @@ public class InputEvents {
     public boolean gamePadDisconnected;
     public boolean gamePadLeftXMoved;
     public boolean gamePadLeftYMoved;
-
     public float gamePadLeftX;
     public float gamePadLeftY;
     public boolean gamePadRightXMoved;
-
     public boolean gamePadRightYMoved;
     public float gamePadRightX;
     public float gamePadRightY;
+    public boolean gamePadLeftTriggerMoved;
+    public float gamePadLeftTrigger;
+    public boolean gamePadRightTriggerMoved;
+    public float gamePadRightTrigger;
     public boolean gamePadButtonDown;
     public boolean gamePadButtonUp;
     public ArrayList<Integer> gamePadButtonDownKeyCodes;
@@ -77,6 +79,10 @@ public class InputEvents {
         gamePadRightYMoved = false;
         gamePadRightX = 0f;
         gamePadRightY = 0f;
+        gamePadLeftTriggerMoved = false;
+        gamePadLeftTrigger = 0f;
+        gamePadRightTriggerMoved = false;
+        gamePadRightTrigger = 0f;
         gamePadButtonDown = false;
         gamePadButtonUp = false;
         gamePadButtonDownKeyCodes = new ArrayList<>();
@@ -108,6 +114,8 @@ public class InputEvents {
         gamePadLeftYMoved = false;
         gamePadRightXMoved = false;
         gamePadRightYMoved = false;
+        gamePadLeftTriggerMoved = false;
+        gamePadRightTriggerMoved = false;
         gamePadButtonDown = false;
         gamePadButtonUp = false;
         gamePadButtonDownKeyCodes.clear();
