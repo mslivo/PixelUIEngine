@@ -1609,7 +1609,7 @@ public class API {
         private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
         private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
         private boolean gamePadMouseEnabled = false;
-        private float gamePadMouseSensitivity = 0.4f;
+        private float gamePadMouseJoystickDeadZone = 0.4f;
         private boolean gamePadMouseStickLeftEnabled = true;
         private boolean gamePadMouseStickRightEnabled = false;
         private int[] gamePadMouseButtonsMouse1 = new int[]{KeyCode.GamePad.A};
@@ -1619,8 +1619,8 @@ public class API {
         private int[] gamePadMouseButtonsMouse5 = new int[]{};
         private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
         private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
-        private float simulatedMouseCursorSpeed = 4.0f;
-        private boolean simulatedMouseMagnetModeEnabled = true;
+        private float emulatedMouseCursorSpeed = 4.0f;
+        private boolean emulatedMouseMagnetModeEnabled = true;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private Color windowsDefaultColor = Color.WHITE.cpy();
         private Color componentsDefaultColor = Color.WHITE.cpy();
@@ -1685,12 +1685,12 @@ public class API {
             this.windowsDefaultColor = windowsDefaultColor;
         }
 
-        public float getGamePadMouseSensitivity() {
-            return gamePadMouseSensitivity;
+        public float getGamePadMouseJoystickDeadZone() {
+            return gamePadMouseJoystickDeadZone;
         }
 
-        public void setGamePadMouseSensitivity(float gamePadMouseSensitivity) {
-            this.gamePadMouseSensitivity = gamePadMouseSensitivity;
+        public void setGamePadMouseJoystickDeadZone(float gamePadMouseJoystickDeadZone) {
+            this.gamePadMouseJoystickDeadZone = gamePadMouseJoystickDeadZone;
         }
 
         public Color getComponentsDefaultColor() {
@@ -1983,20 +1983,20 @@ public class API {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
 
-        public float getSimulatedMouseCursorSpeed() {
-            return simulatedMouseCursorSpeed;
+        public float getEmulatedMouseCursorSpeed() {
+            return emulatedMouseCursorSpeed;
         }
 
-        public void setSimulatedMouseCursorSpeed(float simulatedMouseCursorSpeed) {
-            this.simulatedMouseCursorSpeed = simulatedMouseCursorSpeed;
+        public void setEmulatedMouseCursorSpeed(float emulatedMouseCursorSpeed) {
+            this.emulatedMouseCursorSpeed = emulatedMouseCursorSpeed;
         }
 
-        public boolean isSimulatedMouseMagnetModeEnabled() {
-            return simulatedMouseMagnetModeEnabled;
+        public boolean isEmulatedMouseMagnetModeEnabled() {
+            return emulatedMouseMagnetModeEnabled;
         }
 
-        public void setSimulatedMouseMagnetModeEnabled(boolean simulatedMouseMagnetModeEnabled) {
-            this.simulatedMouseMagnetModeEnabled = simulatedMouseMagnetModeEnabled;
+        public void setEmulatedMouseMagnetModeEnabled(boolean emulatedMouseMagnetModeEnabled) {
+            this.emulatedMouseMagnetModeEnabled = emulatedMouseMagnetModeEnabled;
         }
 
         public boolean isUiKeyInteractionsDisabled() {
@@ -2166,9 +2166,9 @@ public class API {
             setGamePadMouseButtonsMouse5(config.getKeyboardMouseButtonsMouse5());
             setGamePadMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setGamePadMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
-            setGamePadMouseSensitivity(config.getGamePadMouseSensitivity());
-            setSimulatedMouseMagnetModeEnabled(config.isSimulatedMouseMagnetModeEnabled());
-            setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
+            setGamePadMouseJoystickDeadZone(config.getGamePadMouseJoystickDeadZone());
+            setEmulatedMouseMagnetModeEnabled(config.isEmulatedMouseMagnetModeEnabled());
+            setEmulatedMouseCursorSpeed(config.getEmulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
             setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());

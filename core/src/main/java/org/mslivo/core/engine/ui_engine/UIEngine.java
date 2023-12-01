@@ -1494,14 +1494,14 @@ public class UIEngine<T extends UIAdapter> {
     private boolean gamePadMouseDetectUse() {
         if (api.config.isGamePadMouseStickLeftEnabled()) {
             if (inputState.inputEvents.gamePadLeftXMoved || inputState.inputEvents.gamePadLeftYMoved) {
-                return inputState.inputEvents.gamePadLeftX < -api.config.getGamePadMouseSensitivity() ||
-                        inputState.inputEvents.gamePadLeftX > api.config.getGamePadMouseSensitivity();
+                return inputState.inputEvents.gamePadLeftX < -api.config.getGamePadMouseJoystickDeadZone() ||
+                        inputState.inputEvents.gamePadLeftX > api.config.getGamePadMouseJoystickDeadZone();
             }
         }
         if (api.config.isGamePadMouseStickRightEnabled()) {
             if (inputState.inputEvents.gamePadRightXMoved || inputState.inputEvents.gamePadRightYMoved) {
-                return inputState.inputEvents.gamePadRightX < -api.config.getGamePadMouseSensitivity() ||
-                        inputState.inputEvents.gamePadRightX > api.config.getGamePadMouseSensitivity();
+                return inputState.inputEvents.gamePadRightX < -api.config.getGamePadMouseJoystickDeadZone() ||
+                        inputState.inputEvents.gamePadRightX > api.config.getGamePadMouseJoystickDeadZone();
             }
         }
 
@@ -1659,7 +1659,7 @@ public class UIEngine<T extends UIAdapter> {
         if (moveButtonPressed) {
             inputState.siumlatedMouseSpeedUp = inputState.siumlatedMouseSpeedUp < 1f ? inputState.siumlatedMouseSpeedUp + 0.25f : inputState.siumlatedMouseSpeedUp;
 
-            float moveSpeed = api.config.getSimulatedMouseCursorSpeed() * inputState.siumlatedMouseSpeedUp;
+            float moveSpeed = api.config.getEmulatedMouseCursorSpeed() * inputState.siumlatedMouseSpeedUp;
             if (buttonUp)
                 deltaY -= MathUtils.round(moveSpeed);
             if (buttonDown)
@@ -1671,7 +1671,7 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             inputState.siumlatedMouseSpeedUp = 0;
             // Magnet
-            if (api.config.isSimulatedMouseMagnetModeEnabled()) {
+            if (api.config.isEmulatedMouseMagnetModeEnabled()) {
                 boolean magnetPossible = false;
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.modalWindow != null) {
@@ -1865,7 +1865,6 @@ public class UIEngine<T extends UIAdapter> {
         // Emulate Mouse Scroll Events
         inputState.inputEvents.mouseScrolled = buttonScrolledUp || buttonScrolledDown;
         inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
-
     }
 
     private boolean isTranslatedKeyCodeDown(boolean[] translatedKeys, int[] keys) {
@@ -1887,7 +1886,7 @@ public class UIEngine<T extends UIAdapter> {
         boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
         boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
 
-        final float sensitivity = 0.4f;
+        final float sensitivity = api.config.getGamePadMouseJoystickDeadZone();
         boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
         boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
         boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.y > sensitivity);
