@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.tools.save.settings;
+package org.mslivo.core.engine.tools.save.settings.validator;
 
 public interface ValueValidator {
 
