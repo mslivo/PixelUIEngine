@@ -57,8 +57,8 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.render.GrayScaleShader;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.render.GrayScaleShader;
 import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
@@ -524,8 +524,8 @@ public class UIEngine<T extends UIAdapter> {
                         List list = (List) inputState.lastGUIMouseHover;
                         UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                         Object selectedListItem = null;
-                        if(inputState.itemInfo_listValid){
-                            selectedListItem =  (inputState.itemInfo_listIndex < list.items.size()) ? list.items.get(inputState.itemInfo_listIndex) : null;
+                        if (inputState.itemInfo_listValid) {
+                            selectedListItem = (inputState.itemInfo_listIndex < list.items.size()) ? list.items.get(inputState.itemInfo_listIndex) : null;
                         }
                         if (selectedListItem != null) {
                             if (list.multiSelect) {
@@ -542,7 +542,7 @@ public class UIEngine<T extends UIAdapter> {
                             if (list.dragEnabled) {
                                 inputState.listDrag_from_index = inputState.itemInfo_listIndex;
                                 inputState.listDrag_offset.x = inputState.mouse_gui.x - (UICommons.component_getAbsoluteX(list));
-                                inputState.listDrag_offset.y = (inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list))%8;
+                                inputState.listDrag_offset.y = (inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) % 8;
                                 inputState.listDrag_Item = selectedListItem;
                                 inputState.listDrag_List = list;
                             }
@@ -667,7 +667,8 @@ public class UIEngine<T extends UIAdapter> {
                             Tab newTab = tabBar.tabs.get(inputState.itemInfo_tabBarTabIndex);
                             UICommons.tabBar_selectTab(tabBar, inputState.itemInfo_tabBarTabIndex);
                             if (newTab.tabAction != null) newTab.tabAction.onSelect();
-                            if (tabBar.tabBarAction != null) tabBar.tabBarAction.onChangeTab(inputState.itemInfo_tabBarTabIndex);
+                            if (tabBar.tabBarAction != null)
+                                tabBar.tabBarAction.onChangeTab(inputState.itemInfo_tabBarTabIndex);
                         }
 
                     } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
@@ -1480,8 +1481,10 @@ public class UIEngine<T extends UIAdapter> {
     private boolean keyboardMouseDetectUse() {
         for (int i = 0; i <= 10; i++) {
             int[] buttons = keyboardMouseButtons(i);
-            for (int i2 = 0; i2 < buttons.length; i2++) {
-                if (buttons != null && inputState.inputEvents.keysDown[buttons[i2]]) return true;
+            if (buttons != null) {
+                for (int i2 = 0; i2 < buttons.length; i2++) {
+                    if (inputState.inputEvents.keysDown[buttons[i2]]) return true;
+                }
             }
         }
         return false;
@@ -1504,8 +1507,10 @@ public class UIEngine<T extends UIAdapter> {
 
         for (int i = 0; i <= 6; i++) {
             int[] buttons = gamePadMouseButtons(i);
-            for (int i2 = 0; i2 < buttons.length; i2++) {
-                if (buttons != null && inputState.inputEvents.gamePadButtonsDown[buttons[i2]]) return true;
+            if (buttons != null) {
+                for (int i2 = 0; i2 < buttons.length; i2++) {
+                    if (inputState.inputEvents.gamePadButtonsDown[buttons[i2]]) return true;
+                }
             }
         }
         return false;
@@ -2193,6 +2198,7 @@ public class UIEngine<T extends UIAdapter> {
     public void render() {
         render(false);
     }
+
     public void render(boolean frameBuffersOnly) {
 
         // Draw Game
@@ -2231,7 +2237,7 @@ public class UIEngine<T extends UIAdapter> {
             );
             inputState.frameBuffer_screen.end();
             // Draw to Screen
-            if(!frameBuffersOnly) {
+            if (!frameBuffersOnly) {
                 inputState.viewport_screen.apply();
                 render_glClear();
                 inputState.spriteBatch_screen.begin();
@@ -2515,7 +2521,7 @@ public class UIEngine<T extends UIAdapter> {
                 /* Text */
                 for (int i = 0; i < combobox.items.size(); i++) {
                     ComboBoxItem comboBoxItem = combobox.items.get(i);
-                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1,(combobox.width * TILE_SIZE), comboBoxItem.icon, comboBoxItem.iconIndex);
+                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, (combobox.width * TILE_SIZE), comboBoxItem.icon, comboBoxItem.iconIndex);
                 }
             }
 
@@ -2800,7 +2806,7 @@ public class UIEngine<T extends UIAdapter> {
             if (button.getClass() == TextButton.class) {
                 TextButton textButton = (TextButton) button;
                 if (textButton.text != null) {
-                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE,textButton.icon, textButton.iconArrayIndex);
+                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconArrayIndex);
                 }
             } else if (button.getClass() == ImageButton.class) {
                 ImageButton imageButton = (ImageButton) button;
@@ -2936,7 +2942,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             // Text
             if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1,(combobox.width - 1) * TILE_SIZE, combobox.selectedItem.icon, combobox.selectedItem.iconIndex);
+                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, (combobox.width - 1) * TILE_SIZE, combobox.selectedItem.icon, combobox.selectedItem.iconIndex);
             }
         } else if (component.getClass() == Knob.class) {
             Knob knob = (Knob) component;
@@ -3099,7 +3105,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 if (!tabBar.bigIconMode) {
-                    render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tabWidth*UIEngine.TILE_SIZE,tab.icon, tab.iconIndex);
+                    render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tabWidth * UIEngine.TILE_SIZE, tab.icon, tab.iconIndex);
                 }
                 tabXOffset += tabWidth;
             }
@@ -3257,7 +3263,7 @@ public class UIEngine<T extends UIAdapter> {
         render_fontSaveColor(font);
         render_fontSetAlpha(font, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            maxWidth -= ((withIcon ? TILE_SIZE : 0)+textXOffset);
+            maxWidth -= ((withIcon ? TILE_SIZE : 0) + textXOffset);
             mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
             mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text, maxWidth);
@@ -3365,40 +3371,47 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.shutdown();
     }
 
-    public int getInternalResolutionWidth(){
+    public int getInternalResolutionWidth() {
         return inputState.internalResolutionWidth;
     }
-    public int getInternalResolutionHeight(){
+
+    public int getInternalResolutionHeight() {
         return inputState.internalResolutionHeight;
     }
-    public ViewportMode getViewportMode(){
+
+    public ViewportMode getViewportMode() {
         return inputState.viewportMode;
     }
-    public int getViewPortScreenX(){
+
+    public int getViewPortScreenX() {
         return inputState.viewport_screen.getScreenX();
     }
-    public int getViewPortScreenY(){
+
+    public int getViewPortScreenY() {
         return inputState.viewport_screen.getScreenY();
     }
-    public int getViewPortScreenWidth(){
+
+    public int getViewPortScreenWidth() {
         return inputState.viewport_screen.getScreenWidth();
     }
-    public int getViewPortScreenHeight(){
+
+    public int getViewPortScreenHeight() {
         return inputState.viewport_screen.getScreenHeight();
     }
-    public boolean isGamePadSupport(){
+
+    public boolean isGamePadSupport() {
         return inputState.gamePadSupport;
     }
 
-    public TextureRegion getTextureScreen(){
+    public TextureRegion getTextureScreen() {
         return inputState.texture_screen;
     }
 
-    public TextureRegion getTextureGame(){
+    public TextureRegion getTextureGame() {
         return inputState.texture_game;
     }
 
-    public TextureRegion getTextureGUI(){
+    public TextureRegion getTextureGUI() {
         return inputState.texture_game;
     }
 }
