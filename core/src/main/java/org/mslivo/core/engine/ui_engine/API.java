@@ -1619,8 +1619,8 @@ public class API {
         private int[] gamePadMouseButtonsMouse5 = new int[]{};
         private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
         private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
-        private float emulatedMouseCursorSpeed = 4.0f;
-        private boolean emulatedMouseMagnetModeEnabled = true;
+        private float simulatedMouseCursorSpeed = 4.0f;
+        private boolean simulatedMouseMagnetModeEnabled = true;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private Color windowsDefaultColor = Color.WHITE.cpy();
         private Color componentsDefaultColor = Color.WHITE.cpy();
@@ -1983,20 +1983,20 @@ public class API {
             this.tooltipFadeInDelayTime = Tools.Calc.lowerBounds(tooltipFadeInDelayTime, 0);
         }
 
-        public float getEmulatedMouseCursorSpeed() {
-            return emulatedMouseCursorSpeed;
+        public float getSimulatedMouseCursorSpeed() {
+            return simulatedMouseCursorSpeed;
         }
 
-        public void setEmulatedMouseCursorSpeed(float emulatedMouseCursorSpeed) {
-            this.emulatedMouseCursorSpeed = emulatedMouseCursorSpeed;
+        public void setSimulatedMouseCursorSpeed(float simulatedMouseCursorSpeed) {
+            this.simulatedMouseCursorSpeed = simulatedMouseCursorSpeed;
         }
 
-        public boolean isEmulatedMouseMagnetModeEnabled() {
-            return emulatedMouseMagnetModeEnabled;
+        public boolean isSimulatedMouseMagnetModeEnabled() {
+            return simulatedMouseMagnetModeEnabled;
         }
 
-        public void setEmulatedMouseMagnetModeEnabled(boolean emulatedMouseMagnetModeEnabled) {
-            this.emulatedMouseMagnetModeEnabled = emulatedMouseMagnetModeEnabled;
+        public void setSimulatedMouseMagnetModeEnabled(boolean simulatedMouseMagnetModeEnabled) {
+            this.simulatedMouseMagnetModeEnabled = simulatedMouseMagnetModeEnabled;
         }
 
         public boolean isUiKeyInteractionsDisabled() {
@@ -2167,8 +2167,8 @@ public class API {
             setGamePadMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setGamePadMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
             setGamePadMouseJoystickDeadZone(config.getGamePadMouseJoystickDeadZone());
-            setEmulatedMouseMagnetModeEnabled(config.isEmulatedMouseMagnetModeEnabled());
-            setEmulatedMouseCursorSpeed(config.getEmulatedMouseCursorSpeed());
+            setSimulatedMouseMagnetModeEnabled(config.isSimulatedMouseMagnetModeEnabled());
+            setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
             setDefaultLowerCaseCharacters(config.getDefaultLowerCaseCharacters());

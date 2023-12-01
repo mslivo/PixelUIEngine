@@ -1659,7 +1659,7 @@ public class UIEngine<T extends UIAdapter> {
         if (moveButtonPressed) {
             inputState.siumlatedMouseSpeedUp = inputState.siumlatedMouseSpeedUp < 1f ? inputState.siumlatedMouseSpeedUp + 0.25f : inputState.siumlatedMouseSpeedUp;
 
-            float moveSpeed = api.config.getEmulatedMouseCursorSpeed() * inputState.siumlatedMouseSpeedUp;
+            float moveSpeed = api.config.getSimulatedMouseCursorSpeed() * inputState.siumlatedMouseSpeedUp;
             if (buttonUp)
                 deltaY -= MathUtils.round(moveSpeed);
             if (buttonDown)
@@ -1671,7 +1671,7 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             inputState.siumlatedMouseSpeedUp = 0;
             // Magnet
-            if (api.config.isEmulatedMouseMagnetModeEnabled()) {
+            if (api.config.isSimulatedMouseMagnetModeEnabled()) {
                 boolean magnetPossible = false;
                 if (inputState.lastGUIMouseHover != null) {
                     if (inputState.modalWindow != null) {
