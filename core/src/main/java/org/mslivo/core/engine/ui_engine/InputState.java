@@ -166,32 +166,21 @@ public class InputState {
     /* #################### Control #################### */
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
     public MouseControlMode currentControlMode;
-
     public GridPoint2 mouse;
-
     public GridPoint2 mouse_gui;
-
     public GridPoint2 mouse_delta;
-
     public CMediaCursor cursor;
-
     public MouseTool mouseTool;
-
     public boolean mouseToolPressed;
-
     public CMediaCursor overrideCursor;
-
     public boolean displayOverrideCursor;
-
     public Vector3 vector_fboCursor;
-
     public Vector2 vector2_unproject;
-
     public GridPoint2 hardwareMouseLastPosition;
     public Vector2 simulatedMouseGUIPosition;
-    public long keyBoardMouseLastMouseClick;
-    public float keyBoardMouseSpeedUp;
-    public boolean[] keyBoardMouseIsMouseButtonDown;
+    public long simulatedMouseLastMouseClick;
+    public Vector2 keyBoardMouseSpeedUp;
+    public boolean[] simulatedMouseIsButtonDown;
     public boolean[] keyBoardTranslatedKeysDown;
     public Vector2 gamePadTranslatedStickLeft;
     public Vector2 gamePadTranslatedStickRight;

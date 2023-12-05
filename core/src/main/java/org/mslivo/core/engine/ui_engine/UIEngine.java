@@ -234,10 +234,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
         newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2, internalResolutionHeight / 2);
-        newInputState.hardwareMouseLastPosition = new GridPoint2(0,0);
-        newInputState.keyBoardMouseLastMouseClick = 0;
-        newInputState.keyBoardMouseSpeedUp = 0f;
-        newInputState.keyBoardMouseIsMouseButtonDown = new boolean[]{false, false, false, false, false};
+        newInputState.hardwareMouseLastPosition = new GridPoint2(0, 0);
+        newInputState.simulatedMouseLastMouseClick = 0;
+        newInputState.keyBoardMouseSpeedUp = new Vector2(0,0);
+        newInputState.simulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
         newInputState.keyBoardTranslatedKeysDown = new boolean[256];
         newInputState.gamePadTranslatedButtonsDown = new boolean[15];
         newInputState.gamePadTranslatedStickLeft = new Vector2(0, 0);
@@ -1140,9 +1140,10 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.currentControlMode != MouseControlMode.DISABLED) {
             // Translate Keys
             switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {}
-                case GAMEPAD -> gamePadMouseTranslateAndClearEvents();
-                case KEYBOARD -> keyboardMouseTranslateAndClearEvents();
+                case HARDWARE_MOUSE -> {
+                }
+                case GAMEPAD -> gamePadMouseTranslateAndChokeEvents();
+                case KEYBOARD -> keyboardMouseTranslateAndChokeEvents();
                 case DISABLED -> throw new RuntimeException(); // invalid state for this function
             }
 
@@ -1151,7 +1152,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Translate to Text Input
                 updateMouseTextInputControl();
             } else {
-                // Translate to Cursor
+                // Translate to MouseGUI position
                 switch (inputState.currentControlMode) {
                     case HARDWARE_MOUSE -> updateHardwareMouseControl();
                     case KEYBOARD -> updateKeyBoardMouseControl();
@@ -1160,7 +1161,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
         } else {
-            chokeAllMouseEvents();
+            chockeAllMouseEvents();
         }
 
         // Translate MouseXGUI/MouseYGUI to Game X/Y
@@ -1398,7 +1399,7 @@ public class UIEngine<T extends UIAdapter> {
         return;
     }
 
-    private void chokeAllMouseEvents() {
+    private void chockeAllMouseEvents() {
         // clear all mouse inputs
         inputState.inputEvents.mouseMoved = false;
         inputState.inputEvents.mouseDragged = false;
@@ -1454,30 +1455,30 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        // Set Next ControlMode
+
         if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
+            // Clean up current control mode
             switch (inputState.currentControlMode) {
                 case HARDWARE_MOUSE -> {
                     // Save last position, for reuse detection
                     inputState.hardwareMouseLastPosition.x = Gdx.input.getX();
                     inputState.hardwareMouseLastPosition.y = Gdx.input.getY();
                 }
-                case KEYBOARD -> {
+                case GAMEPAD, KEYBOARD -> {
                     // Reset temporary variables
-                    for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
-                        inputState.keyBoardTranslatedKeysDown[i] = false;
-                    inputState.keyBoardMouseSpeedUp = 0f;
-                    for(int i=0;i<=4;i++)inputState.keyBoardMouseIsMouseButtonDown[i] = false;
-                    inputState.keyBoardMouseLastMouseClick = 0;
-                }
-                case GAMEPAD -> {
-                    // Reset temporary variables
-                    for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
-                        inputState.gamePadTranslatedButtonsDown[i] = false;
-                    inputState.gamePadTranslatedStickLeft.set(0f, 0f);
-                    inputState.gamePadTranslatedStickRight.set(0f, 0f);
+                    if (inputState.currentControlMode == MouseControlMode.GAMEPAD) {
+                        for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
+                            inputState.keyBoardTranslatedKeysDown[i] = false;
+                    } else if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                        for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
+                            inputState.gamePadTranslatedButtonsDown[i] = false;
+                        inputState.keyBoardMouseSpeedUp.set(0f,0f);
+                    }
+                    for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
+                    inputState.simulatedMouseLastMouseClick = 0;
                 }
             }
+            // Set Next ControlMode
             switch (nextControlMode) {
                 case GAMEPAD, KEYBOARD -> {
                     // Set simulated mouse position to current
@@ -1561,7 +1562,7 @@ public class UIEngine<T extends UIAdapter> {
         };
     }
 
-    private void gamePadMouseTranslateAndClearEvents() {
+    private void gamePadMouseTranslateAndChokeEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 6; i++) {
             int[] buttons = gamePadMouseButtons(i);
@@ -1628,7 +1629,7 @@ public class UIEngine<T extends UIAdapter> {
 
     }
 
-    private void keyboardMouseTranslateAndClearEvents() {
+    private void keyboardMouseTranslateAndChokeEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
             int[] buttons = keyboardMouseButtons(i);
@@ -1662,14 +1663,14 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
+
     private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
                                                boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
-                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorSpeedX,float cursorSpeedY
+                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorSpeedX, float cursorSpeedY
     ) {
         float deltaX = 0;
         float deltaY = 0;
-        boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
-        if (moveButtonPressed) {
+        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
             float moveSpeedX = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedX;
             if (buttonLeft) deltaX -= moveSpeedX;
             if (buttonRight) deltaX += moveSpeedX;
@@ -1678,142 +1679,19 @@ public class UIEngine<T extends UIAdapter> {
             if (buttonDown) deltaY += moveSpeedY;
         } else {
             // Magnet Mode (Mouse sticks to UI elements)
-            if (api.config.isSimulatedMouseMagnetModeEnabled()) {
-                boolean magnetPossible = false;
-                if (inputState.lastGUIMouseHover != null) {
-                    if (inputState.modalWindow != null) {
-                        if (inputState.lastGUIMouseHover.getClass() == Window.class && inputState.lastGUIMouseHover == inputState.modalWindow) {
-                            magnetPossible = true;
-                        } else if (inputState.lastGUIMouseHover instanceof Component component) {
-                            if (component.addedToWindow == inputState.modalWindow) magnetPossible = true;
-                        }
-                    } else {
-                        magnetPossible = true;
-                    }
-                }
-                if (magnetPossible) {
-                    boolean magnetActive = false;
-                    int magnet_x = 0, magnet_y = 0;
-                    if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                        Window window = (Window) inputState.lastGUIMouseHover;
-                        if (window.moveAble && window.hasTitleBar && window.visible) {
-                            if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                                    window.x, window.y + (window.height - 1) * UIEngine.TILE_SIZE,
-                                    window.width * UIEngine.TILE_SIZE,
-                                    UIEngine.TILE_SIZE)
-                            ) {
-                                magnet_x = inputState.mouse_gui.x;
-                                magnet_y = (window.y + (window.height) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            }
-                        }
-                    } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
-                        ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
-                        magnet_x = inputState.mouse_gui.x;
-                        magnet_y = contextMenuItem.addedToContextMenu.y - (((contextMenuItem.addedToContextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover instanceof Component component) {
-                        if (!component.disabled && component.visible) {
-                            if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                                List list = (List) inputState.lastGUIMouseHover;
-                                magnet_x = inputState.mouse_gui.x;
-                                magnet_y = UICommons.component_getAbsoluteY(list)
-                                        + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) + UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            }
-                            if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                                Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                                int cellSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
-                                int cellSize2 = cellSize / 2;
-                                magnet_x = UICommons.component_getAbsoluteX(inventory)
-                                        + (((inputState.mouse_gui.x - UICommons.component_getAbsoluteX(inventory)) / cellSize) * cellSize) + cellSize2;
-                                magnet_y = UICommons.component_getAbsoluteY(inventory)
-                                        + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(inventory)) / cellSize) * cellSize) + cellSize2;
-                                magnetActive = true;
-                            } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
-                                ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                                magnet_x = UICommons.component_getAbsoluteX(scrollBarVertical) + UIEngine.TILE_SIZE_2;
-                                magnet_y = inputState.mouse_gui.y;
-                                magnetActive = true;
-                            } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
-                                ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                                magnet_x = inputState.mouse_gui.x;
-                                magnet_y = UICommons.component_getAbsoluteY(scrollBarHorizontal) + UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
-                                TextField textField = (TextField) inputState.lastGUIMouseHover;
-                                magnet_x = inputState.mouse_gui.x;
-                                magnet_y = UICommons.component_getAbsoluteY(textField) + UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
-                                ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                                if (!UICommons.comboBox_isOpen(comboBox, inputState)) {
-                                    magnet_x = inputState.mouse_gui.x;
-                                    magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
-                                    magnetActive = true;
-                                } else {
-                                    magnet_x = inputState.mouse_gui.x;
-                                    magnet_y = UICommons.component_getAbsoluteY(comboBox) - (((UICommons.component_getAbsoluteY(comboBox) - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                                    magnetActive = true;
-                                }
-                            } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
-                                CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                                magnet_x = UICommons.component_getAbsoluteX(checkBox) + UIEngine.TILE_SIZE_2;
-                                magnet_y = UICommons.component_getAbsoluteY(checkBox) + UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
-                                TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-                                int xTab = tabBar.tabOffset;
-                                for (int i = 0; i < tabBar.tabs.size(); i++) {
-                                    Tab tab = tabBar.tabs.get(i);
-                                    if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                                            UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE),
-                                            UICommons.component_getAbsoluteY(tabBar),
-                                            tab.width * UIEngine.TILE_SIZE,
-                                            tabBar.height * UIEngine.TILE_SIZE
-                                    )
-                                    ) {
-                                        magnet_x = UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE) + (tab.width * UIEngine.TILE_SIZE_2);
-                                        magnet_y = UICommons.component_getAbsoluteY(tabBar) + UIEngine.TILE_SIZE_2;
-                                        magnetActive = true;
-                                    }
-                                    xTab += tab.width;
-                                }
-                            } else if (inputState.lastGUIMouseHover instanceof Button button) {
-                                magnet_x = UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
-                                magnet_y = UICommons.component_getAbsoluteY(button) + (button.height * UIEngine.TILE_SIZE_2);
-                                magnetActive = true;
-                            }
-                        }
-                    }
-                    // Move Cursor
-                    if (magnetActive) {
-                        if (inputState.mouse_gui.x < magnet_x) {
-                            deltaX = (magnet_x - inputState.mouse_gui.x) / 4f;
-                        } else if (inputState.mouse_gui.x > magnet_x) {
-                            deltaX = -(inputState.mouse_gui.x - magnet_x) / 4f;
-                        }
-                        if (inputState.mouse_gui.y < magnet_y) {
-                            deltaY = -(magnet_y - inputState.mouse_gui.y) / 4f;
-                        } else if (inputState.mouse_gui.y > magnet_y) {
-                            deltaY = (inputState.mouse_gui.y - magnet_y) / 4f;
-                        }
-                    }
-                }
-            }
         }
 
         // Set to final
-        inputState.simulatedMouseGUIPosition.x = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.x+deltaX, 0,inputState.internalResolutionWidth);
-        inputState.simulatedMouseGUIPosition.y = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.y-deltaY, 0,inputState.internalResolutionHeight);
+        inputState.simulatedMouseGUIPosition.x = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.x + deltaX, 0, inputState.internalResolutionWidth);
+        inputState.simulatedMouseGUIPosition.y = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.y - deltaY, 0, inputState.internalResolutionHeight);
         int newCursorPositionX = MathUtils.round(inputState.simulatedMouseGUIPosition.x);
         int newCursorPositionY = MathUtils.round(inputState.simulatedMouseGUIPosition.y);
-        inputState.mouse_delta.x = newCursorPositionX-inputState.mouse_gui.x;
-        inputState.mouse_delta.y = newCursorPositionY-inputState.mouse_gui.y;
+        inputState.mouse_delta.x = newCursorPositionX - inputState.mouse_gui.x;
+        inputState.mouse_delta.y = newCursorPositionY - inputState.mouse_gui.y;
         inputState.mouse_gui.x = newCursorPositionX;
         inputState.mouse_gui.y = newCursorPositionY;
 
-        // Emulate Mouse Button Press Events
+        // Simluate Mouse Button Press Events
         boolean anyButtonChanged = false;
         for (int i = 0; i <= 4; i++) {
             boolean buttonMouseDown = switch (i) {
@@ -1824,18 +1702,18 @@ public class UIEngine<T extends UIAdapter> {
                 case 4 -> buttonMouse5Down;
                 default -> throw new IllegalStateException("Unexpected value: " + i);
             };
-            if (inputState.keyBoardMouseIsMouseButtonDown[i] != buttonMouseDown) {
-                inputState.keyBoardMouseIsMouseButtonDown[i] = buttonMouseDown;
-                if (inputState.keyBoardMouseIsMouseButtonDown[i]) {
+            if (inputState.simulatedMouseIsButtonDown[i] != buttonMouseDown) {
+                inputState.simulatedMouseIsButtonDown[i] = buttonMouseDown;
+                if (inputState.simulatedMouseIsButtonDown[i]) {
                     inputState.inputEvents.mouseDown = true;
                     inputState.inputEvents.mouseDownButtons.add(i);
                     anyButtonChanged = true;
                     if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.keyBoardMouseLastMouseClick) < DOUBLECLICK_TIME_MS) {
+                        if ((System.currentTimeMillis() - inputState.simulatedMouseLastMouseClick) < DOUBLECLICK_TIME_MS) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
-                        inputState.keyBoardMouseLastMouseClick = System.currentTimeMillis();
+                        inputState.simulatedMouseLastMouseClick = System.currentTimeMillis();
                     }
 
                 } else {
@@ -1844,7 +1722,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                 }
             }
-            inputState.inputEvents.mouseButtonsDown[i] = inputState.keyBoardMouseIsMouseButtonDown[i];
+            inputState.inputEvents.mouseButtonsDown[i] = inputState.simulatedMouseIsButtonDown[i];
         }
         if (!anyButtonChanged) {
             inputState.inputEvents.mouseDown = false;
@@ -1854,13 +1732,13 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseUpButtons.clear();
         }
 
-        // Emulate Mouse Move Events
+        // Simluate Mouse Move Events
         if (deltaX != 0 || deltaY != 0) {
             inputState.inputEvents.mouseMoved = true;
             inputState.inputEvents.mouseDragged = false;
             draggedLoop:
             for (int i = 0; i <= 4; i++) {
-                if (inputState.keyBoardMouseIsMouseButtonDown[i]) {
+                if (inputState.simulatedMouseIsButtonDown[i]) {
                     inputState.inputEvents.mouseDragged = true;
                     inputState.inputEvents.mouseMoved = false;
                     break draggedLoop;
@@ -1871,7 +1749,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseMoved = false;
         }
 
-        // Emulate Mouse Scroll Events
+        // Simluate Mouse Scroll Events
         inputState.inputEvents.mouseScrolled = buttonScrolledUp || buttonScrolledDown;
         inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
     }
@@ -1910,18 +1788,18 @@ public class UIEngine<T extends UIAdapter> {
 
         float cursorSpeedX = 0f;
         if (buttonLeft || buttonRight) {
-            cursorSpeedX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x),Math.abs(inputState.gamePadTranslatedStickRight.x));
+            cursorSpeedX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickRight.x));
             cursorSpeedX = (cursorSpeedX - joystickDeadZone) / (1f - joystickDeadZone);
         }
         float cursorSpeedY = 0f;
         if (buttonUp || buttonDown) {
-            cursorSpeedY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y),Math.abs(inputState.gamePadTranslatedStickRight.y));
+            cursorSpeedY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y), Math.abs(inputState.gamePadTranslatedStickRight.y));
             cursorSpeedY = (cursorSpeedY - joystickDeadZone) / (1f - joystickDeadZone);
         }
         // Translate to mouse events
         translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
                 buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, cursorSpeedX,cursorSpeedY
+                buttonScrolledUp, buttonScrolledDown, cursorSpeedX, cursorSpeedY
         );
     }
 
@@ -1946,15 +1824,22 @@ public class UIEngine<T extends UIAdapter> {
         boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsScrollUp());
         boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsScrollDown());
 
-        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            inputState.keyBoardMouseSpeedUp = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp < 1f ? inputState.keyBoardMouseSpeedUp + 0.1f : inputState.keyBoardMouseSpeedUp, 0f, 1f);
-        } else {
-            inputState.keyBoardMouseSpeedUp = 0;
+        final float SPEEDUP_SPEED = 0.1f;
+        if (buttonLeft || buttonRight){
+            inputState.keyBoardMouseSpeedUp.x = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
+        }else{
+            inputState.keyBoardMouseSpeedUp.set(0,inputState.keyBoardMouseSpeedUp.y);
         }
+        if(buttonUp || buttonDown){
+            inputState.keyBoardMouseSpeedUp.y = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
+        }else{
+            inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x,0);
+        }
+
         // Translate to mouse events
         translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
                 buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp,inputState.keyBoardMouseSpeedUp
+                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp.x, inputState.keyBoardMouseSpeedUp.y
         );
     }
 
@@ -3434,4 +3319,130 @@ public class UIEngine<T extends UIAdapter> {
     public TextureRegion getTextureGUI() {
         return inputState.texture_game;
     }
+
+        /*private void calculateMagnetModeMouseMovements(){
+        float deltaX = 0f;
+        float deltaY = 0f;
+        boolean magnetPossible = false;
+        if (inputState.lastGUIMouseHover != null) {
+            if (inputState.modalWindow != null) {
+                if (inputState.lastGUIMouseHover.getClass() == Window.class && inputState.lastGUIMouseHover == inputState.modalWindow) {
+                    magnetPossible = true;
+                } else if (inputState.lastGUIMouseHover instanceof Component component) {
+                    if (component.addedToWindow == inputState.modalWindow) magnetPossible = true;
+                }
+            } else {
+                magnetPossible = true;
+            }
+        }
+        if (magnetPossible) {
+            boolean magnetActive = false;
+            int magnet_x = 0, magnet_y = 0;
+            if (inputState.lastGUIMouseHover.getClass() == Window.class) {
+                Window window = (Window) inputState.lastGUIMouseHover;
+                if (window.moveAble && window.hasTitleBar && window.visible) {
+                    if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                            window.x, window.y + (window.height - 1) * UIEngine.TILE_SIZE,
+                            window.width * UIEngine.TILE_SIZE,
+                            UIEngine.TILE_SIZE)
+                    ) {
+                        magnet_x = inputState.mouse_gui.x;
+                        magnet_y = (window.y + (window.height) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
+                    }
+                }
+            } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
+                ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
+                magnet_x = inputState.mouse_gui.x;
+                magnet_y = contextMenuItem.addedToContextMenu.y - (((contextMenuItem.addedToContextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                magnetActive = true;
+            } else if (inputState.lastGUIMouseHover instanceof Component component) {
+                if (!component.disabled && component.visible) {
+                    if (inputState.lastGUIMouseHover.getClass() == List.class) {
+                        List list = (List) inputState.lastGUIMouseHover;
+                        magnet_x = inputState.mouse_gui.x;
+                        magnet_y = UICommons.component_getAbsoluteY(list)
+                                + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) + UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
+                    }
+                    if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
+                        Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
+                        int cellSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
+                        int cellSize2 = cellSize / 2;
+                        magnet_x = UICommons.component_getAbsoluteX(inventory)
+                                + (((inputState.mouse_gui.x - UICommons.component_getAbsoluteX(inventory)) / cellSize) * cellSize) + cellSize2;
+                        magnet_y = UICommons.component_getAbsoluteY(inventory)
+                                + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(inventory)) / cellSize) * cellSize) + cellSize2;
+                        magnetActive = true;
+                    } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
+                        ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
+                        magnet_x = UICommons.component_getAbsoluteX(scrollBarVertical) + UIEngine.TILE_SIZE_2;
+                        magnet_y = inputState.mouse_gui.y;
+                        magnetActive = true;
+                    } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
+                        ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
+                        magnet_x = inputState.mouse_gui.x;
+                        magnet_y = UICommons.component_getAbsoluteY(scrollBarHorizontal) + UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
+                    } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
+                        TextField textField = (TextField) inputState.lastGUIMouseHover;
+                        magnet_x = inputState.mouse_gui.x;
+                        magnet_y = UICommons.component_getAbsoluteY(textField) + UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
+                    } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
+                        ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
+                        if (!UICommons.comboBox_isOpen(comboBox, inputState)) {
+                            magnet_x = inputState.mouse_gui.x;
+                            magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
+                            magnetActive = true;
+                        } else {
+                            magnet_x = inputState.mouse_gui.x;
+                            magnet_y = UICommons.component_getAbsoluteY(comboBox) - (((UICommons.component_getAbsoluteY(comboBox) - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
+                            magnetActive = true;
+                        }
+                    } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
+                        CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
+                        magnet_x = UICommons.component_getAbsoluteX(checkBox) + UIEngine.TILE_SIZE_2;
+                        magnet_y = UICommons.component_getAbsoluteY(checkBox) + UIEngine.TILE_SIZE_2;
+                        magnetActive = true;
+                    } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
+                        TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
+                        int xTab = tabBar.tabOffset;
+                        for (int i = 0; i < tabBar.tabs.size(); i++) {
+                            Tab tab = tabBar.tabs.get(i);
+                            if (Tools.Calc.Tiles.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                    UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE),
+                                    UICommons.component_getAbsoluteY(tabBar),
+                                    tab.width * UIEngine.TILE_SIZE,
+                                    tabBar.height * UIEngine.TILE_SIZE
+                            )
+                            ) {
+                                magnet_x = UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE) + (tab.width * UIEngine.TILE_SIZE_2);
+                                magnet_y = UICommons.component_getAbsoluteY(tabBar) + UIEngine.TILE_SIZE_2;
+                                magnetActive = true;
+                            }
+                            xTab += tab.width;
+                        }
+                    } else if (inputState.lastGUIMouseHover instanceof Button button) {
+                        magnet_x = UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
+                        magnet_y = UICommons.component_getAbsoluteY(button) + (button.height * UIEngine.TILE_SIZE_2);
+                        magnetActive = true;
+                    }
+                }
+            }
+            // Move Cursor
+            if (magnetActive) {
+                if (inputState.mouse_gui.x < magnet_x) {
+                    deltaX = (magnet_x - inputState.mouse_gui.x) / 4f;
+                } else if (inputState.mouse_gui.x > magnet_x) {
+                    deltaX = -(inputState.mouse_gui.x - magnet_x) / 4f;
+                }
+                if (inputState.mouse_gui.y < magnet_y) {
+                    deltaY = -(magnet_y - inputState.mouse_gui.y) / 4f;
+                } else if (inputState.mouse_gui.y > magnet_y) {
+                    deltaY = (inputState.mouse_gui.y - magnet_y) / 4f;
+                }
+            }
+        }
+    }*/
 }

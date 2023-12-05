@@ -1620,7 +1620,6 @@ public class API {
         private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
         private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
         private float simulatedMouseCursorSpeed = 4.0f;
-        private boolean simulatedMouseMagnetModeEnabled = false;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private Color windowsDefaultColor = Color.WHITE.cpy();
         private Color componentsDefaultColor = Color.WHITE.cpy();
@@ -1991,14 +1990,6 @@ public class API {
             this.simulatedMouseCursorSpeed = simulatedMouseCursorSpeed;
         }
 
-        public boolean isSimulatedMouseMagnetModeEnabled() {
-            return simulatedMouseMagnetModeEnabled;
-        }
-
-        public void setSimulatedMouseMagnetModeEnabled(boolean simulatedMouseMagnetModeEnabled) {
-            this.simulatedMouseMagnetModeEnabled = simulatedMouseMagnetModeEnabled;
-        }
-
         public boolean isUiKeyInteractionsDisabled() {
             return uiKeyInteractionsDisabled;
         }
@@ -2167,7 +2158,6 @@ public class API {
             setGamePadMouseButtonsScrollDown(config.getKeyboardMouseButtonsScrollDown());
             setGamePadMouseButtonsScrollUp(config.getKeyboardMouseButtonsScrollUp());
             setGamePadMouseJoystickDeadZone(config.getGamePadMouseJoystickDeadZone());
-            setSimulatedMouseMagnetModeEnabled(config.isSimulatedMouseMagnetModeEnabled());
             setSimulatedMouseCursorSpeed(config.getSimulatedMouseCursorSpeed());
             setUiKeyInteractionsDisabled(config.isUiKeyInteractionsDisabled());
             setUiMouseInteractionsDisabled(config.isUiMouseInteractionsDisabled());
