@@ -233,8 +233,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.hardwareMouseLastPosition = new GridPoint2(0, 0);
-        newInputState.simulatedMousePosition = new Vector2(0, 0);
+        newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2, internalResolutionHeight / 2);
+        newInputState.hardwareMouseLastPosition = new GridPoint2(0,0);
         newInputState.keyBoardMouseLastMouseClick = 0;
         newInputState.keyBoardMouseSpeedUp = 0f;
         newInputState.keyBoardMouseIsMouseButtonDown = new boolean[]{false, false, false, false, false};
@@ -1140,11 +1140,10 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.currentControlMode != MouseControlMode.DISABLED) {
             // Translate Keys
             switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {
-                }
+                case HARDWARE_MOUSE -> {}
                 case GAMEPAD -> gamePadMouseTranslateAndClearEvents();
                 case KEYBOARD -> keyboardMouseTranslateAndClearEvents();
-                case DISABLED -> throw new RuntimeException();
+                case DISABLED -> throw new RuntimeException(); // invalid state for this function
             }
 
             // Update OnScreenTextinput or Mouse Cursor
@@ -1157,7 +1156,7 @@ public class UIEngine<T extends UIAdapter> {
                     case HARDWARE_MOUSE -> updateHardwareMouseControl();
                     case KEYBOARD -> updateKeyBoardMouseControl();
                     case GAMEPAD -> updateGamePadMouseControl();
-                    case DISABLED -> throw new RuntimeException();
+                    case DISABLED -> throw new RuntimeException(); // invalid state for this function
                 }
             }
         } else {
@@ -1482,7 +1481,7 @@ public class UIEngine<T extends UIAdapter> {
             switch (nextControlMode) {
                 case GAMEPAD, KEYBOARD -> {
                     // Set simulated mouse position to current
-                    this.inputState.simulatedMousePosition.set(inputState.mouse_gui.x, inputState.mouse_gui.y);
+                    this.inputState.simulatedMouseGUIPosition.set(inputState.mouse_gui.x, inputState.mouse_gui.y);
                 }
             }
             inputState.currentControlMode = nextControlMode;
@@ -1806,10 +1805,10 @@ public class UIEngine<T extends UIAdapter> {
 
 
         // Set to final
-        inputState.simulatedMousePosition.x += deltaX;
-        inputState.simulatedMousePosition.y -= deltaY;
-        int newCursorPositionX = MathUtils.round(inputState.simulatedMousePosition.x);
-        int newCursorPositionY = MathUtils.round(inputState.simulatedMousePosition.y);
+        inputState.simulatedMouseGUIPosition.x += deltaX;
+        inputState.simulatedMouseGUIPosition.y -= deltaY;
+        int newCursorPositionX = MathUtils.round(inputState.simulatedMouseGUIPosition.x);
+        int newCursorPositionY = MathUtils.round(inputState.simulatedMouseGUIPosition.y);
         inputState.mouse_delta.x = newCursorPositionX-inputState.mouse_gui.x;
         inputState.mouse_delta.y = newCursorPositionY-inputState.mouse_gui.y;
         inputState.mouse_gui.x = newCursorPositionX;
@@ -1967,9 +1966,6 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateGameMouseXY() {
-        // Enforce mouse gui x
-
-
         // MouseXGUI/MouseYGUI -> To MouseX/MouseY
         inputState.vector_fboCursor.x = inputState.mouse_gui.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_gui.y;

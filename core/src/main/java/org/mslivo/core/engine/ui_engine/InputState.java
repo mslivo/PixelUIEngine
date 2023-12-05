@@ -188,7 +188,7 @@ public class InputState {
     public Vector2 vector2_unproject;
 
     public GridPoint2 hardwareMouseLastPosition;
-    public Vector2 simulatedMousePosition;
+    public Vector2 simulatedMouseGUIPosition;
     public long keyBoardMouseLastMouseClick;
     public float keyBoardMouseSpeedUp;
     public boolean[] keyBoardMouseIsMouseButtonDown;
