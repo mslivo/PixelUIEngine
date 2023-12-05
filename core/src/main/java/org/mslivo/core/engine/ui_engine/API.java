@@ -1609,7 +1609,7 @@ public class API {
         private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
         private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
         private boolean gamePadMouseEnabled = false;
-        private float gamePadMouseJoystickDeadZone = 0.4f;
+        private float gamePadMouseJoystickDeadZone = 0.2f;
         private boolean gamePadMouseStickLeftEnabled = true;
         private boolean gamePadMouseStickRightEnabled = false;
         private int[] gamePadMouseButtonsMouse1 = new int[]{KeyCode.GamePad.A};
@@ -2269,11 +2269,11 @@ public class API {
             return inputState.mouse.y;
         }
 
-        public int mouseXDelta() {
+        public float mouseXDelta() {
             return inputState.mouse_delta.x;
         }
 
-        public int mouseYDelta() {
+        public float mouseYDelta() {
             return inputState.mouse_delta.y;
         }
 
