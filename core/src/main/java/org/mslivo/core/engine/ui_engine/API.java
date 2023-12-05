@@ -1609,7 +1609,7 @@ public class API {
         private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
         private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
         private boolean gamePadMouseEnabled = false;
-        private float gamePadMouseJoystickDeadZone = 0.2f;
+        private float gamePadMouseJoystickDeadZone = 0.3f;
         private boolean gamePadMouseStickLeftEnabled = true;
         private boolean gamePadMouseStickRightEnabled = false;
         private int[] gamePadMouseButtonsMouse1 = new int[]{KeyCode.GamePad.A};
