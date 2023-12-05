@@ -1664,19 +1664,20 @@ public class UIEngine<T extends UIAdapter> {
 
     private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
                                                boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
-                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorSpeed
+                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorSpeedX,float cursorSpeedY
     ) {
         float deltaX = 0;
         float deltaY = 0;
         boolean moveButtonPressed = buttonLeft || buttonRight || buttonUp || buttonDown;
         if (moveButtonPressed) {
-            float moveSpeed = api.config.getSimulatedMouseCursorSpeed() * cursorSpeed;
-            if (buttonUp) deltaY -= moveSpeed;
-            if (buttonDown) deltaY += moveSpeed;
-            if (buttonLeft) deltaX -= moveSpeed;
-            if (buttonRight) deltaX += moveSpeed;
+            float moveSpeedX = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedX;
+            if (buttonLeft) deltaX -= moveSpeedX;
+            if (buttonRight) deltaX += moveSpeedX;
+            float moveSpeedY = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedY;
+            if (buttonUp) deltaY -= moveSpeedY;
+            if (buttonDown) deltaY += moveSpeedY;
         } else {
-            // Magnet
+            // Magnet Mode (Mouse sticks to UI elements)
             if (api.config.isSimulatedMouseMagnetModeEnabled()) {
                 boolean magnetPossible = false;
                 if (inputState.lastGUIMouseHover != null) {
@@ -1690,7 +1691,6 @@ public class UIEngine<T extends UIAdapter> {
                         magnetPossible = true;
                     }
                 }
-
                 if (magnetPossible) {
                     boolean magnetActive = false;
                     int magnet_x = 0, magnet_y = 0;
@@ -1803,10 +1803,9 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-
         // Set to final
-        inputState.simulatedMouseGUIPosition.x += deltaX;
-        inputState.simulatedMouseGUIPosition.y -= deltaY;
+        inputState.simulatedMouseGUIPosition.x = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.x+deltaX, 0,inputState.internalResolutionWidth);
+        inputState.simulatedMouseGUIPosition.y = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.y-deltaY, 0,inputState.internalResolutionHeight);
         int newCursorPositionX = MathUtils.round(inputState.simulatedMouseGUIPosition.x);
         int newCursorPositionY = MathUtils.round(inputState.simulatedMouseGUIPosition.y);
         inputState.mouse_delta.x = newCursorPositionX-inputState.mouse_gui.x;
@@ -1909,17 +1908,20 @@ public class UIEngine<T extends UIAdapter> {
         boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollUp());
         boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollDown());
 
-        float cursorSpeed = 0f;
-        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            cursorSpeed = Math.max(
-                    Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickLeft.y)),
-                    Math.max(Math.abs(inputState.gamePadTranslatedStickRight.x), Math.abs(inputState.gamePadTranslatedStickRight.y)));
-            cursorSpeed = (cursorSpeed - joystickDeadZone) / (1f - joystickDeadZone);
+        float cursorSpeedX = 0f;
+        if (buttonLeft || buttonRight) {
+            cursorSpeedX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x),Math.abs(inputState.gamePadTranslatedStickRight.x));
+            cursorSpeedX = (cursorSpeedX - joystickDeadZone) / (1f - joystickDeadZone);
+        }
+        float cursorSpeedY = 0f;
+        if (buttonUp || buttonDown) {
+            cursorSpeedY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y),Math.abs(inputState.gamePadTranslatedStickRight.y));
+            cursorSpeedY = (cursorSpeedY - joystickDeadZone) / (1f - joystickDeadZone);
         }
         // Translate to mouse events
         translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
                 buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, cursorSpeed
+                buttonScrolledUp, buttonScrolledDown, cursorSpeedX,cursorSpeedY
         );
     }
 
@@ -1952,7 +1954,7 @@ public class UIEngine<T extends UIAdapter> {
         // Translate to mouse events
         translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
                 buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp
+                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp,inputState.keyBoardMouseSpeedUp
         );
     }
 

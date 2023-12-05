@@ -1620,7 +1620,7 @@ public class API {
         private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
         private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
         private float simulatedMouseCursorSpeed = 4.0f;
-        private boolean simulatedMouseMagnetModeEnabled = true;
+        private boolean simulatedMouseMagnetModeEnabled = false;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private Color windowsDefaultColor = Color.WHITE.cpy();
         private Color componentsDefaultColor = Color.WHITE.cpy();
