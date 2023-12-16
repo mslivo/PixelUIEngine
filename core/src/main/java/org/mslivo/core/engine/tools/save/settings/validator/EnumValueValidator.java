@@ -25,7 +25,7 @@ public class EnumValueValidator implements ValueValidator {
     @Override
     public boolean isValueValid(String value) {
         if (!SettingsManager.isValidEnum(value, c)) return false;
-        if (!this.allowedValuesSet.isEmpty() && !this.allowedValuesSet.contains(value)) return false;
+        if (!this.allowedValuesSet.isEmpty() && !this.allowedValuesSet.contains(Enum.valueOf(c, value))) return false;
         return true;
     }
 }
