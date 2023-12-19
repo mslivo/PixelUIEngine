@@ -35,14 +35,18 @@ public class TransitionManager {
     }
 
     public void init(UIEngine from, UIEngine to) {
-        this.init(from, to, null, 1);
+        this.init(from, to, null, 1, false);
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition) {
-        this.init(from, to, transition, 1);
+        this.init(from, to, transition, 1, false);
     }
 
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
+        this.init(from, to, transition, transitionSpeed, false);
+    }
+
+    public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed, boolean updateUIEngine) {
         if(from == null) throw new RuntimeException("UIEngine from is null");
         if(to == null) throw new RuntimeException("UIEngine to is null");
         if (from.getInternalResolutionWidth() != to.getInternalResolutionWidth())
@@ -87,6 +91,7 @@ public class TransitionManager {
         viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         if (from != null) {
+            if(updateUIEngine) from.update();
             from.render(true);
             frameBuffer_from.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);
@@ -96,6 +101,7 @@ public class TransitionManager {
             frameBuffer_from.end();
         }
         if (to != null) {
+            if(updateUIEngine) to.update();
             to.render(true);
             frameBuffer_to.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);
