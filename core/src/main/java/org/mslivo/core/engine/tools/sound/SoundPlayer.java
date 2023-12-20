@@ -102,7 +102,7 @@ public class SoundPlayer {
     }
 
     private long playSound2DInternal(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch, boolean loop) {
-        float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.Tiles.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
+        float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
         playVolume = playVolume * volume * this.volume;
         float pan = 0;
         if (camera_x > position_x) {

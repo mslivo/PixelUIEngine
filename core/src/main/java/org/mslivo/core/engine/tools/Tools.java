@@ -347,160 +347,6 @@ public class Tools {
 
     public static class Calc {
 
-        public static class Tiles {
-
-            private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
-
-            private static void doInRadiusInternal(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
-                for (int iy = -radius; iy <= radius; iy++) {
-                    for (int ix = -radius; ix <= radius; ix++) {
-                        if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                            if (!tileFunction.apply(x + ix, y + iy)) {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            public static void doInRadius(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
-                ArrayList<Long> cached = doInRadiusCache.get(radius);
-                if (cached == null) {
-                    cached = new ArrayList<>();
-                    ArrayList<Long> finalCached = cached;
-                    doInRadiusInternal(0, 0, radius, (x1, y1) -> {
-                        finalCached.add(
-                                (((long) x1) << 32) | (y1 & 0xffffffffL));
-                        return true;
-                    });
-                    doInRadiusCache.put(radius, cached);
-                }
-
-                for (int i=0;i<cached.size();i++) {
-                    Long positions = cached.get(i);
-                    if (!tileFunction.apply(
-                            x + ((int) (positions >> 32)),
-                            y + positions.intValue())
-                    ) {
-                        return;
-                    }
-                }
-            }
-
-            public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
-                for (int x = x1 - 1; x <= x1 + 1; x++) {
-                    yloop:
-                    for (int y = y1 - 1; y <= y1 + 1; y++) {
-                        if (x == x1 && y == y1) continue yloop; // middle
-                        if (!diagonal) {
-                            if (x == (x1 - 1) && y == (y1 - 1)) continue yloop;
-                            if (x == (x1 + 1) && y == (y1 + 1)) continue yloop;
-                            if (x == (x1 - 1) && y == (y1 + 1)) continue yloop;
-                            if (x == (x1 + 1) && y == (y1 - 1)) continue yloop;
-                        }
-                        if (x >= 0 && y >= 0 && x < map_size && y < map_size) {
-                            if (x == x2 && y == y2) {
-                                return true;
-                            }
-                        }
-                    }
-
-                }
-                return false;
-            }
-
-            public static int distance(int x1, int y1, int x2, int y2) {
-                return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
-            }
-
-            public static float distance(float x1, float y1, float x2, float y2) {
-                return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-            }
-
-            public static boolean isInDistance(int x1, int y1, int x2, int y2, int radius) {
-                return distance(x1, y1, x2, y2) <= radius;
-            }
-
-            public static boolean isInDistance(float x1, float y1, float x2, float y2, float radius) {
-                return distance(x1, y1, x2, y2) <= radius;
-            }
-
-            public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
-                return (MathUtils.atan2((y1 - y2), (x1 - x2))) + MathUtils.PI;
-            }
-
-            public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-                return Bx + Bw > Ax &&
-                        By + Bh > Ay &&
-                        Ax + Aw > Bx &&
-                        Ay + Ah > By;
-            }
-
-            public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
-                return Bx + Bw > Ax &&
-                        By + Bh > Ay &&
-                        Ax + Aw > Bx &&
-                        Ay + Ah > By;
-            }
-
-            public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-                return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
-            }
-
-            public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
-                return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
-            }
-
-            public static float toIsoX(float cart_X, float cart_Y) {
-                return cart_X - cart_Y;
-            }
-
-            public static float toIsoY(float cart_X, float cart_Y) {
-                return (cart_X + cart_Y) / 2;
-            }
-
-            public static int toIsoX(int cart_X, int cart_Y) {
-                return cart_X - cart_Y;
-            }
-
-            public static int toIsoY(int cart_X, int cart_Y) {
-                return (cart_X + cart_Y) / 2;
-            }
-
-            public static int toCartX(int iso_X, int iso_Y) {
-                return (2 * iso_Y + iso_X) / 2;
-            }
-
-            public static float toCartX(float iso_X, float iso_Y) {
-                return (2 * iso_Y + iso_X) / 2;
-            }
-
-            public static float toCartY(float iso_X, float iso_Y) {
-                return (2 * iso_Y - iso_X) / 2;
-            }
-
-            public static int toCartY(int iso_X, int iso_Y) {
-                return (2 * iso_Y - iso_X) / 2;
-            }
-
-        }
-
-        /*public static int findHighestPowerOf2(int number) {
-            // If the input number is already a power of 2, return it
-            if ((number & (number - 1)) == 0) {
-                return number;
-            }
-
-            // Find the position of the most significant bit
-            int msbPosition = 0;
-            while ((1 << msbPosition) < number) {
-                msbPosition++;
-            }
-
-            // Calculate and return the higher power of 2
-            return 1 << msbPosition;
-        }*/
-
         public static float maxOfValues(float... values) {
             float sum = 0;
             for (float f : values) if (f > sum) sum = f;
@@ -736,6 +582,140 @@ public class Tools {
         public static <T> T chooseRandom(List<T> list){
             if(list==null || list.size() == 0) return null;
             return list.get(MathUtils.random(0,list.size()-1));
+        }
+
+        private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
+
+        private static void doInRadiusInternal(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+            for (int iy = -radius; iy <= radius; iy++) {
+                for (int ix = -radius; ix <= radius; ix++) {
+                    if ((ix * ix) + (iy * iy) <= (radius * radius)) {
+                        if (!tileFunction.apply(x + ix, y + iy)) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void doInRadius(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+            ArrayList<Long> cached = doInRadiusCache.get(radius);
+            if (cached == null) {
+                cached = new ArrayList<>();
+                ArrayList<Long> finalCached = cached;
+                doInRadiusInternal(0, 0, radius, (x1, y1) -> {
+                    finalCached.add(
+                            (((long) x1) << 32) | (y1 & 0xffffffffL));
+                    return true;
+                });
+                doInRadiusCache.put(radius, cached);
+            }
+
+            for (int i=0;i<cached.size();i++) {
+                Long positions = cached.get(i);
+                if (!tileFunction.apply(
+                        x + ((int) (positions >> 32)),
+                        y + positions.intValue())
+                ) {
+                    return;
+                }
+            }
+        }
+
+        public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
+            for (int x = x1 - 1; x <= x1 + 1; x++) {
+                yloop:
+                for (int y = y1 - 1; y <= y1 + 1; y++) {
+                    if (x == x1 && y == y1) continue yloop; // middle
+                    if (!diagonal) {
+                        if (x == (x1 - 1) && y == (y1 - 1)) continue yloop;
+                        if (x == (x1 + 1) && y == (y1 + 1)) continue yloop;
+                        if (x == (x1 - 1) && y == (y1 + 1)) continue yloop;
+                        if (x == (x1 + 1) && y == (y1 - 1)) continue yloop;
+                    }
+                    if (x >= 0 && y >= 0 && x < map_size && y < map_size) {
+                        if (x == x2 && y == y2) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
+            return false;
+        }
+
+        public static int distance(int x1, int y1, int x2, int y2) {
+            return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
+        }
+
+        public static float distance(float x1, float y1, float x2, float y2) {
+            return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        public static boolean isInDistance(int x1, int y1, int x2, int y2, int radius) {
+            return distance(x1, y1, x2, y2) <= radius;
+        }
+
+        public static boolean isInDistance(float x1, float y1, float x2, float y2, float radius) {
+            return distance(x1, y1, x2, y2) <= radius;
+        }
+
+        public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
+            return (MathUtils.atan2((y1 - y2), (x1 - x2))) + MathUtils.PI;
+        }
+
+        public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
+            return Bx + Bw > Ax &&
+                    By + Bh > Ay &&
+                    Ax + Aw > Bx &&
+                    Ay + Ah > By;
+        }
+
+        public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
+            return Bx + Bw > Ax &&
+                    By + Bh > Ay &&
+                    Ax + Aw > Bx &&
+                    Ay + Ah > By;
+        }
+
+        public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
+            return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+        }
+
+        public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
+            return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+        }
+
+        public static float toIsoX(float cart_X, float cart_Y) {
+            return cart_X - cart_Y;
+        }
+
+        public static float toIsoY(float cart_X, float cart_Y) {
+            return (cart_X + cart_Y) / 2;
+        }
+
+        public static int toIsoX(int cart_X, int cart_Y) {
+            return cart_X - cart_Y;
+        }
+
+        public static int toIsoY(int cart_X, int cart_Y) {
+            return (cart_X + cart_Y) / 2;
+        }
+
+        public static int toCartX(int iso_X, int iso_Y) {
+            return (2 * iso_Y + iso_X) / 2;
+        }
+
+        public static float toCartX(float iso_X, float iso_Y) {
+            return (2 * iso_Y + iso_X) / 2;
+        }
+
+        public static float toCartY(float iso_X, float iso_Y) {
+            return (2 * iso_Y - iso_X) / 2;
+        }
+
+        public static int toCartY(int iso_X, int iso_Y) {
+            return (2 * iso_Y - iso_X) / 2;
         }
     }
 

@@ -413,7 +413,7 @@ public class API {
             components.addUpdateAction(hlText, new UpdateAction(0) {
                 @Override
                 public void onUpdate() {
-                    if (Tools.Calc.Tiles.pointRectsCollide(
+                    if (Tools.Calc.pointRectsCollide(
                             input.mouseXGUI(),
                             input.mouseYGUI(),
                             components.getAbsoluteX(hlText),
