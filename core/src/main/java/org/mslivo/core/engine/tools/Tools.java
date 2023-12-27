@@ -586,7 +586,7 @@ public class Tools {
 
         private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
 
-        interface DoInRadiusFunction{
+        public interface DoInRadiusFunction{
             boolean apply(int x, int y);
         }
 
