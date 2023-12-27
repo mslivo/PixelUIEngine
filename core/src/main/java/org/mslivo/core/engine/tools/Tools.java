@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.BiFunction;
 
 /**
  * Utility Class
@@ -113,7 +112,6 @@ public class Tools {
     }
 
     public static class Colors {
-
 
 
     }
@@ -574,19 +572,19 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
-        public static <T> T chooseRandom(T[] array){
-            if(array==null || array.length == 0) return null;
-            return array[MathUtils.random(0,array.length-1)];
+        public static <T> T chooseRandom(T[] array) {
+            if (array == null || array.length == 0) return null;
+            return array[MathUtils.random(0, array.length - 1)];
         }
 
-        public static <T> T chooseRandom(List<T> list){
-            if(list==null || list.size() == 0) return null;
-            return list.get(MathUtils.random(0,list.size()-1));
+        public static <T> T chooseRandom(List<T> list) {
+            if (list == null || list.size() == 0) return null;
+            return list.get(MathUtils.random(0, list.size() - 1));
         }
 
         private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
 
-        public interface DoInRadiusFunction{
+        public interface DoInRadiusFunction {
             boolean apply(int x, int y);
         }
 
@@ -615,7 +613,7 @@ public class Tools {
                 doInRadiusCache.put(radius, cached);
             }
 
-            for (int i=0;i<cached.size();i++) {
+            for (int i = 0; i < cached.size(); i++) {
                 Long positions = cached.get(i);
                 if (!radiusFunction.apply(
                         x + ((int) (positions >> 32)),
@@ -648,6 +646,22 @@ public class Tools {
             return false;
         }
 
+        public static float distanceFast(float x1, float y1, float x2, float y2) {
+            float dx = x2 - x1;
+            float dy = y2 - y1;
+            float x = dx * dx + dy * dy;
+            float xhalf = 0.5f * x;
+            int i = Float.floatToIntBits(x);
+            i = 0x5f3759df - (i >> 1);
+            x = Float.intBitsToFloat(i);
+            x = x * (1.5f - xhalf * x * x);
+            return 1.0f / x;
+        }
+
+        public static float distanceFast(int x1, int y1, int x2, int y2) {
+            return distance((float) x1, (float) y1, (float) x2, (float) y2);
+        }
+
         public static int distance(int x1, int y1, int x2, int y2) {
             return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
         }
@@ -662,6 +676,14 @@ public class Tools {
 
         public static boolean isInDistance(float x1, float y1, float x2, float y2, float radius) {
             return distance(x1, y1, x2, y2) <= radius;
+        }
+
+        public static boolean isInDistanceFast(float x1, float y1, float x2, float y2, float radius) {
+            return distanceFast(x1, y1, x2, y2) <= radius;
+        }
+
+        public static boolean isInDistanceFast(int x1, int y1, int x2, int y2, int radius) {
+            return distanceFast(x1, y1, x2, y2) <= radius;
         }
 
         public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
@@ -792,7 +814,7 @@ public class Tools {
             }
 
             Field[] fields = object.getClass().getFields();
-            for (int i=0;i<fields.length;i++) {
+            for (int i = 0; i < fields.length; i++) {
                 Object fieldObject = null;
                 try {
                     fieldObject = fields[i].get(object);
@@ -806,13 +828,13 @@ public class Tools {
                         prepareList.add(cMedia);
                     } else if (fieldObject.getClass() == ArrayList.class) {
                         ArrayList arrayList = (ArrayList) fieldObject;
-                        for (int i2=0;i2<arrayList.size();i2++) {
+                        for (int i2 = 0; i2 < arrayList.size(); i2++) {
                             scanObjectForCMedia(arrayList.get(i2), scanDepthMax, currentDepth + 1, prepareList);
                         }
                     } else if (fields[i].getType().isArray()) {
                         if (fields[i].getType().getName().matches("\\[+L")) {
                             Object[] arrayObjects = (Object[]) fieldObject;
-                            for (int i2=0;i2<arrayObjects.length;i2++) {
+                            for (int i2 = 0; i2 < arrayObjects.length; i2++) {
                                 scanObjectForCMedia(arrayObjects[i2], scanDepthMax, currentDepth + 1, prepareList);
                             }
                         }
