@@ -586,11 +586,15 @@ public class Tools {
 
         private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
 
-        private static void doInRadiusInternal(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+        interface DoInRadiusFunction{
+            boolean apply(int x, int y);
+        }
+
+        private static void doInRadiusInternal(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
             for (int iy = -radius; iy <= radius; iy++) {
                 for (int ix = -radius; ix <= radius; ix++) {
                     if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!tileFunction.apply(x + ix, y + iy)) {
+                        if (!radiusFunction.apply(x + ix, y + iy)) {
                             return;
                         }
                     }
@@ -598,7 +602,7 @@ public class Tools {
             }
         }
 
-        public static void doInRadius(int x, int y, int radius, BiFunction<Integer, Integer, Boolean> tileFunction) {
+        public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
             ArrayList<Long> cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new ArrayList<>();
@@ -613,7 +617,7 @@ public class Tools {
 
             for (int i=0;i<cached.size();i++) {
                 Long positions = cached.get(i);
-                if (!tileFunction.apply(
+                if (!radiusFunction.apply(
                         x + ((int) (positions >> 32)),
                         y + positions.intValue())
                 ) {
