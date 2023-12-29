@@ -46,7 +46,7 @@ public class Tools {
     }
 
     public static class Log {
-
+        private static StringBuilder logMessageBuilder = new StringBuilder();
         private static String timestamp() {
             return sdf.format(new Date());
         }
@@ -55,26 +55,45 @@ public class Tools {
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
                 custom.append(" | ").append(String.format("%1$10s", customValues[i]));
-
             Tools.Log.message(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
                     String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))) + "MB RAM" + custom);
         }
 
         public static void message(String msg) {
-            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + msg);
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_BLUE).append(timestamp()).append(Text.ANSI_RESET).append(msg);
+            System.out.println(logMessageBuilder.toString());
         }
 
         public static void message(String msg, Object values) {
-            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + String.format(msg, values));
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_BLUE).append(timestamp()).append(Text.ANSI_RESET).append(String.format(msg, values));
+            System.out.println(logMessageBuilder.toString());
         }
 
         public static void error(String msg) {
-            System.err.println(Text.ANSI_RED + timestamp() + "error:" + msg + Text.ANSI_RESET);
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_RED).append(timestamp()).append( "error:").append(msg).append(Text.ANSI_RESET);
+            System.err.println(logMessageBuilder.toString());
         }
 
         public static void error(Exception e) {
-            System.err.println(Text.ANSI_RED + timestamp() + e.getClass().getSimpleName() + Text.ANSI_RESET);
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_RED).append(timestamp()).append(e.getClass().getSimpleName()).append(Text.ANSI_RESET);
+            System.err.println(logMessageBuilder.toString());
             e.printStackTrace();
+        }
+
+        public static void inProgress(String what) {
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_BLUE).append(timestamp()).append(Text.ANSI_RESET).append(what).append("...");
+            System.out.println(logMessageBuilder);
+        }
+
+        public static void done() {
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(Text.ANSI_BLUE).append(timestamp()).append(Text.ANSI_RESET).append("Done.");
+            System.out.println(logMessageBuilder);
         }
 
         public static void toFile(String message, Path file) {
@@ -101,13 +120,7 @@ public class Tools {
         }
 
 
-        public static void inProgress(String what) {
-            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + what);
-        }
 
-        public static void done() {
-            System.out.println(Text.ANSI_BLUE + timestamp() + Text.ANSI_RESET + "Done.");
-        }
 
     }
 
