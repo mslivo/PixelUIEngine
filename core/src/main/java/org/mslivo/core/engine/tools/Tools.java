@@ -672,7 +672,7 @@ public class Tools {
         }
 
         public static float distanceFast(int x1, int y1, int x2, int y2) {
-            return distance((float) x1, (float) y1, (float) x2, (float) y2);
+            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
         }
 
         public static int distance(int x1, int y1, int x2, int y2) {
