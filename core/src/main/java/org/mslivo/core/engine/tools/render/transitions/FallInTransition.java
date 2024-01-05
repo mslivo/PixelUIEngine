@@ -9,8 +9,15 @@ public class FallInTransition implements Transition {
     private float yTo;
     private float ySpeed;
     private int bounce;
-
     private int screenHeight;
+    private Runnable bounceAction;
+
+    public FallInTransition(){
+        this(null);
+    }
+    public FallInTransition(Runnable bounceAction) {
+        this.bounceAction = bounceAction;
+    }
 
     @Override
     public TRANSITION_MODE init(int screenWidth, int screenHeight) {
@@ -31,6 +38,7 @@ public class FallInTransition implements Transition {
             ySpeed = -ySpeed / 2f;
             yTo += ySpeed;
             bounce--;
+            if(bounceAction != null) bounceAction.run();
         }
         return bounce <= 0;
     }
