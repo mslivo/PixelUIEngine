@@ -1,5 +1,8 @@
 package org.mslivo.core.engine.tools.sound;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.math.MathUtils;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaSound;
 import org.mslivo.core.engine.tools.Tools;

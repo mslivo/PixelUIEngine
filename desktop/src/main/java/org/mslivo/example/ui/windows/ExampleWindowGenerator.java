@@ -9,6 +9,7 @@ import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.engine.GameEngine;
+import org.mslivo.core.engine.tools.sound.SoundPlayer;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.WindowGenerator;
@@ -62,11 +63,15 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
     private MediaManager mediaManager;
 
+    private SoundPlayer soundPlayer;
+
     @Override
     public Window create(Object[] p) {
         String title = (String) p[0];
         this.gameEngine = (GameEngine) p[1];
         this.mediaManager = (MediaManager) p[2];
+
+        this.soundPlayer = new SoundPlayer(mediaManager);
         /* Window */
         Window window = api.windows.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, false, true, true);
         api.windows.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
@@ -74,16 +79,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.windows.center(window);
 
         /* List / Inventory */
-
         ArrayList<Component> components_tab1 = createTab1(window);
-
         /* Button, Text, Image */
-
         ArrayList<Component> components_tab2 = createTab2(window);
-
         /* Slider */
         ArrayList<Component> components_tab3 = createTab3(window);
-
         /* Font */
         ArrayList<Component> components_tab4 = createTab4(window);
 
@@ -266,6 +266,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
+        Button soundBtn = api.components.button.textButton.create(34, 2, 3, 1, "SFX", new ButtonAction() {
+            @Override
+            public void onRelease() {
+
+            }
+        });
+
         CheckBox checkBox = api.components.checkBox.create(10, 2, "CheckBox");
 
         CheckBox checkBox2 = api.components.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
@@ -296,7 +303,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(gameViewPort, comboBox, checkBox, checkBox2, modal1, modal2, modal3, modal4, number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR, scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput));
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(gameViewPort, comboBox, checkBox, checkBox2,
+                modal1, modal2, modal3, modal4, soundBtn,
+                number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR,
+                scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput));
         api.windows.addComponents(window, components.toArray(new Component[]{}));
         return components;
     }
