@@ -28,6 +28,8 @@ public class TransitionManager {
     private int resolutionWidth, resolutionHeight;
     private ViewportMode viewportMode;
     private TRANSITION_MODE transitionMode;
+    private UIEngine from;
+    private UIEngine to;
 
     public TransitionManager() {
         this.finished = true;
@@ -54,6 +56,8 @@ public class TransitionManager {
         if (from.getInternalResolutionHeight() != to.getInternalResolutionHeight())
             throw new RuntimeException("UIEngine internalResolutionHeight does not match");
         if (from.getViewportMode() != to.getViewportMode()) throw new RuntimeException("viewportMode does not match");
+        this.from = from;
+        this.to = to;
         int resolutionWidth = from.getInternalResolutionWidth();
         int resolutionHeight = from.getInternalResolutionHeight();
         ViewportMode viewportMode = from.getViewportMode();
@@ -173,6 +177,8 @@ public class TransitionManager {
         this.viewportMode = null;
         this.initialized = false;
         this.finished = true;
+        this.from = null;
+        this.to = null;
     }
 
     public boolean isFinished() {
@@ -190,6 +196,14 @@ public class TransitionManager {
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
             case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
         };
+    }
+
+    public UIEngine getFrom() {
+        return from;
+    }
+
+    public UIEngine getTo() {
+        return to;
     }
 
 }
