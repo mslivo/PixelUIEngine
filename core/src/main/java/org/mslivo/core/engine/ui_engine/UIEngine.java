@@ -331,7 +331,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (focusedTextField.textFieldAction != null)
                         focusedTextField.textFieldAction.onTyped(keyTypedCharacter);
 
-                    inputState.usedTextFieldThisUpdate = inputState.focusedTextField;
+                    inputState.usedTextFieldThisUpdate = focusedTextField;
                 }
             }
         }
