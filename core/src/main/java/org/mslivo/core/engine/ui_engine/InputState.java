@@ -157,9 +157,11 @@ public class InputState {
     public int mTextInputScrollTime;
     public int mTextInputScrollSpeed;
     public boolean mTextInputTranslatedMouse1Down;
-
     public boolean mTextInputTranslatedMouse2Down;
     public boolean mTextInputUnlock;
+    public boolean usedTextFieldThisUpdate;
+    public boolean usedHotKeyThisUpdate;
+
     /* #################### OnScreenTextInput #################### */
 
 

@@ -188,7 +188,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mTextInputTranslatedMouse1Down = false;
         newInputState.mTextInputTranslatedMouse2Down = false;
         newInputState.mTextInputUnlock = false;
-
+        newInputState.usedTextFieldThisUpdate = false;
+        newInputState.usedHotKeyThisUpdate = false;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
         newInputState.focusedTextField = null;
@@ -288,6 +289,8 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateKeyInteractions() {
+        inputState.usedTextFieldThisUpdate = false;
+        inputState.usedHotKeyThisUpdate = false;
         if (api.config.isUiKeyInteractionsDisabled()) return;
 
         if (inputState.inputEvents.keyTyped) {
@@ -327,6 +330,8 @@ public class UIEngine<T extends UIAdapter> {
                     // Execute Typed Character Action
                     if (focusedTextField.textFieldAction != null)
                         focusedTextField.textFieldAction.onTyped(keyTypedCharacter);
+
+                    inputState.usedTextFieldThisUpdate = true;
                 }
             }
         }
@@ -344,8 +349,8 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
                     }
+                    inputState.usedTextFieldThisUpdate = true;
                 }
-
             } else {
                 // Hotkeys
                 for (int ihk = 0; ihk < inputState.hotKeys.size(); ihk++) {
@@ -353,7 +358,9 @@ public class UIEngine<T extends UIAdapter> {
                     boolean hotKeyPressed = true;
                     hkLoop:
                     for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
-                        if (!inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
+                        if(inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]){
+                            inputState.usedHotKeyThisUpdate = true;
+                        }else{
                             hotKeyPressed = false;
                             break hkLoop;
                         }
@@ -393,7 +400,6 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateMouseInteractions() {
         if (api.config.isUiMouseInteractionsDisabled()) return;
-
 
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseClick = true;

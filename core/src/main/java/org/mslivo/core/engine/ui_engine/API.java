@@ -2186,6 +2186,10 @@ public class API {
             return false;
         }
 
+        public boolean keyBoardBusyWithGUI() {
+            return inputState.usedTextFieldThisUpdate || inputState.usedHotKeyThisUpdate;
+        }
+
         public Object lastGUIMouseHover() {
             return inputState.lastGUIMouseHover;
         }
