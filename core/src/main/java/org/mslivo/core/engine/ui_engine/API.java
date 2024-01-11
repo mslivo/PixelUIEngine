@@ -48,8 +48,8 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -97,6 +97,7 @@ public class API {
     public final _Input input = new _Input();
     public final _MouseTool mouseTool = new _MouseTool();
     public final _HotKey hotkey = new _HotKey();
+    public final _MouseTextInput mouseTextInput = new _MouseTextInput();
     public final _PreConfigured preConfigured = new _PreConfigured();
     private final InputState inputState;
     private final MediaManager mediaManager;
@@ -1076,9 +1077,9 @@ public class API {
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (valid){
+                    if (valid) {
                         onChange.accept(Float.parseFloat(content));
-                    }else{
+                    } else {
                         components.textField.focus(textField);
                     }
                 }
@@ -1104,7 +1105,7 @@ public class API {
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
                         onChange.accept(Integer.parseInt(content));
-                    }else{
+                    } else {
                         components.textField.focus(textField);
                     }
                 }
@@ -1510,94 +1511,159 @@ public class API {
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    private MouseTextInputAction defaultMouseTextInputConfirmAction() {
-        return new MouseTextInputAction() {
-        };
-    }
 
-    public void openMouseTextInput(int x, int y) {
-        openMouseTextInput(x, y, defaultMouseTextInputConfirmAction(),
-                null,
-                config.defaultLowerCaseCharacters,
-                config.defaultUpperCaseCharacters,
-                config.defaultFont, Color.BLACK);
-    }
-
-    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm) {
-        openMouseTextInput(x, y,
-                onConfirm, null,
-                config.defaultLowerCaseCharacters,
-                config.defaultUpperCaseCharacters,
-                config.defaultFont, Color.BLACK);
-    }
-
-    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
-        openMouseTextInput(x, y,
-                onConfirm, selectedCharacter,
-                config.defaultLowerCaseCharacters,
-                config.defaultUpperCaseCharacters,
-                config.defaultFont, Color.BLACK);
-    }
-
-
-    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
-        openMouseTextInput(x, y, onConfirm,
-                selectedCharacter,
-                charactersLC,
-                charactersUC,
-                config.defaultFont, Color.BLACK);
-    }
-
-    public void openMouseTextInput(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC, CMediaFont font, Color color) {
-        if (charactersLC == null || charactersUC == null || font == null) return;
-        if (inputState.openMouseTextInput != null) return;
-        // Check for Length and ISO Control Except special characters
-        if (charactersLC.length != charactersUC.length) return;
-        int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
-        for (int i = 0; i < maxCharacters; i++) {
-            if (Character.isISOControl(charactersLC[i]) &&
-                    !(charactersLC[i] == '\n' || charactersLC[i] == '\b' || charactersLC[i] == '\t')) {
-                return;
-            } else if (Character.isISOControl(charactersUC[i]) &&
-                    !(charactersUC[i] == '\n' || charactersUC[i] == '\b' || charactersUC[i] == '\t')) {
-                return;
-            }
+    public class _MouseTextInput {
+        private MouseTextInputAction defaultMouseTextInputConfirmAction() {
+            return new MouseTextInputAction() {
+            };
         }
-        OnScreenTextInput onScreenTextInput = new OnScreenTextInput();
-        onScreenTextInput.charactersLC = charactersLC;
-        onScreenTextInput.charactersUC = charactersUC;
-        onScreenTextInput.font = font;
-        onScreenTextInput.mouseTextInputAction = onConfirm;
-        onScreenTextInput.upperCase = false;
-        if (selectedCharacter != null) {
+
+        public void open(int x, int y) {
+
+            open(x, y, defaultMouseTextInputConfirmAction(),
+                    null,
+                    config.defaultLowerCaseCharacters,
+                    config.defaultUpperCaseCharacters,
+                    config.defaultFont, Color.BLACK);
+        }
+
+        public void open(int x, int y, MouseTextInputAction onConfirm) {
+            open(x, y,
+                    onConfirm, null,
+                    config.defaultLowerCaseCharacters,
+                    config.defaultUpperCaseCharacters,
+                    config.defaultFont, Color.BLACK);
+        }
+
+        public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
+            open(x, y,
+                    onConfirm, selectedCharacter,
+                    config.defaultLowerCaseCharacters,
+                    config.defaultUpperCaseCharacters,
+                    config.defaultFont, Color.BLACK);
+        }
+
+
+        public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+            open(x, y, onConfirm,
+                    selectedCharacter,
+                    charactersLC,
+                    charactersUC,
+                    config.defaultFont, Color.BLACK);
+        }
+
+        public void changeCase() {
+            if (inputState.openMouseTextInput == null) return;
+            changeCase(inputState.openMouseTextInput.upperCase);
+        }
+
+        public boolean isUpperCase() {
+            if (inputState.openMouseTextInput == null) return false;
+            return inputState.openMouseTextInput.upperCase;
+        }
+
+        public void changeCase(boolean upperCase) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.upperCase = !inputState.openMouseTextInput.upperCase;
+        }
+
+        public void selectCharacter(char character) {
+            if (inputState.openMouseTextInput == null) return;
+            char[] charactersLC = inputState.openMouseTextInput.charactersLC;
+            char[] charactersUC = inputState.openMouseTextInput.charactersUC;
+            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
             for (int i = 0; i < maxCharacters; i++) {
-                if (selectedCharacter == charactersLC[i]) {
-                    onScreenTextInput.selectedIndex = i;
+                if (character == charactersLC[i]) {
+                    inputState.openMouseTextInput.selectedIndex = i;
                     break;
                 }
-                if (selectedCharacter == charactersUC[i]) {
-                    onScreenTextInput.selectedIndex = i;
-                    onScreenTextInput.upperCase = true;
+                if (character == charactersUC[i]) {
+                    inputState.openMouseTextInput.selectedIndex = i;
+                    inputState.openMouseTextInput.upperCase = true;
                     break;
                 }
             }
-        } else {
-            onScreenTextInput.selectedIndex = 0;
         }
-        onScreenTextInput.x = x - 6;
-        onScreenTextInput.y = y - 12;
-        onScreenTextInput.color_r = color.r;
-        onScreenTextInput.color_g = color.g;
-        onScreenTextInput.color_b = color.b;
-        onScreenTextInput.color_a = color.a;
-        inputState.mTextInputMouseX = Gdx.input.getX();
-        inputState.mTextInputUnlock = false;
-        inputState.openMouseTextInput = onScreenTextInput;
+        public void selectCharacter(int index) {
+            if (inputState.openMouseTextInput == null) return;
+            char[] charactersLC = inputState.openMouseTextInput.charactersLC;
+            char[] charactersUC = inputState.openMouseTextInput.charactersUC;
+            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
+            inputState.openMouseTextInput.selectedIndex = Tools.Calc.inBounds(index,0,maxCharacters);
+        }
+
+
+        private void setCharacters(char[] charactersLC, char[] charactersUC) {
+            if (inputState.openMouseTextInput == null) return;
+            if (charactersLC == null || charactersUC == null) return;
+            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
+            for (int i = 0; i < maxCharacters; i++) {
+                if (Character.isISOControl(charactersLC[i]) || Character.isISOControl(charactersUC[i]))
+                    throw new RuntimeException("ISO Control character not allowed");
+            }
+            if (maxCharacters == 0) {
+                inputState.openMouseTextInput.charactersLC = Arrays.copyOf(charactersLC, maxCharacters);
+                inputState.openMouseTextInput.charactersUC = Arrays.copyOf(charactersUC, maxCharacters);
+                ;
+            } else {
+                inputState.openMouseTextInput.charactersLC = new char[]{};
+                inputState.openMouseTextInput.charactersUC = new char[]{};
+            }
+        }
+
+        private void setColor(float r, float g, float b, float a) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.color_r = r;
+            inputState.openMouseTextInput.color_g = g;
+            inputState.openMouseTextInput.color_b = b;
+            inputState.openMouseTextInput.color_a = a;
+        }
+
+        private void setPosition(int x, int y) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.x = x;
+            inputState.openMouseTextInput.y = y;
+        }
+
+        private void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction){
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.mouseTextInputAction = mouseTextInputAction;
+        }
+
+        private void setFont(CMediaFont font){
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.font = font == null ? config.defaultFont : font ;
+        }
+
+
+        public void open(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter,
+                         char[] charactersLC, char[] charactersUC, CMediaFont font, Color color) {
+            if (charactersLC == null || charactersUC == null || font == null) return;
+            if (inputState.openMouseTextInput != null) return;
+            MouseTextInput mouseTextInput = new MouseTextInput();
+            inputState.mTextInputMouseX = Gdx.input.getX();
+            inputState.mTextInputUnlock = false;
+            inputState.openMouseTextInput = mouseTextInput;
+
+            setFont(font);
+            setMouseTextInputAction(mouseTextInputAction);
+            changeCase(false);
+            setPosition(x, y);
+            setColor(color.r, color.g, color.b, color.a);
+            setCharacters(charactersLC, charactersUC);
+            if (selectedCharacter != null) {
+                selectCharacter(selectedCharacter);
+            } else {
+                selectCharacter(0);
+            }
+        }
+
+        public void close() {
+            inputState.openMouseTextInput = null;
+        }
+
     }
 
-    public void closeMouseTextInput() {
-        inputState.openMouseTextInput = null;
-    }
 
     public static class _Config {
         private boolean hardwareMouseEnabled = true;
@@ -1657,7 +1723,7 @@ public class API {
                 's', 't', 'u', 'v', 'w',
                 'x', 'y', 'z',
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-                };
+        };
 
         private char[] defaultUpperCaseCharacters = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F',
@@ -1666,7 +1732,7 @@ public class API {
                 'S', 'T', 'U', 'V', 'W',
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
-                };
+        };
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -2174,8 +2240,8 @@ public class API {
     }
 
     public class _Input {
-        public final Event event = new Event();
-        public final State state = new State();
+        public final _Event event = new _Event();
+        public final _State state = new _State();
 
         private String mouseGUIObjectName(Object mouseObject) {
             if (mouseObject != null) {
@@ -2270,7 +2336,7 @@ public class API {
         }
 
 
-        public class Event {
+        public class _Event {
             /* ---- MOUSE EVENTS --- */
             public boolean mouseDown() {
                 return inputState.inputEvents.mouseDown;
@@ -2399,7 +2465,7 @@ public class API {
             }
         }
 
-        public class State {
+        public class _State {
 
             /* ---- MOUSE STATES --- */
 

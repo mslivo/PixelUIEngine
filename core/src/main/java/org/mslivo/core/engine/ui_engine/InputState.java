@@ -27,7 +27,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
@@ -148,7 +148,7 @@ public class InputState {
 
     public int displayedContextMenuWidth;
 
-    public OnScreenTextInput openMouseTextInput;
+    public MouseTextInput openMouseTextInput;
     public int mTextInputMouseX;
     public boolean mTextInputConfirmPressed, mTextInputChangeCasePressed,mTextInputDeletePressed;
     public boolean mTextInputKeyBoardGamePadLeft;

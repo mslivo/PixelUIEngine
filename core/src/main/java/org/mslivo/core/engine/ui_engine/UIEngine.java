@@ -49,7 +49,7 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.OnScreenTextInput;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -1177,8 +1177,8 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateMouseTextInputControl() {
         if (inputState.openMouseTextInput == null) return;
-        OnScreenTextInput onScreenTextInput = inputState.openMouseTextInput;
-        char[] characters = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
+        MouseTextInput mouseTextInput = inputState.openMouseTextInput;
+        char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
         int scrollDirection = 0;
         boolean confirmPressed = false;
@@ -1235,9 +1235,9 @@ public class UIEngine<T extends UIAdapter> {
                 deletePressed = inputState.mTextInputTranslatedMouse2Down;
                 // Change Case
                 if (inputState.inputEvents.mouseScrolled) {
-                    if (inputState.inputEvents.mouseScrolledAmount > 0 && onScreenTextInput.upperCase)
+                    if (inputState.inputEvents.mouseScrolledAmount > 0 && mouseTextInput.upperCase)
                         changeCasePressed = true;
-                    if (inputState.inputEvents.mouseScrolledAmount < 0 && !onScreenTextInput.upperCase)
+                    if (inputState.inputEvents.mouseScrolledAmount < 0 && !mouseTextInput.upperCase)
                         changeCasePressed = true;
                     inputState.inputEvents.mouseScrolled = false;
                     inputState.inputEvents.mouseScrolledAmount = 0f;
@@ -1250,9 +1250,9 @@ public class UIEngine<T extends UIAdapter> {
                 confirmPressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse2());
                 if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollUp())) {
-                    changeCasePressed = !onScreenTextInput.upperCase;
+                    changeCasePressed = !mouseTextInput.upperCase;
                 } else if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollDown())) {
-                    changeCasePressed = onScreenTextInput.upperCase;
+                    changeCasePressed = mouseTextInput.upperCase;
                 }
             }
             case GAMEPAD -> {
@@ -1264,9 +1264,9 @@ public class UIEngine<T extends UIAdapter> {
                 confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
                 if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollUp())) {
-                    changeCasePressed = !onScreenTextInput.upperCase;
+                    changeCasePressed = !mouseTextInput.upperCase;
                 } else if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollDown())) {
-                    changeCasePressed = onScreenTextInput.upperCase;
+                    changeCasePressed = mouseTextInput.upperCase;
                 }
             }
         }
@@ -1349,20 +1349,20 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.inputEvents.keyTyped) {
             char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
             findCharLoop:
-            for (int i = 0; i < onScreenTextInput.charactersLC.length; i++) {
-                if (onScreenTextInput.charactersLC[i] == typedChar) {
-                    onScreenTextInput.selectedIndex = i;
-                    onScreenTextInput.upperCase = false;
+            for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
+                if (mouseTextInput.charactersLC[i] == typedChar) {
+                    mouseTextInput.selectedIndex = i;
+                    mouseTextInput.upperCase = false;
                     break findCharLoop;
-                } else if (onScreenTextInput.charactersUC[i] == typedChar) {
-                    onScreenTextInput.selectedIndex = i;
-                    onScreenTextInput.upperCase = true;
+                } else if (mouseTextInput.charactersUC[i] == typedChar) {
+                    mouseTextInput.selectedIndex = i;
+                    mouseTextInput.upperCase = true;
                     break findCharLoop;
                 }
 
             }
         } else if (scrollDirection != 0) {
-            onScreenTextInput.selectedIndex = Tools.Calc.inBounds(onScreenTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
 
         if (confirmCharacter) {
@@ -1372,29 +1372,29 @@ public class UIEngine<T extends UIAdapter> {
             } else if (deleteCharacter) {
                 c = '\b';
             } else {
-                c = characters[onScreenTextInput.selectedIndex];
+                c = characters[mouseTextInput.selectedIndex];
             }
             switch (c) {
                 case '\b' -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add('\b');
-                    if (onScreenTextInput.mouseTextInputAction != null)
-                        onScreenTextInput.mouseTextInputAction.onDelete();
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onDelete();
                 }
                 case '\t' -> {
-                    onScreenTextInput.upperCase = !onScreenTextInput.upperCase;
-                    if (onScreenTextInput.mouseTextInputAction != null)
-                        onScreenTextInput.mouseTextInputAction.onChangeCase(onScreenTextInput.upperCase);
+                    mouseTextInput.upperCase = !mouseTextInput.upperCase;
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
                 }
                 case '\n' -> {
-                    boolean close = onScreenTextInput.mouseTextInputAction != null ? onScreenTextInput.mouseTextInputAction.onConfirm() : true;
+                    boolean close = mouseTextInput.mouseTextInputAction != null ? mouseTextInput.mouseTextInputAction.onConfirm() : true;
                     inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
                 }
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
-                    if (onScreenTextInput.mouseTextInputAction != null)
-                        onScreenTextInput.mouseTextInputAction.onEnterCharacter(c);
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
                 }
             }
 
@@ -2253,31 +2253,31 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawOnScreenTextInput() {
         if (inputState.openMouseTextInput == null) return;
-        OnScreenTextInput onScreenTextInput = inputState.openMouseTextInput;
-        render_batchSetColorWhite(onScreenTextInput.color_a);
+        MouseTextInput mouseTextInput = inputState.openMouseTextInput;
+        render_batchSetColorWhite(mouseTextInput.color_a);
         final int CHARACTERS = 4;
-        char[] chars = onScreenTextInput.upperCase ? onScreenTextInput.charactersUC : onScreenTextInput.charactersLC;
+        char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
         // 4 to the left
         for (int i = 1; i <= CHARACTERS; i++) {
-            int index = onScreenTextInput.selectedIndex - i;
+            int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x - (i * 12), onScreenTextInput.y - ((i * i) / 2), onScreenTextInput.upperCase, false);
+                render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
-            int index = onScreenTextInput.selectedIndex + i;
+            int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[index], onScreenTextInput.x + (i * 12), onScreenTextInput.y - ((i * i) / 2), onScreenTextInput.upperCase, false);
+                render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
-        render_drawOnScreenTextInputCharacter(onScreenTextInput.font, chars[onScreenTextInput.selectedIndex], onScreenTextInput.x, onScreenTextInput.y, onScreenTextInput.upperCase, inputState.mTextInputConfirmPressed);
+        render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputConfirmPressed);
 
         // Selection
-        render_batchSetColor(onScreenTextInput.color_r, onScreenTextInput.color_g, onScreenTextInput.color_b, onScreenTextInput.color_a);
-        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, onScreenTextInput.x - 1, onScreenTextInput.y - 1);
+        render_batchSetColor(mouseTextInput.color_r, mouseTextInput.color_g, mouseTextInput.color_b, mouseTextInput.color_a);
+        render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
         render_batchSetColorWhite(1f);
     }
 

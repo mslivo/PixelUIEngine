@@ -1,9 +1,8 @@
 package org.mslivo.core.engine.ui_engine.gui.ostextinput;
 
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
-import com.badlogic.gdx.graphics.Color;
 
-public class OnScreenTextInput {
+public class MouseTextInput {
 
     /**
      * Special Character
