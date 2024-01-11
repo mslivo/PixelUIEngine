@@ -789,10 +789,8 @@ public class API {
                 @Override
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
-                        if (inputTextField.content.length() >= minInputLength) {
-                            if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
-                            removeCurrentModalWindow();
-                        }
+                        if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
+                        removeCurrentModalWindow();
                     } else {
                         components.textField.focus(inputTextField);
                     }
@@ -1078,7 +1076,11 @@ public class API {
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (textField.contentValid) onChange.accept(Float.parseFloat(content));
+                    if (valid){
+                        onChange.accept(Float.parseFloat(content));
+                    }else{
+                        components.textField.focus(textField);
+                    }
                 }
             });
             return textField;
@@ -1100,7 +1102,11 @@ public class API {
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (textField.contentValid) onChange.accept(Integer.parseInt(content));
+                    if (valid) {
+                        onChange.accept(Integer.parseInt(content));
+                    }else{
+                        components.textField.focus(textField);
+                    }
                 }
             });
             return textField;
@@ -2171,7 +2177,7 @@ public class API {
         public final Event event = new Event();
         public final State state = new State();
 
-        private String mouseGUIObjectName(Object mouseObject){
+        private String mouseGUIObjectName(Object mouseObject) {
             if (mouseObject != null) {
                 if (mouseObject instanceof Component component) {
                     return component.name;
@@ -2183,10 +2189,10 @@ public class API {
         }
 
         public String keyBoardGUIObjectName(Object keyBoardobject) {
-            if(keyBoardobject != null){
-                if(keyBoardobject instanceof Component component){
+            if (keyBoardobject != null) {
+                if (keyBoardobject instanceof Component component) {
                     return component.name;
-                }else if(keyBoardobject instanceof HotKey hotKey){
+                } else if (keyBoardobject instanceof HotKey hotKey) {
                     return hotKey.name;
                 }
             }
@@ -2238,7 +2244,7 @@ public class API {
             return inputState.lastGUIMouseHover;
         }
 
-        public boolean mouseHoveringOverGUIObject(){
+        public boolean mouseHoveringOverGUIObject() {
             return mouseHoverGUIObject() != null;
         }
 
