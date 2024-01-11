@@ -2224,6 +2224,10 @@ public class API {
             return null;
         }
 
+        public boolean mouseUsingGUIObject() {
+            return mouseUseGUIObject() != null;
+        }
+
         public String mouseUseGUIObjectName() {
             return mouseGUIObjectName(mouseUseGUIObject());
         }
