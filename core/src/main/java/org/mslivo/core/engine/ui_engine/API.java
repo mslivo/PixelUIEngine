@@ -54,7 +54,6 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
-import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
@@ -2172,38 +2171,78 @@ public class API {
         public final Event event = new Event();
         public final State state = new State();
 
-        public boolean mouseBusyWithGUI() {
-            if (inputState.lastGUIMouseHover != null) return true;
-            if (inputState.draggedWindow != null) return true;
-            if (inputState.pressedButton != null) return true;
-            if (inputState.scrolledScrollBarHorizontal != null) return true;
-            if (inputState.scrolledScrollBarVertical != null) return true;
-            if (inputState.turnedKnob != null) return true;
-            if (inputState.pressedMap != null) return true;
-            if (inputState.pressedGameViewPort != null) return true;
-            if (inputState.inventoryDrag_Inventory != null) return true;
-            if (inputState.listDrag_List != null) return true;
-            return false;
-        }
-
-        public boolean keyBoardBusyWithGUI() {
-            return inputState.usedTextFieldThisUpdate || inputState.usedHotKeyThisUpdate;
-        }
-
-        public Object lastGUIMouseHover() {
-            return inputState.lastGUIMouseHover;
-        }
-
-        public String lastGUIMouseHoverName() {
-            if (inputState.lastGUIMouseHover != null) {
-                if (inputState.lastGUIMouseHover instanceof Component) {
-                    return ((Component) inputState.lastGUIMouseHover).name;
-                } else if (inputState.lastGUIMouseHover instanceof Window) {
-                    return ((Window) inputState.lastGUIMouseHover).name;
+        private String mouseGUIObjectName(Object mouseObject){
+            if (mouseObject != null) {
+                if (mouseObject instanceof Component component) {
+                    return component.name;
+                } else if (mouseObject instanceof Window window) {
+                    return window.name;
                 }
             }
             return "";
         }
+
+        public String keyBoardGUIObjectName(Object keyBoardobject) {
+            if(keyBoardobject != null){
+                if(keyBoardobject instanceof Component component){
+                    return component.name;
+                }else if(keyBoardobject instanceof HotKey hotKey){
+                    return hotKey.name;
+                }
+            }
+            return "";
+        }
+
+        // Keyboard USE Info
+
+        public Object keyBoardUseGUIObject() {
+            if (inputState.usedTextFieldThisUpdate != null) return inputState.usedTextFieldThisUpdate;
+            if (inputState.usedHotKeyThisUpdate != null) return inputState.usedHotKeyThisUpdate;
+            return null;
+        }
+
+        public boolean keyBoardUsingGUIObject() {
+            return keyBoardUseGUIObject() != null;
+        }
+
+        public String keyBoardUsingGUIObjectName() {
+            return keyBoardGUIObjectName(keyBoardUseGUIObject());
+        }
+
+        // Mouse USE Info
+
+        public Object mouseUseGUIObject() {
+            if (inputState.draggedWindow != null) return inputState.draggedWindow;
+            if (inputState.pressedButton != null) return inputState.pressedButton;
+            if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
+            if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
+            if (inputState.turnedKnob != null) return inputState.turnedKnob;
+            if (inputState.pressedMap != null) return inputState.pressedMap;
+            if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
+            if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
+            if (inputState.listDrag_List != null) return inputState.listDrag_List;
+            return null;
+        }
+
+        public String mouseUseGUIObjectName() {
+            return mouseGUIObjectName(mouseUseGUIObject());
+        }
+
+        // Mouse Hover Info
+
+        public Object mouseHoverGUIObject() {
+            return inputState.lastGUIMouseHover;
+        }
+
+        public boolean mouseHoveringOverGUIObject(){
+            return mouseHoverGUIObject() != null;
+        }
+
+        public String mouseHoverGUIObjectName() {
+            return mouseGUIObjectName(mouseHoverGUIObject());
+        }
+
+        // Mouse Control
 
         public void setMousePosition(int x, int y) {
             if (inputState.currentControlMode != MouseControlMode.HARDWARE_MOUSE) return;

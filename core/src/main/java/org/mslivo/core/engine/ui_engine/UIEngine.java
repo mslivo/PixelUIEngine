@@ -188,8 +188,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mTextInputTranslatedMouse1Down = false;
         newInputState.mTextInputTranslatedMouse2Down = false;
         newInputState.mTextInputUnlock = false;
-        newInputState.usedTextFieldThisUpdate = false;
-        newInputState.usedHotKeyThisUpdate = false;
+        newInputState.usedTextFieldThisUpdate = null;
+        newInputState.usedHotKeyThisUpdate = null;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
         newInputState.focusedTextField = null;
@@ -289,8 +289,8 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateKeyInteractions() {
-        inputState.usedTextFieldThisUpdate = false;
-        inputState.usedHotKeyThisUpdate = false;
+        inputState.usedTextFieldThisUpdate = null;
+        inputState.usedHotKeyThisUpdate = null;
         if (api.config.isUiKeyInteractionsDisabled()) return;
 
         if (inputState.inputEvents.keyTyped) {
@@ -331,7 +331,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (focusedTextField.textFieldAction != null)
                         focusedTextField.textFieldAction.onTyped(keyTypedCharacter);
 
-                    inputState.usedTextFieldThisUpdate = true;
+                    inputState.usedTextFieldThisUpdate = inputState.focusedTextField;
                 }
             }
         }
@@ -349,7 +349,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
                     }
-                    inputState.usedTextFieldThisUpdate = true;
+                    inputState.usedTextFieldThisUpdate = focusedTextField;
                 }
             } else {
                 // Hotkeys
@@ -359,7 +359,7 @@ public class UIEngine<T extends UIAdapter> {
                     hkLoop:
                     for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
                         if(inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]){
-                            inputState.usedHotKeyThisUpdate = true;
+                            inputState.usedHotKeyThisUpdate = hotKey;
                         }else{
                             hotKeyPressed = false;
                             break hkLoop;

@@ -159,8 +159,8 @@ public class InputState {
     public boolean mTextInputTranslatedMouse1Down;
     public boolean mTextInputTranslatedMouse2Down;
     public boolean mTextInputUnlock;
-    public boolean usedTextFieldThisUpdate;
-    public boolean usedHotKeyThisUpdate;
+    public TextField usedTextFieldThisUpdate;
+    public HotKey usedHotKeyThisUpdate;
 
     /* #################### OnScreenTextInput #################### */
 
