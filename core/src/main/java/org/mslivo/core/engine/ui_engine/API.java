@@ -2289,6 +2289,14 @@ public class API {
 
             /* ---- GAMEPAD EVENTS --- */
 
+            public boolean gamePadDown() {
+                return inputState.inputEvents.gamePadButtonDown;
+            }
+
+            public boolean gamePadUp() {
+                return inputState.inputEvents.gamePadButtonUp;
+            }
+
             public boolean gamePadConnected() {
                 return inputState.inputEvents.gamePadConnected;
             }
@@ -2327,6 +2335,14 @@ public class API {
 
             public boolean gamePadRightTriggerMoved() {
                 return inputState.inputEvents.gamePadRightTriggerMoved;
+            }
+
+            public ArrayList<Integer> gamePadDownButtons() {
+                return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
+            }
+
+            public ArrayList<Integer> gamePadUpButtons() {
+                return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
             }
         }
 
@@ -2412,27 +2428,6 @@ public class API {
 
             /* ---- GAMEPAD STATES --- */
 
-            public boolean gamePadDown() {
-                return inputState.inputEvents.gamePadButtonDown;
-            }
-
-            public boolean gamePadUp() {
-                return inputState.inputEvents.gamePadButtonUp;
-            }
-
-            public ArrayList<Integer> gamePadDownButtons() {
-                return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
-            }
-
-            public ArrayList<Integer> gamePadUpButtons() {
-                return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
-            }
-
-            public boolean gamePadDownButton(int keyCode) {
-                for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++)
-                    if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
-                return false;
-            }
 
             public boolean gamePadIsButtonDown(int keyCode) {
                 return inputState.inputEvents.gamePadButtonsDown[keyCode];
