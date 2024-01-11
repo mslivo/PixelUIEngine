@@ -281,12 +281,12 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
             @Override
             public void onEnter(String content, boolean valid) {
-                api.closeMouseTextInput();
+                api.mouseTextInput.close();
             }
 
             @Override
             public void onFocus() {
-                api.openMouseTextInput(
+                api.mouseTextInput.open(
                         api.components.getAbsoluteX(osKeyBoardTextInput),
                         api.components.getAbsoluteY(osKeyBoardTextInput)
                         , new MouseTextInputAction() {

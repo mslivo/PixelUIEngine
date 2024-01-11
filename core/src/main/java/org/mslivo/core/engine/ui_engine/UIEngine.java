@@ -1376,19 +1376,19 @@ public class UIEngine<T extends UIAdapter> {
             }
             switch (c) {
                 case '\b' -> {
-                    inputState.inputEvents.keyTyped = true;
-                    inputState.inputEvents.keyTypedCharacters.add('\b');
+                    inputState.inputEvents.keyDown = true;
+                    inputState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
                     if (mouseTextInput.mouseTextInputAction != null)
                         mouseTextInput.mouseTextInputAction.onDelete();
+                }
+                case '\n' -> {
+                    boolean close = mouseTextInput.mouseTextInputAction != null ? mouseTextInput.mouseTextInputAction.onConfirm() : true;
+                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
                 }
                 case '\t' -> {
                     mouseTextInput.upperCase = !mouseTextInput.upperCase;
                     if (mouseTextInput.mouseTextInputAction != null)
                         mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
-                }
-                case '\n' -> {
-                    boolean close = mouseTextInput.mouseTextInputAction != null ? mouseTextInput.mouseTextInputAction.onConfirm() : true;
-                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
                 }
                 default -> {
                     inputState.inputEvents.keyTyped = true;

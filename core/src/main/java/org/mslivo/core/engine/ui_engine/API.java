@@ -1564,7 +1564,7 @@ public class API {
 
         public void changeCase(boolean upperCase) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.upperCase = !inputState.openMouseTextInput.upperCase;
+            inputState.openMouseTextInput.upperCase = upperCase;
         }
 
         public void selectCharacter(char character) {
@@ -1597,18 +1597,20 @@ public class API {
             if (inputState.openMouseTextInput == null) return;
             if (charactersLC == null || charactersUC == null) return;
             int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
+            inputState.openMouseTextInput.charactersLC = new char[maxCharacters+3];
+            inputState.openMouseTextInput.charactersUC = new char[maxCharacters+3];
             for (int i = 0; i < maxCharacters; i++) {
                 if (Character.isISOControl(charactersLC[i]) || Character.isISOControl(charactersUC[i]))
                     throw new RuntimeException("ISO Control character not allowed");
+                inputState.openMouseTextInput.charactersLC[i] = charactersLC[i];
+                inputState.openMouseTextInput.charactersUC[i] = charactersUC[i];
             }
-            if (maxCharacters == 0) {
-                inputState.openMouseTextInput.charactersLC = Arrays.copyOf(charactersLC, maxCharacters);
-                inputState.openMouseTextInput.charactersUC = Arrays.copyOf(charactersUC, maxCharacters);
-                ;
-            } else {
-                inputState.openMouseTextInput.charactersLC = new char[]{};
-                inputState.openMouseTextInput.charactersUC = new char[]{};
-            }
+            inputState.openMouseTextInput.charactersLC[maxCharacters] = '\t';
+            inputState.openMouseTextInput.charactersUC[maxCharacters] = '\t';
+            inputState.openMouseTextInput.charactersLC[maxCharacters+1] = '\b';
+            inputState.openMouseTextInput.charactersUC[maxCharacters+1] = '\b';
+            inputState.openMouseTextInput.charactersLC[maxCharacters+2] = '\n';
+            inputState.openMouseTextInput.charactersUC[maxCharacters+2] = '\n';
         }
 
         private void setColor(float r, float g, float b, float a) {
@@ -1621,8 +1623,8 @@ public class API {
 
         private void setPosition(int x, int y) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.x = x;
-            inputState.openMouseTextInput.y = y;
+            inputState.openMouseTextInput.x = x-6;
+            inputState.openMouseTextInput.y = y-12;
         }
 
         private void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction){
