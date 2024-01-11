@@ -1657,7 +1657,7 @@ public class API {
                 's', 't', 'u', 'v', 'w',
                 'x', 'y', 'z',
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-                , '\t', '\b', '\n'};
+                };
 
         private char[] defaultUpperCaseCharacters = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F',
@@ -1666,7 +1666,7 @@ public class API {
                 'S', 'T', 'U', 'V', 'W',
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
-                , '\t', '\b', '\n'};
+                };
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;

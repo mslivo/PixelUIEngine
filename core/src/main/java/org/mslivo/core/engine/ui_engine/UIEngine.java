@@ -298,33 +298,13 @@ public class UIEngine<T extends UIAdapter> {
                 TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size(); ic++) {
                     Character keyTypedCharacter = inputState.inputEvents.keyTypedCharacters.get(ic);
-                    if (keyTypedCharacter == '\b') { // BACKSPACE
-                        if (!focusedTextField.content.isEmpty() && focusedTextField.markerPosition > 0) {
-                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition - 1) + focusedTextField.content.substring(focusedTextField.markerPosition);
-                            UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
-                            UICommons.textField_setContent(inputState.focusedTextField, newContent);
-                            if (focusedTextField.textFieldAction != null)
-                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                        }
-                    } else if (keyTypedCharacter == '\u007F') { // DEL
-                        if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
-                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
-                            UICommons.textField_setContent(focusedTextField, newContent);
-                            if (focusedTextField.textFieldAction != null)
-                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                        }
-                    } else if (keyTypedCharacter == '\n') { // Enter
+
+                    if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
+                        String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
+                        UICommons.textField_setContent(focusedTextField, newContent);
+                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
                         if (focusedTextField.textFieldAction != null)
-                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
-                        UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
-                    } else {
-                        if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
-                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
-                            UICommons.textField_setContent(focusedTextField, newContent);
-                            UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
-                            if (focusedTextField.textFieldAction != null)
-                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                        }
+                            focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                     }
 
                     // Execute Typed Character Action
@@ -348,6 +328,25 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.content.length());
                     } else if (keyDownKeyCode == Input.Keys.END) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
+                    } else if (keyDownKeyCode == Input.Keys.BACKSPACE) {
+                        if (!focusedTextField.content.isEmpty() && focusedTextField.markerPosition > 0) {
+                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition - 1) + focusedTextField.content.substring(focusedTextField.markerPosition);
+                            UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
+                            UICommons.textField_setContent(inputState.focusedTextField, newContent);
+                            if (focusedTextField.textFieldAction != null)
+                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
+                        }
+                    }  else if (keyDownKeyCode == Input.Keys.FORWARD_DEL) {
+                        if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
+                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
+                            UICommons.textField_setContent(focusedTextField, newContent);
+                            if (focusedTextField.textFieldAction != null)
+                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
+                        }
+                    } else if (keyDownKeyCode == Input.Keys.ENTER || keyDownKeyCode == Input.Keys.NUMPAD_ENTER){
+                        if (focusedTextField.textFieldAction != null)
+                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
+                        UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
                     }
                     inputState.usedTextFieldThisUpdate = focusedTextField;
                 }
@@ -1636,6 +1635,9 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void keyboardMouseTranslateAndChokeEvents() {
+        if (inputState.focusedTextField != null)
+            return; // Stop Keyboard control if the user wants to type into a textfield
+
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
             int[] buttons = keyboardMouseButtons(i);
@@ -1644,8 +1646,9 @@ public class UIEngine<T extends UIAdapter> {
                     int keyCode = buttons[i2];
                     if (inputState.inputEvents.keyDown) {
                         ArrayList<Integer> downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
-                        for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
-                            if (downKeyCodes.get(ikc) == keyCode) {
+                        keyCodeLoop:for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                            int downKeyCode = downKeyCodes.get(ikc);
+                            if (downKeyCode == keyCode) {
                                 downKeyCodes.remove(ikc);
                                 inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.keysDown[keyCode] = false;
@@ -1810,10 +1813,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateKeyBoardMouseControl() {
-
         if (inputState.focusedTextField != null)
             return; // Stop Keyboard control if the user wants to type into a textfield
-
 
         // Swallow & Translate keyboard events
         boolean[] translatedKeys = inputState.keyBoardTranslatedKeysDown;

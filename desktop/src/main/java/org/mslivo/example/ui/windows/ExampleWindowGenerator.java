@@ -168,9 +168,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.components.setColor1And2(scrollBarHorizontalB, Color.BLUE);
 
 
-        HashSet<Character> allowedCharacters = new HashSet<>();
-        for(int i=0;i<255;i++) allowedCharacters.add((char)i);
-        TextField textField = api.components.textField.create(18, 11, 10, "", null, 128,allowedCharacters);
+        TextField textField = api.components.textField.create(18, 11, 10, "", null, 128);
         Button notiBtn = api.components.button.textButton.create(18, 9, 10, 2, "Notification");
         api.components.button.centerContent(notiBtn);
         api.components.addUpdateAction(notiBtn, new UpdateAction() {
