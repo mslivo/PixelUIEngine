@@ -73,6 +73,7 @@ public class ExampleMain extends ApplicationAdapter {
                 ExampleMainConstants.VIEWPORT_MODE, true);
         Tools.Log.done();
 
+
         this.state = STATE.RUN;
     }
 

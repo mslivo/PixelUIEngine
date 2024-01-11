@@ -333,7 +333,7 @@ public class API {
             components.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouseScrolledAmount();
+                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.event.mouseScrolledAmount();
                     if (!scrollBarVertical.disabled) {
                         components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
                                 scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
@@ -414,8 +414,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (Tools.Calc.pointRectsCollide(
-                            input.mouseXGUI(),
-                            input.mouseYGUI(),
+                            input.state.mouseXGUI(),
+                            input.state.mouseYGUI(),
                             components.getAbsoluteX(hlText),
                             components.getAbsoluteY(hlText),
                             hlText.width * UIEngine.TILE_SIZE,
@@ -612,8 +612,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.mouseXGUI() - components.getAbsoluteX(colorMap);
-                        int yInv = (input.mouseYGUI() - components.getAbsoluteY(colorMap));
+                        int x = input.state.mouseXGUI() - components.getAbsoluteX(colorMap);
+                        int yInv = (input.state.mouseYGUI() - components.getAbsoluteY(colorMap));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
@@ -2169,6 +2169,8 @@ public class API {
     }
 
     public class _Input {
+        public final Event event = new Event();
+        public final State state = new State();
 
         public boolean mouseBusyWithGUI() {
             if (inputState.lastGUIMouseHover != null) return true;
@@ -2213,224 +2215,272 @@ public class API {
         public InputMethod lastUsedInputMethod() {
             return inputState.inputEvents.lastUsedInputMethod;
         }
-        /* ---- MOUSE EVENTS --- */
 
-        public boolean mouseDown() {
-            return inputState.inputEvents.mouseDown;
-        }
 
-        public boolean mouseDoubleClick() {
-            return inputState.inputEvents.mouseDoubleClick;
-        }
+        class Event {
+            /* ---- MOUSE EVENTS --- */
+            public boolean mouseDown() {
+                return inputState.inputEvents.mouseDown;
+            }
 
-        public boolean mouseUp() {
-            return inputState.inputEvents.mouseUp;
-        }
+            public boolean mouseDoubleClick() {
+                return inputState.inputEvents.mouseDoubleClick;
+            }
 
-        public boolean mouseDragged() {
-            return inputState.inputEvents.mouseDragged;
-        }
+            public boolean mouseUp() {
+                return inputState.inputEvents.mouseUp;
+            }
 
-        public boolean mouseMoved() {
-            return inputState.inputEvents.mouseMoved;
-        }
+            public boolean mouseDragged() {
+                return inputState.inputEvents.mouseDragged;
+            }
 
-        public boolean mouseScrolled() {
-            return inputState.inputEvents.mouseScrolled;
-        }
+            public boolean mouseMoved() {
+                return inputState.inputEvents.mouseMoved;
+            }
 
-        public float mouseScrolledAmount() {
-            return inputState.inputEvents.mouseScrolledAmount;
-        }
+            public boolean mouseScrolled() {
+                return inputState.inputEvents.mouseScrolled;
+            }
 
-        public int mouseXGUI() {
-            return inputState.mouse_gui.x;
-        }
+            public float mouseScrolledAmount() {
+                return inputState.inputEvents.mouseScrolledAmount;
+            }
 
-        public int mouseYGUI() {
-            return inputState.mouse_gui.y;
-        }
+            public ArrayList<Integer> mouseUpButtons() {
+                return new ArrayList<>(inputState.inputEvents.mouseUpButtons);
+            }
 
-        public int mouseX() {
-            return inputState.mouse.x;
-        }
+            public ArrayList<Integer> mouseDownButtons() {
+                return new ArrayList<>(inputState.inputEvents.mouseDownButtons);
+            }
 
-        public int mouseY() {
-            return inputState.mouse.y;
-        }
+            /* ---- KEYBOARD EVENTS --- */
 
-        public float mouseXDelta() {
-            return inputState.mouse_delta.x;
-        }
+            public boolean keyDown() {
+                return inputState.inputEvents.keyDown;
+            }
 
-        public float mouseYDelta() {
-            return inputState.mouse_delta.y;
-        }
+            public boolean keyUp() {
+                return inputState.inputEvents.keyUp;
+            }
 
-        public ArrayList<Integer> mouseUpButtons() {
-            return new ArrayList<>(inputState.inputEvents.mouseUpButtons);
-        }
+            public boolean keyTyped() {
+                return inputState.inputEvents.keyTyped;
+            }
 
-        public boolean mouseUpButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseUpButtons.size(); i++)
-                if (button == inputState.inputEvents.mouseUpButtons.get(i)) return true;
-            return false;
-        }
+            public boolean keyTypedCharacter(Character character) {
+                for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++)
+                    if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
+                return false;
+            }
 
-        public boolean isMouseButtonUp(int button) {
-            return !inputState.inputEvents.mouseButtonsDown[button];
-        }
+            public ArrayList<Integer> keyUpKeys() {
+                return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
+            }
 
-        public ArrayList<Integer> mouseDownButtons() {
-            return new ArrayList<>(inputState.inputEvents.mouseDownButtons);
-        }
+            public ArrayList<Integer> keyDownKeys() {
+                return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
+            }
 
-        public boolean mouseDownButton(int button) {
-            for (int i = 0; i < inputState.inputEvents.mouseDownButtons.size(); i++)
-                if (button == inputState.inputEvents.mouseDownButtons.get(i)) return true;
-            return false;
-        }
+            public ArrayList<Character> keyTypedCharacters() {
+                return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
+            }
 
-        public boolean isMouseButtonDown(int button) {
-            return inputState.inputEvents.mouseButtonsDown[button];
-        }
+            /* ---- GAMEPAD EVENTS --- */
 
-        /* ---- KEYBOARD EVENTS --- */
+            public boolean gamePadConnected() {
+                return inputState.inputEvents.gamePadConnected;
+            }
 
-        public boolean keyDown() {
-            return inputState.inputEvents.keyDown;
-        }
+            public boolean gamePadDisconnected() {
+                return inputState.inputEvents.gamePadDisconnected;
+            }
 
-        public boolean keyUp() {
-            return inputState.inputEvents.keyUp;
-        }
+            public boolean gamePadLeftXMoved() {
+                return inputState.inputEvents.gamePadLeftXMoved;
+            }
 
-        public boolean keyTyped() {
-            return inputState.inputEvents.keyTyped;
-        }
+            public boolean gamePadLeftYMoved() {
+                return inputState.inputEvents.gamePadLeftYMoved;
+            }
 
-        public ArrayList<Integer> keyDownKeys() {
-            return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
-        }
+            public boolean gamePadLeftMoved() {
+                return gamePadLeftXMoved() || gamePadLeftYMoved();
+            }
 
-        public boolean keyDownKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyDownKeyCodes.size(); i++)
-                if (keyCode == inputState.inputEvents.keyDownKeyCodes.get(i)) return true;
-            return false;
-        }
+            public boolean gamePadRightXMoved() {
+                return inputState.inputEvents.gamePadRightXMoved;
+            }
 
-        public boolean isKeyDown(int keyCode) {
-            return inputState.inputEvents.keysDown[keyCode];
-        }
+            public boolean gamePadRightYMoved() {
+                return inputState.inputEvents.gamePadRightYMoved;
+            }
 
-        public boolean keyTypedCharacter(Character character) {
-            for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++)
-                if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
-            return false;
-        }
+            public boolean gamePadRightMoved() {
+                return gamePadRightXMoved() || gamePadRightYMoved();
+            }
 
-        public ArrayList<Character> keyTypedCharacters() {
-            return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
+            public boolean gamePadLeftTriggerMoved() {
+                return inputState.inputEvents.gamePadLeftTriggerMoved;
+            }
+
+            public boolean gamePadRightTriggerMoved() {
+                return inputState.inputEvents.gamePadRightTriggerMoved;
+            }
         }
 
-        public ArrayList<Integer> keyUpKeys() {
-            return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
+        class State {
+
+            /* ---- MOUSE STATES --- */
+
+            public int mouseXGUI() {
+                return inputState.mouse_gui.x;
+            }
+
+            public int mouseYGUI() {
+                return inputState.mouse_gui.y;
+            }
+
+            public int mouseX() {
+                return inputState.mouse.x;
+            }
+
+            public int mouseY() {
+                return inputState.mouse.y;
+            }
+
+            public float mouseXDelta() {
+                return inputState.mouse_delta.x;
+            }
+
+            public float mouseYDelta() {
+                return inputState.mouse_delta.y;
+            }
+
+            public boolean isMouseButtonUp(int keyCode) {
+                return !inputState.inputEvents.mouseButtonsDown[keyCode];
+            }
+
+            public boolean isAnyMouseButtonUp(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (isMouseButtonUp(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            public boolean isMouseButtonDown(int button) {
+                return inputState.inputEvents.mouseButtonsDown[button];
+            }
+
+            public boolean isAnyMouseButtonDown(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (isMouseButtonDown(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            /* ---- KEYBOARD STATES --- */
+
+            public boolean isKeyDown(int keyCode) {
+                return inputState.inputEvents.keysDown[keyCode];
+            }
+
+            public boolean isAnyKeyDown(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (isKeyDown(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            public boolean keyUpKey(int keyCode) {
+                for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++)
+                    if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
+                return false;
+            }
+
+            public boolean isKeyUp(int keyCode) {
+                return !inputState.inputEvents.keysDown[keyCode];
+            }
+
+            public boolean isAnyKeyUp(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (isKeyUp(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            /* ---- GAMEPAD STATES --- */
+
+            public boolean gamePadDown() {
+                return inputState.inputEvents.gamePadButtonDown;
+            }
+
+            public boolean gamePadUp() {
+                return inputState.inputEvents.gamePadButtonUp;
+            }
+
+            public ArrayList<Integer> gamePadDownButtons() {
+                return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
+            }
+
+            public ArrayList<Integer> gamePadUpButtons() {
+                return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
+            }
+
+            public boolean gamePadDownButton(int keyCode) {
+                for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++)
+                    if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
+                return false;
+            }
+
+            public boolean gamePadIsButtonDown(int keyCode) {
+                return inputState.inputEvents.gamePadButtonsDown[keyCode];
+            }
+
+            public boolean gamePadIsAnyButtonDown(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (gamePadIsButtonDown(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            public boolean gamePadIsButtonUp(int keyCode) {
+                return !inputState.inputEvents.gamePadButtonsDown[keyCode];
+            }
+
+            public boolean gamePadIsAnyButtonUp(int[] keyCodes) {
+                for (int i = 0; i < keyCodes.length; i++) {
+                    if (gamePadIsButtonUp(keyCodes[i])) return true;
+                }
+                return false;
+            }
+
+            public float gamePadLeftTrigger() {
+                return inputState.inputEvents.gamePadLeftTrigger;
+            }
+
+            public float gamePadRightTrigger() {
+                return inputState.inputEvents.gamePadRightTrigger;
+            }
+
+            public float gamePadLeftX() {
+                return inputState.inputEvents.gamePadLeftX;
+            }
+
+            public float gamePadLeftY() {
+                return inputState.inputEvents.gamePadLeftY;
+            }
+
+            public float gamePadRightX() {
+                return inputState.inputEvents.gamePadRightX;
+            }
+
+            public float gamePadRightY() {
+                return inputState.inputEvents.gamePadRightY;
+            }
         }
 
-        public boolean keyUpKey(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++)
-                if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
-            return false;
-        }
-
-        public boolean isKeyUp(int keyCode) {
-            return !inputState.inputEvents.keysDown[keyCode];
-        }
-
-        /* ---- GAMEPAD EVENTS --- */
-        public boolean gamePadDown() {
-            return inputState.inputEvents.gamePadButtonDown;
-        }
-
-        public ArrayList<Integer> gamePadDownButtons() {
-            return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
-        }
-
-        public boolean gamePadDownButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonDownKeyCodes.size(); i++)
-                if (keyCode == inputState.inputEvents.gamePadButtonDownKeyCodes.get(i)) return true;
-            return false;
-        }
-
-        public boolean gamePadIsButtonDown(int keyCode) {
-            return inputState.inputEvents.gamePadButtonsDown[keyCode];
-        }
-
-        public boolean gamePadUp() {
-            return inputState.inputEvents.gamePadButtonUp;
-        }
-
-        public ArrayList<Integer> gamePadUpButtons() {
-            return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
-        }
-
-        public boolean gamePadUpButton(int keyCode) {
-            for (int i = 0; i < inputState.inputEvents.gamePadButtonUpKeyCodes.size(); i++)
-                if (keyCode == inputState.inputEvents.gamePadButtonUpKeyCodes.get(i)) return true;
-            return false;
-        }
-
-        public boolean gamePadIsButtonUp(int keyCode) {
-            return !inputState.inputEvents.gamePadButtonsDown[keyCode];
-        }
-        public boolean gamePadConnected() {
-            return inputState.inputEvents.gamePadConnected;
-        }
-        public boolean gamePadDisconnected() {
-            return inputState.inputEvents.gamePadDisconnected;
-        }
-        public boolean gamePadLeftXMoved() {
-            return inputState.inputEvents.gamePadLeftXMoved;
-        }
-        public boolean gamePadLeftYMoved() {
-            return inputState.inputEvents.gamePadLeftYMoved;
-        }
-        public boolean gamePadLeftMoved() {
-            return gamePadLeftXMoved() || gamePadLeftYMoved();
-        }
-        public float gamePadLeftX() {
-            return inputState.inputEvents.gamePadLeftX;
-        }
-        public float gamePadLeftY() {
-            return inputState.inputEvents.gamePadLeftY;
-        }
-        public boolean gamePadRightXMoved() {
-            return inputState.inputEvents.gamePadRightXMoved;
-        }
-        public boolean gamePadRightYMoved() {
-            return inputState.inputEvents.gamePadRightYMoved;
-        }
-        public boolean gamePadRightMoved() {
-            return gamePadRightXMoved() || gamePadRightYMoved();
-        }
-        public float gamePadRightX() {
-            return inputState.inputEvents.gamePadRightX;
-        }
-        public float gamePadRightY() {
-            return inputState.inputEvents.gamePadRightY;
-        }
-        public boolean gamePadLeftTriggerMoved() {
-            return inputState.inputEvents.gamePadLeftTriggerMoved;
-        }
-        public float gamePadLeftTrigger() {
-            return inputState.inputEvents.gamePadLeftTrigger;
-        }
-        public boolean gamePadRightTriggerMoved() {
-            return inputState.inputEvents.gamePadRightTriggerMoved;
-        }
-        public float gamePadRightTrigger() {
-            return inputState.inputEvents.gamePadRightTrigger;
-        }
 
     }
 

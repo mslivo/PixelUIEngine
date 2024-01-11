@@ -797,8 +797,8 @@ public class UIEngine<T extends UIAdapter> {
                     if (dragInventory.inventoryAction != null) dragInventory.inventoryAction.onDragIntoScreen(
                             dragItem,
                             dragFromX, dragFromY,
-                            api.input.mouseX(),
-                            api.input.mouseY()
+                            api.input.state.mouseX(),
+                            api.input.state.mouseY()
                     );
                 }
                 inputState.inventoryDrag_Inventory = null;
@@ -837,8 +837,8 @@ public class UIEngine<T extends UIAdapter> {
                     if (dragList.listAction != null) dragList.listAction.onDragIntoScreen(
                             dragItem,
                             dragFromIndex,
-                            api.input.mouseX(),
-                            api.input.mouseY()
+                            api.input.state.mouseX(),
+                            api.input.state.mouseY()
                     );
                 }
                 inputState.listDrag_List = null;
