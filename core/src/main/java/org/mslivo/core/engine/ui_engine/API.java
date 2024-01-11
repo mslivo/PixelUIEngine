@@ -1595,30 +1595,30 @@ public class API {
     }
 
     public static class _Config {
-        private boolean hardwareMouseEnabled;
-        private boolean keyboardMouseEnabled;
-        private int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
-        private int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
-        private int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
-        private int[] keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
-        private int[] keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
-        private int[] keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.CONTROL_RIGHT};
-        private int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.TAB};
-        private int[] keyboardMouseButtonsMouse4 = new int[]{KeyCode.Key.UNKNOWN};
-        private int[] keyboardMouseButtonsMouse5 = new int[]{KeyCode.Key.UNKNOWN};
-        private int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
-        private int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
+        private boolean hardwareMouseEnabled = true;
+        private boolean keyboardMouseEnabled = false;
+        private int[] keyboardMouseButtonsUp = null;
+        private int[] keyboardMouseButtonsDown = null;
+        private int[] keyboardMouseButtonsLeft = null;
+        private int[] keyboardMouseButtonsRight = null;
+        private int[] keyboardMouseButtonsMouse1 = null;
+        private int[] keyboardMouseButtonsMouse2 = null;
+        private int[] keyboardMouseButtonsMouse3 = null;
+        private int[] keyboardMouseButtonsMouse4 = null;
+        private int[] keyboardMouseButtonsMouse5 = null;
+        private int[] keyboardMouseButtonsScrollUp = null;
+        private int[] keyboardMouseButtonsScrollDown = null;
         private boolean gamePadMouseEnabled = false;
         private float gamePadMouseJoystickDeadZone = 0.3f;
-        private boolean gamePadMouseStickLeftEnabled = true;
+        private boolean gamePadMouseStickLeftEnabled = false;
         private boolean gamePadMouseStickRightEnabled = false;
-        private int[] gamePadMouseButtonsMouse1 = new int[]{KeyCode.GamePad.A};
-        private int[] gamePadMouseButtonsMouse2 = new int[]{KeyCode.GamePad.B};
-        private int[] gamePadMouseButtonsMouse3 = new int[]{KeyCode.GamePad.X};
-        private int[] gamePadMouseButtonsMouse4 = new int[]{KeyCode.GamePad.Y};
-        private int[] gamePadMouseButtonsMouse5 = new int[]{};
-        private int[] gamePadMouseButtonsScrollUp = new int[]{KeyCode.GamePad.DPAD_UP};
-        private int[] gamePadMouseButtonsScrollDown = new int[]{KeyCode.GamePad.DPAD_DOWN};
+        private int[] gamePadMouseButtonsMouse1 = null;
+        private int[] gamePadMouseButtonsMouse2 = null;
+        private int[] gamePadMouseButtonsMouse3 = null;
+        private int[] gamePadMouseButtonsMouse4 = null;
+        private int[] gamePadMouseButtonsMouse5 = null;
+        private int[] gamePadMouseButtonsScrollUp = null;
+        private int[] gamePadMouseButtonsScrollDown = null;
         private float simulatedMouseCursorSpeed = 4.0f;
         private boolean windowsDefaultEnforceScreenBounds = false;
         private Color windowsDefaultColor = Color.WHITE.cpy();
@@ -1732,7 +1732,7 @@ public class API {
             return keyboardMouseButtonsMouse2;
         }
 
-        public void setKeyboardMouseButtonsMouse2(int[] keyboardMouseButtonsMouse2) {
+        public void setKeyboardMouseButtonsMouse2(int... keyboardMouseButtonsMouse2) {
             this.keyboardMouseButtonsMouse2 = keyboardMouseButtonsMouse2;
         }
 
@@ -1740,7 +1740,7 @@ public class API {
             return keyboardMouseButtonsMouse3;
         }
 
-        public void setKeyboardMouseButtonsMouse3(int[] keyboardMouseButtonsMouse3) {
+        public void setKeyboardMouseButtonsMouse3(int... keyboardMouseButtonsMouse3) {
             this.keyboardMouseButtonsMouse3 = keyboardMouseButtonsMouse3;
         }
 
@@ -1748,7 +1748,7 @@ public class API {
             return keyboardMouseButtonsMouse4;
         }
 
-        public void setKeyboardMouseButtonsMouse4(int[] keyboardMouseButtonsMouse4) {
+        public void setKeyboardMouseButtonsMouse4(int... keyboardMouseButtonsMouse4) {
             this.keyboardMouseButtonsMouse4 = keyboardMouseButtonsMouse4;
         }
 
@@ -1756,7 +1756,7 @@ public class API {
             return keyboardMouseButtonsMouse5;
         }
 
-        public void setKeyboardMouseButtonsMouse5(int[] keyboardMouseButtonsMouse5) {
+        public void setKeyboardMouseButtonsMouse5(int... keyboardMouseButtonsMouse5) {
             this.keyboardMouseButtonsMouse5 = keyboardMouseButtonsMouse5;
         }
 
@@ -1764,7 +1764,7 @@ public class API {
             return keyboardMouseButtonsUp;
         }
 
-        public void setKeyboardMouseButtonsUp(int[] keyboardMouseButtonsUp) {
+        public void setKeyboardMouseButtonsUp(int... keyboardMouseButtonsUp) {
             this.keyboardMouseButtonsUp = keyboardMouseButtonsUp;
         }
 
@@ -1772,7 +1772,7 @@ public class API {
             return keyboardMouseButtonsDown;
         }
 
-        public void setKeyBoardControlButtonsDown(int[] keyBoardControlButtonsDown) {
+        public void setKeyBoardControlButtonsDown(int... keyBoardControlButtonsDown) {
             this.keyboardMouseButtonsDown = keyBoardControlButtonsDown;
         }
 
@@ -1780,7 +1780,7 @@ public class API {
             return keyboardMouseButtonsLeft;
         }
 
-        public void setKeyboardMouseButtonsLeft(int[] keyboardMouseButtonsLeft) {
+        public void setKeyboardMouseButtonsLeft(int... keyboardMouseButtonsLeft) {
             this.keyboardMouseButtonsLeft = keyboardMouseButtonsLeft;
         }
 
@@ -1788,7 +1788,7 @@ public class API {
             return keyboardMouseButtonsRight;
         }
 
-        public void setKeyboardMouseButtonsRight(int[] keyboardMouseButtonsRight) {
+        public void setKeyboardMouseButtonsRight(int... keyboardMouseButtonsRight) {
             this.keyboardMouseButtonsRight = keyboardMouseButtonsRight;
         }
 
@@ -1804,7 +1804,7 @@ public class API {
             return keyboardMouseButtonsDown;
         }
 
-        public void setKeyboardMouseButtonsDown(int[] keyboardMouseButtonsDown) {
+        public void setKeyboardMouseButtonsDown(int... keyboardMouseButtonsDown) {
             this.keyboardMouseButtonsDown = keyboardMouseButtonsDown;
         }
 
@@ -1812,7 +1812,7 @@ public class API {
             return keyboardMouseButtonsMouse1;
         }
 
-        public void setKeyboardMouseButtonsMouse1(int[] keyboardMouseButtonsMouse1) {
+        public void setKeyboardMouseButtonsMouse1(int... keyboardMouseButtonsMouse1) {
             this.keyboardMouseButtonsMouse1 = keyboardMouseButtonsMouse1;
         }
 
@@ -1820,7 +1820,7 @@ public class API {
             return keyboardMouseButtonsScrollUp;
         }
 
-        public void setKeyboardMouseButtonsScrollUp(int[] keyboardMouseButtonsScrollUp) {
+        public void setKeyboardMouseButtonsScrollUp(int... keyboardMouseButtonsScrollUp) {
             this.keyboardMouseButtonsScrollUp = keyboardMouseButtonsScrollUp;
         }
 
@@ -1828,7 +1828,7 @@ public class API {
             return keyboardMouseButtonsScrollDown;
         }
 
-        public void setKeyboardMouseButtonsScrollDown(int[] keyboardMouseButtonsScrollDown) {
+        public void setKeyboardMouseButtonsScrollDown(int... keyboardMouseButtonsScrollDown) {
             this.keyboardMouseButtonsScrollDown = keyboardMouseButtonsScrollDown;
         }
 
@@ -2034,7 +2034,7 @@ public class API {
             return gamePadMouseButtonsMouse1;
         }
 
-        public void setGamePadMouseButtonsMouse1(int[] gamePadMouseButtonsMouse1) {
+        public void setGamePadMouseButtonsMouse1(int... gamePadMouseButtonsMouse1) {
             this.gamePadMouseButtonsMouse1 = gamePadMouseButtonsMouse1;
         }
 
@@ -2042,7 +2042,7 @@ public class API {
             return gamePadMouseButtonsMouse2;
         }
 
-        public void setGamePadMouseButtonsMouse2(int[] gamePadMouseButtonsMouse2) {
+        public void setGamePadMouseButtonsMouse2(int... gamePadMouseButtonsMouse2) {
             this.gamePadMouseButtonsMouse2 = gamePadMouseButtonsMouse2;
         }
 
@@ -2050,7 +2050,7 @@ public class API {
             return gamePadMouseButtonsMouse3;
         }
 
-        public void setGamePadMouseButtonsMouse3(int[] gamePadMouseButtonsMouse3) {
+        public void setGamePadMouseButtonsMouse3(int... gamePadMouseButtonsMouse3) {
             this.gamePadMouseButtonsMouse3 = gamePadMouseButtonsMouse3;
         }
 
@@ -2058,7 +2058,7 @@ public class API {
             return gamePadMouseButtonsMouse4;
         }
 
-        public void setGamePadMouseButtonsMouse4(int[] gamePadMouseButtonsMouse4) {
+        public void setGamePadMouseButtonsMouse4(int... gamePadMouseButtonsMouse4) {
             this.gamePadMouseButtonsMouse4 = gamePadMouseButtonsMouse4;
         }
 
@@ -2066,7 +2066,7 @@ public class API {
             return gamePadMouseButtonsMouse5;
         }
 
-        public void setGamePadMouseButtonsMouse5(int[] gamePadMouseButtonsMouse5) {
+        public void setGamePadMouseButtonsMouse5(int... gamePadMouseButtonsMouse5) {
             this.gamePadMouseButtonsMouse5 = gamePadMouseButtonsMouse5;
         }
 
@@ -2074,7 +2074,7 @@ public class API {
             return gamePadMouseButtonsScrollUp;
         }
 
-        public void setGamePadMouseButtonsScrollUp(int[] gamePadMouseButtonsScrollUp) {
+        public void setGamePadMouseButtonsScrollUp(int... gamePadMouseButtonsScrollUp) {
             this.gamePadMouseButtonsScrollUp = gamePadMouseButtonsScrollUp;
         }
 
@@ -2082,7 +2082,7 @@ public class API {
             return gamePadMouseButtonsScrollDown;
         }
 
-        public void setGamePadMouseButtonsScrollDown(int[] gamePadMouseButtonsScrollDown) {
+        public void setGamePadMouseButtonsScrollDown(int... gamePadMouseButtonsScrollDown) {
             this.gamePadMouseButtonsScrollDown = gamePadMouseButtonsScrollDown;
         }
 

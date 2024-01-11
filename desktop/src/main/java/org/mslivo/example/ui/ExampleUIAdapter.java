@@ -12,6 +12,7 @@ import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
@@ -86,9 +87,19 @@ public class ExampleUIAdapter implements UIAdapter {
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setHardwareMouseEnabled(true);
+
         api.config.setKeyboardMouseEnabled(true);
+        api.config.setKeyboardMouseButtonsUp(KeyCode.Key.UP);
+        api.config.setKeyboardMouseButtonsDown(KeyCode.Key.DOWN);
+        api.config.setKeyboardMouseButtonsLeft(KeyCode.Key.LEFT);
+        api.config.setKeyboardMouseButtonsRight(KeyCode.Key.RIGHT);
+
+        api.config.setKeyboardMouseButtonsMouse1(KeyCode.Key.CONTROL_LEFT);
+
         api.config.setGamePadMouseEnabled(true);
+        api.config.setGamePadMouseStickLeftEnabled(true);
         api.config.setGamePadMouseStickRightEnabled(true);
+        api.config.setGamePadMouseButtonsMouse1(KeyCode.GamePad.A);
     }
 
     @Override
