@@ -32,17 +32,27 @@ public class Tools {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
-    private static float skipFrameAccumulator = 0f;
+    public static class Update {
+        private static float skipFrameAccumulator = 0f;
+        private static int updatesPerSecond = 60;
+        private static float timeStep;
 
-    public static boolean runStep(int updatesPerSecond) {
-        float TIME_STEP = (1f / (float) updatesPerSecond);
-        skipFrameAccumulator += Gdx.graphics.getDeltaTime();
-        if (skipFrameAccumulator < TIME_STEP) {
-            return false;
-        } else {
-            skipFrameAccumulator -= TIME_STEP;
-            return true;
+        public static void setUpdatesPerSecond(int updatesPerSecond){
+            Update.updatesPerSecond = Tools.Calc.lowerBounds(updatesPerSecond,1);
+            timeStep = (1f/(float) Update.updatesPerSecond);
+            skipFrameAccumulator = 0;
         }
+
+        public static boolean runUpdate() {
+            skipFrameAccumulator += Gdx.graphics.getDeltaTime();
+            if (skipFrameAccumulator < timeStep) {
+                return false;
+            } else {
+                skipFrameAccumulator -= timeStep;
+                return true;
+            }
+        }
+
     }
 
     public static class Log {
@@ -118,14 +128,6 @@ public class Tools {
                 ex.printStackTrace();
             }
         }
-
-
-
-
-    }
-
-    public static class Colors {
-
 
     }
 
