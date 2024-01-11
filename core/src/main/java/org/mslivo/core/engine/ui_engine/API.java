@@ -2217,7 +2217,7 @@ public class API {
         }
 
 
-        class Event {
+        public class Event {
             /* ---- MOUSE EVENTS --- */
             public boolean mouseDown() {
                 return inputState.inputEvents.mouseDown;
@@ -2330,7 +2330,7 @@ public class API {
             }
         }
 
-        class State {
+        public class State {
 
             /* ---- MOUSE STATES --- */
 
