@@ -96,10 +96,13 @@ public class ExampleUIAdapter implements UIAdapter {
 
         api.config.setKeyboardMouseButtonsMouse1(KeyCode.Key.CONTROL_LEFT);
 
+
         api.config.setGamePadMouseEnabled(true);
         api.config.setGamePadMouseStickLeftEnabled(true);
         api.config.setGamePadMouseStickRightEnabled(true);
         api.config.setGamePadMouseButtonsMouse1(KeyCode.GamePad.A);
+        api.config.setGamePadMouseButtonsMouse2(KeyCode.GamePad.B);
+        api.config.setGamePadMouseButtonsMouse3(KeyCode.GamePad.Y);
     }
 
     @Override

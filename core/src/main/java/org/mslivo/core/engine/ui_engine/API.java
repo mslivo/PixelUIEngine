@@ -1552,53 +1552,60 @@ public class API {
                     config.defaultFont, Color.BLACK);
         }
 
-        public void changeCase() {
-            if (inputState.openMouseTextInput == null) return;
-            changeCase(inputState.openMouseTextInput.upperCase);
-        }
-
         public boolean isUpperCase() {
             if (inputState.openMouseTextInput == null) return false;
             return inputState.openMouseTextInput.upperCase;
         }
 
-        public void changeCase(boolean upperCase) {
+        public void enterChangeCase() {
+            enterChangeCase(!inputState.openMouseTextInput.upperCase);
+        }
+
+        public void enterChangeCase(boolean upperCase) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.upperCase = upperCase;
+            if (inputState.openMouseTextInput.upperCase != upperCase) {
+                enterCharacter('\t');
+            }
+        }
+
+        public void enterDelete() {
+            if (inputState.openMouseTextInput == null) return;
+            enterCharacter('\b');
+        }
+
+        public void enterConfirm() {
+            if (inputState.openMouseTextInput == null) return;
+            enterCharacter('\n');
+        }
+
+        public void enterCharacters(String text) {
+            if (inputState.openMouseTextInput == null) return;
+            char[] characters = text.toCharArray();
+            for(int i=0;i<characters.length;i++) enterCharacter(characters[i]);
+        }
+
+
+        public void enterCharacter(char character) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.mTextInputAPICharacterQueue.push(character);
         }
 
         public void selectCharacter(char character) {
             if (inputState.openMouseTextInput == null) return;
-            char[] charactersLC = inputState.openMouseTextInput.charactersLC;
-            char[] charactersUC = inputState.openMouseTextInput.charactersUC;
-            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
-            for (int i = 0; i < maxCharacters; i++) {
-                if (character == charactersLC[i]) {
-                    inputState.openMouseTextInput.selectedIndex = i;
-                    break;
-                }
-                if (character == charactersUC[i]) {
-                    inputState.openMouseTextInput.selectedIndex = i;
-                    inputState.openMouseTextInput.upperCase = true;
-                    break;
-                }
-            }
-        }
-        public void selectCharacter(int index) {
-            if (inputState.openMouseTextInput == null) return;
-            char[] charactersLC = inputState.openMouseTextInput.charactersLC;
-            char[] charactersUC = inputState.openMouseTextInput.charactersUC;
-            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
-            inputState.openMouseTextInput.selectedIndex = Tools.Calc.inBounds(index,0,maxCharacters);
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, character);
         }
 
+        public void selectIndex(int index) {
+            if (inputState.openMouseTextInput == null) return;
+            UICommons.mouseTextInput_selectIndex(inputState.openMouseTextInput, index);
+        }
 
         private void setCharacters(char[] charactersLC, char[] charactersUC) {
             if (inputState.openMouseTextInput == null) return;
             if (charactersLC == null || charactersUC == null) return;
             int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
-            inputState.openMouseTextInput.charactersLC = new char[maxCharacters+3];
-            inputState.openMouseTextInput.charactersUC = new char[maxCharacters+3];
+            inputState.openMouseTextInput.charactersLC = new char[maxCharacters + 3];
+            inputState.openMouseTextInput.charactersUC = new char[maxCharacters + 3];
             for (int i = 0; i < maxCharacters; i++) {
                 if (Character.isISOControl(charactersLC[i]) || Character.isISOControl(charactersUC[i]))
                     throw new RuntimeException("ISO Control character not allowed");
@@ -1607,10 +1614,10 @@ public class API {
             }
             inputState.openMouseTextInput.charactersLC[maxCharacters] = '\t';
             inputState.openMouseTextInput.charactersUC[maxCharacters] = '\t';
-            inputState.openMouseTextInput.charactersLC[maxCharacters+1] = '\b';
-            inputState.openMouseTextInput.charactersUC[maxCharacters+1] = '\b';
-            inputState.openMouseTextInput.charactersLC[maxCharacters+2] = '\n';
-            inputState.openMouseTextInput.charactersUC[maxCharacters+2] = '\n';
+            inputState.openMouseTextInput.charactersLC[maxCharacters + 1] = '\b';
+            inputState.openMouseTextInput.charactersUC[maxCharacters + 1] = '\b';
+            inputState.openMouseTextInput.charactersLC[maxCharacters + 2] = '\n';
+            inputState.openMouseTextInput.charactersUC[maxCharacters + 2] = '\n';
         }
 
         private void setColor(float r, float g, float b, float a) {
@@ -1623,18 +1630,18 @@ public class API {
 
         private void setPosition(int x, int y) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.x = x-6;
-            inputState.openMouseTextInput.y = y-12;
+            inputState.openMouseTextInput.x = x - 6;
+            inputState.openMouseTextInput.y = y - 12;
         }
 
-        private void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction){
+        private void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction) {
             if (inputState.openMouseTextInput == null) return;
             inputState.openMouseTextInput.mouseTextInputAction = mouseTextInputAction;
         }
 
-        private void setFont(CMediaFont font){
+        private void setFont(CMediaFont font) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.font = font == null ? config.defaultFont : font ;
+            inputState.openMouseTextInput.font = font == null ? config.defaultFont : font;
         }
 
 
@@ -1649,14 +1656,14 @@ public class API {
 
             setFont(font);
             setMouseTextInputAction(mouseTextInputAction);
-            changeCase(false);
+            enterChangeCase(false);
             setPosition(x, y);
             setColor(color.r, color.g, color.b, color.a);
             setCharacters(charactersLC, charactersUC);
             if (selectedCharacter != null) {
                 selectCharacter(selectedCharacter);
             } else {
-                selectCharacter(0);
+                selectIndex(0);
             }
         }
 

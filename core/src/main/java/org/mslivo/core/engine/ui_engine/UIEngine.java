@@ -50,6 +50,7 @@ import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
@@ -180,14 +181,15 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mTextInputConfirmPressed = false;
         newInputState.mTextInputChangeCasePressed = false;
         newInputState.mTextInputDeletePressed = false;
-        newInputState.mTextInputKeyBoardGamePadLeft = false;
-        newInputState.mTextInputKeyBoardGamePadRight = false;
+        newInputState.mTextInputGamePadLeft = false;
+        newInputState.mTextInputGamePadRight = false;
         newInputState.mTextInputScrollTimer = 0;
         newInputState.mTextInputScrollTime = 0;
         newInputState.mTextInputScrollSpeed = 0;
         newInputState.mTextInputTranslatedMouse1Down = false;
         newInputState.mTextInputTranslatedMouse2Down = false;
         newInputState.mTextInputUnlock = false;
+        newInputState.mTextInputAPICharacterQueue = new ArrayDeque<>();
         newInputState.usedTextFieldThisUpdate = null;
         newInputState.usedHotKeyThisUpdate = null;
         newInputState.modalWindow = null;
@@ -237,7 +239,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2, internalResolutionHeight / 2);
         newInputState.hardwareMouseLastPosition = new GridPoint2(0, 0);
         newInputState.simulatedMouseLastMouseClick = 0;
-        newInputState.keyBoardMouseSpeedUp = new Vector2(0,0);
+        newInputState.keyBoardMouseSpeedUp = new Vector2(0, 0);
         newInputState.simulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
         newInputState.keyBoardTranslatedKeysDown = new boolean[256];
         newInputState.gamePadTranslatedButtonsDown = new boolean[15];
@@ -336,14 +338,14 @@ public class UIEngine<T extends UIAdapter> {
                             if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                         }
-                    }  else if (keyDownKeyCode == Input.Keys.FORWARD_DEL) {
+                    } else if (keyDownKeyCode == Input.Keys.FORWARD_DEL) {
                         if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
                             String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
                             UICommons.textField_setContent(focusedTextField, newContent);
                             if (focusedTextField.textFieldAction != null)
                                 focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
                         }
-                    } else if (keyDownKeyCode == Input.Keys.ENTER || keyDownKeyCode == Input.Keys.NUMPAD_ENTER){
+                    } else if (keyDownKeyCode == Input.Keys.ENTER || keyDownKeyCode == Input.Keys.NUMPAD_ENTER) {
                         if (focusedTextField.textFieldAction != null)
                             focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                         UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
@@ -357,9 +359,9 @@ public class UIEngine<T extends UIAdapter> {
                     boolean hotKeyPressed = true;
                     hkLoop:
                     for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
-                        if(inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]){
+                        if (inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
                             inputState.usedHotKeyThisUpdate = hotKey;
-                        }else{
+                        } else {
                             hotKeyPressed = false;
                             break hkLoop;
                         }
@@ -478,15 +480,7 @@ public class UIEngine<T extends UIAdapter> {
 
             if (processMouseClick) {
                 Window moveWindow = null;
-                boolean isMouseLeftButton = false;
-                for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
-                    int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                    if (mouseDownButton == Input.Buttons.LEFT) {
-                        isMouseLeftButton = true;
-                        break;
-                    }
-                }
-
+                boolean isMouseLeftButton = inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT];
                 if (isMouseLeftButton) {
                     // Mouse Action
                     if (inputState.lastGUIMouseHover.getClass() == Window.class) {
@@ -1174,7 +1168,6 @@ public class UIEngine<T extends UIAdapter> {
         updateGameMouseXY();
     }
 
-
     private void updateMouseTextInputControl() {
         if (inputState.openMouseTextInput == null) return;
         MouseTextInput mouseTextInput = inputState.openMouseTextInput;
@@ -1184,8 +1177,8 @@ public class UIEngine<T extends UIAdapter> {
         boolean confirmPressed = false;
         boolean changeCasePressed = false;
         boolean deletePressed = false;
-        boolean leftKeyBoardGamePad = false;
-        boolean rightKeyBoardGamePad = false;
+        boolean leftGamePad = false;
+        boolean rightGamePad = false;
         switch (inputState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
@@ -1197,118 +1190,105 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.mTextInputMouseX = Gdx.input.getX();
                 }
                 if (inputState.inputEvents.mouseDown) {
+                    // Choke Events & Translate
                     int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
-                    int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfLeft != -1) {
-                        // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
                         inputState.inputEvents.mouseDownButtons.remove(indexOfLeft);
-                        // Translate
                         inputState.mTextInputTranslatedMouse1Down = true;
                     }
+                    int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfRight != -1) {
-                        // Choke Events
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.RIGHT] = false;
                         inputState.inputEvents.mouseDownButtons.remove(indexOfRight);
-                        // Translate
                         inputState.mTextInputTranslatedMouse2Down = true;
+                    }
+                    int indexOfMiddle = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.MIDDLE);
+                    if (indexOfMiddle != -1) {
+                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.MIDDLE] = false;
+                        inputState.inputEvents.mouseDownButtons.remove(indexOfMiddle);
+                        inputState.mTextInputTranslatedMouse3Down = true;
                     }
                     inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size() > 0;
                 }
                 if (inputState.inputEvents.mouseUp) {
+                    // Choke Events & Translate
                     int indexOfLeft = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.LEFT);
-                    int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfLeft != -1) {
-                        // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(indexOfLeft);
-                        // Translate
                         inputState.mTextInputTranslatedMouse1Down = false;
                     }
+                    int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfRight != -1) {
-                        // Choke Events
                         inputState.inputEvents.mouseUpButtons.remove(indexOfRight);
                         inputState.mTextInputTranslatedMouse2Down = false;
+                    }
+                    int indexOfMiddle = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.MIDDLE);
+                    if (indexOfMiddle != -1) {
+                        inputState.inputEvents.mouseUpButtons.remove(indexOfMiddle);
+                        inputState.mTextInputTranslatedMouse3Down = false;
                     }
                     inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size() > 0;
                 }
                 confirmPressed = inputState.mTextInputTranslatedMouse1Down;
                 deletePressed = inputState.mTextInputTranslatedMouse2Down;
-                // Change Case
-                if (inputState.inputEvents.mouseScrolled) {
-                    if (inputState.inputEvents.mouseScrolledAmount > 0 && mouseTextInput.upperCase)
-                        changeCasePressed = true;
-                    if (inputState.inputEvents.mouseScrolledAmount < 0 && !mouseTextInput.upperCase)
-                        changeCasePressed = true;
-                    inputState.inputEvents.mouseScrolled = false;
-                    inputState.inputEvents.mouseScrolledAmount = 0f;
-                }
-
+                changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
             }
             case KEYBOARD -> {
-                leftKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsLeft());
-                rightKeyBoardGamePad = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsRight());
-                confirmPressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse1());
-                deletePressed = isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsMouse2());
-                if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollUp())) {
-                    changeCasePressed = !mouseTextInput.upperCase;
-                } else if (isTranslatedKeyCodeDown(inputState.keyBoardTranslatedKeysDown, api.config.getKeyboardMouseButtonsScrollDown())) {
-                    changeCasePressed = mouseTextInput.upperCase;
+                // Not Needed, focus last typed character
+                if (inputState.inputEvents.keyTyped) {
+                    char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
+                    UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
                 }
             }
             case GAMEPAD -> {
                 boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
                 boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
                 final float sensitivity = 0.4f;
-                leftKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
-                rightKeyBoardGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
+                leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
+                rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
                 confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
-                if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollUp())) {
-                    changeCasePressed = !mouseTextInput.upperCase;
-                } else if (isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsScrollDown())) {
-                    changeCasePressed = mouseTextInput.upperCase;
-                }
-            }
-        }
+                changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse3());
 
-        if (inputState.currentControlMode == MouseControlMode.GAMEPAD || inputState.currentControlMode == MouseControlMode.KEYBOARD) {
-            if (leftKeyBoardGamePad) {
-                if (inputState.mTextInputKeyBoardGamePadLeft == false) {
-                    scrollDirection = -1;
-                    inputState.mTextInputKeyBoardGamePadLeft = true;
-                }
-            } else {
-                inputState.mTextInputKeyBoardGamePadLeft = false;
-            }
-            if (rightKeyBoardGamePad) {
-                if (inputState.mTextInputKeyBoardGamePadRight == false) {
-                    scrollDirection = 1;
-                    inputState.mTextInputKeyBoardGamePadRight = true;
-                }
-            } else {
-                inputState.mTextInputKeyBoardGamePadRight = false;
-            }
-
-            // Continue Scroll
-            if (leftKeyBoardGamePad || rightKeyBoardGamePad) {
-                inputState.mTextInputScrollTimer++;
-                if (inputState.mTextInputScrollTimer > inputState.mTextInputScrollTime) {
-                    inputState.mTextInputKeyBoardGamePadLeft = false;
-                    inputState.mTextInputKeyBoardGamePadRight = false;
-                    inputState.mTextInputScrollTimer = 0;
-                    inputState.mTextInputScrollSpeed++;
-                    if (inputState.mTextInputScrollSpeed >= 3) {
-                        inputState.mTextInputScrollTime = 2;
-                    } else if (inputState.mTextInputScrollSpeed >= 2) {
-                        inputState.mTextInputScrollTime = 5;
-                    } else if (inputState.mTextInputScrollSpeed >= 1) {
-                        inputState.mTextInputScrollTime = 10;
+                if (leftGamePad) {
+                    if (inputState.mTextInputGamePadLeft == false) {
+                        scrollDirection = -1;
+                        inputState.mTextInputGamePadLeft = true;
                     }
+                } else {
+                    inputState.mTextInputGamePadLeft = false;
                 }
-            } else {
-                inputState.mTextInputScrollTimer = 0;
-                inputState.mTextInputScrollTime = 20;
-                inputState.mTextInputScrollSpeed = 0;
+                if (rightGamePad) {
+                    if (inputState.mTextInputGamePadRight == false) {
+                        scrollDirection = 1;
+                        inputState.mTextInputGamePadRight = true;
+                    }
+                } else {
+                    inputState.mTextInputGamePadRight = false;
+                }
+
+                // Continue Scroll
+                if (leftGamePad || rightGamePad) {
+                    inputState.mTextInputScrollTimer++;
+                    if (inputState.mTextInputScrollTimer > inputState.mTextInputScrollTime) {
+                        inputState.mTextInputGamePadLeft = false;
+                        inputState.mTextInputGamePadRight = false;
+                        inputState.mTextInputScrollTimer = 0;
+                        inputState.mTextInputScrollSpeed++;
+                        if (inputState.mTextInputScrollSpeed >= 3) {
+                            inputState.mTextInputScrollTime = 2;
+                        } else if (inputState.mTextInputScrollSpeed >= 2) {
+                            inputState.mTextInputScrollTime = 5;
+                        } else if (inputState.mTextInputScrollSpeed >= 1) {
+                            inputState.mTextInputScrollTime = 10;
+                        }
+                    }
+                } else {
+                    inputState.mTextInputScrollTimer = 0;
+                    inputState.mTextInputScrollTime = 20;
+                    inputState.mTextInputScrollSpeed = 0;
+                }
             }
         }
 
@@ -1321,9 +1301,16 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        // Confirm Character / Change Case
+        // Scroll
+        if(scrollDirection != 0){
+            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+        }
+
+
+
+        // Confirm Character from Input
         boolean confirmCharacter = false;
-        boolean changeCase = false;
+        boolean changeCaseMouse = false;
         boolean deleteCharacter = false;
         if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
         if (!confirmPressed && inputState.mTextInputConfirmPressed) {
@@ -1334,7 +1321,7 @@ public class UIEngine<T extends UIAdapter> {
         if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
         if (!changeCasePressed && inputState.mTextInputChangeCasePressed) {
             confirmCharacter = true;
-            changeCase = true;
+            changeCaseMouse = true;
             inputState.mTextInputChangeCasePressed = false;
         }
 
@@ -1345,29 +1332,16 @@ public class UIEngine<T extends UIAdapter> {
             inputState.mTextInputDeletePressed = false;
         }
 
-        // Set Index
-        if (inputState.inputEvents.keyTyped) {
-            char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
-            findCharLoop:
-            for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
-                if (mouseTextInput.charactersLC[i] == typedChar) {
-                    mouseTextInput.selectedIndex = i;
-                    mouseTextInput.upperCase = false;
-                    break findCharLoop;
-                } else if (mouseTextInput.charactersUC[i] == typedChar) {
-                    mouseTextInput.selectedIndex = i;
-                    mouseTextInput.upperCase = true;
-                    break findCharLoop;
-                }
-
-            }
-        } else if (scrollDirection != 0) {
-            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+        // Confirm Character from API
+        if(!inputState.mTextInputAPICharacterQueue.isEmpty()){
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, inputState.mTextInputAPICharacterQueue.pollLast());
+            confirmCharacter = true;
         }
+
 
         if (confirmCharacter) {
             char c;
-            if (changeCase) {
+            if (changeCaseMouse) {
                 c = '\t';
             } else if (deleteCharacter) {
                 c = '\b';
@@ -1477,7 +1451,7 @@ public class UIEngine<T extends UIAdapter> {
                     } else if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
                         for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
                             inputState.gamePadTranslatedButtonsDown[i] = false;
-                        inputState.keyBoardMouseSpeedUp.set(0f,0f);
+                        inputState.keyBoardMouseSpeedUp.set(0f, 0f);
                     }
                     for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
                     inputState.simulatedMouseLastMouseClick = 0;
@@ -1635,8 +1609,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void keyboardMouseTranslateAndChokeEvents() {
-        if (inputState.focusedTextField != null)
-            return; // Stop Keyboard control if the user wants to type into a textfield
+        boolean textFieldFocused = inputState.focusedTextField != null;
 
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
@@ -1646,14 +1619,28 @@ public class UIEngine<T extends UIAdapter> {
                     int keyCode = buttons[i2];
                     if (inputState.inputEvents.keyDown) {
                         ArrayList<Integer> downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
-                        keyCodeLoop:for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        keyCodeLoop:
+                        for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             int downKeyCode = downKeyCodes.get(ikc);
-                            if (downKeyCode == keyCode) {
+                            boolean choke = true;
+                            if (textFieldFocused && (
+                                    downKeyCode == KeyCode.Key.LEFT ||
+                                            downKeyCode == KeyCode.Key.RIGHT ||
+                                            downKeyCode == KeyCode.Key.HOME ||
+                                            downKeyCode == KeyCode.Key.END ||
+                                            downKeyCode == KeyCode.Key.BACKSPACE ||
+                                            downKeyCode == KeyCode.Key.FORWARD_DEL ||
+                                            downKeyCode == KeyCode.Key.ENTER
+                            )) {
+                                choke = false; // // dont choke textfield control character
+                            }
+                            if (choke && downKeyCode == keyCode) {
                                 downKeyCodes.remove(ikc);
                                 inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.keysDown[keyCode] = false;
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = true;
                             }
+
                         }
                     }
                     if (inputState.inputEvents.keyUp) {
@@ -1670,7 +1657,6 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
     }
-
 
 
     private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
@@ -1832,15 +1818,15 @@ public class UIEngine<T extends UIAdapter> {
         boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsScrollDown());
 
         final float SPEEDUP_SPEED = 0.1f;
-        if (buttonLeft || buttonRight){
+        if (buttonLeft || buttonRight) {
             inputState.keyBoardMouseSpeedUp.x = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
-        }else{
-            inputState.keyBoardMouseSpeedUp.set(0,inputState.keyBoardMouseSpeedUp.y);
+        } else {
+            inputState.keyBoardMouseSpeedUp.set(0, inputState.keyBoardMouseSpeedUp.y);
         }
-        if(buttonUp || buttonDown){
+        if (buttonUp || buttonDown) {
             inputState.keyBoardMouseSpeedUp.y = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
-        }else{
-            inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x,0);
+        } else {
+            inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x, 0);
         }
 
         // Translate to mouse events

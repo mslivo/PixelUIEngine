@@ -25,6 +25,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
@@ -180,13 +181,14 @@ class UICommons {
         inputState.mTextInputConfirmPressed = false;
         inputState.mTextInputChangeCasePressed = false;
         inputState.mTextInputDeletePressed = false;
-        inputState.mTextInputKeyBoardGamePadLeft = false;
-        inputState.mTextInputKeyBoardGamePadRight = false;
+        inputState.mTextInputGamePadLeft = false;
+        inputState.mTextInputGamePadRight = false;
         inputState.mTextInputScrollTimer = 0;
         inputState.mTextInputScrollTime = 0;
         inputState.mTextInputScrollSpeed = 0;
         inputState.mTextInputTranslatedMouse1Down = false;
         inputState.mTextInputTranslatedMouse2Down = false;
+        inputState.mTextInputTranslatedMouse3Down = false;
         inputState.mTextInputUnlock = false;
     }
 
@@ -648,6 +650,26 @@ class UICommons {
         } else {
             return false;
         }
+    }
+
+    static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar){
+        findCharLoop:
+        for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
+            if (mouseTextInput.charactersLC[i] == selectChar) {
+                mouseTextInput_selectIndex(mouseTextInput, i);
+                mouseTextInput.upperCase = false;
+                break findCharLoop;
+            } else if (mouseTextInput.charactersUC[i] == selectChar) {
+                mouseTextInput_selectIndex(mouseTextInput, i);
+                mouseTextInput.upperCase = true;
+                break findCharLoop;
+            }
+        }
+    }
+
+    static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index){
+        int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
+        mouseTextInput.selectedIndex = Tools.Calc.inBounds(index,0,(maxCharacters-1));
     }
 
 
