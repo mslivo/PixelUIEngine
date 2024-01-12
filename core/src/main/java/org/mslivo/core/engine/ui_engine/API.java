@@ -4024,7 +4024,6 @@ public class API {
                     xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
                     yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
                     setOffsetContent(textButton, xOffset, yOffset);
-
                 }
             }
 
