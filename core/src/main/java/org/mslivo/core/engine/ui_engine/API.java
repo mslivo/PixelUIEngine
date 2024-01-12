@@ -3013,8 +3013,7 @@ public class API {
                 if (match) {
                     if (componentColor1) components.setColor(component, color);
                     if (componentColor2) components.setColor2(component, color);
-                    if (component.getClass() == ComboBox.class) {
-                        ComboBox comboBox = (ComboBox) component;
+                    if (component instanceof ComboBox comboBox) {
                         for (int i2 = 0; i2 < comboBox.items.size(); i2++)
                             components.comboBox.item.setColor(comboBox.items.get(i2), color);
                     }
@@ -4012,14 +4011,12 @@ public class API {
                 if (button == null) return;
                 int xOffset;
                 int yOffset;
-                if (button.getClass() == ImageButton.class) {
-                    ImageButton imageButton = (ImageButton) button;
+                if (button instanceof ImageButton imageButton) {
                     if (imageButton.image == null) return;
                     xOffset = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
                     yOffset = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
                     setOffsetContent(imageButton, xOffset, yOffset);
-                } else if (button.getClass() == TextButton.class) {
-                    TextButton textButton = (TextButton) button;
+                } else if (button instanceof TextButton textButton) {
                     if (textButton.text == null) return;
                     int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
                     int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;

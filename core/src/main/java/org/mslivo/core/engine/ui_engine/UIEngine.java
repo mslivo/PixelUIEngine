@@ -35,7 +35,6 @@ import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
 import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
 import org.mslivo.core.engine.ui_engine.gui.components.shape.Shape;
@@ -413,8 +412,7 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             if (processMouseDoubleClick) {
-                if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                    Window window = (Window) inputState.lastGUIMouseHover;
+                if (inputState.lastGUIMouseHover instanceof Window window) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (api.config.isFoldWindowsOnDoubleClick() && mouseDownButton == Input.Buttons.LEFT) {
@@ -484,190 +482,188 @@ public class UIEngine<T extends UIAdapter> {
                 boolean isMouseLeftButton = inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT];
                 if (isMouseLeftButton) {
                     // Mouse Action
-                    if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                        Window window = (Window) inputState.lastGUIMouseHover;
-                        if (window.moveAble) moveWindow = window;
-                    } else if (inputState.lastGUIMouseHover instanceof ContextMenuItem contextMenuItem) {
-                        ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
-                        if (contextMenuItem.contextMenuItemAction != null)
-                            contextMenuItem.contextMenuItemAction.onSelect();
-                        if (contextMenu.contextMenuAction != null)
-                            contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
-                        UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
-                    } else if (inputState.lastGUIMouseHover instanceof Button button) {
-                        inputState.pressedButton = button;
-                        if (button.mode == ButtonMode.TOGGLE) {
-                            button.pressed = !button.pressed;
-                        } else {
-                            button.pressed = true;
+                    switch (inputState.lastGUIMouseHover) {
+                        case Window window -> {
+                            if (window.moveAble) moveWindow = window;
                         }
-                        if (button.buttonAction != null) {
-                            button.buttonAction.onPress();
-                            if (button.mode == ButtonMode.TOGGLE) button.buttonAction.onToggle(button.pressed);
-                            inputState.pressedButton_timer_hold = 0;
+                        case ContextMenuItem contextMenuItem -> {
+                            ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
+                            if (contextMenuItem.contextMenuItemAction != null)
+                                contextMenuItem.contextMenuItemAction.onSelect();
+                            if (contextMenu.contextMenuAction != null)
+                                contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+                            UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
                         }
-                    } else if (inputState.lastGUIMouseHover instanceof ScrollBarVertical scrollBarVertical) {
-                        scrollBarVertical.buttonPressed = true;
-                        if (scrollBarVertical.scrollBarAction != null)
-                            scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
-                        inputState.scrolledScrollBarVertical = scrollBarVertical;
-                    } else if (inputState.lastGUIMouseHover instanceof ScrollBarHorizontal scrollBarHorizontal) {
-                        scrollBarHorizontal.buttonPressed = true;
-                        inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
-                        if (scrollBarHorizontal.scrollBarAction != null)
-                            scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
-                    } else if (inputState.lastGUIMouseHover instanceof List list) {
-                        UICommons.list_updateItemInfoAtMousePosition(inputState, list);
-                        Object selectedListItem = null;
-                        if (inputState.itemInfo_listValid) {
-                            selectedListItem = (inputState.itemInfo_listIndex < list.items.size()) ? list.items.get(inputState.itemInfo_listIndex) : null;
+                        case Button button -> {
+                            inputState.pressedButton = button;
+                            if (button.mode == ButtonMode.TOGGLE) {
+                                button.pressed = !button.pressed;
+                            } else {
+                                button.pressed = true;
+                            }
+                            if (button.buttonAction != null) {
+                                button.buttonAction.onPress();
+                                if (button.mode == ButtonMode.TOGGLE) button.buttonAction.onToggle(button.pressed);
+                                inputState.pressedButton_timer_hold = 0;
+                            }
                         }
-                        if (selectedListItem != null) {
-                            if (list.multiSelect) {
-                                if (list.selectedItems.contains(selectedListItem)) {
-                                    list.selectedItems.remove(selectedListItem);
+                        case ScrollBarVertical scrollBarVertical -> {
+                            scrollBarVertical.buttonPressed = true;
+                            if (scrollBarVertical.scrollBarAction != null)
+                                scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
+                            inputState.scrolledScrollBarVertical = scrollBarVertical;
+                        }
+                        case ScrollBarHorizontal scrollBarHorizontal -> {
+                            scrollBarHorizontal.buttonPressed = true;
+                            inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
+                            if (scrollBarHorizontal.scrollBarAction != null)
+                                scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
+                        }
+                        case List list -> {
+                            UICommons.list_updateItemInfoAtMousePosition(inputState, list);
+                            Object selectedListItem = null;
+                            if (inputState.itemInfo_listValid) {
+                                selectedListItem = (inputState.itemInfo_listIndex < list.items.size()) ? list.items.get(inputState.itemInfo_listIndex) : null;
+                            }
+                            if (selectedListItem != null) {
+                                if (list.multiSelect) {
+                                    if (list.selectedItems.contains(selectedListItem)) {
+                                        list.selectedItems.remove(selectedListItem);
+                                    } else {
+                                        list.selectedItems.add(selectedListItem);
+                                    }
+                                    if (list.listAction != null) list.listAction.onItemsSelected(list.selectedItems);
                                 } else {
-                                    list.selectedItems.add(selectedListItem);
+                                    list.selectedItem = selectedListItem;
+                                    if (list.listAction != null) list.listAction.onItemSelected(list.selectedItem);
                                 }
-                                if (list.listAction != null) list.listAction.onItemsSelected(list.selectedItems);
+                                if (list.dragEnabled) {
+                                    inputState.listDrag_from_index = inputState.itemInfo_listIndex;
+                                    inputState.listDrag_offset.x = inputState.mouse_gui.x - (UICommons.component_getAbsoluteX(list));
+                                    inputState.listDrag_offset.y = (inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) % 8;
+                                    inputState.listDrag_Item = selectedListItem;
+                                    inputState.listDrag_List = list;
+                                }
                             } else {
-                                list.selectedItem = selectedListItem;
-                                if (list.listAction != null) list.listAction.onItemSelected(list.selectedItem);
+                                if (list.multiSelect) {
+                                    list.selectedItems.clear();
+                                } else {
+                                    list.selectedItem = null;
+                                }
+                                if (list.listAction != null) list.listAction.onItemSelected(null);
                             }
-                            if (list.dragEnabled) {
-                                inputState.listDrag_from_index = inputState.itemInfo_listIndex;
-                                inputState.listDrag_offset.x = inputState.mouse_gui.x - (UICommons.component_getAbsoluteX(list));
-                                inputState.listDrag_offset.y = (inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) % 8;
-                                inputState.listDrag_Item = selectedListItem;
-                                inputState.listDrag_List = list;
-                            }
-                        } else {
-                            if (list.multiSelect) {
-                                list.selectedItems.clear();
-                            } else {
-                                list.selectedItem = null;
-                            }
-                            if (list.listAction != null) list.listAction.onItemSelected(null);
                         }
-                    } else if (inputState.lastGUIMouseHover instanceof ComboBox comboBox) {
-                        if (UICommons.comboBox_isOpen(comboBox, inputState)) {
-                            for (int i = 0; i < comboBox.items.size(); i++) {
-                                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                                        UICommons.component_getParentWindowX(comboBox) + (comboBox.x * TILE_SIZE) + comboBox.offset_x,
-                                        UICommons.component_getParentWindowY(comboBox) + (comboBox.y * TILE_SIZE) + comboBox.offset_y - (i * TILE_SIZE) - TILE_SIZE,
-                                        comboBox.width * TILE_SIZE,
-                                        TILE_SIZE
-                                )) {
-                                    ComboBoxItem comboBoxItem = comboBox.items.get(i);
-                                    comboBox.selectedItem = comboBoxItem;
-                                    if (comboBoxItem.comboBoxItemAction != null)
-                                        comboBoxItem.comboBoxItemAction.onSelect();
-                                    if (comboBox.comboBoxAction != null)
-                                        comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-                                    if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
-                                        // keyboard mode: move mouse back to combobox on item select
-                                        inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                        case ComboBox comboBox -> {
+                            if (UICommons.comboBox_isOpen(comboBox, inputState)) {
+                                for (int i = 0; i < comboBox.items.size(); i++) {
+                                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                            UICommons.component_getParentWindowX(comboBox) + (comboBox.x * TILE_SIZE) + comboBox.offset_x,
+                                            UICommons.component_getParentWindowY(comboBox) + (comboBox.y * TILE_SIZE) + comboBox.offset_y - (i * TILE_SIZE) - TILE_SIZE,
+                                            comboBox.width * TILE_SIZE,
+                                            TILE_SIZE
+                                    )) {
+                                        ComboBoxItem comboBoxItem = comboBox.items.get(i);
+                                        comboBox.selectedItem = comboBoxItem;
+                                        if (comboBoxItem.comboBoxItemAction != null)
+                                            comboBoxItem.comboBoxItemAction.onSelect();
+                                        if (comboBox.comboBoxAction != null)
+                                            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
+                                        if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                                            // keyboard mode: move mouse back to combobox on item select
+                                            inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                                        }
                                     }
                                 }
-                            }
 
-                            UICommons.comboBox_close(comboBox, inputState);
-                        } else {
-                            // Open this combobox
-                            UICommons.comboBox_open(comboBox, inputState);
-                        }
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
-                        Knob knob = (Knob) inputState.lastGUIMouseHover;
-
-                        inputState.turnedKnob = knob;
-                        if (knob.knobAction != null) knob.knobAction.onPress();
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == Map.class) {
-                        Map map = (Map) inputState.lastGUIMouseHover;
-
-                        int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(map) + (map.x * TILE_SIZE) + map.offset_x);
-                        int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(map) + (map.y * TILE_SIZE) + map.offset_y);
-                        if (map.mapAction != null) map.mapAction.onPress(x, y);
-                        inputState.pressedMap = map;
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == GameViewPort.class) {
-                        GameViewPort gameViewPort = (GameViewPort) inputState.lastGUIMouseHover;
-
-                        int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(gameViewPort) + (gameViewPort.x * TILE_SIZE) + gameViewPort.offset_x);
-                        int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(gameViewPort) + (gameViewPort.y * TILE_SIZE) + gameViewPort.offset_y);
-
-                        if (gameViewPort.gameViewPortAction != null) {
-                            gameViewPort.gameViewPortAction.onPress(x, y);
-                        }
-                        inputState.pressedGameViewPort = gameViewPort;
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
-                        TextField textField = (TextField) inputState.lastGUIMouseHover;
-                        // Set Marker to mouse position
-                        int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
-                        char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
-                        String testString = "";
-                        boolean found = false;
-                        charLoop:
-                        for (int i = 0; i < fieldContent.length; i++) {
-                            testString += fieldContent[i];
-                            if (mediaManager.textWidth(textField.font, testString) > mouseX) {
-                                UICommons.textField_setMarkerPosition(mediaManager, textField,
-                                        textField.offset + i);
-                                found = true;
-                                break charLoop;
-                            }
-                        }
-                        if (!found) {
-                            // Set to end
-                            UICommons.textField_setMarkerPosition(mediaManager, textField,
-                                    textField.offset + fieldContent.length);
-                        }
-                        // Set Focus
-                        UICommons.textField_focus(inputState, textField);
-                    } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                        Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                        int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-
-                        int x_inventory = UICommons.component_getAbsoluteX(inventory);
-                        int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                        int inv_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
-                        int inv_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
-                        if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
-                            Object selectInvItem = inventory.items[inv_x][inv_y];
-                            if (selectInvItem != null) {
-                                inventory.selectedItem = selectInvItem;
-                                inventory.inventoryAction.onItemSelected(selectInvItem, inv_x, inv_y);
-                                if (inventory.dragEnabled) {
-                                    inputState.inventoryDrag_from.x = inv_x;
-                                    inputState.inventoryDrag_from.y = inv_y;
-                                    inputState.inventoryDrag_offset.x = inputState.mouse_gui.x - (x_inventory + (inv_x * tileSize));
-                                    inputState.inventoryDrag_offset.y = inputState.mouse_gui.y - (y_inventory + (inv_y * tileSize));
-                                    inputState.inventoryDrag_Item = inventory.items[inv_x][inv_y];
-                                    inputState.inventoryDrag_Inventory = inventory;
-                                }
+                                UICommons.comboBox_close(comboBox, inputState);
                             } else {
-                                inventory.selectedItem = null;
-                                inventory.inventoryAction.onItemSelected(null, inv_x, inv_y);
+                                // Open this combobox
+                                UICommons.comboBox_open(comboBox, inputState);
                             }
                         }
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
-                        TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-                        UICommons.tabBar_updateItemInfoAtMousePosition(inputState, tabBar);
-                        if (inputState.itemInfo_tabBarValid && tabBar.selectedTab != inputState.itemInfo_tabBarTabIndex) {
-                            Tab newTab = tabBar.tabs.get(inputState.itemInfo_tabBarTabIndex);
-                            UICommons.tabBar_selectTab(tabBar, inputState.itemInfo_tabBarTabIndex);
-                            if (newTab.tabAction != null) newTab.tabAction.onSelect();
-                            if (tabBar.tabBarAction != null)
-                                tabBar.tabBarAction.onChangeTab(inputState.itemInfo_tabBarTabIndex);
+                        case Knob knob -> {
+                            inputState.turnedKnob = knob;
+                            if (knob.knobAction != null) knob.knobAction.onPress();
                         }
-
-                    } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
-                        CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                        checkBox.checked = !checkBox.checked;
-                        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                        case Map map -> {
+                            int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(map) + (map.x * TILE_SIZE) + map.offset_x);
+                            int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(map) + (map.y * TILE_SIZE) + map.offset_y);
+                            if (map.mapAction != null) map.mapAction.onPress(x, y);
+                            inputState.pressedMap = map;
+                        }
+                        case GameViewPort gameViewPort -> {
+                            int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(gameViewPort) + (gameViewPort.x * TILE_SIZE) + gameViewPort.offset_x);
+                            int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(gameViewPort) + (gameViewPort.y * TILE_SIZE) + gameViewPort.offset_y);
+                            if (gameViewPort.gameViewPortAction != null) {
+                                gameViewPort.gameViewPortAction.onPress(x, y);
+                            }
+                            inputState.pressedGameViewPort = gameViewPort;
+                        }
+                        case TextField textField -> {
+                            // Set Marker to mouse position
+                            int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
+                            char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
+                            String testString = "";
+                            boolean found = false;
+                            charLoop:
+                            for (int i = 0; i < fieldContent.length; i++) {
+                                testString += fieldContent[i];
+                                if (mediaManager.textWidth(textField.font, testString) > mouseX) {
+                                    UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                            textField.offset + i);
+                                    found = true;
+                                    break charLoop;
+                                }
+                            }
+                            if (!found) {
+                                // Set to end
+                                UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                        textField.offset + fieldContent.length);
+                            }
+                            // Set Focus
+                            UICommons.textField_focus(inputState, textField);
+                        }
+                        case Inventory inventory -> {
+                            int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
+                            int x_inventory = UICommons.component_getAbsoluteX(inventory);
+                            int y_inventory = UICommons.component_getAbsoluteY(inventory);
+                            int inv_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
+                            int inv_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
+                            if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
+                                Object selectInvItem = inventory.items[inv_x][inv_y];
+                                if (selectInvItem != null) {
+                                    inventory.selectedItem = selectInvItem;
+                                    inventory.inventoryAction.onItemSelected(selectInvItem, inv_x, inv_y);
+                                    if (inventory.dragEnabled) {
+                                        inputState.inventoryDrag_from.x = inv_x;
+                                        inputState.inventoryDrag_from.y = inv_y;
+                                        inputState.inventoryDrag_offset.x = inputState.mouse_gui.x - (x_inventory + (inv_x * tileSize));
+                                        inputState.inventoryDrag_offset.y = inputState.mouse_gui.y - (y_inventory + (inv_y * tileSize));
+                                        inputState.inventoryDrag_Item = inventory.items[inv_x][inv_y];
+                                        inputState.inventoryDrag_Inventory = inventory;
+                                    }
+                                } else {
+                                    inventory.selectedItem = null;
+                                    inventory.inventoryAction.onItemSelected(null, inv_x, inv_y);
+                                }
+                            }
+                        }
+                        case TabBar tabBar -> {
+                            UICommons.tabBar_updateItemInfoAtMousePosition(inputState, tabBar);
+                            if (inputState.itemInfo_tabBarValid && tabBar.selectedTab != inputState.itemInfo_tabBarTabIndex) {
+                                Tab newTab = tabBar.tabs.get(inputState.itemInfo_tabBarTabIndex);
+                                UICommons.tabBar_selectTab(tabBar, inputState.itemInfo_tabBarTabIndex);
+                                if (newTab.tabAction != null) newTab.tabAction.onSelect();
+                                if (tabBar.tabBarAction != null)
+                                    tabBar.tabBarAction.onChangeTab(inputState.itemInfo_tabBarTabIndex);
+                            }
+                        }
+                        case CheckBox checkBox -> {
+                            checkBox.checked = !checkBox.checked;
+                            if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                        }
+                        case null, default -> {
+                        }
                     }
 
                     // Additonal Actions
@@ -716,119 +712,129 @@ public class UIEngine<T extends UIAdapter> {
         }
         // ------ MOUSE UP ------
         if (inputState.inputEvents.mouseUp) {
-            Object temporaryObject = mouseTemporaryGUIObject();
-            if(temporaryObject != null){
-                if (temporaryObject instanceof Window) {
-                    inputState.draggedWindow = null;
-                    inputState.draggedWindow_offset.x = 0;
-                    inputState.draggedWindow_offset.y = 0;
-                }else if(temporaryObject instanceof Map map){
-                    if (map.mapAction != null) map.mapAction.onRelease();
-                    inputState.pressedMap = null;
-                }else if(temporaryObject instanceof GameViewPort gameViewPort){
-                    if (gameViewPort.gameViewPortAction != null)
-                        gameViewPort.gameViewPortAction.onRelease();
-                    inputState.pressedGameViewPort = null;
-                }else if(temporaryObject instanceof Button button){
-                    if (button.mode != ButtonMode.TOGGLE) button.pressed = false;
-                    if (button.buttonAction != null) button.buttonAction.onRelease();
-                    inputState.pressedButton = null;
-                }else if(temporaryObject instanceof ScrollBarVertical scrollBarVertical){
-                    scrollBarVertical.buttonPressed = false;
-                    if (scrollBarVertical.scrollBarAction != null)
-                        scrollBarVertical.scrollBarAction.onRelease(scrollBarVertical.scrolled);
-                    inputState.scrolledScrollBarVertical = null;
-                }else if(temporaryObject instanceof ScrollBarHorizontal scrollBarHorizontal){
-                    scrollBarHorizontal.buttonPressed = false;
-                    if (scrollBarHorizontal.scrollBarAction != null)
-                        scrollBarHorizontal.scrollBarAction.onRelease(scrollBarHorizontal.scrolled);
-                    inputState.scrolledScrollBarHorizontal = null;
-                }else if(temporaryObject instanceof Knob knob){
-                    if (knob.knobAction != null)
-                        knob.knobAction.onRelease();
-                    inputState.turnedKnob = null;
-                }else if(temporaryObject instanceof Inventory inventory){
-                    int dragFromX = inputState.inventoryDrag_from.x;
-                    int dragFromY = inputState.inventoryDrag_from.y;
-                    Object dragItem = inputState.inventoryDrag_Item;
+            // Active UI Element Interaction
+            Object usedUIObject = UICommons.getActivelyUsedUIReference(inputState);
+            if (usedUIObject != null) {
+                switch (usedUIObject) {
+                    case Window window -> {
+                        inputState.draggedWindow = null;
+                        inputState.draggedWindow_offset.x = 0;
+                        inputState.draggedWindow_offset.y = 0;
+                    }
+                    case Map map -> {
+                        if (map.mapAction != null) map.mapAction.onRelease();
+                        inputState.pressedMap = null;
+                    }
+                    case GameViewPort gameViewPort -> {
+                        if (gameViewPort.gameViewPortAction != null)
+                            gameViewPort.gameViewPortAction.onRelease();
+                        inputState.pressedGameViewPort = null;
+                    }
+                    case Button button -> {
+                        if (button.mode != ButtonMode.TOGGLE) button.pressed = false;
+                        if (button.buttonAction != null) button.buttonAction.onRelease();
+                        inputState.pressedButton = null;
+                    }
+                    case ScrollBarVertical scrollBarVertical -> {
+                        scrollBarVertical.buttonPressed = false;
+                        if (scrollBarVertical.scrollBarAction != null)
+                            scrollBarVertical.scrollBarAction.onRelease(scrollBarVertical.scrolled);
+                        inputState.scrolledScrollBarVertical = null;
+                    }
+                    case ScrollBarHorizontal scrollBarHorizontal -> {
+                        scrollBarHorizontal.buttonPressed = false;
+                        if (scrollBarHorizontal.scrollBarAction != null)
+                            scrollBarHorizontal.scrollBarAction.onRelease(scrollBarHorizontal.scrolled);
+                        inputState.scrolledScrollBarHorizontal = null;
+                    }
+                    case Knob knob -> {
+                        if (knob.knobAction != null)
+                            knob.knobAction.onRelease();
+                        inputState.turnedKnob = null;
+                    }
+                    case Inventory inventory -> {
+                        int dragFromX = inputState.inventoryDrag_from.x;
+                        int dragFromY = inputState.inventoryDrag_from.y;
+                        Object dragItem = inputState.inventoryDrag_Item;
 
-                    if (inputState.lastGUIMouseHover != null) {
-                        if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                            Inventory hoverInventory = (Inventory) inputState.lastGUIMouseHover;
-                            if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
-                                UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
-                                if (inputState.itemInfo_inventoryValid) {
-                                    if (hoverInventory.inventoryAction != null)
-                                        hoverInventory.inventoryAction.onDragFromInventory(inventory,
-                                                dragFromX, dragFromY,
-                                                inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                        if (inputState.lastGUIMouseHover != null) {
+                            if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
+                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
+                                    if (inputState.itemInfo_inventoryValid) {
+                                        if (hoverInventory.inventoryAction != null)
+                                            hoverInventory.inventoryAction.onDragFromInventory(inventory,
+                                                    dragFromX, dragFromY,
+                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                                    }
+                                }
+                            } else if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                                if (UICommons.list_canDragIntoList(inputState, hoverList)) {
+                                    UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
+                                    if (inputState.itemInfo_listValid) {
+                                        int toIndex = inputState.itemInfo_listIndex;
+                                        if (hoverList.listAction != null)
+                                            hoverList.listAction.onDragFromInventory(inventory, dragFromX, dragFromY, toIndex);
+                                    }
                                 }
                             }
-                        } else if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                            List list = (List) inputState.lastGUIMouseHover;
-                            if (UICommons.list_canDragIntoList(inputState, list)) {
-                                UICommons.list_updateItemInfoAtMousePosition(inputState, list);
-                                if (inputState.itemInfo_listValid) {
-                                    int toIndex = inputState.itemInfo_listIndex;
-                                    if (list.listAction != null)
-                                        list.listAction.onDragFromInventory(inventory, dragFromX, dragFromY, toIndex);
-                                }
-                            }
+                        } else if (UICommons.inventory_canDragIntoScreen(inventory)) {
+                            if (inventory.inventoryAction != null) inventory.inventoryAction.onDragIntoScreen(
+                                    dragItem,
+                                    dragFromX, dragFromY,
+                                    api.input.state.mouseX(),
+                                    api.input.state.mouseY()
+                            );
                         }
-                    } else if (UICommons.inventory_canDragIntoScreen(inventory)) {
-                        if (inventory.inventoryAction != null) inventory.inventoryAction.onDragIntoScreen(
-                                dragItem,
-                                dragFromX, dragFromY,
-                                api.input.state.mouseX(),
-                                api.input.state.mouseY()
-                        );
+                        inputState.inventoryDrag_Inventory = null;
+                        inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
+                        inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
+                        inputState.inventoryDrag_Item = null;
                     }
-                    inputState.inventoryDrag_Inventory = null;
-                    inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
-                    inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
-                    inputState.inventoryDrag_Item = null;
-                }else if(temporaryObject instanceof List list){
-                    int dragFromIndex = inputState.listDrag_from_index;
-                    Object dragItem = inputState.listDrag_Item;
-                    // Drag code
-                    if (inputState.lastGUIMouseHover != null) {
-                        if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                            List hoverList = (List) inputState.lastGUIMouseHover;
-                            if (UICommons.list_canDragIntoList(inputState, hoverList)) {
-                                UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
-                                if (inputState.itemInfo_listValid) {
-                                    int toIndex = inputState.itemInfo_listIndex;
-                                    if (hoverList.listAction != null)
-                                        hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
+                    case List list -> {
+                        int dragFromIndex = inputState.listDrag_from_index;
+                        Object dragItem = inputState.listDrag_Item;
+                        // Drag code
+                        if (inputState.lastGUIMouseHover != null) {
+                            if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                                if (UICommons.list_canDragIntoList(inputState, hoverList)) {
+                                    UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
+                                    if (inputState.itemInfo_listValid) {
+                                        int toIndex = inputState.itemInfo_listIndex;
+                                        if (hoverList.listAction != null)
+                                            hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
+                                    }
+                                }
+                            } else if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
+                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
+                                    if (inputState.itemInfo_inventoryValid) {
+                                        if (hoverInventory.inventoryAction != null)
+                                            hoverInventory.inventoryAction.onDragFromList(list, dragFromIndex,
+                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                                    }
                                 }
                             }
-                        } else if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                            Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                            if (UICommons.inventory_canDragIntoInventory(inputState, inventory)) {
-                                UICommons.inventory_updateItemInfoAtMousePosition(inputState, inventory);
-                                if (inputState.itemInfo_inventoryValid) {
-                                    if (inventory.inventoryAction != null)
-                                        inventory.inventoryAction.onDragFromList(list, dragFromIndex,
-                                                inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
-                                }
-                            }
+                        } else if (UICommons.list_canDragIntoScreen(list)) {
+                            if (list.listAction != null) list.listAction.onDragIntoScreen(
+                                    dragItem,
+                                    dragFromIndex,
+                                    api.input.state.mouseX(),
+                                    api.input.state.mouseY()
+                            );
                         }
-                    } else if (UICommons.list_canDragIntoScreen(list)) {
-                        if (list.listAction != null) list.listAction.onDragIntoScreen(
-                                dragItem,
-                                dragFromIndex,
-                                api.input.state.mouseX(),
-                                api.input.state.mouseY()
-                        );
+                        inputState.listDrag_List = null;
+                        inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
+                        inputState.listDrag_from_index = 0;
+                        inputState.listDrag_Item = null;
                     }
-                    inputState.listDrag_List = null;
-                    inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
-                    inputState.listDrag_from_index = 0;
-                    inputState.listDrag_Item = null;
+                    case null, default -> {
+                    }
                 }
-                inputState.mouseUsedUIObjectFrame = temporaryObject;
+                inputState.mouseUsedUIObjectFrame = usedUIObject;
             }
 
+            // MouseTool Interaction
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                 MouseTool pressedMouseTool = inputState.mouseTool;
                 if (pressedMouseTool.mouseToolAction != null) {
@@ -842,34 +848,43 @@ public class UIEngine<T extends UIAdapter> {
         }
         // ------ MOUSE DRAGGED ------
         if (inputState.inputEvents.mouseDragged) {
-            Object temporaryObject = mouseTemporaryGUIObject();
-            if(temporaryObject instanceof Window window){
-                window.x = inputState.mouse_gui.x - inputState.draggedWindow_offset.x;
-                window.y = inputState.mouse_gui.y - inputState.draggedWindow_offset.y;
-                if (window.windowAction != null)
-                    window.windowAction.onMove(window.x, window.y);
-            }else if(temporaryObject instanceof ScrollBarVertical scrollBarVertical){
-                int mouseYrel = inputState.mouse_gui.y - UICommons.component_getParentWindowY(scrollBarVertical) - (scrollBarVertical.y * TILE_SIZE) - scrollBarVertical.offset_y;
-                float newScrolled = (mouseYrel / ((float) (scrollBarVertical.height * TILE_SIZE)));
-                scrollBarVertical.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
-                if (scrollBarVertical.scrollBarAction != null)
-                    scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
-            }else if(temporaryObject instanceof ScrollBarHorizontal scrollBarHorizontal){
-                int mouseXrel = inputState.mouse_gui.x - UICommons.component_getParentWindowX(scrollBarHorizontal) - (scrollBarHorizontal.x * TILE_SIZE) - scrollBarHorizontal.offset_x;
-                float newScrolled = (mouseXrel / ((float) (scrollBarHorizontal.width * TILE_SIZE)));
-                scrollBarHorizontal.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
-                if (scrollBarHorizontal.scrollBarAction != null)
-                    scrollBarHorizontal.scrollBarAction.onScrolled(inputState.scrolledScrollBarHorizontal.scrolled);
-            }else if(temporaryObject instanceof Knob knob){
-                float amount = -(inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
-                float newValue = knob.turned + amount;
-                UICommons.knob_turnKnob(knob, newValue, amount);
-                if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
-                    // keyboard mode: keep mouse position steady
-                    inputState.mouse_gui.y += inputState.mouse_delta.y;
+            // Active UI Element Interaction
+            Object usedUIObject = UICommons.getActivelyUsedUIReference(inputState);
+            switch (usedUIObject) {
+                case Window window -> {
+                    window.x = inputState.mouse_gui.x - inputState.draggedWindow_offset.x;
+                    window.y = inputState.mouse_gui.y - inputState.draggedWindow_offset.y;
+                    if (window.windowAction != null)
+                        window.windowAction.onMove(window.x, window.y);
+                }
+                case ScrollBarVertical scrollBarVertical -> {
+                    int mouseYrel = inputState.mouse_gui.y - UICommons.component_getParentWindowY(scrollBarVertical) - (scrollBarVertical.y * TILE_SIZE) - scrollBarVertical.offset_y;
+                    float newScrolled = (mouseYrel / ((float) (scrollBarVertical.height * TILE_SIZE)));
+                    scrollBarVertical.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
+                    if (scrollBarVertical.scrollBarAction != null)
+                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                }
+                case ScrollBarHorizontal scrollBarHorizontal -> {
+                    int mouseXrel = inputState.mouse_gui.x - UICommons.component_getParentWindowX(scrollBarHorizontal) - (scrollBarHorizontal.x * TILE_SIZE) - scrollBarHorizontal.offset_x;
+                    float newScrolled = (mouseXrel / ((float) (scrollBarHorizontal.width * TILE_SIZE)));
+                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
+                    if (scrollBarHorizontal.scrollBarAction != null)
+                        scrollBarHorizontal.scrollBarAction.onScrolled(inputState.scrolledScrollBarHorizontal.scrolled);
+                }
+                case Knob knob -> {
+                    float amount = -(inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
+                    float newValue = knob.turned + amount;
+                    UICommons.knob_turnKnob(knob, newValue, amount);
+                    if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                        // keyboard mode: keep mouse position steady
+                        inputState.mouse_gui.y += inputState.mouse_delta.y;
+                    }
+                }
+                case null, default -> {
                 }
             }
 
+            // Mouse Tool Interaction
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                 MouseTool draggedMouseTool = inputState.mouseTool;
                 if (draggedMouseTool.mouseToolAction != null)
@@ -877,7 +892,9 @@ public class UIEngine<T extends UIAdapter> {
             }
 
         }
+        // ------ MOUSE MOVED ------
         if (inputState.inputEvents.mouseMoved) {
+            // Mouse Tool Interaction
             if (inputState.mouseTool != null) {
                 MouseTool movedMouseTool = inputState.mouseTool;
                 if (movedMouseTool.mouseToolAction != null)
@@ -887,32 +904,31 @@ public class UIEngine<T extends UIAdapter> {
         // ------ MOUSE SCROLLED ------
         if (inputState.inputEvents.mouseScrolled) {
             if (inputState.lastGUIMouseHover != null) {
-                if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                    List list = (List) inputState.lastGUIMouseHover;
-                    int size = list.items != null ? list.items.size() : 0;
-                    float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
-                    list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
-                    if (list.listAction != null) {
-                        list.listAction.onScrolled(list.scrolled);
+                switch (inputState.lastGUIMouseHover) {
+                    case List list -> {
+                        int size = list.items != null ? list.items.size() : 0;
+                        float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
+                        list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
+                        if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
                     }
-                } else if (inputState.lastGUIMouseHover.getClass() == Knob.class) {
-                    Knob knop = (Knob) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
-                    float newValue = knop.turned + amount;
-                    UICommons.knob_turnKnob(knop, newValue, amount);
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
-                    ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
-                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
-                    if (scrollBarHorizontal.scrollBarAction != null) {
-                        scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
+                    case Knob knob -> {
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                        float newValue = knob.turned + amount;
+                        UICommons.knob_turnKnob(knob, newValue, amount);
                     }
-                } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
-                    ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                    float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
-                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
-                    if (scrollBarVertical.scrollBarAction != null) {
-                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                    case ScrollBarHorizontal scrollBarHorizontal -> {
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
+                        scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
+                        if (scrollBarHorizontal.scrollBarAction != null)
+                            scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
+                    }
+                    case ScrollBarVertical scrollBarVertical -> {
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
+                        scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
+                        if (scrollBarVertical.scrollBarAction != null)
+                            scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                    }
+                    case null, default -> {
                     }
                 }
 
@@ -922,19 +938,6 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.mouseUsedUIObjectFrame = inputState.lastGUIMouseHover;
             }
         }
-    }
-
-    public Object mouseTemporaryGUIObject() {
-        if (inputState.draggedWindow != null) return inputState.draggedWindow;
-        if (inputState.pressedButton != null) return inputState.pressedButton;
-        if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
-        if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
-        if (inputState.turnedKnob != null) return inputState.turnedKnob;
-        if (inputState.pressedMap != null) return inputState.pressedMap;
-        if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
-        if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
-        if (inputState.listDrag_List != null) return inputState.listDrag_List;
-        return null;
     }
 
     private void updateButtonHoldActions() {
@@ -1032,16 +1035,14 @@ public class UIEngine<T extends UIAdapter> {
         if (showComponentToolTip) {
             Component hoverComponent = (Component) inputState.lastGUIMouseHover;
             Object toolTipSubItem = null;
-            if (hoverComponent.getClass() == List.class) {
-                List list = (List) inputState.lastGUIMouseHover;
+            if (hoverComponent instanceof List list) {
                 if (list.listAction != null) {
                     UICommons.list_updateItemInfoAtMousePosition(inputState, list);
                     if (inputState.itemInfo_listValid) {
                         toolTipSubItem = inputState.itemInfo_listIndex < list.items.size() ? list.items.get(inputState.itemInfo_listIndex) : null;
                     }
                 }
-            } else if (hoverComponent.getClass() == Inventory.class) {
-                Inventory inventory = (Inventory) hoverComponent;
+            } else if (hoverComponent instanceof Inventory inventory) {
                 int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
                 if (inventory.inventoryAction != null) {
                     int x_inventory = UICommons.component_getAbsoluteX(inventory);
@@ -1054,13 +1055,12 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
 
-
             boolean updateComponentToolTip;
             if (hoverComponent.updateToolTip) {
                 updateComponentToolTip = true;
                 hoverComponent.updateToolTip = false;
             } else {
-                if (hoverComponent.getClass() == List.class || hoverComponent.getClass() == Inventory.class) {
+                if (hoverComponent instanceof List || hoverComponent instanceof Inventory) {
                     // Check on subitem change
                     updateComponentToolTip = inputState.tooltip_lastHoverObject != toolTipSubItem;
                 } else {
@@ -1072,14 +1072,12 @@ public class UIEngine<T extends UIAdapter> {
             if (updateComponentToolTip) {
                 inputState.tooltip_wait_delay = true;
                 inputState.tooltip_delay_timer = System.currentTimeMillis();
-                if (hoverComponent.getClass() == List.class && toolTipSubItem != null) {
+                if (hoverComponent instanceof List list && toolTipSubItem != null) {
                     // check for list item tooltips
-                    List list = (List) hoverComponent;
                     inputState.tooltip = list.listAction.toolTip(toolTipSubItem);
                     inputState.tooltip_lastHoverObject = toolTipSubItem;
-                } else if (hoverComponent.getClass() == Inventory.class && toolTipSubItem != null) {
+                } else if (hoverComponent instanceof Inventory inventory && toolTipSubItem != null) {
                     // check for inventory item tooltip
-                    Inventory inventory = (Inventory) hoverComponent;
                     inputState.tooltip = inventory.inventoryAction.toolTip(toolTipSubItem);
                     inputState.tooltip_lastHoverObject = toolTipSubItem;
                 } else {
@@ -1294,10 +1292,9 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Scroll
-        if(scrollDirection != 0){
+        if (scrollDirection != 0) {
             mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
-
 
 
         // Confirm Character from Input
@@ -1325,7 +1322,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Confirm Character from API
-        if(!inputState.mTextInputAPICharacterQueue.isEmpty()){
+        if (!inputState.mTextInputAPICharacterQueue.isEmpty()) {
             UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, inputState.mTextInputAPICharacterQueue.pollLast());
             confirmCharacter = true;
         }
@@ -1937,35 +1934,23 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private CommonActions getUIObjectCommonActions(Object uiObject) {
-        if (uiObject.getClass() == Window.class) { // Not a component
-            return ((Window) uiObject).windowAction;
-        } else if (uiObject.getClass() == Notification.class) { // Not a component
-            return ((Notification) uiObject).notificationAction;
-        } else if (uiObject.getClass() == Button.class) {
-            return ((Button) uiObject).buttonAction;
-        } else if (uiObject.getClass() == ComboBox.class) {
-            return ((ComboBox) uiObject).comboBoxAction;
-        } else if (uiObject.getClass() == GameViewPort.class) {
-            return ((GameViewPort) uiObject).gameViewPortAction;
-        } else if (uiObject.getClass() == Image.class) {
-            return ((Image) uiObject).imageAction;
-        } else if (uiObject.getClass() == Inventory.class) {
-            return ((Inventory) uiObject).inventoryAction;
-        } else if (uiObject.getClass() == List.class) {
-            return ((List) uiObject).listAction;
-        } else if (uiObject.getClass() == Map.class) {
-            return ((Map) uiObject).mapAction;
-        } else if (uiObject.getClass() == ScrollBarHorizontal.class || uiObject.getClass() == ScrollBarVertical.class) {
-            return ((ScrollBar) uiObject).scrollBarAction;
-        } else if (uiObject.getClass() == TabBar.class) {
-            return ((TabBar) uiObject).tabBarAction;
-        } else if (uiObject.getClass() == Text.class) {
-            return ((Text) uiObject).textAction;
-        } else if (uiObject.getClass() == TextField.class) {
-            return ((TextField) uiObject).textFieldAction;
-        } else {
-            return null;
-        }
+        return switch (uiObject) {
+            case Window window -> window.windowAction;
+            case Notification notification -> notification.notificationAction;
+            case Button button -> button.buttonAction;
+            case ComboBox comboBox -> comboBox.comboBoxAction;
+            case GameViewPort gameViewPort -> gameViewPort.gameViewPortAction;
+            case Image image -> image.imageAction;
+            case Inventory inventory -> inventory.inventoryAction;
+            case List list -> list.listAction;
+            case Map map -> map.mapAction;
+            case ScrollBarVertical scrollBarVertical -> scrollBarVertical.scrollBarAction;
+            case ScrollBarHorizontal scrollBarHorizontal -> scrollBarHorizontal.scrollBarAction;
+            case TabBar tabBar -> tabBar.tabBarAction;
+            case Text text -> text.textAction;
+            case TextField textField -> textField.textFieldAction;
+            case null, default -> null;
+        };
     }
 
 
@@ -2384,39 +2369,40 @@ public class UIEngine<T extends UIAdapter> {
         if (render_isComponentNotRendered(component)) return;
         float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
-        if (component.getClass() == ComboBox.class) {
-            ComboBox combobox = (ComboBox) component;
-            // Menu
-            if (UICommons.comboBox_isOpen(combobox, inputState)) {
-                int width = combobox.width;
-                int height = combobox.items.size();
-                /* Menu */
-                for (int iy = 0; iy < height; iy++) {
-                    ComboBoxItem comboBoxItem = combobox.items.get(iy);
-                    for (int ix = 0; ix < width; ix++) {
-                        int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
-                        CMediaArray cMenuTexture;
-                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (TILE_SIZE) - (iy * TILE_SIZE), combobox.width * TILE_SIZE, TILE_SIZE)) {
-                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
-                        } else {
-                            cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST;
+        switch (component) {
+            case ComboBox comboBox -> {
+                // Menu
+                if (UICommons.comboBox_isOpen(comboBox, inputState)) {
+                    int width = comboBox.width;
+                    int height = comboBox.items.size();
+                    /* Menu */
+                    for (int iy = 0; iy < height; iy++) {
+                        ComboBoxItem comboBoxItem = comboBox.items.get(iy);
+                        for (int ix = 0; ix < width; ix++) {
+                            int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                            CMediaArray cMenuTexture;
+                            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox) - (TILE_SIZE) - (iy * TILE_SIZE), comboBox.width * TILE_SIZE, TILE_SIZE)) {
+                                cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
+                            } else {
+                                cMenuTexture = GUIBaseMedia.GUI_COMBOBOX_LIST;
+                            }
+                            render_batchSaveColor();
+                            render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
+                            render_drawCMediaGFX(cMenuTexture, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox) - (iy * TILE_SIZE) - TILE_SIZE, index);
+                            render_batchLoadColor();
                         }
-                        render_batchSaveColor();
-                        render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
-                        render_drawCMediaGFX(cMenuTexture, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox) - (iy * TILE_SIZE) - TILE_SIZE, index);
-                        render_batchLoadColor();
+                    }
+
+                    /* Text */
+                    for (int i = 0; i < comboBox.items.size(); i++) {
+                        ComboBoxItem comboBoxItem = comboBox.items.get(i);
+                        render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, (comboBox.width * TILE_SIZE), comboBoxItem.icon, comboBoxItem.iconIndex);
                     }
                 }
-
-                /* Text */
-                for (int i = 0; i < combobox.items.size(); i++) {
-                    ComboBoxItem comboBoxItem = combobox.items.get(i);
-                    render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, (combobox.width * TILE_SIZE), comboBoxItem.icon, comboBoxItem.iconIndex);
-                }
             }
-
+            case null, default -> {
+            }
         }
-
         render_batchSetColorWhite(1f);
     }
 
@@ -2684,402 +2670,387 @@ public class UIEngine<T extends UIAdapter> {
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
 
-        if (component instanceof Button button) {
-            CMediaArray buttonMedia = (button.pressed ? GUIBaseMedia.GUI_BUTTON_PRESSED : GUIBaseMedia.GUI_BUTTON);
-            int pressed_offset = button.pressed ? 1 : 0;
+        switch (component) {
+            case Button button -> {
+                CMediaArray buttonMedia = (button.pressed ? GUIBaseMedia.GUI_BUTTON_PRESSED : GUIBaseMedia.GUI_BUTTON);
+                int pressed_offset = button.pressed ? 1 : 0;
 
-            for (int ix = 0; ix < button.width; ix++) {
-                for (int iy = 0; iy < button.height; iy++) {
-                    render_drawCMediaGFX(buttonMedia, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_get16TilesCMediaIndex(ix, iy, button.width, button.height));
-                }
-            }
-            if (button.getClass() == TextButton.class) {
-                TextButton textButton = (TextButton) button;
-                if (textButton.text != null) {
-                    render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconArrayIndex);
-                }
-            } else if (button.getClass() == ImageButton.class) {
-                ImageButton imageButton = (ImageButton) button;
-                render_batchSaveColor();
-                render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha2);
-                render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.offset_content_y - pressed_offset, imageButton.arrayIndex);
-                render_batchLoadColor();
-            }
-        } else if (component.getClass() == Image.class) {
-            Image image = (Image) component;
-            if (image.image != null) {
-                render_drawCMediaGFX(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex, image.animationOffset);
-            }
-        } else if (component.getClass() == Text.class) {
-            Text text = (Text) component;
-            int textHeight = ((text.height - 1) * TILE_SIZE);
-            if (text.lines != null && text.lines.length > 0) {
-                for (int i = 0; i < text.lines.length; i++) {
-                    render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 1);
-                }
-            }
-        } else if (component.getClass() == ScrollBarVertical.class) {
-            ScrollBarVertical scrollBarVertical = (ScrollBarVertical) component;
-            for (int i = 0; i < scrollBarVertical.height; i++) {
-                int index = (i == 0 ? 2 : (i == (scrollBarVertical.height - 1) ? 0 : 1));
-                render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
-                int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
-                render_batchSaveColor();
-                render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha2);
-                render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
-                render_batchLoadColor();
-            }
-        } else if (component.getClass() == ScrollBarHorizontal.class) {
-            ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) component;
-            for (int i = 0; i < scrollBarHorizontal.width; i++) {
-                int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
-                render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
-                int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
-                render_batchSaveColor();
-                render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha2);
-                render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
-                render_batchLoadColor();
-            }
-        } else if (component.getClass() == List.class) {
-            List list = (List) component;
-            boolean itemsValid = (list.items != null && list.items.size() > 0 && list.listAction != null);
-            int itemFrom = 0;
-            if (itemsValid) {
-                itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-                itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
-            }
-            boolean dragEnabled = false;
-            boolean dragValid = false;
-            int drag_x = -1, drag_y = -1;
-            if ((inputState.listDrag_List != null || inputState.inventoryDrag_Inventory != null) && list == inputState.lastGUIMouseHover) {
-                dragEnabled = true;
-                dragValid = UICommons.list_canDragIntoList(inputState, list);
-                if (dragValid) {
-                    drag_x = UICommons.component_getAbsoluteX(list);
-                    int y_list = UICommons.component_getAbsoluteY(list);
-                    drag_y = y_list + ((inputState.mouse_gui.y - y_list) / TILE_SIZE) * TILE_SIZE;
-                }
-            }
-
-            boolean grayScaleBefore = render_GrayScaleShaderEnabled();
-            if (dragEnabled && !dragValid) {
-                render_enableGrayScaleShader(true);
-            }
-
-            // List
-            for (int iy = 0; iy < list.height; iy++) {
-                int itemIndex = itemFrom + iy;
-                int itemOffsetY = (((list.height - 1)) - (iy));
-                Object item = null;
-                if (list.items != null && list.items.size() > 0 && list.listAction != null) {
-                    if (itemIndex < list.items.size()) {
-                        item = list.items.get(itemIndex);
+                for (int ix = 0; ix < button.width; ix++) {
+                    for (int iy = 0; iy < button.height; iy++) {
+                        render_drawCMediaGFX(buttonMedia, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_get16TilesCMediaIndex(ix, iy, button.width, button.height));
                     }
                 }
-
-                boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
-
-                // Cell
-                Color cellColor = null;
-                if (list.listAction != null && list.items != null) {
-                    if (itemIndex < list.items.size()) {
-                        cellColor = list.listAction.cellColor(item);
-                        if (cellColor != null) {
-                            render_batchSaveColor();
-                            render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1);
-                        }
+                if (button instanceof TextButton textButton) {
+                    if (textButton.text != null) {
+                        render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconArrayIndex);
                     }
-                }
-                for (int ix = 0; ix < list.width; ix++) {
-                    this.render_drawCMediaGFX(selected ? GUIBaseMedia.GUI_LIST_SELECTED : GUIBaseMedia.GUI_LIST, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
-                }
-                if (cellColor != null) render_batchLoadColor();
-
-                // Text
-                if (item != null) {
-                    String text = list.listAction.text(item);
-                    render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, list.width * TILE_SIZE, list.listAction.icon(item), list.listAction.iconArrayIndex(item));
-                }
-            }
-
-            if (dragEnabled && dragValid) {
-                for (int ix = 0; ix < list.width; ix++) {
-                    this.render_drawCMediaGFX(GUIBaseMedia.GUI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
-                }
-            }
-
-            render_enableGrayScaleShader(grayScaleBefore);
-
-
-        } else if (component.getClass() == ComboBox.class) {
-            ComboBox combobox = (ComboBox) component;
-
-            // Box
-            for (int ix = 0; ix < combobox.width; ix++) {
-                int index = ix == 0 ? 0 : (ix == combobox.width - 1 ? 2 : 1);
-                CMediaGFX comboMedia = UICommons.comboBox_isOpen(combobox, inputState) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
-
-                // Item color or default color
-                float color_r = combobox.selectedItem != null ? combobox.selectedItem.color_r : combobox.color_r;
-                float color_g = combobox.selectedItem != null ? combobox.selectedItem.color_g : combobox.color_g;
-                float color_b = combobox.selectedItem != null ? combobox.selectedItem.color_b : combobox.color_b;
-
-                render_batchSaveColor();
-                render_batchSetColor(color_r, color_g, color_b, alpha2);
-                this.render_drawCMediaGFX(comboMedia, UICommons.component_getAbsoluteX(combobox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(combobox), index);
-                render_batchLoadColor();
-
-            }
-            // Text
-            if (combobox.selectedItem != null && combobox.comboBoxAction != null) {
-                render_drawFont(combobox.selectedItem.font, combobox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(combobox), UICommons.component_getAbsoluteY(combobox), 2, 1, (combobox.width - 1) * TILE_SIZE, combobox.selectedItem.icon, combobox.selectedItem.iconIndex);
-            }
-        } else if (component.getClass() == Knob.class) {
-            Knob knob = (Knob) component;
-
-            render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
-            render_batchSaveColor();
-            render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
-            if (knob.endless) {
-                int index = MathUtils.round(knob.turned * 36);
-                render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
-            } else {
-                int index = MathUtils.round(knob.turned * 28);
-                render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
-            }
-            render_batchLoadColor();
-        } else if (component.getClass() == Map.class) {
-            Map map = (Map) component;
-            inputState.spriteBatch_gui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
-
-            map.mapOverlays.removeIf(mapOverlay -> {
-                if (mapOverlay.fadeOut) {
-                    mapOverlay.color_a = 1 - ((System.currentTimeMillis() - mapOverlay.timer) / (float) mapOverlay.fadeOutTime);
-                    if (mapOverlay.color_a <= 0) return true;
-                }
-                render_batchSaveColor();
-                render_batchSetColor(mapOverlay.color_r, mapOverlay.color_g, mapOverlay.color_b, alpha * mapOverlay.color_a);
-                render_drawCMediaGFX(mapOverlay.image, UICommons.component_getAbsoluteX(map) + mapOverlay.x, UICommons.component_getAbsoluteY(map) + mapOverlay.y, mapOverlay.arrayIndex);
-                render_batchLoadColor();
-                return false;
-            });
-
-        } else if (component.getClass() == TextField.class) {
-            TextField textField = (TextField) component;
-            for (int ix = 0; ix < textField.width; ix++) {
-                int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
-
-                render_drawCMediaGFX(inputState.focusedTextField == textField ? GUIBaseMedia.GUI_TEXTFIELD_FOCUSED : GUIBaseMedia.GUI_TEXTFIELD, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
-
-
-                if (!textField.contentValid) {
+                } else if (button instanceof ImageButton imageButton) {
                     render_batchSaveColor();
-                    render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, 0.2f);
-                    render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                    render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha2);
+                    render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.offset_content_y - pressed_offset, imageButton.arrayIndex);
                     render_batchLoadColor();
                 }
-
-                if (textField.content != null) {
-                    render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
-                    if (UICommons.textField_isFocused(inputState, textField)) {
-                        int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
-                        if (xOffset < textField.width * TILE_SIZE) {
-                            render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
-                        }
+            }
+            case Image image -> {
+                if (image.image != null) {
+                    render_drawCMediaGFX(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex, image.animationOffset);
+                }
+            }
+            case Text text -> {
+                int textHeight = ((text.height - 1) * TILE_SIZE);
+                if (text.lines != null && text.lines.length > 0) {
+                    for (int i = 0; i < text.lines.length; i++) {
+                        render_drawFont(text.font, text.lines[i], alpha, UICommons.component_getAbsoluteX(text), UICommons.component_getAbsoluteY(text) + textHeight - (i * TILE_SIZE), 1, 1);
                     }
                 }
             }
-
-        } else if (component.getClass() == Inventory.class) {
-            Inventory inventory = (Inventory) component;
-
-            int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-            int inventoryWidth = inventory.items.length;
-            int inventoryHeight = inventory.items[0].length;
-
-
-            boolean dragEnabled = false;
-            boolean dragValid = false;
-            int drag_x = -1, drag_y = -1;
-            if ((inputState.listDrag_List != null || inputState.inventoryDrag_Inventory != null) && inventory == inputState.lastGUIMouseHover) {
-                dragEnabled = true;
-                dragValid = UICommons.inventory_canDragIntoInventory(inputState, inventory);
-                if (dragValid) {
-                    int x_inventory = UICommons.component_getAbsoluteX(inventory);
-                    int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                    int m_x = inputState.mouse_gui.x - x_inventory;
-                    int m_y = inputState.mouse_gui.y - y_inventory;
-                    if (m_x > 0 && m_x < (inventory.width * tileSize) && m_y > 0 && m_y < (inventory.height * tileSize)) {
-                        int inv_x = m_x / tileSize;
-                        int inv_y = m_y / tileSize;
-                        if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
-                            drag_x = inv_x;
-                            drag_y = inv_y;
-                        }
-                    }
+            case ScrollBarVertical scrollBarVertical -> {
+                for (int i = 0; i < scrollBarVertical.height; i++) {
+                    int index = (i == 0 ? 2 : (i == (scrollBarVertical.height - 1) ? 0 : 1));
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
+                    int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
+                    render_batchSaveColor();
+                    render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha2);
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
+                    render_batchLoadColor();
                 }
             }
+            case ScrollBarHorizontal scrollBarHorizontal -> {
+                for (int i = 0; i < scrollBarHorizontal.width; i++) {
+                    int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
+                    int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
+                    render_batchSaveColor();
+                    render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha2);
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
+                    render_batchLoadColor();
+                }
+            }
+            case List list -> {
+                boolean itemsValid = (list.items != null && list.items.size() > 0 && list.listAction != null);
+                int itemFrom = 0;
+                if (itemsValid) {
+                    itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
+                    itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
+                }
+                boolean dragEnabled = false;
+                boolean dragValid = false;
+                int drag_x = -1, drag_y = -1;
+                if ((inputState.listDrag_List != null || inputState.inventoryDrag_Inventory != null) && list == inputState.lastGUIMouseHover) {
+                    dragEnabled = true;
+                    dragValid = UICommons.list_canDragIntoList(inputState, list);
+                    if (dragValid) {
+                        drag_x = UICommons.component_getAbsoluteX(list);
+                        int y_list = UICommons.component_getAbsoluteY(list);
+                        drag_y = y_list + ((inputState.mouse_gui.y - y_list) / TILE_SIZE) * TILE_SIZE;
+                    }
+                }
 
-            boolean grayScaleBefore = render_GrayScaleShaderEnabled();
-            if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
+                boolean grayScaleBefore = render_GrayScaleShaderEnabled();
+                if (dragEnabled && !dragValid) {
+                    render_enableGrayScaleShader(true);
+                }
 
-            for (int ix = 0; ix < inventoryWidth; ix++) {
-                for (int iy = 0; iy < inventoryHeight; iy++) {
-                    if (inventory.items != null) {
-                        CMediaGFX cellMedia;
-                        boolean selected = inventory.items[ix][iy] != null && inventory.items[ix][iy] == inventory.selectedItem;
-                        if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
-                            cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_DRAGGED_X2 : GUIBaseMedia.GUI_INVENTORY_DRAGGED;
-                        } else {
-                            if (selected) {
-                                cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_SELECTED_X2 : GUIBaseMedia.GUI_INVENTORY_SELECTED;
-                            } else {
-                                cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_X2 : GUIBaseMedia.GUI_INVENTORY;
+                // List
+                for (int iy = 0; iy < list.height; iy++) {
+                    int itemIndex = itemFrom + iy;
+                    int itemOffsetY = (((list.height - 1)) - (iy));
+                    Object item = null;
+                    if (list.items != null && list.items.size() > 0 && list.listAction != null) {
+                        if (itemIndex < list.items.size()) {
+                            item = list.items.get(itemIndex);
+                        }
+                    }
+
+                    boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
+
+                    // Cell
+                    Color cellColor = null;
+                    if (list.listAction != null && list.items != null) {
+                        if (itemIndex < list.items.size()) {
+                            cellColor = list.listAction.cellColor(item);
+                            if (cellColor != null) {
+                                render_batchSaveColor();
+                                render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1);
                             }
                         }
+                    }
+                    for (int ix = 0; ix < list.width; ix++) {
+                        this.render_drawCMediaGFX(selected ? GUIBaseMedia.GUI_LIST_SELECTED : GUIBaseMedia.GUI_LIST, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
+                    }
+                    if (cellColor != null) render_batchLoadColor();
 
+                    // Text
+                    if (item != null) {
+                        String text = list.listAction.text(item);
+                        render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, list.width * TILE_SIZE, list.listAction.icon(item), list.listAction.iconArrayIndex(item));
+                    }
+                }
+
+                if (dragEnabled && dragValid) {
+                    for (int ix = 0; ix < list.width; ix++) {
+                        this.render_drawCMediaGFX(GUIBaseMedia.GUI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
+                    }
+                }
+                render_enableGrayScaleShader(grayScaleBefore);
+            }
+            case ComboBox comboBox -> {
+                // Box
+                for (int ix = 0; ix < comboBox.width; ix++) {
+                    int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
+                    CMediaGFX comboMedia = UICommons.comboBox_isOpen(comboBox, inputState) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
+
+                    // Item color or default color
+                    float color_r = comboBox.selectedItem != null ? comboBox.selectedItem.color_r : comboBox.color_r;
+                    float color_g = comboBox.selectedItem != null ? comboBox.selectedItem.color_g : comboBox.color_g;
+                    float color_b = comboBox.selectedItem != null ? comboBox.selectedItem.color_b : comboBox.color_b;
+
+                    render_batchSaveColor();
+                    render_batchSetColor(color_r, color_g, color_b, alpha2);
+                    this.render_drawCMediaGFX(comboMedia, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox), index);
+                    render_batchLoadColor();
+
+                }
+                // Text
+                if (comboBox.selectedItem != null && comboBox.comboBoxAction != null) {
+                    render_drawFont(comboBox.selectedItem.font, comboBox.selectedItem.text, alpha, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox), 2, 1, (comboBox.width - 1) * TILE_SIZE, comboBox.selectedItem.icon, comboBox.selectedItem.iconIndex);
+                }
+            }
+            case Knob knob -> {
+                render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
+                render_batchSaveColor();
+                render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
+                if (knob.endless) {
+                    int index = MathUtils.round(knob.turned * 36);
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                } else {
+                    int index = MathUtils.round(knob.turned * 28);
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                }
+                render_batchLoadColor();
+            }
+            case Map map -> {
+                inputState.spriteBatch_gui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
+
+                map.mapOverlays.removeIf(mapOverlay -> {
+                    if (mapOverlay.fadeOut) {
+                        mapOverlay.color_a = 1 - ((System.currentTimeMillis() - mapOverlay.timer) / (float) mapOverlay.fadeOutTime);
+                        if (mapOverlay.color_a <= 0) return true;
+                    }
+                    render_batchSaveColor();
+                    render_batchSetColor(mapOverlay.color_r, mapOverlay.color_g, mapOverlay.color_b, alpha * mapOverlay.color_a);
+                    render_drawCMediaGFX(mapOverlay.image, UICommons.component_getAbsoluteX(map) + mapOverlay.x, UICommons.component_getAbsoluteY(map) + mapOverlay.y, mapOverlay.arrayIndex);
+                    render_batchLoadColor();
+                    return false;
+                });
+            }
+            case TextField textField -> {
+                for (int ix = 0; ix < textField.width; ix++) {
+                    int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
+
+                    render_drawCMediaGFX(inputState.focusedTextField == textField ? GUIBaseMedia.GUI_TEXTFIELD_FOCUSED : GUIBaseMedia.GUI_TEXTFIELD, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+
+
+                    if (!textField.contentValid) {
                         render_batchSaveColor();
-
-                        // Draw Cell
-                        Color cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[ix][iy], ix, iy) : null;
-                        if (cellColor != null) {
-                            render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
-                        } else {
-                            render_batchSetColorWhite(alpha);
-                        }
-                        int index = inventory.doubleSized ? render_get16TilesCMediaIndex(ix, iy, inventory.width / 2, inventory.height / 2) : render_get16TilesCMediaIndex(ix, iy, inventory.width, inventory.height);
-                        render_drawCMediaGFX(cellMedia, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), index);
-
-                        // Draw Icon
-                        CMediaGFX icon = (inventory.items[ix][iy] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[ix][iy]) : null;
-
-                        if (icon != null) {
-                            render_batchSetColorWhite(alpha);
-                            int iconIndex = inventory.inventoryAction != null ? inventory.inventoryAction.iconArrayIndex(inventory.items[ix][iy]) : 0;
-                            render_drawCMediaGFX(icon, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), iconIndex);
-                        }
+                        render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, 0.2f);
+                        render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                         render_batchLoadColor();
+                    }
 
+                    if (textField.content != null) {
+                        render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
+                        if (UICommons.textField_isFocused(inputState, textField)) {
+                            int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
+                            if (xOffset < textField.width * TILE_SIZE) {
+                                render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
+                            }
+                        }
                     }
                 }
             }
-            render_enableGrayScaleShader(grayScaleBefore);
-        } else if (component.getClass() == TabBar.class) {
-            TabBar tabBar = (TabBar) component;
-            int tabXOffset = tabBar.tabOffset;
-            int topBorder;
-            for (int i = 0; i < tabBar.tabs.size(); i++) {
-                Tab tab = tabBar.tabs.get(i);
-                int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
-                if ((tabXOffset + tabWidth) > tabBar.width) break;
+            case Inventory inventory -> {
+                int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
+                int inventoryWidth = inventory.items.length;
+                int inventoryHeight = inventory.items[0].length;
 
-                boolean selected = i == tabBar.selectedTab;
-                CMediaGFX tabGraphic;
-                if (tabBar.bigIconMode) {
-                    tabGraphic = selected ? GUIBaseMedia.GUI_TAB_BIGICON_SELECTED : GUIBaseMedia.GUI_TAB_BIGICON;
-                } else {
-                    tabGraphic = selected ? GUIBaseMedia.GUI_TAB_SELECTED : GUIBaseMedia.GUI_TAB;
-                }
-
-                if (tabBar.bigIconMode) {
-                    render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
-                    // Icon
-                    if (tab.icon != null) {
-                        int selected_offset = selected ? 0 : 1;
-                        render_drawCMediaGFX(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
-                    }
-                } else {
-                    for (int ix = 0; ix < tabWidth; ix++) {
-                        render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
+                boolean dragEnabled = false;
+                boolean dragValid = false;
+                int drag_x = -1, drag_y = -1;
+                if ((inputState.listDrag_List != null || inputState.inventoryDrag_Inventory != null) && inventory == inputState.lastGUIMouseHover) {
+                    dragEnabled = true;
+                    dragValid = UICommons.inventory_canDragIntoInventory(inputState, inventory);
+                    if (dragValid) {
+                        int x_inventory = UICommons.component_getAbsoluteX(inventory);
+                        int y_inventory = UICommons.component_getAbsoluteY(inventory);
+                        int m_x = inputState.mouse_gui.x - x_inventory;
+                        int m_y = inputState.mouse_gui.y - y_inventory;
+                        if (m_x > 0 && m_x < (inventory.width * tileSize) && m_y > 0 && m_y < (inventory.height * tileSize)) {
+                            int inv_x = m_x / tileSize;
+                            int inv_y = m_y / tileSize;
+                            if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
+                                drag_x = inv_x;
+                                drag_y = inv_y;
+                            }
+                        }
                     }
                 }
 
-                if (!tabBar.bigIconMode) {
-                    render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tabWidth * UIEngine.TILE_SIZE, tab.icon, tab.iconIndex);
+                boolean grayScaleBefore = render_GrayScaleShaderEnabled();
+                if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
+
+                for (int ix = 0; ix < inventoryWidth; ix++) {
+                    for (int iy = 0; iy < inventoryHeight; iy++) {
+                        if (inventory.items != null) {
+                            CMediaGFX cellMedia;
+                            boolean selected = inventory.items[ix][iy] != null && inventory.items[ix][iy] == inventory.selectedItem;
+                            if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
+                                cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_DRAGGED_X2 : GUIBaseMedia.GUI_INVENTORY_DRAGGED;
+                            } else {
+                                if (selected) {
+                                    cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_SELECTED_X2 : GUIBaseMedia.GUI_INVENTORY_SELECTED;
+                                } else {
+                                    cellMedia = inventory.doubleSized ? GUIBaseMedia.GUI_INVENTORY_X2 : GUIBaseMedia.GUI_INVENTORY;
+                                }
+                            }
+
+                            render_batchSaveColor();
+
+                            // Draw Cell
+                            Color cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[ix][iy], ix, iy) : null;
+                            if (cellColor != null) {
+                                render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
+                            } else {
+                                render_batchSetColorWhite(alpha);
+                            }
+                            int index = inventory.doubleSized ? render_get16TilesCMediaIndex(ix, iy, inventory.width / 2, inventory.height / 2) : render_get16TilesCMediaIndex(ix, iy, inventory.width, inventory.height);
+                            render_drawCMediaGFX(cellMedia, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), index);
+
+                            // Draw Icon
+                            CMediaGFX icon = (inventory.items[ix][iy] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[ix][iy]) : null;
+
+                            if (icon != null) {
+                                render_batchSetColorWhite(alpha);
+                                int iconIndex = inventory.inventoryAction != null ? inventory.inventoryAction.iconArrayIndex(inventory.items[ix][iy]) : 0;
+                                render_drawCMediaGFX(icon, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), iconIndex);
+                            }
+                            render_batchLoadColor();
+                        }
+                    }
                 }
-                tabXOffset += tabWidth;
+                render_enableGrayScaleShader(grayScaleBefore);
             }
+            case TabBar tabBar -> {
+                int tabXOffset = tabBar.tabOffset;
+                int topBorder;
+                for (int i = 0; i < tabBar.tabs.size(); i++) {
+                    Tab tab = tabBar.tabs.get(i);
+                    int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
+                    if ((tabXOffset + tabWidth) > tabBar.width) break;
 
-            topBorder = tabBar.width - tabXOffset;
-
-            // Top Border Top
-            for (int ix = 0; ix < topBorder; ix++) {
-                render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
-            }
-
-            if (tabBar.border) {
-                // Bottom
-                for (int ix = 0; ix < tabBar.width; ix++) {
-                    render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
-                }
-                // Left/Right
-                for (int iy = 0; iy < tabBar.borderHeight; iy++) {
-                    int yOffset = (iy + 1) * TILE_SIZE;
-                    render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
-                    render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
-                }
-            }
-
-        } else if (component instanceof Shape shape) {
-            if (shape.shapeType != null) {
-                CMediaImage shapeImage = switch (shape.shapeType) {
-                    case OVAL -> GUIBaseMedia.GUI_SHAPE_OVAL;
-                    case RECT -> GUIBaseMedia.GUI_SHAPE_RECT;
-                    case DIAMOND -> GUIBaseMedia.GUI_SHAPE_DIAMOND;
-                    case TRIANGLE_LEFT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_DOWN;
-                    case TRIANGLE_RIGHT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_DOWN;
-                    case TRIANGLE_LEFT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_UP;
-                    case TRIANGLE_RIGHT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_UP;
-                };
-                mediaManager.drawCMediaImage(inputState.spriteBatch_gui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
-                        0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
-            }
-        } else if (component instanceof ProgressBar progressBar) {
-            // Bar Background
-            for (int ix = 0; ix < progressBar.width; ix++) {
-                int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
-                render_drawCMediaGFX(GUIBaseMedia.GUI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
-            }
-
-            // Bar Bar
-            render_batchSaveColor();
-            render_batchSetColor(progressBar.color2_r, progressBar.color2_g, progressBar.color2_b, alpha2);
-            int pixels = MathUtils.round(progressBar.progress * (progressBar.width * TILE_SIZE));
-            for (int ix = 0; ix < progressBar.width; ix++) {
-                int xOffset = ix * TILE_SIZE;
-                int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
-                if (xOffset < pixels) {
-                    if (pixels - xOffset < TILE_SIZE) {
-                        mediaManager.drawCMediaArrayCut(inputState.spriteBatch_gui, GUIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
+                    boolean selected = i == tabBar.selectedTab;
+                    CMediaGFX tabGraphic;
+                    if (tabBar.bigIconMode) {
+                        tabGraphic = selected ? GUIBaseMedia.GUI_TAB_BIGICON_SELECTED : GUIBaseMedia.GUI_TAB_BIGICON;
                     } else {
-                        mediaManager.drawCMediaArray(inputState.spriteBatch_gui, GUIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
+                        tabGraphic = selected ? GUIBaseMedia.GUI_TAB_SELECTED : GUIBaseMedia.GUI_TAB;
+                    }
+
+                    if (tabBar.bigIconMode) {
+                        render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
+                        // Icon
+                        if (tab.icon != null) {
+                            int selected_offset = selected ? 0 : 1;
+                            render_drawCMediaGFX(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
+                        }
+                    } else {
+                        for (int ix = 0; ix < tabWidth; ix++) {
+                            render_drawCMediaGFX(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
+                        }
+                    }
+
+                    if (!tabBar.bigIconMode) {
+                        render_drawFont(tab.font, tab.title, alpha, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2, 1, tabWidth * UIEngine.TILE_SIZE, tab.icon, tab.iconIndex);
+                    }
+                    tabXOffset += tabWidth;
+                }
+
+                topBorder = tabBar.width - tabXOffset;
+
+                // Top Border Top
+                for (int ix = 0; ix < topBorder; ix++) {
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
+                }
+
+                if (tabBar.border) {
+                    // Bottom
+                    for (int ix = 0; ix < tabBar.width; ix++) {
+                        render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
+                    }
+                    // Left/Right
+                    for (int iy = 0; iy < tabBar.borderHeight; iy++) {
+                        int yOffset = (iy + 1) * TILE_SIZE;
+                        render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
+                        render_drawCMediaGFX(GUIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
                     }
                 }
             }
-            render_batchLoadColor();
-
-            if (progressBar.progressText) {
-                String percentTxt = progressBar.progressText2Decimal ? UICommons.progressBar_getProgressText2Decimal(progressBar.progress) : UICommons.progressBar_getProgressText(progressBar.progress);
-                int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (mediaManager.textWidth(progressBar.font, percentTxt) / 2);
-                render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 1);
+            case Shape shape -> {
+                if (shape.shapeType != null) {
+                    CMediaImage shapeImage = switch (shape.shapeType) {
+                        case OVAL -> GUIBaseMedia.GUI_SHAPE_OVAL;
+                        case RECT -> GUIBaseMedia.GUI_SHAPE_RECT;
+                        case DIAMOND -> GUIBaseMedia.GUI_SHAPE_DIAMOND;
+                        case TRIANGLE_LEFT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_DOWN;
+                        case TRIANGLE_RIGHT_DOWN -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_DOWN;
+                        case TRIANGLE_LEFT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_UP;
+                        case TRIANGLE_RIGHT_UP -> GUIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_UP;
+                    };
+                    mediaManager.drawCMediaImage(inputState.spriteBatch_gui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
+                            0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
+                }
             }
+            case ProgressBar progressBar -> {
+                // Background
+                for (int ix = 0; ix < progressBar.width; ix++) {
+                    int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
+                    render_drawCMediaGFX(GUIBaseMedia.GUI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
+                }
 
+                // Bar
+                render_batchSaveColor();
+                render_batchSetColor(progressBar.color2_r, progressBar.color2_g, progressBar.color2_b, alpha2);
+                int pixels = MathUtils.round(progressBar.progress * (progressBar.width * TILE_SIZE));
+                for (int ix = 0; ix < progressBar.width; ix++) {
+                    int xOffset = ix * TILE_SIZE;
+                    int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
+                    if (xOffset < pixels) {
+                        if (pixels - xOffset < TILE_SIZE) {
+                            mediaManager.drawCMediaArrayCut(inputState.spriteBatch_gui, GUIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
+                        } else {
+                            mediaManager.drawCMediaArray(inputState.spriteBatch_gui, GUIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
+                        }
+                    }
+                }
+                render_batchLoadColor();
 
-        } else if (component.getClass() == CheckBox.class) {
-            CheckBox checkBox = (CheckBox) component;
-
-            CMediaArray tex = checkBox.checkBoxStyle == CheckBoxStyle.CHECKBOX ? GUIBaseMedia.GUI_CHECKBOX_CHECKBOX : GUIBaseMedia.GUI_CHECKBOX_RADIO;
-
-            render_drawCMediaGFX(tex, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
-
-            render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
-
-        } else if (component.getClass() == GameViewPort.class) {
-            GameViewPort gameViewPort = (GameViewPort) component;
-            //inputState.spriteBatch_gui.setColor(1, 1, 1, 1f);
-            inputState.spriteBatch_gui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
+                if (progressBar.progressText) {
+                    String percentTxt = progressBar.progressText2Decimal ? UICommons.progressBar_getProgressText2Decimal(progressBar.progress) : UICommons.progressBar_getProgressText(progressBar.progress);
+                    int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (mediaManager.textWidth(progressBar.font, percentTxt) / 2);
+                    render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 1);
+                }
+            }
+            case CheckBox checkBox -> {
+                CMediaArray tex = checkBox.checkBoxStyle == CheckBoxStyle.CHECKBOX ? GUIBaseMedia.GUI_CHECKBOX_CHECKBOX : GUIBaseMedia.GUI_CHECKBOX_RADIO;
+                render_drawCMediaGFX(tex, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
+                render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
+            }
+            case GameViewPort gameViewPort -> {
+                inputState.spriteBatch_gui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
+            }
+            case null, default -> {
+            }
         }
-
 
         render_enableGrayScaleShader(disableShaderState);
         render_batchSetColorWhite(1f);
@@ -3113,7 +3084,6 @@ public class UIEngine<T extends UIAdapter> {
                         dragList.width * TILE_SIZE, dragList.listAction.icon(dragItem), dragList.listAction.iconArrayIndex(dragItem));
             }
         }
-
 
         render_batchSetColorWhite(1f);
     }
@@ -3304,130 +3274,4 @@ public class UIEngine<T extends UIAdapter> {
     public TextureRegion getTextureGUI() {
         return inputState.texture_game;
     }
-
-        /*private void calculateMagnetModeMouseMovements(){
-        float deltaX = 0f;
-        float deltaY = 0f;
-        boolean magnetPossible = false;
-        if (inputState.lastGUIMouseHover != null) {
-            if (inputState.modalWindow != null) {
-                if (inputState.lastGUIMouseHover.getClass() == Window.class && inputState.lastGUIMouseHover == inputState.modalWindow) {
-                    magnetPossible = true;
-                } else if (inputState.lastGUIMouseHover instanceof Component component) {
-                    if (component.addedToWindow == inputState.modalWindow) magnetPossible = true;
-                }
-            } else {
-                magnetPossible = true;
-            }
-        }
-        if (magnetPossible) {
-            boolean magnetActive = false;
-            int magnet_x = 0, magnet_y = 0;
-            if (inputState.lastGUIMouseHover.getClass() == Window.class) {
-                Window window = (Window) inputState.lastGUIMouseHover;
-                if (window.moveAble && window.hasTitleBar && window.visible) {
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                            window.x, window.y + (window.height - 1) * UIEngine.TILE_SIZE,
-                            window.width * UIEngine.TILE_SIZE,
-                            UIEngine.TILE_SIZE)
-                    ) {
-                        magnet_x = inputState.mouse_gui.x;
-                        magnet_y = (window.y + (window.height) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    }
-                }
-            } else if (inputState.lastGUIMouseHover.getClass() == ContextMenuItem.class) {
-                ContextMenuItem contextMenuItem = (ContextMenuItem) inputState.lastGUIMouseHover;
-                magnet_x = inputState.mouse_gui.x;
-                magnet_y = contextMenuItem.addedToContextMenu.y - (((contextMenuItem.addedToContextMenu.y - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                magnetActive = true;
-            } else if (inputState.lastGUIMouseHover instanceof Component component) {
-                if (!component.disabled && component.visible) {
-                    if (inputState.lastGUIMouseHover.getClass() == List.class) {
-                        List list = (List) inputState.lastGUIMouseHover;
-                        magnet_x = inputState.mouse_gui.x;
-                        magnet_y = UICommons.component_getAbsoluteY(list)
-                                + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) + UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    }
-                    if (inputState.lastGUIMouseHover.getClass() == Inventory.class) {
-                        Inventory inventory = (Inventory) inputState.lastGUIMouseHover;
-                        int cellSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
-                        int cellSize2 = cellSize / 2;
-                        magnet_x = UICommons.component_getAbsoluteX(inventory)
-                                + (((inputState.mouse_gui.x - UICommons.component_getAbsoluteX(inventory)) / cellSize) * cellSize) + cellSize2;
-                        magnet_y = UICommons.component_getAbsoluteY(inventory)
-                                + (((inputState.mouse_gui.y - UICommons.component_getAbsoluteY(inventory)) / cellSize) * cellSize) + cellSize2;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarVertical.class) {
-                        ScrollBarVertical scrollBarVertical = (ScrollBarVertical) inputState.lastGUIMouseHover;
-                        magnet_x = UICommons.component_getAbsoluteX(scrollBarVertical) + UIEngine.TILE_SIZE_2;
-                        magnet_y = inputState.mouse_gui.y;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover.getClass() == ScrollBarHorizontal.class) {
-                        ScrollBarHorizontal scrollBarHorizontal = (ScrollBarHorizontal) inputState.lastGUIMouseHover;
-                        magnet_x = inputState.mouse_gui.x;
-                        magnet_y = UICommons.component_getAbsoluteY(scrollBarHorizontal) + UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover.getClass() == TextField.class) {
-                        TextField textField = (TextField) inputState.lastGUIMouseHover;
-                        magnet_x = inputState.mouse_gui.x;
-                        magnet_y = UICommons.component_getAbsoluteY(textField) + UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover.getClass() == ComboBox.class) {
-                        ComboBox comboBox = (ComboBox) inputState.lastGUIMouseHover;
-                        if (!UICommons.comboBox_isOpen(comboBox, inputState)) {
-                            magnet_x = inputState.mouse_gui.x;
-                            magnet_y = UICommons.component_getAbsoluteY(comboBox) + UIEngine.TILE_SIZE_2;
-                            magnetActive = true;
-                        } else {
-                            magnet_x = inputState.mouse_gui.x;
-                            magnet_y = UICommons.component_getAbsoluteY(comboBox) - (((UICommons.component_getAbsoluteY(comboBox) - inputState.mouse_gui.y) / UIEngine.TILE_SIZE) * UIEngine.TILE_SIZE) - UIEngine.TILE_SIZE_2;
-                            magnetActive = true;
-                        }
-                    } else if (inputState.lastGUIMouseHover.getClass() == CheckBox.class) {
-                        CheckBox checkBox = (CheckBox) inputState.lastGUIMouseHover;
-                        magnet_x = UICommons.component_getAbsoluteX(checkBox) + UIEngine.TILE_SIZE_2;
-                        magnet_y = UICommons.component_getAbsoluteY(checkBox) + UIEngine.TILE_SIZE_2;
-                        magnetActive = true;
-                    } else if (inputState.lastGUIMouseHover.getClass() == TabBar.class) {
-                        TabBar tabBar = (TabBar) inputState.lastGUIMouseHover;
-                        int xTab = tabBar.tabOffset;
-                        for (int i = 0; i < tabBar.tabs.size(); i++) {
-                            Tab tab = tabBar.tabs.get(i);
-                            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                                    UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE),
-                                    UICommons.component_getAbsoluteY(tabBar),
-                                    tab.width * UIEngine.TILE_SIZE,
-                                    tabBar.height * UIEngine.TILE_SIZE
-                            )
-                            ) {
-                                magnet_x = UICommons.component_getAbsoluteX(tabBar) + (xTab * UIEngine.TILE_SIZE) + (tab.width * UIEngine.TILE_SIZE_2);
-                                magnet_y = UICommons.component_getAbsoluteY(tabBar) + UIEngine.TILE_SIZE_2;
-                                magnetActive = true;
-                            }
-                            xTab += tab.width;
-                        }
-                    } else if (inputState.lastGUIMouseHover instanceof Button button) {
-                        magnet_x = UICommons.component_getAbsoluteX(button) + (button.width * UIEngine.TILE_SIZE_2);
-                        magnet_y = UICommons.component_getAbsoluteY(button) + (button.height * UIEngine.TILE_SIZE_2);
-                        magnetActive = true;
-                    }
-                }
-            }
-            // Move Cursor
-            if (magnetActive) {
-                if (inputState.mouse_gui.x < magnet_x) {
-                    deltaX = (magnet_x - inputState.mouse_gui.x) / 4f;
-                } else if (inputState.mouse_gui.x > magnet_x) {
-                    deltaX = -(inputState.mouse_gui.x - magnet_x) / 4f;
-                }
-                if (inputState.mouse_gui.y < magnet_y) {
-                    deltaY = -(magnet_y - inputState.mouse_gui.y) / 4f;
-                } else if (inputState.mouse_gui.y > magnet_y) {
-                    deltaY = (inputState.mouse_gui.y - magnet_y) / 4f;
-                }
-            }
-        }
-    }*/
 }

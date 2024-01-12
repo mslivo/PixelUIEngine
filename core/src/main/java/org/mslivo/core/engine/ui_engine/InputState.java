@@ -101,53 +101,39 @@ public class InputState {
 
     public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
-    /* #################### GUI: Temporary References #################### */
+    /* #################### GUI: Actively used UI References #################### */
     public Window draggedWindow;
     public GridPoint2 draggedWindow_offset;
     public Button pressedButton;
     public int pressedButton_timer_hold;
-
     public ScrollBarVertical scrolledScrollBarVertical;
-
     public ScrollBarHorizontal scrolledScrollBarHorizontal;
 
     public ToolTip tooltip;
-
     public float tooltip_fadeIn_pct;
-
     public boolean tooltip_wait_delay;
-
     public long tooltip_delay_timer, tooltip_fadeIn_timer;
-
     public ToolTip gameToolTip;
     public Object tooltip_lastHoverObject;
-
     public Knob turnedKnob;
-
     public Map pressedMap;
-
     public GameViewPort pressedGameViewPort;
-
     public TextField focusedTextField;
-
     public Inventory inventoryDrag_Inventory;
-
     public GridPoint2 inventoryDrag_from;
-
     public GridPoint2 inventoryDrag_offset;
     public Object inventoryDrag_Item;
-
     public List listDrag_List;
     public int listDrag_from_index;
     public GridPoint2 listDrag_offset;
     public Object listDrag_Item;
-
     public ComboBox openComboBox;
-
     public ContextMenu openContextMenu;
-
     public int displayedContextMenuWidth;
+    public Object keyboardUsedUIObjectFrame;
+    public Object mouseUsedUIObjectFrame;
 
+    /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;
     public int mTextInputMouseX;
     public boolean mTextInputConfirmPressed, mTextInputChangeCasePressed,mTextInputDeletePressed;
@@ -161,11 +147,6 @@ public class InputState {
     public boolean mTextInputTranslatedMouse3Down;
     public boolean mTextInputUnlock;
     public ArrayDeque<Character> mTextInputAPICharacterQueue;
-    public Object keyboardUsedUIObjectFrame;
-    public Object mouseUsedUIObjectFrame;
-
-    /* #################### OnScreenTextInput #################### */
-
 
     /* #################### Control #################### */
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over

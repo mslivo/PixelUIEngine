@@ -29,8 +29,8 @@ import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
-import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
+import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 class UICommons {
@@ -109,7 +109,7 @@ class UICommons {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         inputState.windows.add(window);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onAdd();
     }
 
@@ -119,11 +119,11 @@ class UICommons {
         if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         window.addedToScreen = false;
         inputState.windows.remove(window);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onRemove();
     }
 
-    static void resetGUITemporaryReferences(InputState inputState) {
+    static void resetActivelyUsedUIReferences(InputState inputState) {
         // Window
         inputState.draggedWindow = null;
         inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
@@ -151,7 +151,7 @@ class UICommons {
         // Map
         inputState.pressedMap = null;
 
-        // Viewport
+        // GameViewport
         inputState.pressedGameViewPort = null;
 
         // Inventory
@@ -190,6 +190,19 @@ class UICommons {
         inputState.mTextInputTranslatedMouse2Down = false;
         inputState.mTextInputTranslatedMouse3Down = false;
         inputState.mTextInputUnlock = false;
+    }
+
+    static Object getActivelyUsedUIReference(InputState inputState) {
+        if (inputState.draggedWindow != null) return inputState.draggedWindow;
+        if (inputState.pressedButton != null) return inputState.pressedButton;
+        if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
+        if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
+        if (inputState.turnedKnob != null) return inputState.turnedKnob;
+        if (inputState.pressedMap != null) return inputState.pressedMap;
+        if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
+        if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
+        if (inputState.listDrag_List != null) return inputState.listDrag_List;
+        return null;
     }
 
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
@@ -342,19 +355,19 @@ class UICommons {
     static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.add(gameViewPort);
         component.addedToWindow = window;
         window.components.add(component);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_addToScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.add((GameViewPort) component);
+        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.add(gameViewPort);
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_removeFromScreen(Component component, InputState inputState) {
@@ -362,10 +375,10 @@ class UICommons {
         if (!component.addedToScreen) return;
         if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
+        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
         component.addedToScreen = true;
         inputState.screenComponents.remove(component);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_removeFromWindow(Component component, Window window, InputState inputState) {
@@ -373,10 +386,10 @@ class UICommons {
         if (component.addedToScreen) return;
         if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component.getClass() == GameViewPort.class) inputState.gameViewPorts.remove((GameViewPort) component);
+        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
         component.addedToWindow = null;
         component.addedToWindow.components.remove(component);
-        resetGUITemporaryReferences(inputState);
+        resetActivelyUsedUIReferences(inputState);
     }
 
 
@@ -604,7 +617,7 @@ class UICommons {
                 }
             }
             // Insert at end
-            if(Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,x_list, y_list, UIEngine.TILE_SIZE*list.width, UIEngine.TILE_SIZE*list.height)){
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_list, y_list, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE * list.height)) {
                 inputState.itemInfo_listIndex = list.items.size();
                 inputState.itemInfo_listValid = true;
                 return;
@@ -629,7 +642,7 @@ class UICommons {
             inputState.itemInfo_inventoryValid = true;
             return;
         }
-        inputState.itemInfo_inventoryPos.set(0,0);
+        inputState.itemInfo_inventoryPos.set(0, 0);
         inputState.itemInfo_inventoryValid = false;
         return;
     }
@@ -652,7 +665,7 @@ class UICommons {
         }
     }
 
-    static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar){
+    static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar) {
         findCharLoop:
         for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
             if (mouseTextInput.charactersLC[i] == selectChar) {
@@ -667,9 +680,9 @@ class UICommons {
         }
     }
 
-    static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index){
+    static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
         int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
-        mouseTextInput.selectedIndex = Tools.Calc.inBounds(index,0,(maxCharacters-1));
+        mouseTextInput.selectedIndex = Tools.Calc.inBounds(index, 0, (maxCharacters - 1));
     }
 
 
