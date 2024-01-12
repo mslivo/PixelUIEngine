@@ -730,31 +730,7 @@ public class API {
                 for (int i = 0; i < maxCharacters; i++) {
                     char cl = lowerCaseCharacters[i];
                     char cu = upperCaseCharacters[i];
-                    if (cl == '\t' || cu == '\t') {
-                        ImageButton caseButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
-                                new ButtonAction() {
-                                    @Override
-                                    public void onToggle(boolean value) {
-                                        for (int i2 = 0; i2 < lowerCaseButtonsList.size(); i2++)
-                                            components.setVisible(lowerCaseButtonsList.get(i2), !value);
-                                        for (int i2 = 0; i2 < upperCaseButtonsList.size(); i2++)
-                                            components.setVisible(upperCaseButtonsList.get(i2), value);
-                                    }
-                                }, ButtonMode.TOGGLE);
-                        componentsList.add(caseButton);
-                    } else if (cl == '\b' || cu == '\b') {
-                        ImageButton delButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
-                                new ButtonAction() {
-                                    @Override
-                                    public void onRelease() {
-                                        if (inputTextField.content.length() > 0) {
-                                            components.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
-                                            components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
-                                        }
-                                    }
-                                }, ButtonMode.DEFAULT);
-                        componentsList.add(delButton);
-                    } else if (!Character.isISOControl(cl) && !Character.isISOControl(cu)) {
+                    if (!Character.isISOControl(cl) && !Character.isISOControl(cu)) {
                         TextButton charButtonLC = components.button.textButton.create(ix, iy, 2, 2, String.valueOf(cl), new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -775,13 +751,44 @@ public class API {
                         components.setVisible(charButtonUC, false);
                         upperCaseButtonsList.add(charButtonUC);
                     }
-
                     ix += 2;
                     if (ix >= (wnd_width - 2)) {
                         ix = 0;
                         iy -= 2;
                     }
                 }
+
+                // Add Case Button
+                ImageButton caseButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
+                        new ButtonAction() {
+                            @Override
+                            public void onToggle(boolean value) {
+                                for (int i2 = 0; i2 < lowerCaseButtonsList.size(); i2++)
+                                    components.setVisible(lowerCaseButtonsList.get(i2), !value);
+                                for (int i2 = 0; i2 < upperCaseButtonsList.size(); i2++)
+                                    components.setVisible(upperCaseButtonsList.get(i2), value);
+                            }
+                        }, ButtonMode.TOGGLE);
+                componentsList.add(caseButton);
+                ix += 2;
+                if (ix >= (wnd_width - 2)) {
+                    ix = 0;
+                    iy -= 2;
+                }
+                // Add Delete Button
+                ImageButton delButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
+                        new ButtonAction() {
+                            @Override
+                            public void onRelease() {
+                                if (inputTextField.content.length() > 0) {
+                                    components.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
+                                    components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
+                                }
+                            }
+                        }, ButtonMode.DEFAULT);
+                componentsList.add(delButton);
+
+
             }
 
 
