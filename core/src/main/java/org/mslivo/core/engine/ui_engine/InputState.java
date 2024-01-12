@@ -161,8 +161,8 @@ public class InputState {
     public boolean mTextInputTranslatedMouse3Down;
     public boolean mTextInputUnlock;
     public ArrayDeque<Character> mTextInputAPICharacterQueue;
-    public TextField usedTextFieldThisUpdate;
-    public HotKey usedHotKeyThisUpdate;
+    public Object keyboardUsedUIObjectFrame;
+    public Object mouseUsedUIObjectFrame;
 
     /* #################### OnScreenTextInput #################### */
 

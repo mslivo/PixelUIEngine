@@ -2284,9 +2284,7 @@ public class API {
         // Keyboard USE Info
 
         public Object keyBoardUseGUIObject() {
-            if (inputState.usedTextFieldThisUpdate != null) return inputState.usedTextFieldThisUpdate;
-            if (inputState.usedHotKeyThisUpdate != null) return inputState.usedHotKeyThisUpdate;
-            return null;
+            return inputState.keyboardUsedUIObjectFrame != null ? inputState.keyboardUsedUIObjectFrame : null ;
         }
 
         public boolean keyBoardUsingGUIObject() {
@@ -2300,16 +2298,7 @@ public class API {
         // Mouse USE Info
 
         public Object mouseUseGUIObject() {
-            if (inputState.draggedWindow != null) return inputState.draggedWindow;
-            if (inputState.pressedButton != null) return inputState.pressedButton;
-            if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
-            if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
-            if (inputState.turnedKnob != null) return inputState.turnedKnob;
-            if (inputState.pressedMap != null) return inputState.pressedMap;
-            if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
-            if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
-            if (inputState.listDrag_List != null) return inputState.listDrag_List;
-            return null;
+            return inputState.mouseUsedUIObjectFrame != null ? inputState.mouseUsedUIObjectFrame : null ;
         }
 
         public boolean mouseUsingGUIObject() {
