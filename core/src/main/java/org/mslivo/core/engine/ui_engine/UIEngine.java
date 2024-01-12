@@ -1224,13 +1224,6 @@ public class UIEngine<T extends UIAdapter> {
                 deletePressed = inputState.mTextInputTranslatedMouse2Down;
                 changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
             }
-            case KEYBOARD -> {
-                // Not Needed, focus last typed character
-                if (inputState.inputEvents.keyTyped) {
-                    char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
-                    UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
-                }
-            }
             case GAMEPAD -> {
                 boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
                 boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
@@ -1280,6 +1273,9 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.mTextInputScrollSpeed = 0;
                 }
             }
+            case KEYBOARD -> {
+                // Not Needed since you are already using a keyboard to type
+            }
         }
 
         // Unlock on first press
@@ -1291,11 +1287,16 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        // Scroll
+        // Focus character on keyboard type
+        if (inputState.inputEvents.keyTyped) {
+            char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
+        }
+
+        // Scroll Forward/Backwards
         if (scrollDirection != 0) {
             mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
-
 
         // Confirm Character from Input
         boolean confirmCharacter = false;
@@ -1321,12 +1322,11 @@ public class UIEngine<T extends UIAdapter> {
             inputState.mTextInputDeletePressed = false;
         }
 
-        // Confirm Character from API
-        if (!inputState.mTextInputAPICharacterQueue.isEmpty()) {
+        // Confirm Character from API Queue
+        if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
             UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, inputState.mTextInputAPICharacterQueue.pollLast());
             confirmCharacter = true;
         }
-
 
         if (confirmCharacter) {
             char c;
