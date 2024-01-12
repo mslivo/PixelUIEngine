@@ -313,6 +313,12 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.keyboardUsedUIObjectFrame = focusedTextField;
                 }
             }
+            if (inputState.openMouseTextInput != null) {
+                // Focus character on last typed character
+                char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
+                UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
+                inputState.keyboardUsedUIObjectFrame = inputState.openMouseTextInput;
+            }
         }
         if (inputState.inputEvents.keyDown) {
             if (inputState.focusedTextField != null) {
@@ -1285,12 +1291,6 @@ public class UIEngine<T extends UIAdapter> {
             } else {
                 inputState.mTextInputUnlock = true;
             }
-        }
-
-        // Focus character on keyboard type
-        if (inputState.inputEvents.keyTyped) {
-            char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
-            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
         }
 
         // Scroll Forward/Backwards
