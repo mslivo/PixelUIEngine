@@ -34,17 +34,20 @@ public class Tools {
 
     public static class Update {
         private static float skipFrameAccumulator = 0f;
-        private static int updatesPerSecond = 60;
+        private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
+        private static float timeStepX2;
 
-        public static void setUpdatesPerSecond(int updatesPerSecond){
-            Update.updatesPerSecond = Tools.Calc.lowerBounds(updatesPerSecond,1);
-            timeStep = (1f/(float) Update.updatesPerSecond);
+        public static void setUpdatesPerSecond(int maxUpdatesPerSecond){
+            Update.maxUpdatesPerSecond = Tools.Calc.lowerBounds(maxUpdatesPerSecond,1);
+            timeStep = (1f/(float) Update.maxUpdatesPerSecond);
+            timeStepX2 = timeStep*2f;
             skipFrameAccumulator = 0;
         }
 
         public static boolean runUpdate() {
-            skipFrameAccumulator += Gdx.graphics.getDeltaTime();
+            // Accumulate 2 frames max
+            skipFrameAccumulator = Tools.Calc.upperBounds(skipFrameAccumulator+Gdx.graphics.getDeltaTime(), timeStepX2);
             if (skipFrameAccumulator < timeStep) {
                 return false;
             } else {
