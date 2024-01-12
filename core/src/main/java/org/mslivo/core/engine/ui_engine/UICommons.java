@@ -28,6 +28,7 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
@@ -368,6 +369,16 @@ class UICommons {
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
         resetActivelyUsedUIReferences(inputState);
+    }
+
+    static boolean textField_isTextFieldControlKey(int keyCode){
+        return keyCode == KeyCode.Key.LEFT ||
+                keyCode == KeyCode.Key.RIGHT ||
+                keyCode == KeyCode.Key.HOME ||
+                keyCode == KeyCode.Key.END ||
+                keyCode == KeyCode.Key.BACKSPACE ||
+                keyCode == KeyCode.Key.FORWARD_DEL ||
+                keyCode == KeyCode.Key.ENTER;
     }
 
     static void component_removeFromScreen(Component component, InputState inputState) {
