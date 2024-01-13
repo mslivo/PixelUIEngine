@@ -2284,7 +2284,7 @@ public class API {
         // Keyboard USE Info
 
         public Object keyBoardUseGUIObject() {
-            return inputState.keyboardUsedUIObjectFrame != null ? inputState.keyboardUsedUIObjectFrame : null ;
+            return inputState.keyboardInteractedUIObjectFrame != null ? inputState.keyboardInteractedUIObjectFrame : null ;
         }
 
         public boolean keyBoardUsingGUIObject() {
@@ -2298,7 +2298,7 @@ public class API {
         // Mouse USE Info
 
         public Object mouseUseGUIObject() {
-            return inputState.mouseUsedUIObjectFrame != null ? inputState.mouseUsedUIObjectFrame : null ;
+            return inputState.mouseInteractedUIObjectFrame != null ? inputState.mouseInteractedUIObjectFrame : null ;
         }
 
         public boolean mouseUsingGUIObject() {

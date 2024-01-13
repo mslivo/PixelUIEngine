@@ -189,8 +189,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mTextInputTranslatedMouse2Down = false;
         newInputState.mTextInputUnlock = false;
         newInputState.mTextInputAPICharacterQueue = new ArrayDeque<>();
-        newInputState.keyboardUsedUIObjectFrame = null;
-        newInputState.mouseUsedUIObjectFrame = null;
+        newInputState.keyboardInteractedUIObjectFrame = null;
+        newInputState.mouseInteractedUIObjectFrame = null;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
         newInputState.pressedTextField = null;
@@ -297,7 +297,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateKeyInteractions() {
-        inputState.keyboardUsedUIObjectFrame = null;
+        inputState.keyboardInteractedUIObjectFrame = null;
         if (api.config.isUiKeyInteractionsDisabled()) return;
 
         if (inputState.inputEvents.keyTyped) {
@@ -318,14 +318,14 @@ public class UIEngine<T extends UIAdapter> {
                     if (focusedTextField.textFieldAction != null)
                         focusedTextField.textFieldAction.onTyped(keyTypedCharacter);
 
-                    inputState.keyboardUsedUIObjectFrame = focusedTextField;
+                    inputState.keyboardInteractedUIObjectFrame = focusedTextField;
                 }
             }
             if (inputState.openMouseTextInput != null) {
                 // Focus character on last typed character
                 char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
                 UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
-                inputState.keyboardUsedUIObjectFrame = inputState.openMouseTextInput;
+                inputState.keyboardInteractedUIObjectFrame = inputState.openMouseTextInput;
             }
         }
         if (inputState.inputEvents.keyDown) {
@@ -361,7 +361,7 @@ public class UIEngine<T extends UIAdapter> {
                             focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
                         UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
                     }
-                    inputState.keyboardUsedUIObjectFrame = focusedTextField;
+                    inputState.keyboardInteractedUIObjectFrame = focusedTextField;
                 }
             } else {
                 // Hotkeys
@@ -371,7 +371,7 @@ public class UIEngine<T extends UIAdapter> {
                     hkLoop:
                     for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
                         if (inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
-                            inputState.keyboardUsedUIObjectFrame = hotKey;
+                            inputState.keyboardInteractedUIObjectFrame = hotKey;
                         } else {
                             hotKeyPressed = false;
                             break hkLoop;
@@ -398,7 +398,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                     if (!hotKeyPressed) {
-                        inputState.keyboardUsedUIObjectFrame = hotKey;
+                        inputState.keyboardInteractedUIObjectFrame = hotKey;
                         hotKey.pressed = false;
                         if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
                     }
@@ -412,7 +412,7 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateMouseInteractions() {
-        inputState.mouseUsedUIObjectFrame = null;
+        inputState.mouseInteractedUIObjectFrame = null;
         if (api.config.isUiMouseInteractionsDisabled()) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (inputState.inputEvents.mouseDoubleClick) {
@@ -450,7 +450,7 @@ public class UIEngine<T extends UIAdapter> {
                     executeOnMouseDoubleClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
                 }
 
-                inputState.mouseUsedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
@@ -666,8 +666,7 @@ public class UIEngine<T extends UIAdapter> {
                     executeOnMouseClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
                 }
 
-
-                inputState.mouseUsedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
@@ -681,8 +680,94 @@ public class UIEngine<T extends UIAdapter> {
         }
         // ------ MOUSE UP ------
         if (inputState.inputEvents.mouseUp) {
+            // Drag Interaction
+            Object draggedUIObject = UICommons.getDraggedUIReference(inputState);
+            if (draggedUIObject != null) {
+                switch (draggedUIObject) {
+                    case List list -> {
+                        int dragFromIndex = inputState.draggedListFromIndex;
+                        Object dragItem = inputState.draggedListItem;
+                        if (inputState.lastGUIMouseHover != null) {
+                            if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                                if (UICommons.list_canDragIntoList(inputState, hoverList)) {
+                                    UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
+                                    if (inputState.itemInfo_listValid) {
+                                        int toIndex = inputState.itemInfo_listIndex;
+                                        if (hoverList.listAction != null)
+                                            hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
+                                    }
+                                }
+                            } else if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
+                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
+                                    if (inputState.itemInfo_inventoryValid) {
+                                        if (hoverInventory.inventoryAction != null)
+                                            hoverInventory.inventoryAction.onDragFromList(list, dragFromIndex,
+                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                                    }
+                                }
+                            }
+                        } else if (UICommons.list_canDragIntoScreen(list)) {
+                            if (list.listAction != null) list.listAction.onDragIntoScreen(
+                                    dragItem,
+                                    dragFromIndex,
+                                    api.input.state.mouseX(),
+                                    api.input.state.mouseY()
+                            );
+                        }
+                        inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
+                        inputState.draggedListFromIndex = 0;
+                        inputState.draggedListItem = null;
+                        inputState.draggedList = null;
+                    }
+                    case Inventory inventory -> {
+                        int dragFromX = inputState.draggedInventoryFrom.x;
+                        int dragFromY = inputState.draggedInventoryFrom.y;
+                        Object dragItem = inputState.draggedInventoryItem;
+                        if (inputState.lastGUIMouseHover != null) {
+                            if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
+                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
+                                    if (inputState.itemInfo_inventoryValid) {
+                                        if (hoverInventory.inventoryAction != null)
+                                            hoverInventory.inventoryAction.onDragFromInventory(inventory,
+                                                    dragFromX, dragFromY,
+                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                                    }
+                                }
+                            } else if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                                if (UICommons.list_canDragIntoList(inputState, hoverList)) {
+                                    UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
+                                    if (inputState.itemInfo_listValid) {
+                                        int toIndex = inputState.itemInfo_listIndex;
+                                        if (hoverList.listAction != null)
+                                            hoverList.listAction.onDragFromInventory(inventory, dragFromX, dragFromY, toIndex);
+                                    }
+                                }
+                            }
+                        } else if (UICommons.inventory_canDragIntoScreen(inventory)) {
+                            if (inventory.inventoryAction != null)
+                                inventory.inventoryAction.onDragIntoScreen(
+                                        dragItem,
+                                        dragFromX, dragFromY,
+                                        api.input.state.mouseX(),
+                                        api.input.state.mouseY()
+                                );
+                        }
+                        inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
+                        inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
+                        inputState.draggedInventoryItem = null;
+                        inputState.draggedInventory = null;
+
+                    }
+                    case null, default -> {
+                    }
+                }
+
+                inputState.mouseInteractedUIObjectFrame = draggedUIObject;
+            }
             // Active UI Element Interaction
-            Object usedUIObject = UICommons.getActivelyUsedUIReference(inputState);
+            Object usedUIObject = UICommons.getUsedUIReference(inputState);
             if (usedUIObject != null) {
                 switch (usedUIObject) {
                     case Window window -> {
@@ -703,7 +788,7 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
                         inputState.pressedContextMenuItem = null;
                     }
-                    case CheckBox checkBox->{
+                    case CheckBox checkBox -> {
                         checkBox.checked = !checkBox.checked;
                         if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
                         inputState.pressedCheckBox = null;
@@ -761,6 +846,7 @@ public class UIEngine<T extends UIAdapter> {
                         scrollBarVertical.buttonPressed = false;
                         if (scrollBarVertical.scrollBarAction != null)
                             scrollBarVertical.scrollBarAction.onRelease(scrollBarVertical.scrolled);
+
                         inputState.scrolledScrollBarVertical = null;
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
@@ -775,135 +861,50 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.turnedKnob = null;
                     }
                     case Inventory inventory -> {
-                        Inventory draggedInventory = inputState.draggedInventory;
-                        Inventory pressedInventory = inputState.pressedInventory;
-                        // Dragging
-                        if (draggedInventory != null) {
-                            int dragFromX = inputState.draggedInventoryFrom.x;
-                            int dragFromY = inputState.draggedInventoryFrom.y;
-                            Object dragItem = inputState.draggedInventoryItem;
-                            if (inputState.lastGUIMouseHover != null) {
-                                if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
-                                    if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
-                                        UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
-                                        if (inputState.itemInfo_inventoryValid) {
-                                            if (hoverInventory.inventoryAction != null)
-                                                hoverInventory.inventoryAction.onDragFromInventory(draggedInventory,
-                                                        dragFromX, dragFromY,
-                                                        inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
-                                        }
-                                    }
-                                } else if (inputState.lastGUIMouseHover instanceof List hoverList) {
-                                    if (UICommons.list_canDragIntoList(inputState, hoverList)) {
-                                        UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
-                                        if (inputState.itemInfo_listValid) {
-                                            int toIndex = inputState.itemInfo_listIndex;
-                                            if (hoverList.listAction != null)
-                                                hoverList.listAction.onDragFromInventory(draggedInventory, dragFromX, dragFromY, toIndex);
-                                        }
-                                    }
-                                }
-                            } else if (UICommons.inventory_canDragIntoScreen(draggedInventory)) {
-                                if (draggedInventory.inventoryAction != null)
-                                    draggedInventory.inventoryAction.onDragIntoScreen(
-                                            dragItem,
-                                            dragFromX, dragFromY,
-                                            api.input.state.mouseX(),
-                                            api.input.state.mouseY()
-                                    );
+                        boolean isHoverObject = inputState.lastGUIMouseHover == usedUIObject;
+                        if (isHoverObject) {
+                            if (inputState.pressedInventoryItem != null) {
+                                inputState.pressedInventory.inventoryAction.onItemSelected(inputState.pressedInventoryItem);
+                            } else {
+                                inputState.pressedInventory.inventoryAction.onItemSelected(null);
                             }
-                            inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
-                            inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
-                            inputState.draggedInventoryItem = null;
-                            inputState.draggedInventory = null;
                         }
-                        // Selecting
-                        if (pressedInventory != null) {
-                            if (inputState.lastGUIMouseHover == pressedInventory) {
-                                if(inputState.pressedInventoryItem != null) {
-                                    inputState.pressedInventory.inventoryAction.onItemSelected(inputState.pressedInventoryItem);
-                                }else{
-                                    inputState.pressedInventory.inventoryAction.onItemSelected(null);
-                                }
-                            }
-                            inputState.pressedInventory = null;
-                            inputState.pressedInventoryItem = null;
-                        }
+                        inputState.pressedInventory = null;
+                        inputState.pressedInventoryItem = null;
                     }
                     case List list -> {
-                        List draggedList = inputState.draggedList;
-                        List pressedList = inputState.pressedList;
-                        // Dragging
-                        if (draggedList != null) {
-                            int dragFromIndex = inputState.draggedListFromIndex;
-                            Object dragItem = inputState.draggedListItem;
-                            if (inputState.lastGUIMouseHover != null) {
-                                if (inputState.lastGUIMouseHover instanceof List hoverList) {
-                                    if (UICommons.list_canDragIntoList(inputState, hoverList)) {
-                                        UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
-                                        if (inputState.itemInfo_listValid) {
-                                            int toIndex = inputState.itemInfo_listIndex;
-                                            if (hoverList.listAction != null)
-                                                hoverList.listAction.onDragFromList(draggedList, dragFromIndex, toIndex);
-                                        }
-                                    }
-                                } else if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
-                                    if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
-                                        UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
-                                        if (inputState.itemInfo_inventoryValid) {
-                                            if (hoverInventory.inventoryAction != null)
-                                                hoverInventory.inventoryAction.onDragFromList(draggedList, dragFromIndex,
-                                                        inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
-                                        }
-                                    }
-                                }
-                            } else if (UICommons.list_canDragIntoScreen(draggedList)) {
-                                if (draggedList.listAction != null) draggedList.listAction.onDragIntoScreen(
-                                        dragItem,
-                                        dragFromIndex,
-                                        api.input.state.mouseX(),
-                                        api.input.state.mouseY()
-                                );
-                            }
-                            inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
-                            inputState.draggedListFromIndex = 0;
-                            inputState.draggedListItem = null;
-                            inputState.draggedList = null;
-                        }
-                        // Selecting
-                        if (pressedList != null) {
-                            if (inputState.lastGUIMouseHover == pressedList) {
-                                if(inputState.pressedListItem != null) {
-                                    if (pressedList.multiSelect) {
-                                        if (pressedList.selectedItems.contains(inputState.pressedListItem)) {
-                                            pressedList.selectedItems.remove(inputState.pressedListItem);
-                                        } else {
-                                            pressedList.selectedItems.add(inputState.pressedListItem);
-                                        }
-                                        if (pressedList.listAction != null)
-                                            pressedList.listAction.onItemsSelected(pressedList.selectedItems);
+                        boolean isHoverObject = inputState.lastGUIMouseHover == usedUIObject;
+                        if (isHoverObject) {
+                            if (inputState.pressedListItem != null) {
+                                if (list.multiSelect) {
+                                    if (list.selectedItems.contains(inputState.pressedListItem)) {
+                                        list.selectedItems.remove(inputState.pressedListItem);
                                     } else {
-                                        pressedList.selectedItem = inputState.pressedListItem;
-                                        if (pressedList.listAction != null)
-                                            pressedList.listAction.onItemSelected(pressedList.selectedItem);
+                                        list.selectedItems.add(inputState.pressedListItem);
                                     }
-                                }else{
-                                    if (pressedList.multiSelect) {
-                                        pressedList.selectedItems.clear();
-                                    } else {
-                                        pressedList.selectedItem = null;
-                                    }
-                                    if (pressedList.listAction != null) pressedList.listAction.onItemSelected(null);
+                                    if (list.listAction != null)
+                                        list.listAction.onItemsSelected(list.selectedItems);
+                                } else {
+                                    list.selectedItem = inputState.pressedListItem;
+                                    if (list.listAction != null)
+                                        list.listAction.onItemSelected(list.selectedItem);
                                 }
+                            } else {
+                                if (list.multiSelect) {
+                                    list.selectedItems.clear();
+                                } else {
+                                    list.selectedItem = null;
+                                }
+                                if (list.listAction != null) list.listAction.onItemSelected(null);
                             }
-                            inputState.pressedListItem = null;
-                            inputState.pressedList = null;
                         }
+                        inputState.pressedListItem = null;
+                        inputState.pressedList = null;
                     }
                     case null, default -> {
                     }
                 }
-                inputState.mouseUsedUIObjectFrame = usedUIObject;
+                inputState.mouseInteractedUIObjectFrame = usedUIObject;
             }
 
 
@@ -922,7 +923,7 @@ public class UIEngine<T extends UIAdapter> {
         // ------ MOUSE DRAGGED ------
         if (inputState.inputEvents.mouseDragged) {
             // Active UI Element Interaction
-            Object usedUIObject = UICommons.getActivelyUsedUIReference(inputState);
+            Object usedUIObject = UICommons.getUsedUIReference(inputState);
             switch (usedUIObject) {
                 case Window window -> {
                     window.x = inputState.mouse_gui.x - inputState.draggedWindow_offset.x;
@@ -1008,7 +1009,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Execute Common Actions
                 executeOnMouseScrollCommonAction(inputState.lastGUIMouseHover, inputState.inputEvents.mouseScrolledAmount);
 
-                inputState.mouseUsedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
             }
         }
     }

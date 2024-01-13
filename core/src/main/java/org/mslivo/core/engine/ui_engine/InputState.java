@@ -142,8 +142,8 @@ public class InputState {
     public ContextMenu openContextMenu;
     public ContextMenuItem pressedContextMenuItem;
     public int displayedContextMenuWidth;
-    public Object keyboardUsedUIObjectFrame;
-    public Object mouseUsedUIObjectFrame;
+    public Object keyboardInteractedUIObjectFrame;
+    public Object mouseInteractedUIObjectFrame;
 
     /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;

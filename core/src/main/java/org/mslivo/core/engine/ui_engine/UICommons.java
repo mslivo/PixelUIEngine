@@ -205,7 +205,7 @@ class UICommons {
         inputState.mTextInputUnlock = false;
     }
 
-    static Object getActivelyUsedUIReference(InputState inputState) {
+    static Object getUsedUIReference(InputState inputState) {
         if (inputState.draggedWindow != null) return inputState.draggedWindow;
         if (inputState.pressedButton != null) return inputState.pressedButton;
         if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
@@ -214,13 +214,17 @@ class UICommons {
         if (inputState.pressedMap != null) return inputState.pressedMap;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
-        if (inputState.draggedInventory != null) return inputState.draggedInventory;
         if (inputState.pressedInventory != null) return inputState.pressedInventory;
-        if (inputState.draggedList != null) return inputState.draggedList;
         if (inputState.pressedList != null) return inputState.pressedList;
         if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
         if (inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
         if(inputState.pressedCheckBox != null) return inputState.pressedCheckBox;
+        return null;
+    }
+
+    static Object getDraggedUIReference(InputState inputState) {
+        if (inputState.draggedInventory != null) return inputState.draggedInventory;
+        if (inputState.draggedList != null) return inputState.draggedList;
         return null;
     }
 
