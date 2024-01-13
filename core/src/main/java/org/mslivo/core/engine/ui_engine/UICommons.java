@@ -28,7 +28,6 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
@@ -160,16 +159,20 @@ class UICommons {
         inputState.pressedTextFieldMouseX = 0;
 
         // Inventory
-        inputState.inventoryDrag_Inventory = null;
-        inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
-        inputState.inventoryDrag_offset.x = inputState.inventoryDrag_offset.y = 0;
-        inputState.inventoryDrag_Item = null;
+        inputState.draggedInventory = null;
+        inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
+        inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
+        inputState.draggedInventoryItem = null;
+        inputState.pressedInventory = null;
+        inputState.pressedInventoryItem = null;
 
         // List
-        inputState.listDrag_List = null;
-        inputState.listDrag_from_index = 0;
-        inputState.listDrag_offset.x = inputState.listDrag_offset.y = 0;
-        inputState.listDrag_Item = null;
+        inputState.draggedList = null;
+        inputState.draggedListFromIndex = 0;
+        inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
+        inputState.draggedListItem = null;
+        inputState.pressedList = null;
+        inputState.pressedListItem = null;
 
         // Textfield
         inputState.focusedTextField = null;
@@ -208,10 +211,12 @@ class UICommons {
         if (inputState.pressedMap != null) return inputState.pressedMap;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
-        if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
-        if (inputState.listDrag_List != null) return inputState.listDrag_List;
-        if(inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
-        if(inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
+        if (inputState.draggedInventory != null) return inputState.draggedInventory;
+        if (inputState.pressedInventory != null) return inputState.pressedInventory;
+        if (inputState.draggedList != null) return inputState.draggedList;
+        if (inputState.pressedList != null) return inputState.pressedList;
+        if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
+        if (inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
         return null;
     }
 
@@ -486,18 +491,18 @@ class UICommons {
     }
 
 
-    static boolean comboBox_isOpen(InputState inputState,ComboBox comboBox) {
+    static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;
     }
 
-    static boolean contextMenu_isOpen(InputState inputState,ContextMenu contextMenu) {
+    static boolean contextMenu_isOpen(InputState inputState, ContextMenu contextMenu) {
         return inputState.openContextMenu != null && inputState.openContextMenu == contextMenu;
     }
 
     static void comboBox_open(InputState inputState, ComboBox comboBox) {
         // Close other Comboboxes
         if (inputState.openComboBox != null) {
-            comboBox_close(inputState,inputState.openComboBox);
+            comboBox_close(inputState, inputState.openComboBox);
         }
         // Open this one
         inputState.openComboBox = comboBox;
@@ -566,15 +571,15 @@ class UICommons {
 
     static boolean list_canDragIntoList(InputState inputState, List list) {
         if (list == null) return false;
-        if (inputState.listDrag_List != null) {
-            if (inputState.listDrag_List == list) return true; // into itself
+        if (inputState.draggedList != null) {
+            if (inputState.draggedList == list) return true; // into itself
             return list.dragInEnabled &&
-                    !list.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromList(inputState.listDrag_List);
-        } else if (inputState.inventoryDrag_Inventory != null) {
+                    !list.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
+                    list.listAction != null && list.listAction.canDragFromList(inputState.draggedList);
+        } else if (inputState.draggedInventory != null) {
             return list.dragInEnabled &&
-                    !list.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
+                    !list.disabled && !inputState.draggedInventory.disabled && inputState.draggedInventory.dragOutEnabled &&
+                    list.listAction != null && list.listAction.canDragFromInventory(inputState.draggedInventory);
         } else {
             return false;
         }
@@ -659,17 +664,17 @@ class UICommons {
 
 
     static boolean inventory_canDragIntoInventory(InputState inputState, Inventory inventory) {
-        if (inputState.inventoryDrag_Item != null) {
-            if (inputState.inventoryDrag_Inventory == null || inventory == null) return false;
-            if (inputState.inventoryDrag_Inventory == inventory) return true; // into itself
+        if (inputState.draggedInventoryItem != null) {
+            if (inputState.draggedInventory == null || inventory == null) return false;
+            if (inputState.draggedInventory == inventory) return true; // into itself
             return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.inventoryDrag_Inventory.disabled && inputState.inventoryDrag_Inventory.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromInventory(inputState.inventoryDrag_Inventory);
-        } else if (inputState.listDrag_Item != null) {
-            if (inputState.listDrag_List == null || inventory == null) return false;
+                    !inventory.disabled && !inputState.draggedInventory.disabled && inputState.draggedInventory.dragOutEnabled &&
+                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromInventory(inputState.draggedInventory);
+        } else if (inputState.draggedListItem != null) {
+            if (inputState.draggedList == null || inventory == null) return false;
             return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.listDrag_List.disabled && inputState.listDrag_List.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromList(inputState.listDrag_List);
+                    !inventory.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
+                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromList(inputState.draggedList);
         } else {
             return false;
         }

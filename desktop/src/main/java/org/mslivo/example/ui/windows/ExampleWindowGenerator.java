@@ -511,8 +511,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public void onItemSelected(ListItem listItem) {
-                if (listItem == null) return;
-                api.addNotification(api.notifications.create("Selected: " + (listItem.text)));
+                api.addNotification(api.notifications.create("Selected: " +listItem));
             }
 
             @Override
@@ -560,8 +559,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public void onItemSelected(ListItem listItem) {
-                if (listItem == null) return;
-                api.addNotification(api.notifications.create("Selected: " + (listItem.text)));
+                api.addNotification(api.notifications.create("Selected: " +listItem));
             }
 
             @Override
@@ -615,6 +613,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
             public boolean canDragFromInventory(Inventory fromInventory) {
                 return true;
             }
+
+            @Override
+            public void onItemSelected(ListItem listItem) {
+                api.addNotification(api.notifications.create("Selected: " +listItem));
+            }
         };
         api.components.inventory.setInventoryAction(inventory1, inventoryAction1);
         api.windows.addComponent(window, inventory1);
@@ -654,6 +657,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
             @Override
             public boolean canDragFromInventory(Inventory fromInventory) {
                 return true;
+            }
+            @Override
+            public void onItemSelected(ListItem listItem) {
+                api.addNotification(api.notifications.create("Selected: " +listItem));
             }
         };
         api.components.inventory.setInventoryAction(inventory2, inventoryAction2);

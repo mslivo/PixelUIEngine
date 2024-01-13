@@ -20,7 +20,7 @@ public abstract class InventoryAction<T> extends CommonActions {
         return 0;
     }
 
-    public void onItemSelected(T listItem, int x, int y) {
+    public void onItemSelected(T listItem) {
     }
 
     public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int to_x, int to_y) {
