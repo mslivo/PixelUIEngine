@@ -1598,42 +1598,44 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void keyboardMouseTranslateAndChokeEvents() {
-        boolean textFieldFocused = inputState.focusedTextField != null;
+        boolean textFieldFocused = inputState.focusedTextField != null; // dont choke events on textfieldFocused
 
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
             int[] buttons = keyboardMouseButtons(i);
             if (buttons != null) {
-                for (int i2 = 0; i2 < buttons.length; i2++) {
-                    int keyCode = buttons[i2];
-                    if (inputState.inputEvents.keyDown) {
+                if (inputState.inputEvents.keyDown) {
+                    for (int i2 = 0; i2 < buttons.length; i2++) {
+                        int keyCode = buttons[i2];
                         ArrayList<Integer> downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
-                        keyCodeLoop:for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        keyCodeLoop:
+                        for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             int downKeyCode = downKeyCodes.get(ikc);
                             if (downKeyCode == keyCode) {
                                 boolean choke = !(textFieldFocused && UICommons.textField_isTextFieldControlKey(downKeyCode));
-                                if(choke) {
+                                if (choke) {
                                     downKeyCodes.remove(ikc);
                                     inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                     inputState.inputEvents.keysDown[keyCode] = false;
                                     inputState.keyBoardTranslatedKeysDown[keyCode] = true;
+                                    break keyCodeLoop;
                                 }
-                                break keyCodeLoop;
                             }
 
                         }
                     }
-                    if (inputState.inputEvents.keyUp) {
+                }
+                if (inputState.inputEvents.keyUp) {
+                    for (int i2 = 0; i2 < buttons.length; i2++) {
+                        int keyCode = buttons[i2];
                         ArrayList<Integer> upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
-                        keyCodeLoop:for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        keyCodeLoop:
+                        for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             int upKeyCode = upKeyCodes.get(ikc);
                             if (upKeyCode == keyCode) {
-                                boolean choke = !(textFieldFocused && UICommons.textField_isTextFieldControlKey(upKeyCode));
-                                if(choke){
-                                    upKeyCodes.remove(ikc);
-                                    inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
-                                    inputState.keyBoardTranslatedKeysDown[keyCode] = false;
-                                }
+                                upKeyCodes.remove(ikc);
+                                inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
+                                inputState.keyBoardTranslatedKeysDown[keyCode] = false;
                                 break keyCodeLoop;
                             }
                         }
@@ -1642,8 +1644,6 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
     }
-
-
 
 
     private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
