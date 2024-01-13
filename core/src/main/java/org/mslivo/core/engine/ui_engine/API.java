@@ -1274,7 +1274,7 @@ public class API {
     }
 
     public boolean isContextMenuOpen(ContextMenu contextMenu) {
-        return UICommons.contextMenu_isOpen(contextMenu, inputState);
+        return UICommons.contextMenu_isOpen(inputState, contextMenu);
     }
 
     public ArrayList<Window> getWindows() {
@@ -5165,16 +5165,16 @@ public class API {
 
             public void open(ComboBox comboBox) {
                 if (comboBox == null) return;
-                UICommons.comboBox_open(comboBox, inputState);
+                UICommons.comboBox_open(inputState, comboBox);
             }
 
             public void close(ComboBox comboBox) {
                 if (comboBox == null) return;
-                UICommons.comboBox_close(comboBox, inputState);
+                UICommons.comboBox_close(inputState, comboBox);
             }
 
             public boolean isOpen(ComboBox comboBox) {
-                return UICommons.comboBox_isOpen(comboBox, inputState);
+                return UICommons.comboBox_isOpen(inputState, comboBox);
             }
 
             public class _ComboBoxItem {

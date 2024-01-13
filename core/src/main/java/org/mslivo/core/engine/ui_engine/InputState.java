@@ -16,6 +16,7 @@ import org.mslivo.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
 import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
@@ -25,6 +26,7 @@ import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertic
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
+import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
@@ -118,6 +120,8 @@ public class InputState {
     public Knob turnedKnob;
     public Map pressedMap;
     public GameViewPort pressedGameViewPort;
+    public TextField pressedTextField;
+    public int pressedTextFieldMouseX;
     public TextField focusedTextField;
     public Inventory inventoryDrag_Inventory;
     public GridPoint2 inventoryDrag_from;
@@ -128,7 +132,9 @@ public class InputState {
     public GridPoint2 listDrag_offset;
     public Object listDrag_Item;
     public ComboBox openComboBox;
+    public ComboBoxItem pressedComboBoxItem;
     public ContextMenu openContextMenu;
+    public ContextMenuItem pressedContextMenuItem;
     public int displayedContextMenuWidth;
     public Object keyboardUsedUIObjectFrame;
     public Object mouseUsedUIObjectFrame;

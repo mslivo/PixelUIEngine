@@ -174,6 +174,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.windows = new ArrayList<>();
         newInputState.screenComponents = new ArrayList<>();
         newInputState.openContextMenu = null;
+        newInputState.pressedContextMenuItem = null;
         newInputState.displayedContextMenuWidth = 0;
         newInputState.openMouseTextInput = null;
         newInputState.mTextInputConfirmPressed = false;
@@ -192,6 +193,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseUsedUIObjectFrame = null;
         newInputState.modalWindow = null;
         newInputState.modalWindowQueue = new ArrayDeque<>();
+        newInputState.pressedTextField = null;
+        newInputState.pressedTextFieldMouseX = 0;
         newInputState.focusedTextField = null;
         newInputState.notifications = new ArrayList<>();
         newInputState.hotKeys = new ArrayList<>();
@@ -222,7 +225,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.tooltip_lastHoverObject = null;
         newInputState.pressedMap = null;
         newInputState.openComboBox = null;
-
+        newInputState.pressedComboBoxItem = null;
         // ----- Controls
         newInputState.currentControlMode = MouseControlMode.KEYBOARD;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
@@ -492,14 +495,6 @@ public class UIEngine<T extends UIAdapter> {
                         case Window window -> {
                             if (window.moveAble) moveWindow = window;
                         }
-                        case ContextMenuItem contextMenuItem -> {
-                            ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
-                            if (contextMenuItem.contextMenuItemAction != null)
-                                contextMenuItem.contextMenuItemAction.onSelect();
-                            if (contextMenu.contextMenuAction != null)
-                                contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
-                            UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
-                        }
                         case Button button -> {
                             inputState.pressedButton = button;
                             if (button.mode == ButtonMode.TOGGLE) {
@@ -512,6 +507,9 @@ public class UIEngine<T extends UIAdapter> {
                                 if (button.mode == ButtonMode.TOGGLE) button.buttonAction.onToggle(button.pressed);
                                 inputState.pressedButton_timer_hold = 0;
                             }
+                        }
+                        case ContextMenuItem contextMenuItem -> {
+                            inputState.pressedContextMenuItem = contextMenuItem;
                         }
                         case ScrollBarVertical scrollBarVertical -> {
                             scrollBarVertical.buttonPressed = true;
@@ -560,31 +558,33 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                         case ComboBox comboBox -> {
-                            if (UICommons.comboBox_isOpen(comboBox, inputState)) {
-                                for (int i = 0; i < comboBox.items.size(); i++) {
-                                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                                            UICommons.component_getParentWindowX(comboBox) + (comboBox.x * TILE_SIZE) + comboBox.offset_x,
-                                            UICommons.component_getParentWindowY(comboBox) + (comboBox.y * TILE_SIZE) + comboBox.offset_y - (i * TILE_SIZE) - TILE_SIZE,
-                                            comboBox.width * TILE_SIZE,
-                                            TILE_SIZE
-                                    )) {
-                                        ComboBoxItem comboBoxItem = comboBox.items.get(i);
-                                        comboBox.selectedItem = comboBoxItem;
-                                        if (comboBoxItem.comboBoxItemAction != null)
-                                            comboBoxItem.comboBoxItemAction.onSelect();
-                                        if (comboBox.comboBoxAction != null)
-                                            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-                                        if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
-                                            // keyboard mode: move mouse back to combobox on item select
-                                            inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                            if (UICommons.comboBox_isOpen(inputState, comboBox)) {
+                                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                        UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox),
+                                        (comboBox.width*TILE_SIZE),TILE_SIZE)){
+                                    // Clicked on Combobox itself -> close
+                                    UICommons.comboBox_close(inputState, comboBox);
+                                }else{
+                                    // Clicked on Item
+                                    for (int i = 0; i < comboBox.items.size(); i++) {
+                                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                                UICommons.component_getAbsoluteX(comboBox),
+                                                UICommons.component_getAbsoluteY(comboBox) - (i * TILE_SIZE) - TILE_SIZE,
+                                                comboBox.width * TILE_SIZE,
+                                                TILE_SIZE
+                                        )) {
+                                            ComboBoxItem comboBoxItem = comboBox.items.get(i);
+                                            inputState.pressedComboBoxItem = comboBoxItem;
                                         }
                                     }
                                 }
 
-                                UICommons.comboBox_close(comboBox, inputState);
+
+
+
                             } else {
                                 // Open this combobox
-                                UICommons.comboBox_open(comboBox, inputState);
+                                UICommons.comboBox_open(inputState, comboBox);
                             }
                         }
                         case Knob knob -> {
@@ -600,34 +600,12 @@ public class UIEngine<T extends UIAdapter> {
                         case GameViewPort gameViewPort -> {
                             int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(gameViewPort) + (gameViewPort.x * TILE_SIZE) + gameViewPort.offset_x);
                             int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(gameViewPort) + (gameViewPort.y * TILE_SIZE) + gameViewPort.offset_y);
-                            if (gameViewPort.gameViewPortAction != null) {
-                                gameViewPort.gameViewPortAction.onPress(x, y);
-                            }
+                            if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(x, y);
                             inputState.pressedGameViewPort = gameViewPort;
                         }
                         case TextField textField -> {
-                            // Set Marker to mouse position
-                            int mouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
-                            char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
-                            String testString = "";
-                            boolean found = false;
-                            charLoop:
-                            for (int i = 0; i < fieldContent.length; i++) {
-                                testString += fieldContent[i];
-                                if (mediaManager.textWidth(textField.font, testString) > mouseX) {
-                                    UICommons.textField_setMarkerPosition(mediaManager, textField,
-                                            textField.offset + i);
-                                    found = true;
-                                    break charLoop;
-                                }
-                            }
-                            if (!found) {
-                                // Set to end
-                                UICommons.textField_setMarkerPosition(mediaManager, textField,
-                                        textField.offset + fieldContent.length);
-                            }
-                            // Set Focus
-                            UICommons.textField_focus(inputState, textField);
+                            inputState.pressedTextFieldMouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
+                            inputState.pressedTextField = textField;
                         }
                         case Inventory inventory -> {
                             int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
@@ -681,19 +659,25 @@ public class UIEngine<T extends UIAdapter> {
                         // Move on top ?
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
-                    // Hide displayed context Menus
-                    if (inputState.openContextMenu != null) {
-                        UICommons.contextMenu_close(inputState.openContextMenu, inputState);
-                    }
-                    // Close opened Comboboxes
-                    if (inputState.openComboBox != null &&
-                            inputState.lastGUIMouseHover != inputState.openComboBox // dont close immediately on opening
-                    ) {
-                        UICommons.comboBox_close(inputState.openComboBox, inputState);
-                    }
+
+
                     // Unfocus focused textfields
                     if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
                         UICommons.textField_unFocus(inputState, inputState.focusedTextField);
+                    }
+                }
+
+                // Close opened ComboBoxes
+                if (inputState.openComboBox != null && inputState.lastGUIMouseHover != inputState.openComboBox) {
+                    //if (!(inputState.lastGUIMouseHover instanceof ComboBoxItem comboBoxItem) || comboBoxItem.addedToComboBox != inputState.openComboBox) {
+                    UICommons.comboBox_close(inputState, inputState.openComboBox);
+                    //}
+                }
+
+                // Hide displayed ContextMenus
+                if (inputState.openContextMenu != null) {
+                    if (!(inputState.lastGUIMouseHover instanceof ContextMenuItem contextMenuItem) || contextMenuItem.addedToContextMenu != inputState.openContextMenu) {
+                        UICommons.contextMenu_close(inputState.openContextMenu, inputState);
                     }
                 }
 
@@ -718,6 +702,7 @@ public class UIEngine<T extends UIAdapter> {
         }
         // ------ MOUSE UP ------
         if (inputState.inputEvents.mouseUp) {
+
             // Active UI Element Interaction
             Object usedUIObject = UICommons.getActivelyUsedUIReference(inputState);
             if (usedUIObject != null) {
@@ -730,6 +715,52 @@ public class UIEngine<T extends UIAdapter> {
                     case Map map -> {
                         if (map.mapAction != null) map.mapAction.onRelease();
                         inputState.pressedMap = null;
+                    }
+                    case ContextMenuItem contextMenuItem -> {
+                        ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
+                        if (contextMenuItem.contextMenuItemAction != null)
+                            contextMenuItem.contextMenuItemAction.onSelect();
+                        if (contextMenu.contextMenuAction != null)
+                            contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+                        UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
+                    }
+                    case ComboBoxItem comboBoxItem -> {
+                        ComboBox comboBox = comboBoxItem.addedToComboBox;
+                        comboBox.selectedItem = comboBoxItem;
+                        if (comboBoxItem.comboBoxItemAction != null)
+                            comboBoxItem.comboBoxItemAction.onSelect();
+                        if (comboBox.comboBoxAction != null)
+                            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
+                        if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                            // keyboard mode: move mouse back to combobox on item select
+                            inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                        }
+                        UICommons.comboBox_close(inputState, comboBox);
+                        inputState.pressedComboBoxItem = null;
+                    }
+                    case TextField textField -> {
+                        // Set Marker to mouse position
+                        int mouseX = inputState.pressedTextFieldMouseX;
+                        char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
+                        String testString = "";
+                        boolean found = false;
+                        charLoop:
+                        for (int i = 0; i < fieldContent.length; i++) {
+                            testString += fieldContent[i];
+                            if (mediaManager.textWidth(textField.font, testString) > mouseX) {
+                                UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                        textField.offset + i);
+                                found = true;
+                                break charLoop;
+                            }
+                        }
+                        if (!found) {
+                            // Set to end
+                            UICommons.textField_setMarkerPosition(mediaManager, textField,
+                                    textField.offset + fieldContent.length);
+                        }
+                        // Set Focus
+                        UICommons.textField_focus(inputState, textField);
                     }
                     case GameViewPort gameViewPort -> {
                         if (gameViewPort.gameViewPortAction != null)
@@ -839,6 +870,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 inputState.mouseUsedUIObjectFrame = usedUIObject;
             }
+
 
             // MouseTool Interaction
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
@@ -1598,7 +1630,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void keyboardMouseTranslateAndChokeEvents() {
-        boolean textFieldFocused = inputState.focusedTextField != null; // dont choke events on textfieldFocused
+        if (inputState.focusedTextField != null) return; // Disable during Textfield Input
 
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
@@ -1612,14 +1644,11 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
                             int downKeyCode = downKeyCodes.get(ikc);
                             if (downKeyCode == keyCode) {
-                                boolean choke = !(textFieldFocused && UICommons.textField_isTextFieldControlKey(downKeyCode));
-                                if (choke) {
-                                    downKeyCodes.remove(ikc);
-                                    inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
-                                    inputState.inputEvents.keysDown[keyCode] = false;
-                                    inputState.keyBoardTranslatedKeysDown[keyCode] = true;
-                                    break keyCodeLoop;
-                                }
+                                downKeyCodes.remove(ikc);
+                                inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
+                                inputState.inputEvents.keysDown[keyCode] = false;
+                                inputState.keyBoardTranslatedKeysDown[keyCode] = true;
+                                break keyCodeLoop;
                             }
 
                         }
@@ -1786,8 +1815,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateKeyBoardMouseControl() {
-        if (inputState.focusedTextField != null)
-            return; // Stop Keyboard control if the user wants to type into a textfield
+        if (inputState.focusedTextField != null) return; // Disable during Textfield Input
 
         // Swallow & Translate keyboard events
         boolean[] translatedKeys = inputState.keyBoardTranslatedKeysDown;
@@ -2370,7 +2398,7 @@ public class UIEngine<T extends UIAdapter> {
         switch (component) {
             case ComboBox comboBox -> {
                 // Menu
-                if (UICommons.comboBox_isOpen(comboBox, inputState)) {
+                if (UICommons.comboBox_isOpen(inputState, comboBox)) {
                     int width = comboBox.width;
                     int height = comboBox.items.size();
                     /* Menu */
@@ -2796,7 +2824,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Box
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
-                    CMediaGFX comboMedia = UICommons.comboBox_isOpen(comboBox, inputState) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
+                    CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, comboBox) ? GUIBaseMedia.GUI_COMBOBOX_OPEN : GUIBaseMedia.GUI_COMBOBOX;
 
                     // Item color or default color
                     float color_r = comboBox.selectedItem != null ? comboBox.selectedItem.color_r : comboBox.color_r;

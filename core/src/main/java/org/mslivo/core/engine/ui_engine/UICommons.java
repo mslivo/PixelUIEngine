@@ -155,6 +155,10 @@ class UICommons {
         // GameViewport
         inputState.pressedGameViewPort = null;
 
+        // TextField
+        inputState.pressedTextField = null;
+        inputState.pressedTextFieldMouseX = 0;
+
         // Inventory
         inputState.inventoryDrag_Inventory = null;
         inputState.inventoryDrag_from.x = inputState.inventoryDrag_from.y = 0;
@@ -172,10 +176,12 @@ class UICommons {
 
         // ComboBox
         inputState.openComboBox = null;
+        inputState.pressedComboBoxItem = null;
 
         // ContextMenu
         inputState.openContextMenu = null;
         inputState.displayedContextMenuWidth = 0;
+        inputState.pressedContextMenuItem = null;
 
         // OnScreen Keyboard
         inputState.openMouseTextInput = null;
@@ -200,9 +206,12 @@ class UICommons {
         if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
         if (inputState.turnedKnob != null) return inputState.turnedKnob;
         if (inputState.pressedMap != null) return inputState.pressedMap;
+        if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
         if (inputState.inventoryDrag_Inventory != null) return inputState.inventoryDrag_Inventory;
         if (inputState.listDrag_List != null) return inputState.listDrag_List;
+        if(inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
+        if(inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
         return null;
     }
 
@@ -254,7 +263,7 @@ class UICommons {
     }
 
     static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
-        if (contextMenu_isOpen(contextMenu, inputState)) {
+        if (contextMenu_isOpen(inputState, contextMenu)) {
             inputState.openContextMenu = null;
             inputState.displayedContextMenuWidth = 0;
             if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
@@ -371,16 +380,6 @@ class UICommons {
         resetActivelyUsedUIReferences(inputState);
     }
 
-    static boolean textField_isTextFieldControlKey(int keyCode){
-        return keyCode == KeyCode.Key.LEFT ||
-                keyCode == KeyCode.Key.RIGHT ||
-                keyCode == KeyCode.Key.HOME ||
-                keyCode == KeyCode.Key.END ||
-                keyCode == KeyCode.Key.BACKSPACE ||
-                keyCode == KeyCode.Key.FORWARD_DEL ||
-                keyCode == KeyCode.Key.ENTER;
-    }
-
     static void component_removeFromScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
@@ -487,26 +486,26 @@ class UICommons {
     }
 
 
-    static boolean comboBox_isOpen(ComboBox comboBox, InputState inputState) {
+    static boolean comboBox_isOpen(InputState inputState,ComboBox comboBox) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;
     }
 
-    static boolean contextMenu_isOpen(ContextMenu contextMenu, InputState inputState) {
+    static boolean contextMenu_isOpen(InputState inputState,ContextMenu contextMenu) {
         return inputState.openContextMenu != null && inputState.openContextMenu == contextMenu;
     }
 
-    static void comboBox_open(ComboBox comboBox, InputState inputState) {
+    static void comboBox_open(InputState inputState, ComboBox comboBox) {
         // Close other Comboboxes
         if (inputState.openComboBox != null) {
-            comboBox_close(inputState.openComboBox, inputState);
+            comboBox_close(inputState,inputState.openComboBox);
         }
         // Open this one
         inputState.openComboBox = comboBox;
         if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onOpen();
     }
 
-    static void comboBox_close(ComboBox comboBox, InputState inputState) {
-        if (comboBox_isOpen(comboBox, inputState)) {
+    static void comboBox_close(InputState inputState, ComboBox comboBox) {
+        if (comboBox_isOpen(inputState, comboBox)) {
             inputState.openComboBox = null;
             if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
         }
