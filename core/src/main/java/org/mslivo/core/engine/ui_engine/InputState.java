@@ -15,6 +15,7 @@ import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
@@ -125,6 +126,7 @@ public class InputState {
     public TextField focusedTextField;
     public Inventory draggedInventory;
     public Inventory pressedInventory;
+    public CheckBox pressedCheckBox;
     public Object pressedInventoryItem;
     public GridPoint2 draggedInventoryFrom;
     public GridPoint2 draggedInventoryOffset;

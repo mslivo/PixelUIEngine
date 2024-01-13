@@ -230,6 +230,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedMap = null;
         newInputState.openComboBox = null;
         newInputState.pressedComboBoxItem = null;
+        newInputState.pressedCheckBox = null;
         // ----- Controls
         newInputState.currentControlMode = MouseControlMode.KEYBOARD;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
@@ -622,8 +623,7 @@ public class UIEngine<T extends UIAdapter> {
                             }
                         }
                         case CheckBox checkBox -> {
-                            checkBox.checked = !checkBox.checked;
-                            if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                            inputState.pressedCheckBox = checkBox;
                         }
                         case null, default -> {
                         }
@@ -686,9 +686,9 @@ public class UIEngine<T extends UIAdapter> {
             if (usedUIObject != null) {
                 switch (usedUIObject) {
                     case Window window -> {
-                        inputState.draggedWindow = null;
                         inputState.draggedWindow_offset.x = 0;
                         inputState.draggedWindow_offset.y = 0;
+                        inputState.draggedWindow = null;
                     }
                     case Map map -> {
                         if (map.mapAction != null) map.mapAction.onRelease();
@@ -701,6 +701,12 @@ public class UIEngine<T extends UIAdapter> {
                         if (contextMenu.contextMenuAction != null)
                             contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
                         UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
+                        inputState.pressedContextMenuItem = null;
+                    }
+                    case CheckBox checkBox->{
+                        checkBox.checked = !checkBox.checked;
+                        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                        inputState.pressedCheckBox = null;
                     }
                     case ComboBoxItem comboBoxItem -> {
                         ComboBox comboBox = comboBoxItem.addedToComboBox;
@@ -739,6 +745,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                         // Set Focus
                         UICommons.textField_focus(inputState, textField);
+                        inputState.pressedTextField = null;
                     }
                     case GameViewPort gameViewPort -> {
                         if (gameViewPort.gameViewPortAction != null)
@@ -889,10 +896,9 @@ public class UIEngine<T extends UIAdapter> {
                                     if (pressedList.listAction != null) pressedList.listAction.onItemSelected(null);
                                 }
                             }
-                            inputState.pressedList = null;
                             inputState.pressedListItem = null;
+                            inputState.pressedList = null;
                         }
-
                     }
                     case null, default -> {
                     }

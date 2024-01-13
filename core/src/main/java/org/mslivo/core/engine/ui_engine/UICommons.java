@@ -186,7 +186,10 @@ class UICommons {
         inputState.displayedContextMenuWidth = 0;
         inputState.pressedContextMenuItem = null;
 
-        // OnScreen Keyboard
+        // Checkbox
+        inputState.pressedCheckBox = null;
+
+        // mouseTextInput Keyboard
         inputState.openMouseTextInput = null;
         inputState.mTextInputConfirmPressed = false;
         inputState.mTextInputChangeCasePressed = false;
@@ -217,6 +220,7 @@ class UICommons {
         if (inputState.pressedList != null) return inputState.pressedList;
         if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
         if (inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
+        if(inputState.pressedCheckBox != null) return inputState.pressedCheckBox;
         return null;
     }
 
