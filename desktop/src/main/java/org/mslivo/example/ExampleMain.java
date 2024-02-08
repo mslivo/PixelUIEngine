@@ -5,8 +5,8 @@ import com.badlogic.gdx.Gdx;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.engine.GameEngine;
-import org.mslivo.core.engine.tools.render.transitions.FadeTransition;
-import org.mslivo.core.engine.tools.render.transitions.TransitionManager;
+import org.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
+import org.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.data.ExampleDataGenerator;
@@ -70,7 +70,7 @@ public class ExampleMain extends ApplicationAdapter {
                 new ExampleUIAdapter(this.gameEngine),
                 this.mediaManager,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                ExampleMainConstants.VIEWPORT_MODE, true);
+                ExampleMainConstants.viewportMode, true, true, true);
         Tools.Log.done();
 
 
@@ -104,7 +104,7 @@ public class ExampleMain extends ApplicationAdapter {
                             new ExampleUIAdapter(this.gameEngine),
                             this.mediaManager,
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                            ExampleMainConstants.VIEWPORT_MODE, true);
+                            ExampleMainConstants.viewportMode, true, true ,true);
                     this.uiEngine_transition.update();
                     this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     this.transitionManager.render();

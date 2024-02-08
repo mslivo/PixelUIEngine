@@ -56,10 +56,11 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
+import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.misc.render.GrayScaleShader;
+import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -95,14 +96,26 @@ public class UIEngine<T extends UIAdapter> {
         return uiAdapter;
     }
 
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, boolean gamePadSupport) {
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight) {
+        this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, VIEWPORT_MODE.PIXEL_PERFECT, true, true, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode) {
+        this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, viewportMode, true, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer,boolean immediateRenderer) {
+        this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, viewportMode, spriteRenderer, immediateRenderer, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer,boolean immediateRenderer, boolean gamePadSupport) {
         if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize IREngine: invalid parameters");
         }
         this.uiAdapter = uiAdapter;
         this.mediaManager = mediaManager;
         /* Setup */
-        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode, gamePadSupport);
+        this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode, spriteRenderer, immediateRenderer, gamePadSupport);
         this.api = new API(this.inputState, mediaManager);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
         render_glClear();
@@ -115,25 +128,29 @@ public class UIEngine<T extends UIAdapter> {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
     }
 
-    private Texture.TextureFilter determineUpscaleTextureFilter(ViewportMode viewportMode) {
-        return switch (viewportMode) {
-            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
-            case FIT, STRETCH -> Texture.TextureFilter.Linear;
-        };
-    }
-
-    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, ViewportMode viewportMode, boolean gamePadSupport) {
+    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer,boolean immediateRenderer, boolean gamePadSupport) {
         InputState newInputState = new InputState();
 
         //  ----- Parameters
-
         newInputState.internalResolutionWidth = Tools.Calc.lowerBounds(internalResolutionWidth, TILE_SIZE * 2);
         newInputState.internalResolutionHeight = Tools.Calc.lowerBounds(internalResolutionHeight, TILE_SIZE * 2);
-        newInputState.viewportMode = viewportMode;
+        newInputState.viewportMode = viewPortMode;
+        newInputState.spriteRenderer = spriteRenderer;
+        newInputState.immediateRenderer = immediateRenderer;
         newInputState.gamePadSupport = gamePadSupport;
         // -----  Game
-        newInputState.spriteBatch_game = new SpriteBatch(8191);
-        newInputState.spriteBatch_game.setBlendFunction(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        if (spriteRenderer) {
+            newInputState.spriteBatch_game = new SpriteBatch(8191);
+            newInputState.spriteBatch_game.setBlendFunction(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        } else {
+            newInputState.spriteBatch_game = null;
+        }
+        if (immediateRenderer) {
+            newInputState.imRenderer_game = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        } else {
+            newInputState.imRenderer_game = null;
+        }
+
         newInputState.camera_x = newInputState.camera_y = newInputState.camera_z = 0;
         newInputState.camera_zoom = 1f;
         newInputState.camera_width = newInputState.internalResolutionWidth;
@@ -150,6 +167,9 @@ public class UIEngine<T extends UIAdapter> {
         // -----  GUI
         newInputState.spriteBatch_gui = new SpriteBatch(8191);
         newInputState.spriteBatch_gui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        if (immediateRenderer) {
+            newInputState.imRenderer_gui = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        }
         newInputState.camera_gui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_gui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.frameBuffer_gui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
@@ -157,8 +177,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
         newInputState.texture_gui.flip(false, true);
         // ----- UpScaler
-        newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewportMode, internalResolutionWidth, internalResolutionHeight);
-        newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
+        newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewPortMode, internalResolutionWidth, internalResolutionHeight);
+        newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewPortMode);
         newInputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth * newInputState.upscaleFactor_screen, newInputState.internalResolutionHeight * newInputState.upscaleFactor_screen, false);
         newInputState.frameBuffer_screen.getColorBufferTexture().setFilter(newInputState.textureFilter_screen, newInputState.textureFilter_screen);
         newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
@@ -167,7 +187,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_screen = new SpriteBatch(1);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
-        newInputState.viewport_screen = UICommons.viewport_createViewport(viewportMode, newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         // -----  GUI
@@ -232,7 +252,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedComboBoxItem = null;
         newInputState.pressedCheckBox = null;
         // ----- Controls
-        newInputState.currentControlMode = MouseControlMode.KEYBOARD;
+        newInputState.currentControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
         newInputState.mouse = new GridPoint2(0, 0);
         newInputState.mouse_delta = new GridPoint2(0, 0);
@@ -800,7 +820,7 @@ public class UIEngine<T extends UIAdapter> {
                             comboBoxItem.comboBoxItemAction.onSelect();
                         if (comboBox.comboBoxAction != null)
                             comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-                        if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                        if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                             // keyboard mode: move mouse back to combobox on item select
                             inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
                         }
@@ -946,10 +966,10 @@ public class UIEngine<T extends UIAdapter> {
                         scrollBarHorizontal.scrollBarAction.onScrolled(inputState.scrolledScrollBarHorizontal.scrolled);
                 }
                 case Knob knob -> {
-                    float amount = -(inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
+                    float amount = (inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
                     float newValue = knob.turned + amount;
                     UICommons.knob_turnKnob(knob, newValue, amount);
-                    if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                    if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                         // keyboard mode: keep mouse position steady
                         inputState.mouse_gui.y += inputState.mouse_delta.y;
                     }
@@ -1200,7 +1220,7 @@ public class UIEngine<T extends UIAdapter> {
 
         updateMouseControlMode();
 
-        if (inputState.currentControlMode != MouseControlMode.DISABLED) {
+        if (inputState.currentControlMode != MOUSE_CONTROL_MODE.DISABLED) {
             // Translate Keys
             switch (inputState.currentControlMode) {
                 case HARDWARE_MOUSE -> {
@@ -1460,32 +1480,32 @@ public class UIEngine<T extends UIAdapter> {
         boolean keyboardMouse = api.config.isKeyboardMouseEnabled();
         boolean gamePadMouse = api.config.isGamePadMouseEnabled();
 
-        MouseControlMode nextControlMode = null;
+        MOUSE_CONTROL_MODE nextControlMode = null;
 
         if (!hardwareMouse && !keyboardMouse && !gamePadMouse) {
-            nextControlMode = MouseControlMode.DISABLED;
+            nextControlMode = MOUSE_CONTROL_MODE.DISABLED;
         } else {
             if (hardwareMouse && !keyboardMouse && !gamePadMouse) {
-                nextControlMode = MouseControlMode.HARDWARE_MOUSE;
+                nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
             } else if (keyboardMouse && !gamePadMouse && !hardwareMouse) {
-                nextControlMode = MouseControlMode.KEYBOARD;
+                nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
             } else if (gamePadMouse && !hardwareMouse && !keyboardMouse) {
-                nextControlMode = MouseControlMode.GAMEPAD;
+                nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
             } else {
                 switch (inputState.currentControlMode) {
                     case HARDWARE_MOUSE -> {
-                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
-                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
+                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
+                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
                     }
                     case KEYBOARD -> {
                         if (hardwareMouse && hardwareMouseDetectUse())
-                            nextControlMode = MouseControlMode.HARDWARE_MOUSE;
-                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MouseControlMode.GAMEPAD;
+                            nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
+                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
                     }
                     case GAMEPAD -> {
                         if (hardwareMouse && hardwareMouseDetectUse())
-                            nextControlMode = MouseControlMode.HARDWARE_MOUSE;
-                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MouseControlMode.KEYBOARD;
+                            nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
+                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
                     }
                 }
             }
@@ -1502,10 +1522,10 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case GAMEPAD, KEYBOARD -> {
                     // Reset temporary variables
-                    if (inputState.currentControlMode == MouseControlMode.GAMEPAD) {
+                    if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
                         for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
                             inputState.keyBoardTranslatedKeysDown[i] = false;
-                    } else if (inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+                    } else if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                         for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
                             inputState.gamePadTranslatedButtonsDown[i] = false;
                         inputState.keyBoardMouseSpeedUp.set(0f, 0f);
@@ -2146,9 +2166,10 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             // Draw Main FrameBuffer
-            inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
+            if (inputState.spriteRenderer) inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
+            if (inputState.immediateRenderer) inputState.imRenderer_game.setProjectionMatrix(this.inputState.camera_game.combined);
             inputState.frameBuffer_game.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, true);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, true);
             inputState.frameBuffer_game.end();
         }
 
@@ -2157,9 +2178,10 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_gui.begin();
             render_glClear();
             inputState.spriteBatch_gui.setProjectionMatrix(this.inputState.camera_gui.combined);
-            this.uiAdapter.renderUIBefore(inputState.spriteBatch_gui);
+            if (inputState.immediateRenderer) inputState.imRenderer_gui.setProjectionMatrix(this.inputState.camera_game.combined);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
             this.renderGUI();
-            this.uiAdapter.renderUIAfter(inputState.spriteBatch_gui);
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
             inputState.frameBuffer_gui.end();
         }
 
@@ -2208,9 +2230,10 @@ public class UIEngine<T extends UIAdapter> {
             inputState.camera_height = gameViewPort.height * TILE_SIZE;
             updateGameCamera();
             // draw to frambuffer
-            inputState.spriteBatch_game.setProjectionMatrix(inputState.camera_game.combined);
+            if(inputState.spriteRenderer) inputState.spriteBatch_game.setProjectionMatrix(inputState.camera_game.combined);
+            if(inputState.immediateRenderer) inputState.imRenderer_game.setProjectionMatrix(inputState.camera_game.combined);
             gameViewPort.frameBuffer.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, false);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, false);
             gameViewPort.frameBuffer.end();
 
             // reset camera position back
@@ -3276,16 +3299,21 @@ public class UIEngine<T extends UIAdapter> {
         inputState.notifications.clear();
         inputState.gameViewPorts.clear();
 
-        // GFX
-        inputState.spriteBatch_game.dispose();
+        // SpriteBatch
+        if(inputState.spriteRenderer) inputState.spriteBatch_game.dispose();
         inputState.spriteBatch_gui.dispose();
-        inputState.spriteBatch_screen.dispose();
 
+        // ImmediateRenderer
+        if(inputState.immediateRenderer) inputState.imRenderer_game.dispose();
+        if(inputState.immediateRenderer) inputState.imRenderer_gui.dispose();
+
+        // Textures
+        inputState.spriteBatch_screen.dispose();
         inputState.texture_game.getTexture().dispose();
         inputState.texture_gui.getTexture().dispose();
-        if (inputState.viewportMode == ViewportMode.FIT || inputState.viewportMode == ViewportMode.STRETCH) {
-            inputState.texture_screen.getTexture().dispose();
-        }
+        inputState.texture_screen.getTexture().dispose();
+
+        // Shaders
         inputState.grayScaleShader.dispose();
 
         inputState = null;
@@ -3301,8 +3329,14 @@ public class UIEngine<T extends UIAdapter> {
         return inputState.internalResolutionHeight;
     }
 
-    public ViewportMode getViewportMode() {
+    public VIEWPORT_MODE getViewportMode() {
         return inputState.viewportMode;
+    }
+    public boolean isSpriteRendererEnabled() {
+        return inputState.spriteRenderer;
+    }
+    public boolean isImmediateRendererEnabled() {
+        return inputState.immediateRenderer;
     }
 
     public int getViewPortScreenX() {

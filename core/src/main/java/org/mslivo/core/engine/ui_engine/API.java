@@ -56,9 +56,9 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 
 import java.awt.*;
 import java.net.URI;
@@ -2326,13 +2326,13 @@ public class API {
         // Mouse Control
 
         public void setMousePosition(int x, int y) {
-            if (inputState.currentControlMode != MouseControlMode.HARDWARE_MOUSE) return;
+            if (inputState.currentControlMode != MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
             inputState.mouse_gui.x = x;
             inputState.mouse_gui.y = y;
             inputState.lastGUIMouseHover = null;
         }
 
-        public MouseControlMode currentMouseControlMode() {
+        public MOUSE_CONTROL_MODE currentMouseControlMode() {
             return inputState.currentControlMode;
         }
 
@@ -3394,14 +3394,14 @@ public class API {
         return inputState.internalResolutionHeight;
     }
 
-    public ViewportMode viewportMode() {
+    public VIEWPORT_MODE viewportMode() {
         return inputState.viewportMode;
     }
 
-    public void setViewportMode(ViewportMode viewportMode) {
-        if (viewportMode == null || viewportMode == inputState.viewportMode) return;
-        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewportMode, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewportMode);
+    public void setViewportMode(VIEWPORT_MODE VIEWPORTMODE) {
+        if (VIEWPORTMODE == null || VIEWPORTMODE == inputState.viewportMode) return;
+        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(VIEWPORTMODE, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(VIEWPORTMODE);
         // frameBuffer_upScale
         inputState.frameBuffer_screen.dispose();
         inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.upscaleFactor_screen, inputState.internalResolutionHeight * inputState.upscaleFactor_screen, false);
@@ -3411,10 +3411,10 @@ public class API {
         inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
         inputState.texture_screen.flip(false, true);
         // viewport_screen
-        inputState.viewport_screen = UICommons.viewport_createViewport(viewportMode, inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.viewport_screen = UICommons.viewport_createViewport(VIEWPORTMODE, inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // viewportMode
-        inputState.viewportMode = viewportMode;
+        inputState.viewportMode = VIEWPORTMODE;
     }
 
     public class _Camera {

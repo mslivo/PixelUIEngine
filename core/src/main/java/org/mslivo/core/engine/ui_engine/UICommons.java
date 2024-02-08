@@ -3,6 +3,8 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -28,15 +30,15 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
-import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 
 class UICommons {
 
-    static int viewport_determineUpscaleFactor(ViewportMode viewportMode, int internalResolutionWidth, int internalResolutionHeight) {
-        switch (viewportMode) {
+    static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
+        switch (VIEWPORTMODE) {
             case PIXEL_PERFECT -> {
                 return 1;
             }
@@ -50,12 +52,13 @@ class UICommons {
                 return upSampling;
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + viewportMode);
+            default -> throw new IllegalStateException("Unexpected value: " + VIEWPORTMODE);
         }
     }
 
-    static Viewport viewport_createViewport(ViewportMode viewportMode, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
-        return switch (viewportMode) {
+
+    static Viewport viewport_createViewport(VIEWPORT_MODE VIEWPORTMODE, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
+        return switch (VIEWPORTMODE) {
             case FIT -> new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
             case PIXEL_PERFECT ->
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
@@ -63,8 +66,8 @@ class UICommons {
         };
     }
 
-    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(ViewportMode viewportMode) {
-        return switch (viewportMode) {
+    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE VIEWPORTMODE) {
+        return switch (VIEWPORTMODE) {
             case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
             case FIT, STRETCH -> Texture.TextureFilter.Linear;
         };
@@ -245,7 +248,7 @@ class UICommons {
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
         boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x, inputState.mouse_gui.y);
-        if (success && inputState.currentControlMode == MouseControlMode.KEYBOARD) {
+        if (success && inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
             // keyboard mode: move mouse onto the opened menu
             inputState.mouse_gui.x += UIEngine.TILE_SIZE_2;
             inputState.mouse_gui.y -= UIEngine.TILE_SIZE_2;

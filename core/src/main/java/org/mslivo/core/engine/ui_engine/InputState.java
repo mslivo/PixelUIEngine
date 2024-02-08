@@ -35,9 +35,10 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
-import org.mslivo.core.engine.ui_engine.misc.MouseControlMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
+import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -45,35 +46,26 @@ import java.util.ArrayList;
 public class InputState {
 
     /* Parameters */
-
     public int internalResolutionWidth, internalResolutionHeight;
-
-    public ViewportMode viewportMode;
-
+    public VIEWPORT_MODE viewportMode;
+    public boolean spriteRenderer;
+    public boolean immediateRenderer;
     public boolean gamePadSupport;
-
 
     /* #################### Graphics: Game #################### */
     public SpriteBatch spriteBatch_game;
-
+    public ImmediateRenderer imRenderer_game;
     public TextureRegion texture_game;
-
     public OrthographicCamera camera_game;
-
     public float camera_x, camera_y, camera_z, camera_zoom;
-
     public int camera_width, camera_height;
-
     public NestedFrameBuffer frameBuffer_game;
 
-
     /* #################### Graphics: GUI #################### */
-
     public SpriteBatch spriteBatch_gui;
+    public ImmediateRenderer imRenderer_gui;
     public TextureRegion texture_gui;
-
     public OrthographicCamera camera_gui;
-
     public NestedFrameBuffer frameBuffer_gui;
 
     /* #################### Graphics: Screen #################### */
@@ -162,7 +154,7 @@ public class InputState {
 
     /* #################### Control #################### */
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
-    public MouseControlMode currentControlMode;
+    public MOUSE_CONTROL_MODE currentControlMode;
     public GridPoint2 mouse;
     public GridPoint2 mouse_gui;
     public GridPoint2 mouse_delta;

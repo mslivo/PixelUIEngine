@@ -43,14 +43,13 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.render.ViewportMode;
+import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class ExampleWindowGenerator extends WindowGenerator {
@@ -375,9 +374,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
             @Override
             public void onRelease() {
                 switch (api.viewportMode()) {
-                    case PIXEL_PERFECT -> api.setViewportMode(ViewportMode.FIT);
-                    case FIT -> api.setViewportMode(ViewportMode.STRETCH);
-                    case STRETCH -> api.setViewportMode(ViewportMode.PIXEL_PERFECT);
+                    case PIXEL_PERFECT -> api.setViewportMode(VIEWPORT_MODE.FIT);
+                    case FIT -> api.setViewportMode(VIEWPORT_MODE.STRETCH);
+                    case STRETCH -> api.setViewportMode(VIEWPORT_MODE.PIXEL_PERFECT);
                 }
             }
         });
