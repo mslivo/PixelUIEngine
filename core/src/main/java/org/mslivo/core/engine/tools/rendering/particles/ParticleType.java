@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.tools.rendering.particles;
 
 public enum ParticleType {
-    FONT, IMAGE, ANIMATION, ARRAY, CURSOR
+    IMMEDIATE_PIXEL,
+    SPRITE_FONT, SPRITE_IMAGE, SPRITE_ANIMATION, SPRITE_ARRAY, SPRITE_CURSOR
 }

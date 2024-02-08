@@ -10,12 +10,9 @@ public class Particle<D> {
     public int array_index;
     public float origin_x, origin_y;
     public CMediaGFX appearance;
-
     public CMediaFont font;
-
     public String text;
     public float animation_offset;
     public boolean visible;
     public D data;
-
 }
