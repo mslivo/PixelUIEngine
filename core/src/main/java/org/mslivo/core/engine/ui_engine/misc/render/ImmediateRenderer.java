@@ -17,7 +17,6 @@ public class ImmediateRenderer {
         meshResizeStep = resolutionWidth * resolutionHeight;
         this.renderer20 = new ImmediateModeRenderer20(meshResizeStep, false, true, 0);
         this.color = new Color(Color.WHITE);
-        renderer20.color(this.color);
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -69,10 +68,12 @@ public class ImmediateRenderer {
     }
 
     private void checkMeshSize(int vertices){
-        // Resize ImmediateRenderer Mesh if needed
+        // Resize ImmediateRenderer MaxVertices
         if((renderer20.getNumVertices()+vertices) > renderer20.getMaxVertices()){
+            this.renderer20.end();
             this.renderer20.dispose();
             this.renderer20 = new ImmediateModeRenderer20(renderer20.getMaxVertices()+meshResizeStep, false, true, 0);
+            this.begin();
         }
     }
 
