@@ -207,9 +207,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-
         TextField number = api.preConfigured.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notifications.create("Input: " + integer)));
-
 
         ArrayList<ComboBoxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
         ComboBox comboBox = api.components.comboBox.create(25, 7, 6, new ComboBoxItem[]{
@@ -321,7 +319,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         TextButton textBtn1 = api.components.button.textButton.create(3, 3, 6, 2, "Toggle", new ButtonAction() {
             @Override
             public void onToggle(boolean value) {
-                api.input.setMousePosition(100, 100);
+                api.input.mouse.setPosition(100, 100);
             }
         }, null, ButtonMode.TOGGLE);
         api.components.tabBar.tab.addTabComponent(tabTextButton, textBtn1);

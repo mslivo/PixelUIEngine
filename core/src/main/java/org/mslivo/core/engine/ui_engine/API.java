@@ -1,13 +1,13 @@
 package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.IntArray;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -43,22 +43,16 @@ import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
-import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.GraphInfo;
 import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
-import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 
 import java.awt.*;
 import java.net.URI;
@@ -86,19 +80,19 @@ import java.util.function.Function;
  */
 public class API {
 
-    public final _Notification notifications = new _Notification();
-    public final _ContextMenu contextMenu = new _ContextMenu();
-    public final _Windows windows = new _Windows();
+    public final Notification notifications = new Notification();
+    public final ContextMenu contextMenu = new ContextMenu();
+    public final Windows windows = new Windows();
 
-    public final _Components components = new _Components();
-    public final _Camera camera = new _Camera();
-    public final _ToolTip toolTip = new _ToolTip();
-    public final _Config config = new _Config();
-    public final _Input input = new _Input();
-    public final _MouseTool mouseTool = new _MouseTool();
-    public final _HotKey hotkey = new _HotKey();
-    public final _MouseTextInput mouseTextInput = new _MouseTextInput();
-    public final _PreConfigured preConfigured = new _PreConfigured();
+    public final Components components = new Components();
+    public final Camera camera = new Camera();
+    public final ToolTip toolTip = new ToolTip();
+    public final Config config = new Config();
+    public final Input input = new Input();
+    public final MouseTool mouseTool = new MouseTool();
+    public final HotKey hotkey = new HotKey();
+    public final MouseTextInput mouseTextInput = new MouseTextInput();
+    public final PreConfigured preConfigured = new PreConfigured();
     private final InputState inputState;
     private final MediaManager mediaManager;
 
@@ -108,12 +102,12 @@ public class API {
     }
 
 
-    public static class _HotKey {
+    public static class HotKey {
 
-        public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
+        public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
             if (keyCodes == null || keyCodes.length == 0) return null;
             if (hotKeyAction == null) return null;
-            HotKey hotKey = new HotKey();
+            org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey = new org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey();
             hotKey.pressed = false;
             setKeyCodes(hotKey, keyCodes);
             setHotKeyAction(hotKey, hotKeyAction);
@@ -122,54 +116,54 @@ public class API {
             return hotKey;
         }
 
-        public void setKeyCodes(HotKey hotKey, int[] keyCodes) {
+        public void setKeyCodes(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, int[] keyCodes) {
             if (hotKey == null) return;
             hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
         }
 
 
-        public void setHotKeyAction(HotKey hotKey, HotKeyAction hotKeyAction) {
+        public void setHotKeyAction(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, HotKeyAction hotKeyAction) {
             if (hotKey == null) return;
             hotKey.hotKeyAction = hotKeyAction;
         }
 
-        public void setName(HotKey hotKey, String name) {
+        public void setName(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, String name) {
             if (hotKey == null) return;
             hotKey.name = Tools.Text.validString(name);
         }
 
-        public void setData(HotKey hotKey, Object data) {
+        public void setData(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, Object data) {
             if (hotKey == null) return;
             hotKey.data = data;
         }
 
-        public String getKeysAsString(HotKey hotKey) {
+        public String getKeysAsString(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
             String result = "";
             String[] names = new String[hotKey.keyCodes.length];
             for (int i = 0; i < hotKey.keyCodes.length; i++) {
-                names[i] = Input.Keys.toString(hotKey.keyCodes[i]);
+                names[i] = com.badlogic.gdx.Input.Keys.toString(hotKey.keyCodes[i]);
             }
             return String.join("+", names);
         }
     }
 
 
-    public static class _MouseTool {
+    public static class MouseTool {
 
-        public MouseTool create(String name, Object data, CMediaCursor cursor) {
+        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor) {
             return create(name, data, cursor, cursor, null);
         }
 
-        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
+        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
             return create(name, data, cursor, cursorDown, null);
         }
 
-        public MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
+        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
             return create(name, data, cursor, cursor, mouseToolAction);
         }
 
-        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
-            MouseTool mouseTool = new MouseTool();
+        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
+            org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool = new org.mslivo.core.engine.ui_engine.gui.tool.MouseTool();
             setName(mouseTool, name);
             setData(mouseTool, data);
             setCursor(mouseTool, cursor);
@@ -178,38 +172,38 @@ public class API {
             return mouseTool;
         }
 
-        public void setName(MouseTool mouseTool, String name) {
+        public void setName(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, String name) {
             if (mouseTool == null) return;
             mouseTool.name = Tools.Text.validString(name);
         }
 
-        public void setData(MouseTool mouseTool, Object data) {
+        public void setData(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, Object data) {
             if (mouseTool == null) return;
             mouseTool.data = data;
         }
 
-        public void setCursor(MouseTool mouseTool, CMediaCursor cursor) {
+        public void setCursor(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, CMediaCursor cursor) {
             if (mouseTool == null) return;
             mouseTool.cursor = cursor;
         }
 
-        public void setCursorDown(MouseTool mouseTool, CMediaCursor cursorDown) {
+        public void setCursorDown(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, CMediaCursor cursorDown) {
             if (mouseTool == null) return;
             mouseTool.cursorDown = cursorDown;
         }
 
-        public void setMouseToolAction(MouseTool mouseTool, MouseToolAction mouseToolAction) {
+        public void setMouseToolAction(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, MouseToolAction mouseToolAction) {
             if (mouseTool == null) return;
             mouseTool.mouseToolAction = mouseToolAction;
         }
 
     }
 
-    public class _PreConfigured {
+    public class PreConfigured {
 
-        private final HashSet<Character> numbersAllowedCharacters = new HashSet<>(Arrays.asList('-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
+        private final char[] numbersAllowedCharacters = new char[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-        private final HashSet<Character> decimalsAllowedCharacters = new HashSet<>(Arrays.asList('-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
+        private final char[] decimalsAllowedCharacters = new char[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
         public TextField list_CreateSearchBar(List list) {
             return list_CreateSearchBar(list, null, false, false);
@@ -261,7 +255,7 @@ public class API {
                 } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                     resultList.add(item);
                 } else if (searchTooltips) {
-                    ToolTip tooltip = list.listAction.toolTip(item);
+                    org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip = list.listAction.toolTip(item);
                     if (tooltip != null) {
                         linesLoop:
                         for (int i2 = 0; i2 < tooltip.lines.length; i2++) {
@@ -333,7 +327,7 @@ public class API {
             components.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.event.mouseScrolledAmount();
+                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouse.event.scrolledAmount();
                     if (!scrollBarVertical.disabled) {
                         components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
                                 scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
@@ -414,8 +408,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (Tools.Calc.pointRectsCollide(
-                            input.state.mouseXGUI(),
-                            input.state.mouseYGUI(),
+                            input.mouse.state.xGUI(),
+                            input.mouse.state.yGUI(),
                             components.getAbsoluteX(hlText),
                             components.getAbsoluteY(hlText),
                             hlText.width * UIEngine.TILE_SIZE,
@@ -612,8 +606,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.state.mouseXGUI() - components.getAbsoluteX(colorMap);
-                        int yInv = (input.state.mouseYGUI() - components.getAbsoluteY(colorMap));
+                        int x = input.mouse.state.xGUI() - components.getAbsoluteX(colorMap);
+                        int yInv = (input.mouse.state.yGUI() - components.getAbsoluteY(colorMap));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
@@ -1183,7 +1177,7 @@ public class API {
                                 }
                             }, invisibleTab.icon));
                         }
-                        ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         openContextMenu(selectTabMenu);
                     }
                 });
@@ -1199,7 +1193,7 @@ public class API {
 
     }
 
-    public void setGameToolTip(ToolTip toolTip) {
+    public void setGameToolTip(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip) {
         inputState.gameToolTip = toolTip;
     }
 
@@ -1212,68 +1206,68 @@ public class API {
         this.inputState.singleUpdateActions.add(updateAction);
     }
 
-    public void addNotification(Notification notification) {
+    public void addNotification(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
         if (notification == null) return;
         UICommons.notification_addToScreen(inputState, notification, config.notificationsMax);
     }
 
-    public void addNotifications(Notification[] notifications) {
+    public void addNotifications(org.mslivo.core.engine.ui_engine.gui.notification.Notification[] notifications) {
         if (notifications == null) return;
         for (int i = 0; i < notifications.length; i++) addNotification(notifications[i]);
     }
 
-    public void removeNotification(Notification notification) {
+    public void removeNotification(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
         if (notification == null) return;
         UICommons.notification_removeFromScreen(inputState, notification);
     }
 
-    public void removeNotifications(Notification[] notifications) {
+    public void removeNotifications(org.mslivo.core.engine.ui_engine.gui.notification.Notification[] notifications) {
         if (notifications == null) return;
         for (int i = 0; i < notifications.length; i++) removeNotification(notifications[i]);
     }
 
     public void removeAllNotifications() {
-        removeNotifications(inputState.notifications.toArray(new Notification[]{}));
+        removeNotifications(inputState.notifications.toArray(new org.mslivo.core.engine.ui_engine.gui.notification.Notification[]{}));
     }
 
-    public ArrayList<Notification> findNotificationsByName(String name) {
+    public ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> findNotificationsByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<Notification> result = new ArrayList<>();
+        ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> result = new ArrayList<>();
         for (int i = 0; i < inputState.notifications.size(); i++)
             if (name.equals(inputState.notifications.get(i).name)) result.add(inputState.notifications.get(i));
         return result;
     }
 
-    public Notification findNotificationByName(String name) {
+    public org.mslivo.core.engine.ui_engine.gui.notification.Notification findNotificationByName(String name) {
         if (name == null) return null;
-        ArrayList<Notification> result = findNotificationsByName(name);
+        ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> result = findNotificationsByName(name);
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    public boolean isNotificationAddedToScreen(Notification notification) {
+    public boolean isNotificationAddedToScreen(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
         if (notification == null) return false;
         return notification.addedToScreen;
     }
 
 
-    public ArrayList<Notification> getNotifications() {
+    public ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> getNotifications() {
         return new ArrayList<>(inputState.notifications);
     }
 
-    public void openContextMenu(ContextMenu contextMenu) {
+    public void openContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
         UICommons.contextMenu_openAtMousePosition(contextMenu, inputState, mediaManager);
     }
 
-    public void openContextMenu(ContextMenu contextMenu, int x, int y) {
+    public void openContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
         UICommons.contextMenu_open(contextMenu, inputState, mediaManager, x, y);
     }
 
-    public void closeContextMenu(ContextMenu contextMenu) {
+    public void closeContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
         UICommons.contextMenu_close(contextMenu, inputState);
     }
 
-    public boolean isContextMenuOpen(ContextMenu contextMenu) {
+    public boolean isContextMenuOpen(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
         return UICommons.contextMenu_isOpen(inputState, contextMenu);
     }
 
@@ -1442,7 +1436,7 @@ public class API {
         removeAllNotifications();
     }
 
-    public void setMouseTool(MouseTool mouseTool) {
+    public void setMouseTool(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool) {
         inputState.mouseTool = mouseTool;
     }
 
@@ -1452,7 +1446,7 @@ public class API {
         inputState.displayOverrideCursor = true;
     }
 
-    public MouseTool getMouseTool() {
+    public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool getMouseTool() {
         return inputState.mouseTool;
     }
 
@@ -1461,45 +1455,45 @@ public class API {
         return inputState.mouseTool != null && name.equals(inputState.mouseTool.name);
     }
 
-    public ArrayList<HotKey> getHotKeys() {
+    public ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> getHotKeys() {
         return new ArrayList<>(inputState.hotKeys);
     }
 
-    public void addHotKey(HotKey hotKey) {
+    public void addHotKey(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.add(hotKey);
     }
 
-    public void addHotKeys(HotKey[] hotKeys) {
+    public void addHotKeys(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) addHotKey(hotKeys[i]);
     }
 
-    public void removeHotKey(HotKey hotKey) {
+    public void removeHotKey(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.remove(hotKey);
     }
 
-    public void removeHotKeys(HotKey[] hotKeys) {
+    public void removeHotKeys(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) removeHotKey(hotKeys[i]);
     }
 
     public void removeAllHotKeys() {
-        removeHotKeys(inputState.hotKeys.toArray(new HotKey[]{}));
+        removeHotKeys(inputState.hotKeys.toArray(new org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[]{}));
     }
 
-    public ArrayList<HotKey> findHotKeysByName(String name) {
+    public ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> findHotKeysByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<HotKey> result = new ArrayList<>();
+        ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> result = new ArrayList<>();
         for (int i = 0; i < inputState.hotKeys.size(); i++)
             if (name.equals(inputState.hotKeys.get(i).name)) result.add(inputState.hotKeys.get(i));
         return result;
     }
 
-    public HotKey findHotKeyByName(String name) {
+    public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey findHotKeyByName(String name) {
         if (name == null) return null;
-        ArrayList<HotKey> result = findHotKeysByName(name);
+        ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> result = findHotKeysByName(name);
         return result.size() > 0 ? result.get(0) : null;
     }
 
@@ -1519,7 +1513,7 @@ public class API {
     }
 
 
-    public class _MouseTextInput {
+    public class MouseTextInput {
         private MouseTextInputAction defaultMouseTextInputConfirmAction() {
             return new MouseTextInputAction() {
             };
@@ -1588,7 +1582,7 @@ public class API {
         public void enterCharacters(String text) {
             if (inputState.openMouseTextInput == null) return;
             char[] characters = text.toCharArray();
-            for(int i=0;i<characters.length;i++) enterCharacter(characters[i]);
+            for (int i = 0; i < characters.length; i++) enterCharacter(characters[i]);
         }
 
 
@@ -1656,7 +1650,7 @@ public class API {
                          char[] charactersLC, char[] charactersUC, CMediaFont font, Color color) {
             if (charactersLC == null || charactersUC == null || font == null) return;
             if (inputState.openMouseTextInput != null) return;
-            MouseTextInput mouseTextInput = new MouseTextInput();
+            org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput mouseTextInput = new org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput();
             inputState.mTextInputMouseX = Gdx.input.getX();
             inputState.mTextInputUnlock = false;
             inputState.openMouseTextInput = mouseTextInput;
@@ -1681,7 +1675,7 @@ public class API {
     }
 
 
-    public static class _Config {
+    public static class Config {
         private boolean hardwareMouseEnabled = true;
         private boolean keyboardMouseEnabled = false;
         private int[] keyboardMouseButtonsUp = null;
@@ -1727,7 +1721,6 @@ public class API {
         private int notificationsFadeoutTime = 200;
         private float notificationsScrollSpeed = 1;
         private int mapOverlayDefaultFadeoutTime = 200;
-        private final HashSet<Character> textFieldDefaultAllowedCharacters = new HashSet<>();
         private int tooltipFadeInTime = 50;
         private int tooltipFadeInDelayTime = 25;
         private boolean uiKeyInteractionsDisabled = false;
@@ -1749,6 +1742,8 @@ public class API {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
+
+        private char[] textFieldDefaultCharacters;
 
         public boolean isWindowsDefaultEnforceScreenBounds() {
             return windowsDefaultEnforceScreenBounds;
@@ -2043,16 +2038,6 @@ public class API {
             this.mapOverlayDefaultFadeoutTime = Tools.Calc.lowerBounds(mapOverlayDefaultFadeoutTime, 0);
         }
 
-        public HashSet<Character> getTextFieldDefaultAllowedCharacters() {
-            return textFieldDefaultAllowedCharacters;
-        }
-
-        public void setTextFieldDefaultAllowedCharacters(HashSet<Character> textFieldDefaultAllowedCharacters) {
-            if (textFieldDefaultAllowedCharacters == null) return;
-            this.textFieldDefaultAllowedCharacters.clear();
-            this.textFieldDefaultAllowedCharacters.addAll(textFieldDefaultAllowedCharacters);
-        }
-
         public int getTooltipFadeInTime() {
             return tooltipFadeInTime;
         }
@@ -2189,15 +2174,22 @@ public class API {
             this.defaultUpperCaseCharacters = defaultUpperCaseCharacters;
         }
 
-        public _Config() {
-            int maxCharacters = Math.min(defaultLowerCaseCharacters.length, defaultUpperCaseCharacters.length);
-            for (int i = 0; i < maxCharacters; i++) {
-                this.textFieldDefaultAllowedCharacters.add(defaultLowerCaseCharacters[i]);
-                this.textFieldDefaultAllowedCharacters.add(defaultUpperCaseCharacters[i]);
-            }
+        public char[] getTextFieldDefaultCharacters() {
+            return textFieldDefaultCharacters;
         }
 
-        public void loadConfig(_Config config) {
+        public void setTextFieldDefaultCharacters(char[] textFieldDefaultCharacters) {
+            this.textFieldDefaultCharacters = textFieldDefaultCharacters;
+        }
+
+        public Config() {
+            textFieldDefaultCharacters = new char[defaultLowerCaseCharacters.length+defaultUpperCaseCharacters.length];
+            int index = 0;
+            for (int i = 0; i < defaultLowerCaseCharacters.length; i++) textFieldDefaultCharacters[index++] = defaultLowerCaseCharacters[i];
+            for (int i = 0; i < defaultUpperCaseCharacters.length; i++) textFieldDefaultCharacters[index++] = defaultUpperCaseCharacters[i];
+        }
+
+        public void loadConfig(Config config) {
             setWindowsDefaultEnforceScreenBounds(config.getWindowsDefaultEnforceScreenBounds());
             setWindowsDefaultColor(config.getWindowsDefaultColor());
             setComponentsDefaultColor(config.getComponentsDefaultColor());
@@ -2218,7 +2210,7 @@ public class API {
             setNotificationsFadeoutTime(config.getNotificationsFadeoutTime());
             setNotificationsScrollSpeed(config.getNotificationsScrollSpeed());
             setMapOverlayDefaultFadeoutTime(config.getMapOverlayDefaultFadeoutTime());
-            setTextFieldDefaultAllowedCharacters(config.getTextFieldDefaultAllowedCharacters());
+            setTextFieldDefaultCharacters(config.getTextFieldDefaultCharacters());
             setTooltipFadeInTime(config.getTooltipFadeInTime());
             setTooltipFadeInDelayTime(config.getTooltipFadeInDelayTime());
             setHardwareMouseEnabled(config.isHardwareMouseEnabled());
@@ -2255,373 +2247,402 @@ public class API {
 
     }
 
-    public class _Input {
-        public final _Event event = new _Event();
-        public final _State state = new _State();
-
-        private String mouseGUIObjectName(Object mouseObject) {
-            if (mouseObject != null) {
-                if (mouseObject instanceof Component component) {
-                    return component.name;
-                } else if (mouseObject instanceof Window window) {
-                    return window.name;
-                }
-            }
-            return "";
-        }
-
-        public String keyBoardGUIObjectName(Object keyBoardobject) {
-            if (keyBoardobject != null) {
-                if (keyBoardobject instanceof Component component) {
-                    return component.name;
-                } else if (keyBoardobject instanceof HotKey hotKey) {
-                    return hotKey.name;
-                }
-            }
-            return "";
-        }
-
-        // Keyboard USE Info
-
-        public Object keyBoardUseGUIObject() {
-            return inputState.keyboardInteractedUIObjectFrame != null ? inputState.keyboardInteractedUIObjectFrame : null ;
-        }
-
-        public boolean keyBoardUsingGUIObject() {
-            return keyBoardUseGUIObject() != null;
-        }
-
-        public String keyBoardUsingGUIObjectName() {
-            return keyBoardGUIObjectName(keyBoardUseGUIObject());
-        }
-
-        // Mouse USE Info
-
-        public Object mouseUseGUIObject() {
-            return inputState.mouseInteractedUIObjectFrame != null ? inputState.mouseInteractedUIObjectFrame : null ;
-        }
-
-        public boolean mouseUsingGUIObject() {
-            return mouseUseGUIObject() != null;
-        }
-
-        public String mouseUseGUIObjectName() {
-            return mouseGUIObjectName(mouseUseGUIObject());
-        }
-
-        // Mouse Hover Info
-
-        public Object mouseHoverGUIObject() {
-            return inputState.lastGUIMouseHover;
-        }
-
-        public boolean mouseHoveringOverGUIObject() {
-            return mouseHoverGUIObject() != null;
-        }
-
-        public String mouseHoverGUIObjectName() {
-            return mouseGUIObjectName(mouseHoverGUIObject());
-        }
-
-        // Mouse Control
-
-        public void setMousePosition(int x, int y) {
-            if (inputState.currentControlMode != MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
-            inputState.mouse_gui.x = x;
-            inputState.mouse_gui.y = y;
-            inputState.lastGUIMouseHover = null;
-        }
-
-        public MOUSE_CONTROL_MODE currentMouseControlMode() {
-            return inputState.currentControlMode;
-        }
-
+    public class Input {
+        public final Mouse mouse = new Mouse();
+        public final KeyBoard keyboard = new KeyBoard();
+        public final GamePad gamepad = new GamePad();
         public InputMethod lastUsedInputMethod() {
             return inputState.inputEvents.lastUsedInputMethod;
         }
 
+        public class Mouse {
+            public final Event event = new Event();
+            public final State state = new State();
 
-        public class _Event {
-            /* ---- MOUSE EVENTS --- */
-            public boolean mouseDown() {
-                return inputState.inputEvents.mouseDown;
+            private String mouseGUIObjectName(Object mouseObject) {
+                if (mouseObject != null) {
+                    if (mouseObject instanceof Component component) {
+                        return component.name;
+                    } else if (mouseObject instanceof Window window) {
+                        return window.name;
+                    }
+                }
+                return "";
             }
 
-            public boolean mouseDoubleClick() {
-                return inputState.inputEvents.mouseDoubleClick;
+            public void setPosition(int x, int y) {
+                if (inputState.currentControlMode != MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
+                inputState.mouse_gui.x = x;
+                inputState.mouse_gui.y = y;
+                inputState.lastGUIMouseHover = null;
             }
 
-            public boolean mouseUp() {
-                return inputState.inputEvents.mouseUp;
+            public MOUSE_CONTROL_MODE currentControlMode() {
+                return inputState.currentControlMode;
             }
 
-            public boolean mouseDragged() {
-                return inputState.inputEvents.mouseDragged;
+            public Object hoverGUIObject() {
+                return inputState.lastGUIMouseHover;
             }
 
-            public boolean mouseMoved() {
-                return inputState.inputEvents.mouseMoved;
+            public boolean isHoveringOverGUIObject() {
+                return hoverGUIObject() != null;
             }
 
-            public boolean mouseScrolled() {
-                return inputState.inputEvents.mouseScrolled;
+            public String hoverGUIObjectName() {
+                return mouseGUIObjectName(hoverGUIObject());
             }
 
-            public float mouseScrolledAmount() {
-                return inputState.inputEvents.mouseScrolledAmount;
+            public Object useGUIObject() {
+                return inputState.mouseInteractedUIObjectFrame != null ? inputState.mouseInteractedUIObjectFrame : null;
             }
 
-            public ArrayList<Integer> mouseUpButtons() {
-                return new ArrayList<>(inputState.inputEvents.mouseUpButtons);
+            public boolean isUsingGUIObject() {
+                return useGUIObject() != null;
             }
 
-            public ArrayList<Integer> mouseDownButtons() {
-                return new ArrayList<>(inputState.inputEvents.mouseDownButtons);
+            public String useGUIObjectName() {
+                return mouseGUIObjectName(useGUIObject());
             }
 
-            /* ---- KEYBOARD EVENTS --- */
+            public class Event {
+                /* ---- MOUSE EVENTS --- */
+                public boolean buttonDown() {
+                    return inputState.inputEvents.mouseDown;
+                }
 
-            public boolean keyDown() {
-                return inputState.inputEvents.keyDown;
+                public boolean doubleClick() {
+                    return inputState.inputEvents.mouseDoubleClick;
+                }
+
+                public boolean buttonUp() {
+                    return inputState.inputEvents.mouseUp;
+                }
+
+                public boolean dragged() {
+                    return inputState.inputEvents.mouseDragged;
+                }
+
+                public boolean moved() {
+                    return inputState.inputEvents.mouseMoved;
+                }
+
+                public boolean scrolled() {
+                    return inputState.inputEvents.mouseScrolled;
+                }
+
+                public float scrolledAmount() {
+                    return inputState.inputEvents.mouseScrolledAmount;
+                }
+
+                public boolean upHasNextButton(){
+                    return inputState.inputEvents.mouseUpButtonIndex < inputState.inputEvents.mouseUpButtons.size;
+                }
+
+                public int upNextButton() {
+                    return upHasNextButton() ? inputState.inputEvents.mouseUpButtons.get(inputState.inputEvents.mouseUpButtonIndex++) : 0;
+                }
+
+                public boolean downHasNextButton(){
+                    return inputState.inputEvents.mouseDownButtonIndex < inputState.inputEvents.mouseDownButtons.size;
+                }
+
+                public int downNextButton() {
+                    return downHasNextButton() ? inputState.inputEvents.mouseDownButtons.get(inputState.inputEvents.mouseDownButtonIndex++) : 0;
+                }
             }
 
-            public boolean keyUp() {
-                return inputState.inputEvents.keyUp;
+            public class State {
+                public int xGUI() {
+                    return inputState.mouse_gui.x;
+                }
+
+                public int yGUI() {
+                    return inputState.mouse_gui.y;
+                }
+
+                public int x() {
+                    return inputState.mouse.x;
+                }
+
+                public int y() {
+                    return inputState.mouse.y;
+                }
+
+                public float xDelta() {
+                    return inputState.mouse_delta.x;
+                }
+
+                public float yDelta() {
+                    return inputState.mouse_delta.y;
+                }
+
+                public boolean isButtonUp(int keyCode) {
+                    return !inputState.inputEvents.mouseButtonsDown[keyCode];
+                }
+
+                public boolean isAnyButtonUp(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isButtonUp(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
+
+                public boolean isButtonDown(int button) {
+                    return inputState.inputEvents.mouseButtonsDown[button];
+                }
+
+                public boolean isAnyButtonDown(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isButtonDown(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
             }
 
-            public boolean keyTyped() {
-                return inputState.inputEvents.keyTyped;
-            }
-
-            public boolean keyTypedCharacter(Character character) {
-                for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size(); i++)
-                    if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
-                return false;
-            }
-
-            public ArrayList<Integer> keyUpKeys() {
-                return new ArrayList<>(inputState.inputEvents.keyUpKeyCodes);
-            }
-
-            public ArrayList<Integer> keyDownKeys() {
-                return new ArrayList<>(inputState.inputEvents.keyDownKeyCodes);
-            }
-
-            public ArrayList<Character> keyTypedCharacters() {
-                return new ArrayList<>(inputState.inputEvents.keyTypedCharacters);
-            }
-
-            /* ---- GAMEPAD EVENTS --- */
-
-            public boolean gamePadDown() {
-                return inputState.inputEvents.gamePadButtonDown;
-            }
-
-            public boolean gamePadUp() {
-                return inputState.inputEvents.gamePadButtonUp;
-            }
-
-            public boolean gamePadConnected() {
-                return inputState.inputEvents.gamePadConnected;
-            }
-
-            public boolean gamePadDisconnected() {
-                return inputState.inputEvents.gamePadDisconnected;
-            }
-
-            public boolean gamePadLeftXMoved() {
-                return inputState.inputEvents.gamePadLeftXMoved;
-            }
-
-            public boolean gamePadLeftYMoved() {
-                return inputState.inputEvents.gamePadLeftYMoved;
-            }
-
-            public boolean gamePadLeftMoved() {
-                return gamePadLeftXMoved() || gamePadLeftYMoved();
-            }
-
-            public boolean gamePadRightXMoved() {
-                return inputState.inputEvents.gamePadRightXMoved;
-            }
-
-            public boolean gamePadRightYMoved() {
-                return inputState.inputEvents.gamePadRightYMoved;
-            }
-
-            public boolean gamePadRightMoved() {
-                return gamePadRightXMoved() || gamePadRightYMoved();
-            }
-
-            public boolean gamePadLeftTriggerMoved() {
-                return inputState.inputEvents.gamePadLeftTriggerMoved;
-            }
-
-            public boolean gamePadRightTriggerMoved() {
-                return inputState.inputEvents.gamePadRightTriggerMoved;
-            }
-
-            public ArrayList<Integer> gamePadDownButtons() {
-                return new ArrayList<>(inputState.inputEvents.gamePadButtonDownKeyCodes);
-            }
-
-            public ArrayList<Integer> gamePadUpButtons() {
-                return new ArrayList<>(inputState.inputEvents.gamePadButtonUpKeyCodes);
-            }
         }
 
-        public class _State {
+        public class KeyBoard {
 
-            /* ---- MOUSE STATES --- */
+            public final Event event = new Event();
+            public final State state = new State();
 
-            public int mouseXGUI() {
-                return inputState.mouse_gui.x;
-            }
-
-            public int mouseYGUI() {
-                return inputState.mouse_gui.y;
-            }
-
-            public int mouseX() {
-                return inputState.mouse.x;
-            }
-
-            public int mouseY() {
-                return inputState.mouse.y;
-            }
-
-            public float mouseXDelta() {
-                return inputState.mouse_delta.x;
-            }
-
-            public float mouseYDelta() {
-                return inputState.mouse_delta.y;
-            }
-
-            public boolean isMouseButtonUp(int keyCode) {
-                return !inputState.inputEvents.mouseButtonsDown[keyCode];
-            }
-
-            public boolean isAnyMouseButtonUp(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (isMouseButtonUp(keyCodes[i])) return true;
+            private String keyBoardGUIObjectName(Object keyBoardobject) {
+                if (keyBoardobject != null) {
+                    if (keyBoardobject instanceof Component component) {
+                        return component.name;
+                    } else if (keyBoardobject instanceof org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
+                        return hotKey.name;
+                    }
                 }
-                return false;
+                return "";
+            }
+            public Object useGUIObject() {
+                return inputState.keyboardInteractedUIObjectFrame != null ? inputState.keyboardInteractedUIObjectFrame : null;
+            }
+            public boolean isUsingGUIObject() {
+                return useGUIObject() != null;
             }
 
-            public boolean isMouseButtonDown(int button) {
-                return inputState.inputEvents.mouseButtonsDown[button];
+            public String keyBoardUsingGUIObjectName() {
+                return keyBoardGUIObjectName(useGUIObject());
             }
 
-            public boolean isAnyMouseButtonDown(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (isMouseButtonDown(keyCodes[i])) return true;
+            public class Event {
+                public boolean keyDown() {
+                    return inputState.inputEvents.keyDown;
                 }
-                return false;
-            }
 
-            /* ---- KEYBOARD STATES --- */
-
-            public boolean isKeyDown(int keyCode) {
-                return inputState.inputEvents.keysDown[keyCode];
-            }
-
-            public boolean isAnyKeyDown(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (isKeyDown(keyCodes[i])) return true;
+                public boolean keyUp() {
+                    return inputState.inputEvents.keyUp;
                 }
-                return false;
-            }
 
-            public boolean keyUpKey(int keyCode) {
-                for (int i = 0; i < inputState.inputEvents.keyUpKeyCodes.size(); i++)
-                    if (keyCode == inputState.inputEvents.keyUpKeyCodes.get(i)) return true;
-                return false;
-            }
-
-            public boolean isKeyUp(int keyCode) {
-                return !inputState.inputEvents.keysDown[keyCode];
-            }
-
-            public boolean isAnyKeyUp(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (isKeyUp(keyCodes[i])) return true;
+                public boolean keyTyped() {
+                    return inputState.inputEvents.keyTyped;
                 }
-                return false;
-            }
 
-            /* ---- GAMEPAD STATES --- */
-
-
-            public boolean gamePadIsButtonDown(int keyCode) {
-                return inputState.inputEvents.gamePadButtonsDown[keyCode];
-            }
-
-            public boolean gamePadIsAnyButtonDown(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (gamePadIsButtonDown(keyCodes[i])) return true;
+                public boolean keyTypedCharacter(Character character) {
+                    for (int i = 0; i < inputState.inputEvents.keyTypedCharacters.size; i++)
+                        if (character == inputState.inputEvents.keyTypedCharacters.get(i)) return true;
+                    return false;
                 }
-                return false;
-            }
 
-            public boolean gamePadIsButtonUp(int keyCode) {
-                return !inputState.inputEvents.gamePadButtonsDown[keyCode];
-            }
-
-            public boolean gamePadIsAnyButtonUp(int[] keyCodes) {
-                for (int i = 0; i < keyCodes.length; i++) {
-                    if (gamePadIsButtonUp(keyCodes[i])) return true;
+                public boolean keyUpHasNextKey(){
+                    return inputState.inputEvents.keyUpKeyCodeIndex < inputState.inputEvents.keyUpKeyCodes.size;
                 }
-                return false;
+
+                public int keyUpNextKey() {
+                    return keyUpHasNextKey() ? inputState.inputEvents.keyUpKeyCodes.get(inputState.inputEvents.keyUpKeyCodeIndex++) : 0;
+                }
+
+                public boolean keyDownHasNextKey(){
+                    return inputState.inputEvents.keyDownKeyCodeIndex < inputState.inputEvents.keyDownKeyCodes.size;
+                }
+
+                public int keyDownNextKey() {
+                    return keyDownHasNextKey() ? inputState.inputEvents.keyDownKeyCodes.get(inputState.inputEvents.keyDownKeyCodeIndex++) : 0;
+                }
+
+                public boolean keyTypedHasNextCharacter() {
+                    return inputState.inputEvents.keyTypedCharacterIndex < inputState.inputEvents.keyTypedCharacters.size;
+                }
+
+                public char keyTypedNextCharacter() {
+                    return (char) (keyTypedHasNextCharacter() ? inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacterIndex++) : -1);
+                }
             }
 
-            public float gamePadLeftTrigger() {
-                return inputState.inputEvents.gamePadLeftTrigger;
+            public class State {
+                public boolean isKeyDown(int keyCode) {
+                    return inputState.inputEvents.keysDown[keyCode];
+                }
+
+                public boolean isAnyKeyDown(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isKeyDown(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
+
+                public boolean isKeyUp(int keyCode) {
+                    return !inputState.inputEvents.keysDown[keyCode];
+                }
+
+                public boolean isAnyKeyUp(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isKeyUp(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
             }
 
-            public float gamePadRightTrigger() {
-                return inputState.inputEvents.gamePadRightTrigger;
-            }
-
-            public float gamePadLeftX() {
-                return inputState.inputEvents.gamePadLeftX;
-            }
-
-            public float gamePadLeftY() {
-                return inputState.inputEvents.gamePadLeftY;
-            }
-
-            public float gamePadRightX() {
-                return inputState.inputEvents.gamePadRightX;
-            }
-
-            public float gamePadRightY() {
-                return inputState.inputEvents.gamePadRightY;
-            }
         }
+
+        public class GamePad {
+
+            public final Event event = new Event();
+            public final State state = new State();
+
+            public class Event {
+                public boolean buttonDown() {
+                    return inputState.inputEvents.gamePadButtonDown;
+                }
+
+                public boolean buttonUp() {
+                    return inputState.inputEvents.gamePadButtonUp;
+                }
+
+                public boolean connected() {
+                    return inputState.inputEvents.gamePadConnected;
+                }
+
+                public boolean disconnected() {
+                    return inputState.inputEvents.gamePadDisconnected;
+                }
+
+                public boolean leftXMoved() {
+                    return inputState.inputEvents.gamePadLeftXMoved;
+                }
+
+                public boolean leftYMoved() {
+                    return inputState.inputEvents.gamePadLeftYMoved;
+                }
+
+                public boolean leftMoved() {
+                    return leftXMoved() || leftYMoved();
+                }
+
+                public boolean rightXMoved() {
+                    return inputState.inputEvents.gamePadRightXMoved;
+                }
+
+                public boolean rightYMoved() {
+                    return inputState.inputEvents.gamePadRightYMoved;
+                }
+
+                public boolean rightMoved() {
+                    return rightXMoved() || rightYMoved();
+                }
+
+                public boolean leftTriggerMoved() {
+                    return inputState.inputEvents.gamePadLeftTriggerMoved;
+                }
+
+                public boolean rightTriggerMoved() {
+                    return inputState.inputEvents.gamePadRightTriggerMoved;
+                }
+
+                public boolean downHasNextButton(){
+                    return inputState.inputEvents.gamePadButtonDownIndex < inputState.inputEvents.gamePadButtonDownKeyCodes.size;
+                }
+
+                public int downNextButton() {
+                    return downHasNextButton() ? inputState.inputEvents.gamePadButtonDownKeyCodes.get(inputState.inputEvents.gamePadButtonDownIndex++) : 0;
+                }
+
+                public boolean upHasNextButton(){
+                    return inputState.inputEvents.gamePadButtonUpIndex < inputState.inputEvents.gamePadButtonUpKeyCodes.size;
+                }
+
+                public int upNextButton() {
+                    return upHasNextButton() ? inputState.inputEvents.gamePadButtonUpKeyCodes.get(inputState.inputEvents.gamePadButtonUpIndex++) : 0;
+                }
+            }
+
+            public class State {
+                public boolean isButtonDown(int keyCode) {
+                    return inputState.inputEvents.gamePadButtonsDown[keyCode];
+                }
+
+                public boolean isAnyButtonDown(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isButtonDown(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
+
+                public boolean isButtonUp(int keyCode) {
+                    return !inputState.inputEvents.gamePadButtonsDown[keyCode];
+                }
+
+                public boolean isAnyButtonUp(int[] keyCodes) {
+                    for (int i = 0; i < keyCodes.length; i++) {
+                        if (isButtonUp(keyCodes[i])) return true;
+                    }
+                    return false;
+                }
+
+                public float leftTrigger() {
+                    return inputState.inputEvents.gamePadLeftTrigger;
+                }
+
+                public float rightTrigger() {
+                    return inputState.inputEvents.gamePadRightTrigger;
+                }
+
+                public float leftX() {
+                    return inputState.inputEvents.gamePadLeftX;
+                }
+
+                public float leftY() {
+                    return inputState.inputEvents.gamePadLeftY;
+                }
+
+                public float rightX() {
+                    return inputState.inputEvents.gamePadRightX;
+                }
+
+                public float rightY() {
+                    return inputState.inputEvents.gamePadRightY;
+                }
+            }
+
+        }
+
+
 
 
     }
 
-    public class _Notification {
-        public Notification create(String text) {
+    public class Notification {
+        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text) {
             return create(text, config.notificationsDefaultColor, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, Color color) {
+        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color) {
             return create(text, color, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, Color color, CMediaFont font) {
+        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font) {
             return create(text, color, font, config.notificationsDefaultDisplayTime, null);
         }
 
-        public Notification create(String text, Color color, CMediaFont font, int displayTime) {
+        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font, int displayTime) {
             return create(text, color, font, displayTime, null);
         }
 
-        public Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
-            Notification notification = new Notification();
+        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
+            org.mslivo.core.engine.ui_engine.gui.notification.Notification notification = new org.mslivo.core.engine.ui_engine.gui.notification.Notification();
             setText(notification, text);
             setDisplayTime(notification, displayTime);
             setColor(notification, color);
@@ -2643,32 +2664,32 @@ public class API {
             return notification;
         }
 
-        public void setName(Notification notification, String name) {
+        public void setName(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, String name) {
             if (notification == null) return;
             notification.name = Tools.Text.validString(name);
         }
 
-        public void setData(Notification notification, Object data) {
+        public void setData(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, Object data) {
             if (notification == null) return;
             notification.data = data;
         }
 
-        public void setNotificationAction(Notification notification, NotificationAction notificationAction) {
+        public void setNotificationAction(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, NotificationAction notificationAction) {
             if (notification == null) return;
             notification.notificationAction = notificationAction;
         }
 
-        public void setDisplayTime(Notification notification, int displayTime) {
+        public void setDisplayTime(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, int displayTime) {
             if (notification == null) return;
             notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
         }
 
-        public void setColor(Notification notification, Color color) {
+        public void setColor(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, Color color) {
             if (notification == null || color == null) return;
             setColor(notification, color.r, color.g, color.b, color.a);
         }
 
-        public void setColor(Notification notification, float r, float g, float b, float a) {
+        public void setColor(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, float r, float g, float b, float a) {
             if (notification == null) return;
             notification.color_r = r;
             notification.color_g = g;
@@ -2676,19 +2697,19 @@ public class API {
             notification.color_a = a;
         }
 
-        public void setFont(Notification notification, CMediaFont font) {
+        public void setFont(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, CMediaFont font) {
             if (notification == null) return;
             notification.font = font == null ? config.notificationsDefaultFont : font;
         }
 
-        public void setText(Notification notification, String text) {
+        public void setText(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, String text) {
             if (notification == null) return;
             notification.text = Tools.Text.validString(text);
         }
 
     }
 
-    public class _ContextMenu {
+    public class ContextMenu {
 
         private ContextMenuAction defaultContextMenuAction() {
             return new ContextMenuAction() {
@@ -2697,16 +2718,16 @@ public class API {
 
         public final _ContextMenuItem item = new _ContextMenuItem();
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems) {
+        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
-            ContextMenu contextMenu = new ContextMenu();
+        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
+            org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu = new org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu();
             contextMenu.items = new ArrayList<>();
             setAlpha(contextMenu, alpha);
             addContextMenuItems(contextMenu, contextMenuItems);
@@ -2714,43 +2735,43 @@ public class API {
             return contextMenu;
         }
 
-        public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
+        public void setContextMenuAction(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
             if (contextMenu == null) return;
             contextMenu.contextMenuAction = contextMenuAction;
         }
 
-        public void setAlpha(ContextMenu contextMenu, float alpha) {
+        public void setAlpha(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, float alpha) {
             if (contextMenu == null) return;
             contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
         }
 
-        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void addContextMenuItem(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
         }
 
-        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void addContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void removeContextMenuItem(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
         }
 
-        public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void removeContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++)
                 removeContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeAllContextMenuItems(ContextMenu contextMenu) {
+        public void removeAllContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
             if (contextMenu == null) return;
             removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
         }
 
-        public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
+        public ArrayList<ContextMenuItem> findContextMenuItemsByName(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return new ArrayList<>();
             ArrayList<ContextMenuItem> result = new ArrayList<>();
             for (int i = 0; i < contextMenu.items.size(); i++)
@@ -2758,7 +2779,7 @@ public class API {
             return result;
         }
 
-        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
+        public ContextMenuItem findContextMenuItemByName(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return null;
             ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
             return result.size() > 0 ? result.get(0) : null;
@@ -2853,7 +2874,7 @@ public class API {
 
     }
 
-    public class _Windows {
+    public class Windows {
 
         private WindowAction defaultWindowAction() {
             return new WindowAction() {
@@ -3231,7 +3252,7 @@ public class API {
         }
     }
 
-    public class _ToolTip {
+    public class ToolTip {
 
         public final _ToolTipImage toolTipImage = new _ToolTipImage();
 
@@ -3281,35 +3302,35 @@ public class API {
         }
 
 
-        public ToolTip create(String[] lines) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines) {
             return create(lines, true, defaultToolTipAction(), null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
             return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
             return create(lines, displayFistLineAsTitle, toolTipAction, null, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images) {
             return create(lines, displayFistLineAsTitle, toolTipAction, images, 1, 1, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight) {
             return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, config.tooltipDefaultColor, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color) {
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color) {
             return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, color, config.tooltipDefaultFont);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color, CMediaFont font) {
-            ToolTip tooltip = new ToolTip();
+        public org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color, CMediaFont font) {
+            org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip = new org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip();
             tooltip.images = new ArrayList<>();
             setDisplayFistLineAsTitle(tooltip, displayFistLineAsTitle);
             setLines(tooltip, lines);
@@ -3321,57 +3342,57 @@ public class API {
             return tooltip;
         }
 
-        public void addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+        public void addToolTipImage(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
             UICommons.toolTip_addToolTipImage(toolTip, toolTipImage);
         }
 
-        public void addToolTipImages(ToolTip toolTip, ToolTipImage[] toolTipImages) {
+        public void addToolTipImages(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip, ToolTipImage[] toolTipImages) {
             if (toolTip == null || toolTipImages == null) return;
             for (int i = 0; i < toolTipImages.length; i++) addToolTipImage(toolTip, toolTipImages[i]);
         }
 
-        public void removeToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
+        public void removeToolTipImage(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip, ToolTipImage toolTipImage) {
             if (toolTip == null || toolTipImage == null) return;
             UICommons.toolTip_removeToolTipImage(toolTip, toolTipImage);
         }
 
-        public void removeToolTipImages(ToolTip toolTip, ToolTipImage[] toolTipImages) {
+        public void removeToolTipImages(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip, ToolTipImage[] toolTipImages) {
             if (toolTip == null || toolTipImages == null) return;
             for (int i = 0; i < toolTipImages.length; i++) removeToolTipImage(toolTip, toolTipImages[i]);
         }
 
-        public void removeAllToolTipImages(ToolTip toolTip) {
+        public void removeAllToolTipImages(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip) {
             if (toolTip == null) return;
             removeToolTipImages(toolTip, toolTip.images.toArray(new ToolTipImage[]{}));
         }
 
-        public void setToolTipAction(ToolTip toolTip, ToolTipAction toolTipAction) {
+        public void setToolTipAction(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip toolTip, ToolTipAction toolTipAction) {
             toolTip.toolTipAction = toolTipAction;
         }
 
-        public void setDisplayFistLineAsTitle(ToolTip tooltip, boolean firstLineIsTitle) {
+        public void setDisplayFistLineAsTitle(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, boolean firstLineIsTitle) {
             if (tooltip == null) return;
             tooltip.displayFistLineAsTitle = firstLineIsTitle;
         }
 
-        public void setLines(ToolTip tooltip, String[] lines) {
+        public void setLines(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, String[] lines) {
             if (tooltip == null) return;
             tooltip.lines = Tools.Text.validString(lines);
         }
 
-        public void setSizeMin(ToolTip tooltip, int minWidth, int minHeight) {
+        public void setSizeMin(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, int minWidth, int minHeight) {
             if (tooltip == null) return;
             tooltip.minWidth = Tools.Calc.lowerBounds(minWidth, 1);
             tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
         }
 
-        public void setColor(ToolTip tooltip, Color color) {
+        public void setColor(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, Color color) {
             if (tooltip == null || color == null) return;
             setColor(tooltip, color.r, color.g, color.b, color.a);
         }
 
-        public void setColor(ToolTip tooltip, float r, float g, float b, float a) {
+        public void setColor(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, float r, float g, float b, float a) {
             if (tooltip == null) return;
             tooltip.color_r = r;
             tooltip.color_g = g;
@@ -3379,7 +3400,7 @@ public class API {
             tooltip.color_a = a;
         }
 
-        public void setFont(ToolTip tooltip, CMediaFont font) {
+        public void setFont(org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip, CMediaFont font) {
             if (tooltip == null) return;
             tooltip.font = font == null ? config.tooltipDefaultFont : font;
         }
@@ -3417,7 +3438,7 @@ public class API {
         inputState.viewportMode = VIEWPORTMODE;
     }
 
-    public class _Camera {
+    public class Camera {
 
         public OrthographicCamera camera() {
             return inputState.camera_game;
@@ -3559,7 +3580,7 @@ public class API {
 
     }
 
-    public class _Components {
+    public class Components {
 
         public final _Shape shape = new _Shape();
 
@@ -3591,7 +3612,7 @@ public class API {
 
         public final _GameViewPort gameViewPort = new _GameViewPort();
 
-        public void setToolTip(Component component, ToolTip tooltip) {
+        public void setToolTip(Component component, org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip) {
             if (component == null) return;
             component.toolTip = tooltip;
         }
@@ -4581,30 +4602,30 @@ public class API {
             }
 
             public TextField create(int x, int y, int width) {
-                return create(x, y, width, "", defaultTextFieldAction(), 32, null, null);
+                return create(x, y, width, "", defaultTextFieldAction(), 32, config.getTextFieldDefaultCharacters(), null);
             }
 
 
             public TextField create(int x, int y, int width, String content) {
-                return create(x, y, width, content, defaultTextFieldAction(), 32, null, null);
+                return create(x, y, width, content, defaultTextFieldAction(), 32, config.getTextFieldDefaultCharacters(), null);
             }
 
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
-                return create(x, y, width, content, textFieldAction, 32, null, null);
+                return create(x, y, width, content, textFieldAction, 32, config.getTextFieldDefaultCharacters(), null);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
-                return create(x, y, width, content, textFieldAction, contentMaxLength, null, null);
+                return create(x, y, width, content, textFieldAction, contentMaxLength, config.getTextFieldDefaultCharacters(), null);
             }
 
-            public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, HashSet<Character> allowedCharacters) {
+            public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
                 return create(x, y, width, content, textFieldAction, contentMaxLength, allowedCharacters, null);
             }
 
-            public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, HashSet<Character> allowedCharacters, CMediaFont font) {
+            public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters, CMediaFont font) {
                 TextField textField = new TextField();
-                textField.allowedCharacters = new HashSet<>();
+                textField.allowedCharacters = new IntArray();
                 textField.offset = 0;
 
                 setComponentInitValues(textField);
@@ -4648,10 +4669,13 @@ public class API {
                 textField.contentMaxLength = Tools.Calc.lowerBounds(contentMaxLength, 0);
             }
 
-            public void setAllowedCharacters(TextField textField, HashSet<Character> allowedCharacters) {
+            public void setAllowedCharacters(TextField textField, char[] allowedCharacters) {
                 if (textField == null) return;
                 textField.allowedCharacters.clear();
-                textField.allowedCharacters.addAll(allowedCharacters == null ? config.textFieldDefaultAllowedCharacters : allowedCharacters);
+                if (allowedCharacters != null) {
+                    for (int i = 0; i < allowedCharacters.length; i++)
+                        textField.allowedCharacters.add(allowedCharacters[i]);
+                }
             }
 
             public void unFocus(TextField textField) {

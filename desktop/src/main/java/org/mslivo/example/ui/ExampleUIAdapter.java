@@ -1,7 +1,6 @@
 package org.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.mslivo.core.engine.media_manager.MediaManager;
@@ -78,7 +77,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
         // HotKey
-        api.addHotKey(api.hotkey.create(new int[]{Input.Keys.ESCAPE}, new HotKeyAction() {
+        api.addHotKey(api.hotkey.create(new int[]{com.badlogic.gdx.Input.Keys.ESCAPE}, new HotKeyAction() {
             @Override
             public void onPress() {
                 api.closeAllWindows();

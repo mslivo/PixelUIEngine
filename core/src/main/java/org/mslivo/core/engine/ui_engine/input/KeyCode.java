@@ -72,7 +72,7 @@ public class KeyCode {
      * @author mzechner
      */
     public static class Key {
-        public static final int ANY_KEY = -1;
+        public static final int ANY = -1;
         public static final int NUM_0 = 7;
         public static final int NUM_1 = 8;
         public static final int NUM_2 = 9;

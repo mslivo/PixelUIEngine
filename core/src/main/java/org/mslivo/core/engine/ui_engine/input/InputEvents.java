@@ -1,6 +1,6 @@
 package org.mslivo.core.engine.ui_engine.input;
 
-import java.util.ArrayList;
+import com.badlogic.gdx.utils.IntArray;
 
 public class InputEvents {
     public InputMethod lastUsedInputMethod;
@@ -12,20 +12,19 @@ public class InputEvents {
     public boolean mouseMoved;
     public boolean mouseScrolled;
     public final boolean[] mouseButtonsDown;
-    public final ArrayList<Integer> mouseUpButtons;
-    public final ArrayList<Integer> mouseDownButtons;
+    public final IntArray mouseUpButtons;
+    public final IntArray mouseDownButtons;
     public float mouseScrolledAmount;
-
+    public int mouseUpButtonIndex,mouseDownButtonIndex;
     /* --- Keyboard --- */
     public boolean keyDown;
     public boolean keyUp;
     public boolean keyTyped;
     public final boolean[] keysDown;
-    public final ArrayList<Character> keyTypedCharacters;
-    public final ArrayList<Integer> keyUpKeyCodes;
-    public final ArrayList<Integer> keyDownKeyCodes;
-
-
+    public final IntArray keyTypedCharacters;
+    public final IntArray keyUpKeyCodes;
+    public final IntArray keyDownKeyCodes;
+    public int keyTypedCharacterIndex, keyUpKeyCodeIndex, keyDownKeyCodeIndex;
     /* --- GamePad --- */
     public boolean gamePadConnected;
     public boolean gamePadDisconnected;
@@ -43,51 +42,27 @@ public class InputEvents {
     public float gamePadRightTrigger;
     public boolean gamePadButtonDown;
     public boolean gamePadButtonUp;
-    public ArrayList<Integer> gamePadButtonDownKeyCodes;
-    public ArrayList<Integer> gamePadButtonUpKeyCodes;
+    public IntArray gamePadButtonDownKeyCodes;
+    public IntArray gamePadButtonUpKeyCodes;
     public final boolean[] gamePadButtonsDown;
+    public int gamePadButtonDownIndex,gamePadButtonUpIndex;
 
     public InputEvents() {
         lastUsedInputMethod = InputMethod.NONE;
         // Mouse
-        mouseDownButtons = new ArrayList<>();
-        mouseDown = false;
-        mouseUp = false;
-        mouseDragged = false;
-        mouseMoved = false;
-        mouseScrolled = false;
-        mouseDoubleClick = false;
-        mouseScrolledAmount = -1;
+        mouseDownButtons = new IntArray();
         mouseButtonsDown = new boolean[5];
         // Keyboard
-        keyDown = false;
-        keyUp = false;
-        keyTyped = false;
-        keyUpKeyCodes = new ArrayList<>();
-        keyDownKeyCodes = new ArrayList<>();
-        keyTypedCharacters = new ArrayList<>();
+        keyUpKeyCodes = new IntArray();
+        keyDownKeyCodes = new IntArray();
+        keyTypedCharacters = new IntArray();
         keysDown = new boolean[256];
-        mouseUpButtons = new ArrayList<>();
+        mouseUpButtons = new IntArray();
         // GamePad
-        gamePadConnected = false;
-        gamePadDisconnected = false;
-        gamePadLeftXMoved = false;
-        gamePadLeftYMoved = false;
-        gamePadLeftX = 0f;
-        gamePadLeftY = 0f;
-        gamePadRightXMoved = false;
-        gamePadRightYMoved = false;
-        gamePadRightX = 0f;
-        gamePadRightY = 0f;
-        gamePadLeftTriggerMoved = false;
-        gamePadLeftTrigger = 0f;
-        gamePadRightTriggerMoved = false;
-        gamePadRightTrigger = 0f;
-        gamePadButtonDown = false;
-        gamePadButtonUp = false;
-        gamePadButtonDownKeyCodes = new ArrayList<>();
-        gamePadButtonUpKeyCodes = new ArrayList<>();
+        gamePadButtonDownKeyCodes = new IntArray();
+        gamePadButtonUpKeyCodes = new IntArray();
         gamePadButtonsDown = new boolean[18];
+        this.reset();
     }
 
     public void reset() {
@@ -120,6 +95,14 @@ public class InputEvents {
         gamePadButtonUp = false;
         gamePadButtonDownKeyCodes.clear();
         gamePadButtonUpKeyCodes.clear();
+        // API Return Indexes
+        mouseUpButtonIndex = 0;
+        mouseDownButtonIndex = 0;
+        keyTypedCharacterIndex = 0;
+        keyUpKeyCodeIndex = 0;
+        keyDownKeyCodeIndex = 0;
+        gamePadButtonDownIndex = 0;
+        gamePadButtonUpIndex = 0;
     }
 
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntArray;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -104,11 +105,11 @@ public class UIEngine<T extends UIAdapter> {
         this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, viewportMode, true, true);
     }
 
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer,boolean immediateRenderer) {
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer, boolean immediateRenderer) {
         this(uiAdapter, mediaManager, internalResolutionWidth, internalResolutionHeight, viewportMode, spriteRenderer, immediateRenderer, true);
     }
 
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer,boolean immediateRenderer, boolean gamePadSupport) {
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewportMode, boolean spriteRenderer, boolean immediateRenderer, boolean gamePadSupport) {
         if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize IREngine: invalid parameters");
         }
@@ -128,7 +129,7 @@ public class UIEngine<T extends UIAdapter> {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
     }
 
-    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer,boolean immediateRenderer, boolean gamePadSupport) {
+    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer, boolean immediateRenderer, boolean gamePadSupport) {
         InputState newInputState = new InputState();
 
         //  ----- Parameters
@@ -323,8 +324,8 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
                 TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
-                for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size(); ic++) {
-                    Character keyTypedCharacter = inputState.inputEvents.keyTypedCharacters.get(ic);
+                for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size; ic++) {
+                    char keyTypedCharacter = (char) inputState.inputEvents.keyTypedCharacters.get(ic);
 
                     if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                         String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
@@ -343,7 +344,7 @@ public class UIEngine<T extends UIAdapter> {
             }
             if (inputState.openMouseTextInput != null) {
                 // Focus character on last typed character
-                char typedChar = inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size() - 1);
+                char typedChar = (char) inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size - 1);
                 UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
                 inputState.keyboardInteractedUIObjectFrame = inputState.openMouseTextInput;
             }
@@ -351,7 +352,7 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.inputEvents.keyDown) {
             if (inputState.focusedTextField != null) {
                 TextField focusedTextField = inputState.focusedTextField;
-                for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size(); ik++) {
+                for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size; ik++) {
                     int keyDownKeyCode = inputState.inputEvents.keyDownKeyCodes.get(ik);
                     if (keyDownKeyCode == Input.Keys.LEFT) {
                         UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
@@ -447,7 +448,7 @@ public class UIEngine<T extends UIAdapter> {
 
             if (processMouseDoubleClick) {
                 if (inputState.lastGUIMouseHover instanceof Window window) {
-                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
+                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (api.config.isFoldWindowsOnDoubleClick() && mouseDownButton == Input.Buttons.LEFT) {
                             if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
@@ -465,7 +466,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 // Execute Common Actions
-                for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
+                for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                     executeOnMouseDoubleClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
                 }
@@ -474,7 +475,7 @@ public class UIEngine<T extends UIAdapter> {
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
-                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
+                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         inputState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, inputState.mouse.x, inputState.mouse.y);
                     }
@@ -681,7 +682,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 // Execute Common Actions
-                for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
+                for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                     executeOnMouseClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
                 }
@@ -690,7 +691,7 @@ public class UIEngine<T extends UIAdapter> {
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
-                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size(); ib++) {
+                    for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse.x, inputState.mouse.y);
                         inputState.mouseToolPressed = true;
@@ -731,8 +732,8 @@ public class UIEngine<T extends UIAdapter> {
                             if (list.listAction != null) list.listAction.onDragIntoScreen(
                                     dragItem,
                                     dragFromIndex,
-                                    api.input.state.mouseX(),
-                                    api.input.state.mouseY()
+                                    inputState.mouse_gui.x,
+                                    inputState.mouse_gui.y
                             );
                         }
                         inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
@@ -770,9 +771,9 @@ public class UIEngine<T extends UIAdapter> {
                                 inventory.inventoryAction.onDragIntoScreen(
                                         dragItem,
                                         dragFromX, dragFromY,
-                                        api.input.state.mouseX(),
-                                        api.input.state.mouseY()
-                                );
+                                        inputState.mouse_gui.x,
+                                        inputState.mouse_gui.y
+                                        );
                         }
                         inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
                         inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
@@ -932,7 +933,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                 MouseTool pressedMouseTool = inputState.mouseTool;
                 if (pressedMouseTool.mouseToolAction != null) {
-                    for (int ib = 0; ib < inputState.inputEvents.mouseUpButtons.size(); ib++) {
+                    for (int ib = 0; ib < inputState.inputEvents.mouseUpButtons.size; ib++) {
                         int mouseUpButton = inputState.inputEvents.mouseUpButtons.get(ib);
                         pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse.x, inputState.mouse.y);
                     }
@@ -1278,41 +1279,41 @@ public class UIEngine<T extends UIAdapter> {
                     int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
                     if (indexOfLeft != -1) {
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
-                        inputState.inputEvents.mouseDownButtons.remove(indexOfLeft);
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfLeft);
                         inputState.mTextInputTranslatedMouse1Down = true;
                     }
                     int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfRight != -1) {
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.RIGHT] = false;
-                        inputState.inputEvents.mouseDownButtons.remove(indexOfRight);
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfRight);
                         inputState.mTextInputTranslatedMouse2Down = true;
                     }
                     int indexOfMiddle = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.MIDDLE);
                     if (indexOfMiddle != -1) {
                         inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.MIDDLE] = false;
-                        inputState.inputEvents.mouseDownButtons.remove(indexOfMiddle);
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfMiddle);
                         inputState.mTextInputTranslatedMouse3Down = true;
                     }
-                    inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size() > 0;
+                    inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size > 0;
                 }
                 if (inputState.inputEvents.mouseUp) {
                     // Choke Events & Translate
                     int indexOfLeft = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.LEFT);
                     if (indexOfLeft != -1) {
-                        inputState.inputEvents.mouseUpButtons.remove(indexOfLeft);
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfLeft);
                         inputState.mTextInputTranslatedMouse1Down = false;
                     }
                     int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
                     if (indexOfRight != -1) {
-                        inputState.inputEvents.mouseUpButtons.remove(indexOfRight);
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfRight);
                         inputState.mTextInputTranslatedMouse2Down = false;
                     }
                     int indexOfMiddle = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.MIDDLE);
                     if (indexOfMiddle != -1) {
-                        inputState.inputEvents.mouseUpButtons.remove(indexOfMiddle);
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfMiddle);
                         inputState.mTextInputTranslatedMouse3Down = false;
                     }
-                    inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size() > 0;
+                    inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size > 0;
                 }
                 confirmPressed = inputState.mTextInputTranslatedMouse1Down;
                 deletePressed = inputState.mTextInputTranslatedMouse2Down;
@@ -1626,10 +1627,10 @@ public class UIEngine<T extends UIAdapter> {
                 for (int i2 = 0; i2 < buttons.length; i2++) {
                     int keyCode = buttons[i2];
                     if (inputState.inputEvents.gamePadButtonDown) {
-                        ArrayList<Integer> downKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
-                        for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        IntArray downKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
+                        for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
                             if (downKeyCodes.get(ikc) == keyCode) {
-                                downKeyCodes.remove(ikc);
+                                downKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.gamePadButtonDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.gamePadButtonsDown[keyCode] = false;
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = true;
@@ -1637,10 +1638,10 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                     if (inputState.inputEvents.gamePadButtonUp) {
-                        ArrayList<Integer> upKeyCodes = inputState.inputEvents.gamePadButtonUpKeyCodes;
-                        for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        IntArray upKeyCodes = inputState.inputEvents.gamePadButtonUpKeyCodes;
+                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
                             if (upKeyCodes.get(ikc) == keyCode) {
-                                upKeyCodes.remove(ikc);
+                                upKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.gamePadButtonUp = !upKeyCodes.isEmpty();
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = false;
                             }
@@ -1695,12 +1696,12 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.inputEvents.keyDown) {
                     for (int i2 = 0; i2 < buttons.length; i2++) {
                         int keyCode = buttons[i2];
-                        ArrayList<Integer> downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
+                        IntArray downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
                         keyCodeLoop:
-                        for (int ikc = downKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
                             int downKeyCode = downKeyCodes.get(ikc);
                             if (downKeyCode == keyCode) {
-                                downKeyCodes.remove(ikc);
+                                downKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.keysDown[keyCode] = false;
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = true;
@@ -1713,12 +1714,12 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.inputEvents.keyUp) {
                     for (int i2 = 0; i2 < buttons.length; i2++) {
                         int keyCode = buttons[i2];
-                        ArrayList<Integer> upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
+                        IntArray upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
                         keyCodeLoop:
-                        for (int ikc = upKeyCodes.size() - 1; ikc >= 0; ikc--) {
+                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
                             int upKeyCode = upKeyCodes.get(ikc);
                             if (upKeyCode == keyCode) {
-                                upKeyCodes.remove(ikc);
+                                upKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = false;
                                 break keyCodeLoop;
@@ -2166,8 +2167,10 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             // Draw Main FrameBuffer
-            if (inputState.spriteRenderer) inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
-            if (inputState.immediateRenderer) inputState.imRenderer_game.setProjectionMatrix(this.inputState.camera_game.combined);
+            if (inputState.spriteRenderer)
+                inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
+            if (inputState.immediateRenderer)
+                inputState.imRenderer_game.setProjectionMatrix(this.inputState.camera_game.combined);
             inputState.frameBuffer_game.begin();
             this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, true);
             inputState.frameBuffer_game.end();
@@ -2178,7 +2181,8 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_gui.begin();
             render_glClear();
             inputState.spriteBatch_gui.setProjectionMatrix(this.inputState.camera_gui.combined);
-            if (inputState.immediateRenderer) inputState.imRenderer_gui.setProjectionMatrix(this.inputState.camera_game.combined);
+            if (inputState.immediateRenderer)
+                inputState.imRenderer_gui.setProjectionMatrix(this.inputState.camera_game.combined);
             this.uiAdapter.renderBeforeUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
             this.renderGUI();
             this.uiAdapter.renderAfterUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
@@ -2230,8 +2234,10 @@ public class UIEngine<T extends UIAdapter> {
             inputState.camera_height = gameViewPort.height * TILE_SIZE;
             updateGameCamera();
             // draw to frambuffer
-            if(inputState.spriteRenderer) inputState.spriteBatch_game.setProjectionMatrix(inputState.camera_game.combined);
-            if(inputState.immediateRenderer) inputState.imRenderer_game.setProjectionMatrix(inputState.camera_game.combined);
+            if (inputState.spriteRenderer)
+                inputState.spriteBatch_game.setProjectionMatrix(inputState.camera_game.combined);
+            if (inputState.immediateRenderer)
+                inputState.imRenderer_game.setProjectionMatrix(inputState.camera_game.combined);
             gameViewPort.frameBuffer.begin();
             this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, false);
             gameViewPort.frameBuffer.end();
@@ -3300,12 +3306,12 @@ public class UIEngine<T extends UIAdapter> {
         inputState.gameViewPorts.clear();
 
         // SpriteBatch
-        if(inputState.spriteRenderer) inputState.spriteBatch_game.dispose();
+        if (inputState.spriteRenderer) inputState.spriteBatch_game.dispose();
         inputState.spriteBatch_gui.dispose();
 
         // ImmediateRenderer
-        if(inputState.immediateRenderer) inputState.imRenderer_game.dispose();
-        if(inputState.immediateRenderer) inputState.imRenderer_gui.dispose();
+        if (inputState.immediateRenderer) inputState.imRenderer_game.dispose();
+        if (inputState.immediateRenderer) inputState.imRenderer_gui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
@@ -3332,9 +3338,11 @@ public class UIEngine<T extends UIAdapter> {
     public VIEWPORT_MODE getViewportMode() {
         return inputState.viewportMode;
     }
+
     public boolean isSpriteRendererEnabled() {
         return inputState.spriteRenderer;
     }
+
     public boolean isImmediateRendererEnabled() {
         return inputState.immediateRenderer;
     }
