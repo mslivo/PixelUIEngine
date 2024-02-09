@@ -15,7 +15,7 @@ public class ProgressBarPercentText {
     static {
         int index = 0;
         for (float i = 0; i <= 10_000; i+= 1) {
-            progressText2Decimal[index] = String.format("%.2f%%", i / 100f);
+            progressText2Decimal[index] = String.format("%.2f%%", Float.valueOf(i / 100f));
             index += 1;
         }
     }

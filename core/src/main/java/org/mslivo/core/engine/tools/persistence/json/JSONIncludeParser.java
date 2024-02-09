@@ -2,6 +2,7 @@ package org.mslivo.core.engine.tools.persistence.json;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.IntArray;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +20,8 @@ public class JSONIncludeParser {
     private static final String INCLUDE_TRIM = "//INCLUDE_TRIM ";
 
     static final class IncludeInfo {
-        private final String includeFile;
-        private final boolean trim;
+        public final String includeFile;
+        public final boolean trim;
 
         IncludeInfo(String includeFile, boolean trim) {
             this.includeFile = includeFile;
@@ -34,28 +35,6 @@ public class JSONIncludeParser {
         public boolean trim() {
             return trim;
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
-            var that = (IncludeInfo) obj;
-            return Objects.equals(this.includeFile, that.includeFile) &&
-                    this.trim == that.trim;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(includeFile, trim);
-        }
-
-        @Override
-        public String toString() {
-            return "IncludeInfo[" +
-                    "includeFile=" + includeFile + ", " +
-                    "trim=" + trim + ']';
-        }
-
 
     }
 
@@ -126,7 +105,7 @@ public class JSONIncludeParser {
 
 
         // Parse includes
-        ArrayDeque<Integer> removeIndexes = new ArrayDeque<>();
+        IntArray removeIndexes = new IntArray();
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
 
@@ -146,9 +125,8 @@ public class JSONIncludeParser {
         }
 
         // remove empty
-        Integer index;
-        while ((index = removeIndexes.pollLast()) != null) {
-            lines.remove((int) index);
+        while (!removeIndexes.isEmpty()){
+            lines.remove(removeIndexes.removeIndex(removeIndexes.size-1));
         }
 
         for (int i = 0; i < lines.size(); i++) result.append(lines.get(i)).append(System.lineSeparator());

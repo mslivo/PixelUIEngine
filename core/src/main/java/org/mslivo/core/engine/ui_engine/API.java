@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntSet;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -4625,7 +4626,7 @@ public class API {
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters, CMediaFont font) {
                 TextField textField = new TextField();
-                textField.allowedCharacters = new IntArray();
+                textField.allowedCharacters = new IntSet();
                 textField.offset = 0;
 
                 setComponentInitValues(textField);
