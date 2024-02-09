@@ -2,6 +2,7 @@ package org.mslivo.core.engine.tools.sound;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.IntArray;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaMusic;
 import org.mslivo.core.engine.tools.Tools;
@@ -35,7 +36,7 @@ public class MusicPlayer {
 
     private float volume;
 
-    private final ArrayDeque<Integer> randomHistory;
+    private final IntArray randomHistory;
 
     public MusicPlayer(MediaManager mediaManager){
         this.mediaManager = mediaManager;
@@ -45,7 +46,7 @@ public class MusicPlayer {
         this.playCurrent = null;
         this.playCurrentFileName = "";
         this.playListPosition = 0;
-        this.randomHistory = new ArrayDeque<>();
+        this.randomHistory = new IntArray();
         this.playNext = this.playPrevious = false;
         this.volume = 1f;
     }
@@ -134,7 +135,7 @@ public class MusicPlayer {
                             switch (playMode) {
                                 case PLAYMODE_RANDOM -> {
                                     randomHistory.add(playListPosition);
-                                    if (randomHistory.size() > 128) randomHistory.removeFirst();
+                                    if (randomHistory.size > 128) randomHistory.removeIndex(0);
 
                                     int newPosition = 0;
                                     if(playlist.size() >1){
@@ -153,11 +154,11 @@ public class MusicPlayer {
                         }else if(playPrevious){
                             switch (playMode) {
                                 case PLAYMODE_RANDOM->{
-                                    Integer historyPosition = randomHistory.pollLast();
-                                    if(historyPosition != null && historyPosition >0 && historyPosition<playlist.size()-1 ){
-                                        playListPosition = historyPosition;
-                                    }else{
+                                    if(randomHistory.isEmpty()){
                                         playListPosition = MathUtils.random(0, playlist.size() - 1);
+                                    }else{
+                                        int historyPosition = randomHistory.get(randomHistory.size-1);
+                                        playListPosition = historyPosition;
                                     }
                                 }
                                 case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playlist.size()-1 : playListPosition -1);

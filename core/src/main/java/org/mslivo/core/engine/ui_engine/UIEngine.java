@@ -87,7 +87,7 @@ public class UIEngine<T extends UIAdapter> {
     public static final int TILE_SIZE = 8;
     public static final float TILE_SIZE_F = TILE_SIZE;
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
-    public static final float TILE_SIZE_F2 = TILE_SIZE / 2;
+    public static final float TILE_SIZE_F2 = TILE_SIZE / 2f;
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
     public static final int DOUBLECLICK_TIME_MS = 180;
     public static final int COLORSTACK_SIZE = 8;
@@ -209,7 +209,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mTextInputTranslatedMouse1Down = false;
         newInputState.mTextInputTranslatedMouse2Down = false;
         newInputState.mTextInputUnlock = false;
-        newInputState.mTextInputAPICharacterQueue = new ArrayDeque<>();
+        newInputState.mTextInputAPICharacterQueue = new IntArray();
         newInputState.keyboardInteractedUIObjectFrame = null;
         newInputState.mouseInteractedUIObjectFrame = null;
         newInputState.modalWindow = null;
@@ -263,7 +263,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2, internalResolutionHeight / 2);
+        newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2f, internalResolutionHeight / 2f);
         newInputState.hardwareMouseLastPosition = new GridPoint2(0, 0);
         newInputState.simulatedMouseLastMouseClick = 0;
         newInputState.keyBoardMouseSpeedUp = new Vector2(0, 0);
@@ -1413,7 +1413,7 @@ public class UIEngine<T extends UIAdapter> {
 
         // Confirm Character from API Queue
         if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
-            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, inputState.mTextInputAPICharacterQueue.pollLast());
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char)inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size-1));
             confirmCharacter = true;
         }
 

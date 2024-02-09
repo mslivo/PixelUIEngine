@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.ui_engine.gui.Window;
@@ -150,7 +151,7 @@ public class InputState {
     public boolean mTextInputTranslatedMouse2Down;
     public boolean mTextInputTranslatedMouse3Down;
     public boolean mTextInputUnlock;
-    public ArrayDeque<Character> mTextInputAPICharacterQueue;
+    public IntArray mTextInputAPICharacterQueue;
 
     /* #################### Control #################### */
     public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over

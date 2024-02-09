@@ -52,27 +52,27 @@ public class ExampleUIAdapter implements UIAdapter {
         this.animation_timer = 0;
 
         // Example Wnd Button
-        TextButton createExampleWindowButton = api.components.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
+        TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.windows.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
             }
         }, null, ButtonMode.DEFAULT);
 
-        api.components.button.centerContent(createExampleWindowButton);
+        api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
 
         createExampleWindowButton.buttonAction.onPress();
         createExampleWindowButton.buttonAction.onRelease();
 
         // Transition Btn
-        TextButton transitionBtn = api.components.button.textButton.create(0, 2, 10, 2, "Reset", new ButtonAction() {
+        TextButton transitionBtn = api.component.button.textButton.create(0, 2, 10, 2, "Reset", new ButtonAction() {
             @Override
             public void onRelease() {
                 resetPressed = true;
             }
         });
-        api.components.button.centerContent(transitionBtn);
+        api.component.button.centerContent(transitionBtn);
         api.addScreenComponent(transitionBtn);
 
 
@@ -83,7 +83,7 @@ public class ExampleUIAdapter implements UIAdapter {
                 api.closeAllWindows();
             }
         }));
-        api.camera.moveAbs(api.resolutionWidth() / 2, api.resolutionHeight() / 2);
+        api.camera.moveAbs(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setHardwareMouseEnabled(true);

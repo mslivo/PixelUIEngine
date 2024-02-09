@@ -3,6 +3,8 @@ package org.mslivo.core.engine.tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.CMedia;
 
@@ -600,7 +602,7 @@ public class Tools {
             return list.get(MathUtils.random(0, list.size() - 1));
         }
 
-        private static final ObjectMap<Integer, ArrayList<Long>> doInRadiusCache = new ObjectMap<>();
+        private static final IntMap<ArrayList<Long>> doInRadiusCache = new IntMap<>();
 
         public interface DoInRadiusFunction {
             boolean apply(int x, int y);

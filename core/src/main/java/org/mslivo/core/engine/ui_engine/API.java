@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
@@ -45,8 +44,10 @@ import org.mslivo.core.engine.ui_engine.gui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
+import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
@@ -63,6 +64,7 @@ import java.util.HashSet;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 
 /*
     - Collections related functions are provided like
@@ -80,20 +82,21 @@ import java.util.function.Function;
 
  */
 public class API {
+    public final _Notification notification = new _Notification();
+    public final _ContextMenu contextMenu = new _ContextMenu();
+    public final _Window window = new _Window();
 
-    public final Notification notifications = new Notification();
-    public final ContextMenu contextMenu = new ContextMenu();
-    public final Windows windows = new Windows();
+    public final _Component component = new _Component();
+    public final _Camera camera = new _Camera();
+    public final _ToolTip toolTip = new _ToolTip();
+    public final _Config config = new _Config();
+    public final _Input input = new _Input();
+    public final _MouseTool mouseTool = new _MouseTool();
+    public final _HotKey hotkey = new _HotKey();
+    public final _MouseTextInput mouseTextInput = new _MouseTextInput();
+    public final _PreConfigured preConfigured = new _PreConfigured();
 
-    public final Components components = new Components();
-    public final Camera camera = new Camera();
-    public final ToolTip toolTip = new ToolTip();
-    public final Config config = new Config();
-    public final Input input = new Input();
-    public final MouseTool mouseTool = new MouseTool();
-    public final HotKey hotkey = new HotKey();
-    public final MouseTextInput mouseTextInput = new MouseTextInput();
-    public final PreConfigured preConfigured = new PreConfigured();
+    // Private
     private final InputState inputState;
     private final MediaManager mediaManager;
 
@@ -103,7 +106,7 @@ public class API {
     }
 
 
-    public static class HotKey {
+    public static class _HotKey {
 
         public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
             if (keyCodes == null || keyCodes.length == 0) return null;
@@ -149,22 +152,22 @@ public class API {
     }
 
 
-    public static class MouseTool {
+    public static class _MouseTool {
 
-        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor) {
+        public MouseTool create(String name, Object data, CMediaCursor cursor) {
             return create(name, data, cursor, cursor, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
+        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
             return create(name, data, cursor, cursorDown, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
+        public MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
             return create(name, data, cursor, cursor, mouseToolAction);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
-            org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool = new org.mslivo.core.engine.ui_engine.gui.tool.MouseTool();
+        public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
+            MouseTool mouseTool = new MouseTool();
             setName(mouseTool, name);
             setData(mouseTool, data);
             setCursor(mouseTool, cursor);
@@ -173,34 +176,34 @@ public class API {
             return mouseTool;
         }
 
-        public void setName(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, String name) {
+        public void setName(MouseTool mouseTool, String name) {
             if (mouseTool == null) return;
             mouseTool.name = Tools.Text.validString(name);
         }
 
-        public void setData(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, Object data) {
+        public void setData(MouseTool mouseTool, Object data) {
             if (mouseTool == null) return;
             mouseTool.data = data;
         }
 
-        public void setCursor(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, CMediaCursor cursor) {
+        public void setCursor(MouseTool mouseTool, CMediaCursor cursor) {
             if (mouseTool == null) return;
             mouseTool.cursor = cursor;
         }
 
-        public void setCursorDown(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, CMediaCursor cursorDown) {
+        public void setCursorDown(MouseTool mouseTool, CMediaCursor cursorDown) {
             if (mouseTool == null) return;
             mouseTool.cursorDown = cursorDown;
         }
 
-        public void setMouseToolAction(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool, MouseToolAction mouseToolAction) {
+        public void setMouseToolAction(MouseTool mouseTool, MouseToolAction mouseToolAction) {
             if (mouseTool == null) return;
             mouseTool.mouseToolAction = mouseToolAction;
         }
 
     }
 
-    public class PreConfigured {
+    public class _PreConfigured {
 
         private final char[] numbersAllowedCharacters = new char[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
@@ -217,14 +220,14 @@ public class API {
         public TextField list_CreateSearchBar(List list, ScrollBarVertical scrollBarVertical, boolean searchTooltips, boolean searchArrayLists) {
             ArrayList originalList = list.items;
             ArrayList itemsSearched = new ArrayList(list.items);
-            components.setSize(list, list.width, list.height - 1);
-            components.setPosition(list, list.x, list.y + 1);
+            component.setSize(list, list.width, list.height - 1);
+            component.setPosition(list, list.x, list.y + 1);
             if (scrollBarVertical != null) {
-                components.setSize(scrollBarVertical, scrollBarVertical.width, scrollBarVertical.height - 1);
-                components.setPosition(scrollBarVertical, scrollBarVertical.x, scrollBarVertical.y + 1);
+                component.setSize(scrollBarVertical, scrollBarVertical.width, scrollBarVertical.height - 1);
+                component.setPosition(scrollBarVertical, scrollBarVertical.x, scrollBarVertical.y + 1);
             }
-            TextField textField = components.textField.create(list.x, list.y - 1, list.width + 1, "");
-            components.textField.setTextFieldAction(textField, new TextFieldAction() {
+            TextField textField = component.textField.create(list.x, list.y - 1, list.width + 1, "");
+            component.textField.setTextFieldAction(textField, new TextFieldAction() {
 
 
                 @Override
@@ -232,11 +235,11 @@ public class API {
                     if (valid) {
 
                         if (searchText.trim().isEmpty()) {
-                            components.list.setItems(list, originalList);
+                            component.list.setItems(list, originalList);
                         } else {
                             itemsSearched.clear();
                             searchItems(list, originalList, itemsSearched, searchText, searchTooltips, searchArrayLists);
-                            components.list.setItems(list, itemsSearched);
+                            component.list.setItems(list, itemsSearched);
                         }
 
 
@@ -274,9 +277,9 @@ public class API {
             Text[][] ret = new Text[2][column1Text.length];
 
             for (int iy = 0; iy < column1Text.length; iy++) {
-                Text text1 = components.text.create(x, y + ((column1Text.length - 1) - iy), Tools.Text.toArray(column1Text[iy]));
+                Text text1 = component.text.create(x, y + ((column1Text.length - 1) - iy), Tools.Text.toArray(column1Text[iy]));
                 ret[0][iy] = text1;
-                Text text2 = components.text.create(x + col1Width, y + (column1Text.length - 1 - iy), new String[]{});
+                Text text2 = component.text.create(x + col1Width, y + (column1Text.length - 1 - iy), new String[]{});
                 ret[1][iy] = text2;
             }
             return ret;
@@ -285,9 +288,9 @@ public class API {
         public ArrayList<Component> text_createScrollAbleText(int x, int y, int width, int height, String[] text) {
             ArrayList<Component> result = new ArrayList<>();
 
-            Text textField = components.text.create(x, y, null);
-            components.setSize(textField, width - 1, height);
-            ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
+            Text textField = component.text.create(x, y, null);
+            component.setSize(textField, width - 1, height);
+            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(x + width - 1, y, height);
             String[] textConverted;
             String[] textDisplayedLines = new String[height];
 
@@ -325,19 +328,19 @@ public class API {
             }
 
             // Actions
-            components.text.setTextAction(textField, new TextAction() {
+            component.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
                     float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouse.event.scrolledAmount();
                     if (!scrollBarVertical.disabled) {
-                        components.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
+                        component.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
                                 scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
                         scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
                     }
 
                 }
             });
-            components.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
+            component.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolledPct) {
                     float scrolled = 1f - scrolledPct;
@@ -361,13 +364,13 @@ public class API {
             });
 
             // Init
-            components.scrollBar.setScrolled(scrollBarVertical, 1f);
+            component.scrollBar.setScrolled(scrollBarVertical, 1f);
             if (textConverted.length <= height) {
-                components.setDisabled(scrollBarVertical, true);
+                component.setDisabled(scrollBarVertical, true);
             }
 
             scrollBarVertical.scrollBarAction.onScrolled(1f);
-            components.text.setLines(textField, textDisplayedLines);
+            component.text.setLines(textField, textDisplayedLines);
 
 
             result.add(scrollBarVertical);
@@ -380,9 +383,9 @@ public class API {
         }
 
         public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
-            return text_CreateClickableText(x, y, text, font, new Consumer<Integer>() {
+            return text_CreateClickableText(x, y, text, font, new IntConsumer() {
                 @Override
-                public void accept(Integer integer) {
+                public void accept(int button) {
                     try {
                         Desktop.getDesktop().browse(new URI(url));
                     } catch (Exception e) {
@@ -393,34 +396,34 @@ public class API {
         }
 
 
-        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, Consumer<Integer> onClick) {
+        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick) {
             return text_CreateClickableText(x, y, text, font, onClick, text, font);
         }
 
-        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, Consumer<Integer> onClick, String[] textHover, CMediaFont fontHover) {
-            Text hlText = components.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
-            components.text.setTextAction(hlText, new TextAction() {
+        public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick, String[] textHover, CMediaFont fontHover) {
+            Text hlText = component.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
+            component.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
                     onClick.accept(button);
                 }
             });
-            components.addUpdateAction(hlText, new UpdateAction(0) {
+            component.addUpdateAction(hlText, new UpdateAction(0) {
                 @Override
                 public void onUpdate() {
                     if (Tools.Calc.pointRectsCollide(
                             input.mouse.state.xGUI(),
                             input.mouse.state.yGUI(),
-                            components.getAbsoluteX(hlText),
-                            components.getAbsoluteY(hlText),
+                            component.getAbsoluteX(hlText),
+                            component.getAbsoluteY(hlText),
                             hlText.width * UIEngine.TILE_SIZE,
                             hlText.height * UIEngine.TILE_SIZE
                     )) {
-                        components.text.setFont(hlText, fontHover);
-                        components.text.setLines(hlText, textHover);
+                        component.text.setFont(hlText, fontHover);
+                        component.text.setLines(hlText, textHover);
                     } else {
-                        components.text.setFont(hlText, font);
-                        components.text.setLines(hlText, text);
+                        component.text.setFont(hlText, font);
+                        component.text.setLines(hlText, text);
                     }
                 }
             });
@@ -434,7 +437,7 @@ public class API {
                 hotKeyAction = new HotKeyAction() {
                     @Override
                     public void onPress() {
-                        components.button.setPressed(button, !button.pressed);
+                        component.button.setPressed(button, !button.pressed);
                         button.buttonAction.onToggle(button.pressed);
                     }
                 };
@@ -443,13 +446,13 @@ public class API {
                     @Override
                     public void onPress() {
                         button.buttonAction.onPress();
-                        components.button.setPressed(button, true);
+                        component.button.setPressed(button, true);
                     }
 
                     @Override
                     public void onRelease() {
                         button.buttonAction.onRelease();
-                        components.button.setPressed(button, false);
+                        component.button.setPressed(button, false);
                     }
                 };
             }
@@ -461,16 +464,16 @@ public class API {
             if (checkboxes == null || checkedFunction == null) return;
             for (int i = 0; i < checkboxes.length; i++) {
                 int iF = i;
-                components.checkBox.setCheckBoxAction(checkboxes[i], new CheckBoxAction() {
+                component.checkBox.setCheckBoxAction(checkboxes[i], new CheckBoxAction() {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
                             for (int i = 0; i < checkboxes.length; i++)
                                 if (checkboxes[i] != checkboxes[iF])
-                                    components.checkBox.setChecked(checkboxes[i], false);
+                                    component.checkBox.setChecked(checkboxes[i], false);
                             checkedFunction.accept(checkboxes[iF]);
                         } else {
-                            components.checkBox.setChecked(checkboxes[iF], true);
+                            component.checkBox.setChecked(checkboxes[iF], true);
                         }
                     }
                 });
@@ -478,30 +481,30 @@ public class API {
         }
 
         public ScrollBarVertical list_CreateScrollBar(List list) {
-            ScrollBarVertical scrollBarVertical = components.scrollBar.verticalScrollbar.create(list.x + list.width, list.y, list.height, new ScrollBarAction() {
+            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(list.x + list.width, list.y, list.height, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolled) {
-                    components.list.setScrolled(list, 1f - scrolled);
+                    component.list.setScrolled(list, 1f - scrolled);
                 }
             });
 
-            components.setOffset(scrollBarVertical, list.offset_x, list.offset_y);
+            component.setOffset(scrollBarVertical, list.offset_x, list.offset_y);
 
-            components.addUpdateAction(scrollBarVertical, new UpdateAction() {
+            component.addUpdateAction(scrollBarVertical, new UpdateAction() {
                 float scrolledLast = -1;
 
                 @Override
                 public void onUpdate() {
                     if (scrolledLast != list.scrolled) {
-                        components.scrollBar.setScrolled(scrollBarVertical, 1 - list.scrolled);
+                        component.scrollBar.setScrolled(scrollBarVertical, 1 - list.scrolled);
                         scrolledLast = list.scrolled;
                     }
                     // disable scrollbar
                     if (list.items != null && list.items.size() <= list.height) {
-                        components.setDisabled(scrollBarVertical, true);
-                        components.scrollBar.setScrolled(scrollBarVertical, 1f);
+                        component.setDisabled(scrollBarVertical, true);
+                        component.scrollBar.setScrolled(scrollBarVertical, 1f);
                     } else {
-                        components.setDisabled(scrollBarVertical, false);
+                        component.setDisabled(scrollBarVertical, false);
                     }
                 }
             });
@@ -512,8 +515,8 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                Image image = components.image.create(x + i, y, GUIBaseMedia.GUI_SEPARATOR_HORIZONTAL, index);
-                components.setColor(image, config.componentsDefaultColor);
+                Image image = component.image.create(x + i, y, GUIBaseMedia.GUI_SEPARATOR_HORIZONTAL, index);
+                component.setColor(image, config.componentsDefaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -523,8 +526,8 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
-                Image image = components.image.create(x, y + i, GUIBaseMedia.GUI_SEPARATOR_VERTICAL, index);
-                components.setColor(image, config.componentsDefaultColor);
+                Image image = component.image.create(x, y + i, GUIBaseMedia.GUI_SEPARATOR_VERTICAL, index);
+                component.setColor(image, config.componentsDefaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -541,33 +544,33 @@ public class API {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = windows.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
+            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
             ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
-            components.button.setButtonAction(closeButton, new ButtonAction() {
+            component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     selectColorFunction.accept(null);
                     removeCurrentModalWindow();
                 }
             });
-            windows.addComponent(modal, closeButton);
+            window.addComponent(modal, closeButton);
 
-            TextButton ok = components.button.textButton.create(0, 0, colorTextureWidthTiles, 1, "OK", null);
-            components.button.setButtonAction(ok, new ButtonAction() {
+            TextButton ok = component.button.textButton.create(0, 0, colorTextureWidthTiles, 1, "OK", null);
+            component.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     selectColorFunction.accept(new Color(ok.color_r, ok.color_g, ok.color_b, 1f));
                     removeCurrentModalWindow();
                 }
             });
-            components.setColor(ok, initColor);
+            component.setColor(ok, initColor);
 
 
-            Map colorMap = components.map.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
+            Map colorMap = component.map.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-            MapOverlay cursorOverlay = components.map.mapOverlay.create(GUIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
-            components.map.addMapOverlay(colorMap, cursorOverlay);
+            MapOverlay cursorOverlay = component.map.mapOverlay.create(GUIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
+            component.map.addMapOverlay(colorMap, cursorOverlay);
 
 
             if (!colorTexture.getTexture().getTextureData().isPrepared())
@@ -578,17 +581,17 @@ public class API {
             for (int x = 0; x < colorTexture.getRegionWidth(); x++) {
                 for (int y = 0; y < colorTexture.getRegionHeight(); y++) {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
-                    components.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
+                    component.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        components.map.mapOverlay.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
+                        component.map.mapOverlay.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
                     }
                 }
             }
 
-            components.map.update(colorMap);
+            component.map.update(colorMap);
 
             final boolean[] drag = {false};
-            components.map.setMapAction(colorMap, new MapAction() {
+            component.map.setMapAction(colorMap, new MapAction() {
 
                 @Override
                 public void onPress(int x, int y) {
@@ -600,25 +603,25 @@ public class API {
                     drag[0] = false;
                 }
             });
-            components.addUpdateAction(colorMap, new UpdateAction(10, true) {
+            component.addUpdateAction(colorMap, new UpdateAction(10, true) {
                 int xLast = -1, yLast = -1;
                 Color currentColor = new Color();
 
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.mouse.state.xGUI() - components.getAbsoluteX(colorMap);
-                        int yInv = (input.mouse.state.yGUI() - components.getAbsoluteY(colorMap));
+                        int x = input.mouse.state.xGUI() - component.getAbsoluteX(colorMap);
+                        int yInv = (input.mouse.state.yGUI() - component.getAbsoluteY(colorMap));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = components.map.getPixelColor(colorMap, x, y - 1);
-                            components.setColor(ok, currentColor);
+                            currentColor = component.map.getPixelColor(colorMap, x, y - 1);
+                            component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
-                            components.button.textButton.setFont(ok, colorBrightness < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
-                            components.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
+                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
+                            component.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
                         }
@@ -628,9 +631,9 @@ public class API {
 
 
             Component[] componentl = new Component[]{colorMap, ok};
-            components.setOffset(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            components.setOffset(colorMap, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            windows.addComponents(modal, componentl);
+            component.setOffset(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.setOffset(colorMap, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            window.addComponents(modal, componentl);
 
             return modal;
         }
@@ -693,18 +696,18 @@ public class API {
 
             }
 
-            Window modalWnd = windows.create(0, 0, wnd_width, wnd_height, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
+            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
             ArrayList<Component> componentsList = new ArrayList<>();
 
-            Text textC = components.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
+            Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
             componentsList.add(textC);
 
-            TextField inputTextField = components.textField.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
+            TextField inputTextField = component.textField.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
             componentsList.add(inputTextField);
 
             Button okBtn = null;
             if (showOKButton) {
-                okBtn = components.button.textButton.create(0, 0, wnd_width - 1, 1, "OK", new ButtonAction() {
+                okBtn = component.button.textButton.create(0, 0, wnd_width - 1, 1, "OK", new ButtonAction() {
                     @Override
                     public void onRelease() {
                         if (inputTextField.content.length() >= minInputLength) {
@@ -726,24 +729,24 @@ public class API {
                     char cl = lowerCaseCharacters[i];
                     char cu = upperCaseCharacters[i];
                     if (!Character.isISOControl(cl) && !Character.isISOControl(cu)) {
-                        TextButton charButtonLC = components.button.textButton.create(ix, iy, 2, 2, String.valueOf(cl), new ButtonAction() {
+                        TextButton charButtonLC = component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cl), new ButtonAction() {
                             @Override
                             public void onRelease() {
-                                components.textField.setContent(inputTextField, inputTextField.content + cl);
-                                components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
+                                component.textField.setContent(inputTextField, inputTextField.content + cl);
+                                component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
                         componentsList.add(charButtonLC);
                         lowerCaseButtonsList.add(charButtonLC);
-                        TextButton charButtonUC = components.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
+                        TextButton charButtonUC = component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
                             @Override
                             public void onRelease() {
-                                components.textField.setContent(inputTextField, inputTextField.content + cu);
-                                components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
+                                component.textField.setContent(inputTextField, inputTextField.content + cu);
+                                component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
                         componentsList.add(charButtonUC);
-                        components.setVisible(charButtonUC, false);
+                        component.setVisible(charButtonUC, false);
                         upperCaseButtonsList.add(charButtonUC);
                     }
                     ix += 2;
@@ -754,14 +757,14 @@ public class API {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
+                ImageButton caseButton = component.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
                             public void onToggle(boolean value) {
                                 for (int i2 = 0; i2 < lowerCaseButtonsList.size(); i2++)
-                                    components.setVisible(lowerCaseButtonsList.get(i2), !value);
+                                    component.setVisible(lowerCaseButtonsList.get(i2), !value);
                                 for (int i2 = 0; i2 < upperCaseButtonsList.size(); i2++)
-                                    components.setVisible(upperCaseButtonsList.get(i2), value);
+                                    component.setVisible(upperCaseButtonsList.get(i2), value);
                             }
                         }, ButtonMode.TOGGLE);
                 componentsList.add(caseButton);
@@ -771,13 +774,13 @@ public class API {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = components.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = component.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
                                 if (inputTextField.content.length() > 0) {
-                                    components.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
-                                    components.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
+                                    component.textField.setContent(inputTextField, inputTextField.content.substring(0, inputTextField.content.length() - 1));
+                                    component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                                 }
                             }
                         }, ButtonMode.DEFAULT);
@@ -788,20 +791,20 @@ public class API {
 
 
             Button finalOkBtn = okBtn;
-            components.textField.setTextFieldAction(inputTextField, new TextFieldAction() {
+            component.textField.setTextFieldAction(inputTextField, new TextFieldAction() {
                 @Override
                 public void onEnter(String content, boolean valid) {
                     if (valid) {
                         if (inputResultFunction != null) inputResultFunction.accept(inputTextField.content);
                         removeCurrentModalWindow();
                     } else {
-                        components.textField.focus(inputTextField);
+                        component.textField.focus(inputTextField);
                     }
                 }
 
                 @Override
                 public void onContentChange(String newContent, boolean valid) {
-                    if (finalOkBtn != null) components.setDisabled(finalOkBtn, !valid);
+                    if (finalOkBtn != null) component.setDisabled(finalOkBtn, !valid);
                 }
 
                 @Override
@@ -811,19 +814,19 @@ public class API {
 
                 @Override
                 public void onUnFocus() {
-                    components.textField.focus(inputTextField);
+                    component.textField.focus(inputTextField);
                 }
             });
 
 
             Component[] componentArr = componentsList.toArray(new Component[]{});
-            components.setOffset(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            components.setOffset(inputTextField, UIEngine.TILE_SIZE / 2, 0);
-            windows.addComponents(modalWnd, componentArr);
-            windows.setWindowAction(modalWnd, new WindowAction() {
+            component.setOffset(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.setOffset(inputTextField, UIEngine.TILE_SIZE / 2, 0);
+            window.addComponents(modalWnd, componentArr);
+            window.setWindowAction(modalWnd, new WindowAction() {
                 @Override
                 public void onAdd() {
-                    components.textField.focus(inputTextField);
+                    component.textField.focus(inputTextField);
                 }
             });
             inputTextField.textFieldAction.onContentChange(originalText, inputTextField.textFieldAction.isContentValid(originalText));
@@ -840,15 +843,15 @@ public class API {
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = windows.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
-                texts[i] = components.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
+                texts[i] = component.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
                 componentsList.add(texts[i]);
             }
 
-            Button okBtn = components.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+            Button okBtn = component.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (closeFunction != null) {
@@ -857,13 +860,13 @@ public class API {
                     removeCurrentModalWindow();
                 }
             });
-            components.button.centerContent(okBtn);
+            component.button.centerContent(okBtn);
             componentsList.add(okBtn);
 
 
             Component[] componentsArr = componentsList.toArray(new Component[]{});
-            components.setOffset(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            windows.addComponents(modal, componentsArr);
+            component.setOffset(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            window.addComponents(modal, componentsArr);
             return modal;
         }
 
@@ -925,13 +928,13 @@ public class API {
             for (int iy = 0; iy < mapHeight; iy++) {
                 Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
-                    components.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
+                    component.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
                 }
             }
 
             if (values.size() == 0) {
                 // No values available
-                components.map.update(map);
+                component.map.update(map);
                 return null;
             }
 
@@ -974,9 +977,9 @@ public class API {
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
-                        components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     } else {
-                        components.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
+                        component.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
                     }
                 }
 
@@ -984,12 +987,12 @@ public class API {
                 if (indexChange && ix != 0) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        components.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     }
                 } else if (nextIndexChange) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        components.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                        component.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
                     }
                 }
 
@@ -997,7 +1000,7 @@ public class API {
                 lastValue = value;
             }
 
-            components.map.update(map);
+            component.map.update(map);
             return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
         }
 
@@ -1014,34 +1017,34 @@ public class API {
 
             int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = windows.create(0, 0, width, 5, caption, GUIBaseMedia.GUI_ICON_QUESTION);
+            Window modal = window.create(0, 0, width, 5, caption, GUIBaseMedia.GUI_ICON_QUESTION);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
 
-            Text textC = components.text.create(0, 2, new String[]{text});
+            Text textC = component.text.create(0, 2, new String[]{text});
             int xOffset = 0;
-            Button yesC = components.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
+            Button yesC = component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (choiceFunction != null) choiceFunction.accept(true);
                     removeCurrentModalWindow();
                 }
             });
-            components.button.centerContent(yesC);
+            component.button.centerContent(yesC);
             xOffset += width1;
-            Button noC = components.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
+            Button noC = component.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (choiceFunction != null) choiceFunction.accept(false);
                     removeCurrentModalWindow();
                 }
             });
-            components.button.centerContent(noC);
+            component.button.centerContent(noC);
 
             Component[] componentsl = new Component[]{textC, yesC, noC};
-            components.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            windows.addComponents(modal, componentsl);
+            component.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            window.addComponents(modal, componentsl);
             return modal;
         }
 
@@ -1050,9 +1053,9 @@ public class API {
         }
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = components.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
-            components.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
-            components.button.setButtonAction(closeButton, new ButtonAction() {
+            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
+            component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
+            component.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override
                 public void onRelease() {
@@ -1064,9 +1067,9 @@ public class API {
         }
 
         public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, Consumer<Float> onChange) {
-            TextField textField = components.textField.create(x, y, width);
-            components.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
-            components.textField.setTextFieldAction(textField, new TextFieldAction() {
+            TextField textField = component.textField.create(x, y, width);
+            component.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
+            component.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
                     Float value = null;
@@ -1082,7 +1085,7 @@ public class API {
                     if (valid) {
                         onChange.accept(Float.parseFloat(content));
                     } else {
-                        components.textField.focus(textField);
+                        component.textField.focus(textField);
                     }
                 }
             });
@@ -1090,9 +1093,9 @@ public class API {
         }
 
         public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, Consumer<Integer> onChange) {
-            TextField textField = components.textField.create(x, y, width);
-            components.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
-            components.textField.setTextFieldAction(textField, new TextFieldAction() {
+            TextField textField = component.textField.create(x, y, width);
+            component.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
+            component.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
                     Integer value = null;
@@ -1108,7 +1111,7 @@ public class API {
                     if (valid) {
                         onChange.accept(Integer.parseInt(content));
                     } else {
-                        components.textField.focus(textField);
+                        component.textField.focus(textField);
                     }
                 }
             });
@@ -1127,16 +1130,16 @@ public class API {
 
             for (int ix = 0; ix < width; ix++) {
 
-                borders.add(components.image.create(x + ix, y, GUIBaseMedia.GUI_BORDERS, 2));
+                borders.add(component.image.create(x + ix, y, GUIBaseMedia.GUI_BORDERS, 2));
 
                 if (ix >= gap) {
-                    borders.add(components.image.create(x + ix, y + (height - 1), GUIBaseMedia.GUI_BORDERS, 3));
+                    borders.add(component.image.create(x + ix, y + (height - 1), GUIBaseMedia.GUI_BORDERS, 3));
                 }
             }
 
             for (int iy = 0; iy < height; iy++) {
-                borders.add(components.image.create(x, y + iy, GUIBaseMedia.GUI_BORDERS, 0));
-                borders.add(components.image.create(x + (width - 1), y + iy, GUIBaseMedia.GUI_BORDERS, 1));
+                borders.add(component.image.create(x, y + iy, GUIBaseMedia.GUI_BORDERS, 0));
+                borders.add(component.image.create(x + (width - 1), y + iy, GUIBaseMedia.GUI_BORDERS, 1));
             }
 
             return borders;
@@ -1146,8 +1149,8 @@ public class API {
             ArrayList<Component> ret = new ArrayList<>();
 
             width = Tools.Calc.lowerBounds(width, 1);
-            TabBar tabBar = components.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = components.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, GUIBaseMedia.GUI_ICON_EXTEND);
+            TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
+            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, GUIBaseMedia.GUI_ICON_EXTEND);
 
             updateExtendableTabBarButton(tabBar, extendButton);
 
@@ -1160,9 +1163,9 @@ public class API {
         private void updateExtendableTabBarButton(TabBar tabBar, ImageButton extendButton) {
             ArrayList<Tab> invisibleTabs = new ArrayList<>();
             for (int i = 0; i < tabBar.tabs.size(); i++)
-                if (!components.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
+                if (!component.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
             if (invisibleTabs.size() > 0) {
-                components.button.setButtonAction(extendButton, new ButtonAction() {
+                component.button.setButtonAction(extendButton, new ButtonAction() {
                     @Override
                     public void onRelease() {
                         ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
@@ -1171,9 +1174,9 @@ public class API {
                             contextMenuItems.add(contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
                                 @Override
                                 public void onSelect() {
-                                    components.tabBar.removeTab(tabBar, invisibleTab);
-                                    components.tabBar.addTab(tabBar, invisibleTab, 0);
-                                    components.tabBar.selectTab(tabBar, 0);
+                                    component.tabBar.removeTab(tabBar, invisibleTab);
+                                    component.tabBar.addTab(tabBar, invisibleTab, 0);
+                                    component.tabBar.selectTab(tabBar, 0);
                                     updateExtendableTabBarButton(tabBar, extendButton);
                                 }
                             }, invisibleTab.icon));
@@ -1182,11 +1185,11 @@ public class API {
                         openContextMenu(selectTabMenu);
                     }
                 });
-                components.setDisabled(extendButton, false);
+                component.setDisabled(extendButton, false);
 
             } else {
-                components.button.setButtonAction(extendButton, null);
-                components.setDisabled(extendButton, true);
+                component.button.setButtonAction(extendButton, null);
+                component.setDisabled(extendButton, true);
             }
 
 
@@ -1207,51 +1210,51 @@ public class API {
         this.inputState.singleUpdateActions.add(updateAction);
     }
 
-    public void addNotification(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
+    public void addNotification(Notification notification) {
         if (notification == null) return;
         UICommons.notification_addToScreen(inputState, notification, config.notificationsMax);
     }
 
-    public void addNotifications(org.mslivo.core.engine.ui_engine.gui.notification.Notification[] notifications) {
+    public void addNotifications(Notification[] notifications) {
         if (notifications == null) return;
         for (int i = 0; i < notifications.length; i++) addNotification(notifications[i]);
     }
 
-    public void removeNotification(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
+    public void removeNotification(Notification notification) {
         if (notification == null) return;
         UICommons.notification_removeFromScreen(inputState, notification);
     }
 
-    public void removeNotifications(org.mslivo.core.engine.ui_engine.gui.notification.Notification[] notifications) {
+    public void removeNotifications(Notification[] notifications) {
         if (notifications == null) return;
         for (int i = 0; i < notifications.length; i++) removeNotification(notifications[i]);
     }
 
     public void removeAllNotifications() {
-        removeNotifications(inputState.notifications.toArray(new org.mslivo.core.engine.ui_engine.gui.notification.Notification[]{}));
+        removeNotifications(inputState.notifications.toArray(new Notification[]{}));
     }
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> findNotificationsByName(String name) {
+    public ArrayList<Notification> findNotificationsByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> result = new ArrayList<>();
+        ArrayList<Notification> result = new ArrayList<>();
         for (int i = 0; i < inputState.notifications.size(); i++)
             if (name.equals(inputState.notifications.get(i).name)) result.add(inputState.notifications.get(i));
         return result;
     }
 
-    public org.mslivo.core.engine.ui_engine.gui.notification.Notification findNotificationByName(String name) {
+    public Notification findNotificationByName(String name) {
         if (name == null) return null;
-        ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> result = findNotificationsByName(name);
+        ArrayList<Notification> result = findNotificationsByName(name);
         return result.size() > 0 ? result.get(0) : null;
     }
 
-    public boolean isNotificationAddedToScreen(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification) {
+    public boolean isNotificationAddedToScreen(Notification notification) {
         if (notification == null) return false;
         return notification.addedToScreen;
     }
 
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.gui.notification.Notification> getNotifications() {
+    public ArrayList<Notification> getNotification() {
         return new ArrayList<>(inputState.notifications);
     }
 
@@ -1272,7 +1275,7 @@ public class API {
         return UICommons.contextMenu_isOpen(inputState, contextMenu);
     }
 
-    public ArrayList<Window> getWindows() {
+    public ArrayList<Window> getWindow() {
         return new ArrayList<>(inputState.windows);
     }
 
@@ -1330,7 +1333,7 @@ public class API {
 
     public boolean closeWindow(Window window) {
         if (window == null) return false;
-        ArrayList<Component> result = windows.findComponentsByName(window, UIEngine.WND_CLOSE_BUTTON);
+        ArrayList<Component> result = this.window.findComponentsByName(window, UIEngine.WND_CLOSE_BUTTON);
         if (result.size() == 1) {
             if (result.get(0) instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
@@ -1355,11 +1358,11 @@ public class API {
     public void addWindowAsModal(Window modalWindow) {
         if (modalWindow == null) return;
         if (inputState.modalWindow == null) {
-            windows.setAlwaysOnTop(modalWindow, true);
-            windows.setVisible(modalWindow, true);
-            windows.setFolded(modalWindow, false);
-            windows.center(modalWindow);
-            windows.setEnforceScreenBounds(modalWindow, true);
+            window.setAlwaysOnTop(modalWindow, true);
+            window.setVisible(modalWindow, true);
+            window.setFolded(modalWindow, false);
+            window.center(modalWindow);
+            window.setEnforceScreenBounds(modalWindow, true);
             inputState.modalWindow = modalWindow;
             addWindow(modalWindow);
         } else {
@@ -1437,7 +1440,7 @@ public class API {
         removeAllNotifications();
     }
 
-    public void setMouseTool(org.mslivo.core.engine.ui_engine.gui.tool.MouseTool mouseTool) {
+    public void setMouseTool(MouseTool mouseTool) {
         inputState.mouseTool = mouseTool;
     }
 
@@ -1447,7 +1450,7 @@ public class API {
         inputState.displayOverrideCursor = true;
     }
 
-    public org.mslivo.core.engine.ui_engine.gui.tool.MouseTool getMouseTool() {
+    public MouseTool getMouseTool() {
         return inputState.mouseTool;
     }
 
@@ -1514,7 +1517,7 @@ public class API {
     }
 
 
-    public class MouseTextInput {
+    public class _MouseTextInput {
         private MouseTextInputAction defaultMouseTextInputConfirmAction() {
             return new MouseTextInputAction() {
             };
@@ -1589,7 +1592,7 @@ public class API {
 
         public void enterCharacter(char character) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.mTextInputAPICharacterQueue.push(character);
+            inputState.mTextInputAPICharacterQueue.add(character);
         }
 
         public void selectCharacter(char character) {
@@ -1676,7 +1679,7 @@ public class API {
     }
 
 
-    public static class Config {
+    public static class _Config {
         private boolean hardwareMouseEnabled = true;
         private boolean keyboardMouseEnabled = false;
         private int[] keyboardMouseButtonsUp = null;
@@ -2183,14 +2186,14 @@ public class API {
             this.textFieldDefaultCharacters = textFieldDefaultCharacters;
         }
 
-        public Config() {
+        public _Config() {
             textFieldDefaultCharacters = new char[defaultLowerCaseCharacters.length+defaultUpperCaseCharacters.length];
             int index = 0;
             for (int i = 0; i < defaultLowerCaseCharacters.length; i++) textFieldDefaultCharacters[index++] = defaultLowerCaseCharacters[i];
             for (int i = 0; i < defaultUpperCaseCharacters.length; i++) textFieldDefaultCharacters[index++] = defaultUpperCaseCharacters[i];
         }
 
-        public void loadConfig(Config config) {
+        public void loadConfig(_Config config) {
             setWindowsDefaultEnforceScreenBounds(config.getWindowsDefaultEnforceScreenBounds());
             setWindowsDefaultColor(config.getWindowsDefaultColor());
             setComponentsDefaultColor(config.getComponentsDefaultColor());
@@ -2248,17 +2251,17 @@ public class API {
 
     }
 
-    public class Input {
-        public final Mouse mouse = new Mouse();
-        public final KeyBoard keyboard = new KeyBoard();
-        public final GamePad gamepad = new GamePad();
+    public class _Input {
+        public final _Mouse mouse = new _Mouse();
+        public final _KeyBoard keyboard = new _KeyBoard();
+        public final _GamePad gamepad = new _GamePad();
         public InputMethod lastUsedInputMethod() {
             return inputState.inputEvents.lastUsedInputMethod;
         }
 
-        public class Mouse {
-            public final Event event = new Event();
-            public final State state = new State();
+        public class _Mouse {
+            public final _Event event = new _Event();
+            public final _State state = new _State();
 
             private String mouseGUIObjectName(Object mouseObject) {
                 if (mouseObject != null) {
@@ -2306,7 +2309,7 @@ public class API {
                 return mouseGUIObjectName(useGUIObject());
             }
 
-            public class Event {
+            public class _Event {
                 /* ---- MOUSE EVENTS --- */
                 public boolean buttonDown() {
                     return inputState.inputEvents.mouseDown;
@@ -2353,7 +2356,7 @@ public class API {
                 }
             }
 
-            public class State {
+            public class _State {
                 public int xGUI() {
                     return inputState.mouse_gui.x;
                 }
@@ -2403,10 +2406,10 @@ public class API {
 
         }
 
-        public class KeyBoard {
+        public class _KeyBoard {
 
-            public final Event event = new Event();
-            public final State state = new State();
+            public final _Event event = new _Event();
+            public final _State state = new _State();
 
             private String keyBoardGUIObjectName(Object keyBoardobject) {
                 if (keyBoardobject != null) {
@@ -2429,7 +2432,7 @@ public class API {
                 return keyBoardGUIObjectName(useGUIObject());
             }
 
-            public class Event {
+            public class _Event {
                 public boolean keyDown() {
                     return inputState.inputEvents.keyDown;
                 }
@@ -2473,7 +2476,7 @@ public class API {
                 }
             }
 
-            public class State {
+            public class _State {
                 public boolean isKeyDown(int keyCode) {
                     return inputState.inputEvents.keysDown[keyCode];
                 }
@@ -2499,12 +2502,12 @@ public class API {
 
         }
 
-        public class GamePad {
+        public class _GamePad {
 
-            public final Event event = new Event();
-            public final State state = new State();
+            public final _Event event = new _Event();
+            public final _State state = new _State();
 
-            public class Event {
+            public class _Event {
                 public boolean buttonDown() {
                     return inputState.inputEvents.gamePadButtonDown;
                 }
@@ -2570,7 +2573,7 @@ public class API {
                 }
             }
 
-            public class State {
+            public class _State {
                 public boolean isButtonDown(int keyCode) {
                     return inputState.inputEvents.gamePadButtonsDown[keyCode];
                 }
@@ -2625,25 +2628,25 @@ public class API {
 
     }
 
-    public class Notification {
-        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text) {
+    public class _Notification {
+        public Notification create(String text) {
             return create(text, config.notificationsDefaultColor, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color) {
+        public Notification create(String text, Color color) {
             return create(text, color, config.notificationsDefaultFont, config.notificationsDefaultDisplayTime, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font) {
+        public Notification create(String text, Color color, CMediaFont font) {
             return create(text, color, font, config.notificationsDefaultDisplayTime, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font, int displayTime) {
+        public Notification create(String text, Color color, CMediaFont font, int displayTime) {
             return create(text, color, font, displayTime, null);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.notification.Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
-            org.mslivo.core.engine.ui_engine.gui.notification.Notification notification = new org.mslivo.core.engine.ui_engine.gui.notification.Notification();
+        public Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
+            Notification notification = new Notification();
             setText(notification, text);
             setDisplayTime(notification, displayTime);
             setColor(notification, color);
@@ -2665,32 +2668,32 @@ public class API {
             return notification;
         }
 
-        public void setName(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, String name) {
+        public void setName(Notification notification, String name) {
             if (notification == null) return;
             notification.name = Tools.Text.validString(name);
         }
 
-        public void setData(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, Object data) {
+        public void setData(Notification notification, Object data) {
             if (notification == null) return;
             notification.data = data;
         }
 
-        public void setNotificationAction(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, NotificationAction notificationAction) {
+        public void setNotificationAction(Notification notification, NotificationAction notificationAction) {
             if (notification == null) return;
             notification.notificationAction = notificationAction;
         }
 
-        public void setDisplayTime(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, int displayTime) {
+        public void setDisplayTime(Notification notification, int displayTime) {
             if (notification == null) return;
             notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
         }
 
-        public void setColor(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, Color color) {
+        public void setColor(Notification notification, Color color) {
             if (notification == null || color == null) return;
             setColor(notification, color.r, color.g, color.b, color.a);
         }
 
-        public void setColor(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, float r, float g, float b, float a) {
+        public void setColor(Notification notification, float r, float g, float b, float a) {
             if (notification == null) return;
             notification.color_r = r;
             notification.color_g = g;
@@ -2698,19 +2701,19 @@ public class API {
             notification.color_a = a;
         }
 
-        public void setFont(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, CMediaFont font) {
+        public void setFont(Notification notification, CMediaFont font) {
             if (notification == null) return;
             notification.font = font == null ? config.notificationsDefaultFont : font;
         }
 
-        public void setText(org.mslivo.core.engine.ui_engine.gui.notification.Notification notification, String text) {
+        public void setText(Notification notification, String text) {
             if (notification == null) return;
             notification.text = Tools.Text.validString(text);
         }
 
     }
 
-    public class ContextMenu {
+    public class _ContextMenu {
 
         private ContextMenuAction defaultContextMenuAction() {
             return new ContextMenuAction() {
@@ -2875,7 +2878,7 @@ public class API {
 
     }
 
-    public class Windows {
+    public class _Window {
 
         private WindowAction defaultWindowAction() {
             return new WindowAction() {
@@ -3033,11 +3036,11 @@ public class API {
                     }
                 }
                 if (match) {
-                    if (componentColor1) components.setColor(component, color);
-                    if (componentColor2) components.setColor2(component, color);
+                    if (componentColor1) API.this.component.setColor(component, color);
+                    if (componentColor2) API.this.component.setColor2(component, color);
                     if (component instanceof ComboBox comboBox) {
                         for (int i2 = 0; i2 < comboBox.items.size(); i2++)
-                            components.comboBox.item.setColor(comboBox.items.get(i2), color);
+                            API.this.component.comboBox.item.setColor(comboBox.items.get(i2), color);
                     }
                 }
             }
@@ -3090,8 +3093,8 @@ public class API {
                     classLoop:
                     for (int i2 = 0; i2 < inclusions.length; i2++) {
                         if (component.getClass() == inclusions[i2]) {
-                            if (setColor1) components.setColor(component, color);
-                            if (setColor2) components.setColor2(component, color);
+                            if (setColor1) API.this.component.setColor(component, color);
+                            if (setColor2) API.this.component.setColor2(component, color);
                             break classLoop;
                         }
                     }
@@ -3253,7 +3256,7 @@ public class API {
         }
     }
 
-    public class ToolTip {
+    public class _ToolTip {
 
         public final _ToolTipImage toolTipImage = new _ToolTipImage();
 
@@ -3439,7 +3442,7 @@ public class API {
         inputState.viewportMode = VIEWPORTMODE;
     }
 
-    public class Camera {
+    public class _Camera {
 
         public OrthographicCamera camera() {
             return inputState.camera_game;
@@ -3581,7 +3584,7 @@ public class API {
 
     }
 
-    public class Components {
+    public class _Component {
 
         public final _Shape shape = new _Shape();
 
@@ -3825,18 +3828,18 @@ public class API {
         public class _GameViewPort {
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY) {
-                return create(x, y, width, height, camPositionX, camPositionY, 1f, null, null);
+                return create(x, y, width, height, camPositionX, camPositionY, 1f, config.gameViewportDefaultUpdateTime, null);
             }
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom) {
-                return create(x, y, width, height, camPositionX, camPositionY, camZoom, null, null);
+                return create(x, y, width, height, camPositionX, camPositionY, camZoom, config.gameViewportDefaultUpdateTime, null);
             }
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime) {
                 return create(x, y, width, height, camPositionX, camPositionY, camZoom, updateTime, null);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, Integer updateTime, GameViewPortAction gameViewPortAction) {
+            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime, GameViewPortAction gameViewPortAction) {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
                 gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, false);
@@ -3860,9 +3863,9 @@ public class API {
                 gameViewPort.gameViewPortAction = gameViewPortAction;
             }
 
-            public void setUpdateTime(GameViewPort gameViewPort, Integer updateTime) {
+            public void setUpdateTime(GameViewPort gameViewPort, int updateTime) {
                 if (gameViewPort == null) return;
-                gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime == null ? config.gameViewportDefaultUpdateTime : updateTime, 0);
+                gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
             public void setCamZoom(GameViewPort gameViewPort, float camZoom) {
