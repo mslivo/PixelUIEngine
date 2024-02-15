@@ -76,16 +76,13 @@ import java.util.Arrays;
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIAdapter> {
 
-    /* Attributes */
+    // Attributes
     private final T uiAdapter;
-
     private InputState inputState;
-
     private final API api;
-
     private final MediaManager mediaManager;
 
-    /* Constants */
+    // Constants
     public static final int TILE_SIZE = 8;
     public static final float TILE_SIZE_F = TILE_SIZE;
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
@@ -774,7 +771,7 @@ public class UIEngine<T extends UIAdapter> {
                                         dragFromX, dragFromY,
                                         inputState.mouse_gui.x,
                                         inputState.mouse_gui.y
-                                        );
+                                );
                         }
                         inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
                         inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
@@ -1412,7 +1409,7 @@ public class UIEngine<T extends UIAdapter> {
 
         // Confirm Character from API Queue
         if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
-            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char)inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size-1));
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char) inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size - 1));
             confirmCharacter = true;
         }
 
@@ -1518,7 +1515,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case GAMEPAD, KEYBOARD -> {
                     // Reset temporary variables
-                    switch (inputState.currentControlMode){
+                    switch (inputState.currentControlMode) {
                         case GAMEPAD -> {
                             for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
                                 inputState.keyBoardTranslatedKeysDown[i] = false;

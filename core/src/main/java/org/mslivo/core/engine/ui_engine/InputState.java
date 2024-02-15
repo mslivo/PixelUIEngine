@@ -46,7 +46,7 @@ import java.util.ArrayList;
 
 public class InputState {
 
-    /* Parameters */
+    /* ################ Constructor Parameters ################# */
     public int internalResolutionWidth, internalResolutionHeight;
     public VIEWPORT_MODE viewportMode;
     public boolean spriteRenderer;
@@ -81,20 +81,13 @@ public class InputState {
     /* #################### GUI: Added Elements #################### */
 
     public ArrayList<Window> windows;
-
     public ArrayList<Component> screenComponents;
-
     public Window modalWindow;
-
     public ArrayDeque<Window> modalWindowQueue;
-
     public ArrayList<Notification> notifications;
-
     public ArrayList<HotKey> hotKeys;
     public ArrayList<GameViewPort> gameViewPorts;
-
     public ArrayList<UpdateAction> singleUpdateActions;
-
     public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
     /* #################### GUI: Actively used UI References #################### */
@@ -104,7 +97,6 @@ public class InputState {
     public int pressedButton_timer_hold;
     public ScrollBarVertical scrolledScrollBarVertical;
     public ScrollBarHorizontal scrolledScrollBarHorizontal;
-
     public ToolTip tooltip;
     public float tooltip_fadeIn_pct;
     public boolean tooltip_wait_delay;
@@ -180,25 +172,15 @@ public class InputState {
     /* #################### Misc. ####################  */
 
     public float animation_timer_gui;
-
     public Color[] colorStack;
-
     public int colorStackPointer;
-
     public ShaderProgram grayScaleShader;
-
     public OrthographicCamera camera_frustum; // camera for frustum testing
-
     public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;
-
-
     public int itemInfo_listIndex;
     public GridPoint2 itemInfo_inventoryPos;
-
     public int itemInfo_tabBarTabIndex;
     public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_inventoryValid;
-
-
 
 }

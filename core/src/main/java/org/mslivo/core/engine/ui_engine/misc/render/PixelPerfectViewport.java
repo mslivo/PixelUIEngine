@@ -5,14 +5,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class PixelPerfectViewport extends FitViewport {
-
     private final int iRateMin;
-
     public PixelPerfectViewport(float worldWidth, float worldHeight, Camera camera, int iRateMin) {
         super(worldWidth, worldHeight, camera);
         this.iRateMin = iRateMin;
     }
-
     @Override
     public void update(int screenWidth, int screenHeight, boolean centerCamera) {
 

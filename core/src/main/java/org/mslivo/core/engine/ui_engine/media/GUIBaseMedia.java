@@ -8,7 +8,6 @@ import org.mslivo.core.engine.ui_engine.UIEngine;
  * These Medias get loaded on startup no matter what
  */
 public class GUIBaseMedia {
-
     private static final String DIR_GUI_GRAPHICS = MediaManager.DIR_GRAPHICS+"gui/";
 
     // Graphics
@@ -55,7 +54,6 @@ public class GUIBaseMedia {
     public static final CMediaArray GUI_INVENTORY_SELECTED_X2 = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "inventory_selected_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
     public static final CMediaArray GUI_PROGRESSBAR = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "progressbar.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_PROGRESSBAR_BAR = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "progressbar_bar.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-
     public static final CMediaImage GUI_NOTIFICATION_BAR = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "notification_bar.png");
     public static final CMediaArray GUI_CHECKBOX_CHECKBOX = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "checkbox.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray GUI_CHECKBOX_RADIO = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "radio.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
@@ -65,9 +63,11 @@ public class GUIBaseMedia {
     public static final CMediaArray GUI_OSTEXTINPUT_LOWERCASE = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "ostextinput_lowercase.png",12,12);
     public static final CMediaArray GUI_OSTEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(DIR_GUI_GRAPHICS + "ostextinput_uppercase.png",12,12);
     public static final CMediaImage GUI_OSTEXTINPUT_SELECTED = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "ostextinput_selected.png");
+
     //Cursors
     public static final CMediaCursor GUI_CURSOR_ARROW = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"cursors/arrow.png", 16, 16);
     public static final CMediaCursor GUI_CURSOR_TRANSPARENT = MediaManager.create_CMediaCursor(DIR_GUI_GRAPHICS +"cursors/transparent.png", 16, 16);
+
     // Icons
     public static final CMediaImage GUI_ICON_CLOSE = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "icons/close.png");
     public static final CMediaImage GUI_ICON_COLOR = MediaManager.create_CMediaImage(DIR_GUI_GRAPHICS + "icons/color.png");

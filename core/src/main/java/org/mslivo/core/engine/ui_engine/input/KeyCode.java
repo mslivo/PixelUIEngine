@@ -1,7 +1,6 @@
 package org.mslivo.core.engine.ui_engine.input;
 
 public class KeyCode {
-
     public static class GamePad {
         public static final int A = 0;
         public static final int B = 1;
