@@ -22,34 +22,19 @@ import java.util.HashSet;
  * Created by Admin on 07.02.2019.
  */
 public class MediaManager {
-
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND_FX = "sound/";
-
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
-
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
-
     private boolean loaded;
-
     private final HashMap<CMediaSound, Sound> medias_sounds = new HashMap<>();
-
     private final HashMap<CMediaMusic, Music> medias_music = new HashMap<>();
-
     private final HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
-
     private final HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
-
     private final HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
-
     private final HashMap<CMediaArray, TextureRegion[]> medias_arrays = new HashMap<>();
-
     private final HashMap<CMediaAnimation, Animation> medias_animations = new HashMap<>();
-
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
-
-    public final HashSet<CMedia> loadedMediaList = new HashSet<>();
-
     private TextureAtlas textureAtlas;
 
     public MediaManager() {
@@ -97,8 +82,9 @@ public class MediaManager {
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
-        ArrayList<CMedia> imageData = new ArrayList<>();
-        ArrayList<CMedia> soundData = new ArrayList<>();
+        ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
+        ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
+        HashSet<CMedia> preparedForLoad = new HashSet<>();
         int step = 0;
         int stepsMax = 0;
         boolean anyImageData = false;
@@ -106,15 +92,15 @@ public class MediaManager {
         // Split into Image and Sound Data
         CMedia loadMedia;
         while ((loadMedia = loadMediaList.poll()) != null) {
-            if (!loadedMediaList.contains(loadMedia)) {
+            if (!preparedForLoad.contains(loadMedia)) {
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
-                    imageData.add(loadMedia);
-                    loadedMediaList.add(loadMedia);
+                    imageCMediaLoadStack.add(loadMedia);
+                    preparedForLoad.add(loadMedia);
                     stepsMax += 2;
                     anyImageData = true;
                 } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
-                    soundData.add(loadMedia);
-                    loadedMediaList.add(loadMedia);
+                    soundCMediaLoadStack.add(loadMedia);
+                    preparedForLoad.add(loadMedia);
                     stepsMax += 1;
                 } else {
                     throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName() + "\"");
@@ -123,8 +109,8 @@ public class MediaManager {
         }
 
         // 1. Load Image Data Into Pixmap Packer
-        for (int i = 0; i < imageData.size(); i++) {
-            CMedia imageMedia = imageData.get(i);
+        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+            CMedia imageMedia = imageCMediaLoadStack.get(i);
             String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
             Texture texture = new Texture(Tools.File.findResource(textureFileName), false);
             TextureData textureData = texture.getTextureData();
@@ -144,8 +130,8 @@ public class MediaManager {
         }
 
         // 3. Prepare image Data
-        for (int i = 0; i < imageData.size(); i++) {
-            CMedia imageMedia = imageData.get(i);
+        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+            CMedia imageMedia = imageCMediaLoadStack.get(i);
             if (imageMedia.getClass() == CMediaImage.class) {
                 CMediaImage cMediaImage = (CMediaImage) imageMedia;
                 medias_images.put(cMediaImage, textureAtlas.findRegion(imageMedia.file));
@@ -174,28 +160,27 @@ public class MediaManager {
             if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
         }
 
+
         // 4. Load Sound Data
-        for (int i = 0; i < soundData.size(); i++) {
-            CMedia soundMedia = soundData.get(i);
+        for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
+            CMedia soundMedia = soundCMediaLoadStack.get(i);
             if (soundMedia.getClass() == CMediaSound.class) {
-                if (!loadedMediaList.contains(soundMedia)) {
-                    CMediaSound cMediaSound = (CMediaSound) soundMedia;
-                    Sound sound = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
-                    medias_sounds.put(cMediaSound, sound);
-                }
+                CMediaSound cMediaSound = (CMediaSound) soundMedia;
+                Sound sound = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
+                medias_sounds.put(cMediaSound, sound);
             } else if (soundMedia.getClass() == CMediaMusic.class) {
-                if (!loadedMediaList.contains(soundMedia)) {
-                    CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
-                    Music music = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
-                    medias_music.put(cMediaMusic, music);
-                }
+                CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
+                Music music = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
+                medias_music.put(cMediaMusic, music);
             }
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(soundMedia.file, step, stepsMax);
         }
 
-        imageData.clear();
-        soundData.clear();
+        // 5. Clean Up
+        imageCMediaLoadStack.clear();
+        soundCMediaLoadStack.clear();
+        preparedForLoad.clear();
         pixmapPacker.dispose();
         this.loaded = true;
         return true;
@@ -269,7 +254,6 @@ public class MediaManager {
         for (CMediaFont cMediaFont : medias_fonts.keySet()) medias_fonts.get(cMediaFont).dispose();
         this.medias_fonts.clear();
 
-        this.loadedMediaList.clear();
         this.loadMediaList.clear();
         this.loaded = false;
         return true;
@@ -345,14 +329,13 @@ public class MediaManager {
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImage(batch, (CMediaImage) cMedia, x, y);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex);
-        } else if (cMedia.getClass() == CMediaCursor.class) {
-            drawCMediaCursor(batch, (CMediaCursor) cMedia, x, y);
+        switch (cMedia) {
+            case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y);
+            case CMediaAnimation cMediaAnimation -> drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer);
+            case CMediaArray cMediaArray -> drawCMediaArray(batch, cMediaArray, x, y, arrayIndex);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
@@ -362,12 +345,14 @@ public class MediaManager {
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImage(batch, (CMediaImage) cMedia, x, y, origin_x, origin_y);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer, origin_x, origin_y);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex, origin_x, origin_y);
+        switch (cMedia) {
+            case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y);
+            case CMediaAnimation cMediaAnimation ->
+                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y);
+            case CMediaArray cMediaArray -> drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
@@ -377,12 +362,16 @@ public class MediaManager {
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImage(batch, (CMediaImage) cMedia, x, y, origin_x, origin_y, width, height);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer, origin_x, origin_y, width, height);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex, origin_x, origin_y, width, height);
+        switch (cMedia) {
+            case CMediaImage cMediaImage ->
+                    drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y, width, height);
+            case CMediaAnimation cMediaAnimation ->
+                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, width, height);
+            case CMediaArray cMediaArray ->
+                    drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, width, height);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
@@ -392,12 +381,16 @@ public class MediaManager {
 
     public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImage(batch, (CMediaImage) cMedia, x, y, origin_x, origin_y, width, height, rotation);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimation(batch, (CMediaAnimation) cMedia, x, y, animationTimer, origin_x, origin_y, width, height, rotation);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArray(batch, (CMediaArray) cMedia, x, y, arrayIndex, origin_x, origin_y, width, height, rotation);
+        switch (cMedia) {
+            case CMediaImage cMediaImage ->
+                    drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y, width, height, rotation);
+            case CMediaAnimation cMediaAnimation ->
+                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, width, height, rotation);
+            case CMediaArray cMediaArray ->
+                    drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, width, height, rotation);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
@@ -415,12 +408,16 @@ public class MediaManager {
 
     public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImageCut(batch, (CMediaImage) cMedia, x, y, srcX, srcY, widthCut, heightCut);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimationCut(batch, (CMediaAnimation) cMedia, x, y, animationTimer, srcX, srcY, widthCut, heightCut);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArrayCut(batch, (CMediaArray) cMedia, x, y, arrayIndex, srcX, srcY, widthCut, heightCut);
+        switch (cMedia) {
+            case CMediaImage cMediaImage ->
+                    drawCMediaImageCut(batch, cMediaImage, x, y, srcX, srcY, widthCut, heightCut);
+            case CMediaAnimation cMediaAnimation ->
+                    drawCMediaAnimationCut(batch, cMediaAnimation, x, y, animationTimer, srcX, srcY, widthCut, heightCut);
+            case CMediaArray cMediaArray ->
+                    drawCMediaArrayCut(batch, cMediaArray, x, y, arrayIndex, srcX, srcY, widthCut, heightCut);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
@@ -438,12 +435,16 @@ public class MediaManager {
 
     public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
-        if (cMedia.getClass() == CMediaImage.class) {
-            drawCMediaImageScale(batch, (CMediaImage) cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation);
-        } else if (cMedia.getClass() == CMediaAnimation.class) {
-            drawCMediaAnimationScale(batch, (CMediaAnimation) cMedia, x, y, animationTimer, origin_x, origin_y, scaleX, scaleY, rotation);
-        } else if (cMedia.getClass() == CMediaArray.class) {
-            drawCMediaArrayScale(batch, (CMediaArray) cMedia, x, y, arrayIndex, origin_x, origin_y, scaleX, scaleY, rotation);
+        switch (cMedia) {
+            case CMediaImage cMediaImage ->
+                    drawCMediaImageScale(batch, cMediaImage, x, y, origin_x, origin_y, scaleX, scaleY, rotation);
+            case CMediaAnimation cMediaAnimation ->
+                    drawCMediaAnimationScale(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, scaleX, scaleY, rotation);
+            case CMediaArray cMediaArray ->
+                    drawCMediaArrayScale(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, scaleX, scaleY, rotation);
+            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
+            default -> {
+            }
         }
     }
 
