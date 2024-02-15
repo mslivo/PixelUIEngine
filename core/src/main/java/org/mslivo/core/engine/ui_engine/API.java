@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.BooleanArray;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.LongArray;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -61,10 +64,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntConsumer;
+import java.util.function.*;
 
 /*
     - Collections related functions are provided like
@@ -205,6 +205,12 @@ public class API {
 
     public class _PreConfigured {
 
+        public interface DrawGraphFunctions {
+            Color getColorForValues(long value, long lastValue);
+
+            long getValueAtIndex(int index);
+        }
+
         private final char[] numbersAllowedCharacters = new char[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
         private final char[] decimalsAllowedCharacters = new char[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -218,6 +224,7 @@ public class API {
         }
 
         public TextField list_CreateSearchBar(List list, ScrollBarVertical scrollBarVertical, boolean searchTooltips, boolean searchArrayLists) {
+            if(list == null) return null;
             ArrayList originalList = list.items;
             ArrayList itemsSearched = new ArrayList(list.items);
             component.setSize(list, list.width, list.height - 1);
@@ -256,7 +263,7 @@ public class API {
                 Object item = searchList.get(i);
                 if (searchArrayLists && item instanceof ArrayList itemList) {
                     searchItems(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
-                } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                } else if (list.listAction != null && list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                     resultList.add(item);
                 } else if (searchTooltips) {
                     org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip tooltip = list.listAction.toolTip(item);
@@ -383,14 +390,11 @@ public class API {
         }
 
         public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
-            return text_CreateClickableText(x, y, text, font, new IntConsumer() {
-                @Override
-                public void accept(int button) {
-                    try {
-                        Desktop.getDesktop().browse(new URI(url));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            return text_CreateClickableText(x, y, text, font, button -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }, textHover, fontHover);
         }
@@ -468,6 +472,7 @@ public class API {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
+                            //noinspection ForLoopReplaceableByForEach
                             for (int i = 0; i < checkboxes.length; i++)
                                 if (checkboxes[i] != checkboxes[iF])
                                     component.checkBox.setChecked(checkboxes[i], false);
@@ -870,20 +875,8 @@ public class API {
             return modal;
         }
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, Function<Integer, Long> getIndexValue) {
-            BiFunction<Long, Long, Color> colorFunction = (value, lastValue) -> {
-                if (value > lastValue) {
-                    return Color.GREEN;
-                } else if (value < lastValue) {
-                    return Color.RED;
-                } else {
-                    return Color.ORANGE;
-                }
-            };
-            return map_drawGraph(map, itemCount, 1, 1, getIndexValue, Color.WHITE, colorFunction, null, true);
-        }
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Function<Integer, Long> getValueAtIndex, Color colorBackGround, BiFunction<Long, Long, Color> colorFunction, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
             int mapWidth = map.width * UIEngine.TILE_SIZE;
             int mapHeight = map.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
@@ -892,16 +885,16 @@ public class API {
             long lowestValue = Integer.MAX_VALUE;
             long highestValue = Integer.MIN_VALUE;
             // Get Values
-            ArrayList<Integer> indexes = new ArrayList<>();
-            ArrayList<Long> values = new ArrayList<>();
-            ArrayList<Boolean> dataAvailables = new ArrayList<>();
+            IntArray indexes = new IntArray();
+            LongArray values = new LongArray();
+            BooleanArray dataAvailables = new BooleanArray();
             int startIndex = (itemCount - 1) - (steps * stepSize);
             int indexAndValueCount = 0;
-            long valueBefore = (startIndex - stepSize) > 0 ? getValueAtIndex.apply((startIndex - stepSize)) : Long.MIN_VALUE;
+            long valueBefore = (startIndex - stepSize) > 0 ? drawGraphFunctions.getValueAtIndex((startIndex - stepSize)) : Long.MIN_VALUE;
             boolean oneValueFound = false;
             for (int i = startIndex; i < itemCount; i += stepSize) {
                 if (i >= 0) {
-                    long value = getValueAtIndex.apply(i);
+                    long value = drawGraphFunctions.getValueAtIndex(i);
                     lowestValue = Math.min(value, lowestValue);
                     highestValue = Math.max(value, highestValue);
                     indexes.add(i);
@@ -932,7 +925,7 @@ public class API {
                 }
             }
 
-            if (values.size() == 0) {
+            if (values.size == 0) {
                 // No values available
                 component.map.update(map);
                 return null;
@@ -950,7 +943,7 @@ public class API {
             long lastValue = valueBefore;
             int lastIndex = -1;
             final float SHADING = 0.1f;
-            Color color = colorFunction.apply(lastValue, valueBefore);
+            Color color = drawGraphFunctions.getColorForValues(lastValue, valueBefore);
             Color colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
             Color colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
             drawLoop:
@@ -964,7 +957,7 @@ public class API {
                 boolean indexChange = false;
                 boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
                 if (index != lastIndex) {
-                    color = colorFunction.apply(value, lastValue);
+                    color = drawGraphFunctions.getColorForValues(value, lastValue);
                     colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
                     colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
                     indexChange = true;
@@ -1066,25 +1059,28 @@ public class API {
             return closeButton;
         }
 
-        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, Consumer<Float> onChange) {
+        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, DoubleConsumer onChange) {
             TextField textField = component.textField.create(x, y, width);
             component.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
             component.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
-                    Float value = null;
+                    float value;
                     try {
                         value = Float.parseFloat(newContent);
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
+                        return false;
                     }
-                    return (value != null && value >= min && value <= max);
+                    return (value >= min && value <= max);
                 }
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (valid) {
-                        onChange.accept(Float.parseFloat(content));
-                    } else {
+                    float value;
+                    try {
+                        value = Float.parseFloat(content);
+                        onChange.accept(value);
+                    } catch (NumberFormatException e) {
                         component.textField.focus(textField);
                     }
                 }
@@ -1092,25 +1088,28 @@ public class API {
             return textField;
         }
 
-        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, Consumer<Integer> onChange) {
+        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, IntConsumer onChange) {
             TextField textField = component.textField.create(x, y, width);
             component.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
             component.textField.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
                 public boolean isContentValid(String newContent) {
-                    Integer value = null;
+                    int value;
                     try {
                         value = Integer.parseInt(newContent);
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
+                        return false;
                     }
-                    return value != null && value >= min && value <= max;
+                    return (value >= min && value <= max);
                 }
 
                 @Override
                 public void onEnter(String content, boolean valid) {
-                    if (valid) {
-                        onChange.accept(Integer.parseInt(content));
-                    } else {
+                    int value;
+                    try {
+                        value = Integer.parseInt(content);
+                        onChange.accept(value);
+                    } catch (NumberFormatException e) {
                         component.textField.focus(textField);
                     }
                 }
@@ -1245,7 +1244,7 @@ public class API {
     public Notification findNotificationByName(String name) {
         if (name == null) return null;
         ArrayList<Notification> result = findNotificationsByName(name);
-        return result.size() > 0 ? result.get(0) : null;
+        return result.getFirst();
     }
 
     public boolean isNotificationAddedToScreen(Notification notification) {
@@ -1335,7 +1334,7 @@ public class API {
         if (window == null) return false;
         ArrayList<Component> result = this.window.findComponentsByName(window, UIEngine.WND_CLOSE_BUTTON);
         if (result.size() == 1) {
-            if (result.get(0) instanceof Button closeButton) {
+            if (result.getFirst() instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
                     closeButton.buttonAction.onPress();
                     closeButton.buttonAction.onRelease();
@@ -1431,7 +1430,7 @@ public class API {
     public Component findScreenComponentByName(String name) {
         if (name == null) return null;
         ArrayList<Component> result = findScreenComponentsByName(name);
-        return result.size() > 0 ? result.get(0) : null;
+        return result.size() > 0 ? result.getFirst() : null;
     }
 
     public void removeEverything() {
@@ -1498,7 +1497,7 @@ public class API {
     public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey findHotKeyByName(String name) {
         if (name == null) return null;
         ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> result = findHotKeysByName(name);
-        return result.size() > 0 ? result.get(0) : null;
+        return result.size() > 0 ? result.getFirst() : null;
     }
 
 
@@ -1513,7 +1512,7 @@ public class API {
     public Window findWindowByName(String name) {
         if (name == null) return null;
         ArrayList<Window> result = findWindowsByName(name);
-        return result.size() > 0 ? result.get(0) : null;
+        return result.size() > 0 ? result.getFirst() : null;
     }
 
 
@@ -2786,7 +2785,7 @@ public class API {
         public ContextMenuItem findContextMenuItemByName(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return null;
             ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
-            return result.size() > 0 ? result.get(0) : null;
+            return result.size() > 0 ? result.getFirst() : null;
         }
 
         public class _ContextMenuItem {
@@ -3146,7 +3145,7 @@ public class API {
         public Component findComponentByName(Window window, String name) {
             if (window == null || name == null) return null;
             ArrayList<Component> result = findComponentsByName(window, name);
-            return result.size() > 0 ? result.get(0) : null;
+            return result.size() > 0 ? result.getFirst() : null;
         }
 
         public void bringToFront(Window window) {
@@ -4356,7 +4355,7 @@ public class API {
             public Tab findTabByName(TabBar tabBar, String name) {
                 if (tabBar == null || name == null) return null;
                 ArrayList<Tab> result = findTabsByName(tabBar, name);
-                return result.size() > 0 ? result.get(0) : null;
+                return result.size() > 0 ? result.getFirst() : null;
             }
 
             public boolean isTabVisible(TabBar tabBar, Tab tab) {
@@ -4748,8 +4747,8 @@ public class API {
                 return new Color(map.pMap.getPixel(x, y));
             }
 
-            public void clearMap(Map map, Color Color) {
-                clearMap(map, Color);
+            public void clearMap(Map map, Color color) {
+                clearMap(map, color.r, color.g, color.b, color.a);
             }
 
             public void clearMap(Map map, float r, float g, float b, float a) {
@@ -4760,8 +4759,8 @@ public class API {
                 }
             }
 
-            public void drawPixel(Map map, int x, int y, Color Color) {
-                drawPixel(map, x, y, Color.r, Color.g, Color.b, Color.a);
+            public void drawPixel(Map map, int x, int y, Color color) {
+                drawPixel(map, x, y, color.r, color.g, color.b, color.a);
             }
 
             public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
@@ -4836,7 +4835,7 @@ public class API {
             public MapOverlay findMapOverlayByName(Map map, String name) {
                 if (map == null || name == null) return null;
                 ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
-                return result.size() > 0 ? result.get(0) : null;
+                return result.size() > 0 ? result.getFirst() : null;
             }
 
             public class _MapOverlay {

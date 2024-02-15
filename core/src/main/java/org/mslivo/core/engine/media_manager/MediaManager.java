@@ -3,6 +3,7 @@ package org.mslivo.core.engine.media_manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.utils.Align;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -66,9 +66,7 @@ public class MediaManager {
 
     public boolean prepareCMedia(CMedia[] cMedias) {
         if (loaded) return false;
-        for (int i = 0; i < cMedias.length; i++) {
-            loadMediaList.add(cMedias[i]);
-        }
+        for (int i = 0; i < cMedias.length; i++) loadMediaList.add(cMedias[i]);
         return true;
     }
 
@@ -180,20 +178,18 @@ public class MediaManager {
         for (int i = 0; i < soundData.size(); i++) {
             CMedia soundMedia = soundData.get(i);
             if (soundMedia.getClass() == CMediaSound.class) {
-                if (!loadedMediaList.contains(soundMedia.file)) {
+                if (!loadedMediaList.contains(soundMedia)) {
                     CMediaSound cMediaSound = (CMediaSound) soundMedia;
                     Sound sound = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
                     medias_sounds.put(cMediaSound, sound);
                 }
             } else if (soundMedia.getClass() == CMediaMusic.class) {
-                if (!loadedMediaList.contains(soundMedia.file)) {
+                if (!loadedMediaList.contains(soundMedia)) {
                     CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
                     Music music = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
                     medias_music.put(cMediaMusic, music);
                 }
             }
-
-
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(soundMedia.file, step, stepsMax);
         }

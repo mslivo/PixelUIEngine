@@ -74,7 +74,7 @@ class UICommons {
     static void window_bringToFront(InputState inputState, Window window) {
         if (inputState.windows.size() == 1) return;
         if (window.alwaysOnTop) {
-            if (inputState.windows.get(inputState.windows.size() - 1) != window) {
+            if (inputState.windows.getLast() != window) {
                 inputState.windows.remove(window);
                 inputState.windows.add(window);
             }
@@ -235,7 +235,7 @@ class UICommons {
         inputState.notifications.add(notification);
         // Remove first if too many
         if (inputState.notifications.size() > notificationsMax)
-            notification_removeFromScreen(inputState, inputState.notifications.get(0));
+            notification_removeFromScreen(inputState, inputState.notifications.getFirst());
     }
 
     static void notification_removeFromScreen(InputState inputState, Notification notification) {

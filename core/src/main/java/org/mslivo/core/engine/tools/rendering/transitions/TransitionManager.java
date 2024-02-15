@@ -95,8 +95,8 @@ public class TransitionManager {
         batch_screen.setColor(Color.WHITE);
         viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        if (from != null) {
-            if(updateUIEngine) from.update();
+        { // Capture From Framebuffer
+            if (updateUIEngine) from.update();
             from.render(true);
             frameBuffer_from.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);
@@ -105,8 +105,8 @@ public class TransitionManager {
             batch_screen.end();
             frameBuffer_from.end();
         }
-        if (to != null) {
-            if(updateUIEngine) to.update();
+        { // Capture To Framebuffer
+            if (updateUIEngine) to.update();
             to.render(true);
             frameBuffer_to.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);

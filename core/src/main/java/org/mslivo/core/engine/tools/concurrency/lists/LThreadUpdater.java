@@ -13,13 +13,13 @@ import java.util.concurrent.Executors;
  * Threadpool that can be used to iterate over subsets of lists
  */
 public class LThreadUpdater {
-    private ExecutorService threadPool;
+    private final ExecutorService threadPool;
     private final LItemUpdater lThreadPoolUpdater;
     private final int objectsPerWorker;
     private final ArrayList<Worker> tasks;
     private int taskSizeLast;
     private final List updateObjects;
-    private ArrayDeque<Worker> freeWorkerPool;
+    private final ArrayDeque<Worker> freeWorkerPool;
 
     public LThreadUpdater(List updateObjects, LItemUpdater LItemUpdater, int objectsPerWorker) {
         this.lThreadPoolUpdater = LItemUpdater;

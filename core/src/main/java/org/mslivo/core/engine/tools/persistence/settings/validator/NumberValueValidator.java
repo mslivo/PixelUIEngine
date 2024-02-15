@@ -6,7 +6,7 @@ import org.mslivo.core.engine.tools.persistence.settings.ValueValidator;
 
 public class NumberValueValidator implements ValueValidator {
 
-    public int rangeFrom, rangeTo;
+    public final int rangeFrom, rangeTo;
 
     public NumberValueValidator() {
         this(Integer.MIN_VALUE, Integer.MAX_VALUE);

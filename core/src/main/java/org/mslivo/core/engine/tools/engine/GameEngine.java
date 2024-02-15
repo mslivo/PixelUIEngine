@@ -120,7 +120,7 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
     public void update() {
         adapter.beforeInputs();
         // Process Inputs
-        EngineIO engineIO = null;
+        EngineIO engineIO;
         while ((engineIO = this.inputs.pollFirst()) != null) {
             adapter.processInput(engineIO.type, engineIO.params);
             inputPool.add(engineIO);

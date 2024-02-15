@@ -8,27 +8,15 @@ import org.mslivo.core.engine.ui_engine.gui.components.Component;
 import java.util.ArrayList;
 
 public class Tab {
-
     public String title;
-
     public int width;
-
     public TabAction tabAction;
-
     public TabBar addedToTabBar;
-
     public CMediaFont font;
-
     public CMediaGFX icon;
-
     public ArrayList<Component> components;
-
     public int iconIndex;
-
     public int content_offset_x;
-
     public String name;
-
     public Object data;
-
 }

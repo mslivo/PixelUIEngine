@@ -61,15 +61,15 @@ public class Tools {
     }
 
     public static class Log {
-        private static StringBuilder logMessageBuilder = new StringBuilder();
+        private static final StringBuilder logMessageBuilder = new StringBuilder();
         private static String timestamp() {
             return sdf.format(new Date());
         }
-
         public static void benchmark(String... customValues) {
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
                 custom.append(" | ").append(String.format("%1$10s", customValues[i]));
+
             Tools.Log.message(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()) + " FPS | " +
                     String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))) + "MB RAM" + custom);
         }
@@ -791,7 +791,7 @@ public class Tools {
             ArrayList<CMedia> prepareList = new ArrayList<>();
             Field[] fields = loadFromClass.getFields();
             for (int i = 0; i < fields.length; i++) {
-                CMedia cMedia = null;
+                CMedia cMedia;
                 try {
                     if (fields[i].getType().isArray()) {
                         CMedia[] medias = (CMedia[]) fields[i].get(null);
@@ -835,7 +835,7 @@ public class Tools {
 
             Field[] fields = object.getClass().getFields();
             for (int i = 0; i < fields.length; i++) {
-                Object fieldObject = null;
+                Object fieldObject;
                 try {
                     fieldObject = fields[i].get(object);
                 } catch (IllegalAccessException e) {

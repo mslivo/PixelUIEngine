@@ -65,6 +65,7 @@ import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -72,6 +73,7 @@ import java.util.ArrayList;
  * Handles GUI Elements, Input, Cameras
  * Game needs to be implemented inside the uiAdapter
  */
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIAdapter> {
 
     /* Attributes */
@@ -565,8 +567,7 @@ public class UIEngine<T extends UIAdapter> {
                                                 comboBox.width * TILE_SIZE,
                                                 TILE_SIZE
                                         )) {
-                                            ComboBoxItem comboBoxItem = comboBox.items.get(i);
-                                            inputState.pressedComboBoxItem = comboBoxItem;
+                                            inputState.pressedComboBoxItem = comboBox.items.get(i);
                                         }
                                     }
                                 }
@@ -1262,8 +1263,6 @@ public class UIEngine<T extends UIAdapter> {
         boolean confirmPressed = false;
         boolean changeCasePressed = false;
         boolean deletePressed = false;
-        boolean leftGamePad = false;
-        boolean rightGamePad = false;
         switch (inputState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
@@ -1323,14 +1322,14 @@ public class UIEngine<T extends UIAdapter> {
                 boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
                 boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
                 final float sensitivity = 0.4f;
-                leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
-                rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
+                boolean leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
+                boolean rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
                 confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
                 deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
                 changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse3());
 
                 if (leftGamePad) {
-                    if (inputState.mTextInputGamePadLeft == false) {
+                    if (!inputState.mTextInputGamePadLeft) {
                         scrollDirection = -1;
                         inputState.mTextInputGamePadLeft = true;
                     }
@@ -1338,7 +1337,7 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.mTextInputGamePadLeft = false;
                 }
                 if (rightGamePad) {
-                    if (inputState.mTextInputGamePadRight == false) {
+                    if (!inputState.mTextInputGamePadRight) {
                         scrollDirection = 1;
                         inputState.mTextInputGamePadRight = true;
                     }
@@ -1356,9 +1355,9 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.mTextInputScrollSpeed++;
                         if (inputState.mTextInputScrollSpeed >= 3) {
                             inputState.mTextInputScrollTime = 2;
-                        } else if (inputState.mTextInputScrollSpeed >= 2) {
+                        } else if (inputState.mTextInputScrollSpeed == 2) {
                             inputState.mTextInputScrollTime = 5;
-                        } else if (inputState.mTextInputScrollSpeed >= 1) {
+                        } else if (inputState.mTextInputScrollSpeed == 1) {
                             inputState.mTextInputScrollTime = 10;
                         }
                     }
@@ -1465,15 +1464,11 @@ public class UIEngine<T extends UIAdapter> {
         inputState.inputEvents.mouseDown = false;
         inputState.inputEvents.mouseDownButtons.clear();
         inputState.inputEvents.mouseDoubleClick = false;
-        for (int i = 0; i < inputState.inputEvents.mouseButtonsDown.length; i++) {
-            inputState.inputEvents.mouseButtonsDown[i] = false;
-        }
-
+        Arrays.fill(inputState.inputEvents.mouseButtonsDown, false);
         inputState.mouse_gui.x = 0;
         inputState.mouse_gui.y = 0;
         inputState.mouse_delta.x = 0;
         inputState.mouse_delta.y = 0;
-
     }
 
     private void updateMouseControlMode() {
@@ -1523,13 +1518,16 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case GAMEPAD, KEYBOARD -> {
                     // Reset temporary variables
-                    if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
-                        for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
-                            inputState.keyBoardTranslatedKeysDown[i] = false;
-                    } else if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
-                        for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
-                            inputState.gamePadTranslatedButtonsDown[i] = false;
-                        inputState.keyBoardMouseSpeedUp.set(0f, 0f);
+                    switch (inputState.currentControlMode){
+                        case GAMEPAD -> {
+                            for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
+                                inputState.keyBoardTranslatedKeysDown[i] = false;
+                        }
+                        case KEYBOARD -> {
+                            for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
+                                inputState.gamePadTranslatedButtonsDown[i] = false;
+                            inputState.keyBoardMouseSpeedUp.set(0f, 0f);
+                        }
                     }
                     for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
                     inputState.simulatedMouseLastMouseClick = 0;
@@ -1745,8 +1743,6 @@ public class UIEngine<T extends UIAdapter> {
             float moveSpeedY = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedY;
             if (buttonUp) deltaY -= moveSpeedY;
             if (buttonDown) deltaY += moveSpeedY;
-        } else {
-            // Magnet Mode (Mouse sticks to UI elements)
         }
 
         // Set to final
@@ -1953,7 +1949,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateNotifications() {
         if (inputState.notifications.size() > 0) {
-            Notification notification = inputState.notifications.get(0);
+            Notification notification = inputState.notifications.getFirst();
             switch (notification.state) {
                 case INIT_SCROLL -> {
                     notification.timer = System.currentTimeMillis();
@@ -2491,7 +2487,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             }
-            case null, default -> {
+            default -> {
             }
         }
         render_batchSetColorWhite(1f);
@@ -3139,7 +3135,7 @@ public class UIEngine<T extends UIAdapter> {
             case GameViewPort gameViewPort -> {
                 inputState.spriteBatch_gui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
             }
-            case null, default -> {
+            default -> {
             }
         }
 
@@ -3153,7 +3149,7 @@ public class UIEngine<T extends UIAdapter> {
             int dragOffsetX = inputState.draggedInventoryOffset.x;
             int dragOffsetY = inputState.draggedInventoryOffset.y;
             Object dragItem = inputState.draggedInventoryItem;
-            if (dragInventory != null && dragInventory.inventoryAction != null) {
+            if (dragInventory.inventoryAction != null) {
                 render_batchSetColorWhite(api.config.getDragAlpha());
                 CMediaGFX icon = dragInventory.inventoryAction.icon(dragItem);
                 render_drawCMediaGFX(icon, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, dragInventory.inventoryAction.iconArrayIndex(dragItem));
@@ -3214,7 +3210,6 @@ public class UIEngine<T extends UIAdapter> {
         render_fontSaveColor(font);
         render_fontSetAlpha(font, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            maxWidth -= ((withIcon ? TILE_SIZE : 0) + textXOffset);
             mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
             mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text, maxWidth);

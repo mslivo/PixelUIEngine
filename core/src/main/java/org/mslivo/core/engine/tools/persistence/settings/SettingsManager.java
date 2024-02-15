@@ -55,7 +55,7 @@ public class SettingsManager {
 
     public void createBackup() {
         this.backUp.clear();
-        String[] properties = this.properties.keySet().toArray(new String[this.properties.size()]);
+        String[] properties = this.properties.keySet().toArray(new String[0]);
         for (int i = 0; i < properties.length; i++) {
             String property = properties[i];
             this.backUp.setProperty(property, this.properties.getProperty(property));
@@ -123,14 +123,14 @@ public class SettingsManager {
     }
 
     public void setAllToDefault() {
-        String[] entries = this.entries.keySet().toArray(new String[this.entries.size()]);
+        String[] entries = this.entries.keySet().toArray(new String[0]);
         for (int i = 0; i < entries.length; i++) {
             setToDefault(entries[i]);
         }
     }
 
     private void validateAllProperties() {
-        String[] entries = this.entries.keySet().toArray(new String[this.entries.size()]);
+        String[] entries = this.entries.keySet().toArray(new String[0]);
         for (int i = 0; i < entries.length; i++) {
             validateProperty(entries[i]);
         }
@@ -216,12 +216,7 @@ public class SettingsManager {
 
     public static boolean isValidBoolean(String value) {
         if (value == null) return false;
-        try {
-            Boolean.parseBoolean(value);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
+        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
     }
 
 

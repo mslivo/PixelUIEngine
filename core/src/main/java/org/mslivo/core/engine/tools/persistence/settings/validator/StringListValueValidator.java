@@ -48,8 +48,8 @@ public class StringListValueValidator implements ValueValidator {
 
     @Override
     public boolean isValueValid(String value) {
+        if (value == null) return false;
         String[] stringList = value.split(SettingsManager.STRING_LIST_DELIMITER);
-        if (stringList == null) return false;
         if (stringList.length < listSizeMin || stringList.length > listSizeMax) return false;
         for (int i = 0; i < stringList.length; i++) {
             if (!SettingsManager.isValidString(stringList[i])) return false;

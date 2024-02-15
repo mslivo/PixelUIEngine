@@ -1,7 +1,5 @@
 package org.mslivo.core.engine.ui_engine.misc;
 
-import java.util.Objects;
-
 public final class GraphInfo {
     public final long lowestValue;
     public final long highestValue;

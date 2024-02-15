@@ -6,7 +6,7 @@ import org.mslivo.core.engine.tools.persistence.settings.ValueValidator;
 
 public class DecimalValueValidator implements ValueValidator {
 
-    public float rangeFrom, rangeTo;
+    public final float rangeFrom, rangeTo;
 
     public DecimalValueValidator() {
         this(Float.MIN_VALUE, Float.MAX_VALUE);

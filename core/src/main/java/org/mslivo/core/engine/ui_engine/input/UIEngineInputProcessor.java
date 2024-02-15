@@ -10,12 +10,9 @@ import com.studiohartman.jamepad.ControllerAxis;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor, ControllerListener {
-
     private final InputEvents inputEvents;
-
     private long lastClickTime;
-
-    private boolean gamePadSupport;
+    private final boolean gamePadSupport;
     public UIEngineInputProcessor(InputEvents inputEvents, boolean gamePadSupport) {
         this.inputEvents = inputEvents;
         this.lastClickTime = System.currentTimeMillis();
