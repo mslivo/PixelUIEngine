@@ -252,7 +252,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedComboBoxItem = null;
         newInputState.pressedCheckBox = null;
         // ----- Controls
-        newInputState.currentControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
+        newInputState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
         newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
         newInputState.mouse = new GridPoint2(0, 0);
         newInputState.mouse_delta = new GridPoint2(0, 0);
