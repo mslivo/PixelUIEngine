@@ -18,6 +18,9 @@ import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.gui.components.list.List;
 import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
+import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
@@ -28,10 +31,10 @@ import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
-import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
+import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
 
 class UICommons {
 
@@ -219,7 +222,7 @@ class UICommons {
         if (inputState.pressedList != null) return inputState.pressedList;
         if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
         if (inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
-        if(inputState.pressedCheckBox != null) return inputState.pressedCheckBox;
+        if (inputState.pressedCheckBox != null) return inputState.pressedCheckBox;
         return null;
     }
 
@@ -709,5 +712,34 @@ class UICommons {
         mouseTextInput.selectedIndex = Tools.Calc.inBounds(index, 0, (maxCharacters - 1));
     }
 
+    static void scrollBar_scroll(ScrollBar scrollBar, float scrolled) {
+        scrollBar.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
+    }
 
+    static float scrollBar_calculateScrolled(ScrollBar scrollBar, int mouse_gui_xy) {
+        int relative_xy;
+        float max_xy;
+        float buttonOffset;
+        switch (scrollBar){
+            case ScrollBarHorizontal scrollBarHorizontal -> {
+                relative_xy = mouse_gui_xy-UICommons.component_getAbsoluteX(scrollBarHorizontal);
+                max_xy = (scrollBarHorizontal.width*UIEngine.TILE_SIZE)-8;
+                buttonOffset =  (1 / (float) scrollBarHorizontal.width) / 2f;
+            }
+            case ScrollBarVertical scrollBarVertical -> {
+                relative_xy = mouse_gui_xy-UICommons.component_getAbsoluteY(scrollBarVertical);
+                max_xy = (scrollBarVertical.height*UIEngine.TILE_SIZE)-8;
+                buttonOffset =  (1 / (float) scrollBarVertical.height) / 2f;
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + scrollBar);
+        }
+
+        return (relative_xy / max_xy) - buttonOffset;
+    }
+
+    static void list_scroll(List list, float scrolled) {
+        list.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+        if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
+    }
 }

@@ -539,13 +539,17 @@ public class UIEngine<T extends UIAdapter> {
                             scrollBarVertical.buttonPressed = true;
                             if (scrollBarVertical.scrollBarAction != null)
                                 scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
+                            UICommons.scrollBar_scroll(scrollBarVertical,
+                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical,inputState.mouse_gui.y));
                             inputState.scrolledScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollBarHorizontal scrollBarHorizontal -> {
                             scrollBarHorizontal.buttonPressed = true;
-                            inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
                             if (scrollBarHorizontal.scrollBarAction != null)
                                 scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
+                            UICommons.scrollBar_scroll(scrollBarHorizontal,
+                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal,inputState.mouse_gui.x));
+                            inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case ComboBox comboBox -> {
                             if (UICommons.comboBox_isOpen(inputState, comboBox)) {
@@ -579,14 +583,14 @@ public class UIEngine<T extends UIAdapter> {
                             if (knob.knobAction != null) knob.knobAction.onPress();
                         }
                         case Map map -> {
-                            int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(map) + (map.x * TILE_SIZE) + map.offset_x);
-                            int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(map) + (map.y * TILE_SIZE) + map.offset_y);
+                            int x = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(map);
+                            int y = inputState.mouse_gui.y - UICommons.component_getAbsoluteY(map);
                             if (map.mapAction != null) map.mapAction.onPress(x, y);
                             inputState.pressedMap = map;
                         }
                         case GameViewPort gameViewPort -> {
-                            int x = inputState.mouse_gui.x - (UICommons.component_getParentWindowX(gameViewPort) + (gameViewPort.x * TILE_SIZE) + gameViewPort.offset_x);
-                            int y = inputState.mouse_gui.y - (UICommons.component_getParentWindowY(gameViewPort) + (gameViewPort.y * TILE_SIZE) + gameViewPort.offset_y);
+                            int x = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(gameViewPort);
+                            int y = inputState.mouse_gui.y - UICommons.component_getAbsoluteY(gameViewPort);
                             if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(x, y);
                             inputState.pressedGameViewPort = gameViewPort;
                         }
@@ -950,18 +954,10 @@ public class UIEngine<T extends UIAdapter> {
                         window.windowAction.onMove(window.x, window.y);
                 }
                 case ScrollBarVertical scrollBarVertical -> {
-                    int mouseYrel = inputState.mouse_gui.y - UICommons.component_getParentWindowY(scrollBarVertical) - (scrollBarVertical.y * TILE_SIZE) - scrollBarVertical.offset_y;
-                    float newScrolled = (mouseYrel / ((float) (scrollBarVertical.height * TILE_SIZE)));
-                    scrollBarVertical.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
-                    if (scrollBarVertical.scrollBarAction != null)
-                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical,inputState.mouse_gui.y));
                 }
                 case ScrollBarHorizontal scrollBarHorizontal -> {
-                    int mouseXrel = inputState.mouse_gui.x - UICommons.component_getParentWindowX(scrollBarHorizontal) - (scrollBarHorizontal.x * TILE_SIZE) - scrollBarHorizontal.offset_x;
-                    float newScrolled = (mouseXrel / ((float) (scrollBarHorizontal.width * TILE_SIZE)));
-                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(newScrolled, 0f, 1f);
-                    if (scrollBarHorizontal.scrollBarAction != null)
-                        scrollBarHorizontal.scrollBarAction.onScrolled(inputState.scrolledScrollBarHorizontal.scrolled);
+                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal,inputState.mouse_gui.x));
                 }
                 case Knob knob -> {
                     float amount = (inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
@@ -1000,8 +996,7 @@ public class UIEngine<T extends UIAdapter> {
                     case List list -> {
                         int size = list.items != null ? list.items.size() : 0;
                         float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
-                        list.scrolled = Tools.Calc.inBounds(list.scrolled + amount, 0f, 1f);
-                        if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
+                        UICommons.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
                         float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
@@ -1010,15 +1005,11 @@ public class UIEngine<T extends UIAdapter> {
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
                         float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
-                        scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrollBarHorizontal.scrolled + amount, 0f, 1f);
-                        if (scrollBarHorizontal.scrollBarAction != null)
-                            scrollBarHorizontal.scrollBarAction.onScrolled(scrollBarHorizontal.scrolled);
+                        UICommons.scrollBar_scroll(scrollBarHorizontal, scrollBarHorizontal.scrolled + amount);
                     }
                     case ScrollBarVertical scrollBarVertical -> {
                         float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
-                        scrollBarVertical.scrolled = Tools.Calc.inBounds(scrollBarVertical.scrolled + amount, 0f, 1f);
-                        if (scrollBarVertical.scrollBarAction != null)
-                            scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
+                        UICommons.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + amount);
                     }
                     case null, default -> {
                     }
@@ -1222,8 +1213,8 @@ public class UIEngine<T extends UIAdapter> {
                     // Gamepad
                     for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
                         inputState.gamePadTranslatedButtonsDown[i] = false;
-                    inputState.gamePadTranslatedStickLeft.set(0f,0f);
-                    inputState.gamePadTranslatedStickRight.set(0f,0f);
+                    inputState.gamePadTranslatedStickLeft.set(0f, 0f);
+                    inputState.gamePadTranslatedStickRight.set(0f, 0f);
                 }
                 if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                     // Keyboard
@@ -1249,7 +1240,7 @@ public class UIEngine<T extends UIAdapter> {
         if (!api.config.isGamePadMouseEnabled() && !api.config.isKeyboardMouseEnabled() && !api.config.isHardwareMouseEnabled()) {
             setMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
             chockeAllMouseEvents();
-        }else{
+        } else {
             if (api.config.isGamePadMouseEnabled() && gamePadMouseTranslateAndChokeEvents()) {
                 setMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
             } else if (api.config.isKeyboardMouseEnabled() && keyboardMouseTranslateAndChokeEvents()) {
@@ -1268,7 +1259,8 @@ public class UIEngine<T extends UIAdapter> {
                 case GAMEPAD -> updateGamePadMouseControl();
                 case KEYBOARD -> updateKeyBoardMouseControl();
                 case HARDWARE_MOUSE -> updateHardwareMouseControl();
-                case DISABLED -> {}
+                case DISABLED -> {
+                }
             }
         }
 
