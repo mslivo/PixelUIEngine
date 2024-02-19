@@ -158,16 +158,14 @@ public class InputState {
     public boolean displayOverrideCursor;
     public Vector3 vector_fboCursor;
     public Vector2 vector2_unproject;
-    public GridPoint2 hardwareMouseLastPosition;
-    public Vector2 simulatedMouseGUIPosition;
-    public long simulatedMouseLastMouseClick;
-    public Vector2 keyBoardMouseSpeedUp;
-    public boolean[] simulatedMouseIsButtonDown;
     public boolean[] keyBoardTranslatedKeysDown;
+    public Vector2 keyBoardMouseSpeedUp;
     public Vector2 gamePadTranslatedStickLeft;
     public Vector2 gamePadTranslatedStickRight;
     public boolean[] gamePadTranslatedButtonsDown;
-
+    public long simulatedMouseLastMouseClick;
+    public boolean[] simulatedMouseIsButtonDown;
+    public Vector2 simulatedMouseGUIPosition;
 
     /* #################### Misc. ####################  */
 

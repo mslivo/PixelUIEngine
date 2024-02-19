@@ -263,7 +263,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
         newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2f, internalResolutionHeight / 2f);
-        newInputState.hardwareMouseLastPosition = new GridPoint2(0, 0);
         newInputState.simulatedMouseLastMouseClick = 0;
         newInputState.keyBoardMouseSpeedUp = new Vector2(0, 0);
         newInputState.simulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
@@ -1215,35 +1214,62 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
+    private void setMouseControlMode(MOUSE_CONTROL_MODE nextControlMode) {
+        if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
+            // Clean up current control mode
+            if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD || inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
+                    // Gamepad
+                    for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
+                        inputState.gamePadTranslatedButtonsDown[i] = false;
+                    inputState.gamePadTranslatedStickLeft.set(0f,0f);
+                    inputState.gamePadTranslatedStickRight.set(0f,0f);
+                }
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+                    // Keyboard
+                    for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
+                        inputState.keyBoardTranslatedKeysDown[i] = false;
+                    inputState.keyBoardMouseSpeedUp.set(0f, 0f);
+                }
+                // Simulated
+                for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
+                inputState.simulatedMouseLastMouseClick = 0;
+            }
+
+            // Set Next ControlMode
+            if (nextControlMode == MOUSE_CONTROL_MODE.GAMEPAD || nextControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+                this.inputState.simulatedMouseGUIPosition.set(inputState.mouse_gui.x, inputState.mouse_gui.y);
+            }
+            inputState.currentControlMode = nextControlMode;
+        }
+    }
+
+
     private void updateMouseControl() {
-
-        updateMouseControlMode();
-
-        if (inputState.currentControlMode != MOUSE_CONTROL_MODE.DISABLED) {
-            // Translate Keys
-            switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {
-                }
-                case GAMEPAD -> gamePadMouseTranslateAndChokeEvents();
-                case KEYBOARD -> keyboardMouseTranslateAndChokeEvents();
-                case DISABLED -> throw new RuntimeException(); // invalid state for this function
-            }
-
-            // Update OnScreenTextinput or Mouse Cursor
-            if (inputState.openMouseTextInput != null) {
-                // Translate to Text Input
-                updateMouseTextInputControl();
-            } else {
-                // Translate to MouseGUI position
-                switch (inputState.currentControlMode) {
-                    case HARDWARE_MOUSE -> updateHardwareMouseControl();
-                    case KEYBOARD -> updateKeyBoardMouseControl();
-                    case GAMEPAD -> updateGamePadMouseControl();
-                    case DISABLED -> throw new RuntimeException(); // invalid state for this function
-                }
-            }
-        } else {
+        if (!api.config.isGamePadMouseEnabled() && !api.config.isKeyboardMouseEnabled() && !api.config.isHardwareMouseEnabled()) {
+            setMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
             chockeAllMouseEvents();
+        }else{
+            if (api.config.isGamePadMouseEnabled() && gamePadMouseTranslateAndChokeEvents()) {
+                setMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
+            } else if (api.config.isKeyboardMouseEnabled() && keyboardMouseTranslateAndChokeEvents()) {
+                setMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
+            } else if (api.config.isHardwareMouseEnabled() && hardwareMouseDetectUse()) {
+                setMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
+            }
+        }
+
+        if (inputState.openMouseTextInput != null) {
+            // Translate to Text Input
+            updateMouseTextInputControl();
+        } else {
+            // Translate to MouseGUI position
+            switch (inputState.currentControlMode) {
+                case GAMEPAD -> updateGamePadMouseControl();
+                case KEYBOARD -> updateKeyBoardMouseControl();
+                case HARDWARE_MOUSE -> updateHardwareMouseControl();
+                case DISABLED -> {}
+            }
         }
 
         // Translate MouseXGUI/MouseYGUI to Game X/Y
@@ -1468,81 +1494,12 @@ public class UIEngine<T extends UIAdapter> {
         inputState.mouse_delta.y = 0;
     }
 
-    private void updateMouseControlMode() {
-        boolean hardwareMouse = api.config.isHardwareMouseEnabled();
-        boolean keyboardMouse = api.config.isKeyboardMouseEnabled();
-        boolean gamePadMouse = api.config.isGamePadMouseEnabled();
-
-        MOUSE_CONTROL_MODE nextControlMode = null;
-
-        if (!hardwareMouse && !keyboardMouse && !gamePadMouse) {
-            nextControlMode = MOUSE_CONTROL_MODE.DISABLED;
-        } else {
-            if (hardwareMouse && !keyboardMouse && !gamePadMouse) {
-                nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
-            } else if (keyboardMouse && !gamePadMouse && !hardwareMouse) {
-                nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
-            } else if (gamePadMouse && !hardwareMouse && !keyboardMouse) {
-                nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
-            } else {
-                switch (inputState.currentControlMode) {
-                    case HARDWARE_MOUSE -> {
-                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
-                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
-                    }
-                    case KEYBOARD -> {
-                        if (hardwareMouse && hardwareMouseDetectUse())
-                            nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
-                        if (gamePadMouse && gamePadMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.GAMEPAD;
-                    }
-                    case GAMEPAD -> {
-                        if (hardwareMouse && hardwareMouseDetectUse())
-                            nextControlMode = MOUSE_CONTROL_MODE.HARDWARE_MOUSE;
-                        if (keyboardMouse && keyboardMouseDetectUse()) nextControlMode = MOUSE_CONTROL_MODE.KEYBOARD;
-                    }
-                }
-            }
-        }
-
-
-        if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
-            // Clean up current control mode
-            switch (inputState.currentControlMode) {
-                case HARDWARE_MOUSE -> {
-                    // Save last position, for reuse detection
-                    inputState.hardwareMouseLastPosition.x = Gdx.input.getX();
-                    inputState.hardwareMouseLastPosition.y = Gdx.input.getY();
-                }
-                case GAMEPAD, KEYBOARD -> {
-                    // Reset temporary variables
-                    switch (inputState.currentControlMode) {
-                        case GAMEPAD -> {
-                            for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
-                                inputState.keyBoardTranslatedKeysDown[i] = false;
-                        }
-                        case KEYBOARD -> {
-                            for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
-                                inputState.gamePadTranslatedButtonsDown[i] = false;
-                            inputState.keyBoardMouseSpeedUp.set(0f, 0f);
-                        }
-                    }
-                    for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
-                    inputState.simulatedMouseLastMouseClick = 0;
-                }
-            }
-            // Set Next ControlMode
-            switch (nextControlMode) {
-                case GAMEPAD, KEYBOARD -> {
-                    // Set simulated mouse position to current
-                    this.inputState.simulatedMouseGUIPosition.set(inputState.mouse_gui.x, inputState.mouse_gui.y);
-                }
-            }
-            inputState.currentControlMode = nextControlMode;
-        }
-    }
-
     private boolean hardwareMouseDetectUse() {
-        return (Gdx.input.getX() != inputState.hardwareMouseLastPosition.x || Gdx.input.getY() != inputState.hardwareMouseLastPosition.y);
+        if (inputState.inputEvents.mouseDown || inputState.inputEvents.mouseUp ||
+                inputState.inputEvents.mouseMoved || inputState.inputEvents.mouseDragged || inputState.inputEvents.mouseScrolled) {
+            return true;
+        }
+        return false;
     }
 
     private boolean keyboardMouseDetectUse() {
@@ -1614,21 +1571,23 @@ public class UIEngine<T extends UIAdapter> {
         };
     }
 
-    private void gamePadMouseTranslateAndChokeEvents() {
+    private boolean gamePadMouseTranslateAndChokeEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
+        boolean gamepadMouseUsed = false;
         for (int i = 0; i <= 6; i++) {
             int[] buttons = gamePadMouseButtons(i);
             if (buttons != null) {
                 for (int i2 = 0; i2 < buttons.length; i2++) {
                     int keyCode = buttons[i2];
                     if (inputState.inputEvents.gamePadButtonDown) {
-                        IntArray downKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
-                        for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
-                            if (downKeyCodes.get(ikc) == keyCode) {
-                                downKeyCodes.removeIndex(ikc);
-                                inputState.inputEvents.gamePadButtonDown = !downKeyCodes.isEmpty();
+                        IntArray buttonDownKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
+                        for (int ikc = buttonDownKeyCodes.size - 1; ikc >= 0; ikc--) {
+                            if (buttonDownKeyCodes.get(ikc) == keyCode) {
+                                buttonDownKeyCodes.removeIndex(ikc);
+                                inputState.inputEvents.gamePadButtonDown = !buttonDownKeyCodes.isEmpty();
                                 inputState.inputEvents.gamePadButtonsDown[keyCode] = false;
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = true;
+                                gamepadMouseUsed = true;
                             }
                         }
                     }
@@ -1639,6 +1598,7 @@ public class UIEngine<T extends UIAdapter> {
                                 upKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.gamePadButtonUp = !upKeyCodes.isEmpty();
                                 inputState.gamePadTranslatedButtonsDown[keyCode] = false;
+                                gamepadMouseUsed = true;
                             }
                         }
                     }
@@ -1651,11 +1611,13 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.gamePadTranslatedStickLeft.x = inputState.inputEvents.gamePadLeftX;
                 inputState.inputEvents.gamePadLeftX = 0;
                 inputState.inputEvents.gamePadLeftXMoved = false;
+                gamepadMouseUsed = true;
             }
             if (inputState.inputEvents.gamePadLeftYMoved) {
                 inputState.gamePadTranslatedStickLeft.y = inputState.inputEvents.gamePadLeftY;
                 inputState.inputEvents.gamePadLeftY = 0;
                 inputState.inputEvents.gamePadLeftYMoved = false;
+                gamepadMouseUsed = true;
             }
         } else {
             inputState.gamePadTranslatedStickLeft.x = 0;
@@ -1667,23 +1629,25 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.gamePadTranslatedStickRight.x = inputState.inputEvents.gamePadRightX;
                 inputState.inputEvents.gamePadRightX = 0;
                 inputState.inputEvents.gamePadRightXMoved = false;
+                gamepadMouseUsed = true;
             }
             if (inputState.inputEvents.gamePadRightYMoved) {
                 inputState.gamePadTranslatedStickRight.y = inputState.inputEvents.gamePadRightY;
                 inputState.inputEvents.gamePadRightY = 0;
                 inputState.inputEvents.gamePadRightYMoved = false;
+                gamepadMouseUsed = true;
             }
         } else {
             inputState.gamePadTranslatedStickRight.x = 0;
             inputState.gamePadTranslatedStickRight.y = 0;
         }
 
-
+        return gamepadMouseUsed;
     }
 
-    private void keyboardMouseTranslateAndChokeEvents() {
-        if (inputState.focusedTextField != null) return; // Disable during Textfield Input
-
+    private boolean keyboardMouseTranslateAndChokeEvents() {
+        if (inputState.focusedTextField != null) return false; // Disable during Textfield Input
+        boolean keyboardMouseUsed = false;
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         for (int i = 0; i <= 10; i++) {
             int[] buttons = keyboardMouseButtons(i);
@@ -1692,7 +1656,6 @@ public class UIEngine<T extends UIAdapter> {
                     for (int i2 = 0; i2 < buttons.length; i2++) {
                         int keyCode = buttons[i2];
                         IntArray downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
-                        keyCodeLoop:
                         for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
                             int downKeyCode = downKeyCodes.get(ikc);
                             if (downKeyCode == keyCode) {
@@ -1700,7 +1663,7 @@ public class UIEngine<T extends UIAdapter> {
                                 inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
                                 inputState.inputEvents.keysDown[keyCode] = false;
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = true;
-                                break keyCodeLoop;
+                                keyboardMouseUsed = true;
                             }
 
                         }
@@ -1710,36 +1673,36 @@ public class UIEngine<T extends UIAdapter> {
                     for (int i2 = 0; i2 < buttons.length; i2++) {
                         int keyCode = buttons[i2];
                         IntArray upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
-                        keyCodeLoop:
                         for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
                             int upKeyCode = upKeyCodes.get(ikc);
                             if (upKeyCode == keyCode) {
                                 upKeyCodes.removeIndex(ikc);
                                 inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
                                 inputState.keyBoardTranslatedKeysDown[keyCode] = false;
-                                break keyCodeLoop;
+                                keyboardMouseUsed = true;
                             }
                         }
                     }
                 }
             }
         }
+        return keyboardMouseUsed;
     }
 
 
     private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
                                                boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
-                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorSpeedX, float cursorSpeedY
+                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorChangeX, float cursorChangeY
     ) {
         float deltaX = 0;
         float deltaY = 0;
         if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            float moveSpeedX = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedX;
-            if (buttonLeft) deltaX -= moveSpeedX;
-            if (buttonRight) deltaX += moveSpeedX;
-            float moveSpeedY = api.config.getSimulatedMouseCursorSpeed() * cursorSpeedY;
-            if (buttonUp) deltaY -= moveSpeedY;
-            if (buttonDown) deltaY += moveSpeedY;
+            cursorChangeX *= api.config.getSimulatedMouseCursorSpeed();
+            cursorChangeY *= api.config.getSimulatedMouseCursorSpeed();
+            if (buttonLeft) deltaX -= cursorChangeX;
+            if (buttonRight) deltaX += cursorChangeX;
+            if (buttonUp) deltaY -= cursorChangeY;
+            if (buttonDown) deltaY += cursorChangeY;
         }
 
         // Set to final
@@ -1847,20 +1810,20 @@ public class UIEngine<T extends UIAdapter> {
         boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollUp());
         boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollDown());
 
-        float cursorSpeedX = 0f;
+        float cursorChangeX = 0f;
         if (buttonLeft || buttonRight) {
-            cursorSpeedX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickRight.x));
-            cursorSpeedX = (cursorSpeedX - joystickDeadZone) / (1f - joystickDeadZone);
+            cursorChangeX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickRight.x));
+            cursorChangeX = (cursorChangeX - joystickDeadZone) / (1f - joystickDeadZone);
         }
-        float cursorSpeedY = 0f;
+        float cursorChangeY = 0f;
         if (buttonUp || buttonDown) {
-            cursorSpeedY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y), Math.abs(inputState.gamePadTranslatedStickRight.y));
-            cursorSpeedY = (cursorSpeedY - joystickDeadZone) / (1f - joystickDeadZone);
+            cursorChangeY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y), Math.abs(inputState.gamePadTranslatedStickRight.y));
+            cursorChangeY = (cursorChangeY - joystickDeadZone) / (1f - joystickDeadZone);
         }
         // Translate to mouse events
         translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
                 buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, cursorSpeedX, cursorSpeedY
+                buttonScrolledUp, buttonScrolledDown, cursorChangeX, cursorChangeY
         );
     }
 

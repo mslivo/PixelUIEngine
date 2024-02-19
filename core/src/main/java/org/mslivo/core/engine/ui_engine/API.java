@@ -2274,9 +2274,10 @@ public class API {
             }
 
             public void setPosition(int x, int y) {
-                if (inputState.currentControlMode != MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
-                inputState.mouse_gui.x = x;
-                inputState.mouse_gui.y = y;
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
+                // not possibe with hardware mouse - would be resetted instantly
+                inputState.simulatedMouseGUIPosition.x = x;
+                inputState.simulatedMouseGUIPosition.y = y;
                 inputState.lastGUIMouseHover = null;
             }
 
@@ -2450,28 +2451,28 @@ public class API {
                     return false;
                 }
 
-                public boolean keyUpHasNextKey(){
+                public boolean keyUpHasNext(){
                     return inputState.inputEvents.keyUpKeyCodeIndex < inputState.inputEvents.keyUpKeyCodes.size;
                 }
 
-                public int keyUpNextKey() {
-                    return keyUpHasNextKey() ? inputState.inputEvents.keyUpKeyCodes.get(inputState.inputEvents.keyUpKeyCodeIndex++) : 0;
+                public int keyUpNext() {
+                    return keyUpHasNext() ? inputState.inputEvents.keyUpKeyCodes.get(inputState.inputEvents.keyUpKeyCodeIndex++) : 0;
                 }
 
-                public boolean keyDownHasNextKey(){
+                public boolean keyDownHasNext(){
                     return inputState.inputEvents.keyDownKeyCodeIndex < inputState.inputEvents.keyDownKeyCodes.size;
                 }
 
-                public int keyDownNextKey() {
-                    return keyDownHasNextKey() ? inputState.inputEvents.keyDownKeyCodes.get(inputState.inputEvents.keyDownKeyCodeIndex++) : 0;
+                public int keyDownNext() {
+                    return keyDownHasNext() ? inputState.inputEvents.keyDownKeyCodes.get(inputState.inputEvents.keyDownKeyCodeIndex++) : 0;
                 }
 
-                public boolean keyTypedHasNextCharacter() {
+                public boolean keyTypedHasNext() {
                     return inputState.inputEvents.keyTypedCharacterIndex < inputState.inputEvents.keyTypedCharacters.size;
                 }
 
-                public char keyTypedNextCharacter() {
-                    return (char) (keyTypedHasNextCharacter() ? inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacterIndex++) : -1);
+                public char keyTypedNext() {
+                    return (char) (keyTypedHasNext() ? inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacterIndex++) : -1);
                 }
             }
 
@@ -2555,20 +2556,20 @@ public class API {
                     return inputState.inputEvents.gamePadRightTriggerMoved;
                 }
 
-                public boolean downHasNextButton(){
+                public boolean buttonDownHasNext(){
                     return inputState.inputEvents.gamePadButtonDownIndex < inputState.inputEvents.gamePadButtonDownKeyCodes.size;
                 }
 
-                public int downNextButton() {
-                    return downHasNextButton() ? inputState.inputEvents.gamePadButtonDownKeyCodes.get(inputState.inputEvents.gamePadButtonDownIndex++) : 0;
+                public int buttonDownNext() {
+                    return buttonDownHasNext() ? inputState.inputEvents.gamePadButtonDownKeyCodes.get(inputState.inputEvents.gamePadButtonDownIndex++) : 0;
                 }
 
-                public boolean upHasNextButton(){
+                public boolean buttonUpHasNext(){
                     return inputState.inputEvents.gamePadButtonUpIndex < inputState.inputEvents.gamePadButtonUpKeyCodes.size;
                 }
 
-                public int upNextButton() {
-                    return upHasNextButton() ? inputState.inputEvents.gamePadButtonUpKeyCodes.get(inputState.inputEvents.gamePadButtonUpIndex++) : 0;
+                public int buttonUpNext() {
+                    return buttonUpHasNext() ? inputState.inputEvents.gamePadButtonUpKeyCodes.get(inputState.inputEvents.gamePadButtonUpIndex++) : 0;
                 }
             }
 

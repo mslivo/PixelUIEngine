@@ -102,7 +102,6 @@ public class ExampleUIAdapter implements UIAdapter {
         api.config.setGamePadMouseStickRightEnabled(true);
         api.config.setGamePadMouseButtonsMouse1(KeyCode.GamePad.A);
         api.config.setGamePadMouseButtonsMouse2(KeyCode.GamePad.B);
-        api.config.setGamePadMouseButtonsMouse3(KeyCode.GamePad.Y);
     }
 
     @Override
@@ -113,8 +112,22 @@ public class ExampleUIAdapter implements UIAdapter {
             Object[] params = gameEngine.getOutputParams();
         }
 
+
         // Create Inputs
         // gameEngine.input(new EngineInput(0,"TestInput"));
+
+        API._Input._GamePad gamepad = api.input.gamepad;
+        if(gamepad.event.leftXMoved()){
+            System.out.println(gamepad.state.leftX());
+        }
+        while (gamepad.event.buttonDownHasNext()){
+            int key = gamepad.event.buttonDownNext();
+            switch (key){
+                case KeyCode.GamePad.Y -> {
+                    api.input.mouse.setPosition(10,10);
+                }
+            }
+        }
     }
 
 
