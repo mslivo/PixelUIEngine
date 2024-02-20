@@ -11,6 +11,7 @@ import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
 import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
@@ -116,14 +117,11 @@ public class ExampleUIAdapter implements UIAdapter {
         // Create Inputs
         // gameEngine.input(new EngineInput(0,"TestInput"));
 
-        API._Input._GamePad gamepad = api.input.gamepad;
-        if(gamepad.event.leftXMoved()){
-            System.out.println(gamepad.state.leftX());
-        }
-        while (gamepad.event.buttonDownHasNext()){
-            int key = gamepad.event.buttonDownNext();
+        API._Input._KeyBoard keyBoard = api.input.keyboard;
+        while (keyBoard.event.keyDownHasNext()){
+            int key = keyBoard.event.keyDownNext();
             switch (key){
-                case KeyCode.GamePad.Y -> {
+                case KeyCode.Key.Q -> {
                     api.input.mouse.setPosition(10,10);
                 }
             }
@@ -132,7 +130,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(SpriteBatch batch, ImmediateRenderer immediateRenderer, boolean mainViewPort) {
+    public void render(SpriteBatch batch, ImmediateRenderer immediateRenderer, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 

@@ -2,7 +2,9 @@ package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -34,6 +36,7 @@ import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.misc.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
 
 class UICommons {
@@ -742,4 +745,22 @@ class UICommons {
         list.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
     }
+
+    static void gameViewPort_createCameraTextureAndFrameBuffer(GameViewPort gameViewPort, int width, int height){
+        // Clean Up
+        if(gameViewPort.camera != null) gameViewPort.camera = null;
+        if(gameViewPort.textureRegion != null) gameViewPort.textureRegion.getTexture().dispose();
+        if(gameViewPort.frameBuffer != null) gameViewPort.frameBuffer.dispose();
+        // Set
+        int viewportWidth = width*UIEngine.TILE_SIZE;
+        int viewportHeight = height*UIEngine.TILE_SIZE;
+        gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+        Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        gameViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
+        gameViewPort.textureRegion.flip(false, true);
+        gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
+        gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
+    }
+
 }

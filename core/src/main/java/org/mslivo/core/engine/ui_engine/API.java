@@ -3574,14 +3574,6 @@ public class API {
             return inputState.camera_y;
         }
 
-        public float width() {
-            return inputState.camera_width;
-        }
-
-        public float height() {
-            return inputState.camera_height;
-        }
-
     }
 
     public class _Component {
@@ -3693,6 +3685,10 @@ public class API {
             if (component == null) return;
             component.width = Tools.Calc.lowerBounds(width, 1);
             component.height = Tools.Calc.lowerBounds(height, 1);
+
+            if(component instanceof GameViewPort gameViewPort){
+                UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
+            }
         }
 
         public void setDimensions(Component component, int x, int y, int width, int height) {
@@ -3842,16 +3838,12 @@ public class API {
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime, GameViewPortAction gameViewPortAction) {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
-                gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, false);
-                Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
-                texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-                gameViewPort.textureRegion = new TextureRegion(texture, width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE);
-                gameViewPort.textureRegion.flip(false, true);
                 setComponentInitValues(gameViewPort);
+                UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
                 setPosition(gameViewPort, x, y);
                 setSize(gameViewPort, width, height);
-                setCamPosition(gameViewPort, camPositionX, camPositionY);
-                setCamZoom(gameViewPort, camZoom);
+                setCameraPosition(gameViewPort, camPositionX, camPositionY);
+                setCameraZoom(gameViewPort, camZoom);
                 setUpdateTime(gameViewPort, updateTime);
                 setGameViewPortAction(gameViewPort, gameViewPortAction);
                 setColor(gameViewPort, Color.WHITE);
@@ -3868,17 +3860,17 @@ public class API {
                 gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
-            public void setCamZoom(GameViewPort gameViewPort, float camZoom) {
+            public void setCameraZoom(GameViewPort gameViewPort, float camZoom) {
                 if (gameViewPort == null) return;
                 gameViewPort.camera_zoom = Tools.Calc.lowerBounds(camZoom, 0f);
             }
 
-            public void setCamPosition(GameViewPort gameViewPort, float x, float y) {
+            public void setCameraPosition(GameViewPort gameViewPort, float x, float y) {
                 if (gameViewPort == null) return;
-                setCamPosition(gameViewPort, x, y, gameViewPort.camera_z);
+                setCameraPosition(gameViewPort, x, y, gameViewPort.camera_z);
             }
 
-            public void setCamPosition(GameViewPort gameViewPort, float x, float y, float z) {
+            public void setCameraPosition(GameViewPort gameViewPort, float x, float y, float z) {
                 if (gameViewPort == null) return;
                 gameViewPort.camera_x = x;
                 gameViewPort.camera_y = y;

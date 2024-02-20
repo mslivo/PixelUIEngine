@@ -3,6 +3,7 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.media_manager.MediaManager;
+import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
 
 public interface UIAdapter {
@@ -11,7 +12,7 @@ public interface UIAdapter {
 
     void update();
 
-    void render(SpriteBatch batch, ImmediateRenderer imRenderer, boolean mainCamera);
+    void render(SpriteBatch batch, ImmediateRenderer imRenderer, GameViewPort gameViewPort);
 
     void shutdown();
 

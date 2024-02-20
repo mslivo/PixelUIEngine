@@ -153,10 +153,8 @@ public class UIEngine<T extends UIAdapter> {
 
         newInputState.camera_x = newInputState.camera_y = newInputState.camera_z = 0;
         newInputState.camera_zoom = 1f;
-        newInputState.camera_width = newInputState.internalResolutionWidth;
-        newInputState.camera_height = newInputState.internalResolutionHeight;
-        newInputState.camera_game = new OrthographicCamera(newInputState.camera_width, newInputState.camera_height);
-        newInputState.camera_game.setToOrtho(false, newInputState.camera_width, newInputState.camera_height);
+        newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.position.set(newInputState.camera_x, newInputState.camera_y, newInputState.camera_z);
         newInputState.camera_game.zoom = newInputState.camera_zoom;
         newInputState.frameBuffer_game = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
@@ -304,7 +302,7 @@ public class UIEngine<T extends UIAdapter> {
         this.updateMouseControl(); // Map Keyboard/Gamepad controls to mouse controls
         this.updateLastGUIMouseHover(); // Determine object that is targeted by cursor
         this.updateGUI(); // Main GUI Update happen here
-        this.updateGameCamera();
+        this.updateCameras();
         this.updateMouseCursor();
 
         // Update Game
@@ -1985,12 +1983,18 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void updateGameCamera() {
+    private void updateCameras() {
+        // Game Camera
         inputState.camera_game.position.set(inputState.camera_x, inputState.camera_y, inputState.camera_z);
         inputState.camera_game.zoom = inputState.camera_zoom;
-        inputState.camera_game.viewportWidth = inputState.camera_width;
-        inputState.camera_game.viewportHeight = inputState.camera_height;
         inputState.camera_game.update();
+        // Viewport Camera
+        for(int i=0;i<inputState.gameViewPorts.size();i++){
+            GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
+            gameViewPort.camera.position.set(gameViewPort.camera_x,gameViewPort.camera_y,gameViewPort.camera_z);
+            gameViewPort.camera.zoom = gameViewPort.camera_zoom;
+            gameViewPort.camera.update();
+        }
     }
 
     private void updateMouseCursor() {
@@ -2109,19 +2113,19 @@ public class UIEngine<T extends UIAdapter> {
 
         // Draw Game
         {
-            // Draw GUI GameViewPort FrameBuffers
-            for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
-                renderGameViewPortFrameBuffer(inputState.gameViewPorts.get(i));
-            }
-
             // Draw Main FrameBuffer
             if (inputState.spriteRenderer)
                 inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
             if (inputState.immediateRenderer)
                 inputState.imRenderer_game.setProjectionMatrix(this.inputState.camera_game.combined);
             inputState.frameBuffer_game.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, true);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, null);
             inputState.frameBuffer_game.end();
+
+            // Draw GUI GameViewPort FrameBuffers
+            for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
+                renderGameViewPortFrameBuffer(inputState.gameViewPorts.get(i));
+            }
         }
 
 
@@ -2165,39 +2169,14 @@ public class UIEngine<T extends UIAdapter> {
         if (render_isComponentNotRendered(gameViewPort)) return;
 
         if (System.currentTimeMillis() - gameViewPort.updateTimer > gameViewPort.updateTime) {
-            // save camera settings
-            float x = inputState.camera_x;
-            float y = inputState.camera_y;
-            float z = inputState.camera_z;
-            float zoom = inputState.camera_zoom;
-            int width = inputState.camera_width;
-            int height = inputState.camera_height;
-
-            // set camera
-            inputState.camera_x = gameViewPort.camera_x;
-            inputState.camera_y = gameViewPort.camera_y;
-            inputState.camera_z = gameViewPort.camera_z;
-            inputState.camera_zoom = gameViewPort.camera_zoom;
-            inputState.camera_width = gameViewPort.width * TILE_SIZE;
-            inputState.camera_height = gameViewPort.height * TILE_SIZE;
-            updateGameCamera();
             // draw to frambuffer
             if (inputState.spriteRenderer)
-                inputState.spriteBatch_game.setProjectionMatrix(inputState.camera_game.combined);
+                inputState.spriteBatch_game.setProjectionMatrix(gameViewPort.camera.combined);
             if (inputState.immediateRenderer)
-                inputState.imRenderer_game.setProjectionMatrix(inputState.camera_game.combined);
+                inputState.imRenderer_game.setProjectionMatrix(gameViewPort.camera.combined);
             gameViewPort.frameBuffer.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, false);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, gameViewPort);
             gameViewPort.frameBuffer.end();
-
-            // reset camera position back
-            inputState.camera_x = x;
-            inputState.camera_y = y;
-            inputState.camera_z = z;
-            inputState.camera_zoom = zoom;
-            inputState.camera_width = width;
-            inputState.camera_height = height;
-            updateGameCamera();
             gameViewPort.updateTimer = System.currentTimeMillis();
         }
     }
