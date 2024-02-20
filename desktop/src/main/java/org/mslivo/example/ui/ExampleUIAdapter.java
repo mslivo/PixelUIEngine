@@ -84,7 +84,7 @@ public class ExampleUIAdapter implements UIAdapter {
                 api.closeAllWindows();
             }
         }));
-        api.camera.moveAbs(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
+        api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
         api.config.setHardwareMouseEnabled(true);

@@ -761,6 +761,8 @@ class UICommons {
         gameViewPort.textureRegion.flip(false, true);
         gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
+        gameViewPort.camera.position.set(0, 0, 0);
+        gameViewPort.camera.zoom = 1f;
     }
 
 }

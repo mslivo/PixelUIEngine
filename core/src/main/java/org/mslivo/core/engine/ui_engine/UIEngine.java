@@ -150,13 +150,10 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             newInputState.imRenderer_game = null;
         }
-
-        newInputState.camera_x = newInputState.camera_y = newInputState.camera_z = 0;
-        newInputState.camera_zoom = 1f;
         newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.camera_game.position.set(newInputState.camera_x, newInputState.camera_y, newInputState.camera_z);
-        newInputState.camera_game.zoom = newInputState.camera_zoom;
+        newInputState.camera_game.position.set(0, 0, 0);
+        newInputState.camera_game.zoom = 1f;
         newInputState.frameBuffer_game = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
         newInputState.frameBuffer_game.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_game = new TextureRegion(newInputState.frameBuffer_game.getColorBufferTexture());
@@ -1985,16 +1982,9 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateCameras() {
         // Game Camera
-        inputState.camera_game.position.set(inputState.camera_x, inputState.camera_y, inputState.camera_z);
-        inputState.camera_game.zoom = inputState.camera_zoom;
         inputState.camera_game.update();
         // Viewport Camera
-        for(int i=0;i<inputState.gameViewPorts.size();i++){
-            GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-            gameViewPort.camera.position.set(gameViewPort.camera_x,gameViewPort.camera_y,gameViewPort.camera_z);
-            gameViewPort.camera.zoom = gameViewPort.camera_zoom;
-            gameViewPort.camera.update();
-        }
+        for(int i=0;i<inputState.gameViewPorts.size();i++) inputState.gameViewPorts.get(i).camera.update();
     }
 
     private void updateMouseCursor() {

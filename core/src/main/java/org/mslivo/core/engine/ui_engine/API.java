@@ -1,10 +1,8 @@
 package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BooleanArray;
@@ -3444,32 +3442,27 @@ public class API {
 
     public class _Camera {
 
-        public OrthographicCamera camera() {
-            return inputState.camera_game;
-        }
-
         public boolean pointVisible(float x, float y) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            setTestingCamera(inputState.camera_game);
             if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) {
                 return true;
             }
             for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
                 GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
+                setTestingCamera(gameViewPort.camera);
                 if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
             }
             return false;
-
         }
 
         public boolean boundsVisible(float x, float y, float halfWidth, float halfHeight) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            setTestingCamera(inputState.camera_game);
             if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
                 return true;
             }
             for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
                 GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
+                setTestingCamera(gameViewPort.camera);
                 if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f))
                     return true;
             }
@@ -3477,24 +3470,23 @@ public class API {
         }
 
         public boolean sphereVisible(float x, float y, float radius) {
-            setTestingCameraTo(inputState.camera_x, inputState.camera_y, inputState.camera_z, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+            setTestingCamera(inputState.camera_game);
             if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) {
                 return true;
             }
             for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
                 GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCameraTo(gameViewPort.camera_x, gameViewPort.camera_y, gameViewPort.width * UIEngine.TILE_SIZE, gameViewPort.height * UIEngine.TILE_SIZE, gameViewPort.camera_zoom);
+                setTestingCamera(gameViewPort.camera);
                 if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             }
             return false;
         }
 
-        private void setTestingCameraTo(float x, float y, float z, float width, float height) {
-            inputState.camera_frustum.position.x = x;
-            inputState.camera_frustum.position.y = y;
-            inputState.camera_frustum.zoom = z;
-            inputState.camera_frustum.viewportWidth = width;
-            inputState.camera_frustum.viewportHeight = height;
+        private void setTestingCamera(OrthographicCamera camera) {
+            inputState.camera_frustum.position.set(camera.position);
+            inputState.camera_frustum.zoom = camera.zoom;
+            inputState.camera_frustum.viewportWidth = camera.viewportWidth;
+            inputState.camera_frustum.viewportHeight = camera.viewportHeight;
             inputState.camera_frustum.update();
         }
 
@@ -3506,72 +3498,53 @@ public class API {
             return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
         }
 
-        public void moveAbs(float x, float y) {
-            moveAbs(x, y, inputState.camera_z);
+        public void move(float x, float y) {
+            move(x, y, 0f);
         }
-
-        public void moveAbs(float x, float y, float z) {
-            inputState.camera_x = x;
-            inputState.camera_y = y;
-            inputState.camera_z = z;
+        public void move(float x, float y, float z) {
+            setPosition(inputState.camera_game.position.x += x, inputState.camera_game.position.y += y, inputState.camera_game.position.z += z);
         }
-
-        public void moveRel(float x, float y) {
-            moveRel(x, y, inputState.camera_z);
+        public void setPosition(float x, float y) {
+            setPosition(x, y, inputState.camera_game.position.z);
         }
-
-        public void moveRel(float x, float y, float z) {
-            inputState.camera_x += x;
-            inputState.camera_y += y;
-            inputState.camera_y += z;
+        public void setPosition(float x, float y, float z) {
+            inputState.camera_game.position.set(x,y,z);
         }
-
-        public void xRel(float x) {
-            inputState.camera_x += x;
+        public void setX(float x) {
+            inputState.camera_game.position.x = x;
         }
-
-        public void xAbs(float x) {
-            inputState.camera_x = x;
+        public void moveX(float x) {
+            inputState.camera_game.position.x += x;
         }
-
-        public void yRel(float y) {
-            inputState.camera_y += y;
+        public void setY(float y) {
+            inputState.camera_game.position.y = y;
         }
-
-        public void yAbs(float zoom) {
-            inputState.camera_y = zoom;
+        public void moveY(float y) {
+            inputState.camera_game.position.y += y;
         }
-
-        public void zRel(float z) {
-            inputState.camera_z += z;
+        public void setZ(float z) {
+            inputState.camera_game.position.z = z;
         }
-
-        public void zAbs(float z) {
-            inputState.camera_z = z;
+        public void moveZ(float z) {
+            inputState.camera_game.position.z += z;
         }
-
-        public void zoomRel(float z) {
-            inputState.camera_zoom += z;
+        public void setZoom(float zoom) {
+            inputState.camera_game.zoom = zoom;
         }
-
-        public void zoomAbs(float z) {
-            inputState.camera_zoom = z;
+        public void zoom(float zoom) {
+            inputState.camera_game.zoom += zoom;
         }
-
-        public float zoom() {
-            return inputState.camera_zoom;
-        }
-
-        public float z() {
-            return inputState.camera_z;
-        }
-
         public float x() {
-            return inputState.camera_x;
+            return inputState.camera_game.position.x;
         }
-
         public float y() {
-            return inputState.camera_y;
+            return inputState.camera_game.position.y;
+        }
+        public float z() {
+            return inputState.camera_game.position.z;
+        }
+        public float zoom() {
+            return inputState.camera_game.zoom;
         }
 
     }
@@ -3842,8 +3815,8 @@ public class API {
                 UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
                 setPosition(gameViewPort, x, y);
                 setSize(gameViewPort, width, height);
-                setCameraPosition(gameViewPort, camPositionX, camPositionY);
-                setCameraZoom(gameViewPort, camZoom);
+                setCamPosition(gameViewPort, camPositionX, camPositionY);
+                setCamZoom(gameViewPort, camZoom);
                 setUpdateTime(gameViewPort, updateTime);
                 setGameViewPortAction(gameViewPort, gameViewPortAction);
                 setColor(gameViewPort, Color.WHITE);
@@ -3860,21 +3833,69 @@ public class API {
                 gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
-            public void setCameraZoom(GameViewPort gameViewPort, float camZoom) {
+            public void camMove(GameViewPort gameViewPort,float x, float y) {
                 if (gameViewPort == null) return;
-                gameViewPort.camera_zoom = Tools.Calc.lowerBounds(camZoom, 0f);
+                camMove(gameViewPort, x, y, 0f);
             }
-
-            public void setCameraPosition(GameViewPort gameViewPort, float x, float y) {
+            public void camMove(GameViewPort gameViewPort,float x, float y, float z) {
                 if (gameViewPort == null) return;
-                setCameraPosition(gameViewPort, x, y, gameViewPort.camera_z);
+                setCamPosition(gameViewPort, gameViewPort.camera.position.x += x, gameViewPort.camera.position.y += y, gameViewPort.camera.position.z += z);
             }
-
-            public void setCameraPosition(GameViewPort gameViewPort, float x, float y, float z) {
+            public void setCamPosition(GameViewPort gameViewPort,float x, float y) {
                 if (gameViewPort == null) return;
-                gameViewPort.camera_x = x;
-                gameViewPort.camera_y = y;
-                gameViewPort.camera_z = z;
+                setCamPosition(gameViewPort, x, y, gameViewPort.camera.position.z);
+            }
+            public void setCamPosition(GameViewPort gameViewPort,float x, float y, float z) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.set(x,y,z);
+            }
+            public void setCamX(GameViewPort gameViewPort,float x) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.x = x;
+            }
+            public void moveCamX(GameViewPort gameViewPort,float x) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.x += x;
+            }
+            public void setCamY(GameViewPort gameViewPort,float y) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.y = y;
+            }
+            public void moveCamY(GameViewPort gameViewPort,float y) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.y += y;
+            }
+            public void setCamZ(GameViewPort gameViewPort,float z) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.z = z;
+            }
+            public void moveCamZ(GameViewPort gameViewPort,float z) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.position.z += z;
+            }
+            public void setCamZoom(GameViewPort gameViewPort,float zoom) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.zoom = zoom;
+            }
+            public void camZoom(GameViewPort gameViewPort,float zoom) {
+                if (gameViewPort == null) return;
+                gameViewPort.camera.zoom += zoom;
+            }
+            public float camX(GameViewPort gameViewPort) {
+                if (gameViewPort == null) return 0f;
+                return gameViewPort.camera.position.x;
+            }
+            public float camY(GameViewPort gameViewPort) {
+                if (gameViewPort == null) return 0f;
+                return gameViewPort.camera.position.y;
+            }
+            public float camZ(GameViewPort gameViewPort) {
+                if (gameViewPort == null) return 0f;
+                return gameViewPort.camera.position.z;
+            }
+            public float camZoom(GameViewPort gameViewPort) {
+                if (gameViewPort == null) return 0f;
+                return gameViewPort.camera.zoom;
             }
 
         }

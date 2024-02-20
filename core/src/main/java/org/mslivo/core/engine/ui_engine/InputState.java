@@ -58,7 +58,6 @@ public class InputState {
     public ImmediateRenderer imRenderer_game;
     public TextureRegion texture_game;
     public OrthographicCamera camera_game;
-    public float camera_x, camera_y, camera_z, camera_zoom;
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
