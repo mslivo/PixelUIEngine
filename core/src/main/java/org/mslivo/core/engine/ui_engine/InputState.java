@@ -168,8 +168,7 @@ public class InputState {
     /* #################### Misc. ####################  */
 
     public float animation_timer_gui;
-    public Color[] colorStack;
-    public int colorStackPointer;
+    public Color tempSaveColor;
     public ShaderProgram grayScaleShader;
     public OrthographicCamera camera_frustum; // camera for frustum testing
     public InputEvents inputEvents;
