@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc;
+package org.mslivo.core.engine.ui_engine.gui.components.progressbar;
 
 public class ProgressBarPercentText {
     public static final String[] progressText = new String[]{

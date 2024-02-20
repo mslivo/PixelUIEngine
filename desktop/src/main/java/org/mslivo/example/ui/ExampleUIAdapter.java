@@ -87,22 +87,21 @@ public class ExampleUIAdapter implements UIAdapter {
         api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
         api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
 
-        api.config.setHardwareMouseEnabled(true);
 
-        api.config.setKeyboardMouseEnabled(true);
-        api.config.setKeyboardMouseButtonsUp(KeyCode.Key.UP);
-        api.config.setKeyboardMouseButtonsDown(KeyCode.Key.DOWN);
-        api.config.setKeyboardMouseButtonsLeft(KeyCode.Key.LEFT);
-        api.config.setKeyboardMouseButtonsRight(KeyCode.Key.RIGHT);
+        api.config.setInput_hardwareMouseEnabled(true);
 
-        api.config.setKeyboardMouseButtonsMouse1(KeyCode.Key.CONTROL_LEFT);
+        api.config.setInput_keyboardMouseEnabled(true);
+        api.config.setInput_keyboardMouseButtonsUp(new int[]{KeyCode.Key.UP});
+        api.config.setInput_keyboardMouseButtonsDown(new int[]{KeyCode.Key.DOWN});
+        api.config.setInput_keyboardMouseButtonsLeft(new int[]{KeyCode.Key.LEFT});
+        api.config.setInput_keyboardMouseButtonsRight(new int[]{KeyCode.Key.RIGHT});
+        api.config.setInput_keyboardMouseButtonsMouse1(new int[]{KeyCode.Key.CONTROL_LEFT});
 
-
-        api.config.setGamePadMouseEnabled(true);
-        api.config.setGamePadMouseStickLeftEnabled(true);
-        api.config.setGamePadMouseStickRightEnabled(true);
-        api.config.setGamePadMouseButtonsMouse1(KeyCode.GamePad.A);
-        api.config.setGamePadMouseButtonsMouse2(KeyCode.GamePad.B);
+        api.config.setInput_gamePadMouseEnabled(true);
+        api.config.setInput_gamePadMouseStickLeftEnabled(true);
+        api.config.setInput_gamePadMouseStickRightEnabled(true);
+        api.config.setInput_gamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
+        api.config.setInput_gamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
     }
 
     @Override

@@ -36,6 +36,7 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
+import org.mslivo.core.engine.ui_engine.misc.config.Config;
 import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
@@ -52,6 +53,7 @@ public class InputState {
     public boolean spriteRenderer;
     public boolean immediateRenderer;
     public boolean gamePadSupport;
+    public Config config;
 
     /* #################### Graphics: Game #################### */
     public SpriteBatch spriteBatch_game;

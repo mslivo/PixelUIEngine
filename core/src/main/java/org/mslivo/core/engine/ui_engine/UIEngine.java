@@ -56,6 +56,7 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.misc.config.Config;
 import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.misc.render.GrayScaleShader;
@@ -87,8 +88,6 @@ public class UIEngine<T extends UIAdapter> {
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
     public static final float TILE_SIZE_F2 = TILE_SIZE / 2f;
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
-    public static final int DOUBLECLICK_TIME_MS = 180;
-    public static final int COLORSTACK_SIZE = 8;
     private static final int FONT_MAXWIDTH_NONE = -1;
 
     public T getAdapter() {
@@ -137,6 +136,8 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteRenderer = spriteRenderer;
         newInputState.immediateRenderer = immediateRenderer;
         newInputState.gamePadSupport = gamePadSupport;
+        // ----- Config
+        newInputState.config = new Config();
         // -----  Game
         if (spriteRenderer) {
             newInputState.spriteBatch_game = new SpriteBatch(8191);
@@ -307,7 +308,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateKeyInteractions() {
         inputState.keyboardInteractedUIObjectFrame = null;
-        if (api.config.isUiKeyInteractionsDisabled()) return;
+        if (inputState.config.ui_keyInteractionsDisabled) return;
 
         if (inputState.inputEvents.keyTyped) {
             if (inputState.focusedTextField != null) {
@@ -422,7 +423,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateMouseInteractions() {
         inputState.mouseInteractedUIObjectFrame = null;
-        if (api.config.isUiMouseInteractionsDisabled()) return;
+        if (inputState.config.ui_mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseDoubleClick = true;
@@ -438,7 +439,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.lastGUIMouseHover instanceof Window window) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                        if (api.config.isFoldWindowsOnDoubleClick() && mouseDownButton == Input.Buttons.LEFT) {
+                        if (inputState.config.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
                             if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
                                 window.folded = !window.folded;
                                 if (window.windowAction != null) {
@@ -828,7 +829,7 @@ public class UIEngine<T extends UIAdapter> {
                         charLoop:
                         for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
-                            if (mediaManager.textWidth(textField.font, testString) > mouseX) {
+                            if (render_textWidth(textField.font, testString) > mouseX) {
                                 UICommons.textField_setMarkerPosition(mediaManager, textField,
                                         textField.offset + i);
                                 found = true;
@@ -950,7 +951,7 @@ public class UIEngine<T extends UIAdapter> {
                     UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_gui.x));
                 }
                 case Knob knob -> {
-                    float amount = (inputState.mouse_delta.y / 100f) * api.config.getKnobSensitivity();
+                    float amount = (inputState.mouse_delta.y / 100f) * inputState.config.knob_sensitivity;
                     float newValue = knob.turned + amount;
                     UICommons.knob_turnKnob(knob, newValue, amount);
                     if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
@@ -989,16 +990,16 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
-                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getKnobSensitivity();
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * inputState.config.knob_sensitivity;
                         float newValue = knob.turned + amount;
                         UICommons.knob_turnKnob(knob, newValue, amount);
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
-                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * inputState.config.scrollbar_sensitivity;
                         UICommons.scrollBar_scroll(scrollBarHorizontal, scrollBarHorizontal.scrolled + amount);
                     }
                     case ScrollBarVertical scrollBarVertical -> {
-                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * api.config.getScrollBarSensitivity();
+                        float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * inputState.config.scrollbar_sensitivity;
                         UICommons.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + amount);
                     }
                     case null, default -> {
@@ -1018,7 +1019,7 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.pressedButton != null) {
             if (inputState.pressedButton.mode == ButtonMode.HOLD) {
                 inputState.pressedButton_timer_hold = inputState.pressedButton_timer_hold + 1;
-                if (inputState.pressedButton_timer_hold > api.config.getButtonHoldTimer()) {
+                if (inputState.pressedButton_timer_hold > inputState.config.button_holdTimer) {
                     if (inputState.pressedButton.buttonAction != null)
                         inputState.pressedButton.buttonAction.onHold();
                     inputState.pressedButton_timer_hold = 0;
@@ -1176,7 +1177,7 @@ public class UIEngine<T extends UIAdapter> {
         // Fade In/Out
         if (inputState.tooltip != null) {
             if (inputState.tooltip_wait_delay) {
-                if ((System.currentTimeMillis() - inputState.tooltip_delay_timer) > api.config.getTooltipFadeInDelayTime()) {
+                if ((System.currentTimeMillis() - inputState.tooltip_delay_timer) > inputState.config.tooltip_FadeInDelayTime) {
                     inputState.tooltip_wait_delay = false;
                     inputState.tooltip_fadeIn_pct = 0f;
                     inputState.tooltip_fadeIn_timer = System.currentTimeMillis();
@@ -1185,7 +1186,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             } else if (inputState.tooltip_fadeIn_pct < 1f) {
-                inputState.tooltip_fadeIn_pct = Tools.Calc.upperBounds(((System.currentTimeMillis() - inputState.tooltip_fadeIn_timer) / (float) api.config.getTooltipFadeInTime()), 1f);
+                inputState.tooltip_fadeIn_pct = Tools.Calc.upperBounds(((System.currentTimeMillis() - inputState.tooltip_fadeIn_timer) / (float) inputState.config.tooltip_FadeInTime), 1f);
             } else {
                 if (inputState.tooltip.toolTipAction != null) {
                     inputState.tooltip.toolTipAction.onUpdate();
@@ -1227,15 +1228,15 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateMouseControl() {
-        if (!api.config.isGamePadMouseEnabled() && !api.config.isKeyboardMouseEnabled() && !api.config.isHardwareMouseEnabled()) {
+        if (!inputState.config.input_gamePadMouseEnabled && !inputState.config.input_keyboardMouseEnabled && !inputState.config.input_hardwareMouseEnabled) {
             setMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
             chockeAllMouseEvents();
         } else {
-            if (api.config.isGamePadMouseEnabled() && gamePadMouseTranslateAndChokeEvents()) {
+            if (inputState.config.input_gamePadMouseEnabled && gamePadMouseTranslateAndChokeEvents()) {
                 setMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
-            } else if (api.config.isKeyboardMouseEnabled() && keyboardMouseTranslateAndChokeEvents()) {
+            } else if (inputState.config.input_keyboardMouseEnabled && keyboardMouseTranslateAndChokeEvents()) {
                 setMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
-            } else if (api.config.isHardwareMouseEnabled() && hardwareMouseDetectUse()) {
+            } else if (inputState.config.input_hardwareMouseEnabled && hardwareMouseDetectUse()) {
                 setMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
             }
         }
@@ -1324,14 +1325,14 @@ public class UIEngine<T extends UIAdapter> {
                 changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
             }
             case GAMEPAD -> {
-                boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
-                boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
+                boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
+                boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
                 final float sensitivity = 0.4f;
                 boolean leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
                 boolean rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
-                confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse1());
-                deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse2());
-                changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, api.config.getGamePadMouseButtonsMouse3());
+                confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse1);
+                deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse2);
+                changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse3);
 
                 if (leftGamePad) {
                     if (!inputState.mTextInputGamePadLeft) {
@@ -1494,16 +1495,16 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private boolean gamePadMouseDetectUse() {
-        if (api.config.isGamePadMouseStickLeftEnabled()) {
+        if (inputState.config.input_gamePadMouseStickLeftEnabled) {
             if (inputState.inputEvents.gamePadLeftXMoved || inputState.inputEvents.gamePadLeftYMoved) {
-                return inputState.inputEvents.gamePadLeftX < -api.config.getGamePadMouseJoystickDeadZone() ||
-                        inputState.inputEvents.gamePadLeftX > api.config.getGamePadMouseJoystickDeadZone();
+                return inputState.inputEvents.gamePadLeftX < -inputState.config.input_gamePadMouseJoystickDeadZone ||
+                        inputState.inputEvents.gamePadLeftX > inputState.config.input_gamePadMouseJoystickDeadZone;
             }
         }
-        if (api.config.isGamePadMouseStickRightEnabled()) {
+        if (inputState.config.input_gamePadMouseStickRightEnabled) {
             if (inputState.inputEvents.gamePadRightXMoved || inputState.inputEvents.gamePadRightYMoved) {
-                return inputState.inputEvents.gamePadRightX < -api.config.getGamePadMouseJoystickDeadZone() ||
-                        inputState.inputEvents.gamePadRightX > api.config.getGamePadMouseJoystickDeadZone();
+                return inputState.inputEvents.gamePadRightX < -inputState.config.input_gamePadMouseJoystickDeadZone ||
+                        inputState.inputEvents.gamePadRightX > inputState.config.input_gamePadMouseJoystickDeadZone;
             }
         }
 
@@ -1520,17 +1521,17 @@ public class UIEngine<T extends UIAdapter> {
 
     private int[] keyboardMouseButtons(int index) {
         return switch (index) {
-            case 0 -> api.config.getKeyboardMouseButtonsUp();
-            case 1 -> api.config.getKeyBoardControlButtonsDown();
-            case 2 -> api.config.getKeyboardMouseButtonsLeft();
-            case 3 -> api.config.getKeyboardMouseButtonsRight();
-            case 4 -> api.config.getKeyboardMouseButtonsMouse1();
-            case 5 -> api.config.getKeyboardMouseButtonsMouse2();
-            case 6 -> api.config.getKeyboardMouseButtonsMouse3();
-            case 7 -> api.config.getKeyboardMouseButtonsMouse4();
-            case 8 -> api.config.getKeyboardMouseButtonsMouse5();
-            case 9 -> api.config.getKeyboardMouseButtonsScrollUp();
-            case 10 -> api.config.getKeyboardMouseButtonsScrollDown();
+            case 0 -> inputState.config.input_keyboardMouseButtonsUp;
+            case 1 -> inputState.config.input_keyboardMouseButtonsDown;
+            case 2 -> inputState.config.input_keyboardMouseButtonsLeft;
+            case 3 -> inputState.config.input_keyboardMouseButtonsRight;
+            case 4 -> inputState.config.input_keyboardMouseButtonsMouse1;
+            case 5 -> inputState.config.input_keyboardMouseButtonsMouse2;
+            case 6 -> inputState.config.input_keyboardMouseButtonsMouse3;
+            case 7 -> inputState.config.input_keyboardMouseButtonsMouse4;
+            case 8 -> inputState.config.input_keyboardMouseButtonsMouse5;
+            case 9 -> inputState.config.input_keyboardMouseButtonsScrollUp;
+            case 10 -> inputState.config.input_keyboardMouseButtonsScrollDown;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
     }
@@ -1538,13 +1539,13 @@ public class UIEngine<T extends UIAdapter> {
 
     private int[] gamePadMouseButtons(int index) {
         return switch (index) {
-            case 0 -> api.config.getGamePadMouseButtonsMouse1();
-            case 1 -> api.config.getGamePadMouseButtonsMouse2();
-            case 2 -> api.config.getGamePadMouseButtonsMouse3();
-            case 3 -> api.config.getGamePadMouseButtonsMouse4();
-            case 4 -> api.config.getGamePadMouseButtonsMouse5();
-            case 5 -> api.config.getGamePadMouseButtonsScrollUp();
-            case 6 -> api.config.getGamePadMouseButtonsScrollDown();
+            case 0 -> inputState.config.input_gamePadMouseButtonsMouse1;
+            case 1 -> inputState.config.input_gamePadMouseButtonsMouse2;
+            case 2 -> inputState.config.input_gamePadMouseButtonsMouse3;
+            case 3 -> inputState.config.input_gamePadMouseButtonsMouse4;
+            case 4 -> inputState.config.input_gamePadMouseButtonsMouse5;
+            case 5 -> inputState.config.input_gamePadMouseButtonsScrollUp;
+            case 6 -> inputState.config.input_gamePadMouseButtonsScrollDown;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
     }
@@ -1584,7 +1585,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
         // Joystick Events Left
-        if (api.config.isGamePadMouseStickLeftEnabled()) {
+        if (inputState.config.input_gamePadMouseStickLeftEnabled) {
             if (inputState.inputEvents.gamePadLeftXMoved) {
                 inputState.gamePadTranslatedStickLeft.x = inputState.inputEvents.gamePadLeftX;
                 inputState.inputEvents.gamePadLeftX = 0;
@@ -1602,7 +1603,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.gamePadTranslatedStickLeft.y = 0;
         }
         // Joystick Events Right
-        if (api.config.isGamePadMouseStickRightEnabled()) {
+        if (inputState.config.input_gamePadMouseStickRightEnabled) {
             if (inputState.inputEvents.gamePadRightXMoved) {
                 inputState.gamePadTranslatedStickRight.x = inputState.inputEvents.gamePadRightX;
                 inputState.inputEvents.gamePadRightX = 0;
@@ -1675,8 +1676,8 @@ public class UIEngine<T extends UIAdapter> {
         float deltaX = 0;
         float deltaY = 0;
         if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            cursorChangeX *= api.config.getSimulatedMouseCursorSpeed();
-            cursorChangeY *= api.config.getSimulatedMouseCursorSpeed();
+            cursorChangeX *= inputState.config.input_emulatedMouseCursorSpeed;
+            cursorChangeY *= inputState.config.input_emulatedMouseCursorSpeed;
             if (buttonLeft) deltaX -= cursorChangeX;
             if (buttonRight) deltaX += cursorChangeX;
             if (buttonUp) deltaY -= cursorChangeY;
@@ -1712,7 +1713,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                     if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.simulatedMouseLastMouseClick) < DOUBLECLICK_TIME_MS) {
+                        if ((System.currentTimeMillis() - inputState.simulatedMouseLastMouseClick) < inputState.config.ui_doubleClickTime) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
                         inputState.simulatedMouseLastMouseClick = System.currentTimeMillis();
@@ -1772,21 +1773,21 @@ public class UIEngine<T extends UIAdapter> {
 
         // Swallow & Translate Gamepad Events
         boolean[] translatedButtons = inputState.gamePadTranslatedButtonsDown;
-        boolean stickLeft = api.config.isGamePadMouseStickLeftEnabled();
-        boolean stickRight = api.config.isGamePadMouseStickRightEnabled();
+        boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
+        boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
 
-        float joystickDeadZone = api.config.getGamePadMouseJoystickDeadZone();
+        float joystickDeadZone = inputState.config.input_gamePadMouseJoystickDeadZone;
         boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x < -joystickDeadZone);
         boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x > joystickDeadZone);
         boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y > joystickDeadZone);
         boolean buttonDown = (stickLeft && inputState.gamePadTranslatedStickLeft.y < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y < -joystickDeadZone);
-        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse1());
-        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse2());
-        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse3());
-        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse4());
-        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsMouse5());
-        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollUp());
-        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedButtons, api.config.getGamePadMouseButtonsScrollDown());
+        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse1);
+        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse2);
+        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse3);
+        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse4);
+        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse5);
+        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollUp);
+        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollDown);
 
         float cursorChangeX = 0f;
         if (buttonLeft || buttonRight) {
@@ -1811,17 +1812,17 @@ public class UIEngine<T extends UIAdapter> {
         // Swallow & Translate keyboard events
         boolean[] translatedKeys = inputState.keyBoardTranslatedKeysDown;
 
-        boolean buttonLeft = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsLeft());
-        boolean buttonRight = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsRight());
-        boolean buttonUp = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsUp());
-        boolean buttonDown = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyBoardControlButtonsDown());
-        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsMouse1());
-        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsMouse2());
-        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsMouse3());
-        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsMouse4());
-        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsMouse5());
-        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsScrollUp());
-        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedKeys, api.config.getKeyboardMouseButtonsScrollDown());
+        boolean buttonLeft = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsLeft);
+        boolean buttonRight = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsRight);
+        boolean buttonUp = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsUp);
+        boolean buttonDown = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsDown);
+        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse1);
+        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse2);
+        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse3);
+        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse4);
+        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse5);
+        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollUp);
+        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollDown);
 
         final float SPEEDUP_SPEED = 0.1f;
         if (buttonLeft || buttonRight) {
@@ -1899,7 +1900,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 case SCROLL -> {
                     if (System.currentTimeMillis() - notification.timer > 500) {
-                        notification.scroll += MathUtils.round(api.config.getNotificationsScrollSpeed());
+                        notification.scroll += MathUtils.round(inputState.config.notifications_scrollSpeed);
                         if (notification.scroll >= notification.scrollMax) {
                             notification.state = STATE_NOTIFICATION.DISPLAY;
                             notification.timer = System.currentTimeMillis();
@@ -1913,7 +1914,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
                 case FADEOUT -> {
-                    if ((System.currentTimeMillis() - notification.timer > api.config.getNotificationsFadeoutTime())) {
+                    if ((System.currentTimeMillis() - notification.timer > inputState.config.notifications_fadeoutTime)) {
                         UICommons.notification_removeFromScreen(inputState, notification);
                     }
                 }
@@ -1982,7 +1983,7 @@ public class UIEngine<T extends UIAdapter> {
         /* Update Cursor*/
         if (inputState.lastGUIMouseHover != null) {
             // 1. GUI Cursor
-            inputState.cursor = api.config.getCursorGui();
+            inputState.cursor = inputState.config.ui_cursor;
         } else {
             // 2. Manually overidden Cursor
             if (inputState.displayOverrideCursor) {
@@ -2202,7 +2203,7 @@ public class UIEngine<T extends UIAdapter> {
         render_drawTooltip();
 
         /* OnScreenTextInput */
-        render_drawOnScreenTextInput();
+        render_mouseTextInput();
 
         /* Cursor */
         render_drawCursorListDrags();
@@ -2213,10 +2214,10 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void render_drawOnScreenTextInput() {
+    private void render_mouseTextInput() {
         if (inputState.openMouseTextInput == null) return;
         MouseTextInput mouseTextInput = inputState.openMouseTextInput;
-        render_batchSetColorWhite(mouseTextInput.color_a);
+        render_batchSetColorWhite(mouseTextInput.alpha);
         final int CHARACTERS = 4;
         char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
@@ -2224,26 +2225,24 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
-        render_drawOnScreenTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputConfirmPressed);
+        render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputConfirmPressed);
 
         // Selection
-        render_batchSetColor(mouseTextInput.color_r, mouseTextInput.color_g, mouseTextInput.color_b, mouseTextInput.color_a);
         render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
-        render_batchSetColorWhite(1f);
     }
 
-    private void render_drawOnScreenTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
+    private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
         int pressedIndex = pressed ? 1 : 0;
         render_drawCMediaGFX(GUIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
@@ -2454,7 +2453,7 @@ public class UIEngine<T extends UIAdapter> {
         int text_width_max = 0;
         for (int i = 0; i < tooltip.lines.length; i++) {
             String line = tooltip.lines[i];
-            int line_width = mediaManager.textWidth(tooltip.font, line);
+            int line_width = render_textWidth(tooltip.font, line);
             if (line_width > text_width_max) text_width_max = line_width;
         }
 
@@ -2568,7 +2567,7 @@ public class UIEngine<T extends UIAdapter> {
             if (lineIndex < tooltip.lines.length) {
                 String lineTxt = tooltip.lines[lineIndex];
                 if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
-                    int text_width = mediaManager.textWidth(tooltip.font, lineTxt);
+                    int text_width = render_textWidth(tooltip.font, lineTxt);
                     int text_x = tooltip_x + MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
                     int text_y = tooltip_y + (ty * TILE_SIZE);
                     render_drawFont(tooltip.font, lineTxt, tooltip.color_a * inputState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
@@ -2603,7 +2602,7 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 0; i < inputState.notifications.size(); i++) {
             Notification notification = inputState.notifications.get(i);
             if (notification.state == STATE_NOTIFICATION.FADEOUT) {
-                float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) api.config.getNotificationsFadeoutTime());
+                float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) inputState.config.notifications_fadeoutTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TILE_SIZE * (fadeoutProgress));
             }
             render_saveTempColorBatch();
@@ -2611,7 +2610,7 @@ public class UIEngine<T extends UIAdapter> {
             for (int ix = 0; ix < width; ix++) {
                 render_drawCMediaGFX(GUIBaseMedia.GUI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
             }
-            int xOffset = ((width * TILE_SIZE) / 2) - (mediaManager.textWidth(notification.font, notification.text) / 2) - notification.scroll;
+            int xOffset = ((width * TILE_SIZE) / 2) - (render_textWidth(notification.font, notification.text) / 2) - notification.scroll;
             render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
             y = y + 1;
             render_loadTempColorBatch();
@@ -2859,7 +2858,7 @@ public class UIEngine<T extends UIAdapter> {
                     if (textField.content != null) {
                         render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
                         if (UICommons.textField_isFocused(inputState, textField)) {
-                            int xOffset = mediaManager.textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
+                            int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                             if (xOffset < textField.width * TILE_SIZE) {
                                 render_drawCMediaGFX(GUIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
                             }
@@ -3034,7 +3033,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 if (progressBar.progressText) {
                     String percentTxt = progressBar.progressText2Decimal ? UICommons.progressBar_getProgressText2Decimal(progressBar.progress) : UICommons.progressBar_getProgressText(progressBar.progress);
-                    int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (mediaManager.textWidth(progressBar.font, percentTxt) / 2);
+                    int xOffset = ((progressBar.width * TILE_SIZE) / 2) - (render_textWidth(progressBar.font, percentTxt) / 2);
                     render_drawFont(progressBar.font, percentTxt, alpha, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), 0, 1);
                 }
             }
@@ -3061,7 +3060,7 @@ public class UIEngine<T extends UIAdapter> {
             int dragOffsetY = inputState.draggedInventoryOffset.y;
             Object dragItem = inputState.draggedInventoryItem;
             if (dragInventory.inventoryAction != null) {
-                render_batchSetColorWhite(api.config.getDragAlpha());
+                render_batchSetColorWhite(inputState.config.inventory_dragAlpha);
                 CMediaGFX icon = dragInventory.inventoryAction.icon(dragItem);
                 render_drawCMediaGFX(icon, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, dragInventory.inventoryAction.iconArrayIndex(dragItem));
             }
@@ -3072,7 +3071,7 @@ public class UIEngine<T extends UIAdapter> {
             Object dragItem = inputState.draggedListItem;
             if (dragList.listAction != null) {
                 // List
-                render_batchSetColor(dragList.color_r, dragList.color_g, dragList.color_b, Math.min(dragList.color_a, api.config.getDragAlpha()));
+                render_batchSetColor(dragList.color_r, dragList.color_g, dragList.color_b, Math.min(dragList.color_a, inputState.config.list_dragAlpha));
                 for (int ix = 0; ix < dragList.width; ix++) {
                     this.render_drawCMediaGFX(GUIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_gui.x - dragOffsetX + (ix * TILE_SIZE), inputState.mouse_gui.y - dragOffsetY);
                 }
@@ -3109,7 +3108,13 @@ public class UIEngine<T extends UIAdapter> {
         render_drawFont(font, text, alpha, x, y, textXOffset, textYOffset, maxWidth, null, 0);
     }
 
+    private int render_textWidth(CMediaFont font, String text){
+        if(font == null || text == null || text.length() == 0) return 0;
+        return mediaManager.textWidth(font, text);
+    }
+
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaGFX icon, int iconIndex) {
+        if(font == null) return;
         boolean withIcon = icon != null;
         if (withIcon) {
             render_saveTempColorBatch();

@@ -254,8 +254,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
                             }
                         }, 1, 20,
-                        api.config.getDefaultLowerCaseCharacters(),
-                        api.config.getDefaultUpperCaseCharacters(),
+                        api.config.getMouseTextInput_defaultLowerCaseCharacters(),
+                        api.config.getMouseTextInput_defaultUpperCaseCharacters(),
                         14
                 ));
             }
