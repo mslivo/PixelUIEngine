@@ -295,7 +295,6 @@ public class UIEngine<T extends UIAdapter> {
 
     public void update() {
         // GUI
-
         this.updateMouseControl(); // Map Keyboard/Gamepad controls to mouse controls
         this.updateLastGUIMouseHover(); // Determine object that is targeted by cursor
         this.updateGUI(); // Main GUI Update happen here
@@ -306,7 +305,7 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.update();
 
         // Reset Input Events
-        this.inputState.inputEvents.reset(); // Reset Inputs
+        this.inputState.inputEvents.reset();
     }
 
 
