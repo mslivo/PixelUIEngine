@@ -5048,22 +5048,18 @@ public class API {
             }
 
             public ComboBox create(int x, int y, int width) {
-                return create(x, y, width, null, false, defaultComboBoxAction(), null);
+                return create(x, y, width, null, false, defaultComboBoxAction());
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] items) {
-                return create(x, y, width, items, false, defaultComboBoxAction(), null);
+                return create(x, y, width, items, false, defaultComboBoxAction());
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons) {
-                return create(x, y, width, items, useIcons, defaultComboBoxAction(), null);
+                return create(x, y, width, items, useIcons, defaultComboBoxAction());
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons, ComboBoxAction comboBoxAction) {
-                return create(x, y, width, items, useIcons, comboBoxAction, null);
-            }
-
-            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons, ComboBoxAction comboBoxAction, CMediaFont font) {
                 ComboBox comboBox = new ComboBox();
                 comboBox.items = new ArrayList<>();
                 setComponentInitValues(comboBox);
@@ -5158,28 +5154,28 @@ public class API {
 
             public class _ComboBoxItem {
 
-                private ComboBoxItemAction defaultComboBoxItem() {
+                private ComboBoxItemAction defaultComboBoxItemAction() {
                     return new ComboBoxItemAction() {
                     };
                 }
 
                 public ComboBoxItem create(String text) {
-                    return create(text, defaultComboBoxItem(), null,
+                    return create(text, defaultComboBoxItemAction(), null,
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction) {
-                    return create(text, defaultComboBoxItem(), null,
+                    return create(text, contextMenuItemAction, null,
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon) {
-                    return create(text, defaultComboBoxItem(), icon,
+                    return create(text, contextMenuItemAction, icon,
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
-                    return create(text, defaultComboBoxItem(), icon, color, null);
+                    return create(text, contextMenuItemAction, icon, color, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {

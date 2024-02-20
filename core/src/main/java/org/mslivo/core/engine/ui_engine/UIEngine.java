@@ -314,7 +314,6 @@ public class UIEngine<T extends UIAdapter> {
                 TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size; ic++) {
                     char keyTypedCharacter = (char) inputState.inputEvents.keyTypedCharacters.get(ic);
-
                     if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
                         String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
                         UICommons.textField_setContent(focusedTextField, newContent);
@@ -414,8 +413,6 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
             }
-
-
         }
     }
 
