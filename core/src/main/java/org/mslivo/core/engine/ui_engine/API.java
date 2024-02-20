@@ -17,6 +17,8 @@ import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.gui.Window;
 import org.mslivo.core.engine.ui_engine.gui.WindowGenerator;
 import org.mslivo.core.engine.ui_engine.gui.actions.*;
@@ -54,10 +56,7 @@ import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
-import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
-import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 
 import java.awt.*;
 import java.net.URI;
@@ -330,7 +329,7 @@ public class API {
                             StringBuilder currentLine = new StringBuilder();
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 String value = split[i2];
-                                if (mediaManager.textWidth(inputState.config.components_defaultFont, currentLine + value + " ") >= pixelWidth) {
+                                if (mediaManager.textWidth(inputState.config.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
                                     textList.add(currentLine.toString());
                                     currentLine = new StringBuilder(value + " ");
                                 } else {
@@ -402,7 +401,7 @@ public class API {
         }
 
         public Text text_CreateClickableURL(int x, int y, String url) {
-            return text_CreateClickableURL(x, y, url, Tools.Text.toArray(url), GUIBaseMedia.FONT_BLACK, Tools.Text.toArray(url), GUIBaseMedia.FONT_BLACK);
+            return text_CreateClickableURL(x, y, url, Tools.Text.toArray(url), UIBaseMedia.FONT_BLACK, Tools.Text.toArray(url), UIBaseMedia.FONT_BLACK);
         }
 
         public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
@@ -421,7 +420,7 @@ public class API {
         }
 
         public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick, String[] textHover, CMediaFont fontHover) {
-            Text hlText = component.text.create(x, y, text, GUIBaseMedia.FONT_BLACK);
+            Text hlText = component.text.create(x, y, text, UIBaseMedia.FONT_BLACK);
             component.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
@@ -536,8 +535,8 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                Image image = component.image.create(x + i, y, GUIBaseMedia.GUI_SEPARATOR_HORIZONTAL, index);
-                component.setColor(image, inputState.config.components_defaultColor);
+                Image image = component.image.create(x + i, y, UIBaseMedia.GUI_SEPARATOR_HORIZONTAL, index);
+                component.setColor(image, inputState.config.component_defaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -547,15 +546,15 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
-                Image image = component.image.create(x, y + i, GUIBaseMedia.GUI_SEPARATOR_VERTICAL, index);
-                component.setColor(image, inputState.config.components_defaultColor);
+                Image image = component.image.create(x, y + i, UIBaseMedia.GUI_SEPARATOR_VERTICAL, index);
+                component.setColor(image, inputState.config.component_defaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;
         }
 
         public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return modal_CreateColorModal(caption, selectColorFunction, initColor, GUIBaseMedia.GUI_COLOR_SELECTOR);
+            return modal_CreateColorModal(caption, selectColorFunction, initColor, UIBaseMedia.GUI_COLOR_SELECTOR);
         }
 
         public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
@@ -565,7 +564,7 @@ public class API {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, GUIBaseMedia.GUI_ICON_COLOR);
+            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.GUI_ICON_COLOR);
             ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
             component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -590,7 +589,7 @@ public class API {
             Map colorMap = component.map.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-            MapOverlay cursorOverlay = component.map.mapOverlay.create(GUIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
+            MapOverlay cursorOverlay = component.map.mapOverlay.create(UIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
             component.map.addMapOverlay(colorMap, cursorOverlay);
 
 
@@ -641,7 +640,7 @@ public class API {
                             currentColor = component.map.getPixelColor(colorMap, x, y - 1);
                             component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
-                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? GUIBaseMedia.FONT_WHITE : GUIBaseMedia.FONT_BLACK);
+                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.FONT_WHITE : UIBaseMedia.FONT_BLACK);
                             component.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
@@ -701,7 +700,7 @@ public class API {
             showOKButton = showTouchInputs ? true : showOKButton;
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Tools.Calc.lowerBounds(windowMinWidth, 11);
-            int wnd_width = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(inputState.config.components_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, windowMinWidth);
+            int wnd_width = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, windowMinWidth);
             int wnd_height = 6;
             if (showOKButton) wnd_height++;
             if (showTouchInputs) {
@@ -717,7 +716,7 @@ public class API {
 
             }
 
-            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
+            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.GUI_ICON_INFORMATION);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -778,7 +777,7 @@ public class API {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = component.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_CASE, 0,
+                ImageButton caseButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.GUI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
                             public void onToggle(boolean value) {
@@ -795,7 +794,7 @@ public class API {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = component.button.imageButton.create(ix, iy, 2, 2, GUIBaseMedia.GUI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.GUI_ICON_KEY_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -858,13 +857,13 @@ public class API {
         public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.textWidth(inputState.config.components_defaultFont, lines[i]);
+                int len = mediaManager.textWidth(inputState.config.component_defaultFont, lines[i]);
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, GUIBaseMedia.GUI_ICON_INFORMATION);
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.GUI_ICON_INFORMATION);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -1020,13 +1019,13 @@ public class API {
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
-                    (mediaManager.textWidth(inputState.config.components_defaultFont, caption) + 8),
-                    mediaManager.textWidth(inputState.config.components_defaultFont, text)
+                    (mediaManager.textWidth(inputState.config.component_defaultFont, caption) + 8),
+                    mediaManager.textWidth(inputState.config.component_defaultFont, text)
             );
 
             int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = window.create(0, 0, width, 5, caption, GUIBaseMedia.GUI_ICON_QUESTION);
+            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.GUI_ICON_QUESTION);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -1062,7 +1061,7 @@ public class API {
         }
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, GUIBaseMedia.GUI_ICON_CLOSE);
+            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.GUI_ICON_CLOSE);
             component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
             component.button.setButtonAction(closeButton, new ButtonAction() {
 
@@ -1145,16 +1144,16 @@ public class API {
 
             for (int ix = 0; ix < width; ix++) {
 
-                borders.add(component.image.create(x + ix, y, GUIBaseMedia.GUI_BORDERS, 2));
+                borders.add(component.image.create(x + ix, y, UIBaseMedia.GUI_BORDERS, 2));
 
                 if (ix >= gap) {
-                    borders.add(component.image.create(x + ix, y + (height - 1), GUIBaseMedia.GUI_BORDERS, 3));
+                    borders.add(component.image.create(x + ix, y + (height - 1), UIBaseMedia.GUI_BORDERS, 3));
                 }
             }
 
             for (int iy = 0; iy < height; iy++) {
-                borders.add(component.image.create(x, y + iy, GUIBaseMedia.GUI_BORDERS, 0));
-                borders.add(component.image.create(x + (width - 1), y + iy, GUIBaseMedia.GUI_BORDERS, 1));
+                borders.add(component.image.create(x, y + iy, UIBaseMedia.GUI_BORDERS, 0));
+                borders.add(component.image.create(x + (width - 1), y + iy, UIBaseMedia.GUI_BORDERS, 1));
             }
 
             return borders;
@@ -1165,7 +1164,7 @@ public class API {
 
             width = Tools.Calc.lowerBounds(width, 1);
             TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, GUIBaseMedia.GUI_ICON_EXTEND);
+            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.GUI_ICON_EXTEND);
 
             updateExtendableTabBarButton(tabBar, extendButton);
 
@@ -1227,7 +1226,7 @@ public class API {
 
     public void addNotification(Notification notification) {
         if (notification == null) return;
-        UICommons.notification_addToScreen(inputState, notification, inputState.config.notifications_max);
+        UICommons.notification_addToScreen(inputState, notification, inputState.config.notification_max);
     }
 
     public void addNotifications(Notification[] notifications) {
@@ -1687,458 +1686,473 @@ public class API {
         }
 
 
-
-
     }
 
 
     public class _Config {
-        public CMediaCursor getUi_cursor() {
-            return inputState.config.ui_cursor;
-        }
-
-        public void setUi_cursor(CMediaCursor ui_cursor) {
-            inputState.config.ui_cursor = ui_cursor;
-        }
-
-        public boolean isUi_keyInteractionsDisabled() {
-            return inputState.config.ui_keyInteractionsDisabled;
-        }
-
-        public void setUi_keyInteractionsDisabled(boolean ui_keyInteractionsDisabled) {
-            inputState.config.ui_keyInteractionsDisabled = ui_keyInteractionsDisabled;
-        }
-
-        public boolean isUi_mouseInteractionsDisabled() {
-            return inputState.config.ui_mouseInteractionsDisabled;
-        }
-
-        public void setUi_mouseInteractionsDisabled(boolean ui_mouseInteractionsDisabled) {
-            inputState.config.ui_mouseInteractionsDisabled = ui_mouseInteractionsDisabled;
-        }
-
-        public int getUi_doubleClickTime() {
-            return inputState.config.ui_doubleClickTime;
-        }
-
-        public void setUi_doubleClickTime(int ui_doubleClickTime) {
-            inputState.config.ui_doubleClickTime = ui_doubleClickTime;
-        }
-
-        public boolean isUi_foldWindowsOnDoubleClick() {
-            return inputState.config.ui_foldWindowsOnDoubleClick;
-        }
-
-        public void setUi_foldWindowsOnDoubleClick(boolean ui_foldWindowsOnDoubleClick) {
-            inputState.config.ui_foldWindowsOnDoubleClick = ui_foldWindowsOnDoubleClick;
-        }
-
-        public float getInput_emulatedMouseCursorSpeed() {
-            return inputState.config.input_emulatedMouseCursorSpeed;
-        }
-
-        public void setInput_emulatedMouseCursorSpeed(float input_emulatedMouseCursorSpeed) {
-            inputState.config.input_emulatedMouseCursorSpeed = input_emulatedMouseCursorSpeed;
-        }
-
-        public boolean isInput_hardwareMouseEnabled() {
-            return inputState.config.input_hardwareMouseEnabled;
-        }
-
-        public void setInput_hardwareMouseEnabled(boolean input_hardwareMouseEnabled) {
-            inputState.config.input_hardwareMouseEnabled = input_hardwareMouseEnabled;
-        }
-
-        public boolean isInput_keyboardMouseEnabled() {
-            return inputState.config.input_keyboardMouseEnabled;
-        }
-
-        public void setInput_keyboardMouseEnabled(boolean input_keyboardMouseEnabled) {
-            inputState.config.input_keyboardMouseEnabled = input_keyboardMouseEnabled;
-        }
-
-        public int[] getInput_keyboardMouseButtonsUp() {
-            return inputState.config.input_keyboardMouseButtonsUp;
-        }
-
-        public void setInput_keyboardMouseButtonsUp(int[] input_keyboardMouseButtonsUp) {
-            inputState.config.input_keyboardMouseButtonsUp = input_keyboardMouseButtonsUp;
-        }
-
-        public int[] getInput_keyboardMouseButtonsDown() {
-            return inputState.config.input_keyboardMouseButtonsDown;
-        }
-
-        public void setInput_keyboardMouseButtonsDown(int[] input_keyboardMouseButtonsDown) {
-            inputState.config.input_keyboardMouseButtonsDown = input_keyboardMouseButtonsDown;
-        }
-
-        public int[] getInput_keyboardMouseButtonsLeft() {
-            return inputState.config.input_keyboardMouseButtonsLeft;
-        }
-
-        public void setInput_keyboardMouseButtonsLeft(int[] input_keyboardMouseButtonsLeft) {
-            inputState.config.input_keyboardMouseButtonsLeft = input_keyboardMouseButtonsLeft;
-        }
-
-        public int[] getInput_keyboardMouseButtonsRight() {
-            return inputState.config.input_keyboardMouseButtonsRight;
-        }
-
-        public void setInput_keyboardMouseButtonsRight(int[] input_keyboardMouseButtonsRight) {
-            inputState.config.input_keyboardMouseButtonsRight = input_keyboardMouseButtonsRight;
-        }
-
-        public int[] getInput_keyboardMouseButtonsMouse1() {
-            return inputState.config.input_keyboardMouseButtonsMouse1;
-        }
-
-        public void setInput_keyboardMouseButtonsMouse1(int[] input_keyboardMouseButtonsMouse1) {
-            inputState.config.input_keyboardMouseButtonsMouse1 = input_keyboardMouseButtonsMouse1;
-        }
+        public final _UIConfig ui = new _UIConfig();
+        public final _InputConfig input = new _InputConfig();
+        public final _WindowConfig window = new _WindowConfig();
+        public final _ComponentConfig component = new _ComponentConfig();
+        public final _NotificationsConfig notification = new _NotificationsConfig();
+        public final _ToolTipConfig tooltip = new _ToolTipConfig();
+        public final _MouseTextInputConfig mouseTextInput = new _MouseTextInputConfig();
+
+        public class _UIConfig {
+            public CMediaCursor getCursor() {
+                return inputState.config.ui_cursor;
+            }
 
-        public int[] getInput_keyboardMouseButtonsMouse2() {
-            return inputState.config.input_keyboardMouseButtonsMouse2;
-        }
+            public void setCursor(CMediaCursor ui_cursor) {
+                inputState.config.ui_cursor = ui_cursor;
+            }
 
-        public void setInput_keyboardMouseButtonsMouse2(int[] input_keyboardMouseButtonsMouse2) {
-            inputState.config.input_keyboardMouseButtonsMouse2 = input_keyboardMouseButtonsMouse2;
-        }
+            public boolean isKeyInteractionsDisabled() {
+                return inputState.config.ui_keyInteractionsDisabled;
+            }
 
-        public int[] getInput_keyboardMouseButtonsMouse3() {
-            return inputState.config.input_keyboardMouseButtonsMouse3;
-        }
+            public void setKeyInteractionsDisabled(boolean ui_keyInteractionsDisabled) {
+                inputState.config.ui_keyInteractionsDisabled = ui_keyInteractionsDisabled;
+            }
 
-        public void setInput_keyboardMouseButtonsMouse3(int[] input_keyboardMouseButtonsMouse3) {
-            inputState.config.input_keyboardMouseButtonsMouse3 = input_keyboardMouseButtonsMouse3;
-        }
+            public boolean isMouseInteractionsDisabled() {
+                return inputState.config.ui_mouseInteractionsDisabled;
+            }
 
-        public int[] getInput_keyboardMouseButtonsMouse4() {
-            return inputState.config.input_keyboardMouseButtonsMouse4;
-        }
+            public void setMouseInteractionsDisabled(boolean ui_mouseInteractionsDisabled) {
+                inputState.config.ui_mouseInteractionsDisabled = ui_mouseInteractionsDisabled;
+            }
 
-        public void setInput_keyboardMouseButtonsMouse4(int[] input_keyboardMouseButtonsMouse4) {
-            inputState.config.input_keyboardMouseButtonsMouse4 = input_keyboardMouseButtonsMouse4;
-        }
+            public boolean isFoldWindowsOnDoubleClick() {
+                return inputState.config.ui_foldWindowsOnDoubleClick;
+            }
 
-        public int[] getInput_keyboardMouseButtonsMouse5() {
-            return inputState.config.input_keyboardMouseButtonsMouse5;
-        }
+            public void setFoldWindowsOnDoubleClick(boolean ui_foldWindowsOnDoubleClick) {
+                inputState.config.ui_foldWindowsOnDoubleClick = ui_foldWindowsOnDoubleClick;
+            }
 
-        public void setInput_keyboardMouseButtonsMouse5(int[] input_keyboardMouseButtonsMouse5) {
-            inputState.config.input_keyboardMouseButtonsMouse5 = input_keyboardMouseButtonsMouse5;
-        }
+        }
+
+        public class _InputConfig {
+            public float getEmulatedMouseCursorSpeed() {
+                return inputState.config.input_emulatedMouseCursorSpeed;
+            }
+
+            public void setEmulatedMouseCursorSpeed(float input_emulatedMouseCursorSpeed) {
+                inputState.config.input_emulatedMouseCursorSpeed = input_emulatedMouseCursorSpeed;
+            }
+
+            public boolean isHardwareMouseEnabled() {
+                return inputState.config.input_hardwareMouseEnabled;
+            }
+
+            public void setHardwareMouseEnabled(boolean input_hardwareMouseEnabled) {
+                inputState.config.input_hardwareMouseEnabled = input_hardwareMouseEnabled;
+            }
+
+            public boolean isInput_keyboardMouseEnabled() {
+                return inputState.config.input_keyboardMouseEnabled;
+            }
+
+            public void setKeyboardMouseEnabled(boolean input_keyboardMouseEnabled) {
+                inputState.config.input_keyboardMouseEnabled = input_keyboardMouseEnabled;
+            }
+
+            public int[] getKeyboardMouseButtonsUp() {
+                return inputState.config.input_keyboardMouseButtonsUp;
+            }
+
+            public void setKeyboardMouseButtonsUp(int[] input_keyboardMouseButtonsUp) {
+                inputState.config.input_keyboardMouseButtonsUp = input_keyboardMouseButtonsUp;
+            }
+
+            public int[] getKeyboardMouseButtonsDown() {
+                return inputState.config.input_keyboardMouseButtonsDown;
+            }
+
+            public void setKeyboardMouseButtonsDown(int[] input_keyboardMouseButtonsDown) {
+                inputState.config.input_keyboardMouseButtonsDown = input_keyboardMouseButtonsDown;
+            }
+
+            public int[] getKeyboardMouseButtonsLeft() {
+                return inputState.config.input_keyboardMouseButtonsLeft;
+            }
+
+            public void setKeyboardMouseButtonsLeft(int[] input_keyboardMouseButtonsLeft) {
+                inputState.config.input_keyboardMouseButtonsLeft = input_keyboardMouseButtonsLeft;
+            }
+
+            public int[] getKeyboardMouseButtonsRight() {
+                return inputState.config.input_keyboardMouseButtonsRight;
+            }
+
+            public void setKeyboardMouseButtonsRight(int[] input_keyboardMouseButtonsRight) {
+                inputState.config.input_keyboardMouseButtonsRight = input_keyboardMouseButtonsRight;
+            }
+
+            public int[] getKeyboardMouseButtonsMouse1() {
+                return inputState.config.input_keyboardMouseButtonsMouse1;
+            }
+
+            public void setKeyboardMouseButtonsMouse1(int[] input_keyboardMouseButtonsMouse1) {
+                inputState.config.input_keyboardMouseButtonsMouse1 = input_keyboardMouseButtonsMouse1;
+            }
+
+            public int[] getKeyboardMouseButtonsMouse2() {
+                return inputState.config.input_keyboardMouseButtonsMouse2;
+            }
+
+            public void setKeyboardMouseButtonsMouse2(int[] input_keyboardMouseButtonsMouse2) {
+                inputState.config.input_keyboardMouseButtonsMouse2 = input_keyboardMouseButtonsMouse2;
+            }
+
+            public int[] getKeyboardMouseButtonsMouse3() {
+                return inputState.config.input_keyboardMouseButtonsMouse3;
+            }
+
+            public void setKeyboardMouseButtonsMouse3(int[] input_keyboardMouseButtonsMouse3) {
+                inputState.config.input_keyboardMouseButtonsMouse3 = input_keyboardMouseButtonsMouse3;
+            }
+
+            public int[] getKeyboardMouseButtonsMouse4() {
+                return inputState.config.input_keyboardMouseButtonsMouse4;
+            }
+
+            public void setKeyboardMouseButtonsMouse4(int[] input_keyboardMouseButtonsMouse4) {
+                inputState.config.input_keyboardMouseButtonsMouse4 = input_keyboardMouseButtonsMouse4;
+            }
+
+            public int[] getKeyboardMouseButtonsMouse5() {
+                return inputState.config.input_keyboardMouseButtonsMouse5;
+            }
+
+            public void setKeyboardMouseButtonsMouse5(int[] input_keyboardMouseButtonsMouse5) {
+                inputState.config.input_keyboardMouseButtonsMouse5 = input_keyboardMouseButtonsMouse5;
+            }
+
+            public int[] getKeyboardMouseButtonsScrollUp() {
+                return inputState.config.input_keyboardMouseButtonsScrollUp;
+            }
+
+            public void setKeyboardMouseButtonsScrollUp(int[] input_keyboardMouseButtonsScrollUp) {
+                inputState.config.input_keyboardMouseButtonsScrollUp = input_keyboardMouseButtonsScrollUp;
+            }
 
-        public int[] getInput_keyboardMouseButtonsScrollUp() {
-            return inputState.config.input_keyboardMouseButtonsScrollUp;
-        }
+            public int[] getKeyboardMouseButtonsScrollDown() {
+                return inputState.config.input_keyboardMouseButtonsScrollDown;
+            }
 
-        public void setInput_keyboardMouseButtonsScrollUp(int[] input_keyboardMouseButtonsScrollUp) {
-            inputState.config.input_keyboardMouseButtonsScrollUp = input_keyboardMouseButtonsScrollUp;
-        }
+            public void setKeyboardMouseButtonsScrollDown(int[] input_keyboardMouseButtonsScrollDown) {
+                inputState.config.input_keyboardMouseButtonsScrollDown = input_keyboardMouseButtonsScrollDown;
+            }
 
-        public int[] getInput_keyboardMouseButtonsScrollDown() {
-            return inputState.config.input_keyboardMouseButtonsScrollDown;
-        }
+            public boolean isGamePadMouseEnabled() {
+                return inputState.config.input_gamePadMouseEnabled;
+            }
 
-        public void setInput_keyboardMouseButtonsScrollDown(int[] input_keyboardMouseButtonsScrollDown) {
-            inputState.config.input_keyboardMouseButtonsScrollDown = input_keyboardMouseButtonsScrollDown;
-        }
+            public void setGamePadMouseEnabled(boolean input_gamePadMouseEnabled) {
+                inputState.config.input_gamePadMouseEnabled = input_gamePadMouseEnabled;
+            }
 
-        public boolean isInput_gamePadMouseEnabled() {
-            return inputState.config.input_gamePadMouseEnabled;
-        }
+            public float getGamePadMouseJoystickDeadZone() {
+                return inputState.config.input_gamePadMouseJoystickDeadZone;
+            }
 
-        public void setInput_gamePadMouseEnabled(boolean input_gamePadMouseEnabled) {
-            inputState.config.input_gamePadMouseEnabled = input_gamePadMouseEnabled;
-        }
+            public void setGamePadMouseJoystickDeadZone(float input_gamePadMouseJoystickDeadZone) {
+                inputState.config.input_gamePadMouseJoystickDeadZone = input_gamePadMouseJoystickDeadZone;
+            }
 
-        public float getInput_gamePadMouseJoystickDeadZone() {
-            return inputState.config.input_gamePadMouseJoystickDeadZone;
-        }
+            public boolean isInput_gamePadMouseStickLeftEnabled() {
+                return inputState.config.input_gamePadMouseStickLeftEnabled;
+            }
 
-        public void setInput_gamePadMouseJoystickDeadZone(float input_gamePadMouseJoystickDeadZone) {
-            inputState.config.input_gamePadMouseJoystickDeadZone = input_gamePadMouseJoystickDeadZone;
-        }
+            public void setGamePadMouseStickLeftEnabled(boolean input_gamePadMouseStickLeftEnabled) {
+                inputState.config.input_gamePadMouseStickLeftEnabled = input_gamePadMouseStickLeftEnabled;
+            }
 
-        public boolean isInput_gamePadMouseStickLeftEnabled() {
-            return inputState.config.input_gamePadMouseStickLeftEnabled;
-        }
+            public boolean isGamePadMouseStickRightEnabled() {
+                return inputState.config.input_gamePadMouseStickRightEnabled;
+            }
 
-        public void setInput_gamePadMouseStickLeftEnabled(boolean input_gamePadMouseStickLeftEnabled) {
-            inputState.config.input_gamePadMouseStickLeftEnabled = input_gamePadMouseStickLeftEnabled;
-        }
+            public void setGamePadMouseStickRightEnabled(boolean input_gamePadMouseStickRightEnabled) {
+                inputState.config.input_gamePadMouseStickRightEnabled = input_gamePadMouseStickRightEnabled;
+            }
 
-        public boolean isInput_gamePadMouseStickRightEnabled() {
-            return inputState.config.input_gamePadMouseStickRightEnabled;
-        }
+            public int[] getGamePadMouseButtonsMouse1() {
+                return inputState.config.input_gamePadMouseButtonsMouse1;
+            }
 
-        public void setInput_gamePadMouseStickRightEnabled(boolean input_gamePadMouseStickRightEnabled) {
-            inputState.config.input_gamePadMouseStickRightEnabled = input_gamePadMouseStickRightEnabled;
-        }
+            public void setGamePadMouseButtonsMouse1(int[] input_gamePadMouseButtonsMouse1) {
+                inputState.config.input_gamePadMouseButtonsMouse1 = input_gamePadMouseButtonsMouse1;
+            }
 
-        public int[] getInput_gamePadMouseButtonsMouse1() {
-            return inputState.config.input_gamePadMouseButtonsMouse1;
-        }
+            public int[] getGamePadMouseButtonsMouse2() {
+                return inputState.config.input_gamePadMouseButtonsMouse2;
+            }
 
-        public void setInput_gamePadMouseButtonsMouse1(int[] input_gamePadMouseButtonsMouse1) {
-            inputState.config.input_gamePadMouseButtonsMouse1 = input_gamePadMouseButtonsMouse1;
-        }
+            public void setGamePadMouseButtonsMouse2(int[] input_gamePadMouseButtonsMouse2) {
+                inputState.config.input_gamePadMouseButtonsMouse2 = input_gamePadMouseButtonsMouse2;
+            }
 
-        public int[] getInput_gamePadMouseButtonsMouse2() {
-            return inputState.config.input_gamePadMouseButtonsMouse2;
-        }
+            public int[] getGamePadMouseButtonsMouse3() {
+                return inputState.config.input_gamePadMouseButtonsMouse3;
+            }
 
-        public void setInput_gamePadMouseButtonsMouse2(int[] input_gamePadMouseButtonsMouse2) {
-            inputState.config.input_gamePadMouseButtonsMouse2 = input_gamePadMouseButtonsMouse2;
-        }
+            public void setGamePadMouseButtonsMouse3(int[] input_gamePadMouseButtonsMouse3) {
+                inputState.config.input_gamePadMouseButtonsMouse3 = input_gamePadMouseButtonsMouse3;
+            }
 
-        public int[] getInput_gamePadMouseButtonsMouse3() {
-            return inputState.config.input_gamePadMouseButtonsMouse3;
-        }
+            public int[] getGamePadMouseButtonsMouse4() {
+                return inputState.config.input_gamePadMouseButtonsMouse4;
+            }
 
-        public void setInput_gamePadMouseButtonsMouse3(int[] input_gamePadMouseButtonsMouse3) {
-            inputState.config.input_gamePadMouseButtonsMouse3 = input_gamePadMouseButtonsMouse3;
-        }
+            public void setGamePadMouseButtonsMouse4(int[] input_gamePadMouseButtonsMouse4) {
+                inputState.config.input_gamePadMouseButtonsMouse4 = input_gamePadMouseButtonsMouse4;
+            }
 
-        public int[] getInput_gamePadMouseButtonsMouse4() {
-            return inputState.config.input_gamePadMouseButtonsMouse4;
-        }
+            public int[] getGamePadMouseButtonsMouse5() {
+                return inputState.config.input_gamePadMouseButtonsMouse5;
+            }
 
-        public void setInput_gamePadMouseButtonsMouse4(int[] input_gamePadMouseButtonsMouse4) {
-            inputState.config.input_gamePadMouseButtonsMouse4 = input_gamePadMouseButtonsMouse4;
-        }
+            public void setGamePadMouseButtonsMouse5(int[] input_gamePadMouseButtonsMouse5) {
+                inputState.config.input_gamePadMouseButtonsMouse5 = input_gamePadMouseButtonsMouse5;
+            }
 
-        public int[] getInput_gamePadMouseButtonsMouse5() {
-            return inputState.config.input_gamePadMouseButtonsMouse5;
-        }
+            public int[] getGamePadMouseButtonsScrollUp() {
+                return inputState.config.input_gamePadMouseButtonsScrollUp;
+            }
 
-        public void setInput_gamePadMouseButtonsMouse5(int[] input_gamePadMouseButtonsMouse5) {
-            inputState.config.input_gamePadMouseButtonsMouse5 = input_gamePadMouseButtonsMouse5;
-        }
+            public void setGamePadMouseButtonsScrollUp(int[] input_gamePadMouseButtonsScrollUp) {
+                inputState.config.input_gamePadMouseButtonsScrollUp = input_gamePadMouseButtonsScrollUp;
+            }
 
-        public int[] getInput_gamePadMouseButtonsScrollUp() {
-            return inputState.config.input_gamePadMouseButtonsScrollUp;
-        }
+            public int[] getGamePadMouseButtonsScrollDown() {
+                return inputState.config.input_gamePadMouseButtonsScrollDown;
+            }
 
-        public void setInput_gamePadMouseButtonsScrollUp(int[] input_gamePadMouseButtonsScrollUp) {
-            inputState.config.input_gamePadMouseButtonsScrollUp = input_gamePadMouseButtonsScrollUp;
+            public void setGamePadMouseButtonsScrollDown(int[] input_gamePadMouseButtonsScrollDown) {
+                inputState.config.input_gamePadMouseButtonsScrollDown = input_gamePadMouseButtonsScrollDown;
+            }
         }
 
-        public int[] getInput_gamePadMouseButtonsScrollDown() {
-            return inputState.config.input_gamePadMouseButtonsScrollDown;
-        }
+        public class _WindowConfig {
+            public boolean isDefaultEnforceScreenBounds() {
+                return inputState.config.window_defaultEnforceScreenBounds;
+            }
 
-        public void setInput_gamePadMouseButtonsScrollDown(int[] input_gamePadMouseButtonsScrollDown) {
-            inputState.config.input_gamePadMouseButtonsScrollDown = input_gamePadMouseButtonsScrollDown;
-        }
+            public void setDefaultEnforceScreenBounds(boolean windows_defaultEnforceScreenBounds) {
+                inputState.config.window_defaultEnforceScreenBounds = windows_defaultEnforceScreenBounds;
+            }
 
-        public boolean isWindows_defaultEnforceScreenBounds() {
-            return inputState.config.windows_defaultEnforceScreenBounds;
-        }
+            public Color getDefaultColor() {
+                return inputState.config.window_defaultColor;
+            }
 
-        public void setWindows_defaultEnforceScreenBounds(boolean windows_defaultEnforceScreenBounds) {
-            inputState.config.windows_defaultEnforceScreenBounds = windows_defaultEnforceScreenBounds;
-        }
+            public void setDefaultColor(Color windows_defaultColor) {
+                inputState.config.window_defaultColor = windows_defaultColor;
+            }
 
-        public Color getWindows_defaultColor() {
-            return inputState.config.windows_defaultColor;
-        }
+            public CMediaFont getDefaultFont() {
+                return inputState.config.window_defaultFont;
+            }
 
-        public void setWindows_defaultColor(Color windows_defaultColor) {
-            inputState.config.windows_defaultColor = windows_defaultColor;
+            public void setDefaultFont(CMediaFont windows_defaultFont) {
+                inputState.config.window_defaultFont = windows_defaultFont;
+            }
         }
 
-        public CMediaFont getWindows_defaultFont() {
-            return inputState.config.windows_defaultFont;
-        }
+        public class _ComponentConfig {
+            public Color getDefaultColor() {
+                return inputState.config.component_defaultColor;
+            }
 
-        public void setWindows_defaultFont(CMediaFont windows_defaultFont) {
-            inputState.config.windows_defaultFont = windows_defaultFont;
-        }
+            public void setDefaultColor(Color components_defaultColor) {
+                inputState.config.component_defaultColor = components_defaultColor;
+            }
 
-        public Color getComponents_defaultColor() {
-            return inputState.config.components_defaultColor;
-        }
+            public CMediaFont getDefaultFont() {
+                return inputState.config.component_defaultFont;
+            }
 
-        public void setComponents_defaultColor(Color components_defaultColor) {
-            inputState.config.components_defaultColor = components_defaultColor;
-        }
+            public void setDefaultFont(CMediaFont components_defaultFont) {
+                inputState.config.component_defaultFont = components_defaultFont;
+            }
 
-        public CMediaFont getComponents_defaultFont() {
-            return inputState.config.components_defaultFont;
-        }
+            public int getGameViewportDefaultUpdateTime() {
+                return inputState.config.component_gameViewportDefaultUpdateTime;
+            }
 
-        public void setComponents_defaultFont(CMediaFont components_defaultFont) {
-            inputState.config.components_defaultFont = components_defaultFont;
-        }
+            public void setGameViewportDefaultUpdateTime(int gameViewport_defaultUpdateTime) {
+                inputState.config.component_gameViewportDefaultUpdateTime = gameViewport_defaultUpdateTime;
+            }
 
-        public int getGameViewport_defaultUpdateTime() {
-            return inputState.config.gameViewport_defaultUpdateTime;
-        }
+            public float getListDragAlpha() {
+                return inputState.config.component_listDragAlpha;
+            }
 
-        public void setGameViewport_defaultUpdateTime(int gameViewport_defaultUpdateTime) {
-            inputState.config.gameViewport_defaultUpdateTime = gameViewport_defaultUpdateTime;
-        }
+            public void setListDragAlpha(float list_dragAlpha) {
+                inputState.config.component_listDragAlpha = list_dragAlpha;
+            }
 
-        public float getList_dragAlpha() {
-            return inputState.config.list_dragAlpha;
-        }
+            public float getInventoryDragAlpha() {
+                return inputState.config.component_inventoryDragAlpha;
+            }
 
-        public void setList_dragAlpha(float list_dragAlpha) {
-            inputState.config.list_dragAlpha = list_dragAlpha;
-        }
+            public void setInventoryDragAlpha(float inventory_dragAlpha) {
+                inputState.config.component_inventoryDragAlpha = inventory_dragAlpha;
+            }
 
-        public float getInventory_dragAlpha() {
-            return inputState.config.inventory_dragAlpha;
-        }
+            public float getKnobSensitivity() {
+                return inputState.config.component_knobSensitivity;
+            }
 
-        public void setInventory_dragAlpha(float inventory_dragAlpha) {
-            inputState.config.inventory_dragAlpha = inventory_dragAlpha;
-        }
+            public void setKnobSensitivity(float knob_sensitivity) {
+                inputState.config.component_knobSensitivity = knob_sensitivity;
+            }
 
-        public float getKnob_sensitivity() {
-            return inputState.config.knob_sensitivity;
-        }
+            public float getScrollbarSensitivity() {
+                return inputState.config.component_scrollbarSensitivity;
+            }
 
-        public void setKnob_sensitivity(float knob_sensitivity) {
-            inputState.config.knob_sensitivity = knob_sensitivity;
-        }
+            public void setScrollbarSensitivity(float scrollbar_sensitivity) {
+                inputState.config.component_scrollbarSensitivity = scrollbar_sensitivity;
+            }
 
-        public float getScrollbar_sensitivity() {
-            return inputState.config.scrollbar_sensitivity;
-        }
+            public int getButtonHoldTimer() {
+                return inputState.config.component_buttonHoldTimer;
+            }
 
-        public void setScrollbar_sensitivity(float scrollbar_sensitivity) {
-            inputState.config.scrollbar_sensitivity = scrollbar_sensitivity;
-        }
+            public void setButtonHoldTimer(int button_holdTimer) {
+                inputState.config.component_buttonHoldTimer = button_holdTimer;
+            }
 
-        public int getButton_holdTimer() {
-            return inputState.config.button_holdTimer;
-        }
+            public int getMapOverlayDefaultFadeoutTime() {
+                return inputState.config.component_mapOverlayDefaultFadeoutTime;
+            }
 
-        public void setButton_holdTimer(int button_holdTimer) {
-            inputState.config.button_holdTimer = button_holdTimer;
-        }
+            public void setMapOverlayDefaultFadeoutTime(int mapOverlay_defaultFadeoutTime) {
+                inputState.config.component_mapOverlayDefaultFadeoutTime = mapOverlay_defaultFadeoutTime;
+            }
 
-        public int getMapOverlay_defaultFadeoutTime() {
-            return inputState.config.mapOverlay_defaultFadeoutTime;
-        }
+            public char[] getTextfieldDefaultAllowedCharacters() {
+                return inputState.config.component_textFieldDefaultAllowedCharacters;
+            }
 
-        public void setMapOverlay_defaultFadeoutTime(int mapOverlay_defaultFadeoutTime) {
-            inputState.config.mapOverlay_defaultFadeoutTime = mapOverlay_defaultFadeoutTime;
-        }
+            public void setTextfieldDefaultAllowedCharacters(char[] textField_defaultAllowedCharacters) {
+                inputState.config.component_textFieldDefaultAllowedCharacters = textField_defaultAllowedCharacters;
+            }
 
-        public int getNotifications_max() {
-            return inputState.config.notifications_max;
         }
 
-        public void setNotifications_max(int notifications_max) {
-            inputState.config.notifications_max = notifications_max;
-        }
+        public class _NotificationsConfig {
+            public int getMax() {
+                return inputState.config.notification_max;
+            }
 
-        public int getNotifications_defaultDisplayTime() {
-            return inputState.config.notifications_defaultDisplayTime;
-        }
+            public void setMax(int notifications_max) {
+                inputState.config.notification_max = notifications_max;
+            }
 
-        public void setNotifications_defaultDisplayTime(int notifications_defaultDisplayTime) {
-            inputState.config.notifications_defaultDisplayTime = notifications_defaultDisplayTime;
-        }
+            public int getNotifications_defaultDisplayTime() {
+                return inputState.config.notification_defaultDisplayTime;
+            }
 
-        public CMediaFont getNotifications_defaultFont() {
-            return inputState.config.notifications_defaultFont;
-        }
+            public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
+                inputState.config.notification_defaultDisplayTime = notifications_defaultDisplayTime;
+            }
 
-        public void setNotifications_defaultFont(CMediaFont notifications_defaultFont) {
-            inputState.config.notifications_defaultFont = notifications_defaultFont;
-        }
+            public CMediaFont getNotifications_defaultFont() {
+                return inputState.config.notification_defaultFont;
+            }
 
-        public Color getNotifications_defaultColor() {
-            return inputState.config.notifications_defaultColor;
-        }
+            public void setDefaultFont(CMediaFont notifications_defaultFont) {
+                inputState.config.notification_defaultFont = notifications_defaultFont;
+            }
 
-        public void setNotifications_defaultColor(Color notifications_defaultColor) {
-            inputState.config.notifications_defaultColor = notifications_defaultColor;
-        }
+            public Color getNotifications_defaultColor() {
+                return inputState.config.notification_defaultColor;
+            }
 
-        public int getNotifications_fadeoutTime() {
-            return inputState.config.notifications_fadeoutTime;
-        }
+            public void setDefaultColor(Color notifications_defaultColor) {
+                inputState.config.notification_defaultColor = notifications_defaultColor;
+            }
 
-        public void setNotifications_fadeoutTime(int notifications_fadeoutTime) {
-            inputState.config.notifications_fadeoutTime = notifications_fadeoutTime;
-        }
+            public int getNotifications_fadeoutTime() {
+                return inputState.config.notification_fadeoutTime;
+            }
 
-        public float getNotifications_scrollSpeed() {
-            return inputState.config.notifications_scrollSpeed;
-        }
+            public void setFadeoutTime(int notifications_fadeoutTime) {
+                inputState.config.notification_fadeoutTime = notifications_fadeoutTime;
+            }
 
-        public void setNotifications_scrollSpeed(float notifications_scrollSpeed) {
-            inputState.config.notifications_scrollSpeed = notifications_scrollSpeed;
-        }
+            public float getNotifications_scrollSpeed() {
+                return inputState.config.notification_scrollSpeed;
+            }
 
-        public Color getTooltip_defaultColor() {
-            return inputState.config.tooltip_defaultColor;
+            public void setScrollSpeed(float notifications_scrollSpeed) {
+                inputState.config.notification_scrollSpeed = notifications_scrollSpeed;
+            }
         }
 
-        public void setTooltip_defaultColor(Color tooltip_defaultColor) {
-            inputState.config.tooltip_defaultColor = tooltip_defaultColor;
-        }
+        public class _ToolTipConfig {
+            public Color getDefaultColor() {
+                return inputState.config.tooltip_defaultColor;
+            }
 
-        public CMediaFont getTooltip_defaultFont() {
-            return inputState.config.tooltip_defaultFont;
-        }
+            public void setDefaultColor(Color tooltip_defaultColor) {
+                inputState.config.tooltip_defaultColor = tooltip_defaultColor;
+            }
 
-        public void setTooltip_defaultFont(CMediaFont tooltip_defaultFont) {
-            inputState.config.tooltip_defaultFont = tooltip_defaultFont;
-        }
+            public CMediaFont getDefaultFont() {
+                return inputState.config.tooltip_defaultFont;
+            }
 
-        public int getTooltip_FadeInTime() {
-            return inputState.config.tooltip_FadeInTime;
-        }
+            public void setDefaultFont(CMediaFont tooltip_defaultFont) {
+                inputState.config.tooltip_defaultFont = tooltip_defaultFont;
+            }
 
-        public void setTooltip_FadeInTime(int tooltip_FadeInTime) {
-            inputState.config.tooltip_FadeInTime = tooltip_FadeInTime;
-        }
+            public int getFadeInTime() {
+                return inputState.config.tooltip_FadeInTime;
+            }
 
-        public int getTooltip_FadeInDelayTime() {
-            return inputState.config.tooltip_FadeInDelayTime;
-        }
+            public void setFadeInTime(int tooltip_FadeInTime) {
+                inputState.config.tooltip_FadeInTime = tooltip_FadeInTime;
+            }
 
-        public void setTooltip_FadeInDelayTime(int tooltip_FadeInDelayTime) {
-            inputState.config.tooltip_FadeInDelayTime = tooltip_FadeInDelayTime;
-        }
+            public int getFadeInDelayTime() {
+                return inputState.config.tooltip_FadeInDelayTime;
+            }
 
-        public char[] getTextField_defaultAllowedCharacters() {
-            return inputState.config.textField_defaultAllowedCharacters;
-        }
+            public void setFadeInDelayTime(int tooltip_FadeInDelayTime) {
+                inputState.config.tooltip_FadeInDelayTime = tooltip_FadeInDelayTime;
+            }
 
-        public void setTextField_defaultAllowedCharacters(char[] textField_defaultAllowedCharacters) {
-            inputState.config.textField_defaultAllowedCharacters = textField_defaultAllowedCharacters;
         }
 
-        public CMediaFont getMouseTextInput_defaultFont() {
-            return inputState.config.mouseTextInput_defaultFont;
-        }
+        public class _MouseTextInputConfig {
+            public CMediaFont getDefaultFont() {
+                return inputState.config.mouseTextInput_defaultFont;
+            }
 
-        public void setMouseTextInput_defaultFont(CMediaFont mouseTextInput_defaultFont) {
-            inputState.config.mouseTextInput_defaultFont = mouseTextInput_defaultFont;
-        }
+            public void setDefaultFont(CMediaFont mouseTextInput_defaultFont) {
+                inputState.config.mouseTextInput_defaultFont = mouseTextInput_defaultFont;
+            }
 
-        public char[] getMouseTextInput_defaultLowerCaseCharacters() {
-            return inputState.config.mouseTextInput_defaultLowerCaseCharacters;
-        }
+            public char[] getDefaultLowerCaseCharacters() {
+                return inputState.config.mouseTextInput_defaultLowerCaseCharacters;
+            }
 
-        public void setMouseTextInput_defaultLowerCaseCharacters(char[] mouseTextInput_defaultLowerCaseCharacters) {
-            inputState.config.mouseTextInput_defaultLowerCaseCharacters = mouseTextInput_defaultLowerCaseCharacters;
-        }
+            public void setDefaultLowerCaseCharacters(char[] mouseTextInput_defaultLowerCaseCharacters) {
+                inputState.config.mouseTextInput_defaultLowerCaseCharacters = mouseTextInput_defaultLowerCaseCharacters;
+            }
 
-        public char[] getMouseTextInput_defaultUpperCaseCharacters() {
-            return inputState.config.mouseTextInput_defaultUpperCaseCharacters;
-        }
+            public char[] getDefaultUpperCaseCharacters() {
+                return inputState.config.mouseTextInput_defaultUpperCaseCharacters;
+            }
 
-        public void setMouseTextInput_defaultUpperCaseCharacters(char[] mouseTextInput_defaultUpperCaseCharacters) {
-            inputState.config.mouseTextInput_defaultUpperCaseCharacters = mouseTextInput_defaultUpperCaseCharacters;
+            public void setDefaultUpperCaseCharacters(char[] mouseTextInput_defaultUpperCaseCharacters) {
+                inputState.config.mouseTextInput_defaultUpperCaseCharacters = mouseTextInput_defaultUpperCaseCharacters;
+            }
         }
     }
 
@@ -2523,15 +2537,15 @@ public class API {
 
     public class _Notification {
         public Notification create(String text) {
-            return create(text, inputState.config.notifications_defaultColor, inputState.config.notifications_defaultFont, inputState.config.notifications_defaultDisplayTime, null);
+            return create(text, inputState.config.notification_defaultColor, inputState.config.notification_defaultFont, inputState.config.notification_defaultDisplayTime, null);
         }
 
         public Notification create(String text, Color color) {
-            return create(text, color, inputState.config.notifications_defaultFont, inputState.config.notifications_defaultDisplayTime, null);
+            return create(text, color, inputState.config.notification_defaultFont, inputState.config.notification_defaultDisplayTime, null);
         }
 
         public Notification create(String text, Color color, CMediaFont font) {
-            return create(text, color, font, inputState.config.notifications_defaultDisplayTime, null);
+            return create(text, color, font, inputState.config.notification_defaultDisplayTime, null);
         }
 
         public Notification create(String text, Color color, CMediaFont font, int displayTime) {
@@ -2690,15 +2704,15 @@ public class API {
             }
 
             public ContextMenuItem create(String text) {
-                return create(text, defaultContextMenuItemAction(), null, inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                return create(text, defaultContextMenuItemAction(), null, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-                return create(text, contextMenuItemAction, null, inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                return create(text, contextMenuItemAction, null, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon) {
-                return create(text, contextMenuItemAction, icon, inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                return create(text, contextMenuItemAction, icon, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
@@ -2779,39 +2793,39 @@ public class API {
         }
 
         public Window create(int x, int y, int width, int height) {
-            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title) {
-            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon) {
-            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, null, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, inputState.config.windows_defaultColor, inputState.config.windows_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components, Color color) {
@@ -2834,10 +2848,10 @@ public class API {
             setIconIndex(window, 0);
             setName(window, "");
             setData(window, null);
-            setEnforceScreenBounds(window, inputState.config.windows_defaultEnforceScreenBounds);
+            setEnforceScreenBounds(window, inputState.config.window_defaultEnforceScreenBounds);
             setFoldable(window, true);
             window.components = new ArrayList<>();
-            window.font = inputState.config.windows_defaultFont;
+            window.font = inputState.config.window_defaultFont;
             window.messageReceiverActions = new ArrayList<>();
             window.updateActions = new ArrayList<>();
             window.addedToScreen = false;
@@ -3205,12 +3219,12 @@ public class API {
 
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
-            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1, 1,  inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
         }
 
 
         public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1, 1,  inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
         }
 
 
@@ -3643,14 +3657,14 @@ public class API {
         private void setComponentInitValues(Component component) {
             component.x = component.y = 0;
             component.width = component.height = 1;
-            component.color_r = inputState.config.components_defaultColor.r;
-            component.color_g = inputState.config.components_defaultColor.g;
-            component.color_b = inputState.config.components_defaultColor.b;
-            component.color_a = inputState.config.components_defaultColor.a;
-            component.color2_r = inputState.config.components_defaultColor.r;
-            component.color2_g = inputState.config.components_defaultColor.g;
-            component.color2_b = inputState.config.components_defaultColor.b;
-            component.color2_a = inputState.config.components_defaultColor.a;
+            component.color_r = inputState.config.component_defaultColor.r;
+            component.color_g = inputState.config.component_defaultColor.g;
+            component.color_b = inputState.config.component_defaultColor.b;
+            component.color_a = inputState.config.component_defaultColor.a;
+            component.color2_r = inputState.config.component_defaultColor.r;
+            component.color2_g = inputState.config.component_defaultColor.g;
+            component.color2_b = inputState.config.component_defaultColor.b;
+            component.color2_a = inputState.config.component_defaultColor.a;
             component.disabled = false;
             component.updateActions = new ArrayList<>();
             component.data = null;
@@ -3707,11 +3721,11 @@ public class API {
         public class _GameViewPort {
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY) {
-                return create(x, y, width, height, camPositionX, camPositionY, 1f, inputState.config.gameViewport_defaultUpdateTime, null);
+                return create(x, y, width, height, camPositionX, camPositionY, 1f, inputState.config.component_gameViewportDefaultUpdateTime, null);
             }
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom) {
-                return create(x, y, width, height, camPositionX, camPositionY, camZoom, inputState.config.gameViewport_defaultUpdateTime, null);
+                return create(x, y, width, height, camPositionX, camPositionY, camZoom, inputState.config.component_gameViewportDefaultUpdateTime, null);
             }
 
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime) {
@@ -3828,19 +3842,19 @@ public class API {
         public class _ProgressBar {
 
             public ProgressBar create(int x, int y, int width) {
-                return create(x, y, width, 0f, false, false, inputState.config.components_defaultFont, null);
+                return create(x, y, width, 0f, false, false, inputState.config.component_defaultFont, null);
             }
 
             public ProgressBar create(int x, int y, int width, float progress) {
-                return create(x, y, width, progress, false, false, inputState.config.components_defaultFont, null);
+                return create(x, y, width, progress, false, false, inputState.config.component_defaultFont, null);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText) {
-                return create(x, y, width, progress, progressText, false, inputState.config.components_defaultFont, null);
+                return create(x, y, width, progress, progressText, false, inputState.config.component_defaultFont, null);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
-                return create(x, y, width, 0f, progressText, progressText2Decimal, inputState.config.components_defaultFont, null);
+                return create(x, y, width, 0f, progressText, progressText2Decimal, inputState.config.component_defaultFont, null);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font) {
@@ -3885,7 +3899,7 @@ public class API {
         public class _Shape {
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType) {
-                return create(x, y, width, height, shapeType, inputState.config.components_defaultColor);
+                return create(x, y, width, height, shapeType, inputState.config.component_defaultColor);
             }
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType, Color color) {
@@ -3992,24 +4006,24 @@ public class API {
 
             public class _TextButton {
                 public TextButton create(int x, int y, int width, int height, String text) {
-                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, inputState.config.components_defaultFont);
+                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, inputState.config.components_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
                 }
 
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon) {
-                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, inputState.config.components_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, inputState.config.components_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, inputState.config.component_defaultFont);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, inputState.config.components_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, inputState.config.component_defaultFont);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font) {
@@ -4097,19 +4111,19 @@ public class API {
         public class _CheckBox {
 
             public CheckBox create(int x, int y, String text) {
-                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, false, inputState.config.components_defaultFont);
+                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, false, inputState.config.component_defaultFont);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle) {
-                return create(x, y, text, checkBoxStyle, null, false, inputState.config.components_defaultFont);
+                return create(x, y, text, checkBoxStyle, null, false, inputState.config.component_defaultFont);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, false, inputState.config.components_defaultFont);
+                return create(x, y, text, checkBoxStyle, checkBoxAction, false, inputState.config.component_defaultFont);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, checked, inputState.config.components_defaultFont);
+                return create(x, y, text, checkBoxStyle, checkBoxAction, checked, inputState.config.component_defaultFont);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
@@ -4322,15 +4336,15 @@ public class API {
                 }
 
                 public Tab create(String title) {
-                    return create(title, null, null, defaultTabAction(), 0, inputState.config.components_defaultFont);
+                    return create(title, null, null, defaultTabAction(), 0, inputState.config.component_defaultFont);
                 }
 
                 public Tab create(String title, CMediaGFX icon) {
-                    return create(title, icon, null, null, 0, inputState.config.components_defaultFont);
+                    return create(title, icon, null, null, 0, inputState.config.component_defaultFont);
                 }
 
                 public Tab create(String title, CMediaGFX icon, Component[] components) {
-                    return create(title, icon, components, defaultTabAction(), 0, inputState.config.components_defaultFont);
+                    return create(title, icon, components, defaultTabAction(), 0, inputState.config.component_defaultFont);
                 }
 
                 public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width) {
@@ -4545,28 +4559,28 @@ public class API {
 
             public TextField create(int x, int y, int width) {
                 return create(x, y, width, "", defaultTextFieldAction(), 32,
-                        inputState.config.textField_defaultAllowedCharacters, inputState.config.components_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
             }
 
 
             public TextField create(int x, int y, int width, String content) {
                 return create(x, y, width, content, defaultTextFieldAction(), 32,
-                        inputState.config.textField_defaultAllowedCharacters, inputState.config.components_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
             }
 
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
                 return create(x, y, width, content, textFieldAction, 32,
-                        inputState.config.textField_defaultAllowedCharacters, inputState.config.components_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
                 return create(x, y, width, content, textFieldAction, contentMaxLength,
-                        inputState.config.textField_defaultAllowedCharacters, inputState.config.components_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
-                return create(x, y, width, content, textFieldAction, contentMaxLength, allowedCharacters, inputState.config.components_defaultFont);
+                return create(x, y, width, content, textFieldAction, contentMaxLength, allowedCharacters, inputState.config.component_defaultFont);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters, CMediaFont font) {
@@ -4796,7 +4810,7 @@ public class API {
 
                 public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, Color color, int arrayIndex) {
                     MapOverlay mapOverlay = new MapOverlay();
-                    setFadeOutTime(mapOverlay, inputState.config.mapOverlay_defaultFadeoutTime);
+                    setFadeOutTime(mapOverlay, inputState.config.component_mapOverlayDefaultFadeoutTime);
                     setImage(mapOverlay, image);
                     setPosition(mapOverlay, x, y);
                     setFadeOut(mapOverlay, fadeOut);
@@ -4916,7 +4930,7 @@ public class API {
             }
 
             public Text create(int x, int y, String[] lines) {
-                return create(x, y, lines, inputState.config.components_defaultFont, defaultTextAction());
+                return create(x, y, lines, inputState.config.component_defaultFont, defaultTextAction());
             }
 
             public Text create(int x, int y, String[] lines, CMediaFont font) {
@@ -5151,17 +5165,17 @@ public class API {
 
                 public ComboBoxItem create(String text) {
                     return create(text, defaultComboBoxItem(), null,
-                            inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction) {
                     return create(text, defaultComboBoxItem(), null,
-                            inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon) {
                     return create(text, defaultComboBoxItem(), icon,
-                            inputState.config.components_defaultColor, inputState.config.components_defaultFont);
+                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
@@ -5303,32 +5317,32 @@ public class API {
             }
 
             public List create(int x, int y, int width, int height) {
-                return create(x, y, width, height, null, defaultListAction(), false, false, false, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, null, defaultListAction(), false, false, false, false, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items) {
-                return create(x, y, width, height, items, defaultListAction(), false, false, false, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, defaultListAction(), false, false, false, false, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction) {
-                return create(x, y, width, height, items, listAction, false, false, false, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, listAction, false, false, false, false, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect) {
-                return create(x, y, width, height, items, listAction, multiSelect, false, false, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, false, false, false, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, false, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, false, false, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, false, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, false, inputState.config.component_defaultFont);
             }
 
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, inputState.config.components_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, inputState.config.component_defaultFont);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, CMediaFont font) {

@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc.render;
+package org.mslivo.core.engine.ui_engine.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

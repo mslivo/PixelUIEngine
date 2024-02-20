@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc.render;
+package org.mslivo.core.engine.ui_engine.render;
 
 public class GrayScaleShader {
     public static final String VERTEX = """

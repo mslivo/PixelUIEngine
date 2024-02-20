@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc.enums;
+package org.mslivo.core.engine.ui_engine.enums;
 
 public enum MOUSE_CONTROL_MODE {
     HARDWARE_MOUSE("Mouse"), KEYBOARD("Keyboard"), GAMEPAD("Gamepad"), DISABLED("Disabled");

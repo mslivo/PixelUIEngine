@@ -34,10 +34,10 @@ import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBarPercentText;
-import org.mslivo.core.engine.ui_engine.misc.enums.MOUSE_CONTROL_MODE;
-import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
-import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.misc.render.PixelPerfectViewport;
+import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 
 class UICommons {
 

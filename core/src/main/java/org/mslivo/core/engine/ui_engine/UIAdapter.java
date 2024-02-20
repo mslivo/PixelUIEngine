@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 
 public interface UIAdapter {
 

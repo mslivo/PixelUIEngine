@@ -1,13 +1,13 @@
-package org.mslivo.core.engine.ui_engine.media;
+package org.mslivo.core.engine.ui_engine;
 
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.ui_engine.UIEngine;
 
 /**
- * These Medias get loaded on startup no matter what
+ * These Medias need to be loaded on startup for the UI to work no matter what
  */
-public class GUIBaseMedia {
+public class UIBaseMedia {
     private static final String DIR_GUI_GRAPHICS = MediaManager.DIR_GRAPHICS+"gui/";
 
     // Graphics

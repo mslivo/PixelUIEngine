@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc.enums;
+package org.mslivo.core.engine.ui_engine.enums;
 
 public enum VIEWPORT_MODE {
     PIXEL_PERFECT("Pixel Perfect"), FIT("Fit"), STRETCH("Stretch");

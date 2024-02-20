@@ -1,7 +1,7 @@
 package org.mslivo.example;
 
 
-import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 
 public class ExampleMainConstants {
 

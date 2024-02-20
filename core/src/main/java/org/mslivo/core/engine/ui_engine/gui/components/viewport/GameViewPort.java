@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.ui_engine.gui.actions.GameViewPortAction;
 import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.misc.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 
 public class GameViewPort extends Component {
     public OrthographicCamera camera;

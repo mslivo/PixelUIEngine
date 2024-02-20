@@ -7,18 +7,19 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.ControllerMapping;
 import com.badlogic.gdx.controllers.Controllers;
 import com.studiohartman.jamepad.ControllerAxis;
-import org.mslivo.core.engine.ui_engine.UIEngine;
 
 public class UIEngineInputProcessor implements InputProcessor, ControllerListener {
+    public static final int DOUBLE_CLICK_TIME = 180;
     private final InputEvents inputEvents;
     private long lastClickTime;
     private final boolean gamePadSupport;
+
     public UIEngineInputProcessor(InputEvents inputEvents, boolean gamePadSupport) {
         this.inputEvents = inputEvents;
         this.lastClickTime = System.currentTimeMillis();
         this.gamePadSupport = gamePadSupport;
         Gdx.input.setInputProcessor(this);
-        if(gamePadSupport) {
+        if (gamePadSupport) {
             Controllers.addListener(this);
         }
     }
@@ -54,7 +55,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
         this.inputEvents.mouseDown = true;
         this.inputEvents.mouseDownButtons.add(button);
         this.inputEvents.mouseButtonsDown[button] = true;
-        if (button == 0 && (System.currentTimeMillis() - lastClickTime) < UIEngine.DOUBLECLICK_TIME_MS) {
+        if (button == 0 && (System.currentTimeMillis() - lastClickTime) < DOUBLE_CLICK_TIME) {
             this.inputEvents.mouseDoubleClick = true;
         }
         lastClickTime = System.currentTimeMillis();
@@ -101,21 +102,21 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public void connected(Controller controller) {
-        if(!gamePadSupport) return;
+        if (!gamePadSupport) return;
         this.inputEvents.gamePadConnected = true;
         this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
     }
 
     @Override
     public void disconnected(Controller controller) {
-        if(!gamePadSupport) return;
+        if (!gamePadSupport) return;
         this.inputEvents.gamePadDisconnected = true;
         this.inputEvents.lastUsedInputMethod = InputMethod.GAMEPAD;
     }
 
     @Override
     public boolean buttonDown(Controller controller, int button) {
-        if(!gamePadSupport) return false;
+        if (!gamePadSupport) return false;
         int keyCode = gamePadMapButtonToKeyCode(controller.getMapping(), button);
         this.inputEvents.gamePadButtonDown = true;
         this.inputEvents.gamePadButtonDownKeyCodes.add(keyCode);
@@ -126,7 +127,7 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public boolean buttonUp(Controller controller, int button) {
-        if(!gamePadSupport) return false;
+        if (!gamePadSupport) return false;
         int keyCode = gamePadMapButtonToKeyCode(controller.getMapping(), button);
         this.inputEvents.gamePadButtonUp = true;
         this.inputEvents.gamePadButtonUpKeyCodes.add(keyCode);
@@ -137,10 +138,10 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
 
     @Override
     public boolean axisMoved(Controller controller, int axis, float amount) {
-        if(!gamePadSupport) return false;
+        if (!gamePadSupport) return false;
         ControllerAxis controllerAxis = axis < ControllerAxis.values().length ? ControllerAxis.values()[axis] : null;
-        if(controllerAxis != null){
-            switch (controllerAxis){
+        if (controllerAxis != null) {
+            switch (controllerAxis) {
                 case LEFTX -> {
                     this.inputEvents.gamePadLeftXMoved = true;
                     this.inputEvents.gamePadLeftX = amount;
@@ -204,9 +205,9 @@ public class UIEngineInputProcessor implements InputProcessor, ControllerListene
             return KeyCode.GamePad.START;
         } else if (button == mapping.buttonBack) {
             return KeyCode.GamePad.BACK;
-        } else if (button == 5){
+        } else if (button == 5) {
             return KeyCode.GamePad.HOME;
-        }else {
+        } else {
             return KeyCode.GamePad.UNKNOWN;
         }
     }

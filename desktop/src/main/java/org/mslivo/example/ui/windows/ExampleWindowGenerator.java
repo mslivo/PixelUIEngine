@@ -42,8 +42,8 @@ import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
@@ -197,7 +197,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true, GUIBaseMedia.FONT_WHITE, Color.BLUE);
+        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true, UIBaseMedia.FONT_WHITE, Color.BLUE);
         api.component.setColor2(progressBar, Color.RED);
 
         ScrollBarHorizontal pgScrollbar = api.component.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {
@@ -254,8 +254,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
                             }
                         }, 1, 20,
-                        api.config.getMouseTextInput_defaultLowerCaseCharacters(),
-                        api.config.getMouseTextInput_defaultUpperCaseCharacters(),
+                        api.config.mouseTextInput.getDefaultLowerCaseCharacters(),
+                        api.config.mouseTextInput.getDefaultUpperCaseCharacters(),
                         14
                 ));
             }
@@ -446,7 +446,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), GUIBaseMedia.FONT_WHITE);
+        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), UIBaseMedia.FONT_WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 

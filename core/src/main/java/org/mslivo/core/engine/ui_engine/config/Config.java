@@ -1,9 +1,9 @@
-package org.mslivo.core.engine.ui_engine.misc.config;
+package org.mslivo.core.engine.ui_engine.config;
 
 import com.badlogic.gdx.graphics.Color;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 
 import java.io.Serializable;
 
@@ -11,7 +11,6 @@ public class Config implements Serializable {
     public CMediaCursor ui_cursor;
     public boolean ui_keyInteractionsDisabled;
     public boolean ui_mouseInteractionsDisabled;
-    public int ui_doubleClickTime;
     public boolean ui_foldWindowsOnDoubleClick;
     public float input_emulatedMouseCursorSpeed;
     public boolean input_hardwareMouseEnabled;
@@ -38,39 +37,38 @@ public class Config implements Serializable {
     public int[] input_gamePadMouseButtonsMouse5;
     public int[] input_gamePadMouseButtonsScrollUp;
     public int[] input_gamePadMouseButtonsScrollDown;
-    public boolean windows_defaultEnforceScreenBounds;
-    public Color windows_defaultColor;
-    public CMediaFont windows_defaultFont;
-    public Color components_defaultColor;
-    public CMediaFont components_defaultFont;
-    public int gameViewport_defaultUpdateTime;
-    public float list_dragAlpha;
-    public float inventory_dragAlpha;
-    public float knob_sensitivity;
-    public float scrollbar_sensitivity;
-    public int button_holdTimer;
-    public int mapOverlay_defaultFadeoutTime;
-    public int notifications_max;
-    public int notifications_defaultDisplayTime;
-    public CMediaFont notifications_defaultFont;
-    public Color notifications_defaultColor;
-    public int notifications_fadeoutTime;
-    public float notifications_scrollSpeed;
+    public boolean window_defaultEnforceScreenBounds;
+    public Color window_defaultColor;
+    public CMediaFont window_defaultFont;
+    public Color component_defaultColor;
+    public CMediaFont component_defaultFont;
+    public int component_gameViewportDefaultUpdateTime;
+    public float component_listDragAlpha;
+    public float component_inventoryDragAlpha;
+    public float component_knobSensitivity;
+    public float component_scrollbarSensitivity;
+    public int component_buttonHoldTimer;
+    public int component_mapOverlayDefaultFadeoutTime;
+    public int notification_max;
+    public int notification_defaultDisplayTime;
+    public CMediaFont notification_defaultFont;
+    public Color notification_defaultColor;
+    public int notification_fadeoutTime;
+    public float notification_scrollSpeed;
     public Color tooltip_defaultColor;
     public CMediaFont tooltip_defaultFont;
     public int tooltip_FadeInTime;
     public int tooltip_FadeInDelayTime;
-    public char[] textField_defaultAllowedCharacters;
+    public char[] component_textFieldDefaultAllowedCharacters;
     public CMediaFont mouseTextInput_defaultFont;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
 
     public Config() {
         // ##### UI Default Values #####
-        ui_cursor = GUIBaseMedia.GUI_CURSOR_ARROW;
+        ui_cursor = UIBaseMedia.GUI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
-        ui_doubleClickTime = 180;
         ui_foldWindowsOnDoubleClick = true;
         // ##### Input Default Values #####
         input_emulatedMouseCursorSpeed = 4.0f;
@@ -99,29 +97,19 @@ public class Config implements Serializable {
         input_gamePadMouseButtonsScrollUp = null;
         input_gamePadMouseButtonsScrollDown = null;
         // ##### Window & Component Default Values #####
-        windows_defaultEnforceScreenBounds = false;
-        windows_defaultColor = Color.WHITE.cpy();
-        windows_defaultFont = GUIBaseMedia.FONT_BLACK;
-        components_defaultColor = Color.WHITE.cpy();
-        components_defaultFont = GUIBaseMedia.FONT_BLACK;
-        gameViewport_defaultUpdateTime = 200;
-        list_dragAlpha = 0.8f;
-        inventory_dragAlpha = 0.8f;
-        knob_sensitivity = 1f;
-        scrollbar_sensitivity = 1f;
-        button_holdTimer = 8;
-        mapOverlay_defaultFadeoutTime = 200;
-        notifications_max = 20;
-        notifications_defaultDisplayTime = 3000;
-        notifications_defaultFont = GUIBaseMedia.FONT_WHITE;
-        notifications_defaultColor = Color.DARK_GRAY.cpy();
-        notifications_fadeoutTime = 200;
-        notifications_scrollSpeed = 1;
-        tooltip_defaultColor = Color.WHITE.cpy();
-        tooltip_defaultFont = GUIBaseMedia.FONT_BLACK;
-        tooltip_FadeInTime = 50;
-        tooltip_FadeInDelayTime = 25;
-        textField_defaultAllowedCharacters = new char[]{
+        window_defaultEnforceScreenBounds = false;
+        window_defaultColor = Color.WHITE.cpy();
+        window_defaultFont = UIBaseMedia.FONT_BLACK;
+        component_defaultColor = Color.WHITE.cpy();
+        component_defaultFont = UIBaseMedia.FONT_BLACK;
+        component_gameViewportDefaultUpdateTime = 200;
+        component_listDragAlpha = 0.8f;
+        component_inventoryDragAlpha = 0.8f;
+        component_knobSensitivity = 1f;
+        component_scrollbarSensitivity = 1f;
+        component_buttonHoldTimer = 8;
+        component_mapOverlayDefaultFadeoutTime = 200;
+        component_textFieldDefaultAllowedCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
                 'm', 'n', 'o', 'p', 'q', 'r',
@@ -135,6 +123,16 @@ public class Config implements Serializable {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
+        notification_max = 20;
+        notification_defaultDisplayTime = 3000;
+        notification_defaultFont = UIBaseMedia.FONT_WHITE;
+        notification_defaultColor = Color.DARK_GRAY.cpy();
+        notification_fadeoutTime = 200;
+        notification_scrollSpeed = 1;
+        tooltip_defaultColor = Color.WHITE.cpy();
+        tooltip_defaultFont = UIBaseMedia.FONT_BLACK;
+        tooltip_FadeInTime = 50;
+        tooltip_FadeInDelayTime = 25;
         mouseTextInput_defaultLowerCaseCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
@@ -151,7 +149,7 @@ public class Config implements Serializable {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
-        mouseTextInput_defaultFont = GUIBaseMedia.FONT_BLACK;
+        mouseTextInput_defaultFont = UIBaseMedia.FONT_BLACK;
     }
 
 

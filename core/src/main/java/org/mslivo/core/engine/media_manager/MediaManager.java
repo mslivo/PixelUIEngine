@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class MediaManager {
 
     public boolean prepareGUICMedia() {
         if (loaded) return false;
-        prepareCMedia(GUIBaseMedia.ALL);
+        prepareCMedia(UIBaseMedia.ALL);
         return true;
     }
 

@@ -1,4 +1,4 @@
-package org.mslivo.core.engine.ui_engine.misc.render;
+package org.mslivo.core.engine.ui_engine.render;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.MathUtils;

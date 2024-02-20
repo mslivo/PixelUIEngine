@@ -13,8 +13,8 @@ import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.media.GUIBaseMedia;
-import org.mslivo.core.engine.ui_engine.misc.render.ImmediateRenderer;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
@@ -85,23 +85,23 @@ public class ExampleUIAdapter implements UIAdapter {
             }
         }));
         api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
-        api.setMouseTool(api.mouseTool.create("Pointer", null, GUIBaseMedia.GUI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, UIBaseMedia.GUI_CURSOR_ARROW));
 
 
-        api.config.setInput_hardwareMouseEnabled(true);
+        api.config.input.setHardwareMouseEnabled(true);
 
-        api.config.setInput_keyboardMouseEnabled(true);
-        api.config.setInput_keyboardMouseButtonsUp(new int[]{KeyCode.Key.UP});
-        api.config.setInput_keyboardMouseButtonsDown(new int[]{KeyCode.Key.DOWN});
-        api.config.setInput_keyboardMouseButtonsLeft(new int[]{KeyCode.Key.LEFT});
-        api.config.setInput_keyboardMouseButtonsRight(new int[]{KeyCode.Key.RIGHT});
-        api.config.setInput_keyboardMouseButtonsMouse1(new int[]{KeyCode.Key.CONTROL_LEFT});
+        api.config.input.setKeyboardMouseEnabled(true);
+        api.config.input.setKeyboardMouseButtonsUp(new int[]{KeyCode.Key.UP});
+        api.config.input.setKeyboardMouseButtonsDown(new int[]{KeyCode.Key.DOWN});
+        api.config.input.setKeyboardMouseButtonsLeft(new int[]{KeyCode.Key.LEFT});
+        api.config.input.setKeyboardMouseButtonsRight(new int[]{KeyCode.Key.RIGHT});
+        api.config.input.setKeyboardMouseButtonsMouse1(new int[]{KeyCode.Key.CONTROL_LEFT});
 
-        api.config.setInput_gamePadMouseEnabled(true);
-        api.config.setInput_gamePadMouseStickLeftEnabled(true);
-        api.config.setInput_gamePadMouseStickRightEnabled(true);
-        api.config.setInput_gamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
-        api.config.setInput_gamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
+        api.config.input.setGamePadMouseEnabled(true);
+        api.config.input.setGamePadMouseStickLeftEnabled(true);
+        api.config.input.setGamePadMouseStickRightEnabled(true);
+        api.config.input.setGamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
+        api.config.input.setGamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
     }
 
     @Override
