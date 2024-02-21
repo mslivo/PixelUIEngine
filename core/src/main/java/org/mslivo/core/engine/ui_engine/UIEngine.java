@@ -17,41 +17,41 @@ import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.ui_engine.gui.Window;
-import org.mslivo.core.engine.ui_engine.gui.actions.CommonActions;
-import org.mslivo.core.engine.ui_engine.gui.actions.UpdateAction;
-import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ImageButton;
-import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
-import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
-import org.mslivo.core.engine.ui_engine.gui.components.list.List;
-import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.mslivo.core.engine.ui_engine.gui.components.shape.Shape;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.mslivo.core.engine.ui_engine.gui.components.text.Text;
-import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
-import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
+import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
+import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
+import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
+import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
+import org.mslivo.core.engine.ui_engine.ui.components.shape.Shape;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
+import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
+import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
+import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
+import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
@@ -159,17 +159,17 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_game.flip(false, true);
 
         // -----  GUI
-        newInputState.spriteBatch_gui = new SpriteBatch(8191);
-        newInputState.spriteBatch_gui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        newInputState.spriteBatch_ui = new SpriteBatch(8191);
+        newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
         if (immediateRenderer) {
-            newInputState.imRenderer_gui = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+            newInputState.imRenderer_ui = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         }
-        newInputState.camera_gui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.camera_gui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.frameBuffer_gui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
-        newInputState.frameBuffer_gui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newInputState.texture_gui = new TextureRegion(newInputState.frameBuffer_gui.getColorBufferTexture());
-        newInputState.texture_gui.flip(false, true);
+        newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
+        newInputState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newInputState.texture_ui = new TextureRegion(newInputState.frameBuffer_ui.getColorBufferTexture());
+        newInputState.texture_ui.flip(false, true);
         // ----- UpScaler
         newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewPortMode, internalResolutionWidth, internalResolutionHeight);
         newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewPortMode);
@@ -247,26 +247,26 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedCheckBox = null;
         // ----- Controls
         newInputState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
-        newInputState.mouse_gui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
-        newInputState.mouse = new GridPoint2(0, 0);
+        newInputState.mouse_ui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
+        newInputState.mouse_game = new GridPoint2(0, 0);
         newInputState.mouse_delta = new GridPoint2(0, 0);
-        newInputState.lastGUIMouseHover = null;
+        newInputState.lastUIMouseHover = null;
         newInputState.cursor = null;
         newInputState.mouseTool = null;
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.simulatedMouseGUIPosition = new Vector2(internalResolutionWidth / 2f, internalResolutionHeight / 2f);
-        newInputState.simulatedMouseLastMouseClick = 0;
+        newInputState.mouse_emulated = new Vector2(internalResolutionWidth / 2f, internalResolutionHeight / 2f);
+        newInputState.emulatedMouseLastMouseClick = 0;
         newInputState.keyBoardMouseSpeedUp = new Vector2(0, 0);
-        newInputState.simulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
+        newInputState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
         newInputState.keyBoardTranslatedKeysDown = new boolean[256];
         newInputState.gamePadTranslatedButtonsDown = new boolean[15];
         newInputState.gamePadTranslatedStickLeft = new Vector2(0, 0);
         newInputState.gamePadTranslatedStickRight = new Vector2(0, 0);
 
         // ---- Misc
-        newInputState.animation_timer_gui = 0f;
+        newInputState.animation_timer_ui = 0f;
         newInputState.tempSaveColor = new Color(Color.WHITE);
         ShaderProgram.pedantic = false;
         newInputState.grayScaleShader = new ShaderProgram(GrayScaleShader.VERTEX, GrayScaleShader.FRAGMENT);
@@ -292,7 +292,6 @@ public class UIEngine<T extends UIAdapter> {
     public void update() {
         // GUI
         this.updateMouseControl(); // Map Keyboard/Gamepad controls to mouse controls
-        this.updateLastGUIMouseHover(); // Determine object that is targeted by cursor
         this.updateGUI(); // Main GUI Update happen here
         this.updateCameras();
         this.updateMouseCursor();
@@ -423,8 +422,8 @@ public class UIEngine<T extends UIAdapter> {
         // ------ MOUSE DOUBLE CLICK ------
         if (inputState.inputEvents.mouseDoubleClick) {
             boolean processMouseDoubleClick = true;
-            if (inputState.lastGUIMouseHover != null) {
-                if (inputState.modalWindow != null && inputState.lastGUIMouseHover != inputState.modalWindow) {
+            if (inputState.lastUIMouseHover != null) {
+                if (inputState.modalWindow != null && inputState.lastUIMouseHover != inputState.modalWindow) {
                     processMouseDoubleClick = false;
                 }
             } else {
@@ -432,11 +431,11 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             if (processMouseDoubleClick) {
-                if (inputState.lastGUIMouseHover instanceof Window window) {
+                if (inputState.lastUIMouseHover instanceof Window window) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (inputState.config.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
-                            if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
+                            if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
                                 window.folded = !window.folded;
                                 if (window.windowAction != null) {
                                     if (window.folded) {
@@ -453,16 +452,16 @@ public class UIEngine<T extends UIAdapter> {
                 // Execute Common Actions
                 for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                    executeOnMouseDoubleClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
+                    executeOnMouseDoubleClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
                 }
 
-                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                        inputState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, inputState.mouse.x, inputState.mouse.y);
+                        inputState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, inputState.mouse_game.x, inputState.mouse_game.y);
                     }
 
                 }
@@ -472,12 +471,12 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.inputEvents.mouseDown) {
             boolean processMouseClick = true;
             /* Modal ? */
-            if (inputState.lastGUIMouseHover != null) {
+            if (inputState.lastUIMouseHover != null) {
                 if (inputState.modalWindow != null) {
                     /* Modal Active? */
-                    if (inputState.lastGUIMouseHover instanceof Window window) {
+                    if (inputState.lastUIMouseHover instanceof Window window) {
                         if (window != inputState.modalWindow) processMouseClick = false;
-                    } else if (inputState.lastGUIMouseHover instanceof Component component) {
+                    } else if (inputState.lastUIMouseHover instanceof Component component) {
                         if (component.addedToWindow == null) {
                             processMouseClick = false;
                         } else if (component.addedToWindow != inputState.modalWindow) {
@@ -486,9 +485,9 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 } else {
                     /* Hidden ? */
-                    if (inputState.lastGUIMouseHover instanceof Window window) {
+                    if (inputState.lastUIMouseHover instanceof Window window) {
                         if (!window.visible) processMouseClick = false;
-                    } else if (inputState.lastGUIMouseHover instanceof Component component) {
+                    } else if (inputState.lastUIMouseHover instanceof Component component) {
                         if (component.addedToWindow != null && !component.addedToWindow.visible)
                             processMouseClick = false;
                     }
@@ -502,7 +501,7 @@ public class UIEngine<T extends UIAdapter> {
                 boolean isMouseLeftButton = inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT];
                 if (isMouseLeftButton) {
                     // Mouse Action
-                    switch (inputState.lastGUIMouseHover) {
+                    switch (inputState.lastUIMouseHover) {
                         case Window window -> {
                             if (window.moveAble) moveWindow = window;
                         }
@@ -527,7 +526,7 @@ public class UIEngine<T extends UIAdapter> {
                             if (scrollBarVertical.scrollBarAction != null)
                                 scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
                             UICommons.scrollBar_scroll(scrollBarVertical,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_gui.y));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.y));
                             inputState.scrolledScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollBarHorizontal scrollBarHorizontal -> {
@@ -535,12 +534,12 @@ public class UIEngine<T extends UIAdapter> {
                             if (scrollBarHorizontal.scrollBarAction != null)
                                 scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
                             UICommons.scrollBar_scroll(scrollBarHorizontal,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_gui.x));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x));
                             inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case ComboBox comboBox -> {
                             if (UICommons.comboBox_isOpen(inputState, comboBox)) {
-                                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y,
                                         UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox),
                                         (comboBox.width * TILE_SIZE), TILE_SIZE)) {
                                     // Clicked on Combobox itself -> close
@@ -548,7 +547,7 @@ public class UIEngine<T extends UIAdapter> {
                                 } else {
                                     // Clicked on Item
                                     for (int i = 0; i < comboBox.items.size(); i++) {
-                                        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                                        if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y,
                                                 UICommons.component_getAbsoluteX(comboBox),
                                                 UICommons.component_getAbsoluteY(comboBox) - (i * TILE_SIZE) - TILE_SIZE,
                                                 comboBox.width * TILE_SIZE,
@@ -570,34 +569,34 @@ public class UIEngine<T extends UIAdapter> {
                             if (knob.knobAction != null) knob.knobAction.onPress();
                         }
                         case Map map -> {
-                            int x = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(map);
-                            int y = inputState.mouse_gui.y - UICommons.component_getAbsoluteY(map);
+                            int x = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(map);
+                            int y = inputState.mouse_ui.y - UICommons.component_getAbsoluteY(map);
                             if (map.mapAction != null) map.mapAction.onPress(x, y);
                             inputState.pressedMap = map;
                         }
                         case GameViewPort gameViewPort -> {
-                            int x = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(gameViewPort);
-                            int y = inputState.mouse_gui.y - UICommons.component_getAbsoluteY(gameViewPort);
+                            int x = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(gameViewPort);
+                            int y = inputState.mouse_ui.y - UICommons.component_getAbsoluteY(gameViewPort);
                             if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(x, y);
                             inputState.pressedGameViewPort = gameViewPort;
                         }
                         case TextField textField -> {
-                            inputState.pressedTextFieldMouseX = inputState.mouse_gui.x - UICommons.component_getAbsoluteX(textField);
+                            inputState.pressedTextFieldMouseX = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(textField);
                             inputState.pressedTextField = textField;
                         }
                         case Inventory inventory -> {
                             int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
                             int x_inventory = UICommons.component_getAbsoluteX(inventory);
                             int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                            int inv_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
-                            int inv_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
+                            int inv_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
+                            int inv_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
                             if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
                                 Object pressedInventoryItem = inventory.items[inv_x][inv_y];
                                 if (pressedInventoryItem != null && inventory.dragEnabled) {
                                     inputState.draggedInventoryFrom.x = inv_x;
                                     inputState.draggedInventoryFrom.y = inv_y;
-                                    inputState.draggedInventoryOffset.x = inputState.mouse_gui.x - (x_inventory + (inv_x * tileSize));
-                                    inputState.draggedInventoryOffset.y = inputState.mouse_gui.y - (y_inventory + (inv_y * tileSize));
+                                    inputState.draggedInventoryOffset.x = inputState.mouse_ui.x - (x_inventory + (inv_x * tileSize));
+                                    inputState.draggedInventoryOffset.y = inputState.mouse_ui.y - (y_inventory + (inv_y * tileSize));
                                     inputState.draggedInventoryItem = inventory.items[inv_x][inv_y];
                                     inputState.draggedInventory = inventory;
                                 }
@@ -613,8 +612,8 @@ public class UIEngine<T extends UIAdapter> {
                             }
                             if (pressedListItem != null && list.dragEnabled) {
                                 inputState.draggedListFromIndex = inputState.itemInfo_listIndex;
-                                inputState.draggedListOffsetX.x = inputState.mouse_gui.x - (UICommons.component_getAbsoluteX(list));
-                                inputState.draggedListOffsetX.y = (inputState.mouse_gui.y - UICommons.component_getAbsoluteY(list)) % 8;
+                                inputState.draggedListOffsetX.x = inputState.mouse_ui.x - (UICommons.component_getAbsoluteX(list));
+                                inputState.draggedListOffsetX.y = (inputState.mouse_ui.y - UICommons.component_getAbsoluteY(list)) % 8;
                                 inputState.draggedListItem = pressedListItem;
                                 inputState.draggedList = list;
                             }
@@ -642,21 +641,21 @@ public class UIEngine<T extends UIAdapter> {
                     // -> Bring clicked window to top
                     if (moveWindow != null) {
                         inputState.draggedWindow = moveWindow;
-                        inputState.draggedWindow_offset.x = inputState.mouse_gui.x - inputState.draggedWindow.x;
-                        inputState.draggedWindow_offset.y = inputState.mouse_gui.y - inputState.draggedWindow.y;
+                        inputState.draggedWindow_offset.x = inputState.mouse_ui.x - inputState.draggedWindow.x;
+                        inputState.draggedWindow_offset.y = inputState.mouse_ui.y - inputState.draggedWindow.y;
                         // Move on top ?
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
 
 
                     // Unfocus focused textfields
-                    if (inputState.focusedTextField != null && inputState.lastGUIMouseHover != inputState.focusedTextField) {
+                    if (inputState.focusedTextField != null && inputState.lastUIMouseHover != inputState.focusedTextField) {
                         UICommons.textField_unFocus(inputState, inputState.focusedTextField);
                     }
                 }
 
                 // Close opened ComboBoxes
-                if (inputState.openComboBox != null && inputState.lastGUIMouseHover != inputState.openComboBox) {
+                if (inputState.openComboBox != null && inputState.lastUIMouseHover != inputState.openComboBox) {
                     //if (!(inputState.lastGUIMouseHover instanceof ComboBoxItem comboBoxItem) || comboBoxItem.addedToComboBox != inputState.openComboBox) {
                     UICommons.comboBox_close(inputState, inputState.openComboBox);
                     //}
@@ -664,7 +663,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 // Hide displayed ContextMenus
                 if (inputState.openContextMenu != null) {
-                    if (!(inputState.lastGUIMouseHover instanceof ContextMenuItem contextMenuItem) || contextMenuItem.addedToContextMenu != inputState.openContextMenu) {
+                    if (!(inputState.lastUIMouseHover instanceof ContextMenuItem contextMenuItem) || contextMenuItem.addedToContextMenu != inputState.openContextMenu) {
                         UICommons.contextMenu_close(inputState.openContextMenu, inputState);
                     }
                 }
@@ -672,16 +671,16 @@ public class UIEngine<T extends UIAdapter> {
                 // Execute Common Actions
                 for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                    executeOnMouseClickCommonAction(inputState.lastGUIMouseHover, mouseDownButton);
+                    executeOnMouseClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
                 }
 
-                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
             } else {
                 // Tool
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                        inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse.x, inputState.mouse.y);
+                        inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse_game.x, inputState.mouse_game.y);
                         inputState.mouseToolPressed = true;
                     }
                 }
@@ -696,8 +695,8 @@ public class UIEngine<T extends UIAdapter> {
                     case List list -> {
                         int dragFromIndex = inputState.draggedListFromIndex;
                         Object dragItem = inputState.draggedListItem;
-                        if (inputState.lastGUIMouseHover != null) {
-                            if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                        if (inputState.lastUIMouseHover != null) {
+                            if (inputState.lastUIMouseHover instanceof List hoverList) {
                                 if (UICommons.list_canDragIntoList(inputState, hoverList)) {
                                     UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
                                     if (inputState.itemInfo_listValid) {
@@ -706,7 +705,7 @@ public class UIEngine<T extends UIAdapter> {
                                             hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
                                     }
                                 }
-                            } else if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                            } else if (inputState.lastUIMouseHover instanceof Inventory hoverInventory) {
                                 if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
                                     UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
                                     if (inputState.itemInfo_inventoryValid) {
@@ -720,8 +719,8 @@ public class UIEngine<T extends UIAdapter> {
                             if (list.listAction != null) list.listAction.onDragIntoScreen(
                                     dragItem,
                                     dragFromIndex,
-                                    inputState.mouse_gui.x,
-                                    inputState.mouse_gui.y
+                                    inputState.mouse_ui.x,
+                                    inputState.mouse_ui.y
                             );
                         }
                         inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
@@ -733,8 +732,8 @@ public class UIEngine<T extends UIAdapter> {
                         int dragFromX = inputState.draggedInventoryFrom.x;
                         int dragFromY = inputState.draggedInventoryFrom.y;
                         Object dragItem = inputState.draggedInventoryItem;
-                        if (inputState.lastGUIMouseHover != null) {
-                            if (inputState.lastGUIMouseHover instanceof Inventory hoverInventory) {
+                        if (inputState.lastUIMouseHover != null) {
+                            if (inputState.lastUIMouseHover instanceof Inventory hoverInventory) {
                                 if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
                                     UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
                                     if (inputState.itemInfo_inventoryValid) {
@@ -744,7 +743,7 @@ public class UIEngine<T extends UIAdapter> {
                                                     inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
                                     }
                                 }
-                            } else if (inputState.lastGUIMouseHover instanceof List hoverList) {
+                            } else if (inputState.lastUIMouseHover instanceof List hoverList) {
                                 if (UICommons.list_canDragIntoList(inputState, hoverList)) {
                                     UICommons.list_updateItemInfoAtMousePosition(inputState, hoverList);
                                     if (inputState.itemInfo_listValid) {
@@ -759,8 +758,8 @@ public class UIEngine<T extends UIAdapter> {
                                 inventory.inventoryAction.onDragIntoScreen(
                                         dragItem,
                                         dragFromX, dragFromY,
-                                        inputState.mouse_gui.x,
-                                        inputState.mouse_gui.y
+                                        inputState.mouse_ui.x,
+                                        inputState.mouse_ui.y
                                 );
                         }
                         inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
@@ -811,7 +810,7 @@ public class UIEngine<T extends UIAdapter> {
                             comboBox.comboBoxAction.onItemSelected(comboBoxItem);
                         if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                             // keyboard mode: move mouse back to combobox on item select
-                            inputState.mouse_gui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                            inputState.mouse_ui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
                         }
                         UICommons.comboBox_close(inputState, comboBox);
                         inputState.pressedComboBoxItem = null;
@@ -870,7 +869,7 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.turnedKnob = null;
                     }
                     case Inventory inventory -> {
-                        boolean isHoverObject = inputState.lastGUIMouseHover == usedUIObject;
+                        boolean isHoverObject = inputState.lastUIMouseHover == usedUIObject;
                         if (isHoverObject) {
                             if (inputState.pressedInventoryItem != null) {
                                 inputState.pressedInventory.inventoryAction.onItemSelected(inputState.pressedInventoryItem);
@@ -882,7 +881,7 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.pressedInventoryItem = null;
                     }
                     case List list -> {
-                        boolean isHoverObject = inputState.lastGUIMouseHover == usedUIObject;
+                        boolean isHoverObject = inputState.lastUIMouseHover == usedUIObject;
                         if (isHoverObject) {
                             if (inputState.pressedListItem != null) {
                                 if (list.multiSelect) {
@@ -923,7 +922,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (pressedMouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseUpButtons.size; ib++) {
                         int mouseUpButton = inputState.inputEvents.mouseUpButtons.get(ib);
-                        pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse.x, inputState.mouse.y);
+                        pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse_game.x, inputState.mouse_game.y);
                     }
                 }
                 inputState.mouseToolPressed = false;
@@ -935,16 +934,16 @@ public class UIEngine<T extends UIAdapter> {
             Object usedUIObject = UICommons.getUsedUIReference(inputState);
             switch (usedUIObject) {
                 case Window window -> {
-                    window.x = inputState.mouse_gui.x - inputState.draggedWindow_offset.x;
-                    window.y = inputState.mouse_gui.y - inputState.draggedWindow_offset.y;
+                    window.x = inputState.mouse_ui.x - inputState.draggedWindow_offset.x;
+                    window.y = inputState.mouse_ui.y - inputState.draggedWindow_offset.y;
                     if (window.windowAction != null)
                         window.windowAction.onMove(window.x, window.y);
                 }
                 case ScrollBarVertical scrollBarVertical -> {
-                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_gui.y));
+                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.y));
                 }
                 case ScrollBarHorizontal scrollBarHorizontal -> {
-                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_gui.x));
+                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x));
                 }
                 case Knob knob -> {
                     float amount = (inputState.mouse_delta.y / 100f) * inputState.config.component_knobSensitivity;
@@ -952,7 +951,7 @@ public class UIEngine<T extends UIAdapter> {
                     UICommons.knob_turnKnob(knob, newValue, amount);
                     if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
                         // keyboard mode: keep mouse position steady
-                        inputState.mouse_gui.y += inputState.mouse_delta.y;
+                        inputState.mouse_ui.y += inputState.mouse_delta.y;
                     }
                 }
                 case null, default -> {
@@ -963,7 +962,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                 MouseTool draggedMouseTool = inputState.mouseTool;
                 if (draggedMouseTool.mouseToolAction != null)
-                    draggedMouseTool.mouseToolAction.onDrag(inputState.mouse.x, inputState.mouse.y);
+                    draggedMouseTool.mouseToolAction.onDrag(inputState.mouse_game.x, inputState.mouse_game.y);
             }
 
         }
@@ -973,13 +972,13 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.mouseTool != null) {
                 MouseTool movedMouseTool = inputState.mouseTool;
                 if (movedMouseTool.mouseToolAction != null)
-                    movedMouseTool.mouseToolAction.onMove(inputState.mouse.x, inputState.mouse.y);
+                    movedMouseTool.mouseToolAction.onMove(inputState.mouse_game.x, inputState.mouse_game.y);
             }
         }
         // ------ MOUSE SCROLLED ------
         if (inputState.inputEvents.mouseScrolled) {
-            if (inputState.lastGUIMouseHover != null) {
-                switch (inputState.lastGUIMouseHover) {
+            if (inputState.lastUIMouseHover != null) {
+                switch (inputState.lastUIMouseHover) {
                     case List list -> {
                         int size = list.items != null ? list.items.size() : 0;
                         float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
@@ -1003,9 +1002,9 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 // Execute Common Actions
-                executeOnMouseScrollCommonAction(inputState.lastGUIMouseHover, inputState.inputEvents.mouseScrolledAmount);
+                executeOnMouseScrollCommonAction(inputState.lastUIMouseHover, inputState.inputEvents.mouseScrolledAmount);
 
-                inputState.mouseInteractedUIObjectFrame = inputState.lastGUIMouseHover;
+                inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
             }
         }
     }
@@ -1095,15 +1094,15 @@ public class UIEngine<T extends UIAdapter> {
 
         // hovering over a component ?
         if (showComponentToolTip) {
-            showComponentToolTip = (inputState.lastGUIMouseHover instanceof Component);
+            showComponentToolTip = (inputState.lastUIMouseHover instanceof Component);
         }
         // modal active and component does not belong to modal ?
         if (showComponentToolTip) {
-            showComponentToolTip = inputState.modalWindow == null || ((Component) inputState.lastGUIMouseHover).addedToWindow == inputState.modalWindow;
+            showComponentToolTip = inputState.modalWindow == null || ((Component) inputState.lastUIMouseHover).addedToWindow == inputState.modalWindow;
         }
 
         if (showComponentToolTip) {
-            Component hoverComponent = (Component) inputState.lastGUIMouseHover;
+            Component hoverComponent = (Component) inputState.lastUIMouseHover;
             Object toolTipSubItem = null;
             if (hoverComponent instanceof List list) {
                 if (list.listAction != null) {
@@ -1117,8 +1116,8 @@ public class UIEngine<T extends UIAdapter> {
                 if (inventory.inventoryAction != null) {
                     int x_inventory = UICommons.component_getAbsoluteX(inventory);
                     int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                    int inv_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
-                    int inv_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
+                    int inv_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
+                    int inv_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
                     if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
                         toolTipSubItem = inventory.items[inv_x][inv_y];
                     }
@@ -1158,7 +1157,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         } else {
             // Set Game Tooltip
-            if (inputState.lastGUIMouseHover == null && inputState.gameToolTip != null) {
+            if (inputState.lastUIMouseHover == null && inputState.gameToolTip != null) {
                 if (inputState.tooltip != inputState.gameToolTip) {
                     inputState.tooltip = inputState.gameToolTip;
                     inputState.tooltip_wait_delay = true;
@@ -1210,13 +1209,13 @@ public class UIEngine<T extends UIAdapter> {
                     inputState.keyBoardMouseSpeedUp.set(0f, 0f);
                 }
                 // Simulated
-                for (int i = 0; i <= 4; i++) inputState.simulatedMouseIsButtonDown[i] = false;
-                inputState.simulatedMouseLastMouseClick = 0;
+                for (int i = 0; i <= 4; i++) inputState.emulatedMouseIsButtonDown[i] = false;
+                inputState.emulatedMouseLastMouseClick = 0;
             }
 
             // Set Next ControlMode
             if (nextControlMode == MOUSE_CONTROL_MODE.GAMEPAD || nextControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
-                this.inputState.simulatedMouseGUIPosition.set(inputState.mouse_gui.x, inputState.mouse_gui.y);
+                this.inputState.mouse_emulated.set(inputState.mouse_ui.x, inputState.mouse_ui.y);
             }
             inputState.currentControlMode = nextControlMode;
         }
@@ -1251,9 +1250,10 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        // Translate MouseXGUI/MouseYGUI to Game X/Y
-        updateGUIMouseBounds();
-        updateGameMouseXY();
+
+        updateGUIMouseBounds(); // Enforce UI mouse screen bounds
+        updateGameMouseXY(); // Translate UI mouse x,y to Game mouse x,y
+        updateLastUIMouseHover(); // Determine object that is below the cursor
     }
 
     private void updateMouseTextInputControl() {
@@ -1466,8 +1466,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.inputEvents.mouseDownButtons.clear();
         inputState.inputEvents.mouseDoubleClick = false;
         Arrays.fill(inputState.inputEvents.mouseButtonsDown, false);
-        inputState.mouse_gui.x = 0;
-        inputState.mouse_gui.y = 0;
+        inputState.mouse_ui.x = 0;
+        inputState.mouse_ui.y = 0;
         inputState.mouse_delta.x = 0;
         inputState.mouse_delta.y = 0;
     }
@@ -1681,14 +1681,14 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Set to final
-        inputState.simulatedMouseGUIPosition.x = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.x + deltaX, 0, inputState.internalResolutionWidth);
-        inputState.simulatedMouseGUIPosition.y = Tools.Calc.inBounds(inputState.simulatedMouseGUIPosition.y - deltaY, 0, inputState.internalResolutionHeight);
-        int newCursorPositionX = MathUtils.round(inputState.simulatedMouseGUIPosition.x);
-        int newCursorPositionY = MathUtils.round(inputState.simulatedMouseGUIPosition.y);
-        inputState.mouse_delta.x = newCursorPositionX - inputState.mouse_gui.x;
-        inputState.mouse_delta.y = newCursorPositionY - inputState.mouse_gui.y;
-        inputState.mouse_gui.x = newCursorPositionX;
-        inputState.mouse_gui.y = newCursorPositionY;
+        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.internalResolutionWidth);
+        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.internalResolutionHeight);
+        int newCursorPositionX = MathUtils.round(inputState.mouse_emulated.x);
+        int newCursorPositionY = MathUtils.round(inputState.mouse_emulated.y);
+        inputState.mouse_delta.x = newCursorPositionX - inputState.mouse_ui.x;
+        inputState.mouse_delta.y = newCursorPositionY - inputState.mouse_ui.y;
+        inputState.mouse_ui.x = newCursorPositionX;
+        inputState.mouse_ui.y = newCursorPositionY;
 
         // Simluate Mouse Button Press Events
         boolean anyButtonChanged = false;
@@ -1701,18 +1701,18 @@ public class UIEngine<T extends UIAdapter> {
                 case 4 -> buttonMouse5Down;
                 default -> throw new IllegalStateException("Unexpected value: " + i);
             };
-            if (inputState.simulatedMouseIsButtonDown[i] != buttonMouseDown) {
-                inputState.simulatedMouseIsButtonDown[i] = buttonMouseDown;
-                if (inputState.simulatedMouseIsButtonDown[i]) {
+            if (inputState.emulatedMouseIsButtonDown[i] != buttonMouseDown) {
+                inputState.emulatedMouseIsButtonDown[i] = buttonMouseDown;
+                if (inputState.emulatedMouseIsButtonDown[i]) {
                     inputState.inputEvents.mouseDown = true;
                     inputState.inputEvents.mouseDownButtons.add(i);
                     anyButtonChanged = true;
                     if (i == Input.Buttons.LEFT) {
                         // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.simulatedMouseLastMouseClick) < UIEngineInputProcessor.DOUBLE_CLICK_TIME) {
+                        if ((System.currentTimeMillis() - inputState.emulatedMouseLastMouseClick) < UIEngineInputProcessor.DOUBLE_CLICK_TIME) {
                             inputState.inputEvents.mouseDoubleClick = true;
                         }
-                        inputState.simulatedMouseLastMouseClick = System.currentTimeMillis();
+                        inputState.emulatedMouseLastMouseClick = System.currentTimeMillis();
                     }
 
                 } else {
@@ -1721,7 +1721,7 @@ public class UIEngine<T extends UIAdapter> {
                     anyButtonChanged = true;
                 }
             }
-            inputState.inputEvents.mouseButtonsDown[i] = inputState.simulatedMouseIsButtonDown[i];
+            inputState.inputEvents.mouseButtonsDown[i] = inputState.emulatedMouseIsButtonDown[i];
         }
         if (!anyButtonChanged) {
             inputState.inputEvents.mouseDown = false;
@@ -1737,7 +1737,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.inputEvents.mouseDragged = false;
             draggedLoop:
             for (int i = 0; i <= 4; i++) {
-                if (inputState.simulatedMouseIsButtonDown[i]) {
+                if (inputState.emulatedMouseIsButtonDown[i]) {
                     inputState.inputEvents.mouseDragged = true;
                     inputState.inputEvents.mouseMoved = false;
                     break;
@@ -1840,22 +1840,22 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void updateGUIMouseBounds() {
-        if (inputState.mouse_gui.x < 0) inputState.mouse_gui.x = 0;
-        if (inputState.mouse_gui.x > inputState.internalResolutionWidth)
-            inputState.mouse_gui.x = inputState.internalResolutionWidth;
-        if (inputState.mouse_gui.y < 0) inputState.mouse_gui.y = 0;
-        if (inputState.mouse_gui.y > inputState.internalResolutionHeight)
-            inputState.mouse_gui.y = inputState.internalResolutionHeight;
+        if (inputState.mouse_ui.x < 0) inputState.mouse_ui.x = 0;
+        if (inputState.mouse_ui.x > inputState.internalResolutionWidth)
+            inputState.mouse_ui.x = inputState.internalResolutionWidth;
+        if (inputState.mouse_ui.y < 0) inputState.mouse_ui.y = 0;
+        if (inputState.mouse_ui.y > inputState.internalResolutionHeight)
+            inputState.mouse_ui.y = inputState.internalResolutionHeight;
     }
 
     private void updateGameMouseXY() {
         // MouseXGUI/MouseYGUI -> To MouseX/MouseY
-        inputState.vector_fboCursor.x = inputState.mouse_gui.x;
-        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_gui.y;
+        inputState.vector_fboCursor.x = inputState.mouse_ui.x;
+        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_ui.y;
         inputState.vector_fboCursor.z = 1;
         inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        this.inputState.mouse.x = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse.y = (int) inputState.vector_fboCursor.y;
+        this.inputState.mouse_game.x = (int) inputState.vector_fboCursor.x;
+        this.inputState.mouse_game.y = (int) inputState.vector_fboCursor.y;
     }
 
     private void updateHardwareMouseControl() {
@@ -1869,17 +1869,17 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
         inputState.vector_fboCursor.z = 1;
-        inputState.camera_gui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        inputState.camera_ui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
 
         // Set to final
-        inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_gui.x);
-        inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_gui.y);
-        inputState.mouse_gui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.internalResolutionWidth);
-        inputState.mouse_gui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.internalResolutionHeight);
+        inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_ui.x);
+        inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_ui.y);
+        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.internalResolutionWidth);
+        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.internalResolutionHeight);
     }
 
-    private void updateLastGUIMouseHover() {
-        inputState.lastGUIMouseHover = findCurrentLastGUIMouseHover();
+    private void updateLastUIMouseHover() {
+        inputState.lastUIMouseHover = UICommons.component_getComponentAtPosition(inputState, inputState.mouse_ui.x,inputState.mouse_ui.y);
     }
 
     private void updateNotifications() {
@@ -1977,7 +1977,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateMouseCursor() {
         /* Update Cursor*/
-        if (inputState.lastGUIMouseHover != null) {
+        if (inputState.lastUIMouseHover != null) {
             // 1. GUI Cursor
             inputState.cursor = inputState.config.ui_cursor;
         } else {
@@ -2011,78 +2011,6 @@ public class UIEngine<T extends UIAdapter> {
         return false;
     }
 
-    private Object findCurrentLastGUIMouseHover() {
-        // Notification Collision
-        for (int i = 0; i < inputState.notifications.size(); i++) {
-            Notification notification = inputState.notifications.get(i);
-            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
-                    0, inputState.internalResolutionWidth - ((i + 1) * TILE_SIZE),
-                    inputState.internalResolutionWidth, TILE_SIZE)) {
-                return notification;
-            }
-        }
-
-        // Context Menu Item collision
-        if (inputState.openContextMenu != null) {
-            for (int i = 0; i < inputState.openContextMenu.items.size(); i++) {
-                if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, inputState.openContextMenu.x, inputState.openContextMenu.y - (TILE_SIZE) - (i * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
-                    return inputState.openContextMenu.items.get(i);
-                }
-            }
-        }
-
-        // Combobox Open Menu collision
-        if (inputState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * TILE_SIZE), inputState.openComboBox.width * TILE_SIZE, (inputState.openComboBox.items.size() * TILE_SIZE))) {
-                return inputState.openComboBox;
-            }
-        }
-
-        // Window / WindowComponent collision
-        windowLoop:
-        for (int i = inputState.windows.size() - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
-            Window window = inputState.windows.get(i);
-            if (!window.visible) continue windowLoop;
-
-            int wndX = window.x;
-            int wndY = window.y + (window.folded ? ((window.height - 1) * TILE_SIZE) : 0);
-            int wndWidth = UICommons.window_getRealWidth(window);
-            int wndHeight = UICommons.window_getRealHeight(window);
-
-            boolean collidesWithWindow = Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, wndX, wndY, wndWidth, wndHeight);
-            if (collidesWithWindow) {
-                for (int ic = window.components.size() - 1; ic >= 0; ic--) {
-                    Component component = window.components.get(ic);
-                    if (mouseCollidesWithComponent(component)) {
-                        return component;
-                    }
-                }
-                return window;
-            }
-        }
-
-        // Screen component collision
-        for (int i = 0; i < inputState.screenComponents.size(); i++) { // use for(i) to avoid iterator creation
-            Component screenComponent = inputState.screenComponents.get(i);
-            if (mouseCollidesWithComponent(screenComponent)) return screenComponent;
-        }
-        return null;
-    }
-
-
-    private boolean mouseCollidesWithComponent(Component component) {
-        if (!component.visible) return false;
-        if (component.disabled) return false;
-        if (UICommons.component_isHiddenByTab(component)) return false;
-
-        if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * TILE_SIZE, component.height * TILE_SIZE)) {
-            inputState.lastGUIMouseHover = component;
-            return true;
-        }
-
-        return false;
-    }
-
     public void render() {
         render(false);
     }
@@ -2108,15 +2036,15 @@ public class UIEngine<T extends UIAdapter> {
 
 
         { // Draw GUI
-            inputState.frameBuffer_gui.begin();
+            inputState.frameBuffer_ui.begin();
             render_glClear();
-            inputState.spriteBatch_gui.setProjectionMatrix(this.inputState.camera_gui.combined);
+            inputState.spriteBatch_ui.setProjectionMatrix(this.inputState.camera_ui.combined);
             if (inputState.immediateRenderer)
-                inputState.imRenderer_gui.setProjectionMatrix(this.inputState.camera_game.combined);
-            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
+                inputState.imRenderer_ui.setProjectionMatrix(this.inputState.camera_game.combined);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
             this.renderGUI();
-            this.uiAdapter.renderAfterUI(inputState.spriteBatch_gui, inputState.imRenderer_gui);
-            inputState.frameBuffer_gui.end();
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
+            inputState.frameBuffer_ui.end();
         }
 
 
@@ -2125,7 +2053,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             inputState.frameBuffer_screen.begin();
             this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
-                    inputState.texture_game, inputState.texture_gui,
+                    inputState.texture_game, inputState.texture_ui,
                     inputState.internalResolutionWidth, inputState.internalResolutionHeight
             );
             inputState.frameBuffer_screen.end();
@@ -2161,9 +2089,9 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void renderGUI() {
-        inputState.animation_timer_gui = inputState.animation_timer_gui + Gdx.graphics.getDeltaTime();
+        inputState.animation_timer_ui = inputState.animation_timer_ui + Gdx.graphics.getDeltaTime();
 
-        inputState.spriteBatch_gui.begin();
+        inputState.spriteBatch_ui.begin();
         render_batchSetColorWhite(1f);
 
         if (inputState.modalWindow != null) render_enableGrayScaleShader(true);
@@ -2206,7 +2134,7 @@ public class UIEngine<T extends UIAdapter> {
 
         render_drawCursor();
 
-        inputState.spriteBatch_gui.end();
+        inputState.spriteBatch_ui.end();
     }
 
 
@@ -2235,20 +2163,20 @@ public class UIEngine<T extends UIAdapter> {
         render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputConfirmPressed);
 
         // Selection
-        render_drawCMediaGFX(UIBaseMedia.GUI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
+        render_drawCMediaGFX(UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
     }
 
     private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
         int pressedIndex = pressed ? 1 : 0;
-        render_drawCMediaGFX(UIBaseMedia.GUI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
+        render_drawCMediaGFX(UIBaseMedia.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
-            render_drawCMediaGFX(UIBaseMedia.GUI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
+            render_drawCMediaGFX(UIBaseMedia.UI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
         }
         if (c == '\t') {
-            render_drawCMediaGFX(upperCase ? UIBaseMedia.GUI_OSTEXTINPUT_UPPERCASE : UIBaseMedia.GUI_OSTEXTINPUT_LOWERCASE, x, y, pressedIndex);
+            render_drawCMediaGFX(upperCase ? UIBaseMedia.UI_OSTEXTINPUT_UPPERCASE : UIBaseMedia.UI_OSTEXTINPUT_LOWERCASE, x, y, pressedIndex);
         }
         if (c == '\b') {
-            render_drawCMediaGFX(UIBaseMedia.GUI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
+            render_drawCMediaGFX(UIBaseMedia.UI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
         } else {
             int offset = pressed ? 1 : 0;
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2 - offset);
@@ -2256,7 +2184,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCursor() {
-        render_drawCMediaGFX(inputState.cursor, inputState.mouse_gui.x, inputState.mouse_gui.y);
+        render_drawCMediaGFX(inputState.cursor, inputState.mouse_ui.x, inputState.mouse_ui.y);
         render_batchSetColorWhite(1f);
     }
 
@@ -2375,10 +2303,10 @@ public class UIEngine<T extends UIAdapter> {
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                             CMediaArray cMenuTexture;
-                            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox) - (TILE_SIZE) - (iy * TILE_SIZE), comboBox.width * TILE_SIZE, TILE_SIZE)) {
-                                cMenuTexture = UIBaseMedia.GUI_COMBOBOX_LIST_SELECTED;
+                            if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox) - (TILE_SIZE) - (iy * TILE_SIZE), comboBox.width * TILE_SIZE, TILE_SIZE)) {
+                                cMenuTexture = UIBaseMedia.UI_COMBOBOX_LIST_SELECTED;
                             } else {
-                                cMenuTexture = UIBaseMedia.GUI_COMBOBOX_LIST;
+                                cMenuTexture = UIBaseMedia.UI_COMBOBOX_LIST;
                             }
                             render_saveTempColorBatch();
                             render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
@@ -2415,10 +2343,10 @@ public class UIEngine<T extends UIAdapter> {
                 for (int ix = 0; ix < width; ix++) {
                     int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     CMediaArray cMenuTexture;
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
-                        cMenuTexture = UIBaseMedia.GUI_CONTEXT_MENU_SELECTED;
+                    if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, contextMenu.x, contextMenu.y - (TILE_SIZE) - (iy * TILE_SIZE), inputState.displayedContextMenuWidth * TILE_SIZE, TILE_SIZE)) {
+                        cMenuTexture = UIBaseMedia.UI_CONTEXT_MENU_SELECTED;
                     } else {
-                        cMenuTexture = UIBaseMedia.GUI_CONTEXT_MENU;
+                        cMenuTexture = UIBaseMedia.UI_CONTEXT_MENU;
                     }
                     render_saveTempColorBatch();
                     render_batchSetColor(contextMenuItem.color_r, contextMenuItem.color_g, contextMenuItem.color_b, alpha);
@@ -2478,19 +2406,19 @@ public class UIEngine<T extends UIAdapter> {
         boolean collidesDown = true;
 
 
-        if (inputState.mouse_gui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.internalResolutionWidth) {
+        if (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.internalResolutionWidth) {
             collidesRight = false;
             //direction = 1;
         }
-        if (inputState.mouse_gui.x - ((tooltip_width + 2) * TILE_SIZE) >= 0) {
+        if (inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE) >= 0) {
             collidesLeft = false;
             //direction = 2;
         }
-        if (inputState.mouse_gui.y - ((tooltip_height + 2) * TILE_SIZE) >= 0) {
+        if (inputState.mouse_ui.y - ((tooltip_height + 2) * TILE_SIZE) >= 0) {
             collidesDown = false;
             //direction = 3;
         }
-        if (inputState.mouse_gui.y + ((tooltip_height + 2) * TILE_SIZE) <= inputState.internalResolutionHeight) { // Push down
+        if (inputState.mouse_ui.y + ((tooltip_height + 2) * TILE_SIZE) <= inputState.internalResolutionHeight) { // Push down
             collidesUp = false;
             //direction = 4;
         }
@@ -2502,20 +2430,20 @@ public class UIEngine<T extends UIAdapter> {
 
         switch (direction) {
             case 1 -> {
-                tooltip_x = inputState.mouse_gui.x + (2 * TILE_SIZE);
-                tooltip_y = inputState.mouse_gui.y - ((tooltip_height * TILE_SIZE) / 2);
+                tooltip_x = inputState.mouse_ui.x + (2 * TILE_SIZE);
+                tooltip_y = inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2);
             }
             case 2 -> {
-                tooltip_x = inputState.mouse_gui.x - ((tooltip_width + 2) * TILE_SIZE);
-                tooltip_y = inputState.mouse_gui.y - ((tooltip_height * TILE_SIZE) / 2);
+                tooltip_x = inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE);
+                tooltip_y = inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2);
             }
             case 3 -> {
-                tooltip_x = inputState.mouse_gui.x - ((tooltip_width * TILE_SIZE) / 2);
-                tooltip_y = inputState.mouse_gui.y + ((2) * TILE_SIZE);
+                tooltip_x = inputState.mouse_ui.x - ((tooltip_width * TILE_SIZE) / 2);
+                tooltip_y = inputState.mouse_ui.y + ((2) * TILE_SIZE);
             }
             case 4 -> {
-                tooltip_x = inputState.mouse_gui.x - ((tooltip_width * TILE_SIZE) / 2);
-                tooltip_y = inputState.mouse_gui.y - ((tooltip_height + 2) * TILE_SIZE);
+                tooltip_x = inputState.mouse_ui.x - ((tooltip_width * TILE_SIZE) / 2);
+                tooltip_y = inputState.mouse_ui.y - ((tooltip_height + 2) * TILE_SIZE);
             }
         }
 
@@ -2527,20 +2455,20 @@ public class UIEngine<T extends UIAdapter> {
         // Lines
         switch (direction) {
             case 1 -> {
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_X, inputState.mouse_gui.x, inputState.mouse_gui.y);
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_X, inputState.mouse_gui.x + TILE_SIZE, inputState.mouse_gui.y);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x, inputState.mouse_ui.y);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
             }
             case 2 -> {
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_X, inputState.mouse_gui.x - TILE_SIZE, inputState.mouse_gui.y);
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_X, inputState.mouse_gui.x - (TILE_SIZE * 2), inputState.mouse_gui.y);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
             }
             case 3 -> {
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_Y, inputState.mouse_gui.x, inputState.mouse_gui.y);
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_Y, inputState.mouse_gui.x, inputState.mouse_gui.y + TILE_SIZE);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y + TILE_SIZE);
             }
             case 4 -> {
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_Y, inputState.mouse_gui.x, inputState.mouse_gui.y - TILE_SIZE);
-                render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_LINE_Y, inputState.mouse_gui.x, inputState.mouse_gui.y - (TILE_SIZE * 2));
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - TILE_SIZE);
+                render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - (TILE_SIZE * 2));
             }
         }
 
@@ -2549,9 +2477,9 @@ public class UIEngine<T extends UIAdapter> {
             for (int ty = 0; ty < tooltip_height; ty++) {
                 if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
                     int titleIndex = (tx == 0 ? 0 : ((tx == tooltip_width - 1) ? 2 : 1));
-                    render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
+                    render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
                 } else {
-                    render_drawCMediaGFX(UIBaseMedia.GUI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
+                    render_drawCMediaGFX(UIBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
                 }
             }
         }
@@ -2604,7 +2532,7 @@ public class UIEngine<T extends UIAdapter> {
             render_saveTempColorBatch();
             render_batchSetColor(notification.color_r, notification.color_g, notification.color_b, notification.color_a);
             for (int ix = 0; ix < width; ix++) {
-                render_drawCMediaGFX(UIBaseMedia.GUI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
+                render_drawCMediaGFX(UIBaseMedia.UI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
             }
             int xOffset = ((width * TILE_SIZE) / 2) - (render_textWidth(notification.font, notification.text) / 2) - notification.scroll;
             render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (inputState.internalResolutionHeight - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
@@ -2621,10 +2549,10 @@ public class UIEngine<T extends UIAdapter> {
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
                 for (int iy = 0; iy < window.height; iy++) {
-                    render_drawCMediaGFX(UIBaseMedia.GUI_WINDOW, window.x + (ix * TILE_SIZE), window.y + (iy * TILE_SIZE), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
+                    render_drawCMediaGFX(UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + (iy * TILE_SIZE), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
                 }
             } else {
-                render_drawCMediaGFX(UIBaseMedia.GUI_WINDOW, window.x + (ix * TILE_SIZE), window.y + ((window.height - 1) * TILE_SIZE), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
+                render_drawCMediaGFX(UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + ((window.height - 1) * TILE_SIZE), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
             }
         }
 
@@ -2666,7 +2594,7 @@ public class UIEngine<T extends UIAdapter> {
 
         switch (component) {
             case Button button -> {
-                CMediaArray buttonMedia = (button.pressed ? UIBaseMedia.GUI_BUTTON_PRESSED : UIBaseMedia.GUI_BUTTON);
+                CMediaArray buttonMedia = (button.pressed ? UIBaseMedia.UI_BUTTON_PRESSED : UIBaseMedia.UI_BUTTON);
                 int pressed_offset = button.pressed ? 1 : 0;
 
                 for (int ix = 0; ix < button.width; ix++) {
@@ -2701,22 +2629,22 @@ public class UIEngine<T extends UIAdapter> {
             case ScrollBarVertical scrollBarVertical -> {
                 for (int i = 0; i < scrollBarVertical.height; i++) {
                     int index = (i == 0 ? 2 : (i == (scrollBarVertical.height - 1) ? 0 : 1));
-                    render_drawCMediaGFX(UIBaseMedia.GUI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
+                    render_drawCMediaGFX(UIBaseMedia.UI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
                     int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha2);
-                    render_drawCMediaGFX(UIBaseMedia.GUI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
+                    render_drawCMediaGFX(UIBaseMedia.UI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
             case ScrollBarHorizontal scrollBarHorizontal -> {
                 for (int i = 0; i < scrollBarHorizontal.width; i++) {
                     int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
-                    render_drawCMediaGFX(UIBaseMedia.GUI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
+                    render_drawCMediaGFX(UIBaseMedia.UI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
                     int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha2);
-                    render_drawCMediaGFX(UIBaseMedia.GUI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
+                    render_drawCMediaGFX(UIBaseMedia.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
@@ -2730,13 +2658,13 @@ public class UIEngine<T extends UIAdapter> {
                 boolean dragEnabled = false;
                 boolean dragValid = false;
                 int drag_x = -1, drag_y = -1;
-                if ((inputState.draggedList != null || inputState.draggedInventory != null) && list == inputState.lastGUIMouseHover) {
+                if ((inputState.draggedList != null || inputState.draggedInventory != null) && list == inputState.lastUIMouseHover) {
                     dragEnabled = true;
                     dragValid = UICommons.list_canDragIntoList(inputState, list);
                     if (dragValid) {
                         drag_x = UICommons.component_getAbsoluteX(list);
                         int y_list = UICommons.component_getAbsoluteY(list);
-                        drag_y = y_list + ((inputState.mouse_gui.y - y_list) / TILE_SIZE) * TILE_SIZE;
+                        drag_y = y_list + ((inputState.mouse_ui.y - y_list) / TILE_SIZE) * TILE_SIZE;
                     }
                 }
 
@@ -2770,7 +2698,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                     for (int ix = 0; ix < list.width; ix++) {
-                        this.render_drawCMediaGFX(selected ? UIBaseMedia.GUI_LIST_SELECTED : UIBaseMedia.GUI_LIST, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
+                        this.render_drawCMediaGFX(selected ? UIBaseMedia.UI_LIST_SELECTED : UIBaseMedia.UI_LIST, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
                     }
                     if (cellColor != null) render_loadTempColorBatch();
 
@@ -2783,7 +2711,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 if (dragEnabled && dragValid) {
                     for (int ix = 0; ix < list.width; ix++) {
-                        this.render_drawCMediaGFX(UIBaseMedia.GUI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
+                        this.render_drawCMediaGFX(UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
                 render_enableGrayScaleShader(grayScaleBefore);
@@ -2792,7 +2720,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Box
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
-                    CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, comboBox) ? UIBaseMedia.GUI_COMBOBOX_OPEN : UIBaseMedia.GUI_COMBOBOX;
+                    CMediaGFX comboMedia = UICommons.comboBox_isOpen(inputState, comboBox) ? UIBaseMedia.UI_COMBOBOX_OPEN : UIBaseMedia.UI_COMBOBOX;
 
                     // Item color or default color
                     float color_r = comboBox.selectedItem != null ? comboBox.selectedItem.color_r : comboBox.color_r;
@@ -2811,20 +2739,20 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
             case Knob knob -> {
-                render_drawCMediaGFX(UIBaseMedia.GUI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
+                render_drawCMediaGFX(UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
                 render_saveTempColorBatch();
                 render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
                 if (knob.endless) {
                     int index = MathUtils.round(knob.turned * 36);
-                    render_drawCMediaGFX(UIBaseMedia.GUI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                    render_drawCMediaGFX(UIBaseMedia.UI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 } else {
                     int index = MathUtils.round(knob.turned * 28);
-                    render_drawCMediaGFX(UIBaseMedia.GUI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                    render_drawCMediaGFX(UIBaseMedia.UI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 }
                 render_loadTempColorBatch();
             }
             case Map map -> {
-                inputState.spriteBatch_gui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
+                inputState.spriteBatch_ui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
 
                 map.mapOverlays.removeIf(mapOverlay -> {
                     if (mapOverlay.fadeOut) {
@@ -2842,12 +2770,12 @@ public class UIEngine<T extends UIAdapter> {
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
 
-                    render_drawCMediaGFX(inputState.focusedTextField == textField ? UIBaseMedia.GUI_TEXTFIELD_FOCUSED : UIBaseMedia.GUI_TEXTFIELD, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                    render_drawCMediaGFX(inputState.focusedTextField == textField ? UIBaseMedia.UI_TEXTFIELD_FOCUSED : UIBaseMedia.UI_TEXTFIELD, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
 
                     if (!textField.contentValid) {
                         render_saveTempColorBatch();
                         render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, (alpha*0.2f));
-                        render_drawCMediaGFX(UIBaseMedia.GUI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                        render_drawCMediaGFX(UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                         render_loadTempColorBatch();
                     }
 
@@ -2856,7 +2784,7 @@ public class UIEngine<T extends UIAdapter> {
                         if (UICommons.textField_isFocused(inputState, textField)) {
                             int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                             if (xOffset < textField.width * TILE_SIZE) {
-                                render_drawCMediaGFX(UIBaseMedia.GUI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
+                                render_drawCMediaGFX(UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField));
                             }
                         }
                     }
@@ -2870,14 +2798,14 @@ public class UIEngine<T extends UIAdapter> {
                 boolean dragEnabled = false;
                 boolean dragValid = false;
                 int drag_x = -1, drag_y = -1;
-                if ((inputState.draggedList != null || inputState.draggedInventory != null) && inventory == inputState.lastGUIMouseHover) {
+                if ((inputState.draggedList != null || inputState.draggedInventory != null) && inventory == inputState.lastUIMouseHover) {
                     dragEnabled = true;
                     dragValid = UICommons.inventory_canDragIntoInventory(inputState, inventory);
                     if (dragValid) {
                         int x_inventory = UICommons.component_getAbsoluteX(inventory);
                         int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                        int m_x = inputState.mouse_gui.x - x_inventory;
-                        int m_y = inputState.mouse_gui.y - y_inventory;
+                        int m_x = inputState.mouse_ui.x - x_inventory;
+                        int m_y = inputState.mouse_ui.y - y_inventory;
                         if (m_x > 0 && m_x < (inventory.width * tileSize) && m_y > 0 && m_y < (inventory.height * tileSize)) {
                             int inv_x = m_x / tileSize;
                             int inv_y = m_y / tileSize;
@@ -2898,12 +2826,12 @@ public class UIEngine<T extends UIAdapter> {
                             CMediaGFX cellMedia;
                             boolean selected = inventory.items[ix][iy] != null && inventory.items[ix][iy] == inventory.selectedItem;
                             if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
-                                cellMedia = inventory.doubleSized ? UIBaseMedia.GUI_INVENTORY_DRAGGED_X2 : UIBaseMedia.GUI_INVENTORY_DRAGGED;
+                                cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_DRAGGED_X2 : UIBaseMedia.UI_INVENTORY_DRAGGED;
                             } else {
                                 if (selected) {
-                                    cellMedia = inventory.doubleSized ? UIBaseMedia.GUI_INVENTORY_SELECTED_X2 : UIBaseMedia.GUI_INVENTORY_SELECTED;
+                                    cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_SELECTED_X2 : UIBaseMedia.UI_INVENTORY_SELECTED;
                                 } else {
-                                    cellMedia = inventory.doubleSized ? UIBaseMedia.GUI_INVENTORY_X2 : UIBaseMedia.GUI_INVENTORY;
+                                    cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_X2 : UIBaseMedia.UI_INVENTORY;
                                 }
                             }
 
@@ -2944,9 +2872,9 @@ public class UIEngine<T extends UIAdapter> {
                     boolean selected = i == tabBar.selectedTab;
                     CMediaGFX tabGraphic;
                     if (tabBar.bigIconMode) {
-                        tabGraphic = selected ? UIBaseMedia.GUI_TAB_BIGICON_SELECTED : UIBaseMedia.GUI_TAB_BIGICON;
+                        tabGraphic = selected ? UIBaseMedia.UI_TAB_BIGICON_SELECTED : UIBaseMedia.UI_TAB_BIGICON;
                     } else {
-                        tabGraphic = selected ? UIBaseMedia.GUI_TAB_SELECTED : UIBaseMedia.GUI_TAB;
+                        tabGraphic = selected ? UIBaseMedia.UI_TAB_SELECTED : UIBaseMedia.UI_TAB;
                     }
 
                     if (tabBar.bigIconMode) {
@@ -2972,34 +2900,34 @@ public class UIEngine<T extends UIAdapter> {
 
                 // Top Border Top
                 for (int ix = 0; ix < topBorder; ix++) {
-                    render_drawCMediaGFX(UIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
+                    render_drawCMediaGFX(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
                 }
 
                 if (tabBar.border) {
                     // Bottom
                     for (int ix = 0; ix < tabBar.width; ix++) {
-                        render_drawCMediaGFX(UIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
+                        render_drawCMediaGFX(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
                     }
                     // Left/Right
                     for (int iy = 0; iy < tabBar.borderHeight; iy++) {
                         int yOffset = (iy + 1) * TILE_SIZE;
-                        render_drawCMediaGFX(UIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
-                        render_drawCMediaGFX(UIBaseMedia.GUI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
+                        render_drawCMediaGFX(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
+                        render_drawCMediaGFX(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
                     }
                 }
             }
             case Shape shape -> {
                 if (shape.shapeType != null) {
                     CMediaImage shapeImage = switch (shape.shapeType) {
-                        case OVAL -> UIBaseMedia.GUI_SHAPE_OVAL;
-                        case RECT -> UIBaseMedia.GUI_SHAPE_RECT;
-                        case DIAMOND -> UIBaseMedia.GUI_SHAPE_DIAMOND;
-                        case TRIANGLE_LEFT_DOWN -> UIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_DOWN;
-                        case TRIANGLE_RIGHT_DOWN -> UIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_DOWN;
-                        case TRIANGLE_LEFT_UP -> UIBaseMedia.GUI_SHAPE_TRIANGLE_LEFT_UP;
-                        case TRIANGLE_RIGHT_UP -> UIBaseMedia.GUI_SHAPE_TRIANGLE_RIGHT_UP;
+                        case OVAL -> UIBaseMedia.UI_SHAPE_OVAL;
+                        case RECT -> UIBaseMedia.UI_SHAPE_RECT;
+                        case DIAMOND -> UIBaseMedia.UI_SHAPE_DIAMOND;
+                        case TRIANGLE_LEFT_DOWN -> UIBaseMedia.UI_SHAPE_TRIANGLE_LEFT_DOWN;
+                        case TRIANGLE_RIGHT_DOWN -> UIBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_DOWN;
+                        case TRIANGLE_LEFT_UP -> UIBaseMedia.UI_SHAPE_TRIANGLE_LEFT_UP;
+                        case TRIANGLE_RIGHT_UP -> UIBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_UP;
                     };
-                    mediaManager.drawCMediaImage(inputState.spriteBatch_gui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
+                    mediaManager.drawCMediaImage(inputState.spriteBatch_ui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
                             0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
                 }
             }
@@ -3007,7 +2935,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Background
                 for (int ix = 0; ix < progressBar.width; ix++) {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
-                    render_drawCMediaGFX(UIBaseMedia.GUI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
+                    render_drawCMediaGFX(UIBaseMedia.UI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
                 }
 
                 // Bar
@@ -3019,9 +2947,9 @@ public class UIEngine<T extends UIAdapter> {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
                     if (xOffset < pixels) {
                         if (pixels - xOffset < TILE_SIZE) {
-                            mediaManager.drawCMediaArrayCut(inputState.spriteBatch_gui, UIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
+                            mediaManager.drawCMediaArrayCut(inputState.spriteBatch_ui, UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
                         } else {
-                            mediaManager.drawCMediaArray(inputState.spriteBatch_gui, UIBaseMedia.GUI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
+                            mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
                         }
                     }
                 }
@@ -3034,12 +2962,12 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
             case CheckBox checkBox -> {
-                CMediaArray tex = checkBox.checkBoxStyle == CheckBoxStyle.CHECKBOX ? UIBaseMedia.GUI_CHECKBOX_CHECKBOX : UIBaseMedia.GUI_CHECKBOX_RADIO;
+                CMediaArray tex = checkBox.checkBoxStyle == CheckBoxStyle.CHECKBOX ? UIBaseMedia.UI_CHECKBOX_CHECKBOX : UIBaseMedia.UI_CHECKBOX_RADIO;
                 render_drawCMediaGFX(tex, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
                 render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
             }
             case GameViewPort gameViewPort -> {
-                inputState.spriteBatch_gui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
+                inputState.spriteBatch_ui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
             }
             default -> {
             }
@@ -3058,7 +2986,7 @@ public class UIEngine<T extends UIAdapter> {
             if (dragInventory.inventoryAction != null) {
                 render_batchSetColorWhite(inputState.config.component_inventoryDragAlpha);
                 CMediaGFX icon = dragInventory.inventoryAction.icon(dragItem);
-                render_drawCMediaGFX(icon, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, dragInventory.inventoryAction.iconArrayIndex(dragItem));
+                render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragInventory.inventoryAction.iconArrayIndex(dragItem));
             }
         } else if (inputState.draggedList != null) {
             List dragList = inputState.draggedList;
@@ -3069,11 +2997,11 @@ public class UIEngine<T extends UIAdapter> {
                 // List
                 render_batchSetColor(dragList.color_r, dragList.color_g, dragList.color_b, Math.min(dragList.color_a, inputState.config.component_listDragAlpha));
                 for (int ix = 0; ix < dragList.width; ix++) {
-                    this.render_drawCMediaGFX(UIBaseMedia.GUI_LIST_SELECTED, inputState.mouse_gui.x - dragOffsetX + (ix * TILE_SIZE), inputState.mouse_gui.y - dragOffsetY);
+                    this.render_drawCMediaGFX(UIBaseMedia.UI_LIST_SELECTED, inputState.mouse_ui.x - dragOffsetX + (ix * TILE_SIZE), inputState.mouse_ui.y - dragOffsetY);
                 }
                 // Text
                 String text = dragList.listAction.text(dragItem);
-                render_drawFont(dragList.font, text, dragList.color_a, inputState.mouse_gui.x - dragOffsetX, inputState.mouse_gui.y - dragOffsetY, 2, 1,
+                render_drawFont(dragList.font, text, dragList.color_a, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, 2, 1,
                         dragList.width * TILE_SIZE, dragList.listAction.icon(dragItem), dragList.listAction.iconArrayIndex(dragItem));
             }
         }
@@ -3083,11 +3011,11 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private boolean render_GrayScaleShaderEnabled() {
-        return inputState.spriteBatch_gui.getShader() == inputState.grayScaleShader;
+        return inputState.spriteBatch_ui.getShader() == inputState.grayScaleShader;
     }
 
     private void render_enableGrayScaleShader(boolean enable) {
-        inputState.spriteBatch_gui.setShader(enable ? inputState.grayScaleShader : null);
+        inputState.spriteBatch_ui.setShader(enable ? inputState.grayScaleShader : null);
     }
 
 
@@ -3122,9 +3050,9 @@ public class UIEngine<T extends UIAdapter> {
         render_saveTempColorFont(font);
         render_fontSetAlpha(font, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
+            mediaManager.drawCMediaFont(inputState.spriteBatch_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
-            mediaManager.drawCMediaFont(inputState.spriteBatch_gui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text, maxWidth);
+            mediaManager.drawCMediaFont(inputState.spriteBatch_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text, maxWidth);
         }
         render_loadTempColorFont(font);
     }
@@ -3134,7 +3062,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_fontSetColorWhite() {
-        inputState.spriteBatch_gui.setColor(1, 1, 1, 1);
+        inputState.spriteBatch_ui.setColor(1, 1, 1, 1);
     }
 
     private Color render_fontGetColor(CMediaFont font) {
@@ -3143,24 +3071,24 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void render_batchSetColor(float r, float g, float b, float a) {
-        inputState.spriteBatch_gui.setColor(r, g, b, a);
+        inputState.spriteBatch_ui.setColor(r, g, b, a);
     }
 
     private void render_batchSetColorWhite(float alpha) {
-        inputState.spriteBatch_gui.setColor(1, 1, 1, alpha);
+        inputState.spriteBatch_ui.setColor(1, 1, 1, alpha);
     }
 
     private Color render_batchGetColor() {
-        return inputState.spriteBatch_gui.getColor();
+        return inputState.spriteBatch_ui.getColor();
     }
 
 
     private void render_saveTempColorBatch() {
-        inputState.tempSaveColor.set(inputState.spriteBatch_gui.getColor());
+        inputState.tempSaveColor.set(inputState.spriteBatch_ui.getColor());
     }
 
     private void render_loadTempColorBatch() {
-        inputState.spriteBatch_gui.setColor(inputState.tempSaveColor);
+        inputState.spriteBatch_ui.setColor(inputState.tempSaveColor);
     }
 
     private void render_saveTempColorFont(CMediaFont font) {
@@ -3180,11 +3108,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
     private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
-        mediaManager.drawCMediaGFX(inputState.spriteBatch_gui, cMedia, x, y, arrayIndex, (inputState.animation_timer_gui + animation_timer_offset));
+        mediaManager.drawCMediaGFX(inputState.spriteBatch_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
     public void shutdown() {
@@ -3200,16 +3128,16 @@ public class UIEngine<T extends UIAdapter> {
 
         // SpriteBatch
         if (inputState.spriteRenderer) inputState.spriteBatch_game.dispose();
-        inputState.spriteBatch_gui.dispose();
+        inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
         if (inputState.immediateRenderer) inputState.imRenderer_game.dispose();
-        if (inputState.immediateRenderer) inputState.imRenderer_gui.dispose();
+        if (inputState.immediateRenderer) inputState.imRenderer_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
         inputState.texture_game.getTexture().dispose();
-        inputState.texture_gui.getTexture().dispose();
+        inputState.texture_ui.getTexture().dispose();
         inputState.texture_screen.getTexture().dispose();
 
         // Shaders

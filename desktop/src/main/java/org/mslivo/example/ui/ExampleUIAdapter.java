@@ -7,11 +7,11 @@ import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
-import org.mslivo.core.engine.ui_engine.gui.actions.ButtonAction;
-import org.mslivo.core.engine.ui_engine.gui.actions.HotKeyAction;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
+import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
+import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
@@ -85,7 +85,7 @@ public class ExampleUIAdapter implements UIAdapter {
             }
         }));
         api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
-        api.setMouseTool(api.mouseTool.create("Pointer", null, UIBaseMedia.GUI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, UIBaseMedia.UI_CURSOR_ARROW));
 
 
         api.config.input.setHardwareMouseEnabled(true);

@@ -19,42 +19,42 @@ import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
-import org.mslivo.core.engine.ui_engine.gui.Window;
-import org.mslivo.core.engine.ui_engine.gui.WindowGenerator;
-import org.mslivo.core.engine.ui_engine.gui.actions.*;
-import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ImageButton;
-import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
-import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
-import org.mslivo.core.engine.ui_engine.gui.components.list.List;
-import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
-import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.mslivo.core.engine.ui_engine.gui.components.shape.Shape;
-import org.mslivo.core.engine.ui_engine.gui.components.shape.ShapeType;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.mslivo.core.engine.ui_engine.gui.components.text.Text;
-import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.notification.STATE_NOTIFICATION;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
-import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.WindowGenerator;
+import org.mslivo.core.engine.ui_engine.ui.actions.*;
+import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
+import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
+import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
+import org.mslivo.core.engine.ui_engine.ui.components.shape.Shape;
+import org.mslivo.core.engine.ui_engine.ui.components.shape.ShapeType;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
+import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
+import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
+import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 
@@ -109,10 +109,10 @@ public class API {
 
     public static class _HotKey {
 
-        public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
+        public org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
             if (keyCodes == null || keyCodes.length == 0) return null;
             if (hotKeyAction == null) return null;
-            org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey = new org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey();
+            org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey = new org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey();
             hotKey.pressed = false;
             setKeyCodes(hotKey, keyCodes);
             setHotKeyAction(hotKey, hotKeyAction);
@@ -121,28 +121,28 @@ public class API {
             return hotKey;
         }
 
-        public void setKeyCodes(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, int[] keyCodes) {
+        public void setKeyCodes(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, int[] keyCodes) {
             if (hotKey == null) return;
             hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
         }
 
 
-        public void setHotKeyAction(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, HotKeyAction hotKeyAction) {
+        public void setHotKeyAction(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, HotKeyAction hotKeyAction) {
             if (hotKey == null) return;
             hotKey.hotKeyAction = hotKeyAction;
         }
 
-        public void setName(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, String name) {
+        public void setName(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, String name) {
             if (hotKey == null) return;
             hotKey.name = Tools.Text.validString(name);
         }
 
-        public void setData(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey, Object data) {
+        public void setData(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, Object data) {
             if (hotKey == null) return;
             hotKey.data = data;
         }
 
-        public String getKeysAsString(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
+        public String getKeysAsString(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
             String result = "";
             String[] names = new String[hotKey.keyCodes.length];
             for (int i = 0; i < hotKey.keyCodes.length; i++) {
@@ -401,7 +401,7 @@ public class API {
         }
 
         public Text text_CreateClickableURL(int x, int y, String url) {
-            return text_CreateClickableURL(x, y, url, Tools.Text.toArray(url), UIBaseMedia.FONT_BLACK, Tools.Text.toArray(url), UIBaseMedia.FONT_BLACK);
+            return text_CreateClickableURL(x, y, url, Tools.Text.toArray(url), UIBaseMedia.UI_FONT_BLACK, Tools.Text.toArray(url), UIBaseMedia.UI_FONT_BLACK);
         }
 
         public Text text_CreateClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
@@ -420,7 +420,7 @@ public class API {
         }
 
         public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick, String[] textHover, CMediaFont fontHover) {
-            Text hlText = component.text.create(x, y, text, UIBaseMedia.FONT_BLACK);
+            Text hlText = component.text.create(x, y, text, UIBaseMedia.UI_FONT_BLACK);
             component.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
@@ -431,8 +431,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (Tools.Calc.pointRectsCollide(
-                            input.mouse.state.xGUI(),
-                            input.mouse.state.yGUI(),
+                            input.mouse.state.xUI(),
+                            input.mouse.state.yUI(),
                             component.getAbsoluteX(hlText),
                             component.getAbsoluteY(hlText),
                             hlText.width * UIEngine.TILE_SIZE,
@@ -535,7 +535,7 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                Image image = component.image.create(x + i, y, UIBaseMedia.GUI_SEPARATOR_HORIZONTAL, index);
+                Image image = component.image.create(x + i, y, UIBaseMedia.UI_SEPARATOR_HORIZONTAL, index);
                 component.setColor(image, inputState.config.component_defaultColor);
                 returnComponents.add(image);
             }
@@ -546,7 +546,7 @@ public class API {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
-                Image image = component.image.create(x, y + i, UIBaseMedia.GUI_SEPARATOR_VERTICAL, index);
+                Image image = component.image.create(x, y + i, UIBaseMedia.UI_SEPARATOR_VERTICAL, index);
                 component.setColor(image, inputState.config.component_defaultColor);
                 returnComponents.add(image);
             }
@@ -554,7 +554,7 @@ public class API {
         }
 
         public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return modal_CreateColorModal(caption, selectColorFunction, initColor, UIBaseMedia.GUI_COLOR_SELECTOR);
+            return modal_CreateColorModal(caption, selectColorFunction, initColor, UIBaseMedia.UI_COLOR_SELECTOR);
         }
 
         public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
@@ -564,7 +564,7 @@ public class API {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.GUI_ICON_COLOR);
+            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.UI_ICON_COLOR);
             ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
             component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -589,7 +589,7 @@ public class API {
             Map colorMap = component.map.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-            MapOverlay cursorOverlay = component.map.mapOverlay.create(UIBaseMedia.GUI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
+            MapOverlay cursorOverlay = component.map.mapOverlay.create(UIBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
             component.map.addMapOverlay(colorMap, cursorOverlay);
 
 
@@ -630,8 +630,8 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.mouse.state.xGUI() - component.getAbsoluteX(colorMap);
-                        int yInv = (input.mouse.state.yGUI() - component.getAbsoluteY(colorMap));
+                        int x = input.mouse.state.xUI() - component.getAbsoluteX(colorMap);
+                        int yInv = (input.mouse.state.yUI() - component.getAbsoluteY(colorMap));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
@@ -640,7 +640,7 @@ public class API {
                             currentColor = component.map.getPixelColor(colorMap, x, y - 1);
                             component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
-                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.FONT_WHITE : UIBaseMedia.FONT_BLACK);
+                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
                             component.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
@@ -716,7 +716,7 @@ public class API {
 
             }
 
-            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.GUI_ICON_INFORMATION);
+            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.UI_ICON_INFORMATION);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -777,7 +777,7 @@ public class API {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.GUI_ICON_KEY_CASE, 0,
+                ImageButton caseButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.UI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
                             public void onToggle(boolean value) {
@@ -794,7 +794,7 @@ public class API {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.GUI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = component.button.imageButton.create(ix, iy, 2, 2, UIBaseMedia.UI_ICON_KEY_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -863,7 +863,7 @@ public class API {
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.GUI_ICON_INFORMATION);
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -1025,7 +1025,7 @@ public class API {
 
             int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.GUI_ICON_QUESTION);
+            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -1061,7 +1061,7 @@ public class API {
         }
 
         public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.GUI_ICON_CLOSE);
+            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.UI_ICON_CLOSE);
             component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
             component.button.setButtonAction(closeButton, new ButtonAction() {
 
@@ -1144,16 +1144,16 @@ public class API {
 
             for (int ix = 0; ix < width; ix++) {
 
-                borders.add(component.image.create(x + ix, y, UIBaseMedia.GUI_BORDERS, 2));
+                borders.add(component.image.create(x + ix, y, UIBaseMedia.UI_BORDERS, 2));
 
                 if (ix >= gap) {
-                    borders.add(component.image.create(x + ix, y + (height - 1), UIBaseMedia.GUI_BORDERS, 3));
+                    borders.add(component.image.create(x + ix, y + (height - 1), UIBaseMedia.UI_BORDERS, 3));
                 }
             }
 
             for (int iy = 0; iy < height; iy++) {
-                borders.add(component.image.create(x, y + iy, UIBaseMedia.GUI_BORDERS, 0));
-                borders.add(component.image.create(x + (width - 1), y + iy, UIBaseMedia.GUI_BORDERS, 1));
+                borders.add(component.image.create(x, y + iy, UIBaseMedia.UI_BORDERS, 0));
+                borders.add(component.image.create(x + (width - 1), y + iy, UIBaseMedia.UI_BORDERS, 1));
             }
 
             return borders;
@@ -1164,7 +1164,7 @@ public class API {
 
             width = Tools.Calc.lowerBounds(width, 1);
             TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.GUI_ICON_EXTEND);
+            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.UI_ICON_EXTEND);
 
             updateExtendableTabBarButton(tabBar, extendButton);
 
@@ -1195,7 +1195,7 @@ public class API {
                                 }
                             }, invisibleTab.icon));
                         }
-                        org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         openContextMenu(selectTabMenu);
                     }
                 });
@@ -1272,20 +1272,20 @@ public class API {
         return new ArrayList<>(inputState.notifications);
     }
 
-    public void openContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
+    public void openContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
         UICommons.contextMenu_openAtMousePosition(contextMenu, inputState, mediaManager);
     }
 
-    public void openContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, int x, int y) {
+    public void openContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
         UICommons.contextMenu_open(contextMenu, inputState, mediaManager, x, y);
     }
 
-    public void closeContextMenu(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
+    public void closeContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
         UICommons.contextMenu_close(contextMenu, inputState);
     }
 
-    public boolean isContextMenuOpen(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
+    public boolean isContextMenuOpen(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
         return UICommons.contextMenu_isOpen(inputState, contextMenu);
     }
 
@@ -1473,45 +1473,45 @@ public class API {
         return inputState.mouseTool != null && name.equals(inputState.mouseTool.name);
     }
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> getHotKeys() {
+    public ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> getHotKeys() {
         return new ArrayList<>(inputState.hotKeys);
     }
 
-    public void addHotKey(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
+    public void addHotKey(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.add(hotKey);
     }
 
-    public void addHotKeys(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[] hotKeys) {
+    public void addHotKeys(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) addHotKey(hotKeys[i]);
     }
 
-    public void removeHotKey(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
+    public void removeHotKey(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.remove(hotKey);
     }
 
-    public void removeHotKeys(org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[] hotKeys) {
+    public void removeHotKeys(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) removeHotKey(hotKeys[i]);
     }
 
     public void removeAllHotKeys() {
-        removeHotKeys(inputState.hotKeys.toArray(new org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey[]{}));
+        removeHotKeys(inputState.hotKeys.toArray(new org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[]{}));
     }
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> findHotKeysByName(String name) {
+    public ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> findHotKeysByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> result = new ArrayList<>();
+        ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> result = new ArrayList<>();
         for (int i = 0; i < inputState.hotKeys.size(); i++)
             if (name.equals(inputState.hotKeys.get(i).name)) result.add(inputState.hotKeys.get(i));
         return result;
     }
 
-    public org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey findHotKeyByName(String name) {
+    public org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey findHotKeyByName(String name) {
         if (name == null) return null;
-        ArrayList<org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey> result = findHotKeysByName(name);
+        ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> result = findHotKeysByName(name);
         return result.size() > 0 ? result.getFirst() : null;
     }
 
@@ -1575,7 +1575,7 @@ public class API {
                          char[] charactersLC, char[] charactersUC, CMediaFont font, float alpha) {
             if (charactersLC == null || charactersUC == null || font == null) return;
             if (inputState.openMouseTextInput != null) return;
-            org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput mouseTextInput = new org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput();
+            org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput mouseTextInput = new org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput();
             inputState.mTextInputMouseX = Gdx.input.getX();
             inputState.mTextInputUnlock = false;
             inputState.openMouseTextInput = mouseTextInput;
@@ -2169,6 +2169,21 @@ public class API {
             public final _Event event = new _Event();
             public final _State state = new _State();
 
+            public void setPosition(int x, int y) {
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
+                // not possibe with hardware mouse - would be resetted instantly
+                inputState.mouse_emulated.x = x;
+                inputState.mouse_emulated.y = y;
+            }
+
+            public void setPositionComponent(Component component) {
+                if (component == null) return;
+                if (component.addedToWindow == null && !component.addedToScreen) return;
+                int x = UICommons.component_getAbsoluteX(component) + (UICommons.component_getRealWidth(component)/2);
+                int y = UICommons.component_getAbsoluteY(component) + (UICommons.component_getRealHeight(component)/2);;
+                setPosition(x,y);
+            }
+
             private String mouseGUIObjectName(Object mouseObject) {
                 if (mouseObject != null) {
                     if (mouseObject instanceof Component component) {
@@ -2180,20 +2195,12 @@ public class API {
                 return "";
             }
 
-            public void setPosition(int x, int y) {
-                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
-                // not possibe with hardware mouse - would be resetted instantly
-                inputState.simulatedMouseGUIPosition.x = x;
-                inputState.simulatedMouseGUIPosition.y = y;
-                inputState.lastGUIMouseHover = null;
-            }
-
             public MOUSE_CONTROL_MODE currentControlMode() {
                 return inputState.currentControlMode;
             }
 
             public Object hoverGUIObject() {
-                return inputState.lastGUIMouseHover;
+                return inputState.lastUIMouseHover;
             }
 
             public boolean isHoveringOverGUIObject() {
@@ -2264,20 +2271,20 @@ public class API {
             }
 
             public class _State {
-                public int xGUI() {
-                    return inputState.mouse_gui.x;
-                }
-
-                public int yGUI() {
-                    return inputState.mouse_gui.y;
-                }
-
                 public int x() {
-                    return inputState.mouse.x;
+                    return inputState.mouse_game.x;
                 }
 
                 public int y() {
-                    return inputState.mouse.y;
+                    return inputState.mouse_game.y;
+                }
+
+                public int xUI() {
+                    return inputState.mouse_ui.x;
+                }
+
+                public int yUI() {
+                    return inputState.mouse_ui.y;
                 }
 
                 public float xDelta() {
@@ -2322,7 +2329,7 @@ public class API {
                 if (keyBoardobject != null) {
                     if (keyBoardobject instanceof Component component) {
                         return component.name;
-                    } else if (keyBoardobject instanceof org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey hotKey) {
+                    } else if (keyBoardobject instanceof org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
                         return hotKey.name;
                     }
                 }
@@ -2629,16 +2636,16 @@ public class API {
 
         public final _ContextMenuItem item = new _ContextMenuItem();
 
-        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems) {
+        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
-            org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu = new org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu();
+        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
+            org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu = new org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu();
             contextMenu.items = new ArrayList<>();
             setAlpha(contextMenu, alpha);
             addContextMenuItems(contextMenu, contextMenuItems);
@@ -2646,43 +2653,43 @@ public class API {
             return contextMenu;
         }
 
-        public void setContextMenuAction(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
+        public void setContextMenuAction(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
             if (contextMenu == null) return;
             contextMenu.contextMenuAction = contextMenuAction;
         }
 
-        public void setAlpha(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, float alpha) {
+        public void setAlpha(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, float alpha) {
             if (contextMenu == null) return;
             contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
         }
 
-        public void addContextMenuItem(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void addContextMenuItem(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
         }
 
-        public void addContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void addContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeContextMenuItem(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void removeContextMenuItem(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
         }
 
-        public void removeContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void removeContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++)
                 removeContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeAllContextMenuItems(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu) {
+        public void removeAllContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
             if (contextMenu == null) return;
             removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
         }
 
-        public ArrayList<ContextMenuItem> findContextMenuItemsByName(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, String name) {
+        public ArrayList<ContextMenuItem> findContextMenuItemsByName(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return new ArrayList<>();
             ArrayList<ContextMenuItem> result = new ArrayList<>();
             for (int i = 0; i < contextMenu.items.size(); i++)
@@ -2690,7 +2697,7 @@ public class API {
             return result;
         }
 
-        public ContextMenuItem findContextMenuItemByName(org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu contextMenu, String name) {
+        public ContextMenuItem findContextMenuItemByName(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return null;
             ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
             return result.size() > 0 ? result.getFirst() : null;

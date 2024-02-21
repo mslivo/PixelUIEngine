@@ -12,28 +12,28 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
-import org.mslivo.core.engine.ui_engine.gui.Window;
-import org.mslivo.core.engine.ui_engine.gui.actions.UpdateAction;
-import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
-import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
-import org.mslivo.core.engine.ui_engine.gui.components.list.List;
-import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.hotkeys.HotKey;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
-import org.mslivo.core.engine.ui_engine.gui.tool.MouseTool;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
+import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
+import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
+import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
+import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
+import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.config.Config;
@@ -63,11 +63,11 @@ public class InputState {
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
-    public SpriteBatch spriteBatch_gui;
-    public ImmediateRenderer imRenderer_gui;
-    public TextureRegion texture_gui;
-    public OrthographicCamera camera_gui;
-    public NestedFrameBuffer frameBuffer_gui;
+    public SpriteBatch spriteBatch_ui;
+    public ImmediateRenderer imRenderer_ui;
+    public TextureRegion texture_ui;
+    public OrthographicCamera camera_ui;
+    public NestedFrameBuffer frameBuffer_ui;
 
     /* #################### Graphics: Screen #################### */
     public int upscaleFactor_screen;
@@ -78,7 +78,7 @@ public class InputState {
     public Viewport viewport_screen;
     public OrthographicCamera camera_screen;
 
-    /* #################### GUI: Added Elements #################### */
+    /* #################### UI: Added Elements #################### */
 
     public ArrayList<Window> windows;
     public ArrayList<Component> screenComponents;
@@ -90,7 +90,7 @@ public class InputState {
     public ArrayList<UpdateAction> singleUpdateActions;
     public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
-    /* #################### GUI: Actively used UI References #################### */
+    /* #################### UI: Actively used UI References #################### */
     public Window draggedWindow;
     public GridPoint2 draggedWindow_offset;
     public Button pressedButton;
@@ -146,10 +146,11 @@ public class InputState {
     public IntArray mTextInputAPICharacterQueue;
 
     /* #################### Control #################### */
-    public Object lastGUIMouseHover; // Last GUI Element the mouse hovered over
+    public Object lastUIMouseHover; // Last GUI Element the mouse hovered over
     public MOUSE_CONTROL_MODE currentControlMode;
-    public GridPoint2 mouse;
-    public GridPoint2 mouse_gui;
+    public GridPoint2 mouse_game;
+    public Vector2 mouse_emulated; // Mouse Position for Keyboard/Gamepad mouse control
+    public GridPoint2 mouse_ui;
     public GridPoint2 mouse_delta;
     public CMediaCursor cursor;
     public MouseTool mouseTool;
@@ -163,13 +164,12 @@ public class InputState {
     public Vector2 gamePadTranslatedStickLeft;
     public Vector2 gamePadTranslatedStickRight;
     public boolean[] gamePadTranslatedButtonsDown;
-    public long simulatedMouseLastMouseClick;
-    public boolean[] simulatedMouseIsButtonDown;
-    public Vector2 simulatedMouseGUIPosition;
+    public long emulatedMouseLastMouseClick;
+    public boolean[] emulatedMouseIsButtonDown;
 
     /* #################### Misc. ####################  */
 
-    public float animation_timer_gui;
+    public float animation_timer_ui;
     public Color tempSaveColor;
     public ShaderProgram grayScaleShader;
     public OrthographicCamera camera_frustum; // camera for frustum testing

@@ -11,37 +11,37 @@ import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.tools.sound.SoundPlayer;
 import org.mslivo.core.engine.ui_engine.API;
-import org.mslivo.core.engine.ui_engine.gui.Window;
-import org.mslivo.core.engine.ui_engine.gui.WindowGenerator;
-import org.mslivo.core.engine.ui_engine.gui.actions.*;
-import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.gui.components.button.Button;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ButtonMode;
-import org.mslivo.core.engine.ui_engine.gui.components.button.ImageButton;
-import org.mslivo.core.engine.ui_engine.gui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBox;
-import org.mslivo.core.engine.ui_engine.gui.components.checkbox.CheckBoxStyle;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.gui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
-import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
-import org.mslivo.core.engine.ui_engine.gui.components.list.List;
-import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.mslivo.core.engine.ui_engine.gui.components.shape.Shape;
-import org.mslivo.core.engine.ui_engine.gui.components.shape.ShapeType;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.mslivo.core.engine.ui_engine.gui.components.text.Text;
-import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInputAction;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
+import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.WindowGenerator;
+import org.mslivo.core.engine.ui_engine.ui.actions.*;
+import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
+import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
+import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
+import org.mslivo.core.engine.ui_engine.ui.components.shape.Shape;
+import org.mslivo.core.engine.ui_engine.ui.components.shape.ShapeType;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
+import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
+import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.example.data.ExampleData;
@@ -197,7 +197,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true, UIBaseMedia.FONT_WHITE, Color.BLUE);
+        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true, UIBaseMedia.UI_FONT_WHITE, Color.BLUE);
         api.component.setColor2(progressBar, Color.RED);
 
         ScrollBarHorizontal pgScrollbar = api.component.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {
@@ -446,7 +446,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), UIBaseMedia.FONT_WHITE);
+        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), UIBaseMedia.UI_FONT_WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 

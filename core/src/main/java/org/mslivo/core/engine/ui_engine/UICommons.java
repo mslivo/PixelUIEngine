@@ -11,35 +11,128 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.ui_engine.gui.Window;
-import org.mslivo.core.engine.ui_engine.gui.components.Component;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBox;
-import org.mslivo.core.engine.ui_engine.gui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.gui.components.inventory.Inventory;
-import org.mslivo.core.engine.ui_engine.gui.components.knob.Knob;
-import org.mslivo.core.engine.ui_engine.gui.components.list.List;
-import org.mslivo.core.engine.ui_engine.gui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.gui.components.map.MapOverlay;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBar;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarHorizontal;
-import org.mslivo.core.engine.ui_engine.gui.components.scrollbar.ScrollBarVertical;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.Tab;
-import org.mslivo.core.engine.ui_engine.gui.components.tabbar.TabBar;
-import org.mslivo.core.engine.ui_engine.gui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.gui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenu;
-import org.mslivo.core.engine.ui_engine.gui.contextmenu.ContextMenuItem;
-import org.mslivo.core.engine.ui_engine.gui.notification.Notification;
-import org.mslivo.core.engine.ui_engine.gui.ostextinput.MouseTextInput;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.gui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.gui.components.progressbar.ProgressBarPercentText;
+import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
+import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
+import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
+import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
+import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
+import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 
 class UICommons {
+
+    static int component_getParentWindowX(Component component) {
+        return component.addedToWindow != null ? component.addedToWindow.x : 0;
+    }
+
+    static int component_getParentWindowY(Component component) {
+        return component.addedToWindow != null ? component.addedToWindow.y : 0;
+    }
+
+    static int component_getAbsoluteX(Component component) {
+        return component_getParentWindowX(component) + (component.x * UIEngine.TILE_SIZE) + component.offset_x;
+    }
+
+    static int component_getAbsoluteY(Component component) {
+        return component_getParentWindowY(component) + (component.y * UIEngine.TILE_SIZE) + component.offset_y;
+    }
+
+    static int component_getRealWidth(Component component) {
+        return component.width * UIEngine.TILE_SIZE;
+    }
+
+    static int component_getRealHeight(Component component) {
+        return component.height * UIEngine.TILE_SIZE;
+    }
+
+    static Object component_getComponentAtPosition(InputState inputState, int x, int y) {
+        // Notification Collision
+        for (int i = 0; i < inputState.notifications.size(); i++) {
+            Notification notification = inputState.notifications.get(i);
+            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y,
+                    0, inputState.internalResolutionWidth - ((i + 1) * UIEngine.TILE_SIZE),
+                    inputState.internalResolutionWidth, UIEngine.TILE_SIZE)) {
+                return notification;
+            }
+        }
+
+        // Context Menu Item collision
+        if (inputState.openContextMenu != null) {
+            for (int i = 0; i < inputState.openContextMenu.items.size(); i++) {
+                if (Tools.Calc.pointRectsCollide(x, y, inputState.openContextMenu.x, inputState.openContextMenu.y - (UIEngine.TILE_SIZE) - (i * UIEngine.TILE_SIZE), inputState.displayedContextMenuWidth * UIEngine.TILE_SIZE, UIEngine.TILE_SIZE)) {
+                    return inputState.openContextMenu.items.get(i);
+                }
+            }
+        }
+
+        // Combobox Open Menu collision
+        if (inputState.openComboBox != null) {
+            if (Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * UIEngine.TILE_SIZE), inputState.openComboBox.width * UIEngine.TILE_SIZE, (inputState.openComboBox.items.size() * UIEngine.TILE_SIZE))) {
+                return inputState.openComboBox;
+            }
+        }
+
+        // Window / WindowComponent collision
+        windowLoop:
+        for (int i = inputState.windows.size() - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
+            Window window = inputState.windows.get(i);
+            if (!window.visible) continue windowLoop;
+
+            int wndX = window.x;
+            int wndY = window.y + (window.folded ? ((window.height - 1) * UIEngine.TILE_SIZE) : 0);
+            int wndWidth = UICommons.window_getRealWidth(window);
+            int wndHeight = UICommons.window_getRealHeight(window);
+
+            boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, wndX, wndY, wndWidth, wndHeight);
+            if (collidesWithWindow) {
+                for (int ic = window.components.size() - 1; ic >= 0; ic--) {
+                    Component component = window.components.get(ic);
+                    if (component_isComponentAtPosition(x,y,component)) {
+                        return component;
+                    }
+                }
+                return window;
+            }
+        }
+
+        // Screen component collision
+        for (int i = 0; i < inputState.screenComponents.size(); i++) {
+            Component screenComponent = inputState.screenComponents.get(i);
+            if (component_isComponentAtPosition(x,y,screenComponent)) return screenComponent;
+        }
+        return null;
+    }
+
+    static boolean component_isComponentAtPosition(int x, int y, Component component) {
+        if (!component.visible) return false;
+        if (component.disabled) return false;
+        if (UICommons.component_isHiddenByTab(component)) return false;
+
+        if (Tools.Calc.pointRectsCollide(x, y, UICommons.component_getAbsoluteX(component), UICommons.component_getAbsoluteY(component), component.width * UIEngine.TILE_SIZE, component.height * UIEngine.TILE_SIZE)) {
+            return true;
+        }
+        return false;
+    }
 
     static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
         switch (VIEWPORTMODE) {
@@ -122,7 +215,7 @@ class UICommons {
 
     static void window_removeFromScreen(InputState inputState, Window window) {
         if (!window.addedToScreen) return;
-        if (inputState.lastGUIMouseHover == window) inputState.lastGUIMouseHover = null;
+        if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
         if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
         window.addedToScreen = false;
         inputState.windows.remove(window);
@@ -235,6 +328,8 @@ class UICommons {
         return null;
     }
 
+
+
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
         if (notification.addedToScreen) return;
         notification.addedToScreen = true;
@@ -251,11 +346,11 @@ class UICommons {
     }
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
-        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_gui.x, inputState.mouse_gui.y);
-        if (success && inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_ui.x,inputState.mouse_ui.y);
+        if (success && (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD || inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD)) {
             // keyboard mode: move mouse onto the opened menu
-            inputState.mouse_gui.x += UIEngine.TILE_SIZE_2;
-            inputState.mouse_gui.y -= UIEngine.TILE_SIZE_2;
+            inputState.mouse_emulated.x += UIEngine.TILE_SIZE_2;
+            inputState.mouse_emulated.y -= UIEngine.TILE_SIZE_2;
         }
         return success;
     }
@@ -267,8 +362,8 @@ class UICommons {
             contextMenu_close(inputState.openContextMenu, inputState);
         }
         // Open this one
-        contextMenu.x = inputState.mouse_gui.x;
-        contextMenu.y = inputState.mouse_gui.y;
+        contextMenu.x = x;
+        contextMenu.y = y;
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
@@ -298,21 +393,6 @@ class UICommons {
         return ProgressBarPercentText.progressText2Decimal[(int) (progress * 10000)];
     }
 
-    static int component_getParentWindowX(Component component) {
-        return component.addedToWindow != null ? component.addedToWindow.x : 0;
-    }
-
-    static int component_getParentWindowY(Component component) {
-        return component.addedToWindow != null ? component.addedToWindow.y : 0;
-    }
-
-    static int component_getAbsoluteX(Component component) {
-        return component_getParentWindowX(component) + (component.x * UIEngine.TILE_SIZE) + component.offset_x;
-    }
-
-    static int component_getAbsoluteY(Component component) {
-        return component_getParentWindowY(component) + (component.y * UIEngine.TILE_SIZE) + component.offset_y;
-    }
 
     static Tab tabBar_getSelectedTab(TabBar tabBar) {
         if (tabBar == null) return null;
@@ -403,7 +483,7 @@ class UICommons {
     static void component_removeFromScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
-        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
         component.addedToScreen = true;
@@ -414,7 +494,7 @@ class UICommons {
     static void component_removeFromWindow(Component component, Window window, InputState inputState) {
         if (component.addedToWindow != window) return;
         if (component.addedToScreen) return;
-        if (inputState.lastGUIMouseHover == component) inputState.lastGUIMouseHover = null;
+        if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
         component.addedToWindow = null;
@@ -613,7 +693,7 @@ class UICommons {
             }
 
             int tabHeight = tabBar.bigIconMode ? (UIEngine.TILE_SIZE * 2) : UIEngine.TILE_SIZE;
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, x_bar + (tabXOffset * UIEngine.TILE_SIZE), y_bar, tabWidth * UIEngine.TILE_SIZE, tabHeight)) {
                 inputState.itemInfo_tabBarTabIndex = i;
                 inputState.itemInfo_tabBarValid = true;
                 return;
@@ -638,7 +718,7 @@ class UICommons {
                 int itemIndex = itemFrom + iy;
                 if (itemIndex < list.items.size()) {
                     int itemOffsetY = ((list.height - 1) - iy);
-                    if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y,
+                    if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y,
                             x_list, y_list + itemOffsetY * UIEngine.TILE_SIZE, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE)) {
                         inputState.itemInfo_listIndex = itemIndex;
                         inputState.itemInfo_listValid = true;
@@ -647,7 +727,7 @@ class UICommons {
                 }
             }
             // Insert at end
-            if (Tools.Calc.pointRectsCollide(inputState.mouse_gui.x, inputState.mouse_gui.y, x_list, y_list, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE * list.height)) {
+            if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, x_list, y_list, UIEngine.TILE_SIZE * list.width, UIEngine.TILE_SIZE * list.height)) {
                 inputState.itemInfo_listIndex = list.items.size();
                 inputState.itemInfo_listValid = true;
                 return;
@@ -664,8 +744,8 @@ class UICommons {
         int tileSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
         int x_inventory = UICommons.component_getAbsoluteX(inventory);
         int y_inventory = UICommons.component_getAbsoluteY(inventory);
-        int inv_to_x = (inputState.mouse_gui.x - x_inventory) / tileSize;
-        int inv_to_y = (inputState.mouse_gui.y - y_inventory) / tileSize;
+        int inv_to_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
+        int inv_to_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
         if (UICommons.inventory_positionValid(inventory, inv_to_x, inv_to_y)) {
             inputState.itemInfo_inventoryPos.x = inv_to_x;
             inputState.itemInfo_inventoryPos.y = inv_to_y;

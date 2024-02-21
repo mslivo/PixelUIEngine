@@ -66,7 +66,7 @@ public class Config implements Serializable {
 
     public Config() {
         // ##### UI Default Values #####
-        ui_cursor = UIBaseMedia.GUI_CURSOR_ARROW;
+        ui_cursor = UIBaseMedia.UI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
@@ -99,9 +99,9 @@ public class Config implements Serializable {
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = false;
         window_defaultColor = Color.WHITE.cpy();
-        window_defaultFont = UIBaseMedia.FONT_BLACK;
+        window_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_defaultColor = Color.WHITE.cpy();
-        component_defaultFont = UIBaseMedia.FONT_BLACK;
+        component_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_gameViewportDefaultUpdateTime = 200;
         component_listDragAlpha = 0.8f;
         component_inventoryDragAlpha = 0.8f;
@@ -125,12 +125,12 @@ public class Config implements Serializable {
         };
         notification_max = 20;
         notification_defaultDisplayTime = 3000;
-        notification_defaultFont = UIBaseMedia.FONT_WHITE;
+        notification_defaultFont = UIBaseMedia.UI_FONT_WHITE;
         notification_defaultColor = Color.DARK_GRAY.cpy();
         notification_fadeoutTime = 200;
         notification_scrollSpeed = 1;
         tooltip_defaultColor = Color.WHITE.cpy();
-        tooltip_defaultFont = UIBaseMedia.FONT_BLACK;
+        tooltip_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         tooltip_FadeInTime = 50;
         tooltip_FadeInDelayTime = 25;
         mouseTextInput_defaultLowerCaseCharacters = new char[]{
@@ -149,7 +149,7 @@ public class Config implements Serializable {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
-        mouseTextInput_defaultFont = UIBaseMedia.FONT_BLACK;
+        mouseTextInput_defaultFont = UIBaseMedia.UI_FONT_BLACK;
     }
 
 
