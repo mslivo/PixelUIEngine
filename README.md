@@ -37,7 +37,7 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
  - Viewport handling / Pixel-Art upscaling
  - Asset-Management
  - Input handling
- - High performance, low library size (~370kb)
+ - High performance, low library size (~300kb)
  - Utility classes
   - Particle system
   - Transition effects
