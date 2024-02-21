@@ -1,51 +1,50 @@
 # PixelUI Engine
+![](logo.png)
+
 UI-System on top of LibGDX which provides a tiny 8x8-tile based Window and Component system suited for low-resolution games. 
 
-This library is used in the game [Sandtrix](https://www.sandtrix.net).
+This library was used in the game [Sandtrix](https://www.sandtrix.net).
 
-## Features
-### Screenshots
+## Screenshots
 ![](screenshot_1.png)
 ![](screenshot_2.png)
-![](screenshot_3.png)
-![](screenshot_4.png)
 
-### Components
-- Button
-- Checkbox / Radiobox
-- Combobox
-- Image
-- Text
-- Inventory (Grid)
-- List
-- Knob
-- Map
-- Progressbar
-- Scrollbar
-- Shapes
-- Tabbars & Tabs
-- Textfield
-- GameViewPort
+## Features
+- Components
+  - Button
+  - Checkbox / Radiobox
+  - Combobox
+  - Image
+  - Text
+  - Inventory (Grid)
+  - List
+  - Knob
+  - Map
+  - Progressbar
+  - Scrollbar
+  - Shapes
+  - Tabbars & Tabs
+  - Textfield
+  - GameViewPort
+ - ToolTips
+ - Context Menus
+ - Notifications
+ - Modals
+ - Hotkeys
+ - Drag & Drop
+ - Keyboard & Gamepad mouse emulation
+ - Gamepad & Touchscreen text input
+ - Viewport handling / Pixel-Art upscaling
+ - Asset-Management
+ - Input handling
+ - High performance, low library size (~370kb)
+ - Utility classes
+  - Particle system
+  - Transition effects
+  - Music & Sound players
+  - Settings manager
 
-### Additional features
-- ToolTips
-- Context Menus
-- Notifications
-- Modals
-- Hotkeys
-- List/Inventory drag & drop
-- Keyboard mouse control mode
-- Gamepad mouse control mode
-- Gamepad & Touchscreen text input
-- Viewport handling / Pixel-Art upscaling
-- Asset-Management
-- Input handling
-- Particle system
-- Settings storage/loading
-- Sound player
-- Music player
-- Utility classes
-- High performance, low library size (~370kb)
+
 
 ## Overview
 ### desktop/ ... /example
