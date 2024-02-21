@@ -3069,8 +3069,9 @@ public class API {
 
         public void center(Window window) {
             if (window == null) return;
-            window.x = inputState.internalResolutionWidth / 2 - UICommons.window_getRealWidth(window) / 2;
-            window.y = inputState.internalResolutionHeight / 2 - UICommons.window_getRealHeight(window) / 2;
+            int centerX = (inputState.internalResolutionWidth / 2) - (UICommons.window_getRealWidth(window) / 2);
+            int centerY = (inputState.internalResolutionHeight / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getRealHeight(window)) / 2);
+            setPosition(window,centerX, centerY);
         }
 
         public void setFont(Window window, CMediaFont font) {
@@ -3148,8 +3149,7 @@ public class API {
 
         public void setPosition(Window window, int x, int y) {
             if (window == null) return;
-            window.x = x;
-            window.y = y;
+            UICommons.window_setPosition(inputState, window, x,y);
         }
 
         public void move(Window window, int xRel, int yRel) {

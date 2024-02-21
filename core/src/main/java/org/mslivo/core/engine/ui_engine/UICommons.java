@@ -1,6 +1,7 @@
 package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -116,7 +117,7 @@ class UICommons {
             int wndX = window.x;
             int wndY = window.y + (window.folded ? ((window.height - 1) * UIEngine.TILE_SIZE) : 0);
             int wndWidth = UICommons.window_getRealWidth(window);
-            int wndHeight = UICommons.window_getRealHeight(window);
+            int wndHeight = window.folded ? UIEngine.TILE_SIZE : UICommons.window_getRealHeight(window);
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
@@ -421,20 +422,25 @@ class UICommons {
     }
 
     static int window_getRealHeight(Window window) {
-        if (!window.folded) {
-            return window.height * UIEngine.TILE_SIZE;
-        } else {
-            return UIEngine.TILE_SIZE;
-        }
+        return window.height * UIEngine.TILE_SIZE;
     }
+
+    static void window_setPosition(InputState inputState, Window window, int x, int y) {
+        window.x = x;
+        window.y = y;
+        if(window.enforceScreenBounds) window_enforceScreenBounds(inputState, window);
+    }
+
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getRealWidth(window);
-        int wndheight = window_getRealHeight(window);
         window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
-        window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - wndheight);
+        if(window.folded){
+            window.y = Tools.Calc.inBounds(window.y, -((window.height-1)*UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height)*UIEngine.TILE_SIZE);
+        }else{
+            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
+        }
     }
-
 
     static boolean inventory_positionValid(Inventory inventory, int x, int y) {
         if (inventory.items != null) {
@@ -459,6 +465,21 @@ class UICommons {
                 }
             }
         }
+    }
+
+    static boolean textField_isControlKey(int keyCode) {
+        return keyCode == Input.Keys.ENTER ||
+                keyCode == Input.Keys.NUMPAD_ENTER ||
+                keyCode == Input.Keys.FORWARD_DEL ||
+                keyCode == Input.Keys.BACKSPACE ||
+                keyCode == Input.Keys.END ||
+                keyCode == Input.Keys.HOME ||
+                keyCode == Input.Keys.RIGHT ||
+                keyCode == Input.Keys.LEFT;
+    }
+
+    static void textField_executeControlKey(TextField textField, int keyCode) {
+
     }
 
     static void textField_setContent(TextField textField, String content) {

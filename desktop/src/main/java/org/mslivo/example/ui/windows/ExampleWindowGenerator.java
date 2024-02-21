@@ -73,6 +73,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         this.soundPlayer = new SoundPlayer(mediaManager);
         /* Window */
         Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, false, true, true);
+        api.window.setEnforceScreenBounds(window, true);
         api.window.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
         api.window.center(window);

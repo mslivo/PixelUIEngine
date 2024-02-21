@@ -69,7 +69,7 @@ import java.util.Arrays;
 
 /**
  * UI Engine
- * Handles GUI Elements, Input, Cameras
+ * Handles UI Elements, Input, Cameras
  * Game needs to be implemented inside the uiAdapter
  */
 @SuppressWarnings("ForLoopReplaceableByForEach")
@@ -120,10 +120,6 @@ public class UIEngine<T extends UIAdapter> {
         this.uiAdapter.init(this.api, this.mediaManager);
     }
 
-    private void render_glClear() {
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
-    }
 
     private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer, boolean immediateRenderer, boolean gamePadSupport) {
         InputState newInputState = new InputState();
@@ -290,9 +286,9 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void update() {
-        // GUI
-        this.updateMouseControl(); // Map Keyboard/Gamepad controls to mouse controls
-        this.updateUI(); // Main GUI Update happen here
+        // UI
+        this.updateMouseControl();
+        this.updateUI(); // Main UI Updates happen here
         this.updateCameras();
         this.updateMouseCursor();
 
@@ -303,8 +299,694 @@ public class UIEngine<T extends UIAdapter> {
         this.inputState.inputEvents.reset();
     }
 
+    private void updateMouseControl() {
+        if (!inputState.config.input_gamePadMouseEnabled && !inputState.config.input_keyboardMouseEnabled && !inputState.config.input_hardwareMouseEnabled) {
+            mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
+            mouseControl_chokeAllMouseEvents();
+        } else {
+            if (inputState.config.input_gamePadMouseEnabled && mouseControl_gamePadMouseTranslateAndChokeEvents()) {
+                mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
+            } else if (inputState.config.input_keyboardMouseEnabled && mouseControl_keyboardMouseTranslateAndChokeEvents()) {
+                mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
+            } else if (inputState.config.input_hardwareMouseEnabled && mouseControl_hardwareMouseDetectUse()) {
+                mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
+            }
+        }
 
-    private void updateKeyInteractions() {
+        if (inputState.openMouseTextInput != null) {
+            // Translate to Text Input
+            mouseControl_updateMouseTextInput();
+        } else {
+            // Translate to MouseGUI position
+            switch (inputState.currentControlMode) {
+                case GAMEPAD -> mouseControl_updateGamePadMouse();
+                case KEYBOARD -> mouseControl_updateKeyBoardMouse();
+                case HARDWARE_MOUSE -> mouseControl_updateHardwareMouse();
+                case DISABLED -> {
+                }
+            }
+        }
+
+        mouseControl_enforceUIMouseBounds(); // Enforce UI mouse screen bounds
+        mouseControl_updateGameMouseXY(); // Translate UI mouse x,y to Game mouse x,y
+        mouseControl_updateLastUIMouseHover(); // Determine object that is below the cursor
+    }
+
+    private void mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE nextControlMode) {
+        if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
+            // Clean up current control mode
+            if (inputState.currentControlMode.emulated) {
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
+                    // Gamepad
+                    for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
+                        inputState.gamePadTranslatedButtonsDown[i] = false;
+                    inputState.gamePadTranslatedStickLeft.set(0f, 0f);
+                    inputState.gamePadTranslatedStickRight.set(0f, 0f);
+                }
+                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+                    // Keyboard
+                    for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
+                        inputState.keyBoardTranslatedKeysDown[i] = false;
+                    inputState.keyBoardMouseSpeedUp.set(0f, 0f);
+                }
+                // Simulated
+                for (int i = 0; i <= 4; i++) inputState.emulatedMouseIsButtonDown[i] = false;
+                inputState.emulatedMouseLastMouseClick = 0;
+            }
+
+            // Set Next ControlMode
+            if (nextControlMode.emulated) {
+                this.inputState.mouse_emulated.set(inputState.mouse_ui.x, inputState.mouse_ui.y);
+            }
+            inputState.currentControlMode = nextControlMode;
+        }
+    }
+
+
+
+
+    private void mouseControl_updateMouseTextInput() {
+        if (inputState.openMouseTextInput == null) return;
+        MouseTextInput mouseTextInput = inputState.openMouseTextInput;
+        char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
+
+        int scrollDirection = 0;
+        boolean confirmPressed = false;
+        boolean changeCasePressed = false;
+        boolean deletePressed = false;
+        switch (inputState.currentControlMode) {
+            case HARDWARE_MOUSE -> {
+                int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
+                if (deltaX > 6) {
+                    scrollDirection = 1;
+                    inputState.mTextInputMouseX = Gdx.input.getX();
+                } else if (deltaX < -6) {
+                    scrollDirection = -1;
+                    inputState.mTextInputMouseX = Gdx.input.getX();
+                }
+                if (inputState.inputEvents.mouseDown) {
+                    // Choke Events & Translate
+                    int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
+                    if (indexOfLeft != -1) {
+                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfLeft);
+                        inputState.mTextInputTranslatedMouse1Down = true;
+                    }
+                    int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
+                    if (indexOfRight != -1) {
+                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.RIGHT] = false;
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfRight);
+                        inputState.mTextInputTranslatedMouse2Down = true;
+                    }
+                    int indexOfMiddle = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.MIDDLE);
+                    if (indexOfMiddle != -1) {
+                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.MIDDLE] = false;
+                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfMiddle);
+                        inputState.mTextInputTranslatedMouse3Down = true;
+                    }
+                    inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size > 0;
+                }
+                if (inputState.inputEvents.mouseUp) {
+                    // Choke Events & Translate
+                    int indexOfLeft = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.LEFT);
+                    if (indexOfLeft != -1) {
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfLeft);
+                        inputState.mTextInputTranslatedMouse1Down = false;
+                    }
+                    int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
+                    if (indexOfRight != -1) {
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfRight);
+                        inputState.mTextInputTranslatedMouse2Down = false;
+                    }
+                    int indexOfMiddle = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.MIDDLE);
+                    if (indexOfMiddle != -1) {
+                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfMiddle);
+                        inputState.mTextInputTranslatedMouse3Down = false;
+                    }
+                    inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size > 0;
+                }
+                confirmPressed = inputState.mTextInputTranslatedMouse1Down;
+                deletePressed = inputState.mTextInputTranslatedMouse2Down;
+                changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
+            }
+            case GAMEPAD -> {
+                boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
+                boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
+                final float sensitivity = 0.4f;
+                boolean leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
+                boolean rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
+                confirmPressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse1);
+                deletePressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse2);
+                changeCasePressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse3);
+
+                if (leftGamePad) {
+                    if (!inputState.mTextInputGamePadLeft) {
+                        scrollDirection = -1;
+                        inputState.mTextInputGamePadLeft = true;
+                    }
+                } else {
+                    inputState.mTextInputGamePadLeft = false;
+                }
+                if (rightGamePad) {
+                    if (!inputState.mTextInputGamePadRight) {
+                        scrollDirection = 1;
+                        inputState.mTextInputGamePadRight = true;
+                    }
+                } else {
+                    inputState.mTextInputGamePadRight = false;
+                }
+
+                // Continue Scroll
+                if (leftGamePad || rightGamePad) {
+                    inputState.mTextInputScrollTimer++;
+                    if (inputState.mTextInputScrollTimer > inputState.mTextInputScrollTime) {
+                        inputState.mTextInputGamePadLeft = false;
+                        inputState.mTextInputGamePadRight = false;
+                        inputState.mTextInputScrollTimer = 0;
+                        inputState.mTextInputScrollSpeed++;
+                        if (inputState.mTextInputScrollSpeed >= 3) {
+                            inputState.mTextInputScrollTime = 2;
+                        } else if (inputState.mTextInputScrollSpeed == 2) {
+                            inputState.mTextInputScrollTime = 5;
+                        } else if (inputState.mTextInputScrollSpeed == 1) {
+                            inputState.mTextInputScrollTime = 10;
+                        }
+                    }
+                } else {
+                    inputState.mTextInputScrollTimer = 0;
+                    inputState.mTextInputScrollTime = 20;
+                    inputState.mTextInputScrollSpeed = 0;
+                }
+            }
+            case KEYBOARD -> {
+                // Not Needed since you are already using a keyboard to type
+            }
+        }
+
+        // Unlock on first press
+        if (!inputState.mTextInputUnlock) {
+            if (confirmPressed) {
+                confirmPressed = false;
+            } else {
+                inputState.mTextInputUnlock = true;
+            }
+        }
+
+        // Scroll Forward/Backwards
+        if (scrollDirection != 0) {
+            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+        }
+
+        // Confirm Character from Input
+        boolean confirmCharacter = false;
+        boolean changeCaseMouse = false;
+        boolean deleteCharacter = false;
+        if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
+        if (!confirmPressed && inputState.mTextInputConfirmPressed) {
+            confirmCharacter = true;
+            inputState.mTextInputConfirmPressed = false;
+        }
+
+        if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
+        if (!changeCasePressed && inputState.mTextInputChangeCasePressed) {
+            confirmCharacter = true;
+            changeCaseMouse = true;
+            inputState.mTextInputChangeCasePressed = false;
+        }
+
+        if (deletePressed && !inputState.mTextInputDeletePressed) inputState.mTextInputDeletePressed = true;
+        if (!deletePressed && inputState.mTextInputDeletePressed) {
+            confirmCharacter = true;
+            deleteCharacter = true;
+            inputState.mTextInputDeletePressed = false;
+        }
+
+        // Confirm Character from API Queue
+        if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
+            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char) inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size - 1));
+            confirmCharacter = true;
+        }
+
+        if (confirmCharacter) {
+            char c;
+            if (changeCaseMouse) {
+                c = '\t';
+            } else if (deleteCharacter) {
+                c = '\b';
+            } else {
+                c = characters[mouseTextInput.selectedIndex];
+            }
+            switch (c) {
+                case '\b' -> {
+                    inputState.inputEvents.keyDown = true;
+                    inputState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onDelete();
+                }
+                case '\n' -> {
+                    boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
+                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
+                }
+                case '\t' -> {
+                    mouseTextInput.upperCase = !mouseTextInput.upperCase;
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
+                }
+                default -> {
+                    inputState.inputEvents.keyTyped = true;
+                    inputState.inputEvents.keyTypedCharacters.add(c);
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
+                }
+            }
+
+        }
+
+
+    }
+
+    private void mouseControl_chokeAllMouseEvents() {
+        // clear all mouse inputs
+        inputState.inputEvents.mouseMoved = false;
+        inputState.inputEvents.mouseDragged = false;
+        inputState.inputEvents.mouseUp = false;
+        inputState.inputEvents.mouseUpButtons.clear();
+        inputState.inputEvents.mouseDown = false;
+        inputState.inputEvents.mouseDownButtons.clear();
+        inputState.inputEvents.mouseDoubleClick = false;
+        Arrays.fill(inputState.inputEvents.mouseButtonsDown, false);
+        inputState.mouse_ui.x = 0;
+        inputState.mouse_ui.y = 0;
+        inputState.mouse_delta.x = 0;
+        inputState.mouse_delta.y = 0;
+    }
+
+    private boolean mouseControl_hardwareMouseDetectUse() {
+        return inputState.inputEvents.mouseDown || inputState.inputEvents.mouseUp ||
+                inputState.inputEvents.mouseMoved || inputState.inputEvents.mouseDragged || inputState.inputEvents.mouseScrolled;
+    }
+
+    private int[] mouseControl_keyboardMouseGetButtons(int index) {
+        return switch (index) {
+            case 0 -> inputState.config.input_keyboardMouseButtonsUp;
+            case 1 -> inputState.config.input_keyboardMouseButtonsDown;
+            case 2 -> inputState.config.input_keyboardMouseButtonsLeft;
+            case 3 -> inputState.config.input_keyboardMouseButtonsRight;
+            case 4 -> inputState.config.input_keyboardMouseButtonsMouse1;
+            case 5 -> inputState.config.input_keyboardMouseButtonsMouse2;
+            case 6 -> inputState.config.input_keyboardMouseButtonsMouse3;
+            case 7 -> inputState.config.input_keyboardMouseButtonsMouse4;
+            case 8 -> inputState.config.input_keyboardMouseButtonsMouse5;
+            case 9 -> inputState.config.input_keyboardMouseButtonsScrollUp;
+            case 10 -> inputState.config.input_keyboardMouseButtonsScrollDown;
+            default -> throw new IllegalStateException("Unexpected value: " + index);
+        };
+    }
+
+
+    private int[] mouseControl_gamePadMouseGetButtons(int index) {
+        return switch (index) {
+            case 0 -> inputState.config.input_gamePadMouseButtonsMouse1;
+            case 1 -> inputState.config.input_gamePadMouseButtonsMouse2;
+            case 2 -> inputState.config.input_gamePadMouseButtonsMouse3;
+            case 3 -> inputState.config.input_gamePadMouseButtonsMouse4;
+            case 4 -> inputState.config.input_gamePadMouseButtonsMouse5;
+            case 5 -> inputState.config.input_gamePadMouseButtonsScrollUp;
+            case 6 -> inputState.config.input_gamePadMouseButtonsScrollDown;
+            default -> throw new IllegalStateException("Unexpected value: " + index);
+        };
+    }
+
+    private boolean mouseControl_gamePadMouseTranslateAndChokeEvents() {
+        // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
+        boolean gamepadMouseUsed = false;
+        for (int i = 0; i <= 6; i++) {
+            int[] buttons = mouseControl_gamePadMouseGetButtons(i);
+            if (buttons != null) {
+                for (int i2 = 0; i2 < buttons.length; i2++) {
+                    int keyCode = buttons[i2];
+                    if (inputState.inputEvents.gamePadButtonDown) {
+                        IntArray buttonDownKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
+                        for (int ikc = buttonDownKeyCodes.size - 1; ikc >= 0; ikc--) {
+                            if (buttonDownKeyCodes.get(ikc) == keyCode) {
+                                buttonDownKeyCodes.removeIndex(ikc);
+                                inputState.inputEvents.gamePadButtonDown = !buttonDownKeyCodes.isEmpty();
+                                inputState.inputEvents.gamePadButtonsDown[keyCode] = false;
+                                inputState.gamePadTranslatedButtonsDown[keyCode] = true;
+                                gamepadMouseUsed = true;
+                            }
+                        }
+                    }
+                    if (inputState.inputEvents.gamePadButtonUp) {
+                        IntArray upKeyCodes = inputState.inputEvents.gamePadButtonUpKeyCodes;
+                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
+                            if (upKeyCodes.get(ikc) == keyCode) {
+                                upKeyCodes.removeIndex(ikc);
+                                inputState.inputEvents.gamePadButtonUp = !upKeyCodes.isEmpty();
+                                inputState.gamePadTranslatedButtonsDown[keyCode] = false;
+                                gamepadMouseUsed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Joystick Events Left
+        if (inputState.config.input_gamePadMouseStickLeftEnabled) {
+            if (inputState.inputEvents.gamePadLeftXMoved) {
+                inputState.gamePadTranslatedStickLeft.x = inputState.inputEvents.gamePadLeftX;
+                inputState.inputEvents.gamePadLeftX = 0;
+                inputState.inputEvents.gamePadLeftXMoved = false;
+                gamepadMouseUsed = true;
+            }
+            if (inputState.inputEvents.gamePadLeftYMoved) {
+                inputState.gamePadTranslatedStickLeft.y = inputState.inputEvents.gamePadLeftY;
+                inputState.inputEvents.gamePadLeftY = 0;
+                inputState.inputEvents.gamePadLeftYMoved = false;
+                gamepadMouseUsed = true;
+            }
+        } else {
+            inputState.gamePadTranslatedStickLeft.x = 0;
+            inputState.gamePadTranslatedStickLeft.y = 0;
+        }
+        // Joystick Events Right
+        if (inputState.config.input_gamePadMouseStickRightEnabled) {
+            if (inputState.inputEvents.gamePadRightXMoved) {
+                inputState.gamePadTranslatedStickRight.x = inputState.inputEvents.gamePadRightX;
+                inputState.inputEvents.gamePadRightX = 0;
+                inputState.inputEvents.gamePadRightXMoved = false;
+                gamepadMouseUsed = true;
+            }
+            if (inputState.inputEvents.gamePadRightYMoved) {
+                inputState.gamePadTranslatedStickRight.y = inputState.inputEvents.gamePadRightY;
+                inputState.inputEvents.gamePadRightY = 0;
+                inputState.inputEvents.gamePadRightYMoved = false;
+                gamepadMouseUsed = true;
+            }
+        } else {
+            inputState.gamePadTranslatedStickRight.x = 0;
+            inputState.gamePadTranslatedStickRight.y = 0;
+        }
+
+        return gamepadMouseUsed;
+    }
+
+    private boolean mouseControl_keyboardMouseTranslateAndChokeEvents() {
+        if (inputState.focusedTextField != null) return false; // Disable during Textfield Input
+        boolean keyboardMouseUsed = false;
+        // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
+        for (int i = 0; i <= 10; i++) {
+            int[] buttons = mouseControl_keyboardMouseGetButtons(i);
+            if (buttons != null) {
+                if (inputState.inputEvents.keyDown) {
+                    for (int i2 = 0; i2 < buttons.length; i2++) {
+                        int keyCode = buttons[i2];
+                        IntArray downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
+                        for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
+                            int downKeyCode = downKeyCodes.get(ikc);
+                            if (downKeyCode == keyCode) {
+                                downKeyCodes.removeIndex(ikc);
+                                inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
+                                inputState.inputEvents.keysDown[keyCode] = false;
+                                inputState.keyBoardTranslatedKeysDown[keyCode] = true;
+                                keyboardMouseUsed = true;
+                            }
+
+                        }
+                    }
+                }
+                if (inputState.inputEvents.keyUp) {
+                    for (int i2 = 0; i2 < buttons.length; i2++) {
+                        int keyCode = buttons[i2];
+                        IntArray upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
+                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
+                            int upKeyCode = upKeyCodes.get(ikc);
+                            if (upKeyCode == keyCode) {
+                                upKeyCodes.removeIndex(ikc);
+                                inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
+                                inputState.keyBoardTranslatedKeysDown[keyCode] = false;
+                                keyboardMouseUsed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return keyboardMouseUsed;
+    }
+
+
+    private void mouseControl_emulateMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
+                                                 boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
+                                                 boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorChangeX, float cursorChangeY
+    ) {
+        float deltaX = 0;
+        float deltaY = 0;
+        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
+            cursorChangeX *= inputState.config.input_emulatedMouseCursorSpeed;
+            cursorChangeY *= inputState.config.input_emulatedMouseCursorSpeed;
+            if (buttonLeft) deltaX -= cursorChangeX;
+            if (buttonRight) deltaX += cursorChangeX;
+            if (buttonUp) deltaY -= cursorChangeY;
+            if (buttonDown) deltaY += cursorChangeY;
+        }
+
+        // Set to final
+        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.internalResolutionWidth);
+        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.internalResolutionHeight);
+        inputState.mouse_delta.x = deltaX;
+        inputState.mouse_delta.y = -deltaY;
+        inputState.mouse_ui.x = MathUtils.round(inputState.mouse_emulated.x);
+        inputState.mouse_ui.y = MathUtils.round(inputState.mouse_emulated.y);
+
+        // Simluate Mouse Button Press Events
+        boolean anyButtonChanged = false;
+        for (int i = 0; i <= 4; i++) {
+            boolean buttonMouseDown = switch (i) {
+                case 0 -> buttonMouse1Down;
+                case 1 -> buttonMouse2Down;
+                case 2 -> buttonMouse3Down;
+                case 3 -> buttonMouse4Down;
+                case 4 -> buttonMouse5Down;
+                default -> throw new IllegalStateException("Unexpected value: " + i);
+            };
+            if (inputState.emulatedMouseIsButtonDown[i] != buttonMouseDown) {
+                inputState.emulatedMouseIsButtonDown[i] = buttonMouseDown;
+                if (inputState.emulatedMouseIsButtonDown[i]) {
+                    inputState.inputEvents.mouseDown = true;
+                    inputState.inputEvents.mouseDownButtons.add(i);
+                    anyButtonChanged = true;
+                    if (i == Input.Buttons.LEFT) {
+                        // DoubleClick
+                        if ((System.currentTimeMillis() - inputState.emulatedMouseLastMouseClick) < UIEngineInputProcessor.DOUBLE_CLICK_TIME) {
+                            inputState.inputEvents.mouseDoubleClick = true;
+                        }
+                        inputState.emulatedMouseLastMouseClick = System.currentTimeMillis();
+                    }
+
+                } else {
+                    inputState.inputEvents.mouseUp = true;
+                    inputState.inputEvents.mouseUpButtons.add(i);
+                    anyButtonChanged = true;
+                }
+            }
+            inputState.inputEvents.mouseButtonsDown[i] = inputState.emulatedMouseIsButtonDown[i];
+        }
+        if (!anyButtonChanged) {
+            inputState.inputEvents.mouseDown = false;
+            inputState.inputEvents.mouseUp = false;
+            inputState.inputEvents.mouseDoubleClick = false;
+            inputState.inputEvents.mouseDownButtons.clear();
+            inputState.inputEvents.mouseUpButtons.clear();
+        }
+
+        // Simluate Mouse Move Events
+        if (deltaX != 0 || deltaY != 0) {
+            inputState.inputEvents.mouseMoved = true;
+            inputState.inputEvents.mouseDragged = false;
+            draggedLoop:
+            for (int i = 0; i <= 4; i++) {
+                if (inputState.emulatedMouseIsButtonDown[i]) {
+                    inputState.inputEvents.mouseDragged = true;
+                    inputState.inputEvents.mouseMoved = false;
+                    break;
+                }
+            }
+        } else {
+            inputState.inputEvents.mouseDragged = false;
+            inputState.inputEvents.mouseMoved = false;
+        }
+
+        // Simluate Mouse Scroll Events
+        inputState.inputEvents.mouseScrolled = buttonScrolledUp || buttonScrolledDown;
+        inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
+    }
+
+    private boolean mouseControl_isTranslatedKeyCodeDown(boolean[] translatedKeys, int[] keys) {
+        if (keys != null) {
+            for (int i = 0; i < keys.length; i++) {
+                if (translatedKeys[keys[i]]) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void mouseControl_updateGamePadMouse() {
+
+        // Swallow & Translate Gamepad Events
+        boolean[] translatedButtons = inputState.gamePadTranslatedButtonsDown;
+        boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
+        boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
+
+        float joystickDeadZone = inputState.config.input_gamePadMouseJoystickDeadZone;
+        boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x < -joystickDeadZone);
+        boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x > joystickDeadZone);
+        boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y > joystickDeadZone);
+        boolean buttonDown = (stickLeft && inputState.gamePadTranslatedStickLeft.y < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y < -joystickDeadZone);
+        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse1);
+        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse2);
+        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse3);
+        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse4);
+        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse5);
+        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollUp);
+        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollDown);
+
+        float cursorChangeX = 0f;
+        if (buttonLeft || buttonRight) {
+            cursorChangeX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickRight.x));
+            cursorChangeX = (cursorChangeX - joystickDeadZone) / (1f - joystickDeadZone);
+        }
+        float cursorChangeY = 0f;
+        if (buttonUp || buttonDown) {
+            cursorChangeY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y), Math.abs(inputState.gamePadTranslatedStickRight.y));
+            cursorChangeY = (cursorChangeY - joystickDeadZone) / (1f - joystickDeadZone);
+        }
+        // Translate to mouse events
+        mouseControl_emulateMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
+                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
+                buttonScrolledUp, buttonScrolledDown, cursorChangeX, cursorChangeY
+        );
+    }
+
+    private void mouseControl_updateKeyBoardMouse() {
+        if (inputState.focusedTextField != null) return; // Disable during Textfield Input
+
+        // Swallow & Translate keyboard events
+        boolean[] translatedKeys = inputState.keyBoardTranslatedKeysDown;
+
+        boolean buttonLeft = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsLeft);
+        boolean buttonRight = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsRight);
+        boolean buttonUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsUp);
+        boolean buttonDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsDown);
+        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse1);
+        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse2);
+        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse3);
+        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse4);
+        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse5);
+        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollUp);
+        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollDown);
+
+        final float SPEEDUP_SPEED = 0.1f;
+        if (buttonLeft || buttonRight) {
+            inputState.keyBoardMouseSpeedUp.x = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
+        } else {
+            inputState.keyBoardMouseSpeedUp.set(0, inputState.keyBoardMouseSpeedUp.y);
+        }
+        if (buttonUp || buttonDown) {
+            inputState.keyBoardMouseSpeedUp.y = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
+        } else {
+            inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x, 0);
+        }
+
+        // Translate to mouse events
+        mouseControl_emulateMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
+                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
+                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp.x, inputState.keyBoardMouseSpeedUp.y
+        );
+    }
+
+    private void mouseControl_enforceUIMouseBounds() {
+        if (inputState.mouse_ui.x < 0) inputState.mouse_ui.x = 0;
+        if (inputState.mouse_ui.x > inputState.internalResolutionWidth)
+            inputState.mouse_ui.x = inputState.internalResolutionWidth;
+        if (inputState.mouse_ui.y < 0) inputState.mouse_ui.y = 0;
+        if (inputState.mouse_ui.y > inputState.internalResolutionHeight)
+            inputState.mouse_ui.y = inputState.internalResolutionHeight;
+    }
+
+    private void mouseControl_updateGameMouseXY() {
+        // MouseXGUI/MouseYGUI -> To MouseX/MouseY
+        inputState.vector_fboCursor.x = inputState.mouse_ui.x;
+        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_ui.y;
+        inputState.vector_fboCursor.z = 1;
+        inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        this.inputState.mouse_game.x = (int) inputState.vector_fboCursor.x;
+        this.inputState.mouse_game.y = (int) inputState.vector_fboCursor.y;
+    }
+
+    private void mouseControl_updateHardwareMouse() {
+        // --- GUI CURSOR ---
+        // ScreenCursor To WorldCursor
+        inputState.vector2_unproject.x = Gdx.input.getX();
+        inputState.vector2_unproject.y = Gdx.input.getY();
+
+        inputState.viewport_screen.unproject(inputState.vector2_unproject);
+        // WorldCursor to  FBOCursor
+        inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
+        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
+        inputState.vector_fboCursor.z = 1;
+        inputState.camera_ui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+
+        // Set to final
+        inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_ui.x);
+        inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_ui.y);
+        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.internalResolutionWidth);
+        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.internalResolutionHeight);
+    }
+
+    private void mouseControl_updateLastUIMouseHover() {
+        inputState.lastUIMouseHover = UICommons.component_getComponentAtPosition(inputState, inputState.mouse_ui.x,inputState.mouse_ui.y);
+    }
+
+
+    private void updateCameras() {
+        // Game Camera
+        inputState.camera_game.update();
+        // Viewport Camera
+        for (int i = 0; i < inputState.gameViewPorts.size(); i++) inputState.gameViewPorts.get(i).camera.update();
+    }
+
+    private void updateMouseCursor() {
+        /* Update Cursor*/
+        if (inputState.lastUIMouseHover != null) {
+            // 1. GUI Cursor
+            inputState.cursor = inputState.config.ui_cursor;
+        } else {
+            // 2. Manually overidden Cursor
+            if (inputState.displayOverrideCursor) {
+                inputState.cursor = inputState.overrideCursor;
+                inputState.displayOverrideCursor = false;
+            } else {
+                if (inputState.mouseTool != null) {
+                    // 3. Mouse Tool cursor
+                    if (inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT]) {
+                        inputState.cursor = inputState.mouseTool.cursorDown;
+                    } else {
+                        inputState.cursor = inputState.mouseTool.cursor;
+                    }
+                } else {
+                    // no mouse tool set - display no cursor
+                    inputState.cursor = null;
+                }
+            }
+        }
+
+    }
+
+    private void updateUI_keyInteractions() {
         inputState.keyboardInteractedUIObjectFrame = null;
         if (inputState.config.ui_keyInteractionsDisabled) return;
 
@@ -416,7 +1098,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void updateMouseInteractions() {
+    private void updateUI_mouseInteractions() {
         inputState.mouseInteractedUIObjectFrame = null;
         if (inputState.config.ui_mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
@@ -452,7 +1134,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Execute Common Actions
                 for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                    executeOnMouseDoubleClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
+                    actions_executeOnMouseDoubleClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
                 }
 
                 inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
@@ -671,7 +1353,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Execute Common Actions
                 for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                    executeOnMouseClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
+                    actions_executeOnMouseClickCommonAction(inputState.lastUIMouseHover, mouseDownButton);
                 }
 
                 inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
@@ -933,25 +1615,27 @@ public class UIEngine<T extends UIAdapter> {
             // Active UI Element Interaction
             Object usedUIObject = UICommons.getUsedUIReference(inputState);
             switch (usedUIObject) {
-                case Window window -> {
-                    window.x = inputState.mouse_ui.x - inputState.draggedWindow_offset.x;
-                    window.y = inputState.mouse_ui.y - inputState.draggedWindow_offset.y;
-                    if (window.windowAction != null)
-                        window.windowAction.onMove(window.x, window.y);
+                case Window draggedWindow -> {
+                    UICommons.window_setPosition(inputState, draggedWindow,
+                            inputState.mouse_ui.x - inputState.draggedWindow_offset.x,
+                            inputState.mouse_ui.y - inputState.draggedWindow_offset.y);
+
+                    if (draggedWindow.windowAction != null)
+                        draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
                 }
-                case ScrollBarVertical scrollBarVertical -> {
-                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                case ScrollBarVertical scrolledScrollBarVertical -> {
+                    UICommons.scrollBar_scroll(scrolledScrollBarVertical, UICommons.scrollBar_calculateScrolled(scrolledScrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
                 }
-                case ScrollBarHorizontal scrollBarHorizontal -> {
-                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                case ScrollBarHorizontal scrolledScrollBarHorizontal -> {
+                    UICommons.scrollBar_scroll(scrolledScrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
                 }
-                case Knob knob -> {
+                case Knob turnedKnob -> {
                     float amount = (inputState.mouse_delta.y / 100f) * inputState.config.component_knobSensitivity;
-                    float newValue = knob.turned + amount;
-                    UICommons.knob_turnKnob(knob, newValue, amount);
+                    float newValue = turnedKnob.turned + amount;
+                    UICommons.knob_turnKnob(turnedKnob, newValue, amount);
                     if (inputState.currentControlMode.emulated) {
                         // emulated: keep mouse position steady
-                        UICommons.emulatedMouse_setPositionComponent(inputState,knob);
+                        UICommons.emulatedMouse_setPositionComponent(inputState,turnedKnob);
                     }
                 }
                 case null, default -> {
@@ -1002,14 +1686,14 @@ public class UIEngine<T extends UIAdapter> {
                 }
 
                 // Execute Common Actions
-                executeOnMouseScrollCommonAction(inputState.lastUIMouseHover, inputState.inputEvents.mouseScrolledAmount);
+                actions_executeOnMouseScrollCommonAction(inputState.lastUIMouseHover, inputState.inputEvents.mouseScrolledAmount);
 
                 inputState.mouseInteractedUIObjectFrame = inputState.lastUIMouseHover;
             }
         }
     }
 
-    private void updateButtonHoldActions() {
+    private void updateUI_continuousComponentActivity() {
         /* Button Hold Interactions */
         if (inputState.pressedButton != null) {
             if (inputState.pressedButton.mode == ButtonMode.HOLD) {
@@ -1025,23 +1709,21 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateUI() {
 
-        updateMouseInteractions();
+        updateUI_mouseInteractions();
 
-        updateKeyInteractions();
+        updateUI_keyInteractions();
 
-        updateButtonHoldActions();
+        updateUI_continuousComponentActivity();
 
-        updateUpdateActions();
+        updateUI_executeUpdateActions();
 
-        updateEnforceWindowScreenBounds();
+        updateUI_notifications();
 
-        updateNotifications();
-
-        updateToolTip();
+        updateUI_toolTip();
 
     }
 
-    private void updateUpdateActions() {
+    private void updateUI_executeUpdateActions() {
         // for(int i) is used to avoid iterator creation and avoid concurrentModification
         // If UpdateActions are removing/adding other update actions they are caught on the next update/frame
 
@@ -1050,20 +1732,20 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
             Component component = inputState.screenComponents.get(i);
             for (int i2 = 0; i2 < component.updateActions.size(); i2++) {
-                executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
+                actions_executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
             }
         }
         for (int i = 0; i < inputState.windows.size(); i++) {
             // Window UpdateActions
             Window window = inputState.windows.get(i);
             for (int i2 = 0; i2 < window.updateActions.size(); i2++) {
-                executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
+                actions_executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
             }
             // Window Component UpdateActions
             for (int i2 = 0; i2 < window.components.size(); i2++) {
                 Component component = window.components.get(i2);
                 for (int i3 = 0; i3 < component.updateActions.size(); i3++) {
-                    executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
+                    actions_executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
                 }
             }
         }
@@ -1071,7 +1753,7 @@ public class UIEngine<T extends UIAdapter> {
         // Engine SingleUpdateActions
         for (int i = 0; i < inputState.singleUpdateActions.size(); i++) {
             UpdateAction updateAction = inputState.singleUpdateActions.get(i);
-            if (this.executeUpdateAction(updateAction, currentTimeMillis)) {
+            if (this.actions_executeUpdateAction(updateAction, currentTimeMillis)) {
                 inputState.singleUpdateActionsRemoveQ.push(updateAction);
             }
         }
@@ -1081,14 +1763,7 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private void updateEnforceWindowScreenBounds() {
-        for (int i = 0; i < inputState.windows.size(); i++) {
-            Window window = inputState.windows.get(i);
-            if (window.enforceScreenBounds) UICommons.window_enforceScreenBounds(inputState, window);
-        }
-    }
-
-    private void updateToolTip() {
+    private void updateUI_toolTip() {
         // Anything dragged ?
         boolean showComponentToolTip = inputState.draggedList == null && inputState.draggedInventory == null;
 
@@ -1191,697 +1866,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-
-    private void setMouseControlMode(MOUSE_CONTROL_MODE nextControlMode) {
-        if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
-            // Clean up current control mode
-            if (inputState.currentControlMode.emulated) {
-                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
-                    // Gamepad
-                    for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
-                        inputState.gamePadTranslatedButtonsDown[i] = false;
-                    inputState.gamePadTranslatedStickLeft.set(0f, 0f);
-                    inputState.gamePadTranslatedStickRight.set(0f, 0f);
-                }
-                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
-                    // Keyboard
-                    for (int i = 0; i < inputState.keyBoardTranslatedKeysDown.length; i++)
-                        inputState.keyBoardTranslatedKeysDown[i] = false;
-                    inputState.keyBoardMouseSpeedUp.set(0f, 0f);
-                }
-                // Simulated
-                for (int i = 0; i <= 4; i++) inputState.emulatedMouseIsButtonDown[i] = false;
-                inputState.emulatedMouseLastMouseClick = 0;
-            }
-
-            // Set Next ControlMode
-            if (nextControlMode.emulated) {
-                this.inputState.mouse_emulated.set(inputState.mouse_ui.x, inputState.mouse_ui.y);
-            }
-            inputState.currentControlMode = nextControlMode;
-        }
-    }
-
-
-    private void updateMouseControl() {
-        if (!inputState.config.input_gamePadMouseEnabled && !inputState.config.input_keyboardMouseEnabled && !inputState.config.input_hardwareMouseEnabled) {
-            setMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
-            chockeAllMouseEvents();
-        } else {
-            if (inputState.config.input_gamePadMouseEnabled && gamePadMouseTranslateAndChokeEvents()) {
-                setMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
-            } else if (inputState.config.input_keyboardMouseEnabled && keyboardMouseTranslateAndChokeEvents()) {
-                setMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
-            } else if (inputState.config.input_hardwareMouseEnabled && hardwareMouseDetectUse()) {
-                setMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
-            }
-        }
-
-        if (inputState.openMouseTextInput != null) {
-            // Translate to Text Input
-            updateMouseTextInputControl();
-        } else {
-            // Translate to MouseGUI position
-            switch (inputState.currentControlMode) {
-                case GAMEPAD -> updateGamePadMouseControl();
-                case KEYBOARD -> updateKeyBoardMouseControl();
-                case HARDWARE_MOUSE -> updateHardwareMouseControl();
-                case DISABLED -> {
-                }
-            }
-        }
-
-
-        updateUIMouseBounds(); // Enforce UI mouse screen bounds
-        updateGameMouseXY(); // Translate UI mouse x,y to Game mouse x,y
-        updateLastUIMouseHover(); // Determine object that is below the cursor
-    }
-
-    private void updateMouseTextInputControl() {
-        if (inputState.openMouseTextInput == null) return;
-        MouseTextInput mouseTextInput = inputState.openMouseTextInput;
-        char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
-
-        int scrollDirection = 0;
-        boolean confirmPressed = false;
-        boolean changeCasePressed = false;
-        boolean deletePressed = false;
-        switch (inputState.currentControlMode) {
-            case HARDWARE_MOUSE -> {
-                int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
-                if (deltaX > 6) {
-                    scrollDirection = 1;
-                    inputState.mTextInputMouseX = Gdx.input.getX();
-                } else if (deltaX < -6) {
-                    scrollDirection = -1;
-                    inputState.mTextInputMouseX = Gdx.input.getX();
-                }
-                if (inputState.inputEvents.mouseDown) {
-                    // Choke Events & Translate
-                    int indexOfLeft = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
-                    if (indexOfLeft != -1) {
-                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.LEFT] = false;
-                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfLeft);
-                        inputState.mTextInputTranslatedMouse1Down = true;
-                    }
-                    int indexOfRight = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.RIGHT);
-                    if (indexOfRight != -1) {
-                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.RIGHT] = false;
-                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfRight);
-                        inputState.mTextInputTranslatedMouse2Down = true;
-                    }
-                    int indexOfMiddle = inputState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.MIDDLE);
-                    if (indexOfMiddle != -1) {
-                        inputState.inputEvents.mouseButtonsDown[KeyCode.Mouse.MIDDLE] = false;
-                        inputState.inputEvents.mouseDownButtons.removeIndex(indexOfMiddle);
-                        inputState.mTextInputTranslatedMouse3Down = true;
-                    }
-                    inputState.inputEvents.mouseDown = inputState.inputEvents.mouseDownButtons.size > 0;
-                }
-                if (inputState.inputEvents.mouseUp) {
-                    // Choke Events & Translate
-                    int indexOfLeft = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.LEFT);
-                    if (indexOfLeft != -1) {
-                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfLeft);
-                        inputState.mTextInputTranslatedMouse1Down = false;
-                    }
-                    int indexOfRight = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.RIGHT);
-                    if (indexOfRight != -1) {
-                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfRight);
-                        inputState.mTextInputTranslatedMouse2Down = false;
-                    }
-                    int indexOfMiddle = inputState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.MIDDLE);
-                    if (indexOfMiddle != -1) {
-                        inputState.inputEvents.mouseUpButtons.removeIndex(indexOfMiddle);
-                        inputState.mTextInputTranslatedMouse3Down = false;
-                    }
-                    inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size > 0;
-                }
-                confirmPressed = inputState.mTextInputTranslatedMouse1Down;
-                deletePressed = inputState.mTextInputTranslatedMouse2Down;
-                changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
-            }
-            case GAMEPAD -> {
-                boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
-                boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
-                final float sensitivity = 0.4f;
-                boolean leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
-                boolean rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
-                confirmPressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse1);
-                deletePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse2);
-                changeCasePressed = isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse3);
-
-                if (leftGamePad) {
-                    if (!inputState.mTextInputGamePadLeft) {
-                        scrollDirection = -1;
-                        inputState.mTextInputGamePadLeft = true;
-                    }
-                } else {
-                    inputState.mTextInputGamePadLeft = false;
-                }
-                if (rightGamePad) {
-                    if (!inputState.mTextInputGamePadRight) {
-                        scrollDirection = 1;
-                        inputState.mTextInputGamePadRight = true;
-                    }
-                } else {
-                    inputState.mTextInputGamePadRight = false;
-                }
-
-                // Continue Scroll
-                if (leftGamePad || rightGamePad) {
-                    inputState.mTextInputScrollTimer++;
-                    if (inputState.mTextInputScrollTimer > inputState.mTextInputScrollTime) {
-                        inputState.mTextInputGamePadLeft = false;
-                        inputState.mTextInputGamePadRight = false;
-                        inputState.mTextInputScrollTimer = 0;
-                        inputState.mTextInputScrollSpeed++;
-                        if (inputState.mTextInputScrollSpeed >= 3) {
-                            inputState.mTextInputScrollTime = 2;
-                        } else if (inputState.mTextInputScrollSpeed == 2) {
-                            inputState.mTextInputScrollTime = 5;
-                        } else if (inputState.mTextInputScrollSpeed == 1) {
-                            inputState.mTextInputScrollTime = 10;
-                        }
-                    }
-                } else {
-                    inputState.mTextInputScrollTimer = 0;
-                    inputState.mTextInputScrollTime = 20;
-                    inputState.mTextInputScrollSpeed = 0;
-                }
-            }
-            case KEYBOARD -> {
-                // Not Needed since you are already using a keyboard to type
-            }
-        }
-
-        // Unlock on first press
-        if (!inputState.mTextInputUnlock) {
-            if (confirmPressed) {
-                confirmPressed = false;
-            } else {
-                inputState.mTextInputUnlock = true;
-            }
-        }
-
-        // Scroll Forward/Backwards
-        if (scrollDirection != 0) {
-            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
-        }
-
-        // Confirm Character from Input
-        boolean confirmCharacter = false;
-        boolean changeCaseMouse = false;
-        boolean deleteCharacter = false;
-        if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
-        if (!confirmPressed && inputState.mTextInputConfirmPressed) {
-            confirmCharacter = true;
-            inputState.mTextInputConfirmPressed = false;
-        }
-
-        if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
-        if (!changeCasePressed && inputState.mTextInputChangeCasePressed) {
-            confirmCharacter = true;
-            changeCaseMouse = true;
-            inputState.mTextInputChangeCasePressed = false;
-        }
-
-        if (deletePressed && !inputState.mTextInputDeletePressed) inputState.mTextInputDeletePressed = true;
-        if (!deletePressed && inputState.mTextInputDeletePressed) {
-            confirmCharacter = true;
-            deleteCharacter = true;
-            inputState.mTextInputDeletePressed = false;
-        }
-
-        // Confirm Character from API Queue
-        if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
-            UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char) inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size - 1));
-            confirmCharacter = true;
-        }
-
-        if (confirmCharacter) {
-            char c;
-            if (changeCaseMouse) {
-                c = '\t';
-            } else if (deleteCharacter) {
-                c = '\b';
-            } else {
-                c = characters[mouseTextInput.selectedIndex];
-            }
-            switch (c) {
-                case '\b' -> {
-                    inputState.inputEvents.keyDown = true;
-                    inputState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onDelete();
-                }
-                case '\n' -> {
-                    boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
-                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
-                }
-                case '\t' -> {
-                    mouseTextInput.upperCase = !mouseTextInput.upperCase;
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
-                }
-                default -> {
-                    inputState.inputEvents.keyTyped = true;
-                    inputState.inputEvents.keyTypedCharacters.add(c);
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
-                }
-            }
-
-        }
-
-
-    }
-
-    private void chockeAllMouseEvents() {
-        // clear all mouse inputs
-        inputState.inputEvents.mouseMoved = false;
-        inputState.inputEvents.mouseDragged = false;
-        inputState.inputEvents.mouseUp = false;
-        inputState.inputEvents.mouseUpButtons.clear();
-        inputState.inputEvents.mouseDown = false;
-        inputState.inputEvents.mouseDownButtons.clear();
-        inputState.inputEvents.mouseDoubleClick = false;
-        Arrays.fill(inputState.inputEvents.mouseButtonsDown, false);
-        inputState.mouse_ui.x = 0;
-        inputState.mouse_ui.y = 0;
-        inputState.mouse_delta.x = 0;
-        inputState.mouse_delta.y = 0;
-    }
-
-    private boolean hardwareMouseDetectUse() {
-        return inputState.inputEvents.mouseDown || inputState.inputEvents.mouseUp ||
-                inputState.inputEvents.mouseMoved || inputState.inputEvents.mouseDragged || inputState.inputEvents.mouseScrolled;
-    }
-
-    private boolean keyboardMouseDetectUse() {
-        for (int i = 0; i <= 10; i++) {
-            int[] buttons = keyboardMouseButtons(i);
-            if (buttons != null) {
-                for (int i2 = 0; i2 < buttons.length; i2++) {
-                    if (inputState.inputEvents.keysDown[buttons[i2]]) return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    private boolean gamePadMouseDetectUse() {
-        if (inputState.config.input_gamePadMouseStickLeftEnabled) {
-            if (inputState.inputEvents.gamePadLeftXMoved || inputState.inputEvents.gamePadLeftYMoved) {
-                return inputState.inputEvents.gamePadLeftX < -inputState.config.input_gamePadMouseJoystickDeadZone ||
-                        inputState.inputEvents.gamePadLeftX > inputState.config.input_gamePadMouseJoystickDeadZone;
-            }
-        }
-        if (inputState.config.input_gamePadMouseStickRightEnabled) {
-            if (inputState.inputEvents.gamePadRightXMoved || inputState.inputEvents.gamePadRightYMoved) {
-                return inputState.inputEvents.gamePadRightX < -inputState.config.input_gamePadMouseJoystickDeadZone ||
-                        inputState.inputEvents.gamePadRightX > inputState.config.input_gamePadMouseJoystickDeadZone;
-            }
-        }
-
-        for (int i = 0; i <= 6; i++) {
-            int[] buttons = gamePadMouseButtons(i);
-            if (buttons != null) {
-                for (int i2 = 0; i2 < buttons.length; i2++) {
-                    if (inputState.inputEvents.gamePadButtonsDown[buttons[i2]]) return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private int[] keyboardMouseButtons(int index) {
-        return switch (index) {
-            case 0 -> inputState.config.input_keyboardMouseButtonsUp;
-            case 1 -> inputState.config.input_keyboardMouseButtonsDown;
-            case 2 -> inputState.config.input_keyboardMouseButtonsLeft;
-            case 3 -> inputState.config.input_keyboardMouseButtonsRight;
-            case 4 -> inputState.config.input_keyboardMouseButtonsMouse1;
-            case 5 -> inputState.config.input_keyboardMouseButtonsMouse2;
-            case 6 -> inputState.config.input_keyboardMouseButtonsMouse3;
-            case 7 -> inputState.config.input_keyboardMouseButtonsMouse4;
-            case 8 -> inputState.config.input_keyboardMouseButtonsMouse5;
-            case 9 -> inputState.config.input_keyboardMouseButtonsScrollUp;
-            case 10 -> inputState.config.input_keyboardMouseButtonsScrollDown;
-            default -> throw new IllegalStateException("Unexpected value: " + index);
-        };
-    }
-
-
-    private int[] gamePadMouseButtons(int index) {
-        return switch (index) {
-            case 0 -> inputState.config.input_gamePadMouseButtonsMouse1;
-            case 1 -> inputState.config.input_gamePadMouseButtonsMouse2;
-            case 2 -> inputState.config.input_gamePadMouseButtonsMouse3;
-            case 3 -> inputState.config.input_gamePadMouseButtonsMouse4;
-            case 4 -> inputState.config.input_gamePadMouseButtonsMouse5;
-            case 5 -> inputState.config.input_gamePadMouseButtonsScrollUp;
-            case 6 -> inputState.config.input_gamePadMouseButtonsScrollDown;
-            default -> throw new IllegalStateException("Unexpected value: " + index);
-        };
-    }
-
-    private boolean gamePadMouseTranslateAndChokeEvents() {
-        // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
-        boolean gamepadMouseUsed = false;
-        for (int i = 0; i <= 6; i++) {
-            int[] buttons = gamePadMouseButtons(i);
-            if (buttons != null) {
-                for (int i2 = 0; i2 < buttons.length; i2++) {
-                    int keyCode = buttons[i2];
-                    if (inputState.inputEvents.gamePadButtonDown) {
-                        IntArray buttonDownKeyCodes = inputState.inputEvents.gamePadButtonDownKeyCodes;
-                        for (int ikc = buttonDownKeyCodes.size - 1; ikc >= 0; ikc--) {
-                            if (buttonDownKeyCodes.get(ikc) == keyCode) {
-                                buttonDownKeyCodes.removeIndex(ikc);
-                                inputState.inputEvents.gamePadButtonDown = !buttonDownKeyCodes.isEmpty();
-                                inputState.inputEvents.gamePadButtonsDown[keyCode] = false;
-                                inputState.gamePadTranslatedButtonsDown[keyCode] = true;
-                                gamepadMouseUsed = true;
-                            }
-                        }
-                    }
-                    if (inputState.inputEvents.gamePadButtonUp) {
-                        IntArray upKeyCodes = inputState.inputEvents.gamePadButtonUpKeyCodes;
-                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
-                            if (upKeyCodes.get(ikc) == keyCode) {
-                                upKeyCodes.removeIndex(ikc);
-                                inputState.inputEvents.gamePadButtonUp = !upKeyCodes.isEmpty();
-                                inputState.gamePadTranslatedButtonsDown[keyCode] = false;
-                                gamepadMouseUsed = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // Joystick Events Left
-        if (inputState.config.input_gamePadMouseStickLeftEnabled) {
-            if (inputState.inputEvents.gamePadLeftXMoved) {
-                inputState.gamePadTranslatedStickLeft.x = inputState.inputEvents.gamePadLeftX;
-                inputState.inputEvents.gamePadLeftX = 0;
-                inputState.inputEvents.gamePadLeftXMoved = false;
-                gamepadMouseUsed = true;
-            }
-            if (inputState.inputEvents.gamePadLeftYMoved) {
-                inputState.gamePadTranslatedStickLeft.y = inputState.inputEvents.gamePadLeftY;
-                inputState.inputEvents.gamePadLeftY = 0;
-                inputState.inputEvents.gamePadLeftYMoved = false;
-                gamepadMouseUsed = true;
-            }
-        } else {
-            inputState.gamePadTranslatedStickLeft.x = 0;
-            inputState.gamePadTranslatedStickLeft.y = 0;
-        }
-        // Joystick Events Right
-        if (inputState.config.input_gamePadMouseStickRightEnabled) {
-            if (inputState.inputEvents.gamePadRightXMoved) {
-                inputState.gamePadTranslatedStickRight.x = inputState.inputEvents.gamePadRightX;
-                inputState.inputEvents.gamePadRightX = 0;
-                inputState.inputEvents.gamePadRightXMoved = false;
-                gamepadMouseUsed = true;
-            }
-            if (inputState.inputEvents.gamePadRightYMoved) {
-                inputState.gamePadTranslatedStickRight.y = inputState.inputEvents.gamePadRightY;
-                inputState.inputEvents.gamePadRightY = 0;
-                inputState.inputEvents.gamePadRightYMoved = false;
-                gamepadMouseUsed = true;
-            }
-        } else {
-            inputState.gamePadTranslatedStickRight.x = 0;
-            inputState.gamePadTranslatedStickRight.y = 0;
-        }
-
-        return gamepadMouseUsed;
-    }
-
-    private boolean keyboardMouseTranslateAndChokeEvents() {
-        if (inputState.focusedTextField != null) return false; // Disable during Textfield Input
-        boolean keyboardMouseUsed = false;
-        // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
-        for (int i = 0; i <= 10; i++) {
-            int[] buttons = keyboardMouseButtons(i);
-            if (buttons != null) {
-                if (inputState.inputEvents.keyDown) {
-                    for (int i2 = 0; i2 < buttons.length; i2++) {
-                        int keyCode = buttons[i2];
-                        IntArray downKeyCodes = inputState.inputEvents.keyDownKeyCodes;
-                        for (int ikc = downKeyCodes.size - 1; ikc >= 0; ikc--) {
-                            int downKeyCode = downKeyCodes.get(ikc);
-                            if (downKeyCode == keyCode) {
-                                downKeyCodes.removeIndex(ikc);
-                                inputState.inputEvents.keyDown = !downKeyCodes.isEmpty();
-                                inputState.inputEvents.keysDown[keyCode] = false;
-                                inputState.keyBoardTranslatedKeysDown[keyCode] = true;
-                                keyboardMouseUsed = true;
-                            }
-
-                        }
-                    }
-                }
-                if (inputState.inputEvents.keyUp) {
-                    for (int i2 = 0; i2 < buttons.length; i2++) {
-                        int keyCode = buttons[i2];
-                        IntArray upKeyCodes = inputState.inputEvents.keyUpKeyCodes;
-                        for (int ikc = upKeyCodes.size - 1; ikc >= 0; ikc--) {
-                            int upKeyCode = upKeyCodes.get(ikc);
-                            if (upKeyCode == keyCode) {
-                                upKeyCodes.removeIndex(ikc);
-                                inputState.inputEvents.keyUp = !upKeyCodes.isEmpty();
-                                inputState.keyBoardTranslatedKeysDown[keyCode] = false;
-                                keyboardMouseUsed = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return keyboardMouseUsed;
-    }
-
-
-    private void translateSimulatedMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
-                                               boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
-                                               boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorChangeX, float cursorChangeY
-    ) {
-        float deltaX = 0;
-        float deltaY = 0;
-        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            cursorChangeX *= inputState.config.input_emulatedMouseCursorSpeed;
-            cursorChangeY *= inputState.config.input_emulatedMouseCursorSpeed;
-            if (buttonLeft) deltaX -= cursorChangeX;
-            if (buttonRight) deltaX += cursorChangeX;
-            if (buttonUp) deltaY -= cursorChangeY;
-            if (buttonDown) deltaY += cursorChangeY;
-        }
-
-        // Set to final
-        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.internalResolutionWidth);
-        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.internalResolutionHeight);
-        inputState.mouse_delta.x = deltaX;
-        inputState.mouse_delta.y = -deltaY;
-        inputState.mouse_ui.x = MathUtils.round(inputState.mouse_emulated.x);
-        inputState.mouse_ui.y = MathUtils.round(inputState.mouse_emulated.y);
-
-        // Simluate Mouse Button Press Events
-        boolean anyButtonChanged = false;
-        for (int i = 0; i <= 4; i++) {
-            boolean buttonMouseDown = switch (i) {
-                case 0 -> buttonMouse1Down;
-                case 1 -> buttonMouse2Down;
-                case 2 -> buttonMouse3Down;
-                case 3 -> buttonMouse4Down;
-                case 4 -> buttonMouse5Down;
-                default -> throw new IllegalStateException("Unexpected value: " + i);
-            };
-            if (inputState.emulatedMouseIsButtonDown[i] != buttonMouseDown) {
-                inputState.emulatedMouseIsButtonDown[i] = buttonMouseDown;
-                if (inputState.emulatedMouseIsButtonDown[i]) {
-                    inputState.inputEvents.mouseDown = true;
-                    inputState.inputEvents.mouseDownButtons.add(i);
-                    anyButtonChanged = true;
-                    if (i == Input.Buttons.LEFT) {
-                        // DoubleClick
-                        if ((System.currentTimeMillis() - inputState.emulatedMouseLastMouseClick) < UIEngineInputProcessor.DOUBLE_CLICK_TIME) {
-                            inputState.inputEvents.mouseDoubleClick = true;
-                        }
-                        inputState.emulatedMouseLastMouseClick = System.currentTimeMillis();
-                    }
-
-                } else {
-                    inputState.inputEvents.mouseUp = true;
-                    inputState.inputEvents.mouseUpButtons.add(i);
-                    anyButtonChanged = true;
-                }
-            }
-            inputState.inputEvents.mouseButtonsDown[i] = inputState.emulatedMouseIsButtonDown[i];
-        }
-        if (!anyButtonChanged) {
-            inputState.inputEvents.mouseDown = false;
-            inputState.inputEvents.mouseUp = false;
-            inputState.inputEvents.mouseDoubleClick = false;
-            inputState.inputEvents.mouseDownButtons.clear();
-            inputState.inputEvents.mouseUpButtons.clear();
-        }
-
-        // Simluate Mouse Move Events
-        if (deltaX != 0 || deltaY != 0) {
-            inputState.inputEvents.mouseMoved = true;
-            inputState.inputEvents.mouseDragged = false;
-            draggedLoop:
-            for (int i = 0; i <= 4; i++) {
-                if (inputState.emulatedMouseIsButtonDown[i]) {
-                    inputState.inputEvents.mouseDragged = true;
-                    inputState.inputEvents.mouseMoved = false;
-                    break;
-                }
-            }
-        } else {
-            inputState.inputEvents.mouseDragged = false;
-            inputState.inputEvents.mouseMoved = false;
-        }
-
-        // Simluate Mouse Scroll Events
-        inputState.inputEvents.mouseScrolled = buttonScrolledUp || buttonScrolledDown;
-        inputState.inputEvents.mouseScrolledAmount = buttonScrolledUp ? -1 : buttonScrolledDown ? 1 : 0;
-    }
-
-    private boolean isTranslatedKeyCodeDown(boolean[] translatedKeys, int[] keys) {
-        if (keys != null) {
-            for (int i = 0; i < keys.length; i++) {
-                if (translatedKeys[keys[i]]) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    private void updateGamePadMouseControl() {
-
-        // Swallow & Translate Gamepad Events
-        boolean[] translatedButtons = inputState.gamePadTranslatedButtonsDown;
-        boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
-        boolean stickRight = inputState.config.input_gamePadMouseStickRightEnabled;
-
-        float joystickDeadZone = inputState.config.input_gamePadMouseJoystickDeadZone;
-        boolean buttonLeft = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x < -joystickDeadZone);
-        boolean buttonRight = (stickLeft && inputState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.x > joystickDeadZone);
-        boolean buttonUp = (stickLeft && inputState.gamePadTranslatedStickLeft.y > joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y > joystickDeadZone);
-        boolean buttonDown = (stickLeft && inputState.gamePadTranslatedStickLeft.y < -joystickDeadZone) || (stickRight && inputState.gamePadTranslatedStickRight.y < -joystickDeadZone);
-        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse1);
-        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse2);
-        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse3);
-        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse4);
-        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsMouse5);
-        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollUp);
-        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedButtons, inputState.config.input_gamePadMouseButtonsScrollDown);
-
-        float cursorChangeX = 0f;
-        if (buttonLeft || buttonRight) {
-            cursorChangeX = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.x), Math.abs(inputState.gamePadTranslatedStickRight.x));
-            cursorChangeX = (cursorChangeX - joystickDeadZone) / (1f - joystickDeadZone);
-        }
-        float cursorChangeY = 0f;
-        if (buttonUp || buttonDown) {
-            cursorChangeY = Math.max(Math.abs(inputState.gamePadTranslatedStickLeft.y), Math.abs(inputState.gamePadTranslatedStickRight.y));
-            cursorChangeY = (cursorChangeY - joystickDeadZone) / (1f - joystickDeadZone);
-        }
-        // Translate to mouse events
-        translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
-                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, cursorChangeX, cursorChangeY
-        );
-    }
-
-    private void updateKeyBoardMouseControl() {
-        if (inputState.focusedTextField != null) return; // Disable during Textfield Input
-
-        // Swallow & Translate keyboard events
-        boolean[] translatedKeys = inputState.keyBoardTranslatedKeysDown;
-
-        boolean buttonLeft = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsLeft);
-        boolean buttonRight = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsRight);
-        boolean buttonUp = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsUp);
-        boolean buttonDown = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsDown);
-        boolean buttonMouse1Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse1);
-        boolean buttonMouse2Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse2);
-        boolean buttonMouse3Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse3);
-        boolean buttonMouse4Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse4);
-        boolean buttonMouse5Down = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsMouse5);
-        boolean buttonScrolledUp = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollUp);
-        boolean buttonScrolledDown = isTranslatedKeyCodeDown(translatedKeys, inputState.config.input_keyboardMouseButtonsScrollDown);
-
-        final float SPEEDUP_SPEED = 0.1f;
-        if (buttonLeft || buttonRight) {
-            inputState.keyBoardMouseSpeedUp.x = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
-        } else {
-            inputState.keyBoardMouseSpeedUp.set(0, inputState.keyBoardMouseSpeedUp.y);
-        }
-        if (buttonUp || buttonDown) {
-            inputState.keyBoardMouseSpeedUp.y = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
-        } else {
-            inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x, 0);
-        }
-
-        // Translate to mouse events
-        translateSimulatedMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
-                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, inputState.keyBoardMouseSpeedUp.x, inputState.keyBoardMouseSpeedUp.y
-        );
-    }
-
-    private void updateUIMouseBounds() {
-        if (inputState.mouse_ui.x < 0) inputState.mouse_ui.x = 0;
-        if (inputState.mouse_ui.x > inputState.internalResolutionWidth)
-            inputState.mouse_ui.x = inputState.internalResolutionWidth;
-        if (inputState.mouse_ui.y < 0) inputState.mouse_ui.y = 0;
-        if (inputState.mouse_ui.y > inputState.internalResolutionHeight)
-            inputState.mouse_ui.y = inputState.internalResolutionHeight;
-    }
-
-    private void updateGameMouseXY() {
-        // MouseXGUI/MouseYGUI -> To MouseX/MouseY
-        inputState.vector_fboCursor.x = inputState.mouse_ui.x;
-        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_ui.y;
-        inputState.vector_fboCursor.z = 1;
-        inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        this.inputState.mouse_game.x = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_game.y = (int) inputState.vector_fboCursor.y;
-    }
-
-    private void updateHardwareMouseControl() {
-        // --- GUI CURSOR ---
-        // ScreenCursor To WorldCursor
-        inputState.vector2_unproject.x = Gdx.input.getX();
-        inputState.vector2_unproject.y = Gdx.input.getY();
-
-        inputState.viewport_screen.unproject(inputState.vector2_unproject);
-        // WorldCursor to  FBOCursor
-        inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
-        inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
-        inputState.vector_fboCursor.z = 1;
-        inputState.camera_ui.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-
-        // Set to final
-        inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_ui.x);
-        inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_ui.y);
-        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.internalResolutionWidth);
-        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.internalResolutionHeight);
-    }
-
-    private void updateLastUIMouseHover() {
-        inputState.lastUIMouseHover = UICommons.component_getComponentAtPosition(inputState, inputState.mouse_ui.x,inputState.mouse_ui.y);
-    }
-
-    private void updateNotifications() {
+    private void updateUI_notifications() {
         if (inputState.notifications.size() > 0) {
             Notification notification = inputState.notifications.getFirst();
             switch (notification.state) {
@@ -1918,35 +1903,35 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void executeOnMouseClickCommonAction(Object uiObject, int button) {
+    private void actions_executeOnMouseClickCommonAction(Object uiObject, int button) {
         if (uiObject == null) return;
-        CommonActions commonActions = getUIObjectCommonActions(uiObject);
+        CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseClick(button);
         if (uiObject instanceof Component component) {
-            executeOnMouseClickCommonAction(component.addedToWindow, button);
+            actions_executeOnMouseClickCommonAction(component.addedToWindow, button);
         }
     }
 
 
-    private void executeOnMouseDoubleClickCommonAction(Object uiObject, int button) {
+    private void actions_executeOnMouseDoubleClickCommonAction(Object uiObject, int button) {
         if (uiObject == null) return;
-        CommonActions commonActions = getUIObjectCommonActions(uiObject);
+        CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseDoubleClick(button);
         if (uiObject instanceof Component component) {
-            executeOnMouseDoubleClickCommonAction(component.addedToWindow, button);
+            actions_executeOnMouseDoubleClickCommonAction(component.addedToWindow, button);
         }
     }
 
-    private void executeOnMouseScrollCommonAction(Object uiObject, float scrolled) {
+    private void actions_executeOnMouseScrollCommonAction(Object uiObject, float scrolled) {
         if (uiObject == null) return;
-        CommonActions commonActions = getUIObjectCommonActions(uiObject);
+        CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseScroll(scrolled);
         if (uiObject instanceof Component component) {
-            executeOnMouseScrollCommonAction(component.addedToWindow, scrolled);
+            actions_executeOnMouseScrollCommonAction(component.addedToWindow, scrolled);
         }
     }
 
-    private CommonActions getUIObjectCommonActions(Object uiObject) {
+    private CommonActions actions_getUIObjectCommonActions(Object uiObject) {
         return switch (uiObject) {
             case Window window -> window.windowAction;
             case Notification notification -> notification.notificationAction;
@@ -1966,42 +1951,7 @@ public class UIEngine<T extends UIAdapter> {
         };
     }
 
-
-    private void updateCameras() {
-        // Game Camera
-        inputState.camera_game.update();
-        // Viewport Camera
-        for (int i = 0; i < inputState.gameViewPorts.size(); i++) inputState.gameViewPorts.get(i).camera.update();
-    }
-
-    private void updateMouseCursor() {
-        /* Update Cursor*/
-        if (inputState.lastUIMouseHover != null) {
-            // 1. GUI Cursor
-            inputState.cursor = inputState.config.ui_cursor;
-        } else {
-            // 2. Manually overidden Cursor
-            if (inputState.displayOverrideCursor) {
-                inputState.cursor = inputState.overrideCursor;
-                inputState.displayOverrideCursor = false;
-            } else {
-                if (inputState.mouseTool != null) {
-                    // 3. Mouse Tool cursor
-                    if (inputState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT]) {
-                        inputState.cursor = inputState.mouseTool.cursorDown;
-                    } else {
-                        inputState.cursor = inputState.mouseTool.cursor;
-                    }
-                } else {
-                    // no mouse tool set - display no cursor
-                    inputState.cursor = null;
-                }
-            }
-        }
-
-    }
-
-    private boolean executeUpdateAction(UpdateAction updateAction, long currentTimeMillis) {
+    private boolean actions_executeUpdateAction(UpdateAction updateAction, long currentTimeMillis) {
         if ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval) {
             updateAction.onUpdate();
             updateAction.lastUpdate = currentTimeMillis;
@@ -3114,6 +3064,10 @@ public class UIEngine<T extends UIAdapter> {
         mediaManager.drawCMediaGFX(inputState.spriteBatch_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
+    private void render_glClear() {
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+    }
     public void shutdown() {
         // Lists
         inputState.windows.clear();
