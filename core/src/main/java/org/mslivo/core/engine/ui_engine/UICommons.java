@@ -41,6 +41,21 @@ import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 
 class UICommons {
 
+    static void emulatedMouse_setPosition(InputState inputState, int x, int y){
+        if (!inputState.currentControlMode.emulated) return;
+        // not possibe with hardware mouse - would be resetted instantly
+        inputState.mouse_emulated.x = x;
+        inputState.mouse_emulated.y = y;
+    }
+
+    static void emulatedMouse_setPositionComponent(InputState inputState, Component component){
+        if (component == null) return;
+        if (component.addedToWindow == null && !component.addedToScreen) return;
+        int x = component_getAbsoluteX(component) + (component_getRealWidth(component)/2);
+        int y = component_getAbsoluteY(component) + (component_getRealHeight(component)/2);
+        emulatedMouse_setPosition(inputState, x,y);
+    }
+
     static int component_getParentWindowX(Component component) {
         return component.addedToWindow != null ? component.addedToWindow.x : 0;
     }
@@ -328,8 +343,6 @@ class UICommons {
         return null;
     }
 
-
-
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
         if (notification.addedToScreen) return;
         notification.addedToScreen = true;
@@ -347,8 +360,8 @@ class UICommons {
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
         boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_ui.x,inputState.mouse_ui.y);
-        if (success && (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD || inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD)) {
-            // keyboard mode: move mouse onto the opened menu
+        if (success && (inputState.currentControlMode.emulated)) {
+            // emulated mode: move mouse onto the opened menu
             inputState.mouse_emulated.x += UIEngine.TILE_SIZE_2;
             inputState.mouse_emulated.y -= UIEngine.TILE_SIZE_2;
         }
@@ -800,25 +813,25 @@ class UICommons {
         if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
     }
 
-    static float scrollBar_calculateScrolled(ScrollBar scrollBar, int mouse_gui_xy) {
-        int relative_xy;
-        float max_xy;
+    static float scrollBar_calculateScrolled(ScrollBar scrollBar, int mouse_ui_x, int mouse_ui_y) {
+        int relativePos;
+        float maxPos;
         float buttonOffset;
         switch (scrollBar){
             case ScrollBarHorizontal scrollBarHorizontal -> {
-                relative_xy = mouse_gui_xy-UICommons.component_getAbsoluteX(scrollBarHorizontal);
-                max_xy = (scrollBarHorizontal.width*UIEngine.TILE_SIZE)-8;
+                relativePos = mouse_ui_x-UICommons.component_getAbsoluteX(scrollBarHorizontal);
+                maxPos = (scrollBarHorizontal.width*UIEngine.TILE_SIZE)-8;
                 buttonOffset =  (1 / (float) scrollBarHorizontal.width) / 2f;
             }
             case ScrollBarVertical scrollBarVertical -> {
-                relative_xy = mouse_gui_xy-UICommons.component_getAbsoluteY(scrollBarVertical);
-                max_xy = (scrollBarVertical.height*UIEngine.TILE_SIZE)-8;
+                relativePos = mouse_ui_y-UICommons.component_getAbsoluteY(scrollBarVertical);
+                maxPos = (scrollBarVertical.height*UIEngine.TILE_SIZE)-8;
                 buttonOffset =  (1 / (float) scrollBarVertical.height) / 2f;
             }
             default -> throw new IllegalStateException("Unexpected value: " + scrollBar);
         }
 
-        return (relative_xy / max_xy) - buttonOffset;
+        return (relativePos / maxPos) - buttonOffset;
     }
 
     static void list_scroll(List list, float scrolled) {

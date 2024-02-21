@@ -52,7 +52,7 @@ public class ExampleMain extends ApplicationAdapter {
         // Load Assets
         Tools.Log.inProgress("Loading Assets");
         this.mediaManager = new MediaManager();
-        this.mediaManager.prepareGUICMedia();
+        this.mediaManager.prepareUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
         Tools.Log.done();

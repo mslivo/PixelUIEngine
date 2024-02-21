@@ -22,11 +22,11 @@ public interface UIAdapter {
     default void renderAfterUI(SpriteBatch batch, ImmediateRenderer imRenderer) {
     }
 
-    default void renderFinalScreen(SpriteBatch spriteBatch_screen, TextureRegion texture_game, TextureRegion texture_gui,
+    default void renderFinalScreen(SpriteBatch spriteBatch_screen, TextureRegion texture_game, TextureRegion texture_ui,
                                    int internalResolutionWidth, int internalResolutionHeight) {
         spriteBatch_screen.begin();
         spriteBatch_screen.draw(texture_game, 0, 0, internalResolutionWidth, internalResolutionHeight);
-        spriteBatch_screen.draw(texture_gui, 0, 0, internalResolutionWidth, internalResolutionHeight);
+        spriteBatch_screen.draw(texture_ui, 0, 0, internalResolutionWidth, internalResolutionHeight);
         spriteBatch_screen.end();
     }
 

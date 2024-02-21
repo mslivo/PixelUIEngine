@@ -121,7 +121,7 @@ public class ExampleUIAdapter implements UIAdapter {
             int key = keyBoard.event.keyDownNext();
             switch (key){
                 case KeyCode.Key.Q -> {
-                    api.input.mouse.setPosition(10,10);
+                    api.input.mouse.emulated.setPosition(10,10);
                 }
             }
         }

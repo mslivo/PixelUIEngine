@@ -55,7 +55,7 @@ public class MediaManager {
         return true;
     }
 
-    public boolean prepareGUICMedia() {
+    public boolean prepareUICMedia() {
         if (loaded) return false;
         prepareCMedia(UIBaseMedia.ALL);
         return true;

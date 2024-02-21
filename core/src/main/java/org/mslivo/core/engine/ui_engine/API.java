@@ -48,6 +48,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
@@ -1195,7 +1196,7 @@ public class API {
                                 }
                             }, invisibleTab.icon));
                         }
-                        org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         openContextMenu(selectTabMenu);
                     }
                 });
@@ -1272,20 +1273,20 @@ public class API {
         return new ArrayList<>(inputState.notifications);
     }
 
-    public void openContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
+    public void openContextMenu(ContextMenu contextMenu) {
         UICommons.contextMenu_openAtMousePosition(contextMenu, inputState, mediaManager);
     }
 
-    public void openContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, int x, int y) {
+    public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
         UICommons.contextMenu_open(contextMenu, inputState, mediaManager, x, y);
     }
 
-    public void closeContextMenu(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
+    public void closeContextMenu(ContextMenu contextMenu) {
         UICommons.contextMenu_close(contextMenu, inputState);
     }
 
-    public boolean isContextMenuOpen(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
+    public boolean isContextMenuOpen(ContextMenu contextMenu) {
         return UICommons.contextMenu_isOpen(inputState, contextMenu);
     }
 
@@ -2169,22 +2170,20 @@ public class API {
             public final _Event event = new _Event();
             public final _State state = new _State();
 
-            public void setPosition(int x, int y) {
-                if (inputState.currentControlMode == MOUSE_CONTROL_MODE.HARDWARE_MOUSE) return;
-                // not possibe with hardware mouse - would be resetted instantly
-                inputState.mouse_emulated.x = x;
-                inputState.mouse_emulated.y = y;
+            public final _Emulated emulated = new _Emulated();
+
+            public class _Emulated{
+                public void setPosition(int x, int y) {
+                    UICommons.emulatedMouse_setPosition(inputState,x,y);
+                }
+
+                public void setPositionComponent(Component component) {
+                    UICommons.emulatedMouse_setPositionComponent(inputState,component);
+                }
             }
 
-            public void setPositionComponent(Component component) {
-                if (component == null) return;
-                if (component.addedToWindow == null && !component.addedToScreen) return;
-                int x = UICommons.component_getAbsoluteX(component) + (UICommons.component_getRealWidth(component)/2);
-                int y = UICommons.component_getAbsoluteY(component) + (UICommons.component_getRealHeight(component)/2);;
-                setPosition(x,y);
-            }
 
-            private String mouseGUIObjectName(Object mouseObject) {
+            private String mouseUIObjectName(Object mouseObject) {
                 if (mouseObject != null) {
                     if (mouseObject instanceof Component component) {
                         return component.name;
@@ -2199,28 +2198,28 @@ public class API {
                 return inputState.currentControlMode;
             }
 
-            public Object hoverGUIObject() {
+            public Object hoverUIObject() {
                 return inputState.lastUIMouseHover;
             }
 
-            public boolean isHoveringOverGUIObject() {
-                return hoverGUIObject() != null;
+            public boolean isHoveringOverUIObject() {
+                return hoverUIObject() != null;
             }
 
-            public String hoverGUIObjectName() {
-                return mouseGUIObjectName(hoverGUIObject());
+            public String hoverUIObjectName() {
+                return mouseUIObjectName(hoverUIObject());
             }
 
-            public Object useGUIObject() {
+            public Object useUIObject() {
                 return inputState.mouseInteractedUIObjectFrame != null ? inputState.mouseInteractedUIObjectFrame : null;
             }
 
-            public boolean isUsingGUIObject() {
-                return useGUIObject() != null;
+            public boolean isUsingUIObject() {
+                return useUIObject() != null;
             }
 
-            public String useGUIObjectName() {
-                return mouseGUIObjectName(useGUIObject());
+            public String useUIObjectName() {
+                return mouseUIObjectName(useUIObject());
             }
 
             public class _Event {
@@ -2336,16 +2335,16 @@ public class API {
                 return "";
             }
 
-            public Object useGUIObject() {
+            public Object useUIObject() {
                 return inputState.keyboardInteractedUIObjectFrame != null ? inputState.keyboardInteractedUIObjectFrame : null;
             }
 
-            public boolean isUsingGUIObject() {
-                return useGUIObject() != null;
+            public boolean isUsingUIObject() {
+                return useUIObject() != null;
             }
 
-            public String keyBoardUsingGUIObjectName() {
-                return keyBoardGUIObjectName(useGUIObject());
+            public String keyBoardUsingUIObjectName() {
+                return keyBoardGUIObjectName(useUIObject());
             }
 
             public class _Event {
@@ -2636,16 +2635,16 @@ public class API {
 
         public final _ContextMenuItem item = new _ContextMenuItem();
 
-        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems) {
+        public ContextMenu create(ContextMenuItem[] contextMenuItems) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
             return create(contextMenuItems, defaultContextMenuAction(), 1f);
         }
 
-        public org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
-            org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu = new org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu();
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
+            ContextMenu contextMenu = new ContextMenu();
             contextMenu.items = new ArrayList<>();
             setAlpha(contextMenu, alpha);
             addContextMenuItems(contextMenu, contextMenuItems);
@@ -2653,43 +2652,43 @@ public class API {
             return contextMenu;
         }
 
-        public void setContextMenuAction(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
+        public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
             if (contextMenu == null) return;
             contextMenu.contextMenuAction = contextMenuAction;
         }
 
-        public void setAlpha(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, float alpha) {
+        public void setAlpha(ContextMenu contextMenu, float alpha) {
             if (contextMenu == null) return;
             contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
         }
 
-        public void addContextMenuItem(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
         }
 
-        public void addContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeContextMenuItem(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
             if (contextMenu == null || contextMenuItem == null) return;
             UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
         }
 
-        public void removeContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+        public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
             if (contextMenu == null || contextMenuItems == null) return;
             for (int i = 0; i < contextMenuItems.length; i++)
                 removeContextMenuItem(contextMenu, contextMenuItems[i]);
         }
 
-        public void removeAllContextMenuItems(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu) {
+        public void removeAllContextMenuItems(ContextMenu contextMenu) {
             if (contextMenu == null) return;
             removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
         }
 
-        public ArrayList<ContextMenuItem> findContextMenuItemsByName(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, String name) {
+        public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return new ArrayList<>();
             ArrayList<ContextMenuItem> result = new ArrayList<>();
             for (int i = 0; i < contextMenu.items.size(); i++)
@@ -2697,7 +2696,7 @@ public class API {
             return result;
         }
 
-        public ContextMenuItem findContextMenuItemByName(org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu contextMenu, String name) {
+        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
             if (contextMenu == null || name == null) return null;
             ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
             return result.size() > 0 ? result.getFirst() : null;

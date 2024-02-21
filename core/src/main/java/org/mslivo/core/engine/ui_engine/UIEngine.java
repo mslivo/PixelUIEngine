@@ -249,7 +249,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
         newInputState.mouse_ui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
         newInputState.mouse_game = new GridPoint2(0, 0);
-        newInputState.mouse_delta = new GridPoint2(0, 0);
+        newInputState.mouse_delta = new Vector2(0, 0);
         newInputState.lastUIMouseHover = null;
         newInputState.cursor = null;
         newInputState.mouseTool = null;
@@ -292,7 +292,7 @@ public class UIEngine<T extends UIAdapter> {
     public void update() {
         // GUI
         this.updateMouseControl(); // Map Keyboard/Gamepad controls to mouse controls
-        this.updateGUI(); // Main GUI Update happen here
+        this.updateUI(); // Main GUI Update happen here
         this.updateCameras();
         this.updateMouseCursor();
 
@@ -526,7 +526,7 @@ public class UIEngine<T extends UIAdapter> {
                             if (scrollBarVertical.scrollBarAction != null)
                                 scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
                             UICommons.scrollBar_scroll(scrollBarVertical,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.y));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
                             inputState.scrolledScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollBarHorizontal scrollBarHorizontal -> {
@@ -534,7 +534,7 @@ public class UIEngine<T extends UIAdapter> {
                             if (scrollBarHorizontal.scrollBarAction != null)
                                 scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
                             UICommons.scrollBar_scroll(scrollBarHorizontal,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
                             inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case ComboBox comboBox -> {
@@ -808,9 +808,9 @@ public class UIEngine<T extends UIAdapter> {
                             comboBoxItem.comboBoxItemAction.onSelect();
                         if (comboBox.comboBoxAction != null)
                             comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-                        if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
-                            // keyboard mode: move mouse back to combobox on item select
-                            inputState.mouse_ui.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                        if (inputState.currentControlMode.emulated) {
+                            // emulated: move mouse back to combobox on item select
+                            inputState.mouse_emulated.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
                         }
                         UICommons.comboBox_close(inputState, comboBox);
                         inputState.pressedComboBoxItem = null;
@@ -940,18 +940,18 @@ public class UIEngine<T extends UIAdapter> {
                         window.windowAction.onMove(window.x, window.y);
                 }
                 case ScrollBarVertical scrollBarVertical -> {
-                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.y));
+                    UICommons.scrollBar_scroll(scrollBarVertical, UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
                 }
                 case ScrollBarHorizontal scrollBarHorizontal -> {
-                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x));
+                    UICommons.scrollBar_scroll(scrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
                 }
                 case Knob knob -> {
                     float amount = (inputState.mouse_delta.y / 100f) * inputState.config.component_knobSensitivity;
                     float newValue = knob.turned + amount;
                     UICommons.knob_turnKnob(knob, newValue, amount);
-                    if (inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
-                        // keyboard mode: keep mouse position steady
-                        inputState.mouse_ui.y += inputState.mouse_delta.y;
+                    if (inputState.currentControlMode.emulated) {
+                        // emulated: keep mouse position steady
+                        UICommons.emulatedMouse_setPositionComponent(inputState,knob);
                     }
                 }
                 case null, default -> {
@@ -1023,7 +1023,7 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private void updateGUI() {
+    private void updateUI() {
 
         updateMouseInteractions();
 
@@ -1191,10 +1191,11 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
+
     private void setMouseControlMode(MOUSE_CONTROL_MODE nextControlMode) {
         if (nextControlMode != null && nextControlMode != inputState.currentControlMode) {
             // Clean up current control mode
-            if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD || inputState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+            if (inputState.currentControlMode.emulated) {
                 if (inputState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD) {
                     // Gamepad
                     for (int i = 0; i < inputState.gamePadTranslatedButtonsDown.length; i++)
@@ -1214,7 +1215,7 @@ public class UIEngine<T extends UIAdapter> {
             }
 
             // Set Next ControlMode
-            if (nextControlMode == MOUSE_CONTROL_MODE.GAMEPAD || nextControlMode == MOUSE_CONTROL_MODE.KEYBOARD) {
+            if (nextControlMode.emulated) {
                 this.inputState.mouse_emulated.set(inputState.mouse_ui.x, inputState.mouse_ui.y);
             }
             inputState.currentControlMode = nextControlMode;
@@ -1251,7 +1252,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        updateGUIMouseBounds(); // Enforce UI mouse screen bounds
+        updateUIMouseBounds(); // Enforce UI mouse screen bounds
         updateGameMouseXY(); // Translate UI mouse x,y to Game mouse x,y
         updateLastUIMouseHover(); // Determine object that is below the cursor
     }
@@ -1683,12 +1684,10 @@ public class UIEngine<T extends UIAdapter> {
         // Set to final
         inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.internalResolutionWidth);
         inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.internalResolutionHeight);
-        int newCursorPositionX = MathUtils.round(inputState.mouse_emulated.x);
-        int newCursorPositionY = MathUtils.round(inputState.mouse_emulated.y);
-        inputState.mouse_delta.x = newCursorPositionX - inputState.mouse_ui.x;
-        inputState.mouse_delta.y = newCursorPositionY - inputState.mouse_ui.y;
-        inputState.mouse_ui.x = newCursorPositionX;
-        inputState.mouse_ui.y = newCursorPositionY;
+        inputState.mouse_delta.x = deltaX;
+        inputState.mouse_delta.y = -deltaY;
+        inputState.mouse_ui.x = MathUtils.round(inputState.mouse_emulated.x);
+        inputState.mouse_ui.y = MathUtils.round(inputState.mouse_emulated.y);
 
         // Simluate Mouse Button Press Events
         boolean anyButtonChanged = false;
@@ -1839,7 +1838,7 @@ public class UIEngine<T extends UIAdapter> {
         );
     }
 
-    private void updateGUIMouseBounds() {
+    private void updateUIMouseBounds() {
         if (inputState.mouse_ui.x < 0) inputState.mouse_ui.x = 0;
         if (inputState.mouse_ui.x > inputState.internalResolutionWidth)
             inputState.mouse_ui.x = inputState.internalResolutionWidth;
@@ -2042,7 +2041,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.immediateRenderer)
                 inputState.imRenderer_ui.setProjectionMatrix(this.inputState.camera_game.combined);
             this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
-            this.renderGUI();
+            this.renderUI();
             this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
             inputState.frameBuffer_ui.end();
         }
@@ -2088,7 +2087,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void renderGUI() {
+    private void renderUI() {
         inputState.animation_timer_ui = inputState.animation_timer_ui + Gdx.graphics.getDeltaTime();
 
         inputState.spriteBatch_ui.begin();
@@ -3196,7 +3195,7 @@ public class UIEngine<T extends UIAdapter> {
         return inputState.texture_game;
     }
 
-    public TextureRegion getTextureGUI() {
+    public TextureRegion getTextureUI() {
         return inputState.texture_game;
     }
 }

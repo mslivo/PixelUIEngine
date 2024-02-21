@@ -151,7 +151,7 @@ public class InputState {
     public GridPoint2 mouse_game;
     public Vector2 mouse_emulated; // Mouse Position for Keyboard/Gamepad mouse control
     public GridPoint2 mouse_ui;
-    public GridPoint2 mouse_delta;
+    public Vector2 mouse_delta;
     public CMediaCursor cursor;
     public MouseTool mouseTool;
     public boolean mouseToolPressed;
