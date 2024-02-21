@@ -19,7 +19,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
@@ -109,13 +109,13 @@ public class InputState {
     public TextField pressedTextField;
     public int pressedTextFieldMouseX;
     public TextField focusedTextField;
-    public Inventory draggedInventory;
-    public Inventory pressedInventory;
+    public Grid draggedGrid;
+    public Grid pressedGrid;
     public CheckBox pressedCheckBox;
-    public Object pressedInventoryItem;
-    public GridPoint2 draggedInventoryFrom;
-    public GridPoint2 draggedInventoryOffset;
-    public Object draggedInventoryItem;
+    public Object pressedGridItem;
+    public GridPoint2 draggedGridFrom;
+    public GridPoint2 draggedGridOffset;
+    public Object draggedGridItem;
     public List draggedList;
     public List pressedList;
     public Object pressedListItem;
@@ -176,8 +176,8 @@ public class InputState {
     public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;
     public int itemInfo_listIndex;
-    public GridPoint2 itemInfo_inventoryPos;
+    public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;
-    public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_inventoryValid;
+    public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_gridValid;
 
 }

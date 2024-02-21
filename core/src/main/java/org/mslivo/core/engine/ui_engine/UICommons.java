@@ -16,7 +16,7 @@ import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
@@ -35,7 +35,6 @@ import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
-import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
@@ -274,13 +273,13 @@ class UICommons {
         inputState.pressedTextField = null;
         inputState.pressedTextFieldMouseX = 0;
 
-        // Inventory
-        inputState.draggedInventory = null;
-        inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
-        inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
-        inputState.draggedInventoryItem = null;
-        inputState.pressedInventory = null;
-        inputState.pressedInventoryItem = null;
+        // Grid
+        inputState.draggedGrid = null;
+        inputState.draggedGridFrom.x = inputState.draggedGridFrom.y = 0;
+        inputState.draggedGridOffset.x = inputState.draggedGridOffset.y = 0;
+        inputState.draggedGridItem = null;
+        inputState.pressedGrid = null;
+        inputState.pressedGridItem = null;
 
         // List
         inputState.draggedList = null;
@@ -330,7 +329,7 @@ class UICommons {
         if (inputState.pressedMap != null) return inputState.pressedMap;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
-        if (inputState.pressedInventory != null) return inputState.pressedInventory;
+        if (inputState.pressedGrid != null) return inputState.pressedGrid;
         if (inputState.pressedList != null) return inputState.pressedList;
         if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
         if (inputState.pressedComboBoxItem != null) return inputState.pressedComboBoxItem;
@@ -339,7 +338,7 @@ class UICommons {
     }
 
     static Object getDraggedUIReference(InputState inputState) {
-        if (inputState.draggedInventory != null) return inputState.draggedInventory;
+        if (inputState.draggedGrid != null) return inputState.draggedGrid;
         if (inputState.draggedList != null) return inputState.draggedList;
         return null;
     }
@@ -442,9 +441,9 @@ class UICommons {
         }
     }
 
-    static boolean inventory_positionValid(Inventory inventory, int x, int y) {
-        if (inventory.items != null) {
-            return x >= 0 && x < inventory.items.length && y >= 0 && y < inventory.items[0].length;
+    static boolean grid_positionValid(Grid grid, int x, int y) {
+        if (grid.items != null) {
+            return x >= 0 && x < grid.items.length && y >= 0 && y < grid.items[0].length;
         }
         return false;
     }
@@ -694,8 +693,8 @@ class UICommons {
         return list.listAction != null && list.listAction.canDragIntoScreen();
     }
 
-    static boolean inventory_canDragIntoScreen(Inventory inventory) {
-        return inventory.inventoryAction != null && inventory.inventoryAction.canDragIntoScreen();
+    static boolean grid_canDragIntoScreen(Grid grid) {
+        return grid.gridAction != null && grid.gridAction.canDragIntoScreen();
     }
 
     static boolean list_canDragIntoList(InputState inputState, List list) {
@@ -705,10 +704,10 @@ class UICommons {
             return list.dragInEnabled &&
                     !list.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
                     list.listAction != null && list.listAction.canDragFromList(inputState.draggedList);
-        } else if (inputState.draggedInventory != null) {
+        } else if (inputState.draggedGrid != null) {
             return list.dragInEnabled &&
-                    !list.disabled && !inputState.draggedInventory.disabled && inputState.draggedInventory.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromInventory(inputState.draggedInventory);
+                    !list.disabled && !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
+                    list.listAction != null && list.listAction.canDragFromGrid(inputState.draggedGrid);
         } else {
             return false;
         }
@@ -774,36 +773,36 @@ class UICommons {
         return;
     }
 
-    static void inventory_updateItemInfoAtMousePosition(InputState inputState, Inventory inventory) {
-        int tileSize = inventory.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
-        int x_inventory = UICommons.component_getAbsoluteX(inventory);
-        int y_inventory = UICommons.component_getAbsoluteY(inventory);
-        int inv_to_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
-        int inv_to_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
-        if (UICommons.inventory_positionValid(inventory, inv_to_x, inv_to_y)) {
-            inputState.itemInfo_inventoryPos.x = inv_to_x;
-            inputState.itemInfo_inventoryPos.y = inv_to_y;
-            inputState.itemInfo_inventoryValid = true;
+    static void grid_updateItemInfoAtMousePosition(InputState inputState, Grid grid) {
+        int tileSize = grid.doubleSized ? UIEngine.TILE_SIZE * 2 : UIEngine.TILE_SIZE;
+        int x_grid = UICommons.component_getAbsoluteX(grid);
+        int y_grid = UICommons.component_getAbsoluteY(grid);
+        int inv_to_x = (inputState.mouse_ui.x - x_grid) / tileSize;
+        int inv_to_y = (inputState.mouse_ui.y - y_grid) / tileSize;
+        if (UICommons.grid_positionValid(grid, inv_to_x, inv_to_y)) {
+            inputState.itemInfo_gridPos.x = inv_to_x;
+            inputState.itemInfo_gridPos.y = inv_to_y;
+            inputState.itemInfo_gridValid = true;
             return;
         }
-        inputState.itemInfo_inventoryPos.set(0, 0);
-        inputState.itemInfo_inventoryValid = false;
+        inputState.itemInfo_gridPos.set(0, 0);
+        inputState.itemInfo_gridValid = false;
         return;
     }
 
 
-    static boolean inventory_canDragIntoInventory(InputState inputState, Inventory inventory) {
-        if (inputState.draggedInventoryItem != null) {
-            if (inputState.draggedInventory == null || inventory == null) return false;
-            if (inputState.draggedInventory == inventory) return true; // into itself
-            return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.draggedInventory.disabled && inputState.draggedInventory.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromInventory(inputState.draggedInventory);
+    static boolean grid_canDragIntoGrid(InputState inputState, Grid grid) {
+        if (inputState.draggedGridItem != null) {
+            if (inputState.draggedGrid == null || grid == null) return false;
+            if (inputState.draggedGrid == grid) return true; // into itself
+            return grid.dragInEnabled &&
+                    !grid.disabled && !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
+                    grid.gridAction != null && grid.gridAction.canDragFromGrid(inputState.draggedGrid);
         } else if (inputState.draggedListItem != null) {
-            if (inputState.draggedList == null || inventory == null) return false;
-            return inventory.dragInEnabled &&
-                    !inventory.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
-                    inventory.inventoryAction != null && inventory.inventoryAction.canDragFromList(inputState.draggedList);
+            if (inputState.draggedList == null || grid == null) return false;
+            return grid.dragInEnabled &&
+                    !grid.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
+                    grid.gridAction != null && grid.gridAction.canDragFromList(inputState.draggedList);
         } else {
             return false;
         }

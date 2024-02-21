@@ -2,11 +2,11 @@ package org.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 
-public abstract class InventoryAction<T> extends CommonActions {
+public abstract class GridAction<T> extends CommonActions {
 
     public CMediaGFX icon(T listItem) {
         return null;
@@ -23,13 +23,13 @@ public abstract class InventoryAction<T> extends CommonActions {
     public void onItemSelected(T listItem) {
     }
 
-    public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int to_x, int to_y) {
+    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
     }
 
     public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
     }
 
-    public boolean canDragFromInventory(Inventory fromInventory) {
+    public boolean canDragFromGrid(Grid fromGrid) {
         return false;
     }
 

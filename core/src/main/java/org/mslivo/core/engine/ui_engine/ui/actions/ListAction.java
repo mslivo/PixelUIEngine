@@ -2,7 +2,7 @@ package org.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 
@@ -40,14 +40,14 @@ public abstract class ListAction<T> extends CommonActions {
     public void onDragFromList(List fromList, int fromIndex, int toIndex) {
     }
 
-    public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int toIndex) {
+    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int toIndex) {
     }
 
     public boolean canDragFromList(List list) {
         return false;
     }
 
-    public boolean canDragFromInventory(Inventory fromInventory) {
+    public boolean canDragFromGrid(Grid fromGrid) {
         return false;
     }
 

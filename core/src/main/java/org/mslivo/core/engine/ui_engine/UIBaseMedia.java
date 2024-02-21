@@ -45,12 +45,12 @@ public class UIBaseMedia {
     public static final CMediaArray UI_TEXTFIELD_VALIDATION_OVERLAY = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "textfield_validation_overlay.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_TEXTFIELD_FOCUSED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "textfield_focused.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaAnimation UI_TEXTFIELD_CARET = MediaManager.create_CMediaAnimation(DIR_UI_GRAPHICS + "textfield_caret.png", 1, UIEngine.TILE_SIZE, 0.4f);
-    public static final CMediaArray UI_INVENTORY = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static final CMediaArray UI_INVENTORY_DRAGGED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory_dragged.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static final CMediaArray UI_INVENTORY_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static final CMediaArray UI_INVENTORY_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
-    public static final CMediaArray UI_INVENTORY_DRAGGED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory_dragged_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
-    public static final CMediaArray UI_INVENTORY_SELECTED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "inventory_selected_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
+    public static final CMediaArray UI_GRID = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray UI_GRID_DRAGGED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid_dragged.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray UI_GRID_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray UI_GRID_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
+    public static final CMediaArray UI_GRID_DRAGGED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid_dragged_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
+    public static final CMediaArray UI_GRID_SELECTED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "grid_selected_x2.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
     public static final CMediaArray UI_PROGRESSBAR = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "progressbar.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_PROGRESSBAR_BAR = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "progressbar_bar.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaImage UI_NOTIFICATION_BAR = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "notification_bar.png");
@@ -129,12 +129,12 @@ public class UIBaseMedia {
             UI_TEXTFIELD_VALIDATION_OVERLAY,
             UI_TEXTFIELD_FOCUSED,
             UI_TEXTFIELD_CARET,
-            UI_INVENTORY,
-            UI_INVENTORY_DRAGGED,
-            UI_INVENTORY_SELECTED,
-            UI_INVENTORY_X2,
-            UI_INVENTORY_DRAGGED_X2,
-            UI_INVENTORY_SELECTED_X2,
+            UI_GRID,
+            UI_GRID_DRAGGED,
+            UI_GRID_SELECTED,
+            UI_GRID_X2,
+            UI_GRID_DRAGGED_X2,
+            UI_GRID_SELECTED_X2,
             UI_PROGRESSBAR,
             UI_PROGRESSBAR_BAR,
             UI_NOTIFICATION_BAR,

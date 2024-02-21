@@ -30,7 +30,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
@@ -224,12 +224,12 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.tooltip_fadeIn_timer = 0;
         newInputState.scrolledScrollBarVertical = null;
         newInputState.scrolledScrollBarHorizontal = null;
-        newInputState.draggedInventoryItem = null;
-        newInputState.draggedInventory = null;
-        newInputState.draggedInventoryOffset = new GridPoint2();
-        newInputState.draggedInventoryFrom = new GridPoint2();
-        newInputState.pressedInventory = null;
-        newInputState.pressedInventoryItem = null;
+        newInputState.draggedGridItem = null;
+        newInputState.draggedGrid = null;
+        newInputState.draggedGridOffset = new GridPoint2();
+        newInputState.draggedGridFrom = new GridPoint2();
+        newInputState.pressedGrid = null;
+        newInputState.pressedGridItem = null;
         newInputState.draggedListItem = null;
         newInputState.draggedList = null;
         newInputState.draggedListOffsetX = new GridPoint2();
@@ -273,10 +273,10 @@ public class UIEngine<T extends UIAdapter> {
 
         newInputState.itemInfo_listIndex = 0;
         newInputState.itemInfo_tabBarTabIndex = 0;
-        newInputState.itemInfo_inventoryPos = new GridPoint2();
+        newInputState.itemInfo_gridPos = new GridPoint2();
         newInputState.itemInfo_listValid = false;
         newInputState.itemInfo_tabBarValid = false;
-        newInputState.itemInfo_inventoryValid = false;
+        newInputState.itemInfo_gridValid = false;
 
         return newInputState;
     }
@@ -1266,24 +1266,24 @@ public class UIEngine<T extends UIAdapter> {
                             inputState.pressedTextFieldMouseX = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(textField);
                             inputState.pressedTextField = textField;
                         }
-                        case Inventory inventory -> {
-                            int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-                            int x_inventory = UICommons.component_getAbsoluteX(inventory);
-                            int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                            int inv_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
-                            int inv_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
-                            if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
-                                Object pressedInventoryItem = inventory.items[inv_x][inv_y];
-                                if (pressedInventoryItem != null && inventory.dragEnabled) {
-                                    inputState.draggedInventoryFrom.x = inv_x;
-                                    inputState.draggedInventoryFrom.y = inv_y;
-                                    inputState.draggedInventoryOffset.x = inputState.mouse_ui.x - (x_inventory + (inv_x * tileSize));
-                                    inputState.draggedInventoryOffset.y = inputState.mouse_ui.y - (y_inventory + (inv_y * tileSize));
-                                    inputState.draggedInventoryItem = inventory.items[inv_x][inv_y];
-                                    inputState.draggedInventory = inventory;
+                        case Grid grid -> {
+                            int tileSize = grid.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
+                            int x_grid = UICommons.component_getAbsoluteX(grid);
+                            int y_grid = UICommons.component_getAbsoluteY(grid);
+                            int inv_x = (inputState.mouse_ui.x - x_grid) / tileSize;
+                            int inv_y = (inputState.mouse_ui.y - y_grid) / tileSize;
+                            if (UICommons.grid_positionValid(grid, inv_x, inv_y)) {
+                                Object pressedGridItem = grid.items[inv_x][inv_y];
+                                if (pressedGridItem != null && grid.dragEnabled) {
+                                    inputState.draggedGridFrom.x = inv_x;
+                                    inputState.draggedGridFrom.y = inv_y;
+                                    inputState.draggedGridOffset.x = inputState.mouse_ui.x - (x_grid + (inv_x * tileSize));
+                                    inputState.draggedGridOffset.y = inputState.mouse_ui.y - (y_grid + (inv_y * tileSize));
+                                    inputState.draggedGridItem = grid.items[inv_x][inv_y];
+                                    inputState.draggedGrid = grid;
                                 }
-                                inputState.pressedInventory = inventory;
-                                inputState.pressedInventoryItem = pressedInventoryItem;
+                                inputState.pressedGrid = grid;
+                                inputState.pressedGridItem = pressedGridItem;
                             }
                         }
                         case List list -> {
@@ -1387,13 +1387,13 @@ public class UIEngine<T extends UIAdapter> {
                                             hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
                                     }
                                 }
-                            } else if (inputState.lastUIMouseHover instanceof Inventory hoverInventory) {
-                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
-                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
-                                    if (inputState.itemInfo_inventoryValid) {
-                                        if (hoverInventory.inventoryAction != null)
-                                            hoverInventory.inventoryAction.onDragFromList(list, dragFromIndex,
-                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                            } else if (inputState.lastUIMouseHover instanceof Grid hoverGrid) {
+                                if (UICommons.grid_canDragIntoGrid(inputState, hoverGrid)) {
+                                    UICommons.grid_updateItemInfoAtMousePosition(inputState, hoverGrid);
+                                    if (inputState.itemInfo_gridValid) {
+                                        if (hoverGrid.gridAction != null)
+                                            hoverGrid.gridAction.onDragFromList(list, dragFromIndex,
+                                                    inputState.itemInfo_gridPos.x, inputState.itemInfo_gridPos.y);
                                     }
                                 }
                             }
@@ -1410,19 +1410,19 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.draggedListItem = null;
                         inputState.draggedList = null;
                     }
-                    case Inventory inventory -> {
-                        int dragFromX = inputState.draggedInventoryFrom.x;
-                        int dragFromY = inputState.draggedInventoryFrom.y;
-                        Object dragItem = inputState.draggedInventoryItem;
+                    case Grid grid -> {
+                        int dragFromX = inputState.draggedGridFrom.x;
+                        int dragFromY = inputState.draggedGridFrom.y;
+                        Object dragItem = inputState.draggedGridItem;
                         if (inputState.lastUIMouseHover != null) {
-                            if (inputState.lastUIMouseHover instanceof Inventory hoverInventory) {
-                                if (UICommons.inventory_canDragIntoInventory(inputState, hoverInventory)) {
-                                    UICommons.inventory_updateItemInfoAtMousePosition(inputState, hoverInventory);
-                                    if (inputState.itemInfo_inventoryValid) {
-                                        if (hoverInventory.inventoryAction != null)
-                                            hoverInventory.inventoryAction.onDragFromInventory(inventory,
+                            if (inputState.lastUIMouseHover instanceof Grid hoverGrid) {
+                                if (UICommons.grid_canDragIntoGrid(inputState, hoverGrid)) {
+                                    UICommons.grid_updateItemInfoAtMousePosition(inputState, hoverGrid);
+                                    if (inputState.itemInfo_gridValid) {
+                                        if (hoverGrid.gridAction != null)
+                                            hoverGrid.gridAction.onDragFromGrid(grid,
                                                     dragFromX, dragFromY,
-                                                    inputState.itemInfo_inventoryPos.x, inputState.itemInfo_inventoryPos.y);
+                                                    inputState.itemInfo_gridPos.x, inputState.itemInfo_gridPos.y);
                                     }
                                 }
                             } else if (inputState.lastUIMouseHover instanceof List hoverList) {
@@ -1431,23 +1431,23 @@ public class UIEngine<T extends UIAdapter> {
                                     if (inputState.itemInfo_listValid) {
                                         int toIndex = inputState.itemInfo_listIndex;
                                         if (hoverList.listAction != null)
-                                            hoverList.listAction.onDragFromInventory(inventory, dragFromX, dragFromY, toIndex);
+                                            hoverList.listAction.onDragFromGrid(grid, dragFromX, dragFromY, toIndex);
                                     }
                                 }
                             }
-                        } else if (UICommons.inventory_canDragIntoScreen(inventory)) {
-                            if (inventory.inventoryAction != null)
-                                inventory.inventoryAction.onDragIntoScreen(
+                        } else if (UICommons.grid_canDragIntoScreen(grid)) {
+                            if (grid.gridAction != null)
+                                grid.gridAction.onDragIntoScreen(
                                         dragItem,
                                         dragFromX, dragFromY,
                                         inputState.mouse_ui.x,
                                         inputState.mouse_ui.y
                                 );
                         }
-                        inputState.draggedInventoryOffset.x = inputState.draggedInventoryOffset.y = 0;
-                        inputState.draggedInventoryFrom.x = inputState.draggedInventoryFrom.y = 0;
-                        inputState.draggedInventoryItem = null;
-                        inputState.draggedInventory = null;
+                        inputState.draggedGridOffset.x = inputState.draggedGridOffset.y = 0;
+                        inputState.draggedGridFrom.x = inputState.draggedGridFrom.y = 0;
+                        inputState.draggedGridItem = null;
+                        inputState.draggedGrid = null;
 
                     }
                     case null, default -> {
@@ -1550,17 +1550,17 @@ public class UIEngine<T extends UIAdapter> {
                             knob.knobAction.onRelease();
                         inputState.turnedKnob = null;
                     }
-                    case Inventory inventory -> {
+                    case Grid grid -> {
                         boolean isHoverObject = inputState.lastUIMouseHover == usedUIObject;
                         if (isHoverObject) {
-                            if (inputState.pressedInventoryItem != null) {
-                                inputState.pressedInventory.inventoryAction.onItemSelected(inputState.pressedInventoryItem);
+                            if (inputState.pressedGridItem != null) {
+                                inputState.pressedGrid.gridAction.onItemSelected(inputState.pressedGridItem);
                             } else {
-                                inputState.pressedInventory.inventoryAction.onItemSelected(null);
+                                inputState.pressedGrid.gridAction.onItemSelected(null);
                             }
                         }
-                        inputState.pressedInventory = null;
-                        inputState.pressedInventoryItem = null;
+                        inputState.pressedGrid = null;
+                        inputState.pressedGridItem = null;
                     }
                     case List list -> {
                         boolean isHoverObject = inputState.lastUIMouseHover == usedUIObject;
@@ -1765,7 +1765,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateUI_toolTip() {
         // Anything dragged ?
-        boolean showComponentToolTip = inputState.draggedList == null && inputState.draggedInventory == null;
+        boolean showComponentToolTip = inputState.draggedList == null && inputState.draggedGrid == null;
 
         // hovering over a component ?
         if (showComponentToolTip) {
@@ -1786,15 +1786,15 @@ public class UIEngine<T extends UIAdapter> {
                         toolTipSubItem = inputState.itemInfo_listIndex < list.items.size() ? list.items.get(inputState.itemInfo_listIndex) : null;
                     }
                 }
-            } else if (hoverComponent instanceof Inventory inventory) {
-                int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-                if (inventory.inventoryAction != null) {
-                    int x_inventory = UICommons.component_getAbsoluteX(inventory);
-                    int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                    int inv_x = (inputState.mouse_ui.x - x_inventory) / tileSize;
-                    int inv_y = (inputState.mouse_ui.y - y_inventory) / tileSize;
-                    if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
-                        toolTipSubItem = inventory.items[inv_x][inv_y];
+            } else if (hoverComponent instanceof Grid grid) {
+                int tileSize = grid.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
+                if (grid.gridAction != null) {
+                    int x_grid = UICommons.component_getAbsoluteX(grid);
+                    int y_grid = UICommons.component_getAbsoluteY(grid);
+                    int inv_x = (inputState.mouse_ui.x - x_grid) / tileSize;
+                    int inv_y = (inputState.mouse_ui.y - y_grid) / tileSize;
+                    if (UICommons.grid_positionValid(grid, inv_x, inv_y)) {
+                        toolTipSubItem = grid.items[inv_x][inv_y];
                     }
                 }
             }
@@ -1804,7 +1804,7 @@ public class UIEngine<T extends UIAdapter> {
                 updateComponentToolTip = true;
                 hoverComponent.updateToolTip = false;
             } else {
-                if (hoverComponent instanceof List || hoverComponent instanceof Inventory) {
+                if (hoverComponent instanceof List || hoverComponent instanceof Grid) {
                     // Check on subitem change
                     updateComponentToolTip = inputState.tooltip_lastHoverObject != toolTipSubItem;
                 } else {
@@ -1820,9 +1820,9 @@ public class UIEngine<T extends UIAdapter> {
                     // check for list item tooltips
                     inputState.tooltip = list.listAction.toolTip(toolTipSubItem);
                     inputState.tooltip_lastHoverObject = toolTipSubItem;
-                } else if (hoverComponent instanceof Inventory inventory && toolTipSubItem != null) {
-                    // check for inventory item tooltip
-                    inputState.tooltip = inventory.inventoryAction.toolTip(toolTipSubItem);
+                } else if (hoverComponent instanceof Grid grid && toolTipSubItem != null) {
+                    // check for Grid item tooltip
+                    inputState.tooltip = grid.gridAction.toolTip(toolTipSubItem);
                     inputState.tooltip_lastHoverObject = toolTipSubItem;
                 } else {
                     // take component tooltip
@@ -1939,7 +1939,7 @@ public class UIEngine<T extends UIAdapter> {
             case ComboBox comboBox -> comboBox.comboBoxAction;
             case GameViewPort gameViewPort -> gameViewPort.gameViewPortAction;
             case Image image -> image.imageAction;
-            case Inventory inventory -> inventory.inventoryAction;
+            case Grid grid -> grid.gridAction;
             case List list -> list.listAction;
             case Map map -> map.mapAction;
             case ScrollBarVertical scrollBarVertical -> scrollBarVertical.scrollBarAction;
@@ -2607,7 +2607,7 @@ public class UIEngine<T extends UIAdapter> {
                 boolean dragEnabled = false;
                 boolean dragValid = false;
                 int drag_x = -1, drag_y = -1;
-                if ((inputState.draggedList != null || inputState.draggedInventory != null) && list == inputState.lastUIMouseHover) {
+                if ((inputState.draggedList != null || inputState.draggedGrid != null) && list == inputState.lastUIMouseHover) {
                     dragEnabled = true;
                     dragValid = UICommons.list_canDragIntoList(inputState, list);
                     if (dragValid) {
@@ -2739,26 +2739,26 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
             }
-            case Inventory inventory -> {
-                int tileSize = inventory.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
-                int inventoryWidth = inventory.items.length;
-                int inventoryHeight = inventory.items[0].length;
+            case Grid grid -> {
+                int tileSize = grid.doubleSized ? TILE_SIZE * 2 : TILE_SIZE;
+                int gridWidth = grid.items.length;
+                int gridHeight = grid.items[0].length;
 
                 boolean dragEnabled = false;
                 boolean dragValid = false;
                 int drag_x = -1, drag_y = -1;
-                if ((inputState.draggedList != null || inputState.draggedInventory != null) && inventory == inputState.lastUIMouseHover) {
+                if ((inputState.draggedList != null || inputState.draggedGrid != null) && grid == inputState.lastUIMouseHover) {
                     dragEnabled = true;
-                    dragValid = UICommons.inventory_canDragIntoInventory(inputState, inventory);
+                    dragValid = UICommons.grid_canDragIntoGrid(inputState, grid);
                     if (dragValid) {
-                        int x_inventory = UICommons.component_getAbsoluteX(inventory);
-                        int y_inventory = UICommons.component_getAbsoluteY(inventory);
-                        int m_x = inputState.mouse_ui.x - x_inventory;
-                        int m_y = inputState.mouse_ui.y - y_inventory;
-                        if (m_x > 0 && m_x < (inventory.width * tileSize) && m_y > 0 && m_y < (inventory.height * tileSize)) {
+                        int x_grid = UICommons.component_getAbsoluteX(grid);
+                        int y_grid = UICommons.component_getAbsoluteY(grid);
+                        int m_x = inputState.mouse_ui.x - x_grid;
+                        int m_y = inputState.mouse_ui.y - y_grid;
+                        if (m_x > 0 && m_x < (grid.width * tileSize) && m_y > 0 && m_y < (grid.height * tileSize)) {
                             int inv_x = m_x / tileSize;
                             int inv_y = m_y / tileSize;
-                            if (UICommons.inventory_positionValid(inventory, inv_x, inv_y)) {
+                            if (UICommons.grid_positionValid(grid, inv_x, inv_y)) {
                                 drag_x = inv_x;
                                 drag_y = inv_y;
                             }
@@ -2769,40 +2769,40 @@ public class UIEngine<T extends UIAdapter> {
                 boolean grayScaleBefore = render_GrayScaleShaderEnabled();
                 if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
 
-                for (int ix = 0; ix < inventoryWidth; ix++) {
-                    for (int iy = 0; iy < inventoryHeight; iy++) {
-                        if (inventory.items != null) {
+                for (int ix = 0; ix < gridWidth; ix++) {
+                    for (int iy = 0; iy < gridHeight; iy++) {
+                        if (grid.items != null) {
                             CMediaGFX cellMedia;
-                            boolean selected = inventory.items[ix][iy] != null && inventory.items[ix][iy] == inventory.selectedItem;
+                            boolean selected = grid.items[ix][iy] != null && grid.items[ix][iy] == grid.selectedItem;
                             if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
-                                cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_DRAGGED_X2 : UIBaseMedia.UI_INVENTORY_DRAGGED;
+                                cellMedia = grid.doubleSized ? UIBaseMedia.UI_GRID_DRAGGED_X2 : UIBaseMedia.UI_GRID_DRAGGED;
                             } else {
                                 if (selected) {
-                                    cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_SELECTED_X2 : UIBaseMedia.UI_INVENTORY_SELECTED;
+                                    cellMedia = grid.doubleSized ? UIBaseMedia.UI_GRID_SELECTED_X2 : UIBaseMedia.UI_GRID_SELECTED;
                                 } else {
-                                    cellMedia = inventory.doubleSized ? UIBaseMedia.UI_INVENTORY_X2 : UIBaseMedia.UI_INVENTORY;
+                                    cellMedia = grid.doubleSized ? UIBaseMedia.UI_GRID_X2 : UIBaseMedia.UI_GRID;
                                 }
                             }
 
                             render_saveTempColorBatch();
 
                             // Draw Cell
-                            Color cellColor = inventory.inventoryAction != null ? inventory.inventoryAction.cellColor(inventory.items[ix][iy], ix, iy) : null;
+                            Color cellColor = grid.gridAction != null ? grid.gridAction.cellColor(grid.items[ix][iy], ix, iy) : null;
                             if (cellColor != null) {
                                 render_batchSetColor(cellColor.r, cellColor.g, cellColor.b, 1f);
                             } else {
                                 render_batchSetColorWhite(alpha);
                             }
-                            int index = inventory.doubleSized ? render_get16TilesCMediaIndex(ix, iy, inventory.width / 2, inventory.height / 2) : render_get16TilesCMediaIndex(ix, iy, inventory.width, inventory.height);
-                            render_drawCMediaGFX(cellMedia, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), index);
+                            int index = grid.doubleSized ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
+                            render_drawCMediaGFX(cellMedia, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), index);
 
                             // Draw Icon
-                            CMediaGFX icon = (inventory.items[ix][iy] != null && inventory.inventoryAction != null) ? inventory.inventoryAction.icon(inventory.items[ix][iy]) : null;
+                            CMediaGFX icon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
 
                             if (icon != null) {
                                 render_batchSetColorWhite(alpha);
-                                int iconIndex = inventory.inventoryAction != null ? inventory.inventoryAction.iconArrayIndex(inventory.items[ix][iy]) : 0;
-                                render_drawCMediaGFX(icon, UICommons.component_getAbsoluteX(inventory) + (ix * tileSize), UICommons.component_getAbsoluteY(inventory) + (iy * tileSize), iconIndex);
+                                int iconIndex = grid.gridAction != null ? grid.gridAction.iconArrayIndex(grid.items[ix][iy]) : 0;
+                                render_drawCMediaGFX(icon, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex);
                             }
                             render_loadTempColorBatch();
                         }
@@ -2927,15 +2927,15 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_drawCursorListDrags() {
-        if (inputState.draggedInventory != null) {
-            Inventory dragInventory = inputState.draggedInventory;
-            int dragOffsetX = inputState.draggedInventoryOffset.x;
-            int dragOffsetY = inputState.draggedInventoryOffset.y;
-            Object dragItem = inputState.draggedInventoryItem;
-            if (dragInventory.inventoryAction != null) {
-                render_batchSetColorWhite(inputState.config.component_inventoryDragAlpha);
-                CMediaGFX icon = dragInventory.inventoryAction.icon(dragItem);
-                render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragInventory.inventoryAction.iconArrayIndex(dragItem));
+        if (inputState.draggedGrid != null) {
+            Grid dragGrid = inputState.draggedGrid;
+            int dragOffsetX = inputState.draggedGridOffset.x;
+            int dragOffsetY = inputState.draggedGridOffset.y;
+            Object dragItem = inputState.draggedGridItem;
+            if (dragGrid.gridAction != null) {
+                render_batchSetColorWhite(inputState.config.component_gridDragAlpha);
+                CMediaGFX icon = dragGrid.gridAction.icon(dragItem);
+                render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconArrayIndex(dragItem));
             }
         } else if (inputState.draggedList != null) {
             List dragList = inputState.draggedList;

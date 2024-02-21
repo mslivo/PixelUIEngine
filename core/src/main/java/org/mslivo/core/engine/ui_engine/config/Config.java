@@ -44,7 +44,7 @@ public class Config implements Serializable {
     public CMediaFont component_defaultFont;
     public int component_gameViewportDefaultUpdateTime;
     public float component_listDragAlpha;
-    public float component_inventoryDragAlpha;
+    public float component_gridDragAlpha;
     public float component_knobSensitivity;
     public float component_scrollbarSensitivity;
     public int component_buttonHoldTimer;
@@ -104,7 +104,7 @@ public class Config implements Serializable {
         component_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_gameViewportDefaultUpdateTime = 200;
         component_listDragAlpha = 0.8f;
-        component_inventoryDragAlpha = 0.8f;
+        component_gridDragAlpha = 0.8f;
         component_knobSensitivity = 1f;
         component_scrollbarSensitivity = 1f;
         component_buttonHoldTimer = 8;

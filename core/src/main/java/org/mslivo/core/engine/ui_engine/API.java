@@ -32,7 +32,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
@@ -1995,12 +1995,12 @@ public class API {
                 inputState.config.component_listDragAlpha = list_dragAlpha;
             }
 
-            public float getInventoryDragAlpha() {
-                return inputState.config.component_inventoryDragAlpha;
+            public float getGridDragAlpha() {
+                return inputState.config.component_gridDragAlpha;
             }
 
-            public void setInventoryDragAlpha(float inventory_dragAlpha) {
-                inputState.config.component_inventoryDragAlpha = inventory_dragAlpha;
+            public void setGridDragAlpha(float grid_dragAlpha) {
+                inputState.config.component_gridDragAlpha = grid_dragAlpha;
             }
 
             public float getKnobSensitivity() {
@@ -3487,7 +3487,7 @@ public class API {
 
         public final _TabBar tabBar = new _TabBar();
 
-        public final _Inventory inventory = new _Inventory();
+        public final _Grid grid = new _Grid();
 
         public final _ScrollBar scrollBar = new _ScrollBar();
 
@@ -4468,89 +4468,89 @@ public class API {
             }
         }
 
-        public class _Inventory {
+        public class _Grid {
 
-            private InventoryAction defaultInventoryAction() {
-                return new InventoryAction() {
+            private GridAction defaultGridAction() {
+                return new GridAction() {
                 };
             }
 
-            public Inventory create(int x, int y, Object[][] items) {
-                return create(x, y, items, defaultInventoryAction(), false, false, false, false);
+            public Grid create(int x, int y, Object[][] items) {
+                return create(x, y, items, defaultGridAction(), false, false, false, false);
             }
 
-            public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction) {
-                return create(x, y, items, inventoryAction, false, false, false, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction) {
+                return create(x, y, items, gridAction, false, false, false, false);
             }
 
-            public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction, boolean dragEnabled) {
-                return create(x, y, items, inventoryAction, dragEnabled, false, false, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled) {
+                return create(x, y, items, gridAction, dragEnabled, false, false, false);
             }
 
-            public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction, boolean dragEnabled, boolean dragOutEnabled) {
-                return create(x, y, items, inventoryAction, dragEnabled, dragOutEnabled, false, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled) {
+                return create(x, y, items, gridAction, dragEnabled, dragOutEnabled, false, false);
             }
 
-            public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-                return create(x, y, items, inventoryAction, dragEnabled, dragOutEnabled, dragInEnabled, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
+                return create(x, y, items, gridAction, dragEnabled, dragOutEnabled, dragInEnabled, false);
             }
 
-            public Inventory create(int x, int y, Object[][] items, InventoryAction inventoryAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
-                Inventory inventory = new Inventory();
-                setComponentInitValues(inventory);
-                setPosition(inventory, x, y);
-                setItems(inventory, items);
-                setInventoryAction(inventory, inventoryAction);
-                setDragEnabled(inventory, dragEnabled);
-                setDragOutEnabled(inventory, dragOutEnabled);
-                setDragInEnabled(inventory, dragInEnabled);
-                setDoubleSized(inventory, doubleSized);
-                updateSize(inventory);
-                return inventory;
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
+                Grid grid = new Grid();
+                setComponentInitValues(grid);
+                setPosition(grid, x, y);
+                setItems(grid, items);
+                setGridAction(grid, gridAction);
+                setDragEnabled(grid, dragEnabled);
+                setDragOutEnabled(grid, dragOutEnabled);
+                setDragInEnabled(grid, dragInEnabled);
+                setDoubleSized(grid, doubleSized);
+                updateSize(grid);
+                return grid;
             }
 
-            public void setDoubleSized(Inventory inventory, boolean doubleSized) {
-                inventory.doubleSized = doubleSized;
-                updateSize(inventory);
+            public void setDoubleSized(Grid grid, boolean doubleSized) {
+                grid.doubleSized = doubleSized;
+                updateSize(grid);
             }
 
-            public boolean isPositionValid(Inventory inventory, int x, int y) {
-                if (inventory == null) return false;
-                return UICommons.inventory_positionValid(inventory, x, y);
+            public boolean isPositionValid(Grid grid, int x, int y) {
+                if (grid == null) return false;
+                return UICommons.grid_positionValid(grid, x, y);
             }
 
-            public void setDragInEnabled(Inventory inventory, boolean dragInEnabled) {
-                if (inventory == null) return;
-                inventory.dragInEnabled = dragInEnabled;
+            public void setDragInEnabled(Grid grid, boolean dragInEnabled) {
+                if (grid == null) return;
+                grid.dragInEnabled = dragInEnabled;
             }
 
-            public void setDragOutEnabled(Inventory inventory, boolean dragOutEnabled) {
-                if (inventory == null) return;
-                inventory.dragOutEnabled = dragOutEnabled;
+            public void setDragOutEnabled(Grid grid, boolean dragOutEnabled) {
+                if (grid == null) return;
+                grid.dragOutEnabled = dragOutEnabled;
             }
 
-            public void setDragEnabled(Inventory inventory, boolean dragEnabled) {
-                if (inventory == null) return;
-                inventory.dragEnabled = dragEnabled;
+            public void setDragEnabled(Grid grid, boolean dragEnabled) {
+                if (grid == null) return;
+                grid.dragEnabled = dragEnabled;
             }
 
-            public void setInventoryAction(Inventory inventory, InventoryAction inventoryAction) {
-                if (inventory == null) return;
-                inventory.inventoryAction = inventoryAction;
+            public void setGridAction(Grid grid, GridAction gridAction) {
+                if (grid == null) return;
+                grid.gridAction = gridAction;
             }
 
-            public void setItems(Inventory inventory, Object[][] items) {
-                if (inventory == null || items == null) return;
-                inventory.items = items;
-                updateSize(inventory);
+            public void setItems(Grid grid, Object[][] items) {
+                if (grid == null || items == null) return;
+                grid.items = items;
+                updateSize(grid);
             }
 
-            private void updateSize(Inventory inventory) {
-                if (inventory == null) return;
-                int factor = inventory.doubleSized ? 2 : 1;
-                if (inventory.items != null) {
-                    inventory.width = inventory.items.length * factor;
-                    inventory.height = inventory.items[0].length * factor;
+            private void updateSize(Grid grid) {
+                if (grid == null) return;
+                int factor = grid.doubleSized ? 2 : 1;
+                if (grid.items != null) {
+                    grid.width = grid.items.length * factor;
+                    grid.height = grid.items[0].length * factor;
                 }
             }
 

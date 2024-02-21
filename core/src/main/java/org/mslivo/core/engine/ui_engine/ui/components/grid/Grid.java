@@ -1,11 +1,11 @@
-package org.mslivo.core.engine.ui_engine.ui.components.inventory;
+package org.mslivo.core.engine.ui_engine.ui.components.grid;
 
-import org.mslivo.core.engine.ui_engine.ui.actions.InventoryAction;
+import org.mslivo.core.engine.ui_engine.ui.actions.GridAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
 
-public class Inventory<T> extends Component {
+public class Grid<T> extends Component {
     public T[][] items;
-    public InventoryAction inventoryAction;
+    public GridAction gridAction;
     public T selectedItem;
     public boolean dragEnabled;
     public boolean dragOutEnabled;

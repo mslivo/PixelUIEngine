@@ -24,7 +24,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
-import org.mslivo.core.engine.ui_engine.ui.components.inventory.Inventory;
+import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
@@ -493,12 +493,12 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
 
             @Override
-            public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int toIndex) {
+            public void onDragFromGrid(Grid fromInventory, int from_x, int from_y, int toIndex) {
                 moveFromInventoryToList(fromInventory.items, from_x, from_y, list1.items, toIndex);
             }
 
             @Override
-            public boolean canDragFromInventory(Inventory fromInventory) {
+            public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
 
@@ -540,13 +540,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
 
             @Override
-            public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int toIndex) {
+            public void onDragFromGrid(Grid fromInventory, int from_x, int from_y, int toIndex) {
                 moveFromInventoryToList(fromInventory.items, from_x, from_y, list2.items, toIndex);
             }
 
 
             @Override
-            public boolean canDragFromInventory(Inventory fromInventory) {
+            public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
 
@@ -579,17 +579,17 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ListItem[][] invItems = new ListItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
-        Inventory inventory1 = api.component.inventory.create(18, 2, invItems, null, true, true, true, false);
+        Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true, false);
 
-        InventoryAction inventoryAction1 = new InventoryAction<ListItem>() {
+        GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
             public CMediaGFX icon(ListItem listItem) {
                 return listItem.icon;
             }
 
             @Override
-            public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int to_x, int to_y) {
-                moveToInventory(fromInventory.items, from_x, from_y, inventory1.items, to_x, to_y);
+            public void onDragFromGrid(Grid fromInventory, int from_x, int from_y, int to_x, int to_y) {
+                moveToInventory(fromInventory.items, from_x, from_y, grid1.items, to_x, to_y);
             }
 
             @Override
@@ -608,7 +608,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
 
             @Override
-            public boolean canDragFromInventory(Inventory fromInventory) {
+            public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
 
@@ -617,24 +617,24 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 api.addNotification(api.notification.create("Selected: " +listItem));
             }
         };
-        api.component.inventory.setInventoryAction(inventory1, inventoryAction1);
-        api.window.addComponent(window, inventory1);
+        api.component.grid.setGridAction(grid1, gridAction1);
+        api.window.addComponent(window, grid1);
 
 
         ListItem[][] invItems2 = new ListItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
-        Inventory inventory2 = api.component.inventory.create(25, 2, invItems2, null, true, true, true, false);
+        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true, false);
 
-        InventoryAction inventoryAction2 = new InventoryAction<ListItem>() {
+        GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
             public CMediaGFX icon(ListItem listItem) {
                 return listItem.icon;
             }
 
             @Override
-            public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int to_x, int to_y) {
-                moveToInventory(fromInventory.items, from_x, from_y, inventory2.items, to_x, to_y);
+            public void onDragFromGrid(Grid fromInventory, int from_x, int from_y, int to_x, int to_y) {
+                moveToInventory(fromInventory.items, from_x, from_y, grid2.items, to_x, to_y);
             }
 
             @Override
@@ -653,7 +653,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
 
             @Override
-            public boolean canDragFromInventory(Inventory fromInventory) {
+            public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
             @Override
@@ -661,23 +661,23 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 api.addNotification(api.notification.create("Selected: " +listItem));
             }
         };
-        api.component.inventory.setInventoryAction(inventory2, inventoryAction2);
-        api.window.addComponent(window, inventory2);
+        api.component.grid.setGridAction(grid2, gridAction2);
+        api.window.addComponent(window, grid2);
 
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Inventory inventory3 = api.component.inventory.create(32, 2, invItems3, null, true, false, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null, true, false, false, true);
 
-        InventoryAction inventoryAction3 = new InventoryAction<ListItem>() {
+        GridAction gridAction3 = new GridAction<ListItem>() {
             @Override
             public CMediaGFX icon(ListItem listItem) {
                 return listItem.icon;
             }
 
             @Override
-            public void onDragFromInventory(Inventory fromInventory, int from_x, int from_y, int to_x, int to_y) {
-                moveToInventory(fromInventory.items, from_x, from_y, inventory3.items, to_x, to_y);
+            public void onDragFromGrid(Grid fromInventory, int from_x, int from_y, int to_x, int to_y) {
+                moveToInventory(fromInventory.items, from_x, from_y, grid3.items, to_x, to_y);
             }
 
             @Override
@@ -696,7 +696,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
 
             @Override
-            public boolean canDragFromInventory(Inventory fromInventory) {
+            public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
 
@@ -711,11 +711,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
                 return true;
             }
         };
-        api.component.inventory.setInventoryAction(inventory3, inventoryAction3);
-        api.window.addComponent(window, inventory3);
+        api.component.grid.setGridAction(grid3, gridAction3);
+        api.window.addComponent(window, grid3);
 
         components.addAll(Arrays.asList(new Component[]{
-                list1,list1ScrollBar,list2,list2ScrollBar,inventory1,inventory2,inventory3
+                list1,list1ScrollBar,list2,list2ScrollBar, grid1, grid2, grid3
         }));
 
         return components;

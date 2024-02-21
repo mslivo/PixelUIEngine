@@ -16,7 +16,7 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
   - Combobox
   - Image
   - Text
-  - Inventory (Grid)
+  - Grid
   - List
   - Knob
   - Map
