@@ -3,9 +3,8 @@ package org.mslivo.core.engine.tools.engine;
 import java.util.ArrayDeque;
 
 /**
- * Modifies Data Structure 1 step forward.
- * - Processes and deletes Inputs from inputlist
- * - Appends Outputs to output list
+ * Modifies Data Structure 1 update step at a time.
+ * Sends input to adapter & gathers outputs using object pooling.
  */
 public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
     class EngineIO {
