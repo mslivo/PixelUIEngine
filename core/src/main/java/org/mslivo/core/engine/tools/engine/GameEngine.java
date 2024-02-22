@@ -18,15 +18,15 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
     private final ArrayDeque<EngineIO> inputPool;
     private final ArrayDeque<EngineIO> outputs;
     private final ArrayDeque<EngineIO> outputPool;
+    private final String errorMessageNull = "Cannot initialize GameEngine: %s is null";
     private int outputType;
     private Object[] outputParams;
     private long lastUpdateTime;
     private long ticks;
 
     public GameEngine(A adapter, D data) {
-        if (data == null || adapter == null) {
-            throw new GameEngineException("Cannot initialize GameEngine: invalid parameters");
-        }
+        if(data == null) throw new RuntimeException(String.format(errorMessageNull, "data"));
+        if(adapter == null) throw new RuntimeException(String.format(errorMessageNull, "adapter"));
 
         this.data = data;
         this.inputs = new ArrayDeque<>();
