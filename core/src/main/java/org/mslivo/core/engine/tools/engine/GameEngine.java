@@ -125,11 +125,10 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
             adapter.processInput(engineIO.type, engineIO.params);
             inputPool.add(engineIO);
         }
-        inputs.clear();
         // Update Engine
         adapter.update();
         this.lastUpdateTime = System.currentTimeMillis();
-        this.ticks = this.ticks + 1;
+        this.ticks++;
     }
 
     public void shutdown() {
