@@ -22,7 +22,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
-import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
@@ -103,7 +103,7 @@ public class InputState {
     public ToolTip gameToolTip;
     public Object tooltip_lastHoverObject;
     public Knob turnedKnob;
-    public Map pressedMap;
+    public Canvas pressedCanvas;
     public GameViewPort pressedGameViewPort;
     public TextField pressedTextField;
     public int pressedTextFieldMouseX;

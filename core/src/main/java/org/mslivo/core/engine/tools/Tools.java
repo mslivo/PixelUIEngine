@@ -240,7 +240,19 @@ public class Tools {
         }
 
         public static String[] validString(String[] string) {
-            return string == null ? new String[]{} : string;
+            if(string == null){
+                return new String[]{};
+            }else{
+                String[] validString = new String[string.length];
+                for(int i=0;i<string.length;i++){
+                    if(string[i] != null){
+                        validString[i] = string[i];
+                    }else{
+                        validString[i] = "";
+                    }
+                }
+                return string;
+            }
         }
 
         public static String truncateString(String input, int maxLength) {

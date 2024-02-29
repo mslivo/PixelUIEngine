@@ -17,6 +17,15 @@ import org.mslivo.core.engine.media_manager.media.CMediaFont;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.config.Config;
+import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.input.InputEvents;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
+import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
+import org.mslivo.core.engine.ui_engine.render.GrayScaleShader;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -28,11 +37,11 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
-import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
@@ -51,15 +60,6 @@ import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.input.InputEvents;
-import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
-import org.mslivo.core.engine.ui_engine.config.Config;
-import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
-import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
-import org.mslivo.core.engine.ui_engine.render.GrayScaleShader;
-import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
-import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -235,7 +235,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedList = null;
         newInputState.pressedListItem = null;
         newInputState.tooltip_lastHoverObject = null;
-        newInputState.pressedMap = null;
+        newInputState.pressedCanvas = null;
         newInputState.openComboBox = null;
         newInputState.pressedComboBoxItem = null;
         newInputState.pressedCheckBox = null;
@@ -359,8 +359,6 @@ public class UIEngine<T extends UIAdapter> {
             inputState.currentControlMode = nextControlMode;
         }
     }
-
-
 
 
     private void mouseControl_updateMouseTextInput() {
@@ -497,8 +495,8 @@ public class UIEngine<T extends UIAdapter> {
 
         // Confirm Character from Input
         boolean enterRegularCharacter = false;
-        boolean changeCase = false;
-        boolean deleteCharacter = false;
+        boolean changeCaseMouse2 = false;
+        boolean deleteCharacterMouse3 = false;
         if (mouse1Pressed && !inputState.mTextInputMouse1Pressed) inputState.mTextInputMouse1Pressed = true;
         if (!mouse1Pressed && inputState.mTextInputMouse1Pressed) {
             enterRegularCharacter = true;
@@ -508,14 +506,14 @@ public class UIEngine<T extends UIAdapter> {
         if (mouse3Pressed && !inputState.mTextInputMouse2Pressed) inputState.mTextInputMouse2Pressed = true;
         if (!mouse3Pressed && inputState.mTextInputMouse2Pressed) {
             // Change case from Mouse 2
-            changeCase = true;
+            changeCaseMouse2 = true;
             inputState.mTextInputMouse2Pressed = false;
         }
 
         if (mouse2Pressed && !inputState.mTextInputMouse3Pressed) inputState.mTextInputMouse3Pressed = true;
         if (!mouse2Pressed && inputState.mTextInputMouse3Pressed) {
             // Delete from Mouse 3
-            deleteCharacter = true;
+            deleteCharacterMouse3 = true;
             inputState.mTextInputMouse3Pressed = false;
         }
 
@@ -525,13 +523,13 @@ public class UIEngine<T extends UIAdapter> {
             enterRegularCharacter = true;
         }
 
-        if(changeCase || deleteCharacter || enterRegularCharacter){
+        if (changeCaseMouse2 || deleteCharacterMouse3 || enterRegularCharacter) {
             char c;
-            if(changeCase){
+            if (changeCaseMouse2) {
                 c = '\t';
-            }else if(deleteCharacter){
+            } else if (deleteCharacterMouse3) {
                 c = '\b';
-            }else{
+            } else {
                 c = characters[mouseTextInput.selectedIndex];
             }
 
@@ -950,7 +948,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void mouseControl_updateLastUIMouseHover() {
-        inputState.lastUIMouseHover = UICommons.component_getComponentAtPosition(inputState, inputState.mouse_ui.x,inputState.mouse_ui.y);
+        inputState.lastUIMouseHover = UICommons.component_getComponentAtPosition(inputState, inputState.mouse_ui.x, inputState.mouse_ui.y);
     }
 
 
@@ -1014,9 +1012,9 @@ public class UIEngine<T extends UIAdapter> {
                 TextField focusedTextField = inputState.focusedTextField;
                 for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size; ik++) {
                     int keyDownKeyCode = inputState.inputEvents.keyDownKeyCodes.get(ik);
-                    if(UICommons.textField_isControlKey(keyDownKeyCode)){
+                    if (UICommons.textField_isControlKey(keyDownKeyCode)) {
                         // Repeat certain Control Keys
-                        if(UICommons.textField_isRepeatedControlKey(keyDownKeyCode)){
+                        if (UICommons.textField_isRepeatedControlKey(keyDownKeyCode)) {
                             inputState.focusedTextField_repeatedKey = keyDownKeyCode;
                             inputState.focusedTextField_repeatedKeyTimer = System.currentTimeMillis();
                         }
@@ -1028,7 +1026,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Hotkeys
                 for (int ihk = 0; ihk < inputState.hotKeys.size(); ihk++) {
                     HotKey hotKey = inputState.hotKeys.get(ihk);
-                    if(!hotKey.pressed){
+                    if (!hotKey.pressed) {
                         boolean hotKeyPressed = true;
                         for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
                             if (!inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
@@ -1036,10 +1034,7 @@ public class UIEngine<T extends UIAdapter> {
                                 break;
                             }
                         }
-                        if (hotKeyPressed) {
-                            hotKey.pressed = true;
-                            if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
-                        }
+                        if (hotKeyPressed) UICommons.hotkey_press(hotKey);
                     }
                 }
             }
@@ -1048,7 +1043,7 @@ public class UIEngine<T extends UIAdapter> {
             for (int ik = 0; ik < inputState.inputEvents.keyUpKeyCodes.size; ik++) {
                 int keyUpKeyCode = inputState.inputEvents.keyUpKeyCodes.get(ik);
                 // Reset RepeatKey
-                if(UICommons.textField_isRepeatedControlKey(keyUpKeyCode)){
+                if (UICommons.textField_isRepeatedControlKey(keyUpKeyCode)) {
                     inputState.focusedTextField_repeatedKey = KeyCode.NONE;
                     inputState.focusedTextField_repeatedKeyTimer = 0;
                 }
@@ -1058,9 +1053,9 @@ public class UIEngine<T extends UIAdapter> {
                     if (hotKey.pressed) {
                         hkLoop:
                         for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
-                            if(hotKey.keyCodes[ikc] == keyUpKeyCode){
+                            if (hotKey.keyCodes[ikc] == keyUpKeyCode) {
                                 hotKey.pressed = false;
-                                if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+                                if (hotKey.hotKeyAction != null) UICommons.hotkey_release(hotKey);
                                 break hkLoop;
                             }
                         }
@@ -1090,14 +1085,11 @@ public class UIEngine<T extends UIAdapter> {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (inputState.config.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
-                            if (window.hasTitleBar && window.foldable && Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
-                                window.folded = !window.folded;
-                                if (window.windowAction != null) {
-                                    if (window.folded) {
-                                        window.windowAction.onFold();
-                                    } else {
-                                        window.windowAction.onUnfold();
-                                    }
+                            if (window.hasTitleBar && Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
+                                if (window.folded) {
+                                    UICommons.window_unFold(window);
+                                } else {
+                                    UICommons.window_fold(window);
                                 }
                             }
                         }
@@ -1168,19 +1160,15 @@ public class UIEngine<T extends UIAdapter> {
                             inputState.pressedContextMenuItem = contextMenuItem;
                         }
                         case ScrollBarVertical scrollBarVertical -> {
-                            scrollBarVertical.buttonPressed = true;
-                            if (scrollBarVertical.scrollBarAction != null)
-                                scrollBarVertical.scrollBarAction.onPress(scrollBarVertical.scrolled);
+                            UICommons.scrollBar_pressButton(scrollBarVertical);
                             UICommons.scrollBar_scroll(scrollBarVertical,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x, inputState.mouse_ui.y));
                             inputState.scrolledScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollBarHorizontal scrollBarHorizontal -> {
-                            scrollBarHorizontal.buttonPressed = true;
-                            if (scrollBarHorizontal.scrollBarAction != null)
-                                scrollBarHorizontal.scrollBarAction.onPress(scrollBarHorizontal.scrolled);
+                            UICommons.scrollBar_pressButton(scrollBarHorizontal);
                             UICommons.scrollBar_scroll(scrollBarHorizontal,
-                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                                    UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x, inputState.mouse_ui.y));
                             inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case ComboBox comboBox -> {
@@ -1192,14 +1180,14 @@ public class UIEngine<T extends UIAdapter> {
                                     UICommons.comboBox_close(inputState, comboBox);
                                 } else {
                                     // Clicked on Item
-                                    for (int i = 0; i < comboBox.items.size(); i++) {
+                                    for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
                                         if (Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y,
                                                 UICommons.component_getAbsoluteX(comboBox),
                                                 UICommons.component_getAbsoluteY(comboBox) - (i * TILE_SIZE) - TILE_SIZE,
                                                 comboBox.width * TILE_SIZE,
                                                 TILE_SIZE
                                         )) {
-                                            inputState.pressedComboBoxItem = comboBox.items.get(i);
+                                            inputState.pressedComboBoxItem = comboBox.comboBoxItems.get(i);
                                         }
                                     }
                                 }
@@ -1214,20 +1202,20 @@ public class UIEngine<T extends UIAdapter> {
                             inputState.turnedKnob = knob;
                             if (knob.knobAction != null) knob.knobAction.onPress();
                         }
-                        case Map map -> {
-                            int x = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(map);
-                            int y = inputState.mouse_ui.y - UICommons.component_getAbsoluteY(map);
-                            if (map.mapAction != null) map.mapAction.onPress(x, y);
-                            inputState.pressedMap = map;
+                        case Canvas canvas -> {
+                            if (canvas.canvasAction != null) canvas.canvasAction.onPress(
+                                    UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, canvas),
+                                    UICommons.component_getRelativeMouseY(inputState.mouse_ui.y, canvas));
+                            inputState.pressedCanvas = canvas;
                         }
                         case GameViewPort gameViewPort -> {
-                            int x = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(gameViewPort);
-                            int y = inputState.mouse_ui.y - UICommons.component_getAbsoluteY(gameViewPort);
-                            if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(x, y);
+                            if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(
+                                    UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, gameViewPort),
+                                    UICommons.component_getRelativeMouseY(inputState.mouse_ui.y, gameViewPort));
                             inputState.pressedGameViewPort = gameViewPort;
                         }
                         case TextField textField -> {
-                            inputState.pressedTextFieldMouseX = inputState.mouse_ui.x - UICommons.component_getAbsoluteX(textField);
+                            inputState.pressedTextFieldMouseX = UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, textField);
                             inputState.pressedTextField = textField;
                         }
                         case Grid grid -> {
@@ -1269,11 +1257,7 @@ public class UIEngine<T extends UIAdapter> {
                         case TabBar tabBar -> {
                             UICommons.tabBar_updateItemInfoAtMousePosition(inputState, tabBar);
                             if (inputState.itemInfo_tabBarValid && tabBar.selectedTab != inputState.itemInfo_tabBarTabIndex) {
-                                Tab newTab = tabBar.tabs.get(inputState.itemInfo_tabBarTabIndex);
                                 UICommons.tabBar_selectTab(tabBar, inputState.itemInfo_tabBarTabIndex);
-                                if (newTab.tabAction != null) newTab.tabAction.onSelect();
-                                if (tabBar.tabBarAction != null)
-                                    tabBar.tabBarAction.onChangeTab(inputState.itemInfo_tabBarTabIndex);
                             }
                         }
                         case CheckBox checkBox -> {
@@ -1429,9 +1413,9 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.draggedWindow_offset.y = 0;
                         inputState.draggedWindow = null;
                     }
-                    case Map map -> {
-                        if (map.mapAction != null) map.mapAction.onRelease();
-                        inputState.pressedMap = null;
+                    case Canvas canvas -> {
+                        if (canvas.canvasAction != null) canvas.canvasAction.onRelease();
+                        inputState.pressedCanvas = null;
                     }
                     case ContextMenuItem contextMenuItem -> {
                         ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
@@ -1496,20 +1480,15 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.pressedButton = null;
                     }
                     case ScrollBarVertical scrollBarVertical -> {
-                        scrollBarVertical.buttonPressed = false;
-                        if (scrollBarVertical.scrollBarAction != null)
-                            scrollBarVertical.scrollBarAction.onRelease(scrollBarVertical.scrolled);
+                        UICommons.scrollBar_releaseButton(scrollBarVertical);
                         inputState.scrolledScrollBarVertical = null;
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
-                        scrollBarHorizontal.buttonPressed = false;
-                        if (scrollBarHorizontal.scrollBarAction != null)
-                            scrollBarHorizontal.scrollBarAction.onRelease(scrollBarHorizontal.scrolled);
+                        UICommons.scrollBar_releaseButton(scrollBarHorizontal);
                         inputState.scrolledScrollBarHorizontal = null;
                     }
                     case Knob knob -> {
-                        if (knob.knobAction != null)
-                            knob.knobAction.onRelease();
+                        if (knob.knobAction != null) knob.knobAction.onRelease();
                         inputState.turnedKnob = null;
                     }
                     case Grid grid -> {
@@ -1586,18 +1565,18 @@ public class UIEngine<T extends UIAdapter> {
                         draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
                 }
                 case ScrollBarVertical scrolledScrollBarVertical -> {
-                    UICommons.scrollBar_scroll(scrolledScrollBarVertical, UICommons.scrollBar_calculateScrolled(scrolledScrollBarVertical, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                    UICommons.scrollBar_scroll(scrolledScrollBarVertical, UICommons.scrollBar_calculateScrolled(scrolledScrollBarVertical, inputState.mouse_ui.x, inputState.mouse_ui.y));
                 }
                 case ScrollBarHorizontal scrolledScrollBarHorizontal -> {
-                    UICommons.scrollBar_scroll(scrolledScrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, inputState.mouse_ui.x,inputState.mouse_ui.y));
+                    UICommons.scrollBar_scroll(scrolledScrollBarHorizontal, UICommons.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, inputState.mouse_ui.x, inputState.mouse_ui.y));
                 }
                 case Knob turnedKnob -> {
                     float amount = (inputState.mouse_delta.y / 100f) * inputState.config.component_knobSensitivity;
                     float newValue = turnedKnob.turned + amount;
-                    UICommons.knob_turnKnob(turnedKnob, newValue, amount);
+                    UICommons.knob_turnKnob(turnedKnob, newValue);
                     if (inputState.currentControlMode.emulated) {
                         // emulated: keep mouse position steady
-                        UICommons.emulatedMouse_setPositionComponent(inputState,turnedKnob);
+                        UICommons.emulatedMouse_setPositionComponent(inputState, turnedKnob);
                     }
                 }
                 case null, default -> {
@@ -1633,7 +1612,7 @@ public class UIEngine<T extends UIAdapter> {
                     case Knob knob -> {
                         float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * inputState.config.component_knobSensitivity;
                         float newValue = knob.turned + amount;
-                        UICommons.knob_turnKnob(knob, newValue, amount);
+                        UICommons.knob_turnKnob(knob, newValue);
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
                         float amount = ((-1 / 20f) * inputState.inputEvents.mouseScrolledAmount) * inputState.config.component_scrollbarSensitivity;
@@ -1657,10 +1636,10 @@ public class UIEngine<T extends UIAdapter> {
 
     private void updateUI_continuousComponentActivities() {
         // TextField Repeat
-        if(inputState.focusedTextField_repeatedKey != KeyCode.NONE){
-            long time = (System.currentTimeMillis()-inputState.focusedTextField_repeatedKeyTimer);
-            if(time > 500){
-                UICommons.textField_executeControlKey(inputState,mediaManager, inputState.focusedTextField, inputState.focusedTextField_repeatedKey);
+        if (inputState.focusedTextField_repeatedKey != KeyCode.NONE) {
+            long time = (System.currentTimeMillis() - inputState.focusedTextField_repeatedKeyTimer);
+            if (time > 500) {
+                UICommons.textField_executeControlKey(inputState, mediaManager, inputState.focusedTextField, inputState.focusedTextField_repeatedKey);
             }
         }
     }
@@ -1899,7 +1878,7 @@ public class UIEngine<T extends UIAdapter> {
             case Image image -> image.imageAction;
             case Grid grid -> grid.gridAction;
             case List list -> list.listAction;
-            case Map map -> map.mapAction;
+            case Canvas canvas -> canvas.canvasAction;
             case ScrollBarVertical scrollBarVertical -> scrollBarVertical.scrollBarAction;
             case ScrollBarHorizontal scrollBarHorizontal -> scrollBarHorizontal.scrollBarAction;
             case TabBar tabBar -> tabBar.tabBarAction;
@@ -2203,10 +2182,10 @@ public class UIEngine<T extends UIAdapter> {
                 // Menu
                 if (UICommons.comboBox_isOpen(inputState, comboBox)) {
                     int width = comboBox.width;
-                    int height = comboBox.items.size();
+                    int height = comboBox.comboBoxItems.size();
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
-                        ComboBoxItem comboBoxItem = comboBox.items.get(iy);
+                        ComboBoxItem comboBoxItem = comboBox.comboBoxItems.get(iy);
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                             CMediaArray cMenuTexture;
@@ -2223,8 +2202,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
 
                     /* Text */
-                    for (int i = 0; i < comboBox.items.size(); i++) {
-                        ComboBoxItem comboBoxItem = comboBox.items.get(i);
+                    for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
+                        ComboBoxItem comboBoxItem = comboBox.comboBoxItems.get(i);
                         render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommons.component_getAbsoluteX(comboBox), UICommons.component_getAbsoluteY(comboBox) - (i * TILE_SIZE) - TILE_SIZE, 2, 1, (comboBox.width * TILE_SIZE), comboBoxItem.icon, comboBoxItem.iconIndex);
                     }
                 }
@@ -2265,7 +2244,7 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextMenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, (width * TILE_SIZE), item.icon, item.iconIndex);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, (width * TILE_SIZE), item.icon, item.iconArrayIndex);
             }
 
         }
@@ -2464,7 +2443,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
+            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconArrayIndex);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2658,17 +2637,17 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 render_loadTempColorBatch();
             }
-            case Map map -> {
-                inputState.spriteBatch_ui.draw(map.texture, UICommons.component_getAbsoluteX(map), UICommons.component_getAbsoluteY(map));
+            case Canvas canvas -> {
+                inputState.spriteBatch_ui.draw(canvas.texture, UICommons.component_getAbsoluteX(canvas), UICommons.component_getAbsoluteY(canvas));
 
-                map.mapOverlays.removeIf(mapOverlay -> {
+                canvas.canvasImages.removeIf(mapOverlay -> {
                     if (mapOverlay.fadeOut) {
                         mapOverlay.color_a = 1 - ((System.currentTimeMillis() - mapOverlay.timer) / (float) mapOverlay.fadeOutTime);
                         if (mapOverlay.color_a <= 0) return true;
                     }
                     render_saveTempColorBatch();
                     render_batchSetColor(mapOverlay.color_r, mapOverlay.color_g, mapOverlay.color_b, alpha * mapOverlay.color_a);
-                    render_drawCMediaGFX(mapOverlay.image, UICommons.component_getAbsoluteX(map) + mapOverlay.x, UICommons.component_getAbsoluteY(map) + mapOverlay.y, mapOverlay.arrayIndex);
+                    render_drawCMediaGFX(mapOverlay.image, UICommons.component_getAbsoluteX(canvas) + mapOverlay.x, UICommons.component_getAbsoluteY(canvas) + mapOverlay.y, mapOverlay.arrayIndex);
                     render_loadTempColorBatch();
                     return false;
                 });
@@ -2681,7 +2660,7 @@ public class UIEngine<T extends UIAdapter> {
 
                     if (!textField.contentValid) {
                         render_saveTempColorBatch();
-                        render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, (alpha*0.2f));
+                        render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, (alpha * 0.2f));
                         render_drawCMediaGFX(UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                         render_loadTempColorBatch();
                     }
@@ -2939,13 +2918,13 @@ public class UIEngine<T extends UIAdapter> {
         render_drawFont(font, text, alpha, x, y, textXOffset, textYOffset, maxWidth, null, 0);
     }
 
-    private int render_textWidth(CMediaFont font, String text){
-        if(font == null || text == null || text.length() == 0) return 0;
+    private int render_textWidth(CMediaFont font, String text) {
+        if (font == null || text == null || text.length() == 0) return 0;
         return mediaManager.textWidth(font, text);
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaGFX icon, int iconIndex) {
-        if(font == null) return;
+        if (font == null) return;
         boolean withIcon = icon != null;
         if (withIcon) {
             render_saveTempColorBatch();
@@ -3026,6 +3005,7 @@ public class UIEngine<T extends UIAdapter> {
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
     }
+
     public void shutdown() {
         // Lists
         inputState.windows.clear();

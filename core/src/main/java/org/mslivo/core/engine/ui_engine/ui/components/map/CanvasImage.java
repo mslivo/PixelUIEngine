@@ -2,7 +2,7 @@ package org.mslivo.core.engine.ui_engine.ui.components.map;
 
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 
-public class MapOverlay {
+public class CanvasImage {
 
     public CMediaGFX image;
 
@@ -24,6 +24,6 @@ public class MapOverlay {
 
     public long timer;
 
-    public Map addedToMap;
+    public Canvas addedToCanvas;
 
 }

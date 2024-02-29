@@ -19,7 +19,9 @@ import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.input.InputMethod;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import org.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -32,12 +34,12 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
-import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.ui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
+import org.mslivo.core.engine.ui_engine.ui.components.map.CanvasImage;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -58,8 +60,6 @@ import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.input.InputMethod;
-import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 
 import java.awt.*;
 import java.net.URI;
@@ -84,6 +84,7 @@ import java.util.function.IntConsumer;
         - setColor(X, float r, float g, float b, float a)
         - setColor(X, Color color) -> setColor(X, float r, float g, float b, float a)
 
+    - "create" functions must never trigger ActionListener Events either directly or via UICommons
  */
 public class API {
     public final _Notification notification = new _Notification();
@@ -117,10 +118,10 @@ public class API {
             if (hotKeyAction == null) return null;
             HotKey hotKey = new HotKey();
             hotKey.pressed = false;
-            setKeyCodes(hotKey, keyCodes);
-            setHotKeyAction(hotKey, hotKeyAction);
-            setName(hotKey, "");
-            setData(hotKey, null);
+            hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
+            hotKey.hotKeyAction = hotKeyAction;
+            hotKey.name = "";
+            hotKey.data = null;
             return hotKey;
         }
 
@@ -172,11 +173,11 @@ public class API {
 
         public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
             MouseTool mouseTool = new MouseTool();
-            setName(mouseTool, name);
-            setData(mouseTool, data);
-            setCursor(mouseTool, cursor);
-            setCursorDown(mouseTool, cursorDown);
-            setMouseToolAction(mouseTool, mouseToolAction);
+            mouseTool.name = name;
+            mouseTool.data = data;
+            mouseTool.cursor = cursor;
+            mouseTool.cursorDown = cursorDown;
+            mouseTool.mouseToolAction = mouseToolAction;
             return mouseTool;
         }
 
@@ -569,11 +570,11 @@ public class API {
             component.setColor(ok, initColor);
 
 
-            Map colorMap = component.map.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
+            Canvas colorCanvas = component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-            MapOverlay cursorOverlay = component.map.mapOverlay.create(UIBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4, false);
-            component.map.addMapOverlay(colorMap, cursorOverlay);
+            CanvasImage cursorOverlay = component.canvas.canvasImage.create(UIBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4);
+            component.canvas.addCanvasImage(colorCanvas, cursorOverlay);
 
 
             if (!colorTexture.getTexture().getTextureData().isPrepared())
@@ -584,17 +585,17 @@ public class API {
             for (int x = 0; x < colorTexture.getRegionWidth(); x++) {
                 for (int y = 0; y < colorTexture.getRegionHeight(); y++) {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
-                    component.map.drawPixel(colorMap, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
+                    component.canvas.drawPixel(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        component.map.mapOverlay.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
+                        component.canvas.canvasImage.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
                     }
                 }
             }
 
-            component.map.update(colorMap);
+            component.canvas.updateTexture(colorCanvas);
 
             final boolean[] drag = {false};
-            component.map.setMapAction(colorMap, new MapAction() {
+            component.canvas.setMapAction(colorCanvas, new CanvasAction() {
 
                 @Override
                 public void onPress(int x, int y) {
@@ -606,25 +607,25 @@ public class API {
                     drag[0] = false;
                 }
             });
-            component.addUpdateAction(colorMap, new UpdateAction(10, true) {
+            component.addUpdateAction(colorCanvas, new UpdateAction(10, true) {
                 int xLast = -1, yLast = -1;
                 Color currentColor = new Color();
 
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.mouse.state.xUI() - component.getAbsoluteX(colorMap);
-                        int yInv = (input.mouse.state.yUI() - component.getAbsoluteY(colorMap));
+                        int x = input.mouse.state.xUI() - component.getAbsoluteX(colorCanvas);
+                        int yInv = (input.mouse.state.yUI() - component.getAbsoluteY(colorCanvas));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = component.map.getPixelColor(colorMap, x, y - 1);
+                            currentColor = component.canvas.getPixelColor(colorCanvas, x, y - 1);
                             component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
                             component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
-                            component.map.mapOverlay.setPosition(cursorOverlay, x - 1, yInv - 1);
+                            component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, yInv - 1);
                             xLast = x;
                             yLast = y;
                         }
@@ -633,9 +634,9 @@ public class API {
             });
 
 
-            Component[] componentl = new Component[]{colorMap, ok};
+            Component[] componentl = new Component[]{colorCanvas, ok};
             component.setOffset(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            component.setOffset(colorMap, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.setOffset(colorCanvas, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             window.addComponents(modal, componentl);
 
             return modal;
@@ -874,9 +875,9 @@ public class API {
         }
 
 
-        public GraphInfo map_drawGraph(Map map, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
-            int mapWidth = map.width * UIEngine.TILE_SIZE;
-            int mapHeight = map.height * UIEngine.TILE_SIZE;
+        public GraphInfo map_drawGraph(Canvas canvas, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+            int mapWidth = canvas.width * UIEngine.TILE_SIZE;
+            int mapHeight = canvas.height * UIEngine.TILE_SIZE;
             int[] indexAtPosition = new int[mapWidth];
             long[] valueAtPosition = new long[mapWidth];
             boolean[] dataAvailableAtPosition = new boolean[mapWidth];
@@ -919,13 +920,13 @@ public class API {
             for (int iy = 0; iy < mapHeight; iy++) {
                 Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
-                    component.map.drawPixel(map, ix, iy, color.r, color.g, color.b, color.a);
+                    component.canvas.drawPixel(canvas, ix, iy, color.r, color.g, color.b, color.a);
                 }
             }
 
             if (values.size == 0) {
                 // No values available
-                component.map.update(map);
+                component.canvas.updateTexture(canvas);
                 return null;
             }
 
@@ -968,9 +969,9 @@ public class API {
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
-                        component.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.canvas.drawPixel(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     } else {
-                        component.map.drawPixel(map, ix, y, color.r, color.g, color.b, color.a);
+                        component.canvas.drawPixel(canvas, ix, y, color.r, color.g, color.b, color.a);
                     }
                 }
 
@@ -978,12 +979,12 @@ public class API {
                 if (indexChange && ix != 0) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        component.map.drawPixel(map, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.canvas.drawPixel(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     }
                 } else if (nextIndexChange) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        component.map.drawPixel(map, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                        component.canvas.drawPixel(canvas, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
                     }
                 }
 
@@ -991,7 +992,7 @@ public class API {
                 lastValue = value;
             }
 
-            component.map.update(map);
+            component.canvas.updateTexture(canvas);
             return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
         }
 
@@ -2141,13 +2142,13 @@ public class API {
 
             public final _Emulated emulated = new _Emulated();
 
-            public class _Emulated{
+            public class _Emulated {
                 public void setPosition(int x, int y) {
-                    UICommons.emulatedMouse_setPosition(inputState,x,y);
+                    UICommons.emulatedMouse_setPosition(inputState, x, y);
                 }
 
                 public void setPositionComponent(Component component) {
-                    UICommons.emulatedMouse_setPositionComponent(inputState,component);
+                    UICommons.emulatedMouse_setPositionComponent(inputState, component);
                 }
             }
 
@@ -2529,13 +2530,14 @@ public class API {
 
         public Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
             Notification notification = new Notification();
-            setText(notification, text);
-            setDisplayTime(notification, displayTime);
-            setColor(notification, color);
-            setFont(notification, font);
-            setNotificationAction(notification, notificationAction);
-            setName(notification, "");
-            setData(notification, null);
+            notification.text = Tools.Text.validString(text);
+            notification.displayTime = displayTime;
+            notification.color_r = color.r;
+            notification.color_g = color.g;
+            notification.color_b = color.b;
+            notification.color_a = color.a;
+            notification.font = font;
+            notification.notificationAction = notificationAction;
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
             if (textWidth > inputState.internalResolutionWidth) {
@@ -2615,9 +2617,16 @@ public class API {
         public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.items = new ArrayList<>();
-            setAlpha(contextMenu, alpha);
-            addContextMenuItems(contextMenu, contextMenuItems);
-            setContextMenuAction(contextMenu, contextMenuAction);
+            if (contextMenuItems != null) {
+                for (int i = 0; i < contextMenuItems.length; i++) {
+                    if (contextMenuItems[i].addedToContextMenu == null) {
+                        contextMenu.items.add(contextMenuItems[i]);
+                        contextMenuItems[i].addedToContextMenu = contextMenu;
+                    }
+                }
+            }
+            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
+            contextMenu.contextMenuAction = contextMenuAction;
             return contextMenu;
         }
 
@@ -2679,31 +2688,33 @@ public class API {
             }
 
             public ContextMenuItem create(String text) {
-                return create(text, defaultContextMenuItemAction(), null, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
+                return create(text, defaultContextMenuItemAction(), null, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-                return create(text, contextMenuItemAction, null, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
+                return create(text, contextMenuItemAction, null, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon) {
-                return create(text, contextMenuItemAction, icon, inputState.config.component_defaultColor, inputState.config.component_defaultFont);
+                return create(text, contextMenuItemAction, icon, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
-                return create(text, contextMenuItemAction, icon, color, null);
+                return create(text, contextMenuItemAction, icon, color, inputState.config.component_defaultFont, 0);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font, int iconArrayIndex) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
-                setText(contextMenuItem, text);
-                setFont(contextMenuItem, font);
-                setColor(contextMenuItem, color);
-                setIcon(contextMenuItem, icon);
-                setIconIndex(contextMenuItem, 0);
-                setName(contextMenuItem, "");
-                setData(contextMenuItem, null);
-                setContextMenuItemAction(contextMenuItem, contextMenuItemAction);
+                contextMenuItem.text = Tools.Text.validString(text);
+                contextMenuItem.font = font;
+                contextMenuItem.color_r = color.r;
+                contextMenuItem.color_g = color.g;
+                contextMenuItem.color_b = color.b;
+                contextMenuItem.icon = icon;
+                contextMenuItem.iconArrayIndex = iconArrayIndex;
+                contextMenuItem.name = "";
+                contextMenuItem.data = null;
+                contextMenuItem.contextMenuItemAction = null;
                 contextMenuItem.addedToContextMenu = null;
                 return contextMenuItem;
             }
@@ -2753,7 +2764,7 @@ public class API {
 
             public void setIconIndex(ContextMenuItem contextMenuItem, int index) {
                 if (contextMenuItem == null) return;
-                contextMenuItem.iconIndex = Tools.Calc.lowerBounds(index, 0);
+                contextMenuItem.iconArrayIndex = Tools.Calc.lowerBounds(index, 0);
             }
 
         }
@@ -2768,69 +2779,63 @@ public class API {
         }
 
         public Window create(int x, int y, int width, int height) {
-            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title) {
-            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon) {
-            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, null, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
-        }
-
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction, Component[] components, Color color) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, components, color, null);
-        }
-
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible, WindowAction windowAction, Component[] components, Color color, CMediaFont font) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible, WindowAction windowAction, Color color, CMediaFont font) {
             Window window = new Window();
-            setPosition(window, x, y);
-            setSize(window, width, height);
-            setTitle(window, title);
-            setAlwaysOnTop(window, alwaysOnTop);
-            setMoveAble(window, moveAble);
-            setColor(window, color);
-            setFont(window, font);
-            setHasTitleBar(window, hasTitleBar);
-            setVisible(window, visible);
-            setWindowAction(window, windowAction);
-            setIcon(window, icon);
-            setIconIndex(window, 0);
-            setName(window, "");
-            setData(window, null);
-            setEnforceScreenBounds(window, inputState.config.window_defaultEnforceScreenBounds);
-            setFoldable(window, true);
-            window.components = new ArrayList<>();
-            window.font = inputState.config.window_defaultFont;
+            window.x = x;
+            window.y = y;
+            window.width = Tools.Calc.lowerBounds(width, 2);
+            window.height = Tools.Calc.lowerBounds(height, 2);
+            window.title = Tools.Text.validString(title);
+            window.alwaysOnTop = alwaysOnTop;
+            window.moveAble = moveAble;
+            window.color_r = color.r;
+            window.color_g = color.g;
+            window.color_b = color.b;
+            window.color_a = color.a;
+            window.font = font;
+            window.hasTitleBar = hasTitleBar;
+            window.visible = visible;
+            window.windowAction = windowAction;
+            window.icon = icon;
+            window.iconArrayIndex = 0;
+            window.name = "";
+            window.data = null;
+            window.enforceScreenBounds = inputState.config.window_defaultEnforceScreenBounds;
             window.messageReceiverActions = new ArrayList<>();
             window.updateActions = new ArrayList<>();
             window.addedToScreen = false;
-            addComponents(window, components);
+            window.components = new ArrayList<>();
             return window;
         }
 
@@ -2875,7 +2880,7 @@ public class API {
 
         public void setIconIndex(Window window, int iconIndex) {
             if (window == null) return;
-            window.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+            window.iconArrayIndex = Tools.Calc.lowerBounds(iconIndex, 0);
         }
 
         public void setVisible(Window window, boolean visible) {
@@ -2898,11 +2903,6 @@ public class API {
             return window.addedToScreen;
         }
 
-        public void setFoldable(Window window, boolean foldable) {
-            if (window == null) return;
-            window.foldable = foldable;
-        }
-
         private void setColorFunction(Window window, Color color, int setColorMode, Class[] classes,
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
             if (classes == null) classes = new Class[]{};
@@ -2921,8 +2921,8 @@ public class API {
                     if (componentColor1) API.this.component.setColor(component, color);
                     if (componentColor2) API.this.component.setColor2(component, color);
                     if (component instanceof ComboBox comboBox) {
-                        for (int i2 = 0; i2 < comboBox.items.size(); i2++)
-                            API.this.component.comboBox.item.setColor(comboBox.items.get(i2), color);
+                        for (int i2 = 0; i2 < comboBox.comboBoxItems.size(); i2++)
+                            API.this.component.comboBox.item.setColor(comboBox.comboBoxItems.get(i2), color);
                     }
                 }
             }
@@ -3040,7 +3040,7 @@ public class API {
             if (window == null) return;
             int centerX = (inputState.internalResolutionWidth / 2) - (UICommons.window_getRealWidth(window) / 2);
             int centerY = (inputState.internalResolutionHeight / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getRealHeight(window)) / 2);
-            setPosition(window,centerX, centerY);
+            setPosition(window, centerX, centerY);
         }
 
         public void setFont(Window window, CMediaFont font) {
@@ -3118,7 +3118,7 @@ public class API {
 
         public void setPosition(Window window, int x, int y) {
             if (window == null) return;
-            UICommons.window_setPosition(inputState, window, x,y);
+            UICommons.window_setPosition(inputState, window, x, y);
         }
 
         public void move(Window window, int xRel, int yRel) {
@@ -3449,35 +3449,23 @@ public class API {
     }
 
     public class _Component {
-
         public final _Shape shape = new _Shape();
 
         public final _Button button = new _Button();
-
         public final _TabBar tabBar = new _TabBar();
-
         public final _Grid grid = new _Grid();
-
         public final _ScrollBar scrollBar = new _ScrollBar();
 
         public final _List list = new _List();
-
         public final _TextField textField = new _TextField();
-
-        public final _Map map = new _Map();
-
+        public final _Canvas canvas = new _Canvas();
         public final _Knob knob = new _Knob();
 
         public final _Text text = new _Text();
-
         public final _Image image = new _Image();
-
         public final _ComboBox comboBox = new _ComboBox();
-
         public final _ProgressBar progressBar = new _ProgressBar();
-
         public final _CheckBox checkBox = new _CheckBox();
-
         public final _GameViewPort gameViewPort = new _GameViewPort();
 
         public void setToolTip(Component component, ToolTip tooltip) {
@@ -3629,17 +3617,27 @@ public class API {
             for (int i = 0; i < components.length; i++) setAlpha(components[i], alpha);
         }
 
-        private void setComponentInitValues(Component component) {
-            component.x = component.y = 0;
-            component.width = component.height = 1;
-            component.color_r = inputState.config.component_defaultColor.r;
-            component.color_g = inputState.config.component_defaultColor.g;
-            component.color_b = inputState.config.component_defaultColor.b;
-            component.color_a = inputState.config.component_defaultColor.a;
-            component.color2_r = inputState.config.component_defaultColor.r;
-            component.color2_g = inputState.config.component_defaultColor.g;
-            component.color2_b = inputState.config.component_defaultColor.b;
-            component.color2_a = inputState.config.component_defaultColor.a;
+        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height) {
+            setComponentCommonInitValues(component, x, y, width, height, inputState.config.component_defaultColor, inputState.config.component_defaultColor);
+        }
+
+        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height, Color color) {
+            setComponentCommonInitValues(component, x, y, width, height, color, color);
+        }
+
+        private void setComponentCommonInitValues(Component component, int x, int y, int widht, int height, Color color1, Color color2) {
+            component.x = x;
+            component.y = y;
+            component.width = widht;
+            component.height = height;
+            component.color_r = color1.r;
+            component.color_g = color1.g;
+            component.color_b = color1.b;
+            component.color_a = color1.a;
+            component.color2_r = color2.r;
+            component.color2_g = color2.g;
+            component.color2_b = color2.b;
+            component.color2_a = color2.a;
             component.disabled = false;
             component.updateActions = new ArrayList<>();
             component.data = null;
@@ -3710,15 +3708,12 @@ public class API {
             public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime, GameViewPortAction gameViewPortAction) {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
-                setComponentInitValues(gameViewPort);
+                setComponentCommonInitValues(gameViewPort, x, y, width, height, Color.WHITE);
                 UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
-                setPosition(gameViewPort, x, y);
-                setSize(gameViewPort, width, height);
-                setCamPosition(gameViewPort, camPositionX, camPositionY);
-                setCamZoom(gameViewPort, camZoom);
-                setUpdateTime(gameViewPort, updateTime);
-                setGameViewPortAction(gameViewPort, gameViewPortAction);
-                setColor(gameViewPort, Color.WHITE);
+                gameViewPort.camera.position.set(camPositionX, camPositionY, gameViewPort.camera.position.z);
+                gameViewPort.camera.zoom = camZoom;
+                gameViewPort.updateTime = updateTime;
+                gameViewPort.gameViewPortAction = gameViewPortAction;
                 return gameViewPort;
             }
 
@@ -3838,9 +3833,8 @@ public class API {
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font, Color color) {
                 ProgressBar progressBar = new ProgressBar();
-                setComponentInitValues(progressBar);
-                setPosition(progressBar, x, y);
-                setSize(progressBar, width, 1);
+                setComponentCommonInitValues(progressBar, x, y, width, 1);
+
                 setColor(progressBar, color);
                 setProgress(progressBar, progress);
                 setProgressText(progressBar, progressText);
@@ -3879,11 +3873,8 @@ public class API {
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType, Color color) {
                 Shape shape = new Shape();
-                setComponentInitValues(shape);
-                setPosition(shape, x, y);
-                setSize(shape, width, height);
-                setColor(shape, color);
-                setShapeType(shape, shapeType);
+                setComponentCommonInitValues(shape, x, y, width, height, color);
+                shape.shapeType = shapeType;
                 return shape;
             }
 
@@ -3900,6 +3891,14 @@ public class API {
 
             public final _ImageButton imageButton = new _ImageButton();
 
+            private void setButtonCommonInitValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
+                button.buttonAction = buttonAction;
+                button.mode = buttonMode;
+                button.pressed = false;
+                button.offset_content_x = 0;
+                button.offset_content_y = 0;
+            }
+
             private ButtonAction defaultButtonAction() {
                 return new ButtonAction() {
                 };
@@ -3912,7 +3911,11 @@ public class API {
 
             public void setPressed(Button button, boolean pressed) {
                 if (button == null) return;
-                button.pressed = pressed;
+                if (pressed) {
+                    UICommons.button_press(button);
+                } else {
+                    UICommons.button_release(button);
+                }
             }
 
             public void setPressed(Button[] buttons, boolean pressed) {
@@ -3937,12 +3940,6 @@ public class API {
                 for (int i = 0; i < buttons.length; i++) setOffsetContent(buttons[i], x, y);
             }
 
-            private void setButtonValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
-                setButtonAction(button, buttonAction);
-                setButtonMode(button, buttonMode);
-                setPressed(button, false);
-                setOffsetContent(button, contentOffsetX, contentOffsetY);
-            }
 
             public void centerContent(Button[] buttons) {
                 if (buttons == null) return;
@@ -3960,23 +3957,7 @@ public class API {
             }
 
             public void centerContent(Button button) {
-                if (button == null) return;
-                int xOffset;
-                int yOffset;
-                if (button instanceof ImageButton imageButton) {
-                    if (imageButton.image == null) return;
-                    xOffset = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
-                    yOffset = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
-                    setOffsetContent(imageButton, xOffset, yOffset);
-                } else if (button instanceof TextButton textButton) {
-                    if (textButton.text == null) return;
-                    int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
-                    int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
-                    int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
-                    xOffset = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-                    yOffset = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
-                    setOffsetContent(textButton, xOffset, yOffset);
-                }
+                UICommons.button_centerContent(mediaManager, button);
             }
 
             public class _TextButton {
@@ -4003,15 +3984,13 @@ public class API {
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font) {
                     TextButton textButton = new TextButton();
-                    setComponentInitValues(textButton);
-                    setButtonValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
-                    setPosition(textButton, x, y);
-                    setSize(textButton, width, height);
-                    setText(textButton, text);
-                    setFont(textButton, font);
-                    setIcon(textButton, icon);
-                    setIconArrayIndex(textButton, 0);
-                    centerContent(textButton);
+                    setComponentCommonInitValues(textButton, x, y, width, height);
+                    setButtonCommonInitValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
+                    textButton.text = Tools.Text.validString(text);
+                    textButton.font = font;
+                    textButton.icon = icon;
+                    textButton.iconArrayIndex = 0;
+                    UICommons.button_centerContent(mediaManager, textButton);
                     return textButton;
                 }
 
@@ -4058,14 +4037,11 @@ public class API {
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
                     ImageButton imageButton = new ImageButton();
-                    setComponentInitValues(imageButton);
-                    setButtonValues(imageButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
-                    setPosition(imageButton, x, y);
-                    setSize(imageButton, width, height);
-                    setImage(imageButton, image);
-                    setArrayIndex(imageButton, arrayIndex);
-                    setColor2(imageButton, Color.WHITE);
-                    centerContent(imageButton);
+                    setComponentCommonInitValues(imageButton, x, y, width, height, inputState.config.component_defaultColor, Color.WHITE);
+                    setButtonCommonInitValues(imageButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
+                    imageButton.image = image;
+                    imageButton.arrayIndex = arrayIndex;
+                    UICommons.button_centerContent(mediaManager, imageButton);
                     return imageButton;
                 }
 
@@ -4103,15 +4079,12 @@ public class API {
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
                 CheckBox checkBox = new CheckBox();
-                setComponentInitValues(checkBox);
-                setColor(checkBox, Color.WHITE);
-                setPosition(checkBox, x, y);
-                setSize(checkBox, 1, 1);
-                setText(checkBox, text);
-                setCheckBoxStyle(checkBox, checkBoxStyle);
-                setCheckBoxAction(checkBox, checkBoxAction);
-                setFont(checkBox, font);
-                setChecked(checkBox, checked);
+                setComponentCommonInitValues(checkBox, x, y, 1, 1, Color.WHITE);
+                checkBox.text = Tools.Text.validString(text);
+                checkBox.checkBoxStyle = checkBoxStyle;
+                checkBox.checkBoxAction = checkBoxAction;
+                checkBox.font = font;
+                checkBox.checked = checked;
                 return checkBox;
             }
 
@@ -4127,7 +4100,11 @@ public class API {
 
             public void setChecked(CheckBox checkBox, boolean checked) {
                 if (checkBox == null) return;
-                checkBox.checked = checked;
+                if (checked) {
+                    UICommons.checkbox_check(checkBox);
+                } else {
+                    UICommons.checkbox_unCheck(checkBox);
+                }
             }
 
             public void setCheckBoxStyle(CheckBox checkBox, CheckBoxStyle checkBoxStyle) {
@@ -4168,18 +4145,22 @@ public class API {
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
                 TabBar tabBar = new TabBar();
+                setComponentCommonInitValues(tabBar, x, y, width, (bigIconMode ? 2 : 1));
+                tabBar.tabBarAction = tabBarAction;
+                tabBar.border = border;
+                tabBar.borderHeight = Tools.Calc.lowerBounds(borderHeight, 0);
+                tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
+                tabBar.bigIconMode = bigIconMode;
                 tabBar.tabs = new ArrayList<>();
-                setComponentInitValues(tabBar);
-                setPosition(tabBar, x, y);
-                setSize(tabBar, width, bigIconMode ? 2 : 1);
-                removeAllTabs(tabBar);
-                addTabs(tabBar, tabs);
-                selectTab(tabBar, selectedTab);
-                setTabBarAction(tabBar, tabBarAction);
-                setBorder(tabBar, border);
-                setBorderHeight(tabBar, borderHeight);
-                setTabOffset(tabBar, tabOffset);
-                setBigIconMode(tabBar, bigIconMode);
+                if (tabs != null) {
+                    for (int i = 0; i < tabs.length; i++) {
+                        if (tabs[i].addedToTabBar == null) {
+                            tabBar.tabs.add(tabs[i]);
+                            tabs[i].addedToTabBar = tabBar;
+                        }
+                    }
+                }
+                tabBar.selectedTab = Tools.Calc.inBounds(selectedTab, 0, tabBar.tabs.size() - 1);
                 return tabBar;
             }
 
@@ -4232,11 +4213,7 @@ public class API {
 
             public void selectTab(TabBar tabBar, Tab tab) {
                 if (tabBar == null) return;
-                for (int i = 0; i < tabBar.tabs.size(); i++) {
-                    if (tabBar.tabs.get(i) == tab) {
-                        UICommons.tabBar_selectTab(tabBar, i);
-                    }
-                }
+                UICommons.tabBar_selectTab(tabBar, tab);
             }
 
             public void addTab(TabBar tabBar, Tab tab) {
@@ -4246,10 +4223,7 @@ public class API {
 
             public void addTab(TabBar tabBar, Tab tab, int index) {
                 if (tabBar == null || tab == null) return;
-                if (tab.addedToTabBar == null && !tabBar.tabs.contains(tab)) {
-                    UICommons.tabBar_addTab(tabBar, tab, index);
-                    tabBar.tabs.add(index, tab);
-                }
+                UICommons.tabBar_addTab(tabBar, tab, index);
             }
 
             public void addTabs(TabBar tabBar, Tab[] tabs) {
@@ -4328,21 +4302,27 @@ public class API {
 
                 public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width, CMediaFont font) {
                     Tab tab = new Tab();
-                    tab.components = new ArrayList<>();
-                    setTitle(tab, title);
-                    setTabAction(tab, tabAction);
-                    setIcon(tab, icon);
-                    setIconIndex(tab, 0);
-                    setFont(tab, font);
-                    setContentOffset(tab, 0);
-                    removeAllTabComponents(tab);
-                    setName(tab, "");
-                    setData(tab, null);
-                    addTabComponents(tab, components);
+                    tab.title = Tools.Text.validString(title);
+                    tab.tabAction = tabAction;
+                    tab.icon = icon;
+                    tab.iconIndex = 0;
+                    tab.font = font;
+                    tab.content_offset_x = 0;
+                    tab.name = "";
+                    tab.data = null;
                     if (width == 0) {
-                        updateWidthAuto(tab);
+                        tab.width = MathUtils.round((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
                     } else {
-                        setWidth(tab, width);
+                        tab.width = width;
+                    }
+                    tab.components = new ArrayList<>();
+                    if (components != null) {
+                        for (int i = 0; i < components.length; i++) {
+                            if (components[i].addedToTab == null) {
+                                tab.components.add(components[i]);
+                                components[i].addedToTab = tab;
+                            }
+                        }
                     }
                     return tab;
                 }
@@ -4428,12 +4408,6 @@ public class API {
                     tab.width = Tools.Calc.lowerBounds(width, 1);
                 }
 
-                public void updateWidthAuto(Tab tab) {
-                    if (tab == null) return;
-                    int width = MathUtils.round((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
-                    setWidth(tab, width);
-                }
-
             }
         }
 
@@ -4466,21 +4440,25 @@ public class API {
 
             public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
                 Grid grid = new Grid();
-                setComponentInitValues(grid);
-                setPosition(grid, x, y);
-                setItems(grid, items);
-                setGridAction(grid, gridAction);
-                setDragEnabled(grid, dragEnabled);
-                setDragOutEnabled(grid, dragOutEnabled);
-                setDragInEnabled(grid, dragInEnabled);
-                setDoubleSized(grid, doubleSized);
-                updateSize(grid);
+                int width = 1;
+                int height = 1;
+                if (items != null) {
+                    width = items.length * (doubleSized ? 2 : 1);
+                    height = items[0].length * (doubleSized ? 2 : 1);
+                }
+                setComponentCommonInitValues(grid, x, y, width, height);
+                grid.items = items;
+                grid.gridAction = gridAction;
+                grid.dragEnabled = dragEnabled;
+                grid.dragInEnabled = dragInEnabled;
+                grid.dragOutEnabled = dragOutEnabled;
+                grid.doubleSized = doubleSized;
                 return grid;
             }
 
             public void setDoubleSized(Grid grid, boolean doubleSized) {
                 grid.doubleSized = doubleSized;
-                updateSize(grid);
+                UICommons.grid_updateSize(grid);
             }
 
             public boolean isPositionValid(Grid grid, int x, int y) {
@@ -4511,17 +4489,9 @@ public class API {
             public void setItems(Grid grid, Object[][] items) {
                 if (grid == null || items == null) return;
                 grid.items = items;
-                updateSize(grid);
+                UICommons.grid_updateSize(grid);
             }
 
-            private void updateSize(Grid grid) {
-                if (grid == null) return;
-                int factor = grid.doubleSized ? 2 : 1;
-                if (grid.items != null) {
-                    grid.width = grid.items.length * factor;
-                    grid.height = grid.items[0].length * factor;
-                }
-            }
 
         }
 
@@ -4560,20 +4530,16 @@ public class API {
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters, CMediaFont font) {
                 TextField textField = new TextField();
+                setComponentCommonInitValues(textField, x, y, width, 1, Color.WHITE);
+                textField.font = font;
                 textField.allowedCharacters = new IntSet();
+                for (int i = 0; i < allowedCharacters.length; i++)
+                    textField.allowedCharacters.add(allowedCharacters[i]);
                 textField.offset = 0;
-
-                setComponentInitValues(textField);
-                setColor(textField, Color.WHITE);
-                setPosition(textField, x, y);
-                setSize(textField, width, 1);
-                setFont(textField, font);
-                setContentMaxLength(textField, contentMaxLength);
-                setAllowedCharacters(textField, allowedCharacters);
-                setContent(textField, content);
-                setTextFieldAction(textField, textFieldAction);
-
-                setMarkerPosition(textField, textField.content.length());
+                textField.content = Tools.Text.validString(content);
+                textField.textFieldAction = textFieldAction;
+                textField.markerPosition = 0;
+                textField.contentMaxLength = Tools.Calc.lowerBounds(contentMaxLength, 0);
                 textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
                 return textField;
             }
@@ -4633,217 +4599,227 @@ public class API {
             }
         }
 
-        public class _Map {
+        public class _Canvas {
 
-            public final _MapOverlay mapOverlay = new _MapOverlay();
+            public final _CanvasImage canvasImage = new _CanvasImage();
 
-            private MapAction defaultMapAction() {
-                return new MapAction() {
+            private CanvasAction defaultMapAction() {
+                return new CanvasAction() {
                 };
             }
 
-            public Map create(int x, int y, int width, int height) {
+            public Canvas create(int x, int y, int width, int height) {
                 return create(x, y, width, height, defaultMapAction(), null);
             }
 
-            public Map create(int x, int y, int width, int height, MapAction mapAction) {
-                return create(x, y, width, height, mapAction, null);
+            public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
+                return create(x, y, width, height, canvasAction, null);
             }
 
-            public Map create(int x, int y, int width, int height, MapAction mapAction, MapOverlay[] mapOverlays) {
-                Map map = new Map();
-                map.mapOverlays = new ArrayList<>();
-                setComponentInitValues(map);
-                setColor(map, Color.WHITE);
-                map.pMap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
-                setPosition(map, x, y);
-                setSize(map, width, height);
-                setMapAction(map, mapAction);
-                addMapOverlays(map, mapOverlays);
-                update(map);
-                return map;
-            }
-
-            public void setMapAction(Map map, MapAction mapAction) {
-                if (map == null) return;
-                map.mapAction = mapAction;
-            }
-
-            public void update(Map map) {
-                if (map == null) return;
-                map.texture = new Texture(map.pMap);
-            }
-
-            public Color getPixelColor(Map map, int x, int y) {
-                if (map == null) return null;
-                return new Color(map.pMap.getPixel(x, y));
-            }
-
-            public void clearMap(Map map, Color color) {
-                clearMap(map, color.r, color.g, color.b, color.a);
-            }
-
-            public void clearMap(Map map, float r, float g, float b, float a) {
-                if (map == null) return;
-                map.pMap.setColor(r, g, b, a);
-                for (int iy = 0; iy < map.pMap.getHeight(); iy++) {
-                    map.pMap.drawLine(0, iy, map.pMap.getWidth(), iy);
+            public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
+                Canvas canvas = new Canvas();
+                setComponentCommonInitValues(canvas, x, y, width, height, Color.WHITE);
+                canvas.pixmap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
+                canvas.canvasAction = canvasAction;
+                canvas.canvasImages = new ArrayList<>();
+                if (canvasImages != null) {
+                    for (int i = 0; i < canvasImages.length; i++) {
+                        if (canvasImages[i].addedToCanvas == null) {
+                            canvas.canvasImages.add(canvasImages[i]);
+                            canvasImages[i].addedToCanvas = canvas;
+                        }
+                    }
                 }
+                canvas.texture = new Texture(canvas.pixmap);
+                return canvas;
             }
 
-            public void drawPixel(Map map, int x, int y, Color color) {
-                drawPixel(map, x, y, color.r, color.g, color.b, color.a);
+            public void setMapAction(Canvas canvas, CanvasAction canvasAction) {
+                if (canvas == null) return;
+                canvas.canvasAction = canvasAction;
             }
 
-            public void drawPixel(Map map, int x, int y, float r, float g, float b, float a) {
-                if (map == null) return;
-                map.pMap.setColor(r, g, b, a);
-                map.pMap.drawPixel(x, y);
+            public void updateTexture(Canvas canvas) {
+                if (canvas == null) return;
+                UICommons.canvas_updateTexture(canvas);
             }
 
-            public void drawLine(Map map, int x1, int y1, int x2, int y2, Color Color) {
-                drawLine(map, x1, y1, x2, y2, Color.r, Color.g, Color.b, Color.a);
+            public Color getPixelColor(Canvas canvas, int x, int y) {
+                if (canvas == null) return null;
+                return new Color(canvas.pixmap.getPixel(x, y));
             }
 
-            public void drawLine(Map map, int x1, int y1, int x2, int y2, float r, float g, float b, float a) {
-                if (map == null) return;
-                map.pMap.setColor(r, g, b, a);
-                map.pMap.drawLine(x1, y1, x2, y2);
+            public void clearCanvas(Canvas canvas, Color color) {
+                clearCanvas(canvas, color.r, color.g, color.b, color.a);
             }
 
-            public void drawRect(Map map, int x1, int y1, int width, int height, Color Color) {
-                drawRect(map, x1, y1, width, height, Color.r, Color.g, Color.b, Color.a);
+            public void clearCanvas(Canvas canvas, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                UICommons.canvas_clear(canvas, r, g, b, a);
             }
 
-            public void drawRect(Map map, int x1, int y1, int width, int height, float r, float g, float b, float a) {
-                if (map == null) return;
-                map.pMap.setColor(r, g, b, a);
-                map.pMap.drawRectangle(x1, y1, width, height);
+            public void drawPixel(Canvas canvas, int x, int y, Color color) {
+                drawPixel(canvas, x, y, color.r, color.g, color.b, color.a);
             }
 
-            public void drawCircle(Map map, int x, int y, int radius, Color Color) {
-                drawCircle(map, x, y, radius, Color.r, Color.g, Color.b, Color.a);
+            public void drawPixel(Canvas canvas, int x, int y, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                canvas.pixmap.setColor(r, g, b, a);
+                canvas.pixmap.drawPixel(x, y);
             }
 
-            public void drawCircle(Map map, int x, int y, int radius, float r, float g, float b, float a) {
-                if (map == null) return;
-                map.pMap.setColor(r, g, b, a);
-                map.pMap.drawCircle(x, y, radius);
+            public void drawLine(Canvas canvas, int x1, int y1, int x2, int y2, Color Color) {
+                drawLine(canvas, x1, y1, x2, y2, Color.r, Color.g, Color.b, Color.a);
             }
 
-            public void addMapOverlay(Map map, MapOverlay mapOverlay) {
-                if (map == null || mapOverlay == null) return;
-                UICommons.map_addMapOverlay(map, mapOverlay);
+            public void drawLine(Canvas canvas, int x1, int y1, int x2, int y2, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                canvas.pixmap.setColor(r, g, b, a);
+                canvas.pixmap.drawLine(x1, y1, x2, y2);
             }
 
-            public void addMapOverlays(Map map, MapOverlay[] mapOverlays) {
-                if (map == null || mapOverlays == null) return;
-                for (int i = 0; i < mapOverlays.length; i++) addMapOverlay(map, mapOverlays[i]);
+            public void drawRect(Canvas canvas, int x1, int y1, int width, int height, Color Color) {
+                drawRect(canvas, x1, y1, width, height, Color.r, Color.g, Color.b, Color.a);
             }
 
-            public void removeMapOverlay(Map map, MapOverlay mapOverlay) {
-                if (map == null || mapOverlay == null) return;
-                UICommons.map_removeMapOverlay(map, mapOverlay);
+            public void drawRect(Canvas canvas, int x1, int y1, int width, int height, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                canvas.pixmap.setColor(r, g, b, a);
+                canvas.pixmap.drawRectangle(x1, y1, width, height);
             }
 
-            public void removeMapOverlays(Map map, MapOverlay[] mapOverlays) {
-                if (map == null || mapOverlays == null) return;
-                for (int i = 0; i < mapOverlays.length; i++) removeMapOverlay(map, mapOverlays[i]);
+            public void drawCircle(Canvas canvas, int x, int y, int radius, Color Color) {
+                drawCircle(canvas, x, y, radius, Color.r, Color.g, Color.b, Color.a);
             }
 
-            public void removeAllMapOverlays(Map map) {
-                if (map == null) return;
-                removeMapOverlays(map, map.mapOverlays.toArray(new MapOverlay[]{}));
+            public void drawCircle(Canvas canvas, int x, int y, int radius, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                canvas.pixmap.setColor(r, g, b, a);
+                canvas.pixmap.drawCircle(x, y, radius);
             }
 
-            public ArrayList<MapOverlay> findMapOverlaysByName(Map map, String name) {
-                if (map == null || name == null) return new ArrayList<>();
-                ArrayList<MapOverlay> result = new ArrayList<>();
-                for (int i = 0; i < map.mapOverlays.size(); i++)
-                    if (name.equals(map.mapOverlays.get(i).name)) result.add(map.mapOverlays.get(i));
+            public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
+                if (canvas == null || canvasImage == null) return;
+                UICommons.canvas_addCanvasImage(canvas, canvasImage);
+            }
+
+            public void addCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
+                if (canvas == null || canvasImages == null) return;
+                for (int i = 0; i < canvasImages.length; i++) addCanvasImage(canvas, canvasImages[i]);
+            }
+
+            public void removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
+                if (canvas == null || canvasImage == null) return;
+                UICommons.canvas_removeCanvasImage(canvas, canvasImage);
+            }
+
+            public void removeCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
+                if (canvas == null || canvasImages == null) return;
+                for (int i = 0; i < canvasImages.length; i++) removeCanvasImage(canvas, canvasImages[i]);
+            }
+
+            public void removeAllMapOverlays(Canvas canvas) {
+                if (canvas == null) return;
+                removeCanvasImages(canvas, canvas.canvasImages.toArray(new CanvasImage[]{}));
+            }
+
+            public ArrayList<CanvasImage> findMapOverlaysByName(Canvas canvas, String name) {
+                if (canvas == null || name == null) return new ArrayList<>();
+                ArrayList<CanvasImage> result = new ArrayList<>();
+                for (int i = 0; i < canvas.canvasImages.size(); i++)
+                    if (name.equals(canvas.canvasImages.get(i).name)) result.add(canvas.canvasImages.get(i));
                 return result;
             }
 
-            public MapOverlay findMapOverlayByName(Map map, String name) {
-                if (map == null || name == null) return null;
-                ArrayList<MapOverlay> result = findMapOverlaysByName(map, name);
+            public CanvasImage findMapOverlayByName(Canvas canvas, String name) {
+                if (canvas == null || name == null) return null;
+                ArrayList<CanvasImage> result = findMapOverlaysByName(canvas, name);
                 return result.size() > 0 ? result.getFirst() : null;
             }
 
-            public class _MapOverlay {
-                public MapOverlay create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y, false, Color.WHITE, 0);
+            public class _CanvasImage {
+                public CanvasImage create(CMediaGFX image, int x, int y) {
+                    return create(image, x, y, Color.WHITE, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut) {
-                    return create(image, x, y, fadeOut, Color.WHITE, 0);
+                public CanvasImage create(CMediaGFX image, int x, int y, Color color) {
+                    return create(image, x, y, color, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
+
                 }
 
-                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, Color color) {
-                    return create(image, x, y, fadeOut, color, 0);
+                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex) {
+                    return create(image, x, y, color, arrayIndex, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public MapOverlay create(CMediaGFX image, int x, int y, boolean fadeOut, Color color, int arrayIndex) {
-                    MapOverlay mapOverlay = new MapOverlay();
-                    setFadeOutTime(mapOverlay, inputState.config.component_mapOverlayDefaultFadeoutTime);
-                    setImage(mapOverlay, image);
-                    setPosition(mapOverlay, x, y);
-                    setFadeOut(mapOverlay, fadeOut);
-                    setColor(mapOverlay, color);
-                    setArrayIndex(mapOverlay, arrayIndex);
-                    setName(mapOverlay, "");
-                    setData(mapOverlay, null);
-                    mapOverlay.timer = fadeOut ? System.currentTimeMillis() : 0;
-                    mapOverlay.addedToMap = null;
-                    return mapOverlay;
+                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex, boolean fadeOut) {
+                    return create(image, x, y, color, arrayIndex, fadeOut, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public void setFadeOut(MapOverlay mapOverlay, boolean fadeOut) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.fadeOut = fadeOut;
+                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex, boolean fadeOut, int fadeOutTime) {
+                    CanvasImage canvasImage = new CanvasImage();
+                    canvasImage.image = image;
+                    canvasImage.x = x;
+                    canvasImage.y = y;
+                    canvasImage.fadeOut = fadeOut;
+                    canvasImage.fadeOutTime = fadeOutTime;
+                    canvasImage.color_r = color.r;
+                    canvasImage.color_g = color.g;
+                    canvasImage.color_b = color.b;
+                    canvasImage.color_a = color.a;
+                    canvasImage.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                    canvasImage.name = Tools.Text.validString("");
+                    canvasImage.data = null;
+                    canvasImage.timer = fadeOut ? System.currentTimeMillis() : 0;
+                    canvasImage.addedToCanvas = null;
+                    return canvasImage;
                 }
 
-                public void setFadeOutTime(MapOverlay mapOverlay, int fadeoutTime) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.fadeOutTime = Tools.Calc.lowerBounds(fadeoutTime, 0);
+                public void setFadeOut(CanvasImage canvasImage, boolean fadeOut) {
+                    if (canvasImage == null) return;
+                    canvasImage.fadeOut = fadeOut;
                 }
 
-                public void setPosition(MapOverlay mapOverlay, int x, int y) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.x = x;
-                    mapOverlay.y = y;
+                public void setFadeOutTime(CanvasImage canvasImage, int fadeoutTime) {
+                    if (canvasImage == null) return;
+                    canvasImage.fadeOutTime = Tools.Calc.lowerBounds(fadeoutTime, 0);
                 }
 
-                public void setImage(MapOverlay mapOverlay, CMediaGFX image) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.image = image;
+                public void setPosition(CanvasImage canvasImage, int x, int y) {
+                    if (canvasImage == null) return;
+                    canvasImage.x = x;
+                    canvasImage.y = y;
                 }
 
-                public void setColor(MapOverlay mapOverlay, Color color) {
-                    setColor(mapOverlay, color.r, color.b, color.g, color.a);
+                public void setImage(CanvasImage canvasImage, CMediaGFX image) {
+                    if (canvasImage == null) return;
+                    canvasImage.image = image;
                 }
 
-                public void setColor(MapOverlay mapOverlay, float r, float g, float b, float a) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.color_r = r;
-                    mapOverlay.color_g = g;
-                    mapOverlay.color_b = b;
-                    mapOverlay.color_a = a;
+                public void setColor(CanvasImage canvasImage, Color color) {
+                    setColor(canvasImage, color.r, color.b, color.g, color.a);
                 }
 
-                public void setArrayIndex(MapOverlay mapOverlay, int arrayIndex) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                public void setColor(CanvasImage canvasImage, float r, float g, float b, float a) {
+                    if (canvasImage == null) return;
+                    canvasImage.color_r = r;
+                    canvasImage.color_g = g;
+                    canvasImage.color_b = b;
+                    canvasImage.color_a = a;
                 }
 
-                public void setName(MapOverlay mapOverlay, String name) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.name = Tools.Text.validString(name);
+                public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
+                    if (canvasImage == null) return;
+                    canvasImage.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                 }
 
-                public void setData(MapOverlay mapOverlay, Object data) {
-                    if (mapOverlay == null) return;
-                    mapOverlay.data = data;
+                public void setName(CanvasImage canvasImage, String name) {
+                    if (canvasImage == null) return;
+                    canvasImage.name = Tools.Text.validString(name);
+                }
+
+                public void setData(CanvasImage canvasImage, Object data) {
+                    if (canvasImage == null) return;
+                    canvasImage.data = data;
                 }
             }
 
@@ -4870,19 +4846,16 @@ public class API {
 
             public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
                 Knob knob = new Knob();
-                setComponentInitValues(knob);
-                setPosition(knob, x, y);
-                setSize(knob, 2, 2);
-                setEndless(knob, endless);
-                setTurned(knob, turned);
-                setKnobAction(knob, knobAction);
-                setColor2(knob, Color.BLACK);
+                setComponentCommonInitValues(knob, x, y, 2, 2, inputState.config.component_defaultColor, Color.BLACK);
+                knob.endless = endless;
+                knob.turned = Tools.Calc.inBounds(turned, 0f, 1f);
+                knob.knobAction = knobAction;
                 return knob;
             }
 
             public void setTurned(Knob knob, float turned) {
                 if (knob == null) return;
-                knob.turned = Tools.Calc.inBounds(turned, 0f, 1f);
+                UICommons.knob_turnKnob(knob, turned);
             }
 
             public void setKnobAction(Knob knob, KnobAction knobAction) {
@@ -4913,13 +4886,22 @@ public class API {
             }
 
             public Text create(int x, int y, String[] lines, CMediaFont font, TextAction textAction) {
-                Text textC = new Text();
-                setComponentInitValues(textC);
-                setPosition(textC, x, y);
-                setFont(textC, font);
-                setTextAction(textC, textAction);
-                setLines(textC, lines);
-                return textC;
+                Text text = new Text();
+                int width = 1;
+                int height = 1;
+                if (lines != null && font != null) {
+                    for (int i = 0; i < lines.length; i++) {
+                        int widthT = mediaManager.textWidth(font, lines[i]);
+                        if (widthT > width) width = widthT;
+                    }
+                    width = width / UIEngine.TILE_SIZE;
+                    height = lines.length;
+                }
+                setComponentCommonInitValues(text, x, y, width, height);
+                text.font = font;
+                text.textAction = textAction;
+                text.lines = lines;
+                return text;
             }
 
             public void setTextAction(Text text, TextAction textAction) {
@@ -4930,24 +4912,12 @@ public class API {
             public void setLines(Text text, String... lines) {
                 if (text == null) return;
                 text.lines = Tools.Text.validString(lines);
-                updateSize(text);
+                UICommons.text_setLines(mediaManager, text, lines);
             }
 
             public void setFont(Text text, CMediaFont font) {
                 if (text == null) return;
                 text.font = font;
-            }
-
-            private void updateSize(Text text) {
-                if (text == null) return;
-                int width = 0;
-                for (int i = 0; i < text.lines.length; i++) {
-                    int widthT = mediaManager.textWidth(text.font, text.lines[i]);
-                    if (widthT > width) width = widthT;
-                }
-                width = width / UIEngine.TILE_SIZE;
-                int height = text.lines.length;
-                setSize(text, width, height);
             }
 
         }
@@ -4973,13 +4943,13 @@ public class API {
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset, ImageAction imageAction) {
                 Image imageC = new Image();
-                setComponentInitValues(imageC);
-                setPosition(imageC, x, y);
-                setImage(imageC, image);
-                setArrayIndex(imageC, arrayIndex);
-                setAnimationOffset(imageC, animation_offset);
-                setColor(imageC, Color.WHITE);
-                setImageAction(imageC, imageAction);
+                int width = image != null ? mediaManager.imageWidth(image) / UIEngine.TILE_SIZE : 0;
+                int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
+                setComponentCommonInitValues(imageC, x, y, width, height, Color.WHITE);
+                imageC.image = image;
+                imageC.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                imageC.animationOffset = animation_offset;
+                imageC.imageAction = imageAction;
                 return imageC;
             }
 
@@ -5000,15 +4970,7 @@ public class API {
 
             public void setImage(Image imageC, CMediaGFX image) {
                 if (imageC == null) return;
-                imageC.image = image;
-                updateSize(imageC);
-            }
-
-            private void updateSize(Image image) {
-                if (image == null) return;
-                int width = image.image != null ? mediaManager.imageWidth(image.image) / UIEngine.TILE_SIZE : 0;
-                int height = image.image != null ? mediaManager.imageHeight(image.image) / UIEngine.TILE_SIZE : 0;
-                setSize(image, width, height);
+                UICommons.image_setImage(mediaManager, imageC, image);
             }
 
         }
@@ -5034,17 +4996,21 @@ public class API {
                 return create(x, y, width, items, useIcons, defaultComboBoxAction());
             }
 
-            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons, ComboBoxAction comboBoxAction) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, boolean useIcons, ComboBoxAction comboBoxAction) {
                 ComboBox comboBox = new ComboBox();
-                comboBox.items = new ArrayList<>();
-                setComponentInitValues(comboBox);
-                setPosition(comboBox, x, y);
-                setSize(comboBox, width, 1);
-                setUseIcons(comboBox, useIcons);
-                setComboBoxAction(comboBox, comboBoxAction);
-                addComboBoxItems(comboBox, items);
-                setSelectedItem(comboBox, null);
-                close(comboBox);
+                setComponentCommonInitValues(comboBox, x, y, width, 1);
+                comboBox.useIcons = useIcons;
+                comboBox.comboBoxAction = comboBoxAction;
+                comboBox.selectedItem = null;
+                comboBox.comboBoxItems = new ArrayList<>();
+                if (combobBoxItems != null) {
+                    for (int i = 0; i < combobBoxItems.length; i++) {
+                        if (combobBoxItems[i].addedToComboBox == null) {
+                            comboBox.comboBoxItems.add(combobBoxItems[i]);
+                            combobBoxItems[i].addedToComboBox = comboBox;
+                        }
+                    }
+                }
                 return comboBox;
             }
 
@@ -5080,7 +5046,7 @@ public class API {
 
             public void removeAllComboBoxItems(ComboBox comboBox) {
                 if (comboBox == null) return;
-                removeComboBoxItems(comboBox, comboBox.items.toArray(new ComboBoxItem[]{}));
+                removeComboBoxItems(comboBox, comboBox.comboBoxItems.toArray(new ComboBoxItem[]{}));
             }
 
             public boolean isItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
@@ -5096,7 +5062,7 @@ public class API {
             public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectItem) {
                 if (comboBox == null) return;
                 if (selectItem != null) {
-                    if (comboBox.items != null && comboBox.items.contains(selectItem))
+                    if (comboBox.comboBoxItems != null && comboBox.comboBoxItems.contains(selectItem))
                         comboBox.selectedItem = selectItem;
                 } else {
                     comboBox.selectedItem = null;
@@ -5105,9 +5071,9 @@ public class API {
 
             public void setSelectedItemByText(ComboBox comboBox, String text) {
                 if (comboBox == null || text == null) return;
-                for (int i = 0; i < comboBox.items.size(); i++) {
-                    if (comboBox.items.get(i).text.equals(text)) {
-                        setSelectedItem(comboBox, comboBox.items.get(i));
+                for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
+                    if (comboBox.comboBoxItems.get(i).text.equals(text)) {
+                        setSelectedItem(comboBox, comboBox.comboBoxItems.get(i));
                         return;
                     }
                 }
@@ -5155,15 +5121,16 @@ public class API {
 
                 public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {
                     ComboBoxItem comboBoxItem = new ComboBoxItem();
-                    setText(comboBoxItem, text);
-                    setFont(comboBoxItem, font);
-                    setColor(comboBoxItem, color);
-                    setIcon(comboBoxItem, icon);
-                    setIconIndex(comboBoxItem, 0);
-                    setName(comboBoxItem, "");
-                    setData(comboBoxItem, null);
-                    setComboBoxItemAction(comboBoxItem, contextMenuItemAction);
-                    comboBoxItem.addedToComboBox = null;
+                    comboBoxItem.text = Tools.Text.validString(text);
+                    comboBoxItem.font = font;
+                    comboBoxItem.color_r = color.r;
+                    comboBoxItem.color_g = color.g;
+                    comboBoxItem.color_b = color.b;
+                    comboBoxItem.icon = icon;
+                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(comboBoxItem.iconIndex, 0);
+                    comboBoxItem.comboBoxItemAction = contextMenuItemAction;
+                    comboBoxItem.name = "";
+                    comboBoxItem.data = null;
                     return comboBoxItem;
                 }
 
@@ -5226,7 +5193,7 @@ public class API {
 
             public void setScrolled(ScrollBar scrollBar, float scrolled) {
                 if (scrollBar == null) return;
-                scrollBar.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+                UICommons.scrollBar_scroll(scrollBar, scrolled);
             }
 
             public void setScrollBarAction(ScrollBar scrollBar, ScrollBarAction scrollBarAction) {
@@ -5246,11 +5213,9 @@ public class API {
 
                 public ScrollBarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                     ScrollBarHorizontal scrollBarHorizontal = new ScrollBarHorizontal();
-                    setComponentInitValues(scrollBarHorizontal);
-                    setPosition(scrollBarHorizontal, x, y);
-                    setSize(scrollBarHorizontal, length, 1);
-                    setScrollBarAction(scrollBarHorizontal, scrollBarAction);
-                    setScrolled(scrollBarHorizontal, scrolled);
+                    setComponentCommonInitValues(scrollBarHorizontal, x, y, length, 1);
+                    scrollBarHorizontal.scrollBarAction = scrollBarAction;
+                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
                     return scrollBarHorizontal;
                 }
 
@@ -5268,11 +5233,9 @@ public class API {
 
                 public ScrollBarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                     ScrollBarVertical scrollBarVertical = new ScrollBarVertical();
-                    setComponentInitValues(scrollBarVertical);
-                    setPosition(scrollBarVertical, x, y);
-                    setSize(scrollBarVertical, 1, length);
-                    setScrollBarAction(scrollBarVertical, scrollBarAction);
-                    setScrolled(scrollBarVertical, scrolled);
+                    setComponentCommonInitValues(scrollBarVertical, x, y, 1, length);
+                    scrollBarVertical.scrollBarAction = scrollBarAction;
+                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
                     return scrollBarVertical;
                 }
 
@@ -5318,19 +5281,17 @@ public class API {
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, CMediaFont font) {
                 List list = new List();
+                setComponentCommonInitValues(list, x, y, width, height);
                 list.selectedItem = null;
                 list.selectedItems = new HashSet<>();
-                setComponentInitValues(list);
-                setPosition(list, x, y);
-                setSize(list, width, height);
-                setItems(list, items);
-                setListAction(list, listAction);
-                setMultiSelect(list, multiSelect);
-                setScrolled(list, 0f);
-                setDragEnabled(list, dragEnabled);
-                setDragInEnabled(list, dragInEnabled);
-                setDragOutEnabled(list, dragOutEnabled);
-                setFont(list, font);
+                list.items = items;
+                list.listAction = listAction;
+                list.multiSelect = multiSelect;
+                list.scrolled = 0f;
+                list.dragEnabled = dragEnabled;
+                list.dragInEnabled = dragInEnabled;
+                list.dragOutEnabled = dragOutEnabled;
+                list.font = font;
                 return list;
             }
 
@@ -5356,7 +5317,7 @@ public class API {
 
             public void setScrolled(List list, float scrolled) {
                 if (list == null) return;
-                list.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+                UICommons.list_scroll(list, scrolled);
             }
 
             public void setListAction(List list, ListAction listAction) {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
+import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
@@ -21,23 +22,29 @@ import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
 import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
+import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
-import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
-import org.mslivo.core.engine.ui_engine.ui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
+import org.mslivo.core.engine.ui_engine.ui.components.map.CanvasImage;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
+import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
@@ -83,6 +90,15 @@ class UICommons {
         return component_getParentWindowY(component) + (component.y * UIEngine.TILE_SIZE) + component.offset_y;
     }
 
+    static int component_getRelativeMouseX(int mouse_ui_x, Component component) {
+        return mouse_ui_x - component_getAbsoluteY(component);
+    }
+
+    static int component_getRelativeMouseY(int mouse_ui_y, Component component) {
+        return mouse_ui_y - component_getAbsoluteY(component);
+    }
+
+
     static int component_getRealWidth(Component component) {
         return component.width * UIEngine.TILE_SIZE;
     }
@@ -113,7 +129,7 @@ class UICommons {
 
         // Combobox Open Menu collision
         if (inputState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.items.size() * UIEngine.TILE_SIZE), inputState.openComboBox.width * UIEngine.TILE_SIZE, (inputState.openComboBox.items.size() * UIEngine.TILE_SIZE))) {
+            if (Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE), inputState.openComboBox.width * UIEngine.TILE_SIZE, (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE))) {
                 return inputState.openComboBox;
             }
         }
@@ -261,6 +277,26 @@ class UICommons {
         if (window.windowAction != null) window.windowAction.onRemove();
     }
 
+    static void hotkey_press(HotKey hotKey){
+        hotKey.pressed = true;
+        if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
+    }
+
+    static void hotkey_release(HotKey hotKey){
+        hotKey.pressed = false;
+        if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+    }
+
+    static void checkbox_check(CheckBox checkBox){
+        checkBox.checked = true;
+        if(checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+    }
+
+    static void checkbox_unCheck(CheckBox checkBox){
+        checkBox.checked = false;
+        if(checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+    }
+
     static void resetActivelyUsedUIReferences(InputState inputState) {
         // Window
         inputState.draggedWindow = null;
@@ -286,7 +322,7 @@ class UICommons {
         inputState.turnedKnob = null;
 
         // Map
-        inputState.pressedMap = null;
+        inputState.pressedCanvas = null;
 
         // GameViewport
         inputState.pressedGameViewPort = null;
@@ -350,7 +386,7 @@ class UICommons {
         if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
         if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
         if (inputState.turnedKnob != null) return inputState.turnedKnob;
-        if (inputState.pressedMap != null) return inputState.pressedMap;
+        if (inputState.pressedCanvas != null) return inputState.pressedCanvas;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
         if (inputState.pressedGrid != null) return inputState.pressedGrid;
@@ -436,13 +472,39 @@ class UICommons {
         return tabBar.tabs.get(Tools.Calc.inBounds(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
     }
 
+    static void tabBar_selectTab(TabBar tabBar, Tab tab) {
+        if(tab.addedToTabBar != tabBar) return;
+        for (int i = 0; i < tabBar.tabs.size(); i++) {
+            if (tabBar.tabs.get(i) == tab) {
+                UICommons.tabBar_selectTab(tabBar, i);
+                return;
+            }
+        }
+    }
+
     static void tabBar_selectTab(TabBar tabBar, int index) {
         tabBar.selectedTab = Tools.Calc.inBounds(index, 0, tabBar.tabs.size() - 1);
+        Tab tab = tabBar.tabs.get(tabBar.selectedTab);
+        if (tab.tabAction != null) tab.tabAction.onSelect();
+        if (tabBar.tabBarAction != null)
+            tabBar.tabBarAction.onChangeTab(index, tab);
     }
 
     static int window_getRealWidth(Window window) {
         return window.width * UIEngine.TILE_SIZE;
     }
+
+    static void window_fold(Window window) {
+        window.folded = true;
+        if (window.windowAction != null) window.windowAction.onFold();
+    }
+
+    static void window_unFold(Window window) {
+        window.folded = true;
+        if (window.windowAction != null) window.windowAction.onUnfold();
+
+    }
+
 
     static int window_getRealHeight(Window window) {
         return window.height * UIEngine.TILE_SIZE;
@@ -478,6 +540,25 @@ class UICommons {
         }
     }
 
+    static void button_centerContent(MediaManager mediaManager, Button button){
+        if (button == null) return;
+        int xOffset;
+        int yOffset;
+        if (button instanceof ImageButton imageButton) {
+            if (imageButton.image == null) return;
+            imageButton.offset_content_x  = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
+            imageButton.offset_content_y  = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
+
+        } else if (button instanceof TextButton textButton) {
+            if (textButton.text == null) return;
+            int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
+            int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
+            int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
+            textButton.offset_content_x  = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
+            textButton.offset_content_y  = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
+        }
+    }
+
     static void button_release(Button button){
         switch (button.mode){
             case DEFAULT -> {
@@ -488,7 +569,6 @@ class UICommons {
                 if (button.buttonAction != null) button.buttonAction.onRelease();
             }
         }
-
     }
 
     static boolean grid_positionValid(Grid grid, int x, int y) {
@@ -497,6 +577,17 @@ class UICommons {
         }
         return false;
     }
+    static void grid_updateSize(Grid grid) {
+        int factor = grid.doubleSized ? 2 : 1;
+        if (grid.items != null) {
+            grid.width = grid.items.length * factor;
+            grid.height = grid.items[0].length * factor;
+        }else{
+            grid.width = 1;
+            grid.height = 1;
+        }
+    }
+
 
     static void textField_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
         textField.markerPosition = Tools.Calc.inBounds(position, 0, textField.content.length());
@@ -663,27 +754,34 @@ class UICommons {
     static void comboBox_addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != null) return;
         comboBoxItem.addedToComboBox = comboBox;
-        comboBox.items.add(comboBoxItem);
+        comboBox.comboBoxItems.add(comboBoxItem);
     }
 
     static void comboBox_removeItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != comboBox) return;
         if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
-        comboBox.items.remove(comboBoxItem);
+        comboBox.comboBoxItems.remove(comboBoxItem);
     }
 
 
-    static void map_addMapOverlay(Map map, MapOverlay mapOverlay) {
-        if (mapOverlay.addedToMap != null) return;
-        mapOverlay.addedToMap = map;
-        map.mapOverlays.add(mapOverlay);
+    static void canvas_addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
+        if (canvasImage.addedToCanvas != null) return;
+        canvasImage.addedToCanvas = canvas;
+        canvas.canvasImages.add(canvasImage);
     }
 
-    static void map_removeMapOverlay(Map map, MapOverlay mapOverlay) {
-        if (mapOverlay.addedToMap != map) return;
-        mapOverlay.addedToMap = null;
-        map.mapOverlays.remove(mapOverlay);
+    static void canvas_removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
+        if (canvasImage.addedToCanvas != canvas) return;
+        canvasImage.addedToCanvas = null;
+        canvas.canvasImages.remove(canvasImage);
+    }
+
+    static void canvas_clear(Canvas canvas, float r, float g, float b, float a) {
+        canvas.pixmap.setColor(r, g, b, a);
+        for (int iy = 0; iy < canvas.pixmap.getHeight(); iy++) {
+            canvas.pixmap.drawLine(0, iy, canvas.pixmap.getWidth(), iy);
+        }
     }
 
     static void toolTip_addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
@@ -759,7 +857,7 @@ class UICommons {
     }
 
 
-    static void knob_turnKnob(Knob knob, float newValue, float amount) {
+    static void knob_turnKnob(Knob knob, float newValue) {
         if (knob.endless) {
             if (newValue > 1) {
                 newValue = newValue - 1f;
@@ -767,8 +865,9 @@ class UICommons {
                 newValue = 1f - Math.abs(newValue);
             }
         }
+        float oldValue = knob.turned;
         knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
-        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, amount);
+        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, (newValue-oldValue));
     }
 
     static boolean list_canDragIntoScreen(List list) {
@@ -905,6 +1004,23 @@ class UICommons {
         }
     }
 
+    static void text_setLines(MediaManager mediaManager, Text text, String[] lines){
+        text.lines = Tools.Text.validString(lines);
+        int width = 0;
+        for (int i = 0; i < text.lines.length; i++) {
+            int widthT = mediaManager.textWidth(text.font, text.lines[i]);
+            if (widthT > width) width = widthT;
+        }
+        text.width = width / UIEngine.TILE_SIZE;
+        text.height = text.lines.length;
+    }
+
+    static void image_setImage(MediaManager mediaManager, Image imageC, CMediaGFX image) {
+        imageC.image = image;
+        imageC.width = imageC.image != null ? mediaManager.imageWidth(imageC.image) / UIEngine.TILE_SIZE : 0;
+        imageC.height = imageC.image != null ? mediaManager.imageHeight(imageC.image) / UIEngine.TILE_SIZE : 0;
+    }
+
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
         int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
         mouseTextInput.selectedIndex = Tools.Calc.inBounds(index, 0, (maxCharacters - 1));
@@ -913,6 +1029,15 @@ class UICommons {
     static void scrollBar_scroll(ScrollBar scrollBar, float scrolled) {
         scrollBar.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
         if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
+    }
+
+    static void scrollBar_pressButton(ScrollBar scrollBar){
+        scrollBar.buttonPressed = true;
+        if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
+    }
+    static void scrollBar_releaseButton(ScrollBar scrollBar){
+        scrollBar.buttonPressed = false;
+        if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
     }
 
     static float scrollBar_calculateScrolled(ScrollBar scrollBar, int mouse_ui_x, int mouse_ui_y) {
@@ -939,6 +1064,10 @@ class UICommons {
     static void list_scroll(List list, float scrolled) {
         list.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
+    }
+
+    static void canvas_updateTexture(Canvas canvas) {
+        canvas.texture = new Texture(canvas.pixmap);
     }
 
     static void gameViewPort_createCameraTextureAndFrameBuffer(GameViewPort gameViewPort, int width, int height) {

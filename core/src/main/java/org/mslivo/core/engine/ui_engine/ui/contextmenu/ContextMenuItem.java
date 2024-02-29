@@ -14,7 +14,7 @@ public class ContextMenuItem {
 
     public CMediaGFX icon;
 
-    public int iconIndex;
+    public int iconArrayIndex;
 
     public ContextMenuItemAction contextMenuItemAction;
 

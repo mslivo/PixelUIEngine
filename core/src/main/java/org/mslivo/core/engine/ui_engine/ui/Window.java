@@ -29,26 +29,18 @@ public class Window {
     public Object data;
 
     public float color_r, color_g, color_b, color_a;
-
     public boolean alwaysOnTop;
-
     public boolean folded;
-
-    public boolean foldable;
-
     public boolean moveAble;
-
     public boolean hasTitleBar;
-
     public boolean visible;
-
     public boolean enforceScreenBounds;
 
     public WindowAction windowAction;
 
     public CMediaGFX icon;
 
-    public int iconIndex;
+    public int iconArrayIndex;
 
     public ArrayList<MessageReceiverAction> messageReceiverActions;
 

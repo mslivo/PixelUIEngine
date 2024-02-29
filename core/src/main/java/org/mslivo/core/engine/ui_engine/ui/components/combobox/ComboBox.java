@@ -6,7 +6,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.Component;
 import java.util.ArrayList;
 
 public class ComboBox extends Component {
-    public ArrayList<ComboBoxItem> items;
+    public ArrayList<ComboBoxItem> comboBoxItems;
     public ComboBoxAction comboBoxAction;
     public ComboBoxItem selectedItem;
     public boolean useIcons;
