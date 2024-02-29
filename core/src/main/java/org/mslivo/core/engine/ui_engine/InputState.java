@@ -94,7 +94,6 @@ public class InputState {
     public Window draggedWindow;
     public GridPoint2 draggedWindow_offset;
     public Button pressedButton;
-    public int pressedButton_timer_hold;
     public ScrollBarVertical scrolledScrollBarVertical;
     public ScrollBarHorizontal scrolledScrollBarHorizontal;
     public ToolTip tooltip;
@@ -109,6 +108,8 @@ public class InputState {
     public TextField pressedTextField;
     public int pressedTextFieldMouseX;
     public TextField focusedTextField;
+    public int focusedTextField_repeatedKey;
+    public long focusedTextField_repeatedKeyTimer;
     public Grid draggedGrid;
     public Grid pressedGrid;
     public CheckBox pressedCheckBox;
@@ -133,7 +134,7 @@ public class InputState {
     /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;
     public int mTextInputMouseX;
-    public boolean mTextInputConfirmPressed, mTextInputChangeCasePressed,mTextInputDeletePressed;
+    public boolean mTextInputMouse1Pressed, mTextInputMouse2Pressed, mTextInputMouse3Pressed;
     public boolean mTextInputGamePadLeft;
     public boolean mTextInputGamePadRight;
     public int mTextInputScrollTimer;

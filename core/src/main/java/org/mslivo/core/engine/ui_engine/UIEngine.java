@@ -22,7 +22,6 @@ import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
 import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
-import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
@@ -187,9 +186,9 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedContextMenuItem = null;
         newInputState.displayedContextMenuWidth = 0;
         newInputState.openMouseTextInput = null;
-        newInputState.mTextInputConfirmPressed = false;
-        newInputState.mTextInputChangeCasePressed = false;
-        newInputState.mTextInputDeletePressed = false;
+        newInputState.mTextInputMouse1Pressed = false;
+        newInputState.mTextInputMouse2Pressed = false;
+        newInputState.mTextInputMouse3Pressed = false;
         newInputState.mTextInputGamePadLeft = false;
         newInputState.mTextInputGamePadRight = false;
         newInputState.mTextInputScrollTimer = 0;
@@ -215,7 +214,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.draggedWindow = null;
         newInputState.draggedWindow_offset = new GridPoint2();
         newInputState.pressedButton = null;
-        newInputState.pressedButton_timer_hold = 0;
         newInputState.turnedKnob = null;
         newInputState.tooltip = null;
         newInputState.tooltip_fadeIn_pct = 0f;
@@ -371,9 +369,9 @@ public class UIEngine<T extends UIAdapter> {
         char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
         int scrollDirection = 0;
-        boolean confirmPressed = false;
-        boolean changeCasePressed = false;
-        boolean deletePressed = false;
+        boolean mouse1Pressed = false;
+        boolean mouse3Pressed = false;
+        boolean mouse2Pressed = false;
         switch (inputState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - inputState.mTextInputMouseX;
@@ -425,9 +423,9 @@ public class UIEngine<T extends UIAdapter> {
                     }
                     inputState.inputEvents.mouseUp = inputState.inputEvents.mouseUpButtons.size > 0;
                 }
-                confirmPressed = inputState.mTextInputTranslatedMouse1Down;
-                deletePressed = inputState.mTextInputTranslatedMouse2Down;
-                changeCasePressed = inputState.mTextInputTranslatedMouse3Down;
+                mouse1Pressed = inputState.mTextInputTranslatedMouse1Down;
+                mouse2Pressed = inputState.mTextInputTranslatedMouse2Down;
+                mouse3Pressed = inputState.mTextInputTranslatedMouse3Down;
             }
             case GAMEPAD -> {
                 boolean stickLeft = inputState.config.input_gamePadMouseStickLeftEnabled;
@@ -435,9 +433,9 @@ public class UIEngine<T extends UIAdapter> {
                 final float sensitivity = 0.4f;
                 boolean leftGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x < -sensitivity);
                 boolean rightGamePad = (stickLeft && inputState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && inputState.gamePadTranslatedStickRight.x > sensitivity);
-                confirmPressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse1);
-                deletePressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse2);
-                changeCasePressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse3);
+                mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse1);
+                mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse2);
+                mouse3Pressed = mouseControl_isTranslatedKeyCodeDown(inputState.gamePadTranslatedButtonsDown, inputState.config.input_gamePadMouseButtonsMouse3);
 
                 if (leftGamePad) {
                     if (!inputState.mTextInputGamePadLeft) {
@@ -485,8 +483,8 @@ public class UIEngine<T extends UIAdapter> {
 
         // Unlock on first press
         if (!inputState.mTextInputUnlock) {
-            if (confirmPressed) {
-                confirmPressed = false;
+            if (mouse1Pressed) {
+                mouse1Pressed = false;
             } else {
                 inputState.mTextInputUnlock = true;
             }
@@ -498,60 +496,67 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Confirm Character from Input
-        boolean confirmCharacter = false;
-        boolean changeCaseMouse = false;
+        boolean enterRegularCharacter = false;
+        boolean changeCase = false;
         boolean deleteCharacter = false;
-        if (confirmPressed && !inputState.mTextInputConfirmPressed) inputState.mTextInputConfirmPressed = true;
-        if (!confirmPressed && inputState.mTextInputConfirmPressed) {
-            confirmCharacter = true;
-            inputState.mTextInputConfirmPressed = false;
+        if (mouse1Pressed && !inputState.mTextInputMouse1Pressed) inputState.mTextInputMouse1Pressed = true;
+        if (!mouse1Pressed && inputState.mTextInputMouse1Pressed) {
+            enterRegularCharacter = true;
+            inputState.mTextInputMouse1Pressed = false;
         }
 
-        if (changeCasePressed && !inputState.mTextInputChangeCasePressed) inputState.mTextInputChangeCasePressed = true;
-        if (!changeCasePressed && inputState.mTextInputChangeCasePressed) {
-            confirmCharacter = true;
-            changeCaseMouse = true;
-            inputState.mTextInputChangeCasePressed = false;
+        if (mouse3Pressed && !inputState.mTextInputMouse2Pressed) inputState.mTextInputMouse2Pressed = true;
+        if (!mouse3Pressed && inputState.mTextInputMouse2Pressed) {
+            // Change case from Mouse 2
+            changeCase = true;
+            inputState.mTextInputMouse2Pressed = false;
         }
 
-        if (deletePressed && !inputState.mTextInputDeletePressed) inputState.mTextInputDeletePressed = true;
-        if (!deletePressed && inputState.mTextInputDeletePressed) {
-            confirmCharacter = true;
+        if (mouse2Pressed && !inputState.mTextInputMouse3Pressed) inputState.mTextInputMouse3Pressed = true;
+        if (!mouse2Pressed && inputState.mTextInputMouse3Pressed) {
+            // Delete from Mouse 3
             deleteCharacter = true;
-            inputState.mTextInputDeletePressed = false;
+            inputState.mTextInputMouse3Pressed = false;
         }
 
         // Confirm Character from API Queue
-        if (!confirmCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
+        if (!enterRegularCharacter && !inputState.mTextInputAPICharacterQueue.isEmpty()) {
             UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, (char) inputState.mTextInputAPICharacterQueue.removeIndex(inputState.mTextInputAPICharacterQueue.size - 1));
-            confirmCharacter = true;
+            enterRegularCharacter = true;
         }
 
-        if (confirmCharacter) {
+        if(changeCase || deleteCharacter || enterRegularCharacter){
             char c;
-            if (changeCaseMouse) {
+            if(changeCase){
                 c = '\t';
-            } else if (deleteCharacter) {
+            }else if(deleteCharacter){
                 c = '\b';
-            } else {
+            }else{
                 c = characters[mouseTextInput.selectedIndex];
             }
+
             switch (c) {
-                case '\b' -> {
-                    inputState.inputEvents.keyDown = true;
-                    inputState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onDelete();
-                }
-                case '\n' -> {
-                    boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
-                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
-                }
+                // Control ChangeCase
                 case '\t' -> {
                     mouseTextInput.upperCase = !mouseTextInput.upperCase;
                     if (mouseTextInput.mouseTextInputAction != null)
                         mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
                 }
+                // Control Delete
+                case '\b' -> {
+                    inputState.inputEvents.keyDown = true;
+                    inputState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
+                    inputState.inputEvents.keyUp = true;
+                    inputState.inputEvents.keyUpKeyCodes.add(KeyCode.Key.BACKSPACE);
+                    if (mouseTextInput.mouseTextInputAction != null)
+                        mouseTextInput.mouseTextInputAction.onDelete();
+                }
+                // Control Confirm
+                case '\n' -> {
+                    boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
+                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
+                }
+                // Default Text Character
                 default -> {
                     inputState.inputEvents.keyTyped = true;
                     inputState.inputEvents.keyTypedCharacters.add(c);
@@ -559,10 +564,7 @@ public class UIEngine<T extends UIAdapter> {
                         mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
                 }
             }
-
         }
-
-
     }
 
     private void mouseControl_chokeAllMouseEvents() {
@@ -995,60 +997,30 @@ public class UIEngine<T extends UIAdapter> {
                 TextField focusedTextField = inputState.focusedTextField; // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size; ic++) {
                     char keyTypedCharacter = (char) inputState.inputEvents.keyTypedCharacters.get(ic);
-                    if (focusedTextField.allowedCharacters == null || focusedTextField.allowedCharacters.contains(keyTypedCharacter)) {
-                        String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + keyTypedCharacter + focusedTextField.content.substring(focusedTextField.markerPosition);
-                        UICommons.textField_setContent(focusedTextField, newContent);
-                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
-                        if (focusedTextField.textFieldAction != null)
-                            focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                    }
-
-                    // Execute Typed Character Action
-                    if (focusedTextField.textFieldAction != null)
-                        focusedTextField.textFieldAction.onTyped(keyTypedCharacter);
-
-                    inputState.keyboardInteractedUIObjectFrame = focusedTextField;
+                    UICommons.textField_typeCharacter(mediaManager, focusedTextField, keyTypedCharacter);
                 }
+                // MouseTextInput open = focus on last typed character
+                if (inputState.openMouseTextInput != null) {
+                    char typedChar = (char) inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size - 1);
+                    UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
+                }
+                inputState.keyboardInteractedUIObjectFrame = focusedTextField;
             }
-            if (inputState.openMouseTextInput != null) {
-                // Focus character on last typed character
-                char typedChar = (char) inputState.inputEvents.keyTypedCharacters.get(inputState.inputEvents.keyTypedCharacters.size - 1);
-                UICommons.mouseTextInput_selectCharacter(inputState.openMouseTextInput, typedChar);
-                inputState.keyboardInteractedUIObjectFrame = inputState.openMouseTextInput;
-            }
+
         }
         if (inputState.inputEvents.keyDown) {
             if (inputState.focusedTextField != null) {
+                // TextField Control Keys
                 TextField focusedTextField = inputState.focusedTextField;
                 for (int ik = 0; ik < inputState.inputEvents.keyDownKeyCodes.size; ik++) {
                     int keyDownKeyCode = inputState.inputEvents.keyDownKeyCodes.get(ik);
-                    if (keyDownKeyCode == Input.Keys.LEFT) {
-                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
-                    } else if (keyDownKeyCode == Input.Keys.RIGHT) {
-                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition + 1);
-                    } else if (keyDownKeyCode == Input.Keys.HOME) {
-                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.content.length());
-                    } else if (keyDownKeyCode == Input.Keys.END) {
-                        UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, 0);
-                    } else if (keyDownKeyCode == Input.Keys.BACKSPACE) {
-                        if (!focusedTextField.content.isEmpty() && focusedTextField.markerPosition > 0) {
-                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition - 1) + focusedTextField.content.substring(focusedTextField.markerPosition);
-                            UICommons.textField_setMarkerPosition(mediaManager, focusedTextField, focusedTextField.markerPosition - 1);
-                            UICommons.textField_setContent(inputState.focusedTextField, newContent);
-                            if (focusedTextField.textFieldAction != null)
-                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
+                    if(UICommons.textField_isControlKey(keyDownKeyCode)){
+                        // Repeat certain Control Keys
+                        if(UICommons.textField_isRepeatedControlKey(keyDownKeyCode)){
+                            inputState.focusedTextField_repeatedKey = keyDownKeyCode;
+                            inputState.focusedTextField_repeatedKeyTimer = System.currentTimeMillis();
                         }
-                    } else if (keyDownKeyCode == Input.Keys.FORWARD_DEL) {
-                        if (!inputState.focusedTextField.content.isEmpty() && focusedTextField.markerPosition < focusedTextField.content.length()) {
-                            String newContent = focusedTextField.content.substring(0, focusedTextField.markerPosition) + focusedTextField.content.substring(focusedTextField.markerPosition + 1);
-                            UICommons.textField_setContent(focusedTextField, newContent);
-                            if (focusedTextField.textFieldAction != null)
-                                focusedTextField.textFieldAction.onContentChange(newContent, focusedTextField.contentValid);
-                        }
-                    } else if (keyDownKeyCode == Input.Keys.ENTER || keyDownKeyCode == Input.Keys.NUMPAD_ENTER) {
-                        if (focusedTextField.textFieldAction != null)
-                            focusedTextField.textFieldAction.onEnter(focusedTextField.content, focusedTextField.contentValid);
-                        UICommons.textField_unFocus(inputState, focusedTextField); // Unfocus
+                        UICommons.textField_executeControlKey(inputState, mediaManager, focusedTextField, keyDownKeyCode);
                     }
                     inputState.keyboardInteractedUIObjectFrame = focusedTextField;
                 }
@@ -1056,43 +1028,44 @@ public class UIEngine<T extends UIAdapter> {
                 // Hotkeys
                 for (int ihk = 0; ihk < inputState.hotKeys.size(); ihk++) {
                     HotKey hotKey = inputState.hotKeys.get(ihk);
-                    boolean hotKeyPressed = true;
-                    hkLoop:
-                    for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
-                        if (inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
-                            inputState.keyboardInteractedUIObjectFrame = hotKey;
-                        } else {
-                            hotKeyPressed = false;
-                            break;
+                    if(!hotKey.pressed){
+                        boolean hotKeyPressed = true;
+                        for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
+                            if (!inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
+                                hotKeyPressed = false;
+                                break;
+                            }
                         }
-                    }
-                    if (hotKeyPressed) {
-                        hotKey.pressed = true;
-                        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
+                        if (hotKeyPressed) {
+                            hotKey.pressed = true;
+                            if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
+                        }
                     }
                 }
             }
         }
         if (inputState.inputEvents.keyUp) {
-            // Reset Hotkeys
-            for (int ihk = 0; ihk < inputState.hotKeys.size(); ihk++) {
-                HotKey hotKey = inputState.hotKeys.get(ihk);
-                if (hotKey.pressed) {
-                    boolean hotKeyPressed = true;
-                    hkLoop:
-                    for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
-                        if (!inputState.inputEvents.keysDown[hotKey.keyCodes[ikc]]) {
-                            hotKeyPressed = false;
-                            break;
+            for (int ik = 0; ik < inputState.inputEvents.keyUpKeyCodes.size; ik++) {
+                int keyUpKeyCode = inputState.inputEvents.keyUpKeyCodes.get(ik);
+                // Reset RepeatKey
+                if(UICommons.textField_isRepeatedControlKey(keyUpKeyCode)){
+                    inputState.focusedTextField_repeatedKey = KeyCode.NONE;
+                    inputState.focusedTextField_repeatedKeyTimer = 0;
+                }
+                // Reset Hotkeys
+                for (int ihk = 0; ihk < inputState.hotKeys.size(); ihk++) {
+                    HotKey hotKey = inputState.hotKeys.get(ihk);
+                    if (hotKey.pressed) {
+                        hkLoop:
+                        for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
+                            if(hotKey.keyCodes[ikc] == keyUpKeyCode){
+                                hotKey.pressed = false;
+                                if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+                                break hkLoop;
+                            }
                         }
                     }
-                    if (!hotKeyPressed) {
-                        inputState.keyboardInteractedUIObjectFrame = hotKey;
-                        hotKey.pressed = false;
-                        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
-                    }
                 }
-
             }
         }
     }
@@ -1189,16 +1162,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                         case Button button -> {
                             inputState.pressedButton = button;
-                            if (button.mode == ButtonMode.TOGGLE) {
-                                button.pressed = !button.pressed;
-                            } else {
-                                button.pressed = true;
-                            }
-                            if (button.buttonAction != null) {
-                                button.buttonAction.onPress();
-                                if (button.mode == ButtonMode.TOGGLE) button.buttonAction.onToggle(button.pressed);
-                                inputState.pressedButton_timer_hold = 0;
-                            }
+                            UICommons.button_press(inputState.pressedButton);
                         }
                         case ContextMenuItem contextMenuItem -> {
                             inputState.pressedContextMenuItem = contextMenuItem;
@@ -1528,15 +1492,13 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.pressedGameViewPort = null;
                     }
                     case Button button -> {
-                        if (button.mode != ButtonMode.TOGGLE) button.pressed = false;
-                        if (button.buttonAction != null) button.buttonAction.onRelease();
+                        UICommons.button_release(button);
                         inputState.pressedButton = null;
                     }
                     case ScrollBarVertical scrollBarVertical -> {
                         scrollBarVertical.buttonPressed = false;
                         if (scrollBarVertical.scrollBarAction != null)
                             scrollBarVertical.scrollBarAction.onRelease(scrollBarVertical.scrolled);
-
                         inputState.scrolledScrollBarVertical = null;
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
@@ -1693,16 +1655,12 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
-    private void updateUI_continuousComponentActivity() {
-        /* Button Hold Interactions */
-        if (inputState.pressedButton != null) {
-            if (inputState.pressedButton.mode == ButtonMode.HOLD) {
-                inputState.pressedButton_timer_hold = inputState.pressedButton_timer_hold + 1;
-                if (inputState.pressedButton_timer_hold > inputState.config.component_buttonHoldTimer) {
-                    if (inputState.pressedButton.buttonAction != null)
-                        inputState.pressedButton.buttonAction.onHold();
-                    inputState.pressedButton_timer_hold = 0;
-                }
+    private void updateUI_continuousComponentActivities() {
+        // TextField Repeat
+        if(inputState.focusedTextField_repeatedKey != KeyCode.NONE){
+            long time = (System.currentTimeMillis()-inputState.focusedTextField_repeatedKeyTimer);
+            if(time > 500){
+                UICommons.textField_executeControlKey(inputState,mediaManager, inputState.focusedTextField, inputState.focusedTextField_repeatedKey);
             }
         }
     }
@@ -1713,7 +1671,7 @@ public class UIEngine<T extends UIAdapter> {
 
         updateUI_keyInteractions();
 
-        updateUI_continuousComponentActivity();
+        updateUI_continuousComponentActivities();
 
         updateUI_executeUpdateActions();
 
@@ -2109,7 +2067,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
         // 1 in center
-        render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputConfirmPressed);
+        render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputMouse1Pressed);
 
         // Selection
         render_drawCMediaGFX(UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);

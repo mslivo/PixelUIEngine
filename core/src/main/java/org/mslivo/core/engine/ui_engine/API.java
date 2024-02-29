@@ -19,6 +19,7 @@ import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import org.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -50,6 +51,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
@@ -110,10 +112,10 @@ public class API {
 
     public static class _HotKey {
 
-        public org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
+        public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
             if (keyCodes == null || keyCodes.length == 0) return null;
             if (hotKeyAction == null) return null;
-            org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey = new org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey();
+            HotKey hotKey = new HotKey();
             hotKey.pressed = false;
             setKeyCodes(hotKey, keyCodes);
             setHotKeyAction(hotKey, hotKeyAction);
@@ -122,28 +124,28 @@ public class API {
             return hotKey;
         }
 
-        public void setKeyCodes(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, int[] keyCodes) {
+        public void setKeyCodes(HotKey hotKey, int[] keyCodes) {
             if (hotKey == null) return;
             hotKey.keyCodes = Arrays.copyOf(keyCodes, keyCodes.length);
         }
 
 
-        public void setHotKeyAction(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, HotKeyAction hotKeyAction) {
+        public void setHotKeyAction(HotKey hotKey, HotKeyAction hotKeyAction) {
             if (hotKey == null) return;
             hotKey.hotKeyAction = hotKeyAction;
         }
 
-        public void setName(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, String name) {
+        public void setName(HotKey hotKey, String name) {
             if (hotKey == null) return;
             hotKey.name = Tools.Text.validString(name);
         }
 
-        public void setData(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey, Object data) {
+        public void setData(HotKey hotKey, Object data) {
             if (hotKey == null) return;
             hotKey.data = data;
         }
 
-        public String getKeysAsString(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
+        public String getKeysAsString(HotKey hotKey) {
             String result = "";
             String[] names = new String[hotKey.keyCodes.length];
             for (int i = 0; i < hotKey.keyCodes.length; i++) {
@@ -355,12 +357,7 @@ public class API {
                 @Override
                 public void onMouseScroll(float scrolled) {
                     float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouse.event.scrolledAmount();
-                    if (!scrollBarVertical.disabled) {
-                        component.scrollBar.setScrolled(scrollBarVertical, Tools.Calc.inBounds(
-                                scrollBarVertical.scrolled + scrollAmount, 0f, 1f));
-                        scrollBarVertical.scrollBarAction.onScrolled(scrollBarVertical.scrolled);
-                    }
-
+                    UICommons.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
                 }
             });
             component.scrollBar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
@@ -387,12 +384,11 @@ public class API {
             });
 
             // Init
-            component.scrollBar.setScrolled(scrollBarVertical, 1f);
+            UICommons.scrollBar_scroll(scrollBarVertical, 1f);
             if (textConverted.length <= height) {
                 component.setDisabled(scrollBarVertical, true);
             }
 
-            scrollBarVertical.scrollBarAction.onScrolled(1f);
             component.text.setLines(textField, textDisplayedLines);
 
 
@@ -452,31 +448,17 @@ public class API {
 
 
         public HotKeyAction hotkey_CreateForButton(Button button) {
-            HotKeyAction hotKeyAction;
-            if (button.mode == ButtonMode.TOGGLE) {
-                hotKeyAction = new HotKeyAction() {
-                    @Override
-                    public void onPress() {
-                        component.button.setPressed(button, !button.pressed);
-                        button.buttonAction.onToggle(button.pressed);
-                    }
-                };
-            } else {
-                hotKeyAction = new HotKeyAction() {
-                    @Override
-                    public void onPress() {
-                        button.buttonAction.onPress();
-                        component.button.setPressed(button, true);
-                    }
+            HotKeyAction hotKeyAction = new HotKeyAction() {
+                @Override
+                public void onPress() {
+                    UICommons.button_press(button);
+                }
 
-                    @Override
-                    public void onRelease() {
-                        button.buttonAction.onRelease();
-                        component.button.setPressed(button, false);
-                    }
-                };
-            }
-
+                @Override
+                public void onRelease() {
+                    UICommons.button_release(button);
+                }
+            };
             return hotKeyAction;
         }
 
@@ -850,8 +832,8 @@ public class API {
                     component.textField.focus(inputTextField);
                 }
             });
-            inputTextField.textFieldAction.onContentChange(originalText, inputTextField.textFieldAction.isContentValid(originalText));
 
+            UICommons.textField_setContent(inputTextField, originalText);
             return modalWnd;
         }
 
@@ -1298,12 +1280,7 @@ public class API {
         if (message_type == null) return;
         for (int i = 0; i < inputState.windows.size(); i++) {
             Window window = inputState.windows.get(i);
-            for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
-                MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
-                if (messageReceiverAction.messageType.equals(message_type)) {
-                    messageReceiverAction.onMessageReceived(content);
-                }
-            }
+            UICommons.window_receiveMessage(window, message_type, content);
         }
     }
 
@@ -1352,8 +1329,8 @@ public class API {
         if (result.size() == 1) {
             if (result.getFirst() instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
-                    closeButton.buttonAction.onPress();
-                    closeButton.buttonAction.onRelease();
+                    UICommons.button_press(closeButton);
+                    UICommons.button_release(closeButton);
                     return true;
                 }
             }
@@ -1474,45 +1451,45 @@ public class API {
         return inputState.mouseTool != null && name.equals(inputState.mouseTool.name);
     }
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> getHotKeys() {
+    public ArrayList<HotKey> getHotKeys() {
         return new ArrayList<>(inputState.hotKeys);
     }
 
-    public void addHotKey(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
+    public void addHotKey(HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.add(hotKey);
     }
 
-    public void addHotKeys(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[] hotKeys) {
+    public void addHotKeys(HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) addHotKey(hotKeys[i]);
     }
 
-    public void removeHotKey(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
+    public void removeHotKey(HotKey hotKey) {
         if (hotKey == null) return;
         inputState.hotKeys.remove(hotKey);
     }
 
-    public void removeHotKeys(org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[] hotKeys) {
+    public void removeHotKeys(HotKey[] hotKeys) {
         if (hotKeys == null) return;
         for (int i = 0; i < hotKeys.length; i++) removeHotKey(hotKeys[i]);
     }
 
     public void removeAllHotKeys() {
-        removeHotKeys(inputState.hotKeys.toArray(new org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey[]{}));
+        removeHotKeys(inputState.hotKeys.toArray(new HotKey[]{}));
     }
 
-    public ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> findHotKeysByName(String name) {
+    public ArrayList<HotKey> findHotKeysByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> result = new ArrayList<>();
+        ArrayList<HotKey> result = new ArrayList<>();
         for (int i = 0; i < inputState.hotKeys.size(); i++)
             if (name.equals(inputState.hotKeys.get(i).name)) result.add(inputState.hotKeys.get(i));
         return result;
     }
 
-    public org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey findHotKeyByName(String name) {
+    public HotKey findHotKeyByName(String name) {
         if (name == null) return null;
-        ArrayList<org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey> result = findHotKeysByName(name);
+        ArrayList<HotKey> result = findHotKeysByName(name);
         return result.size() > 0 ? result.getFirst() : null;
     }
 
@@ -2019,14 +1996,6 @@ public class API {
                 inputState.config.component_scrollbarSensitivity = scrollbar_sensitivity;
             }
 
-            public int getButtonHoldTimer() {
-                return inputState.config.component_buttonHoldTimer;
-            }
-
-            public void setButtonHoldTimer(int button_holdTimer) {
-                inputState.config.component_buttonHoldTimer = button_holdTimer;
-            }
-
             public int getMapOverlayDefaultFadeoutTime() {
                 return inputState.config.component_mapOverlayDefaultFadeoutTime;
             }
@@ -2257,7 +2226,7 @@ public class API {
                 }
 
                 public int upNextButton() {
-                    return upHasNextButton() ? inputState.inputEvents.mouseUpButtons.get(inputState.inputEvents.mouseUpButtonIndex++) : 0;
+                    return upHasNextButton() ? inputState.inputEvents.mouseUpButtons.get(inputState.inputEvents.mouseUpButtonIndex++) : KeyCode.NONE;
                 }
 
                 public boolean downHasNextButton() {
@@ -2265,7 +2234,7 @@ public class API {
                 }
 
                 public int downNextButton() {
-                    return downHasNextButton() ? inputState.inputEvents.mouseDownButtons.get(inputState.inputEvents.mouseDownButtonIndex++) : 0;
+                    return downHasNextButton() ? inputState.inputEvents.mouseDownButtons.get(inputState.inputEvents.mouseDownButtonIndex++) : KeyCode.NONE;
                 }
             }
 
@@ -2328,7 +2297,7 @@ public class API {
                 if (keyBoardobject != null) {
                     if (keyBoardobject instanceof Component component) {
                         return component.name;
-                    } else if (keyBoardobject instanceof org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey hotKey) {
+                    } else if (keyBoardobject instanceof HotKey hotKey) {
                         return hotKey.name;
                     }
                 }
@@ -2371,7 +2340,7 @@ public class API {
                 }
 
                 public int keyUpNext() {
-                    return keyUpHasNext() ? inputState.inputEvents.keyUpKeyCodes.get(inputState.inputEvents.keyUpKeyCodeIndex++) : 0;
+                    return keyUpHasNext() ? inputState.inputEvents.keyUpKeyCodes.get(inputState.inputEvents.keyUpKeyCodeIndex++) : KeyCode.NONE;
                 }
 
                 public boolean keyDownHasNext() {
@@ -2379,7 +2348,7 @@ public class API {
                 }
 
                 public int keyDownNext() {
-                    return keyDownHasNext() ? inputState.inputEvents.keyDownKeyCodes.get(inputState.inputEvents.keyDownKeyCodeIndex++) : 0;
+                    return keyDownHasNext() ? inputState.inputEvents.keyDownKeyCodes.get(inputState.inputEvents.keyDownKeyCodeIndex++) : KeyCode.NONE;
                 }
 
                 public boolean keyTypedHasNext() {
@@ -2476,7 +2445,7 @@ public class API {
                 }
 
                 public int buttonDownNext() {
-                    return buttonDownHasNext() ? inputState.inputEvents.gamePadButtonDownKeyCodes.get(inputState.inputEvents.gamePadButtonDownIndex++) : 0;
+                    return buttonDownHasNext() ? inputState.inputEvents.gamePadButtonDownKeyCodes.get(inputState.inputEvents.gamePadButtonDownIndex++) : KeyCode.NONE;
                 }
 
                 public boolean buttonUpHasNext() {
@@ -2484,7 +2453,7 @@ public class API {
                 }
 
                 public int buttonUpNext() {
-                    return buttonUpHasNext() ? inputState.inputEvents.gamePadButtonUpKeyCodes.get(inputState.inputEvents.gamePadButtonUpIndex++) : 0;
+                    return buttonUpHasNext() ? inputState.inputEvents.gamePadButtonUpKeyCodes.get(inputState.inputEvents.gamePadButtonUpIndex++) : KeyCode.NONE;
                 }
             }
 

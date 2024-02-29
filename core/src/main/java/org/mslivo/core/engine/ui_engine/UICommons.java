@@ -7,13 +7,20 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
+import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 import org.mslivo.core.engine.ui_engine.ui.Window;
+import org.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
+import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
@@ -21,6 +28,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Map;
 import org.mslivo.core.engine.ui_engine.ui.components.map.MapOverlay;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
@@ -34,26 +42,29 @@ import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
-import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
-import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 
 class UICommons {
 
-    static void emulatedMouse_setPosition(InputState inputState, int x, int y){
+    private static IntSet textFieldControlKeys = new IntSet();
+    private static IntSet textFieldRepeatedControlKeys = new IntSet();
+    static {
+        textFieldControlKeys.addAll(KeyCode.Key.LEFT,KeyCode.Key.RIGHT,KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME,Input.Keys.END, Input.Keys.ENTER);
+        textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT,KeyCode.Key.RIGHT,KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
+    }
+
+    static void emulatedMouse_setPosition(InputState inputState, int x, int y) {
         if (!inputState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
         inputState.mouse_emulated.x = x;
         inputState.mouse_emulated.y = y;
     }
 
-    static void emulatedMouse_setPositionComponent(InputState inputState, Component component){
+    static void emulatedMouse_setPositionComponent(InputState inputState, Component component) {
         if (component == null) return;
         if (component.addedToWindow == null && !component.addedToScreen) return;
-        int x = component_getAbsoluteX(component) + (component_getRealWidth(component)/2);
-        int y = component_getAbsoluteY(component) + (component_getRealHeight(component)/2);
-        emulatedMouse_setPosition(inputState, x,y);
+        int x = component_getAbsoluteX(component) + (component_getRealWidth(component) / 2);
+        int y = component_getAbsoluteY(component) + (component_getRealHeight(component) / 2);
+        emulatedMouse_setPosition(inputState, x, y);
     }
 
     static int component_getParentWindowX(Component component) {
@@ -122,7 +133,7 @@ class UICommons {
             if (collidesWithWindow) {
                 for (int ic = window.components.size() - 1; ic >= 0; ic--) {
                     Component component = window.components.get(ic);
-                    if (component_isComponentAtPosition(x,y,component)) {
+                    if (component_isComponentAtPosition(x, y, component)) {
                         return component;
                     }
                 }
@@ -133,7 +144,7 @@ class UICommons {
         // Screen component collision
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
             Component screenComponent = inputState.screenComponents.get(i);
-            if (component_isComponentAtPosition(x,y,screenComponent)) return screenComponent;
+            if (component_isComponentAtPosition(x, y, screenComponent)) return screenComponent;
         }
         return null;
     }
@@ -148,6 +159,8 @@ class UICommons {
         }
         return false;
     }
+
+
 
     static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
         switch (VIEWPORTMODE) {
@@ -183,6 +196,16 @@ class UICommons {
             case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
             case FIT, STRETCH -> Texture.TextureFilter.Linear;
         };
+    }
+
+    static void window_receiveMessage(Window window, String message_type, Object... content) {
+        if(message_type == null) return;
+        for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
+            MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
+            if (messageReceiverAction.messageType.equals(message_type)) {
+                messageReceiverAction.onMessageReceived(content);
+            }
+        }
     }
 
     static void window_bringToFront(InputState inputState, Window window) {
@@ -245,7 +268,6 @@ class UICommons {
 
         // Buton
         inputState.pressedButton = null;
-        inputState.pressedButton_timer_hold = 0;
 
         // Scrollbar
         inputState.scrolledScrollBarVertical = null;
@@ -291,6 +313,8 @@ class UICommons {
 
         // Textfield
         inputState.focusedTextField = null;
+        inputState.focusedTextField_repeatedKey = KeyCode.NONE;
+        inputState.focusedTextField_repeatedKeyTimer = 0;
 
         // ComboBox
         inputState.openComboBox = null;
@@ -306,9 +330,9 @@ class UICommons {
 
         // mouseTextInput Keyboard
         inputState.openMouseTextInput = null;
-        inputState.mTextInputConfirmPressed = false;
-        inputState.mTextInputChangeCasePressed = false;
-        inputState.mTextInputDeletePressed = false;
+        inputState.mTextInputMouse1Pressed = false;
+        inputState.mTextInputMouse2Pressed = false;
+        inputState.mTextInputMouse3Pressed = false;
         inputState.mTextInputGamePadLeft = false;
         inputState.mTextInputGamePadRight = false;
         inputState.mTextInputScrollTimer = 0;
@@ -359,7 +383,7 @@ class UICommons {
     }
 
     static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
-        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_ui.x,inputState.mouse_ui.y);
+        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_ui.x, inputState.mouse_ui.y);
         if (success && (inputState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
             inputState.mouse_emulated.x += UIEngine.TILE_SIZE_2;
@@ -427,18 +451,44 @@ class UICommons {
     static void window_setPosition(InputState inputState, Window window, int x, int y) {
         window.x = x;
         window.y = y;
-        if(window.enforceScreenBounds) window_enforceScreenBounds(inputState, window);
+        if (window.enforceScreenBounds) window_enforceScreenBounds(inputState, window);
     }
 
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getRealWidth(window);
         window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
-        if(window.folded){
-            window.y = Tools.Calc.inBounds(window.y, -((window.height-1)*UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height)*UIEngine.TILE_SIZE);
-        }else{
+        if (window.folded) {
+            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height) * UIEngine.TILE_SIZE);
+        } else {
             window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
         }
+    }
+
+    static void button_press(Button button){
+        switch (button.mode){
+            case DEFAULT -> {
+                button.pressed = true;
+                if (button.buttonAction != null) button.buttonAction.onPress();
+            }
+            case TOGGLE -> {
+                button.pressed = !button.pressed;
+                if (button.buttonAction != null) button.buttonAction.onToggle(button.pressed);
+            }
+        }
+    }
+
+    static void button_release(Button button){
+        switch (button.mode){
+            case DEFAULT -> {
+                button.pressed = false;
+                if (button.buttonAction != null) button.buttonAction.onRelease();
+            }
+            case TOGGLE -> {
+                if (button.buttonAction != null) button.buttonAction.onRelease();
+            }
+        }
+
     }
 
     static boolean grid_positionValid(Grid grid, int x, int y) {
@@ -467,30 +517,60 @@ class UICommons {
     }
 
     static boolean textField_isControlKey(int keyCode) {
-        return keyCode == Input.Keys.ENTER ||
-                keyCode == Input.Keys.NUMPAD_ENTER ||
-                keyCode == Input.Keys.FORWARD_DEL ||
-                keyCode == Input.Keys.BACKSPACE ||
-                keyCode == Input.Keys.END ||
-                keyCode == Input.Keys.HOME ||
-                keyCode == Input.Keys.RIGHT ||
-                keyCode == Input.Keys.LEFT;
+        return textFieldControlKeys.contains(keyCode);
     }
 
-    static void textField_executeControlKey(TextField textField, int keyCode) {
+    static boolean textField_isRepeatedControlKey(int keyCode) {
+        return textFieldRepeatedControlKeys.contains(keyCode);
+    }
 
+    static void textField_executeControlKey(InputState inputState, MediaManager mediaManager, TextField textField, int keyCode) {
+        switch (keyCode) {
+            case Input.Keys.LEFT -> textField_setMarkerPosition(mediaManager, textField, textField.markerPosition - 1);
+            case Input.Keys.RIGHT -> textField_setMarkerPosition(mediaManager, textField, textField.markerPosition + 1);
+            case Input.Keys.BACKSPACE -> {
+                if (!textField.content.isEmpty() && textField.markerPosition > 0) {
+                    String newContent = textField.content.substring(0, textField.markerPosition - 1) + textField.content.substring(textField.markerPosition);
+                    UICommons.textField_setMarkerPosition(mediaManager, textField, textField.markerPosition - 1);
+                    UICommons.textField_setContent(textField, newContent);
+                }
+            }
+            case Input.Keys.FORWARD_DEL ->{
+                if (!textField.content.isEmpty() && textField.markerPosition < textField.content.length()) {
+                    String newContent = textField.content.substring(0, textField.markerPosition) + textField.content.substring(textField.markerPosition + 1);
+                    UICommons.textField_setContent(textField, newContent);
+                }
+            }
+            case Input.Keys.HOME -> UICommons.textField_setMarkerPosition(mediaManager, textField, 0);
+            case Input.Keys.END -> UICommons.textField_setMarkerPosition(mediaManager, textField, textField.content.length());
+            case Input.Keys.ENTER,Input.Keys.NUMPAD_ENTER ->{
+                UICommons.textField_unFocus(inputState, textField); // Unfocus
+                if (textField.textFieldAction != null)
+                    textField.textFieldAction.onEnter(textField.content, textField.contentValid);
+            }
+            default -> {}
+        }
+    }
+
+    static void textField_typeCharacter(MediaManager mediaManager, TextField textField, char character) {
+        if (textField.allowedCharacters == null || textField.allowedCharacters.contains(character)) {
+            String newContent = textField.content.substring(0, textField.markerPosition) + character + textField.content.substring(textField.markerPosition);
+            UICommons.textField_setContent(textField, newContent);
+            UICommons.textField_setMarkerPosition(mediaManager, textField, textField.markerPosition + 1);
+            if (textField.textFieldAction != null)
+                textField.textFieldAction.onTyped(character);
+        }
     }
 
     static void textField_setContent(TextField textField, String content) {
-        if (content.length() <= textField.contentMaxLength) {
-            textField.content = Tools.Text.validString(content);
-            textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
-            if (textField.textFieldAction != null) {
-                textField.contentValid = textField.textFieldAction.isContentValid(content);
-                textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
-            } else {
-                textField.contentValid = true;
-            }
+        if (content.length() > textField.contentMaxLength) content = content.substring(0,textField.contentMaxLength);
+        textField.content = Tools.Text.validString(content);
+        textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
+        if (textField.textFieldAction != null) {
+            textField.contentValid = textField.textFieldAction.isContentValid(content);
+            textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
+        } else {
+            textField.contentValid = true;
         }
     }
 
@@ -661,6 +741,8 @@ class UICommons {
     static void textField_unFocus(InputState inputState, TextField textField) {
         if (textField_isFocused(inputState, textField)) {
             inputState.focusedTextField = null;
+            inputState.focusedTextField_repeatedKey = KeyCode.NONE;
+            inputState.focusedTextField_repeatedKeyTimer = 0;
             if (textField.textFieldAction != null)
                 textField.textFieldAction.onUnFocus();
         }
@@ -837,16 +919,16 @@ class UICommons {
         int relativePos;
         float maxPos;
         float buttonOffset;
-        switch (scrollBar){
+        switch (scrollBar) {
             case ScrollBarHorizontal scrollBarHorizontal -> {
-                relativePos = mouse_ui_x-UICommons.component_getAbsoluteX(scrollBarHorizontal);
-                maxPos = (scrollBarHorizontal.width*UIEngine.TILE_SIZE)-8;
-                buttonOffset =  (1 / (float) scrollBarHorizontal.width) / 2f;
+                relativePos = mouse_ui_x - UICommons.component_getAbsoluteX(scrollBarHorizontal);
+                maxPos = (scrollBarHorizontal.width * UIEngine.TILE_SIZE) - 8;
+                buttonOffset = (1 / (float) scrollBarHorizontal.width) / 2f;
             }
             case ScrollBarVertical scrollBarVertical -> {
-                relativePos = mouse_ui_y-UICommons.component_getAbsoluteY(scrollBarVertical);
-                maxPos = (scrollBarVertical.height*UIEngine.TILE_SIZE)-8;
-                buttonOffset =  (1 / (float) scrollBarVertical.height) / 2f;
+                relativePos = mouse_ui_y - UICommons.component_getAbsoluteY(scrollBarVertical);
+                maxPos = (scrollBarVertical.height * UIEngine.TILE_SIZE) - 8;
+                buttonOffset = (1 / (float) scrollBarVertical.height) / 2f;
             }
             default -> throw new IllegalStateException("Unexpected value: " + scrollBar);
         }
@@ -859,14 +941,14 @@ class UICommons {
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
     }
 
-    static void gameViewPort_createCameraTextureAndFrameBuffer(GameViewPort gameViewPort, int width, int height){
+    static void gameViewPort_createCameraTextureAndFrameBuffer(GameViewPort gameViewPort, int width, int height) {
         // Clean Up
-        if(gameViewPort.camera != null) gameViewPort.camera = null;
-        if(gameViewPort.textureRegion != null) gameViewPort.textureRegion.getTexture().dispose();
-        if(gameViewPort.frameBuffer != null) gameViewPort.frameBuffer.dispose();
+        if (gameViewPort.camera != null) gameViewPort.camera = null;
+        if (gameViewPort.textureRegion != null) gameViewPort.textureRegion.getTexture().dispose();
+        if (gameViewPort.frameBuffer != null) gameViewPort.frameBuffer.dispose();
         // Set
-        int viewportWidth = width*UIEngine.TILE_SIZE;
-        int viewportHeight = height*UIEngine.TILE_SIZE;
+        int viewportWidth = width * UIEngine.TILE_SIZE;
+        int viewportHeight = height * UIEngine.TILE_SIZE;
         gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
         Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);

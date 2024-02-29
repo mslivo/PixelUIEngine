@@ -47,7 +47,6 @@ public class Config implements Serializable {
     public float component_gridDragAlpha;
     public float component_knobSensitivity;
     public float component_scrollbarSensitivity;
-    public int component_buttonHoldTimer;
     public int component_mapOverlayDefaultFadeoutTime;
     public int notification_max;
     public int notification_defaultDisplayTime;
@@ -107,7 +106,6 @@ public class Config implements Serializable {
         component_gridDragAlpha = 0.8f;
         component_knobSensitivity = 1f;
         component_scrollbarSensitivity = 1f;
-        component_buttonHoldTimer = 8;
         component_mapOverlayDefaultFadeoutTime = 200;
         component_textFieldDefaultAllowedCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',

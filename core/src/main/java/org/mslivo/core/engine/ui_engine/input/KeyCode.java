@@ -1,6 +1,7 @@
 package org.mslivo.core.engine.ui_engine.input;
 
 public class KeyCode {
+    public static final int NONE = -1;
     public static class GamePad {
         public static final int A = 0;
         public static final int B = 1;
@@ -71,7 +72,6 @@ public class KeyCode {
      * @author mzechner
      */
     public static class Key {
-        public static final int ANY = -1;
         public static final int NUM_0 = 7;
         public static final int NUM_1 = 8;
         public static final int NUM_2 = 9;
@@ -100,11 +100,6 @@ public class KeyCode {
         public static final int DEL = 67;
         public static final int BACKSPACE = 67;
         public static final int FORWARD_DEL = 112;
-        public static final int DPAD_CENTER = 23;
-        public static final int DPAD_DOWN = 20;
-        public static final int DPAD_LEFT = 21;
-        public static final int DPAD_RIGHT = 22;
-        public static final int DPAD_UP = 19;
         public static final int CENTER = 23;
         public static final int DOWN = 20;
         public static final int LEFT = 21;
