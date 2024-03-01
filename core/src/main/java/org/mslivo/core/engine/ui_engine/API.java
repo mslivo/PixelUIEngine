@@ -419,7 +419,7 @@ public class API {
         }
 
         public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick, String[] textHover, CMediaFont fontHover) {
-            Text hlText = component.text.create(x, y, text, UIBaseMedia.UI_FONT_BLACK);
+            Text hlText = component.text.create(x, y, text);
             component.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
@@ -549,7 +549,7 @@ public class API {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.UI_ICON_COLOR);
+            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.UI_ICON_COLOR, 0);
             ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
             component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -701,7 +701,7 @@ public class API {
 
             }
 
-            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.UI_ICON_INFORMATION);
+            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -848,7 +848,7 @@ public class API {
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION);
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -1010,7 +1010,7 @@ public class API {
 
             int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION);
+            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -1178,7 +1178,7 @@ public class API {
                                     component.tabBar.selectTab(tabBar, 0);
                                     updateExtendableTabBarButton(tabBar, extendButton);
                                 }
-                            }, invisibleTab.icon));
+                            }, invisibleTab.icon, 0));
                         }
                         ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         openContextMenu(selectTabMenu);
@@ -2513,31 +2513,28 @@ public class API {
     }
 
     public class _Notification {
+
+        private NotificationAction defaultNotificationAction() {
+            return new NotificationAction() {
+            };
+        }
+
         public Notification create(String text) {
-            return create(text, inputState.config.notification_defaultColor, inputState.config.notification_defaultFont, inputState.config.notification_defaultDisplayTime, null);
+            return create(text, defaultNotificationAction(), inputState.config.notification_defaultDisplayTime);
+        }
+        public Notification create(String text, NotificationAction notificationAction) {
+            return create(text, notificationAction, inputState.config.notification_defaultDisplayTime);
         }
 
-        public Notification create(String text, Color color) {
-            return create(text, color, inputState.config.notification_defaultFont, inputState.config.notification_defaultDisplayTime, null);
-        }
-
-        public Notification create(String text, Color color, CMediaFont font) {
-            return create(text, color, font, inputState.config.notification_defaultDisplayTime, null);
-        }
-
-        public Notification create(String text, Color color, CMediaFont font, int displayTime) {
-            return create(text, color, font, displayTime, null);
-        }
-
-        public Notification create(String text, Color color, CMediaFont font, int displayTime, NotificationAction notificationAction) {
+        public Notification create(String text, NotificationAction notificationAction, int displayTime) {
             Notification notification = new Notification();
             notification.text = Tools.Text.validString(text);
             notification.displayTime = displayTime;
-            notification.color_r = color.r;
-            notification.color_g = color.g;
-            notification.color_b = color.b;
-            notification.color_a = color.a;
-            notification.font = font;
+            notification.color_r = inputState.config.notification_defaultColor.r;
+            notification.color_g = inputState.config.notification_defaultColor.g;
+            notification.color_b = inputState.config.notification_defaultColor.b;
+            notification.color_a = inputState.config.notification_defaultColor.a;
+            notification.font = inputState.config.notification_defaultFont;
             notification.notificationAction = notificationAction;
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
@@ -2612,7 +2609,7 @@ public class API {
         }
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
-            return create(contextMenuItems, defaultContextMenuAction(), 1f);
+            return create(contextMenuItems, contextMenuAction, 1f);
         }
 
         public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
@@ -2689,28 +2686,20 @@ public class API {
             }
 
             public ContextMenuItem create(String text) {
-                return create(text, defaultContextMenuItemAction(), null, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
+                return create(text, defaultContextMenuItemAction(), null, 0);
             }
 
             public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-                return create(text, contextMenuItemAction, null, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
+                return create(text, contextMenuItemAction, null, 0);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon) {
-                return create(text, contextMenuItemAction, icon, inputState.config.component_defaultColor, inputState.config.component_defaultFont, 0);
-            }
-
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
-                return create(text, contextMenuItemAction, icon, color, inputState.config.component_defaultFont, 0);
-            }
-
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font, int iconIndex) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, int iconIndex) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
                 contextMenuItem.text = Tools.Text.validString(text);
-                contextMenuItem.font = font;
-                contextMenuItem.color_r = color.r;
-                contextMenuItem.color_g = color.g;
-                contextMenuItem.color_b = color.b;
+                contextMenuItem.font = inputState.config.component_defaultFont;
+                contextMenuItem.color_r = inputState.config.component_defaultColor.r;
+                contextMenuItem.color_g = inputState.config.component_defaultColor.g;
+                contextMenuItem.color_b = inputState.config.component_defaultColor.b;
                 contextMenuItem.icon = icon;
                 contextMenuItem.iconIndex = iconIndex;
                 contextMenuItem.name = "";
@@ -2785,38 +2774,34 @@ public class API {
         }
 
         public Window create(int x, int y, int width, int height) {
-            return create(x, y, width, height, "", null, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x,y,width, height,"",null,0,null, false,true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title) {
-            return create(x, y, width, height, title, null, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+            return create(x,y,width, height,title,null,0,null, false,true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon) {
-            return create(x, y, width, height, title, icon, false, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex) {
+            return create(x,y,width, height,title,icon,iconIndex,null, false,true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, true, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction) {
+            return create(x,y,width, height,title,icon,iconIndex,windowAction, false,true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, true, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
+            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, true, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
+            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,moveAble, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, defaultWindowAction(), inputState.config.window_defaultColor, inputState.config.window_defaultFont);
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
+            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,moveAble, hasTitleBar, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean hidden, WindowAction windowAction) {
-            return create(x, y, width, height, title, icon, alwaysOnTop, moveAble, hasTitleBar, hidden, windowAction, inputState.config.window_defaultColor, inputState.config.window_defaultFont);
-        }
-
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible, WindowAction windowAction, Color color, CMediaFont font) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
             Window window = new Window();
             window.x = x;
             window.y = y;
@@ -2825,16 +2810,16 @@ public class API {
             window.title = Tools.Text.validString(title);
             window.alwaysOnTop = alwaysOnTop;
             window.moveAble = moveAble;
-            window.color_r = color.r;
-            window.color_g = color.g;
-            window.color_b = color.b;
-            window.color_a = color.a;
-            window.font = font;
+            window.color_r = inputState.config.window_defaultColor.r;
+            window.color_g = inputState.config.window_defaultColor.g;
+            window.color_b = inputState.config.window_defaultColor.b;
+            window.color_a = inputState.config.window_defaultColor.a;
+            window.font = inputState.config.window_defaultFont;
             window.hasTitleBar = hasTitleBar;
             window.visible = visible;
             window.windowAction = windowAction;
             window.icon = icon;
-            window.iconIndex = 0;
+            window.iconIndex = iconIndex;
             window.name = "";
             window.data = null;
             window.enforceScreenBounds = inputState.config.window_defaultEnforceScreenBounds;
@@ -3150,15 +3135,19 @@ public class API {
 
         public class _ToolTipImage {
 
-            public ToolTipImage create(CMediaGFX image, int x, int y) {
-                return create(image, x, y, Color.WHITE);
+            public ToolTipImage create(CMediaGFX image) {
+                return create(image, 0,0);
             }
 
-            public ToolTipImage create(CMediaGFX image, int x, int y, Color color) {
+            public ToolTipImage create(CMediaGFX image, int x, int y) {
                 ToolTipImage toolTipImage = new ToolTipImage();
-                setImage(toolTipImage, image);
-                setPosition(toolTipImage, x, y);
-                setColor(toolTipImage, color);
+                toolTipImage.image = image;
+                toolTipImage.x = x;
+                toolTipImage.y = y;
+                toolTipImage.color_r = Color.WHITE.r;
+                toolTipImage.color_g = Color.WHITE.g;
+                toolTipImage.color_b = Color.WHITE.b;
+                toolTipImage.color_a = Color.WHITE.a;
                 return toolTipImage;
             }
 
@@ -3193,44 +3182,42 @@ public class API {
             };
         }
 
-
         public ToolTip create(String[] lines) {
-            return create(lines, true, defaultToolTipAction(), null, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+            return create(lines, null, defaultToolTipAction(), true, 1, 1);
         }
 
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle) {
-            return create(lines, displayFistLineAsTitle, defaultToolTipAction(), null, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+        public ToolTip create(String[] lines, ToolTipImage[] images) {
+            return create(lines, images, defaultToolTipAction(), true, 1, 1);
         }
 
-
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, null, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+        public ToolTip create(String[] lines, ToolTipImage[] images, ToolTipAction toolTipAction) {
+            return create(lines, images, toolTipAction, true, 1, 1);
         }
 
-
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, 1, 1, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
+        public ToolTip create(String[] lines, ToolTipImage[] images, ToolTipAction toolTipAction, boolean displayFistLineAsTitle) {
+            return create(lines, images, toolTipAction, displayFistLineAsTitle, 1, 1);
         }
 
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, inputState.config.tooltip_defaultColor, inputState.config.tooltip_defaultFont);
-        }
-
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color) {
-            return create(lines, displayFistLineAsTitle, toolTipAction, images, mindWidth, minHeight, color, inputState.config.tooltip_defaultFont);
-        }
-
-        public ToolTip create(String[] lines, boolean displayFistLineAsTitle, ToolTipAction toolTipAction, ToolTipImage[] images, int mindWidth, int minHeight, Color color, CMediaFont font) {
+        public ToolTip create(String[] lines, ToolTipImage[] images, ToolTipAction toolTipAction, boolean displayFistLineAsTitle, int minWidth, int minHeight) {
             ToolTip tooltip = new ToolTip();
+            tooltip.lines = Tools.Text.validStringArrayCopy(lines);
             tooltip.images = new ArrayList<>();
-            setDisplayFistLineAsTitle(tooltip, displayFistLineAsTitle);
-            setLines(tooltip, lines);
-            setColor(tooltip, color);
-            setToolTipAction(tooltip, toolTipAction);
-            setFont(tooltip, font);
-            setSizeMin(tooltip, mindWidth, minHeight);
-            addToolTipImages(tooltip, images);
+            if(images != null) {
+                for (int i = 0; i < images.length; i++) {
+                    tooltip.images.add(images[0]);
+                    images[i].addedToToolTip = tooltip;
+                }
+            }
+            tooltip.toolTipAction = toolTipAction;
+            tooltip.displayFistLineAsTitle = displayFistLineAsTitle;
+            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth,1);
+            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight,1);
+            tooltip.font = inputState.config.tooltip_defaultFont;
+            tooltip.color_r = inputState.config.component_defaultColor.r;
+            tooltip.color_g = inputState.config.component_defaultColor.g;
+            tooltip.color_b = inputState.config.component_defaultColor.b;
+            tooltip.color_a = inputState.config.component_defaultColor.a;
             return tooltip;
         }
 
@@ -3270,7 +3257,7 @@ public class API {
 
         public void setLines(ToolTip tooltip, String[] lines) {
             if (tooltip == null) return;
-            tooltip.lines = Tools.Text.validString(lines);
+            UICommons.tooltip_setLines(tooltip, lines);
         }
 
         public void setSizeMin(ToolTip tooltip, int minWidth, int minHeight) {
@@ -3701,19 +3688,23 @@ public class API {
 
         public class _GameViewPort {
 
-            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY) {
-                return create(x, y, width, height, camPositionX, camPositionY, 1f, inputState.config.component_gameViewportDefaultUpdateTime, null);
+            public GameViewPort create(int x, int y, int width, int height) {
+                return create(x, y, width, height, null, 0, 0, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom) {
-                return create(x, y, width, height, camPositionX, camPositionY, camZoom, inputState.config.component_gameViewportDefaultUpdateTime, null);
+            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction) {
+                return create(x, y, width, height, gameViewPortAction, 0, 0, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime) {
-                return create(x, y, width, height, camPositionX, camPositionY, camZoom, updateTime, null);
+            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY) {
+                return create(x, y, width, height, gameViewPortAction, camPositionX, camPositionY, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, float camPositionX, float camPositionY, float camZoom, int updateTime, GameViewPortAction gameViewPortAction) {
+            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY, float camZoom) {
+                return create(x, y, width, height, gameViewPortAction, camPositionX, camPositionY, camZoom, inputState.config.component_gameViewportDefaultUpdateTime);
+            }
+
+            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
                 setComponentCommonInitValues(gameViewPort, x, y, width, height, Color.WHITE);
@@ -3828,34 +3819,24 @@ public class API {
         public class _ProgressBar {
 
             public ProgressBar create(int x, int y, int width) {
-                return create(x, y, width, 0f, false, false, inputState.config.component_defaultFont, null);
+                return create(x,y,width,0f, true, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress) {
-                return create(x, y, width, progress, false, false, inputState.config.component_defaultFont, null);
+                return create(x,y,width,progress,true, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText) {
-                return create(x, y, width, progress, progressText, false, inputState.config.component_defaultFont, null);
+                return create(x,y,width,progress,progressText, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
-                return create(x, y, width, 0f, progressText, progressText2Decimal, inputState.config.component_defaultFont, null);
-            }
-
-            public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font) {
-                return create(x, y, width, 0f, progressText, progressText2Decimal, font, null);
-            }
-
-            public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, CMediaFont font, Color color) {
                 ProgressBar progressBar = new ProgressBar();
-                setComponentCommonInitValues(progressBar, x, y, width, 1);
-
-                setColor(progressBar, color);
-                setProgress(progressBar, progress);
-                setProgressText(progressBar, progressText);
-                setProgressText2Decimal(progressBar, progressText2Decimal);
-                setFont(progressBar, font);
+                setComponentCommonInitValues(progressBar, x, y, width, 1, inputState.config.component_defaultColor);
+                progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
+                progressBar.progressText = progressText;
+                progressBar.progressText2Decimal = progressText2Decimal;
+                progressBar.font = inputState.config.component_defaultFont;
                 return progressBar;
             }
 
@@ -3866,7 +3847,7 @@ public class API {
 
             public void setProgress(ProgressBar progressBar, float progress) {
                 if (progressBar == null) return;
-                progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
+                UICommons.progressbar_setProgress(progressBar, progress);
             }
 
             public void setProgressText(ProgressBar progressBar, boolean progressText) {
@@ -3884,12 +3865,8 @@ public class API {
         public class _Shape {
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType) {
-                return create(x, y, width, height, shapeType, inputState.config.component_defaultColor);
-            }
-
-            public Shape create(int x, int y, int width, int height, ShapeType shapeType, Color color) {
                 Shape shape = new Shape();
-                setComponentCommonInitValues(shape, x, y, width, height, color);
+                setComponentCommonInitValues(shape, x, y, width, height, inputState.config.component_defaultColor);
                 shape.shapeType = shapeType;
                 return shape;
             }
@@ -3907,12 +3884,13 @@ public class API {
 
             public final _ImageButton imageButton = new _ImageButton();
 
-            private void setButtonCommonInitValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
+            private void setButtonCommonInitValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, boolean togglePressed) {
                 button.buttonAction = buttonAction;
                 button.mode = buttonMode;
-                button.pressed = false;
-                button.offset_content_x = 0;
-                button.offset_content_y = 0;
+                button.offset_content_x = contentOffsetX;
+                button.offset_content_y = contentOffsetY;
+                button.pressed = button.mode == ButtonMode.TOGGLE ? togglePressed : false;
+                button.toggleDisabled = false;
             }
 
             private ButtonAction defaultButtonAction() {
@@ -3925,18 +3903,44 @@ public class API {
                 button.buttonAction = buttonAction;
             }
 
-            public void setPressed(Button button, boolean pressed) {
+            public void press(Button button) {
                 if (button == null) return;
-                if (pressed) {
-                    UICommons.button_press(button);
-                } else {
-                    UICommons.button_release(button);
-                }
+                UICommons.button_press(button);
             }
 
-            public void setPressed(Button[] buttons, boolean pressed) {
+            public void press(Button[] buttons, boolean pressed) {
                 if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) setPressed(buttons[i], pressed);
+                for (int i = 0; i < buttons.length; i++) press(buttons[i]);
+            }
+
+            public void release(Button button) {
+                if (button == null) return;
+                UICommons.button_release(button);
+            }
+
+            public void release(Button[] buttons, boolean pressed) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) release(buttons[i]);
+            }
+
+            public void toggle(Button button) {
+                if (button == null) return;
+                UICommons.button_toggle(button);
+            }
+
+            public void toggle(Button[] buttons) {
+                if (button == null) return;
+                for (int i = 0; i < buttons.length; i++) toggle(buttons[i]);
+            }
+
+            public void toggle(Button button, boolean pressed) {
+                if (button == null) return;
+                UICommons.button_toggle(button, pressed);
+            }
+
+            public void toggle(Button[] buttons, boolean pressed) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) toggle(buttons[i], pressed);
             }
 
             public void setButtonMode(Button button, ButtonMode buttonMode) {
@@ -3950,6 +3954,9 @@ public class API {
                 button.offset_content_y = y;
             }
 
+            public void setToggleDisabled(Button button, boolean disabled){
+                button.toggleDisabled = disabled;
+            }
 
             public void setOffsetContent(Button[] buttons, int x, int y) {
                 if (buttons == null) return;
@@ -3978,30 +3985,33 @@ public class API {
 
             public class _TextButton {
                 public TextButton create(int x, int y, int width, int height, String text) {
-                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
+                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
                 }
 
-
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon) {
-                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, inputState.config.component_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, inputState.config.component_defaultFont, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, inputState.config.component_defaultFont);
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, inputState.config.component_defaultFont, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font) {
+                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, font, false);
+                }
+
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font, boolean togglePressed) {
                     TextButton textButton = new TextButton();
                     setComponentCommonInitValues(textButton, x, y, width, height);
-                    setButtonCommonInitValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
+                    setButtonCommonInitValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY, togglePressed);
                     textButton.text = Tools.Text.validString(text);
                     textButton.font = font;
                     textButton.icon = icon;
@@ -4036,25 +4046,29 @@ public class API {
             public class _ImageButton {
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image) {
-                    return create(x, y, width, height, image, 0, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0);
+                    return create(x, y, width, height, image, 0, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0, false);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex) {
-                    return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0);
+                    return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), ButtonMode.DEFAULT, 0, 0, false);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, ButtonMode.DEFAULT, 0, 0);
+                    return create(x, y, width, height, image, arrayIndex, buttonAction, ButtonMode.DEFAULT, 0, 0, false);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode) {
-                    return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, 0, 0);
+                    return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, 0, 0, false);
                 }
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
+                    return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, contentOffsetX, contentOffsetY, false);
+                }
+
+                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, boolean togglePressed) {
                     ImageButton imageButton = new ImageButton();
                     setComponentCommonInitValues(imageButton, x, y, width, height, inputState.config.component_defaultColor, Color.WHITE);
-                    setButtonCommonInitValues(imageButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY);
+                    setButtonCommonInitValues(imageButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY, togglePressed);
                     imageButton.image = image;
                     imageButton.arrayIndex = arrayIndex;
                     UICommons.button_centerContent(mediaManager, imageButton);
@@ -4078,28 +4092,24 @@ public class API {
         public class _CheckBox {
 
             public CheckBox create(int x, int y, String text) {
-                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, false, inputState.config.component_defaultFont);
+                return create(x, y, text, CheckBoxStyle.CHECKBOX, null, false);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle) {
-                return create(x, y, text, checkBoxStyle, null, false, inputState.config.component_defaultFont);
+                return create(x, y, text, checkBoxStyle, null, false);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, false, inputState.config.component_defaultFont);
+                return create(x, y, text, checkBoxStyle, checkBoxAction, false);
             }
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked) {
-                return create(x, y, text, checkBoxStyle, checkBoxAction, checked, inputState.config.component_defaultFont);
-            }
-
-            public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked, CMediaFont font) {
                 CheckBox checkBox = new CheckBox();
                 setComponentCommonInitValues(checkBox, x, y, 1, 1, Color.WHITE);
                 checkBox.text = Tools.Text.validString(text);
                 checkBox.checkBoxStyle = checkBoxStyle;
                 checkBox.checkBoxAction = checkBoxAction;
-                checkBox.font = font;
+                checkBox.font = inputState.config.component_defaultFont;
                 checkBox.checked = checked;
                 return checkBox;
             }
@@ -4301,28 +4311,29 @@ public class API {
                 }
 
                 public Tab create(String title) {
-                    return create(title, null, null, defaultTabAction(), 0, inputState.config.component_defaultFont);
+                    return create(title, null, 0, null, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon) {
-                    return create(title, icon, null, null, 0, inputState.config.component_defaultFont);
+                public Tab create(String title, CMediaGFX icon, int iconIndex) {
+                    return create(title, icon, iconIndex, null, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, Component[] components) {
-                    return create(title, icon, components, defaultTabAction(), 0, inputState.config.component_defaultFont);
+
+                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components) {
+                    return create(title, icon, iconIndex, components, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width) {
-                    return create(title, icon, components, tabAction, width, null);
+                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components, TabAction tabAction) {
+                    return create(title, icon, iconIndex, components, tabAction, 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, Component[] components, TabAction tabAction, int width, CMediaFont font) {
+                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components, TabAction tabAction, int width) {
                     Tab tab = new Tab();
                     tab.title = Tools.Text.validString(title);
                     tab.tabAction = tabAction;
                     tab.icon = icon;
-                    tab.iconIndex = 0;
-                    tab.font = font;
+                    tab.iconIndex = iconIndex;
+                    tab.font = inputState.config.component_defaultFont;
                     tab.content_offset_x = 0;
                     tab.name = "";
                     tab.data = null;
@@ -4519,34 +4530,30 @@ public class API {
 
             public TextField create(int x, int y, int width) {
                 return create(x, y, width, "", defaultTextFieldAction(), 32,
-                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters);
             }
 
 
             public TextField create(int x, int y, int width, String content) {
                 return create(x, y, width, content, defaultTextFieldAction(), 32,
-                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters);
             }
 
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
                 return create(x, y, width, content, textFieldAction, 32,
-                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
                 return create(x, y, width, content, textFieldAction, contentMaxLength,
-                        inputState.config.component_textFieldDefaultAllowedCharacters, inputState.config.component_defaultFont);
+                        inputState.config.component_textFieldDefaultAllowedCharacters);
             }
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
-                return create(x, y, width, content, textFieldAction, contentMaxLength, allowedCharacters, inputState.config.component_defaultFont);
-            }
-
-            public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters, CMediaFont font) {
                 TextField textField = new TextField();
                 setComponentCommonInitValues(textField, x, y, width, 1, Color.WHITE);
-                textField.font = font;
+                textField.font = inputState.config.component_defaultFont;
                 textField.allowedCharacters = new IntSet();
                 for (int i = 0; i < allowedCharacters.length; i++)
                     textField.allowedCharacters.add(allowedCharacters[i]);
@@ -4754,33 +4761,28 @@ public class API {
 
             public class _CanvasImage {
                 public CanvasImage create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y, Color.WHITE, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
+                    return create(image, x, y,  0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, Color color) {
-                    return create(image, x, y, color, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
-
+                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex) {
+                    return create(image, x, y, arrayIndex, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex) {
-                    return create(image, x, y, color, arrayIndex, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
+                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex, boolean fadeOut) {
+                    return create(image, x, y, arrayIndex, fadeOut, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex, boolean fadeOut) {
-                    return create(image, x, y, color, arrayIndex, fadeOut, inputState.config.component_mapOverlayDefaultFadeoutTime);
-                }
-
-                public CanvasImage create(CMediaGFX image, int x, int y, Color color, int arrayIndex, boolean fadeOut, int fadeOutTime) {
+                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex, boolean fadeOut, int fadeOutTime) {
                     CanvasImage canvasImage = new CanvasImage();
                     canvasImage.image = image;
                     canvasImage.x = x;
                     canvasImage.y = y;
                     canvasImage.fadeOut = fadeOut;
                     canvasImage.fadeOutTime = fadeOutTime;
-                    canvasImage.color_r = color.r;
-                    canvasImage.color_g = color.g;
-                    canvasImage.color_b = color.b;
-                    canvasImage.color_a = color.a;
+                    canvasImage.color_r = Color.WHITE.r;
+                    canvasImage.color_g = Color.WHITE.g;
+                    canvasImage.color_b = Color.WHITE.b;
+                    canvasImage.color_a = Color.WHITE.a;
                     canvasImage.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                     canvasImage.name = Tools.Text.validString("");
                     canvasImage.data = null;
@@ -4893,29 +4895,25 @@ public class API {
             }
 
             public Text create(int x, int y, String[] lines) {
-                return create(x, y, lines, inputState.config.component_defaultFont, defaultTextAction());
+                return create(x, y, lines , defaultTextAction());
             }
 
-            public Text create(int x, int y, String[] lines, CMediaFont font) {
-                return create(x, y, lines, font, defaultTextAction());
-            }
-
-            public Text create(int x, int y, String[] lines, CMediaFont font, TextAction textAction) {
+            public Text create(int x, int y, String[] lines, TextAction textAction) {
                 Text text = new Text();
+                text.font = inputState.config.component_defaultFont;
                 int width = 1;
                 int height = 1;
-                if (lines != null && font != null) {
+                if (lines != null && text.font != null) {
                     for (int i = 0; i < lines.length; i++) {
-                        int widthT = mediaManager.textWidth(font, lines[i]);
+                        int widthT = mediaManager.textWidth(text.font, lines[i]);
                         if (widthT > width) width = widthT;
                     }
                     width = width / UIEngine.TILE_SIZE;
                     height = lines.length;
                 }
                 setComponentCommonInitValues(text, x, y, width, height);
-                text.font = font;
                 text.textAction = textAction;
-                text.lines = lines;
+                text.lines = Tools.Text.validStringArrayCopy(lines);
                 return text;
             }
 
@@ -4926,7 +4924,6 @@ public class API {
 
             public void setLines(Text text, String... lines) {
                 if (text == null) return;
-                text.lines = Tools.Text.validString(lines);
                 UICommons.text_setLines(mediaManager, text, lines);
             }
 
@@ -4945,18 +4942,18 @@ public class API {
             }
 
             public Image create(int x, int y, CMediaGFX image) {
-                return create(x, y, image, 0, 0f, defaultImageAction());
+                return create(x, y, image, 0, defaultImageAction(), 0f);
             }
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex) {
-                return create(x, y, image, arrayIndex, 0f, defaultImageAction());
+                return create(x, y, image, arrayIndex,defaultImageAction(), 0f);
             }
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset) {
-                return create(x, y, image, arrayIndex, animation_offset, defaultImageAction());
+                return create(x, y, image, arrayIndex, defaultImageAction(), animation_offset);
             }
 
-            public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset, ImageAction imageAction) {
+            public Image create(int x, int y, CMediaGFX image,int arrayIndex, ImageAction imageAction, float animation_offset) {
                 Image imageC = new Image();
                 int width = image != null ? mediaManager.imageWidth(image) / UIEngine.TILE_SIZE : 0;
                 int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
@@ -5000,18 +4997,18 @@ public class API {
             }
 
             public ComboBox create(int x, int y, int width) {
-                return create(x, y, width, null, false, defaultComboBoxAction());
+                return create(x, y, width, null, defaultComboBoxAction(), false);
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] items) {
-                return create(x, y, width, items, false, defaultComboBoxAction());
+                return create(x, y, width, items,defaultComboBoxAction() , false);
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons) {
-                return create(x, y, width, items, useIcons, defaultComboBoxAction());
+                return create(x, y, width, items, defaultComboBoxAction(), useIcons);
             }
 
-            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, boolean useIcons, ComboBoxAction comboBoxAction) {
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons) {
                 ComboBox comboBox = new ComboBox();
                 setComponentCommonInitValues(comboBox, x, y, width, 1);
                 comboBox.useIcons = useIcons;
@@ -5111,33 +5108,22 @@ public class API {
                 }
 
                 public ComboBoxItem create(String text) {
-                    return create(text, defaultComboBoxItemAction(), null,
-                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
+                    return create(text, defaultComboBoxItemAction(), null, 0);
                 }
 
                 public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
-                    return create(text, comboBoxItemAction, null,
-                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
+                    return create(text, comboBoxItemAction, null, 0);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon) {
-                    return create(text, comboBoxItemAction, icon,
-                            inputState.config.component_defaultColor, inputState.config.component_defaultFont);
-                }
-
-                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, Color color) {
-                    return create(text, comboBoxItemAction, icon, color, inputState.config.component_defaultFont);
-                }
-
-                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, Color color, CMediaFont font) {
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, int iconIndex) {
                     ComboBoxItem comboBoxItem = new ComboBoxItem();
                     comboBoxItem.text = Tools.Text.validString(text);
-                    comboBoxItem.font = font;
-                    comboBoxItem.color_r = color.r;
-                    comboBoxItem.color_g = color.g;
-                    comboBoxItem.color_b = color.b;
+                    comboBoxItem.font = inputState.config.component_defaultFont;
+                    comboBoxItem.color_r = inputState.config.component_defaultColor.r;
+                    comboBoxItem.color_g = inputState.config.component_defaultColor.g;
+                    comboBoxItem.color_b = inputState.config.component_defaultColor.b;
                     comboBoxItem.icon = icon;
-                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(comboBoxItem.iconIndex, 0);
+                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
                     comboBoxItem.comboBoxItemAction = comboBoxItemAction;
                     comboBoxItem.name = "";
                     comboBoxItem.data = null;
@@ -5261,35 +5247,31 @@ public class API {
             }
 
             public List create(int x, int y, int width, int height) {
-                return create(x, y, width, height, null, defaultListAction(), false, false, false, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, null, defaultListAction(), false, false, false, false);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items) {
-                return create(x, y, width, height, items, defaultListAction(), false, false, false, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, items, defaultListAction(), false, false, false, false);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction) {
-                return create(x, y, width, height, items, listAction, false, false, false, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, items, listAction, false, false, false, false);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect) {
-                return create(x, y, width, height, items, listAction, multiSelect, false, false, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, false, false, false);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, false, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, false, false);
             }
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, false, inputState.config.component_defaultFont);
+                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, false);
             }
 
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-                return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, inputState.config.component_defaultFont);
-            }
-
-            public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, CMediaFont font) {
                 List list = new List();
                 setComponentCommonInitValues(list, x, y, width, height);
                 list.selectedItem = null;
@@ -5301,7 +5283,7 @@ public class API {
                 list.dragEnabled = dragEnabled;
                 list.dragInEnabled = dragInEnabled;
                 list.dragOutEnabled = dragOutEnabled;
-                list.font = font;
+                list.font = inputState.config.component_defaultFont;
                 return list;
             }
 

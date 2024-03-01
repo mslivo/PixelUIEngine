@@ -1154,6 +1154,10 @@ public class UIEngine<T extends UIAdapter> {
                         }
                         case Button button -> {
                             inputState.pressedButton = button;
+                            switch (button.mode){
+                                case DEFAULT -> UICommons.button_release(button);
+                                case TOGGLE -> UICommons.button_toggle(button);
+                            }
                             UICommons.button_press(inputState.pressedButton);
                         }
                         case ContextMenuItem contextMenuItem -> {

@@ -22,6 +22,7 @@ import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
 import org.mslivo.core.engine.ui_engine.ui.components.button.Button;
+import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
@@ -33,6 +34,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
 import org.mslivo.core.engine.ui_engine.ui.components.map.CanvasImage;
+import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -490,22 +492,33 @@ class UICommons {
 
 
     static void button_press(Button button){
-        switch (button.mode){
-            case DEFAULT -> {
-                button.pressed = true;
-                if (button.buttonAction != null) button.buttonAction.onPress();
-            }
-            case TOGGLE -> {
-                button.pressed = !button.pressed;
-                if (button.buttonAction != null) button.buttonAction.onToggle(button.pressed);
-            }
-        }
+        if(button.pressed || button.mode != ButtonMode.DEFAULT) return;
+        button.pressed = true;
+        if (button.buttonAction != null) button.buttonAction.onPress();
+    }
+
+    static void button_release(Button button){
+        if(!button.pressed || button.mode != ButtonMode.DEFAULT) return;
+        button.pressed = false;
+        if (button.buttonAction != null) button.buttonAction.onRelease();
+    }
+
+    static void button_toggle(Button button){
+        button_toggle(button, !button.pressed);
+    }
+
+    static void progressbar_setProgress(ProgressBar progressBar, float progress){
+        progressBar.progress = Tools.Calc.inBounds(progress,0f,1f);
+    }
+
+    static void button_toggle(Button button, boolean pressed){
+        if(button.toggleDisabled || button.pressed == pressed || button.mode != ButtonMode.TOGGLE) return;
+        button.pressed = pressed;
+        if (button.buttonAction != null) button.buttonAction.onToggle(button.pressed);
     }
 
     static void button_centerContent(MediaManager mediaManager, Button button){
         if (button == null) return;
-        int xOffset;
-        int yOffset;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
             imageButton.offset_content_x  = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
@@ -521,17 +534,7 @@ class UICommons {
         }
     }
 
-    static void button_release(Button button){
-        switch (button.mode){
-            case DEFAULT -> {
-                button.pressed = false;
-                if (button.buttonAction != null) button.buttonAction.onRelease();
-            }
-            case TOGGLE -> {
-                if (button.buttonAction != null) button.buttonAction.onRelease();
-            }
-        }
-    }
+
 
     static boolean grid_positionValid(Grid grid, int x, int y) {
         if (grid.items != null) {
@@ -544,6 +547,7 @@ class UICommons {
         grid.items = items;
         grid_updateSize(grid);
     }
+
     static void grid_updateSize(Grid grid) {
         int factor = grid.doubleSized ? 2 : 1;
         if (grid.items != null) {
@@ -996,8 +1000,12 @@ class UICommons {
     }
 
     static void text_setLines(MediaManager mediaManager, Text text, String[] lines){
-        text.lines = Tools.Text.validString(lines);
+        text.lines = Tools.Text.validStringArrayCopy(lines);
         UICommons.text_updateSize(mediaManager, text);
+    }
+
+    static void tooltip_setLines(ToolTip toolTip, String[] lines){
+        toolTip.lines = Tools.Text.validStringArrayCopy(lines);
     }
 
     static void text_updateSize(MediaManager mediaManager, Text text){
@@ -1031,10 +1039,12 @@ class UICommons {
     }
 
     static void scrollBar_pressButton(ScrollBar scrollBar){
+        if(scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = true;
         if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
     }
     static void scrollBar_releaseButton(ScrollBar scrollBar){
+        if(!scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = false;
         if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
     }

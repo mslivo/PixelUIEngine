@@ -72,7 +72,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         this.soundPlayer = new SoundPlayer(mediaManager);
         /* Window */
-        Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, false, true, true);
+        Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, 0);
         api.window.setEnforceScreenBounds(window, true);
         api.window.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
@@ -88,10 +88,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ArrayList<Component> components_tab4 = createTab4(window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
-        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE, components_tab1.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN, components_tab2.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, components_tab3.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, components_tab4.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE,0, components_tab1.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN,0, components_tab2.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE,0, components_tab3.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE,0, components_tab4.toArray(new Component[]{})));
 
 
         ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
@@ -139,11 +139,14 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.component.setColor(knobe, Color.RED);
 
         // Shape
-        Shape oval = api.component.shape.create(11, 3, 4, 4, ShapeType.OVAL, Color.GREEN);
+        Shape oval = api.component.shape.create(11, 3, 4, 4, ShapeType.OVAL);
+        api.component.setColor(oval,Color.GREEN);
 
-        Shape rect = api.component.shape.create(11, 8, 2, 2, ShapeType.RECT, Color.YELLOW);
+        Shape rect = api.component.shape.create(11, 8, 2, 2, ShapeType.RECT);
+        api.component.setColor(rect,Color.YELLOW);
 
-        Shape triangle = api.component.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN, Color.BLUE);
+        Shape triangle = api.component.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN);
+        api.component.setColor(triangle,Color.BLUE);
 
         ScrollBarHorizontal scrollBarHorizontalR = api.component.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
@@ -180,9 +183,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.component.button.setButtonAction(notiBtn, new ButtonAction() {
             @Override
             public void onRelease() {
-                Notification notification = api.notification.create(textField.content, new Color(
-                        MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
-                ));
+                Notification notification = api.notification.create(textField.content);
+                api.notification.setColor(notification, MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
 
                 api.notification.setNotificationAction(notification, new NotificationAction() {
                     @Override
@@ -198,8 +200,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         });
 
 
-        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true, UIBaseMedia.UI_FONT_WHITE, Color.BLUE);
+        ProgressBar progressBar = api.component.progressBar.create(18, 3, 8, 0, true, true);
+        api.component.setColor(progressBar, Color.BLUE);
         api.component.setColor2(progressBar, Color.RED);
+        api.component.progressBar.setFont(progressBar, UIBaseMedia.UI_FONT_WHITE);
 
         ScrollBarHorizontal pgScrollbar = api.component.scrollBar.horizontalScrollbar.create(18, 5, 8, new ScrollBarAction() {
             @Override
@@ -212,9 +216,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ArrayList<ComboBoxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
         ComboBox comboBox = api.component.comboBox.create(25, 7, 6, new ComboBoxItem[]{
-                api.component.comboBox.item.create("One", null, null, Color.RED),
-                api.component.comboBox.item.create("Two", null, null, Color.YELLOW),
-                api.component.comboBox.item.create("Three", null, null, Color.GREEN),
+                api.component.comboBox.item.create("One"),
+                api.component.comboBox.item.create("Two"),
+                api.component.comboBox.item.create("Three"),
 
         });
 
@@ -273,7 +277,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         CheckBox checkBox2 = api.component.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
 
-        GameViewPort gameViewPort = api.component.gameViewPort.create(29, 9, 4, 4, 100, 100, 1);
+        GameViewPort gameViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null,100, 100, 1);
 
         TextField osKeyBoardTextInput = api.component.textField.create(18, 13, 10, "", null, 128);
         api.component.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
@@ -388,7 +392,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ImageButton imageButton1 = api.component.button.imageButton.create(3, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE);
 
-        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY, 0);
+        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY, 0,null,ButtonMode.DEFAULT,0,0);
         ButtonAction imageButton2Action = new ButtonAction() {
             @Override
             public void onRelease() {
@@ -402,7 +406,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         };
         api.component.button.setButtonAction(imageButton2, imageButton2Action);
 
-        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE,0,0,true);
         ImageButton imageButton4 = api.component.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 0, null, ButtonMode.TOGGLE);
         ImageButton imageButton5 = api.component.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 0, null, ButtonMode.TOGGLE);
         ImageButton imageButton6 = api.component.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_4, 0, null, ButtonMode.TOGGLE);
@@ -417,7 +421,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.component.setColor(imageButton5, Color.YELLOW);
         api.component.setColor(imageButton6, Color.ORANGE);
 
-        ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), true, null, null, 3, 4);
+        ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), null,null,true, 3, 4);
 
         api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 0));
         api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 1, 1));
@@ -444,7 +448,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"), UIBaseMedia.UI_FONT_WHITE);
+        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
+        api.component.text.setFont(text2,UIBaseMedia.UI_FONT_WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 

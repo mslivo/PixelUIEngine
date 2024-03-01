@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.CMedia;
 
 import java.io.*;
@@ -239,7 +237,7 @@ public class Tools {
             return string == null ? "" : string;
         }
 
-        public static String[] validString(String[] string) {
+        public static String[] validStringArrayCopy(String[] string) {
             if(string == null){
                 return new String[]{};
             }else{

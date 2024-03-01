@@ -11,9 +11,6 @@ public abstract class ButtonAction extends CommonActions {
     public void onRelease() {
     }
 
-    public void onHold() {
-    }
-
     public void onToggle(boolean value) {
     }
 
