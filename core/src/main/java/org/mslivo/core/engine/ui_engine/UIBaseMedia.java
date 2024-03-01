@@ -7,7 +7,7 @@ import org.mslivo.core.engine.media_manager.media.*;
  * These Medias need to be loaded on startup for the UI to work no matter what
  */
 public class UIBaseMedia {
-    private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS+"ui/";
+    private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS+"pixelui/";
 
     // Graphics
     public static final CMediaArray UI_WINDOW = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "window.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
