@@ -134,7 +134,7 @@ public class ExampleUIAdapter implements UIAdapter {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
         // Draw game based on data
-        /*
+
         batch.begin();
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
@@ -142,7 +142,7 @@ public class ExampleUIAdapter implements UIAdapter {
                         x, y, animation_timer);
             }
         }
-        batch.end();*/
+        batch.end();
 
         shaderRenderer.begin();
         shaderRenderer.drawPixel(100,100);
