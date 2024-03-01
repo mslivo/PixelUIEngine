@@ -135,7 +135,7 @@ public class UIEngine<T extends UIAdapter> {
         // -----  Game
         if (spriteRenderer) {
             newInputState.spriteBatch_game = new SpriteBatch(8191);
-            newInputState.spriteBatch_game.setBlendFunction(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+            newInputState.spriteBatch_game.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
             newInputState.spriteBatch_game = null;
         }
@@ -155,7 +155,7 @@ public class UIEngine<T extends UIAdapter> {
 
         // -----  GUI
         newInputState.spriteBatch_ui = new SpriteBatch(8191);
-        newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
+        newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
             newInputState.shaderRenderer_ui = new ShaderRenderer();
         }
@@ -3001,7 +3001,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_glClear() {
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
     public void shutdown() {

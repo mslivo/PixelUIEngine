@@ -131,7 +131,7 @@ public class ExampleUIAdapter implements UIAdapter {
     @Override
     public void render(SpriteBatch batch, ShaderRenderer shaderRenderer, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Draw game based on data
 
