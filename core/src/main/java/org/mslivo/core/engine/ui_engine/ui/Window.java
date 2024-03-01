@@ -40,7 +40,7 @@ public class Window {
 
     public CMediaGFX icon;
 
-    public int iconArrayIndex;
+    public int iconIndex;
 
     public ArrayList<MessageReceiverAction> messageReceiverActions;
 

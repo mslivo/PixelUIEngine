@@ -1,44 +1,44 @@
 package org.mslivo.core.engine.tools.rendering.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import org.mslivo.core.engine.ui_engine.render.ShaderRenderer;
 
 /*
  * Particle System must be extended and implemented
  */
-public abstract class ImmediateRenderParticleSystem<T> extends ParticleSystem<T> {
+public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
     private Color backup;
 
-    public ImmediateRenderParticleSystem(int particleLimit) {
+    public ShaderRenderParticleSystem(int particleLimit) {
         this(particleLimit, null);
     }
 
-    public ImmediateRenderParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
+    public ShaderRenderParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
         super(particleLimit, particleDataProvider);
         backup = new Color();
     }
 
-    public void render(ImmediateRenderer immediateRenderer) {
+    public void render(ShaderRenderer shaderRenderer) {
         if (particles.size() == 0) return;
-        backup.r = immediateRenderer.getColor().r;
-        backup.g = immediateRenderer.getColor().g;
-        backup.b = immediateRenderer.getColor().b;
-        backup.a = immediateRenderer.getColor().a;
+        backup.r = shaderRenderer.getColor().r;
+        backup.g = shaderRenderer.getColor().g;
+        backup.b = shaderRenderer.getColor().b;
+        backup.a = shaderRenderer.getColor().a;
 
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            immediateRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
+            shaderRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDIATE_PIXEL -> {
-                    immediateRenderer.drawPixel(particle.x, particle.y);
+                    shaderRenderer.drawPixel(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
         }
-        immediateRenderer.setColor(backup);
+        shaderRenderer.setColor(backup);
     }
 
 

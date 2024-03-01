@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
@@ -1257,16 +1258,16 @@ public class API {
     }
 
     public void openContextMenu(ContextMenu contextMenu) {
-        UICommons.contextMenu_openAtMousePosition(contextMenu, inputState, mediaManager);
+        UICommons.contextMenu_openAtMousePosition(inputState,mediaManager,contextMenu);
     }
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        UICommons.contextMenu_open(contextMenu, inputState, mediaManager, x, y);
+        UICommons.contextMenu_open(inputState , mediaManager, contextMenu, x, y);
     }
 
     public void closeContextMenu(ContextMenu contextMenu) {
-        UICommons.contextMenu_close(contextMenu, inputState);
+        UICommons.contextMenu_close(inputState, contextMenu);
     }
 
     public boolean isContextMenuOpen(ContextMenu contextMenu) {
@@ -2703,7 +2704,7 @@ public class API {
                 return create(text, contextMenuItemAction, icon, color, inputState.config.component_defaultFont, 0);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font, int iconArrayIndex) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font, int iconIndex) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
                 contextMenuItem.text = Tools.Text.validString(text);
                 contextMenuItem.font = font;
@@ -2711,10 +2712,10 @@ public class API {
                 contextMenuItem.color_g = color.g;
                 contextMenuItem.color_b = color.b;
                 contextMenuItem.icon = icon;
-                contextMenuItem.iconArrayIndex = iconArrayIndex;
+                contextMenuItem.iconIndex = iconIndex;
                 contextMenuItem.name = "";
                 contextMenuItem.data = null;
-                contextMenuItem.contextMenuItemAction = null;
+                contextMenuItem.contextMenuItemAction = contextMenuItemAction;
                 contextMenuItem.addedToContextMenu = null;
                 return contextMenuItem;
             }
@@ -2764,7 +2765,12 @@ public class API {
 
             public void setIconIndex(ContextMenuItem contextMenuItem, int index) {
                 if (contextMenuItem == null) return;
-                contextMenuItem.iconArrayIndex = Tools.Calc.lowerBounds(index, 0);
+                contextMenuItem.iconIndex = Tools.Calc.lowerBounds(index, 0);
+            }
+
+            public void selectItem(ContextMenuItem contextMenuItem) {
+                if (contextMenuItem == null) return;
+                UICommons.contextMenu_selectItem(inputState, contextMenuItem);
             }
 
         }
@@ -2828,7 +2834,7 @@ public class API {
             window.visible = visible;
             window.windowAction = windowAction;
             window.icon = icon;
-            window.iconArrayIndex = 0;
+            window.iconIndex = 0;
             window.name = "";
             window.data = null;
             window.enforceScreenBounds = inputState.config.window_defaultEnforceScreenBounds;
@@ -2880,7 +2886,7 @@ public class API {
 
         public void setIconIndex(Window window, int iconIndex) {
             if (window == null) return;
-            window.iconArrayIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+            window.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
         }
 
         public void setVisible(Window window, boolean visible) {
@@ -3426,10 +3432,6 @@ public class API {
             inputState.camera_game.zoom = zoom;
         }
 
-        public void zoom(float zoom) {
-            inputState.camera_game.zoom += zoom;
-        }
-
         public float x() {
             return inputState.camera_game.position.x;
         }
@@ -3446,6 +3448,9 @@ public class API {
             return inputState.camera_game.zoom;
         }
 
+        public Matrix4 combined(){
+            return inputState.camera_game.combined;
+        }
     }
 
     public class _Component {
@@ -3547,7 +3552,10 @@ public class API {
             component.height = Tools.Calc.lowerBounds(height, 1);
 
             if (component instanceof GameViewPort gameViewPort) {
-                UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
+                UICommons.gameViewPort_resizeCameraTextureAndFrameBuffer(gameViewPort);
+            }
+            if (component instanceof Canvas canvas) {
+                UICommons.canvas_resizePixMap(canvas);
             }
         }
 
@@ -3709,8 +3717,16 @@ public class API {
                 GameViewPort gameViewPort = new GameViewPort();
                 gameViewPort.updateTimer = 0;
                 setComponentCommonInitValues(gameViewPort, x, y, width, height, Color.WHITE);
-                UICommons.gameViewPort_createCameraTextureAndFrameBuffer(gameViewPort, width, height);
-                gameViewPort.camera.position.set(camPositionX, camPositionY, gameViewPort.camera.position.z);
+                int viewportWidth = gameViewPort.width * UIEngine.TILE_SIZE;
+                int viewportHeight = gameViewPort.height * UIEngine.TILE_SIZE;
+                gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+                Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
+                texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+                gameViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
+                gameViewPort.textureRegion.flip(false, true);
+                gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
+                gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
+                gameViewPort.camera.position.set(camPositionX, camPositionY, 0f);
                 gameViewPort.camera.zoom = camZoom;
                 gameViewPort.updateTime = updateTime;
                 gameViewPort.gameViewPortAction = gameViewPortAction;
@@ -3989,7 +4005,7 @@ public class API {
                     textButton.text = Tools.Text.validString(text);
                     textButton.font = font;
                     textButton.icon = icon;
-                    textButton.iconArrayIndex = 0;
+                    textButton.iconIndex = 0;
                     UICommons.button_centerContent(mediaManager, textButton);
                     return textButton;
                 }
@@ -3999,9 +4015,9 @@ public class API {
                     textButton.icon = icon;
                 }
 
-                public void setIconArrayIndex(TextButton textButton, int iconArrayIndex) {
+                public void setIconIndex(TextButton textButton, int iconIndex) {
                     if (textButton == null) return;
-                    textButton.iconArrayIndex = Tools.Calc.lowerBounds(iconArrayIndex, 0);
+                    textButton.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
                 }
 
 
@@ -4488,8 +4504,7 @@ public class API {
 
             public void setItems(Grid grid, Object[][] items) {
                 if (grid == null || items == null) return;
-                grid.items = items;
-                UICommons.grid_updateSize(grid);
+                UICommons.grid_setItems(grid, items);
             }
 
 
@@ -5054,29 +5069,9 @@ public class API {
                 return comboBox.selectedItem != null ? comboBox.selectedItem == comboBoxItem : false;
             }
 
-            public boolean isSelectedItemText(ComboBox comboBox, String text) {
-                if (comboBox == null || text == null) return false;
-                return comboBox.selectedItem != null ? comboBox.selectedItem.text.equals(text) : false;
-            }
-
-            public void setSelectedItem(ComboBox comboBox, ComboBoxItem selectItem) {
-                if (comboBox == null) return;
-                if (selectItem != null) {
-                    if (comboBox.comboBoxItems != null && comboBox.comboBoxItems.contains(selectItem))
-                        comboBox.selectedItem = selectItem;
-                } else {
-                    comboBox.selectedItem = null;
-                }
-            }
-
-            public void setSelectedItemByText(ComboBox comboBox, String text) {
-                if (comboBox == null || text == null) return;
-                for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
-                    if (comboBox.comboBoxItems.get(i).text.equals(text)) {
-                        setSelectedItem(comboBox, comboBox.comboBoxItems.get(i));
-                        return;
-                    }
-                }
+            public void selectItem(ComboBoxItem selectItem) {
+                if (selectItem == null) return;
+                UICommons.comboBox_selectItem(inputState, selectItem);
             }
 
             public void open(ComboBox comboBox) {
@@ -5093,6 +5088,21 @@ public class API {
                 return UICommons.comboBox_isOpen(inputState, comboBox);
             }
 
+            public void setSelectedItemByText(ComboBox comboBox, String text) {
+                if (comboBox == null || text == null) return;
+                for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
+                    if (comboBox.comboBoxItems.get(i).text.equals(text)) {
+                        UICommons.comboBox_selectItem(inputState, comboBox.comboBoxItems.get(i));
+                        return;
+                    }
+                }
+            }
+
+            public boolean isSelectedItemText(ComboBox comboBox, String text) {
+                if (comboBox == null || text == null) return false;
+                return comboBox.selectedItem != null ? comboBox.selectedItem.text.equals(text) : false;
+            }
+
             public class _ComboBoxItem {
 
                 private ComboBoxItemAction defaultComboBoxItemAction() {
@@ -5105,21 +5115,21 @@ public class API {
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction) {
-                    return create(text, contextMenuItemAction, null,
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
+                    return create(text, comboBoxItemAction, null,
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon) {
-                    return create(text, contextMenuItemAction, icon,
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon) {
+                    return create(text, comboBoxItemAction, icon,
                             inputState.config.component_defaultColor, inputState.config.component_defaultFont);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color) {
-                    return create(text, contextMenuItemAction, icon, color, inputState.config.component_defaultFont);
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, Color color) {
+                    return create(text, comboBoxItemAction, icon, color, inputState.config.component_defaultFont);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction contextMenuItemAction, CMediaGFX icon, Color color, CMediaFont font) {
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, Color color, CMediaFont font) {
                     ComboBoxItem comboBoxItem = new ComboBoxItem();
                     comboBoxItem.text = Tools.Text.validString(text);
                     comboBoxItem.font = font;
@@ -5128,7 +5138,7 @@ public class API {
                     comboBoxItem.color_b = color.b;
                     comboBoxItem.icon = icon;
                     comboBoxItem.iconIndex = Tools.Calc.lowerBounds(comboBoxItem.iconIndex, 0);
-                    comboBoxItem.comboBoxItemAction = contextMenuItemAction;
+                    comboBoxItem.comboBoxItemAction = comboBoxItemAction;
                     comboBoxItem.name = "";
                     comboBoxItem.data = null;
                     return comboBoxItem;

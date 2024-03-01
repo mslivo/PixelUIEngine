@@ -24,8 +24,8 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.render.GrayScaleShader;
-import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.ShaderRenderer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -120,7 +120,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer, boolean immediateRenderer, boolean gamePadSupport) {
+    private InputState initializeInputState(int internalResolutionWidth, int internalResolutionHeight, VIEWPORT_MODE viewPortMode, boolean spriteRenderer, boolean shaderRenderer, boolean gamePadSupport) {
         InputState newInputState = new InputState();
 
         //  ----- Parameters
@@ -128,7 +128,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.internalResolutionHeight = Tools.Calc.lowerBounds(internalResolutionHeight, TILE_SIZE * 2);
         newInputState.viewportMode = viewPortMode;
         newInputState.spriteRenderer = spriteRenderer;
-        newInputState.immediateRenderer = immediateRenderer;
+        newInputState.shaderRenderer = shaderRenderer;
         newInputState.gamePadSupport = gamePadSupport;
         // ----- Config
         newInputState.config = new Config();
@@ -139,10 +139,10 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             newInputState.spriteBatch_game = null;
         }
-        if (immediateRenderer) {
-            newInputState.imRenderer_game = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        if (shaderRenderer) {
+            newInputState.shaderRenderer_game = new ShaderRenderer();
         } else {
-            newInputState.imRenderer_game = null;
+            newInputState.shaderRenderer_game = null;
         }
         newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -156,8 +156,8 @@ public class UIEngine<T extends UIAdapter> {
         // -----  GUI
         newInputState.spriteBatch_ui = new SpriteBatch(8191);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA, GL30.GL_ONE, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        if (immediateRenderer) {
-            newInputState.imRenderer_ui = new ImmediateRenderer(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        if (shaderRenderer) {
+            newInputState.shaderRenderer_ui = new ShaderRenderer();
         }
         newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -1294,7 +1294,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Hide displayed ContextMenus
                 if (inputState.openContextMenu != null) {
                     if (!(inputState.lastUIMouseHover instanceof ContextMenuItem contextMenuItem) || contextMenuItem.addedToContextMenu != inputState.openContextMenu) {
-                        UICommons.contextMenu_close(inputState.openContextMenu, inputState);
+                        UICommons.contextMenu_close(inputState, inputState.openContextMenu);
                     }
                 }
 
@@ -1418,12 +1418,7 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.pressedCanvas = null;
                     }
                     case ContextMenuItem contextMenuItem -> {
-                        ContextMenu contextMenu = contextMenuItem.addedToContextMenu;
-                        if (contextMenuItem.contextMenuItemAction != null)
-                            contextMenuItem.contextMenuItemAction.onSelect();
-                        if (contextMenu.contextMenuAction != null)
-                            contextMenu.contextMenuAction.onItemSelected(contextMenuItem);
-                        UICommons.contextMenu_close(contextMenuItem.addedToContextMenu, inputState);
+                        UICommons.contextMenu_selectItem(inputState, contextMenuItem);
                         inputState.pressedContextMenuItem = null;
                     }
                     case CheckBox checkBox -> {
@@ -1432,17 +1427,11 @@ public class UIEngine<T extends UIAdapter> {
                         inputState.pressedCheckBox = null;
                     }
                     case ComboBoxItem comboBoxItem -> {
-                        ComboBox comboBox = comboBoxItem.addedToComboBox;
-                        comboBox.selectedItem = comboBoxItem;
-                        if (comboBoxItem.comboBoxItemAction != null)
-                            comboBoxItem.comboBoxItemAction.onSelect();
-                        if (comboBox.comboBoxAction != null)
-                            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-                        if (inputState.currentControlMode.emulated) {
+                        UICommons.comboBox_selectItem(inputState, comboBoxItem);
+                        if (inputState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
                             // emulated: move mouse back to combobox on item select
-                            inputState.mouse_emulated.y = UICommons.component_getAbsoluteY(comboBox) + TILE_SIZE_2;
+                            inputState.mouse_emulated.y = UICommons.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TILE_SIZE_2;
                         }
-                        UICommons.comboBox_close(inputState, comboBox);
                         inputState.pressedComboBoxItem = null;
                     }
                     case TextField textField -> {
@@ -1897,21 +1886,32 @@ public class UIEngine<T extends UIAdapter> {
         return false;
     }
 
-    public void render() {
-        render(false);
+    private void render_setUIProjectionMatrix(OrthographicCamera camera){
+        if (inputState.spriteRenderer)
+            inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
+        if (inputState.shaderRenderer)
+            inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
     }
 
-    public void render(boolean frameBuffersOnly) {
+    private void render_setGameProjectionMatrix(OrthographicCamera camera){
+        if (inputState.spriteRenderer)
+            inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
+        if (inputState.shaderRenderer)
+            inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
+    }
+    public void render() {
+        render(true);
+    }
+
+    public void render(boolean drawToScreen) {
 
         // Draw Game
         {
             // Draw Main FrameBuffer
-            if (inputState.spriteRenderer)
-                inputState.spriteBatch_game.setProjectionMatrix(this.inputState.camera_game.combined);
-            if (inputState.immediateRenderer)
-                inputState.imRenderer_game.setProjectionMatrix(this.inputState.camera_game.combined);
+
             inputState.frameBuffer_game.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, null);
+            render_setGameProjectionMatrix(inputState.camera_game);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderRenderer_game, null);
             inputState.frameBuffer_game.end();
 
             // Draw GUI GameViewPort FrameBuffers
@@ -1922,14 +1922,12 @@ public class UIEngine<T extends UIAdapter> {
 
 
         { // Draw GUI
+            render_setUIProjectionMatrix(inputState.camera_ui);
             inputState.frameBuffer_ui.begin();
             render_glClear();
-            inputState.spriteBatch_ui.setProjectionMatrix(this.inputState.camera_ui.combined);
-            if (inputState.immediateRenderer)
-                inputState.imRenderer_ui.setProjectionMatrix(this.inputState.camera_game.combined);
-            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.shaderRenderer_ui);
             this.renderUI();
-            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.imRenderer_ui);
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.shaderRenderer_ui);
             inputState.frameBuffer_ui.end();
         }
 
@@ -1944,7 +1942,7 @@ public class UIEngine<T extends UIAdapter> {
             );
             inputState.frameBuffer_screen.end();
             // Draw to Screen
-            if (!frameBuffersOnly) {
+            if (drawToScreen) {
                 inputState.viewport_screen.apply();
                 render_glClear();
                 inputState.spriteBatch_screen.begin();
@@ -1959,15 +1957,11 @@ public class UIEngine<T extends UIAdapter> {
 
     private void renderGameViewPortFrameBuffer(GameViewPort gameViewPort) {
         if (render_isComponentNotRendered(gameViewPort)) return;
-
         if (System.currentTimeMillis() - gameViewPort.updateTimer > gameViewPort.updateTime) {
             // draw to frambuffer
-            if (inputState.spriteRenderer)
-                inputState.spriteBatch_game.setProjectionMatrix(gameViewPort.camera.combined);
-            if (inputState.immediateRenderer)
-                inputState.imRenderer_game.setProjectionMatrix(gameViewPort.camera.combined);
+            render_setGameProjectionMatrix(gameViewPort.camera);
             gameViewPort.frameBuffer.begin();
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.imRenderer_game, gameViewPort);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderRenderer_game, gameViewPort);
             gameViewPort.frameBuffer.end();
             gameViewPort.updateTimer = System.currentTimeMillis();
         }
@@ -2244,7 +2238,7 @@ public class UIEngine<T extends UIAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextMenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, (width * TILE_SIZE), item.icon, item.iconArrayIndex);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, 2, 1, (width * TILE_SIZE), item.icon, item.iconIndex);
             }
 
         }
@@ -2443,7 +2437,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconArrayIndex);
+            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2490,7 +2484,7 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconArrayIndex);
+                        render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconIndex);
                     }
                 } else if (button instanceof ImageButton imageButton) {
                     render_saveTempColorBatch();
@@ -3022,8 +3016,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.immediateRenderer) inputState.imRenderer_game.dispose();
-        if (inputState.immediateRenderer) inputState.imRenderer_ui.dispose();
+        if (inputState.shaderRenderer) inputState.shaderRenderer_game.dispose();
+        if (inputState.shaderRenderer) inputState.shaderRenderer_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
@@ -3056,7 +3050,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public boolean isImmediateRendererEnabled() {
-        return inputState.immediateRenderer;
+        return inputState.shaderRenderer;
     }
 
     public int getViewPortScreenX() {

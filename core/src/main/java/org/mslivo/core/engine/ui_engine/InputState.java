@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
+import org.mslivo.core.engine.ui_engine.render.ShaderRenderer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -38,7 +39,6 @@ import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.config.Config;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
-import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 
@@ -51,20 +51,20 @@ public class InputState {
     public int internalResolutionWidth, internalResolutionHeight;
     public VIEWPORT_MODE viewportMode;
     public boolean spriteRenderer;
-    public boolean immediateRenderer;
+    public boolean shaderRenderer;
     public boolean gamePadSupport;
     public Config config;
 
     /* #################### Graphics: Game #################### */
     public SpriteBatch spriteBatch_game;
-    public ImmediateRenderer imRenderer_game;
+    public ShaderRenderer shaderRenderer_game;
     public TextureRegion texture_game;
     public OrthographicCamera camera_game;
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
     public SpriteBatch spriteBatch_ui;
-    public ImmediateRenderer imRenderer_ui;
+    public ShaderRenderer shaderRenderer_ui;
     public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;

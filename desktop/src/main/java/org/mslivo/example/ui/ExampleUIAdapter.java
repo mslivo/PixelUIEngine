@@ -7,14 +7,14 @@ import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
+import org.mslivo.core.engine.ui_engine.input.KeyCode;
+import org.mslivo.core.engine.ui_engine.render.ShaderRenderer;
 import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
-import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.UIBaseMedia;
-import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
@@ -41,10 +41,10 @@ public class ExampleUIAdapter implements UIAdapter {
     public void setResetPressed(boolean resetPressed) {
         this.resetPressed = resetPressed;
     }
+
     public boolean isResetPressed() {
         return resetPressed;
     }
-
 
     @Override
     public void init(API api, MediaManager mediaManager) {
@@ -117,11 +117,11 @@ public class ExampleUIAdapter implements UIAdapter {
         // gameEngine.input(new EngineInput(0,"TestInput"));
 
         API._Input._KeyBoard keyBoard = api.input.keyboard;
-        while (keyBoard.event.keyDownHasNext()){
+        while (keyBoard.event.keyDownHasNext()) {
             int key = keyBoard.event.keyDownNext();
-            switch (key){
+            switch (key) {
                 case KeyCode.Key.Q -> {
-                    api.input.mouse.emulated.setPosition(10,10);
+                    api.input.mouse.emulated.setPosition(10, 10);
                 }
             }
         }
@@ -129,7 +129,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(SpriteBatch batch, ImmediateRenderer immediateRenderer, GameViewPort gameViewPort) {
+    public void render(SpriteBatch batch, ShaderRenderer shaderRenderer, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
@@ -141,7 +141,6 @@ public class ExampleUIAdapter implements UIAdapter {
                         x, y, animation_timer);
             }
         }
-
         batch.end();
 
     }

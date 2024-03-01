@@ -74,6 +74,90 @@ class UICommons {
         emulatedMouse_setPosition(inputState, x, y);
     }
 
+    static int window_getRealWidth(Window window) {
+        return window.width * UIEngine.TILE_SIZE;
+    }
+
+    static void window_fold(Window window) {
+        window.folded = true;
+        if (window.windowAction != null) window.windowAction.onFold();
+    }
+
+    static void window_unFold(Window window) {
+        window.folded = true;
+        if (window.windowAction != null) window.windowAction.onUnfold();
+
+    }
+
+    static void window_receiveMessage(Window window, String message_type, Object... content) {
+        if(message_type == null) return;
+        for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
+            MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
+            if (messageReceiverAction.messageType.equals(message_type)) {
+                messageReceiverAction.onMessageReceived(content);
+            }
+        }
+    }
+
+    static void window_bringToFront(InputState inputState, Window window) {
+        if (inputState.windows.size() == 1) return;
+        if (window.alwaysOnTop) {
+            if (inputState.windows.getLast() != window) {
+                inputState.windows.remove(window);
+                inputState.windows.add(window);
+            }
+        } else {
+            int index = inputState.windows.size() - 1;
+            searchIndex:
+            while (index > 0) {
+                if (!inputState.windows.get(index).alwaysOnTop) {
+                    break searchIndex;
+                }
+                index = index - 1;
+            }
+            inputState.windows.remove(window);
+            inputState.windows.add(index, window);
+        }
+    }
+
+    static int window_getRealHeight(Window window) {
+        return window.height * UIEngine.TILE_SIZE;
+    }
+
+    static void window_setPosition(InputState inputState, Window window, int x, int y) {
+        window.x = x;
+        window.y = y;
+        if (window.enforceScreenBounds) window_enforceScreenBounds(inputState, window);
+    }
+
+
+    static void window_enforceScreenBounds(InputState inputState, Window window) {
+        int wndWidth = window_getRealWidth(window);
+        window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
+        if (window.folded) {
+            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height) * UIEngine.TILE_SIZE);
+        } else {
+            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
+        }
+    }
+    static void window_addToScreen(InputState inputState, Window window) {
+        if (window.addedToScreen) return;
+        window.addedToScreen = true;
+        inputState.windows.add(window);
+        resetActivelyUsedUIReferences(inputState);
+        if (window.windowAction != null) window.windowAction.onAdd();
+    }
+
+    static void window_removeFromScreen(InputState inputState, Window window) {
+        if (!window.addedToScreen) return;
+        if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
+        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
+        window.addedToScreen = false;
+        inputState.windows.remove(window);
+        resetActivelyUsedUIReferences(inputState);
+        if (window.windowAction != null) window.windowAction.onRemove();
+    }
+
     static int component_getParentWindowX(Component component) {
         return component.addedToWindow != null ? component.addedToWindow.x : 0;
     }
@@ -176,75 +260,6 @@ class UICommons {
         return false;
     }
 
-
-
-    static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
-        switch (VIEWPORTMODE) {
-            case PIXEL_PERFECT -> {
-                return 1;
-            }
-            case FIT, STRETCH -> {
-                int upSampling = 1;
-                int testWidth = Gdx.graphics.getDisplayMode().width;
-                int testHeight = Gdx.graphics.getDisplayMode().height;
-                while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
-                    upSampling++;
-                }
-                return upSampling;
-            }
-
-            default -> throw new IllegalStateException("Unexpected value: " + VIEWPORTMODE);
-        }
-    }
-
-
-    static Viewport viewport_createViewport(VIEWPORT_MODE VIEWPORTMODE, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
-        return switch (VIEWPORTMODE) {
-            case FIT -> new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
-            case PIXEL_PERFECT ->
-                    new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
-            case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
-        };
-    }
-
-    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE VIEWPORTMODE) {
-        return switch (VIEWPORTMODE) {
-            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
-            case FIT, STRETCH -> Texture.TextureFilter.Linear;
-        };
-    }
-
-    static void window_receiveMessage(Window window, String message_type, Object... content) {
-        if(message_type == null) return;
-        for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
-            MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
-            if (messageReceiverAction.messageType.equals(message_type)) {
-                messageReceiverAction.onMessageReceived(content);
-            }
-        }
-    }
-
-    static void window_bringToFront(InputState inputState, Window window) {
-        if (inputState.windows.size() == 1) return;
-        if (window.alwaysOnTop) {
-            if (inputState.windows.getLast() != window) {
-                inputState.windows.remove(window);
-                inputState.windows.add(window);
-            }
-        } else {
-            int index = inputState.windows.size() - 1;
-            searchIndex:
-            while (index > 0) {
-                if (!inputState.windows.get(index).alwaysOnTop) {
-                    break searchIndex;
-                }
-                index = index - 1;
-            }
-            inputState.windows.remove(window);
-            inputState.windows.add(index, window);
-        }
-    }
-
     static boolean component_isHiddenByTab(Component component) {
         if (component.addedToTab == null) return false;
         Tab selectedTab = UICommons.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
@@ -257,24 +272,6 @@ class UICommons {
         } else {
             return true;
         }
-    }
-
-    static void window_addToScreen(InputState inputState, Window window) {
-        if (window.addedToScreen) return;
-        window.addedToScreen = true;
-        inputState.windows.add(window);
-        resetActivelyUsedUIReferences(inputState);
-        if (window.windowAction != null) window.windowAction.onAdd();
-    }
-
-    static void window_removeFromScreen(InputState inputState, Window window) {
-        if (!window.addedToScreen) return;
-        if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
-        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
-        window.addedToScreen = false;
-        inputState.windows.remove(window);
-        resetActivelyUsedUIReferences(inputState);
-        if (window.windowAction != null) window.windowAction.onRemove();
     }
 
     static void hotkey_press(HotKey hotKey){
@@ -418,8 +415,8 @@ class UICommons {
         inputState.notifications.remove(notification);
     }
 
-    static boolean contextMenu_openAtMousePosition(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager) {
-        boolean success = contextMenu_open(contextMenu, inputState, mediaManager, inputState.mouse_ui.x, inputState.mouse_ui.y);
+    static boolean contextMenu_openAtMousePosition(InputState inputState,MediaManager mediaManager, ContextMenu contextMenu) {
+        boolean success = contextMenu_open(inputState, mediaManager, contextMenu, inputState.mouse_ui.x, inputState.mouse_ui.y);
         if (success && (inputState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
             inputState.mouse_emulated.x += UIEngine.TILE_SIZE_2;
@@ -428,11 +425,11 @@ class UICommons {
         return success;
     }
 
-    static boolean contextMenu_open(ContextMenu contextMenu, InputState inputState, MediaManager mediaManager, int x, int y) {
+    static boolean contextMenu_open(InputState inputState,MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
         if (contextMenu.items.size() == 0) return false;
         // Close open ContextMenus
         if (inputState.openContextMenu != null) {
-            contextMenu_close(inputState.openContextMenu, inputState);
+            contextMenu_close(inputState, inputState.openContextMenu);
         }
         // Open this one
         contextMenu.x = x;
@@ -450,7 +447,7 @@ class UICommons {
         return true;
     }
 
-    static void contextMenu_close(ContextMenu contextMenu, InputState inputState) {
+    static void contextMenu_close(InputState inputState, ContextMenu contextMenu) {
         if (contextMenu_isOpen(inputState, contextMenu)) {
             inputState.openContextMenu = null;
             inputState.displayedContextMenuWidth = 0;
@@ -490,42 +487,7 @@ class UICommons {
             tabBar.tabBarAction.onChangeTab(index, tab);
     }
 
-    static int window_getRealWidth(Window window) {
-        return window.width * UIEngine.TILE_SIZE;
-    }
 
-    static void window_fold(Window window) {
-        window.folded = true;
-        if (window.windowAction != null) window.windowAction.onFold();
-    }
-
-    static void window_unFold(Window window) {
-        window.folded = true;
-        if (window.windowAction != null) window.windowAction.onUnfold();
-
-    }
-
-
-    static int window_getRealHeight(Window window) {
-        return window.height * UIEngine.TILE_SIZE;
-    }
-
-    static void window_setPosition(InputState inputState, Window window, int x, int y) {
-        window.x = x;
-        window.y = y;
-        if (window.enforceScreenBounds) window_enforceScreenBounds(inputState, window);
-    }
-
-
-    static void window_enforceScreenBounds(InputState inputState, Window window) {
-        int wndWidth = window_getRealWidth(window);
-        window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
-        if (window.folded) {
-            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height) * UIEngine.TILE_SIZE);
-        } else {
-            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
-        }
-    }
 
     static void button_press(Button button){
         switch (button.mode){
@@ -576,6 +538,11 @@ class UICommons {
             return x >= 0 && x < grid.items.length && y >= 0 && y < grid.items[0].length;
         }
         return false;
+    }
+
+    static void grid_setItems(Grid grid, Object[][] items) {
+        grid.items = items;
+        grid_updateSize(grid);
     }
     static void grid_updateSize(Grid grid) {
         int factor = grid.doubleSized ? 2 : 1;
@@ -750,6 +717,26 @@ class UICommons {
         contextMenu.items.remove(contextMenuItem);
     }
 
+    static void contextMenu_selectItem(InputState inputState, ContextMenuItem contextMenuItem){
+        if(contextMenuItem.addedToContextMenu == null) return;
+        ContextMenu ContextMenu = contextMenuItem.addedToContextMenu;
+        if (contextMenuItem.contextMenuItemAction != null)
+            contextMenuItem.contextMenuItemAction.onSelect();
+        if (ContextMenu.contextMenuAction != null)
+            ContextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+        UICommons.contextMenu_close(inputState, ContextMenu);
+    }
+
+    static void comboBox_selectItem(InputState inputState, ComboBoxItem comboBoxItem){
+        if(comboBoxItem.addedToComboBox == null) return;
+        ComboBox comboBox = comboBoxItem.addedToComboBox;
+        comboBox.selectedItem = comboBoxItem;
+        if (comboBoxItem.comboBoxItemAction != null)
+            comboBoxItem.comboBoxItemAction.onSelect();
+        if (comboBox.comboBoxAction != null)
+            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
+        UICommons.comboBox_close(inputState, comboBox);
+    }
 
     static void comboBox_addItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != null) return;
@@ -769,6 +756,10 @@ class UICommons {
         if (canvasImage.addedToCanvas != null) return;
         canvasImage.addedToCanvas = canvas;
         canvas.canvasImages.add(canvasImage);
+    }
+
+    static void canvas_resizePixMap(Canvas canvas) {
+        canvas.pixmap = new Pixmap(canvas.width * UIEngine.TILE_SIZE, canvas.width * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
     }
 
     static void canvas_removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
@@ -1006,6 +997,10 @@ class UICommons {
 
     static void text_setLines(MediaManager mediaManager, Text text, String[] lines){
         text.lines = Tools.Text.validString(lines);
+        UICommons.text_updateSize(mediaManager, text);
+    }
+
+    static void text_updateSize(MediaManager mediaManager, Text text){
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
             int widthT = mediaManager.textWidth(text.font, text.lines[i]);
@@ -1017,6 +1012,10 @@ class UICommons {
 
     static void image_setImage(MediaManager mediaManager, Image imageC, CMediaGFX image) {
         imageC.image = image;
+        UICommons.image_updateSize(mediaManager, imageC);
+    }
+
+    static void image_updateSize(MediaManager mediaManager, Image imageC){
         imageC.width = imageC.image != null ? mediaManager.imageWidth(imageC.image) / UIEngine.TILE_SIZE : 0;
         imageC.height = imageC.image != null ? mediaManager.imageHeight(imageC.image) / UIEngine.TILE_SIZE : 0;
     }
@@ -1070,14 +1069,14 @@ class UICommons {
         canvas.texture = new Texture(canvas.pixmap);
     }
 
-    static void gameViewPort_createCameraTextureAndFrameBuffer(GameViewPort gameViewPort, int width, int height) {
+    static void gameViewPort_resizeCameraTextureAndFrameBuffer(GameViewPort gameViewPort) {
         // Clean Up
         if (gameViewPort.camera != null) gameViewPort.camera = null;
         if (gameViewPort.textureRegion != null) gameViewPort.textureRegion.getTexture().dispose();
         if (gameViewPort.frameBuffer != null) gameViewPort.frameBuffer.dispose();
         // Set
-        int viewportWidth = width * UIEngine.TILE_SIZE;
-        int viewportHeight = height * UIEngine.TILE_SIZE;
+        int viewportWidth = gameViewPort.width * UIEngine.TILE_SIZE;
+        int viewportHeight = gameViewPort.height * UIEngine.TILE_SIZE;
         gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
         Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -1085,8 +1084,45 @@ class UICommons {
         gameViewPort.textureRegion.flip(false, true);
         gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        gameViewPort.camera.position.set(0, 0, 0);
-        gameViewPort.camera.zoom = 1f;
+        gameViewPort.camera.position.set(gameViewPort.camera.position.x, gameViewPort.camera.position.y, gameViewPort.camera.position.z);
+        gameViewPort.camera.zoom = gameViewPort.camera.zoom;
     }
+
+    static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
+        switch (VIEWPORTMODE) {
+            case PIXEL_PERFECT -> {
+                return 1;
+            }
+            case FIT, STRETCH -> {
+                int upSampling = 1;
+                int testWidth = Gdx.graphics.getDisplayMode().width;
+                int testHeight = Gdx.graphics.getDisplayMode().height;
+                while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
+                    upSampling++;
+                }
+                return upSampling;
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + VIEWPORTMODE);
+        }
+    }
+
+
+    static Viewport viewport_createViewport(VIEWPORT_MODE VIEWPORTMODE, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
+        return switch (VIEWPORTMODE) {
+            case FIT -> new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+            case PIXEL_PERFECT ->
+                    new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
+            case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
+        };
+    }
+
+    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE VIEWPORTMODE) {
+        return switch (VIEWPORTMODE) {
+            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
+            case FIT, STRETCH -> Texture.TextureFilter.Linear;
+        };
+    }
+
 
 }

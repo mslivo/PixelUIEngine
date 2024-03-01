@@ -7,5 +7,5 @@ public class TextButton extends Button {
     public String text;
     public CMediaFont font;
     public CMediaGFX icon;
-    public int iconArrayIndex;
+    public int iconIndex;
 }
