@@ -31,7 +31,7 @@ public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
             shaderRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDIATE_PIXEL -> {
-                    shaderRenderer.drawPixel(particle.x, particle.y);
+                    shaderRenderer.drawPoint(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());

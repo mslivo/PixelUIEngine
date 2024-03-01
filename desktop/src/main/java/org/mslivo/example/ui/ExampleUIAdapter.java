@@ -145,7 +145,8 @@ public class ExampleUIAdapter implements UIAdapter {
         batch.end();
 
         shaderRenderer.begin();
-        shaderRenderer.drawPixel(100,100);
+        shaderRenderer.setColor(1f,1f,1f,1f);
+        shaderRenderer.drawPoint(100,100);
         shaderRenderer.end();
 
     }
