@@ -58,7 +58,7 @@ public class ExampleUIAdapter implements UIAdapter {
             public void onRelease() {
                 api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
             }
-        }, null, ButtonMode.DEFAULT);
+        }, null,0, ButtonMode.DEFAULT);
 
         api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);

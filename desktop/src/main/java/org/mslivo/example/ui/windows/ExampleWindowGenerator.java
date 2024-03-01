@@ -325,7 +325,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             public void onToggle(boolean value) {
 
             }
-        }, null, ButtonMode.TOGGLE);
+        }, null,0, ButtonMode.TOGGLE);
         api.component.tabBar.tab.addTabComponent(tabTextButton, textBtn1);
         api.component.button.centerContent(textBtn1);
         api.component.setColor(textBtn1, Color.ORANGE);
@@ -368,7 +368,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                         }
                         , null, 1f));
             }
-        }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1);
+        }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1,0);
         api.component.setColor(textBtn4, Color.LIGHT_GRAY);
         api.component.button.centerContent(textBtn4);
 

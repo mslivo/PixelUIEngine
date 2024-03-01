@@ -3985,37 +3985,33 @@ public class API {
 
             public class _TextButton {
                 public TextButton create(int x, int y, int width, int height, String text) {
-                    return create(x, y, width, height, text, defaultButtonAction(), null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
+                    return create(x, y, width, height, text, defaultButtonAction(), null,0, ButtonMode.DEFAULT, 0, 0, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                    return create(x, y, width, height, text, buttonAction, null, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
+                    return create(x, y, width, height, text, buttonAction, null,0, ButtonMode.DEFAULT, 0, 0, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon) {
-                    return create(x, y, width, height, text, buttonAction, icon, ButtonMode.DEFAULT, 0, 0, inputState.config.component_defaultFont, false);
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex) {
+                    return create(x, y, width, height, text, buttonAction, icon,iconIndex, ButtonMode.DEFAULT, 0, 0, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, 0, 0, inputState.config.component_defaultFont, false);
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode) {
+                    return create(x, y, width, height, text, buttonAction, icon,iconIndex, buttonMode, 0, 0, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, inputState.config.component_defaultFont, false);
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY) {
+                    return create(x, y, width, height, text, buttonAction, icon,iconIndex, buttonMode, contentOffsetX, contentOffsetY, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font) {
-                    return create(x, y, width, height, text, buttonAction, icon, buttonMode, contentOffsetX, contentOffsetY, font, false);
-                }
-
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, CMediaFont font, boolean togglePressed) {
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode, int contentOffsetX, int contentOffsetY, boolean togglePressed) {
                     TextButton textButton = new TextButton();
                     setComponentCommonInitValues(textButton, x, y, width, height);
                     setButtonCommonInitValues(textButton, buttonAction, buttonMode, contentOffsetX, contentOffsetY, togglePressed);
                     textButton.text = Tools.Text.validString(text);
-                    textButton.font = font;
+                    textButton.font = inputState.config.component_defaultFont;
                     textButton.icon = icon;
-                    textButton.iconIndex = 0;
+                    textButton.iconIndex = iconIndex;
                     UICommons.button_centerContent(mediaManager, textButton);
                     return textButton;
                 }
@@ -4997,23 +4993,26 @@ public class API {
             }
 
             public ComboBox create(int x, int y, int width) {
-                return create(x, y, width, null, defaultComboBoxAction(), false);
+                return create(x, y, width, null, defaultComboBoxAction(), false, null);
             }
 
-            public ComboBox create(int x, int y, int width, ComboBoxItem[] items) {
-                return create(x, y, width, items,defaultComboBoxAction() , false);
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems) {
+                return create(x, y, width, combobBoxItems,defaultComboBoxAction() , false, null);
             }
 
-            public ComboBox create(int x, int y, int width, ComboBoxItem[] items, boolean useIcons) {
-                return create(x, y, width, items, defaultComboBoxAction(), useIcons);
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
+                return create(x, y, width, combobBoxItems, comboBoxAction, false, null);
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons) {
+                return create(x, y, width, combobBoxItems, comboBoxAction, useIcons, null);
+            }
+
+            public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboBoxItem selectedItem) {
                 ComboBox comboBox = new ComboBox();
                 setComponentCommonInitValues(comboBox, x, y, width, 1);
                 comboBox.useIcons = useIcons;
                 comboBox.comboBoxAction = comboBoxAction;
-                comboBox.selectedItem = null;
                 comboBox.comboBoxItems = new ArrayList<>();
                 if (combobBoxItems != null) {
                     for (int i = 0; i < combobBoxItems.length; i++) {
@@ -5023,6 +5022,7 @@ public class API {
                         }
                     }
                 }
+                comboBox.selectedItem = selectedItem != null && selectedItem.addedToComboBox == comboBox ? selectedItem : null;
                 return comboBox;
             }
 
