@@ -50,8 +50,8 @@ public class ShaderRenderer {
     public void begin() {
         blendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         shader.bind();
-        Gdx.gl.glEnable(GL30.GL_BLEND);
         shader.setUniformMatrix("u_projTrans", this.projection);
+        Gdx.gl.glEnable(GL30.GL_BLEND);
     }
 
     public void end() {

@@ -1890,14 +1890,14 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.spriteRenderer)
             inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
         if (inputState.shaderRenderer)
-            inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
+            inputState.shaderRenderer_ui.setProjectionMatrix(camera.combined);
     }
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera){
         if (inputState.spriteRenderer)
             inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
         if (inputState.shaderRenderer)
-            inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
+            inputState.shaderRenderer_game.setProjectionMatrix(camera.combined);
     }
     public void render() {
         render(true);
