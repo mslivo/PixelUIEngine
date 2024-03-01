@@ -9,7 +9,6 @@ public class ShaderRenderer {
     private Matrix4 projection;
     private Color color;
     private ShaderProgram shader;
-    private float[] pixel_position;
     private boolean blendEnabled;
 
     private static final String VERTEX = """
@@ -38,7 +37,6 @@ public class ShaderRenderer {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
         this.projection = new Matrix4();
         this.color = new Color(Color.WHITE);
-        this.pixel_position = new float[2];
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -77,8 +75,6 @@ public class ShaderRenderer {
     }
 
     public void drawPoint(float x, float y) {
-        pixel_position[0] = x;
-        pixel_position[1] = y;
         shader.setUniformf("u_color", color.r, color.g, color.b, color.a);
         shader.setUniformf("u_pixelPosition", x, y);
         Gdx.gl.glDrawArrays(GL20.GL_POINTS, 0,1);
