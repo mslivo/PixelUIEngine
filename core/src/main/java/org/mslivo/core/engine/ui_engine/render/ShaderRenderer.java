@@ -46,14 +46,12 @@ public class ShaderRenderer {
     public void begin() {
         blendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         shader.bind();
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        if(!blendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
         shader.setUniformMatrix("u_projTrans", this.projection);
     }
 
     public void end() {
-        if(!blendEnabled){
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-        }
+        if(!blendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     public void setColor(Color color) {
