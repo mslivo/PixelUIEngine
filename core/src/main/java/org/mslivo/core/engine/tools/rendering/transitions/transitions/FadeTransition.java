@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_MODE;
+import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_RENDER_MODE;
 import org.mslivo.core.engine.tools.rendering.transitions.Transition;
 
 public class FadeTransition implements Transition {
@@ -12,10 +12,10 @@ public class FadeTransition implements Transition {
     private float fadeIn;
 
     @Override
-    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
-        return TRANSITION_MODE.FROM_FIRST;
+        return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
     @Override

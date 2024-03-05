@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_MODE;
+import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_RENDER_MODE;
 import org.mslivo.core.engine.tools.rendering.transitions.Transition;
 
 public class FallOutTransition implements Transition {
@@ -12,11 +12,11 @@ public class FallOutTransition implements Transition {
     private float ySpeed;
     private int screenHeight;
     @Override
-    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
         this.yTo = 0;
         this.screenHeight = screenHeight;
         this.ySpeed = MathUtils.round(this.screenHeight /80f);
-        return TRANSITION_MODE.TO_FIRST;
+        return TRANSITION_RENDER_MODE.TO_FIRST;
     }
 
     @Override

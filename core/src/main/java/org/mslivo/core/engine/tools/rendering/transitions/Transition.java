@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public interface Transition {
 
-    TRANSITION_MODE init(int screenWidth, int screenHeight);
+    TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight);
 
     boolean update();
 

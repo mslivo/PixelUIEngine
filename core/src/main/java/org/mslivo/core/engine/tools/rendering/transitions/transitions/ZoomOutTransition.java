@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_MODE;
+import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_RENDER_MODE;
 import org.mslivo.core.engine.tools.rendering.transitions.Transition;
 
 public class ZoomOutTransition implements Transition {
@@ -13,12 +13,12 @@ public class ZoomOutTransition implements Transition {
     private int screenHeight;
 
     @Override
-    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 1f;
         this.zoomAcc = 0.02f;
-        return TRANSITION_MODE.TO_FIRST;
+        return TRANSITION_RENDER_MODE.TO_FIRST;
     }
 
     @Override

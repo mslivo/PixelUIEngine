@@ -28,7 +28,7 @@ public class TransitionManager {
     private boolean finished;
     private int resolutionWidth, resolutionHeight;
     private VIEWPORT_MODE VIEWPORTMODE;
-    private TRANSITION_MODE transitionMode;
+    private TRANSITION_RENDER_MODE transitionMode;
     private UIEngine from;
     private UIEngine to;
 
@@ -116,7 +116,7 @@ public class TransitionManager {
             frameBuffer_to.end();
         }
         transitionMode = this.transition.init(resolutionWidth, resolutionHeight);
-        if (transitionMode == null) transitionMode = TRANSITION_MODE.FROM_FIRST;
+        if (transitionMode == null) transitionMode = TRANSITION_RENDER_MODE.FROM_FIRST;
         this.initialized = true;
         this.finished = false;
     }

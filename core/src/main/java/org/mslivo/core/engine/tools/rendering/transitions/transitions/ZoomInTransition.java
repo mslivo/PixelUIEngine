@@ -3,7 +3,7 @@ package org.mslivo.core.engine.tools.rendering.transitions.transitions;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_MODE;
+import org.mslivo.core.engine.tools.rendering.transitions.TRANSITION_RENDER_MODE;
 import org.mslivo.core.engine.tools.rendering.transitions.Transition;
 
 public class ZoomInTransition implements Transition {
@@ -11,12 +11,12 @@ public class ZoomInTransition implements Transition {
     private int screenWidth;
     private int screenHeight;
     @Override
-    public TRANSITION_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 0f;
         this.zoomAcc = 0.02f;
-        return TRANSITION_MODE.TO_FIRST;
+        return TRANSITION_RENDER_MODE.TO_FIRST;
     }
 
     @Override
