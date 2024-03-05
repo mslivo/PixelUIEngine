@@ -114,7 +114,8 @@ public class UIEngine<T extends UIAdapter> {
         this.inputState = initializeInputState(internalResolutionWidth, internalResolutionHeight, viewportMode, spriteRenderer, immediateRenderer, gamePadSupport);
         this.api = new API(this.inputState, mediaManager);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
-        render_glClear();
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         /*  Call Adapter Init */
         this.uiAdapter.init(this.api, this.mediaManager);
     }
@@ -1912,12 +1913,10 @@ public class UIEngine<T extends UIAdapter> {
         // Draw Game
         {
             // Draw Main FrameBuffer
-
             inputState.frameBuffer_game.begin();
             render_setGameProjectionMatrix(inputState.camera_game);
             this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderRenderer_game, null);
             inputState.frameBuffer_game.end();
-
             // Draw GUI GameViewPort FrameBuffers
             for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
                 renderGameViewPortFrameBuffer(inputState.gameViewPorts.get(i));
@@ -1926,29 +1925,31 @@ public class UIEngine<T extends UIAdapter> {
 
 
         { // Draw GUI
-            render_setUIProjectionMatrix(inputState.camera_ui);
             inputState.frameBuffer_ui.begin();
-            render_glClear();
+            render_setUIProjectionMatrix(inputState.camera_ui);
+            Gdx.gl.glClearColor(0, 0, 0, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.shaderRenderer_ui);
             this.renderUI();
             this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.shaderRenderer_ui);
             inputState.frameBuffer_ui.end();
         }
 
-
-        {
-            // Draw to Upscale Buffer
-            inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
+        { // Draw to Screen Buffer, Combine GUI+Game Buffer and Upscale
             inputState.frameBuffer_screen.begin();
+            inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
                     inputState.texture_game, inputState.texture_ui,
                     inputState.internalResolutionWidth, inputState.internalResolutionHeight
             );
             inputState.frameBuffer_screen.end();
+        }
+
+        {
+
             // Draw to Screen
             if (drawToScreen) {
                 inputState.viewport_screen.apply();
-                render_glClear();
                 inputState.spriteBatch_screen.begin();
                 inputState.spriteBatch_screen.draw(inputState.texture_screen, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
                 inputState.spriteBatch_screen.end();
@@ -1963,8 +1964,8 @@ public class UIEngine<T extends UIAdapter> {
         if (render_isComponentNotRendered(gameViewPort)) return;
         if (System.currentTimeMillis() - gameViewPort.updateTimer > gameViewPort.updateTime) {
             // draw to frambuffer
-            render_setGameProjectionMatrix(gameViewPort.camera);
             gameViewPort.frameBuffer.begin();
+            render_setGameProjectionMatrix(gameViewPort.camera);
             this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderRenderer_game, gameViewPort);
             gameViewPort.frameBuffer.end();
             gameViewPort.updateTimer = System.currentTimeMillis();
@@ -2997,11 +2998,6 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
         mediaManager.drawCMediaGFX(inputState.spriteBatch_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
-    }
-
-    private void render_glClear() {
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
     public void shutdown() {
