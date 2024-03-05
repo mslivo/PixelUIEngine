@@ -2589,7 +2589,7 @@ public class UIEngine<T extends UIAdapter> {
                     // Text
                     if (item != null) {
                         String text = list.listAction.text(item);
-                        render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, list.width * TILE_SIZE, list.listAction.icon(item), list.listAction.iconArrayIndex(item));
+                        render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, list.width * TILE_SIZE, list.listAction.icon(item), list.listAction.iconIndex(item));
                     }
                 }
 
@@ -2736,7 +2736,7 @@ public class UIEngine<T extends UIAdapter> {
 
                             if (icon != null) {
                                 render_batchSetColorWhite(alpha);
-                                int iconIndex = grid.gridAction != null ? grid.gridAction.iconArrayIndex(grid.items[ix][iy]) : 0;
+                                int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(grid.items[ix][iy]) : 0;
                                 render_drawCMediaGFX(icon, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex);
                             }
                             render_loadTempColorBatch();
@@ -2870,7 +2870,7 @@ public class UIEngine<T extends UIAdapter> {
             if (dragGrid.gridAction != null) {
                 render_batchSetColorWhite(inputState.config.component_gridDragAlpha);
                 CMediaGFX icon = dragGrid.gridAction.icon(dragItem);
-                render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconArrayIndex(dragItem));
+                render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconIndex(dragItem));
             }
         } else if (inputState.draggedList != null) {
             List dragList = inputState.draggedList;
@@ -2886,7 +2886,7 @@ public class UIEngine<T extends UIAdapter> {
                 // Text
                 String text = dragList.listAction.text(dragItem);
                 render_drawFont(dragList.font, text, dragList.color_a, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, 2, 1,
-                        dragList.width * TILE_SIZE, dragList.listAction.icon(dragItem), dragList.listAction.iconArrayIndex(dragItem));
+                        dragList.width * TILE_SIZE, dragList.listAction.icon(dragItem), dragList.listAction.iconIndex(dragItem));
             }
         }
 

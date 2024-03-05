@@ -18,7 +18,7 @@ public abstract class ListAction<T> extends CommonActions {
         return null;
     }
 
-    public int iconArrayIndex(T listItem) { // if CMedia is CMediaArray
+    public int iconIndex(T listItem) { // if CMedia is CMediaArray
         return 0;
     }
 

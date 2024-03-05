@@ -16,7 +16,7 @@ public abstract class GridAction<T> extends CommonActions {
         return null;
     }
 
-    public int iconArrayIndex(T listItem) {
+    public int iconIndex(T listItem) {
         return 0;
     }
 
