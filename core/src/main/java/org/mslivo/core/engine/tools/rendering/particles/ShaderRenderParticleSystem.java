@@ -30,7 +30,7 @@ public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
             if (!particle.visible) continue;
             shaderRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
-                case IMMEDIATE_PIXEL -> {
+                case SHADER_PIXEL -> {
                     shaderRenderer.drawPoint(particle.x, particle.y);
                 }
                 default -> {
@@ -44,13 +44,13 @@ public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
 
     /* ------- PIXEL ------- */
     protected Particle<T> addParticle(float x, float y, float r, float g, float b) {
-        Particle<T> particle = particleNew(ParticleType.IMMEDIATE_PIXEL, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.SHADER_PIXEL, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected Particle<T> addParticle(float x, float y, float r, float g, float b, float a) {
-        Particle<T> particle = particleNew(ParticleType.IMMEDIATE_PIXEL, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.SHADER_PIXEL, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
