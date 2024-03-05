@@ -3001,6 +3001,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void shutdown() {
+        this.uiAdapter.shutdown();
+
         // Lists
         inputState.windows.clear();
 
@@ -3029,8 +3031,6 @@ public class UIEngine<T extends UIAdapter> {
         inputState.grayScaleShader.dispose();
 
         inputState = null;
-
-        this.uiAdapter.shutdown();
     }
 
     public int getInternalResolutionWidth() {
