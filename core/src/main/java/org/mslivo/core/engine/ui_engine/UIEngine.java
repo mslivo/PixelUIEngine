@@ -2628,10 +2628,10 @@ public class UIEngine<T extends UIAdapter> {
                 render_saveTempColorBatch();
                 render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
                 if (knob.endless) {
-                    int index = MathUtils.round(knob.turned * 36);
+                    int index = MathUtils.round(knob.turned * 31);
                     render_drawCMediaGFX(UIBaseMedia.UI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 } else {
-                    int index = MathUtils.round(knob.turned * 28);
+                    int index = MathUtils.round(knob.turned * 25);
                     render_drawCMediaGFX(UIBaseMedia.UI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 }
                 render_loadTempColorBatch();
