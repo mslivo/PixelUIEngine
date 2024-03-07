@@ -87,7 +87,7 @@ public class ShaderBatch {
     public void drawPoint(float x, float y) {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shader.setUniformf("u_color", currentColor.r, currentColor.g, currentColor.b, currentColor.a);
-        shader.setUniformf("u_pointPosition", x, y);
+        shader.setUniformf("u_pointPosition", x+offsetX, y+offsetY);
         Gdx.gl.glDrawArrays(GL20.GL_POINTS, 0,1);
     }
 
