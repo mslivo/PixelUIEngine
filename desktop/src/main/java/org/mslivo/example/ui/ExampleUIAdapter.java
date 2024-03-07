@@ -148,9 +148,22 @@ public class ExampleUIAdapter implements UIAdapter {
         for(int ix=0;ix<10;ix++){
             for(int iy=0;iy<10;iy++){
                 immediateBatch.setColor(ix/10f,iy/10f,1f,0.5f);
-                immediateBatch.drawPoint(100+ix,100+iy);
+                immediateBatch.vertex(100+ix,100+iy);
             }
         }
+        immediateBatch.end();
+
+        immediateBatch.begin(GL20.GL_LINES);
+        for(int ix=0;ix<10;ix++){
+            for(int iy=0;iy<10;iy++){
+                immediateBatch.setColor(ix/10f,iy/10f,1f,0.5f);
+                immediateBatch.vertex(0,0,100+ix,100+iy);
+            }
+        }
+        immediateBatch.end();
+
+        immediateBatch.begin(GL20.GL_TRIANGLES);
+        immediateBatch.vertex(0,0,100,100,200,0);
         immediateBatch.end();
 
     }

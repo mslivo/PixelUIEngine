@@ -141,7 +141,7 @@ public class UIEngine<T extends UIAdapter> {
             newInputState.spriteBatch_game = null;
         }
         if (shaderRenderer) {
-            newInputState.immediateBatch_game = new ImmediateBatch(internalResolutionWidth, internalResolutionHeight);
+            newInputState.immediateBatch_game = new ImmediateBatch();
         } else {
             newInputState.immediateBatch_game = null;
         }
@@ -158,7 +158,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_ui = new SpriteBatch(8191);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
-            newInputState.immediateBatch_ui = new ImmediateBatch(internalResolutionWidth, internalResolutionHeight);
+            newInputState.immediateBatch_ui = new ImmediateBatch();
         }
         newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);

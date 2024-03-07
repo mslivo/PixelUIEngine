@@ -31,7 +31,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
             immediateBatch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDAITE_POINT -> {
-                    immediateBatch.drawPoint(particle.x, particle.y);
+                    immediateBatch.vertex(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
