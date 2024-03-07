@@ -4,8 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.ByteArray;
-import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.BufferUtils;
+
+import java.nio.FloatBuffer;
 
 public class ShaderBatch {
     private static final byte OPERATION_SETCOLOR = 1;
@@ -17,28 +18,30 @@ public class ShaderBatch {
     private Matrix4 projection;
     private Color currentColor;
     private boolean blendEnabled;
-    private ByteArray opType;
-    private FloatArray opParams;
+    private FloatBuffer vertices;
+    private float offsetX;
+    private float offsetY;
 
     private static final String VERTEX = """
-            attribute vec4 a_position;
-                        uniform mat4 u_projTrans;
-
-                        void main() {
-                            gl_Position = u_projTrans * a_position;
-                            gl_PointSize = 1.0; // Needed for WebGL/ANGLE issue
-                        }
+               attribute vec4 a_position;
+               uniform mat4 u_projTrans;
+            
+               void main() {
+                   gl_Position = u_projTrans * a_position;
+                   gl_PointSize = 1.0;
+               }
             """;
+
     private static final String FRAGMENT = """
-             #ifdef GL_ES
-                        precision mediump float;
-                        #endif
-
-                        uniform vec4 u_color; // Color uniform
-
-                        void main() {
-                            gl_FragColor = u_color;
-                        }
+               #ifdef GL_ES
+                   precision mediump float;
+               #endif
+       
+               uniform vec4 u_color;
+       
+               void main() {
+                   gl_FragColor = u_color;
+               }
             """;
 
 
@@ -47,8 +50,9 @@ public class ShaderBatch {
         this.mesh = new Mesh(true, 3, 0, new VertexAttribute(VertexAttributes.Usage.Position, 2, "a_position"));
         this.projection = new Matrix4();
         this.currentColor = new Color(Color.WHITE);
-        this.opType = new ByteArray();
-        this.opParams = new FloatArray();
+        this.vertices = BufferUtils.newFloatBuffer(6);
+        this.offsetX = 0;
+        this.offsetY = 0;
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -59,53 +63,16 @@ public class ShaderBatch {
         blendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         shader.bind();
         if(!blendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
-        shader.setUniformMatrix("u_projTrans", this.projection);
+        Gdx.gl.glUniformMatrix4fv(shader.getUniformLocation("u_projTrans"), 1, false, this.projection.val, 0);
     }
 
     public void end() {
-        int paramIndex = 0;
-
-        // Render to Screen
-        for(int i = 0; i< opType.size; i++){
-            byte type = opType.get(i);
-            switch (type){
-                case OPERATION_SETCOLOR -> {
-                    currentColor.set(opParams.get(paramIndex), opParams.get(paramIndex+1), opParams.get(paramIndex+2), opParams.get(paramIndex+3));
-                    paramIndex += 4;
-                }
-                case OPERATION_POINTS -> {
-                    shader.setUniformf("u_color", currentColor.r, currentColor.g, currentColor.b, currentColor.a);
-                    mesh.setVertices(opParams.items,paramIndex,2);
-                    mesh.render(shader, GL20.GL_POINTS);
-                    paramIndex += 2;
-                }
-                case OPERATION_LINE -> {
-                    shader.setUniformf("u_color", currentColor.r, currentColor.g, currentColor.b, currentColor.a);
-                    mesh.setVertices(opParams.items,paramIndex,4);
-                    mesh.render(shader, GL20.GL_LINES);
-                    paramIndex += 4;
-                }
-                case OPERATION_TRIANGLE -> {
-                    shader.setUniformf("u_color", currentColor.r, currentColor.g, currentColor.b, currentColor.a);
-                    mesh.setVertices(opParams.items,paramIndex,6);
-                    mesh.render(shader, GL20.GL_TRIANGLES);
-                    paramIndex += 6;
-                }
-            }
-        }
-
-        opType.clear();
-        opParams.clear();
         if(!blendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     public void dispose() {
         projection = null;
         currentColor = null;
-        opParams.clear();
-        opParams.items = null;
-        opParams.clear();
-        opType.items = null;
         mesh.dispose();
         shader.dispose();
     }
@@ -119,27 +86,54 @@ public class ShaderBatch {
     }
 
     public void setColor(float r, float g, float b, float a) {
-        if(currentColor.r == r && currentColor.g == g && currentColor.b == b && currentColor.a == a) return;
-        opType.add(OPERATION_SETCOLOR);
-        opParams.add(r,g,b,a);
         currentColor.set(r,g,b,a);
     }
 
     public void drawPoint(float x, float y){
-        opType.add(OPERATION_POINTS);
-        opParams.add(x,y);
+        Gdx.gl.glUniform4f(shader.getUniformLocation("u_color"), currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+        vertices.put(x+offsetX);
+        vertices.put(y+offsetY);
+        vertices.position(0);
+        Gdx.gl.glEnableVertexAttribArray(0);
+        Gdx.gl.glVertexAttribPointer(0, 2, GL20.GL_FLOAT, false, 0, vertices);
+        Gdx.gl.glDrawArrays(GL20.GL_POINTS, 0, 1);
     }
 
-    public void drawLine(float x1, float y1, float x2, float y2){
-        opType.add(OPERATION_LINE);
-        opParams.add(x1,y1,x2,y2);
+    public void drawLine(float x1, float y1,float x2, float y2){
+        Gdx.gl.glUniform4f(shader.getUniformLocation("u_color"), currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+        vertices.put(x1+offsetX);
+        vertices.put(y1+offsetY);
+        vertices.put(x2+offsetX);
+        vertices.put(y2+offsetY);
+        vertices.position(0);
+        Gdx.gl.glEnableVertexAttribArray(0);
+        Gdx.gl.glVertexAttribPointer(0, 2, GL20.GL_FLOAT, false, 0, vertices);
+        Gdx.gl.glDrawArrays(GL20.GL_LINES, 0, 2);
     }
 
-    public void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3){
-        opType.add(OPERATION_TRIANGLE);
-        opParams.add(x1,y1);
-        opParams.add(x2,y2);
-        opParams.add(x3,y3);
+    public void drawTriangle(float x1, float y1,float x2, float y2,float x3, float y3){
+        Gdx.gl.glUniform4f(shader.getUniformLocation("u_color"), currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+        vertices.put(x1+offsetX);
+        vertices.put(y1+offsetY);
+        vertices.put(x2+offsetX);
+        vertices.put(y2+offsetY);
+        vertices.put(x3+offsetX);
+        vertices.put(y3+offsetY);
+        vertices.position(0);
+        Gdx.gl.glEnableVertexAttribArray(0);
+        Gdx.gl.glVertexAttribPointer(0, 2, GL20.GL_FLOAT, false, 0, vertices);
+        Gdx.gl.glDrawArrays(GL20.GL_TRIANGLES, 0, 3);
+    }
+
+    public void setOffset(float x, float y) {
+        this.offsetX = offsetX;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+    public float getOffsetY() {
+        return offsetX;
     }
 
 }
