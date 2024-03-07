@@ -1,7 +1,7 @@
 package org.mslivo.core.engine.tools.rendering.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import org.mslivo.core.engine.ui_engine.render.ShaderRenderer;
+import org.mslivo.core.engine.ui_engine.render.ShaderBatch;
 
 /*
  * Particle System must be extended and implemented
@@ -18,27 +18,27 @@ public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
         backup = new Color();
     }
 
-    public void render(ShaderRenderer shaderRenderer) {
+    public void render(ShaderBatch shaderBatch) {
         if (particles.size() == 0) return;
-        backup.r = shaderRenderer.getColor().r;
-        backup.g = shaderRenderer.getColor().g;
-        backup.b = shaderRenderer.getColor().b;
-        backup.a = shaderRenderer.getColor().a;
+        backup.r = shaderBatch.getColor().r;
+        backup.g = shaderBatch.getColor().g;
+        backup.b = shaderBatch.getColor().b;
+        backup.a = shaderBatch.getColor().a;
 
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            shaderRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
+            shaderBatch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case SHADER_PIXEL -> {
-                    shaderRenderer.drawPoint(particle.x, particle.y);
+                    shaderBatch.drawPoint(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
         }
-        shaderRenderer.setColor(backup);
+        shaderBatch.setColor(backup);
     }
 
 
