@@ -9,17 +9,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -30,14 +26,15 @@ public class MediaManager {
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
     private boolean loaded;
-    private final ObjectMap<CMediaSound, Sound> medias_sounds = new ObjectMap<>();
-    private final ObjectMap<CMediaMusic, Music> medias_music = new ObjectMap<>();
-    private final ObjectMap<CMediaImage, TextureRegion> medias_images = new ObjectMap<>();
-    private final ObjectMap<CMediaCursor, TextureRegion> medias_cursors = new ObjectMap<>();
-    private final ObjectMap<CMediaFont, BitmapFont> medias_fonts = new ObjectMap<>();
-    private final ObjectMap<CMediaArray, TextureRegion[]> medias_arrays = new ObjectMap<>();
-    private final ObjectMap<CMediaAnimation, Animation> medias_animations = new ObjectMap<>();
+    private Sound[] medias_sounds = null;
+    private Music[] medias_music = null;
+    private TextureRegion[] medias_images = null;
+    private TextureRegion[] medias_cursors = null;
+    private BitmapFont[] medias_fonts = null;
+    private TextureRegion[][] medias_arrays = null;
+    private Animation[] medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
+    private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas;
 
     public MediaManager() {
@@ -85,94 +82,123 @@ public class MediaManager {
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
-        HashSet<CMedia> preparedForLoad = new HashSet<>();
+        HashSet<CMedia> duplicateCheck = new HashSet<>();
         int step = 0;
         int stepsMax = 0;
-        boolean anyImageData = false;
 
-        // Split into Image and Sound Data
+        // split into Image and Sound data, skip duplicates, check format and index
         CMedia loadMedia;
         while ((loadMedia = loadMediaList.poll()) != null) {
-            if (!preparedForLoad.contains(loadMedia)) {
+            if (!duplicateCheck.contains(loadMedia)) {
+                if (loadMedia.mediaManagerIndex != CMedia.MEDIAMANGER_INDEX_NONE)
+                    throw new RuntimeException("CMedia File\"" + loadMedia.file + "\": already loaded in a MediaManager");
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
                     imageCMediaLoadStack.add(loadMedia);
-                    anyImageData = true;
                 } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                     soundCMediaLoadStack.add(loadMedia);
                 } else {
-                    throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName() + "\"");
+                    throw new RuntimeException("CMedia File \"" + loadMedia.file + "\", CMedia Format unknown: \"" + loadMedia.getClass().getSimpleName() + "\"");
                 }
-                preparedForLoad.add(loadMedia);
-                stepsMax ++;
+                duplicateCheck.add(loadMedia);
+                stepsMax++;
             }
         }
+        duplicateCheck.clear();
 
-        if (anyImageData) {
-            // 1. Load Image Data Into Pixmap Packer
-            for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-                CMedia imageMedia = imageCMediaLoadStack.get(i);
-                String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
-                TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
-                textureData.prepare();
-                pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
-                textureData.disposePixmap();
-                step++;
-                if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
+        // 2. Create medias_ arrays
+        int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
+        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+            switch (imageCMediaLoadStack.get(i)) {
+                case CMediaImage cMediaImage -> imagesMax++;
+                case CMediaCursor cMediaCursor -> cursorMax++;
+                case CMediaArray cMediaArray -> arraysMax++;
+                case CMediaAnimation cMediaAnimation -> animationsMax++;
+                case CMediaFont cMediaFont -> fontsMax++;
+                case CMediaSound cMediaSound -> soundMax++;
+                case CMediaMusic cMediaMusic -> musicMax++;
+                default -> throw new IllegalStateException("Unexpected value: " + imageCMediaLoadStack.get(i));
             }
+        }
+        medias_images = new TextureRegion[imagesMax];
+        medias_cursors = new TextureRegion[cursorMax];
+        medias_arrays = new TextureRegion[arraysMax][];
+        medias_animations = new Animation[animationsMax];
+        medias_fonts = new BitmapFont[fontsMax];
+        medias_sounds = new Sound[soundMax];
+        medias_music = new Music[musicMax];
 
-            // 2. Create TextureAtlas
-            this.textureAtlas = new TextureAtlas();
-            pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
+        // 3. Load Image Data Into Pixmap Packer
+        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+            CMedia imageMedia = imageCMediaLoadStack.get(i);
+            String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
+            TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
+            textureData.prepare();
+            pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
+            textureData.disposePixmap();
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
+        }
 
-            // 3. Fill medias_ with TextureAtlas Data
-            for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-                CMedia imageMedia = imageCMediaLoadStack.get(i);
-                if (imageMedia.getClass() == CMediaImage.class) {
-                    CMediaImage cMediaImage = (CMediaImage) imageMedia;
-                    medias_images.put(cMediaImage, textureAtlas.findRegion(imageMedia.file));
-                } else if (imageMedia.getClass() == CMediaCursor.class) {
-                    CMediaCursor cMediaCursor = (CMediaCursor) imageMedia;
-                    medias_cursors.put(cMediaCursor, textureAtlas.findRegion(imageMedia.file));
-                } else if (imageMedia.getClass() == CMediaArray.class) {
-                    CMediaArray cMediaArray = (CMediaArray) imageMedia;
-                    TextureRegion[] result = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
+        // 4. Create TextureAtlas
+        this.textureAtlas = new TextureAtlas();
+        pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
+
+        // 5. Fill arrays with TextureAtlas Data
+        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0;
+        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+            CMedia imageMedia = imageCMediaLoadStack.get(i);
+            switch (imageMedia) {
+                case CMediaImage cMediaImage -> {
+                    cMediaImage.mediaManagerIndex = imagesIdx;
+                    medias_images[imagesIdx++] = textureAtlas.findRegion(cMediaImage.file);
+                }
+                case CMediaCursor cMediaCursor -> {
+                    cMediaCursor.mediaManagerIndex = cursorIdx;
+                    medias_cursors[cursorIdx++] = textureAtlas.findRegion(cMediaCursor.file);
+                }
+                case CMediaArray cMediaArray -> {
+                    cMediaArray.mediaManagerIndex = arraysIdx;
+                    medias_arrays[arraysIdx++] = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
                             cMediaArray.frameOffset, cMediaArray.frameLength);
-                    medias_arrays.put(cMediaArray, result);
-                } else if (imageMedia.getClass() == CMediaAnimation.class) {
-                    CMediaAnimation cMediaAnimation = (CMediaAnimation) imageMedia;
-                    TextureRegion[] result = splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
-                            cMediaAnimation.frameOffset, cMediaAnimation.frameLength);
-                    Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
-                    medias_animations.put(cMediaAnimation, animation);
-                } else if (imageMedia.getClass() == CMediaFont.class) {
-                    CMediaFont cMediaFont = (CMediaFont) imageMedia;
-                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
-                    medias_fonts.put(cMediaFont, bitmapFont);
                 }
+                case CMediaAnimation cMediaAnimation -> {
+                    cMediaAnimation.mediaManagerIndex = animationsIdx;
+                    medias_animations[animationsIdx++] = new Animation<>(cMediaAnimation.animation_speed, splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
+                            cMediaAnimation.frameOffset, cMediaAnimation.frameLength));
+                }
+                case CMediaFont cMediaFont -> {
+                    cMediaFont.mediaManagerIndex = fontsIdx;
+                    medias_fonts[fontsIdx++] = new BitmapFont(Tools.File.findResource(cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + imageMedia);
             }
-            pixmapPacker.dispose();
+            loadedMediaList.add(imageMedia);
         }
+        pixmapPacker.dispose();
+        imageCMediaLoadStack.clear();
 
-        // 4. Load Sound Data
+        // 6. Fill arrays with Sound Data
+        int soundIdx = 0, musicIdx = 0;
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
             CMedia soundMedia = soundCMediaLoadStack.get(i);
-            if (soundMedia.getClass() == CMediaSound.class) {
-                CMediaSound cMediaSound = (CMediaSound) soundMedia;
-                Sound sound = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
-                medias_sounds.put(cMediaSound, sound);
-            } else if (soundMedia.getClass() == CMediaMusic.class) {
-                CMediaMusic cMediaMusic = (CMediaMusic) soundMedia;
-                Music music = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
-                medias_music.put(cMediaMusic, music);
+            switch (soundMedia) {
+                case CMediaSound cMediaSound -> {
+                    cMediaSound.mediaManagerIndex = soundIdx;
+                    medias_sounds[soundIdx++] = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
+                }
+                case CMediaMusic cMediaMusic -> {
+                    cMediaMusic.mediaManagerIndex = musicIdx++;
+                    medias_music[musicIdx] = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + soundMedia);
             }
+            loadedMediaList.add(soundMedia);
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(soundMedia.file, step, stepsMax);
         }
-
-        // 5. Clean Up
-        imageCMediaLoadStack.clear();
         soundCMediaLoadStack.clear();
-        preparedForLoad.clear();
+
+        // 5. Finished
         this.loaded = true;
         return true;
     }
@@ -228,23 +254,28 @@ public class MediaManager {
     /* --- Unload  ---- */
     public boolean unloadAndReset() {
         if (!loaded) return false;
-        // Images
+        // Dispose Atlas
         if (textureAtlas != null) this.textureAtlas.dispose();
         textureAtlas = null;
-        this.medias_cursors.clear();
-        this.medias_images.clear();
-        this.medias_arrays.clear();
-        this.medias_animations.clear();
-        // Sounds
-        for (CMediaSound cMediaSound : medias_sounds.keys()) medias_sounds.get(cMediaSound).dispose();
-        this.medias_sounds.clear();
-        //Music
-        for (CMediaMusic cMediaMusic : medias_music.keys()) medias_music.get(cMediaMusic).dispose();
-        this.medias_music.clear();
-        // Fonts
-        for (CMediaFont cMediaFont : medias_fonts.keys()) medias_fonts.get(cMediaFont).dispose();
-        this.medias_fonts.clear();
 
+        // Reset mediamanager index
+        for (int i = 0; i < loadedMediaList.size(); i++)
+            loadedMediaList.get(i).mediaManagerIndex = CMedia.MEDIAMANGER_INDEX_NONE;
+
+        // Dispose and null
+        for (int i = 0; i < medias_sounds.length; i++) medias_sounds[i].dispose();
+        for (int i = 0; i < medias_music.length; i++) medias_music[i].dispose();
+        for (int i = 0; i < medias_fonts.length; i++) medias_fonts[i].dispose();
+        this.medias_cursors = null;
+        this.medias_images = null;
+        this.medias_arrays = null;
+        this.medias_animations = null;
+        this.medias_sounds = null;
+        this.medias_music = null;
+        this.medias_fonts = null;
+
+        // Reset lists
+        this.loadedMediaList.clear();
         this.loadMediaList.clear();
         this.loaded = false;
         return true;
@@ -478,7 +509,7 @@ public class MediaManager {
     }
 
     public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
-        return medias_cursors.get(cMedia);
+        return medias_cursors[cMedia.mediaManagerIndex];
     }
 
 
@@ -525,11 +556,11 @@ public class MediaManager {
     }
 
     public TextureRegion getCMediaImage(CMediaImage cMedia) {
-        return medias_images.get(cMedia);
+        return medias_images[cMedia.mediaManagerIndex];
     }
 
     public TextureRegion getCMediaAnimation(CMediaAnimation cMedia, float animationTimer) {
-        return (TextureRegion) medias_animations.get(cMedia).getKeyFrame(animationTimer, true);
+        return (TextureRegion) medias_animations[cMedia.mediaManagerIndex].getKeyFrame(animationTimer, true);
     }
 
     /* --- CMediaAnimation  --- */
@@ -574,11 +605,11 @@ public class MediaManager {
     }
 
     public boolean isCMediaAnimationFinished(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations.get(cMedia).isAnimationFinished(animationTimer);
+        return medias_animations[cMedia.mediaManagerIndex].isAnimationFinished(animationTimer);
     }
 
     public int getCMediaAnimationKeyFrameIndex(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations.get(cMedia).getKeyFrameIndex(animationTimer);
+        return medias_animations[cMedia.mediaManagerIndex].getKeyFrameIndex(animationTimer);
     }
 
     /* --- CMediaArray  --- */
@@ -623,11 +654,11 @@ public class MediaManager {
     }
 
     public int getCMediaArraySize(CMediaArray cMedia) {
-        return medias_arrays.get(cMedia).length;
+        return medias_arrays[cMedia.mediaManagerIndex].length;
     }
 
     public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
-        return medias_arrays.get(cMedia)[arrayIndex];
+        return medias_arrays[cMedia.mediaManagerIndex][arrayIndex];
     }
     /* --- CMediaFont  --- */
 
@@ -654,7 +685,7 @@ public class MediaManager {
     }
 
     public BitmapFont getCMediaFont(CMediaFont cMedia) {
-        return medias_fonts.get(cMedia);
+        return medias_fonts[cMedia.mediaManagerIndex];
     }
 
     public int textWidth(CMediaFont font, String text) {
@@ -702,11 +733,11 @@ public class MediaManager {
     }
 
     public Sound getCMediaSound(CMediaSound cMedia) {
-        return medias_sounds.get(cMedia);
+        return medias_sounds[cMedia.mediaManagerIndex];
     }
 
     public Music getCMediaMusic(CMediaMusic cMedia) {
-        return medias_music.get(cMedia);
+        return medias_music[cMedia.mediaManagerIndex];
     }
 
 

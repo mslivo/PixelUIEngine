@@ -4,14 +4,16 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public abstract class CMedia implements Serializable {
+    public static final int MEDIAMANGER_INDEX_NONE = -1;
 
     public final String file;
-
     private final int hash;
+    public int mediaManagerIndex;
 
     protected CMedia(String file) {
         this.file = file;
         this.hash = Objects.hash(file);
+        this.mediaManagerIndex = MEDIAMANGER_INDEX_NONE;
     }
 
     @Override
