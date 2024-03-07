@@ -43,6 +43,10 @@ public class MediaManager {
 
 
     /* ----- Prepare ----- */
+    public boolean prepareUICMedia() {
+        return prepareCMedia(UIBaseMedia.ALL);
+    }
+
     public boolean prepareCMedia(CMedia cMedia) {
         if (loaded) return false;
         loadMediaList.add(cMedia);
@@ -52,12 +56,6 @@ public class MediaManager {
     public boolean prepareCMedia(CMedia[] cMedias) {
         if (loaded) return false;
         for (int i = 0; i < cMedias.length; i++) loadMediaList.add(cMedias[i]);
-        return true;
-    }
-
-    public boolean prepareUICMedia() {
-        if (loaded) return false;
-        prepareCMedia(UIBaseMedia.ALL);
         return true;
     }
 
@@ -96,70 +94,63 @@ public class MediaManager {
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
                     imageCMediaLoadStack.add(loadMedia);
                     preparedForLoad.add(loadMedia);
-                    stepsMax += 2;
+                    stepsMax ++;
                     anyImageData = true;
                 } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                     soundCMediaLoadStack.add(loadMedia);
                     preparedForLoad.add(loadMedia);
-                    stepsMax += 1;
+                    stepsMax ++;
                 } else {
                     throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName() + "\"");
                 }
             }
         }
 
-        // 1. Load Image Data Into Pixmap Packer
-        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-            CMedia imageMedia = imageCMediaLoadStack.get(i);
-            String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
-            Texture texture = new Texture(Tools.File.findResource(textureFileName), false);
-            TextureData textureData = texture.getTextureData();
-            textureData.prepare();
-            pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
-            textureData.disposePixmap();
-            texture.dispose();
-            step++;
-            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
-        }
-
-
-        // 2. Create Image Texture Atlas
         if (anyImageData) {
-            this.textureAtlas = new TextureAtlas();
-            pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
-        }
-
-        // 3. Prepare image Data
-        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-            CMedia imageMedia = imageCMediaLoadStack.get(i);
-            if (imageMedia.getClass() == CMediaImage.class) {
-                CMediaImage cMediaImage = (CMediaImage) imageMedia;
-                medias_images.put(cMediaImage, textureAtlas.findRegion(imageMedia.file));
-            } else if (imageMedia.getClass() == CMediaCursor.class) {
-                CMediaCursor cMediaCursor = (CMediaCursor) imageMedia;
-                medias_cursors.put(cMediaCursor, textureAtlas.findRegion(imageMedia.file));
-            } else if (imageMedia.getClass() == CMediaArray.class) {
-                CMediaArray cMediaArray = (CMediaArray) imageMedia;
-                TextureRegion[] result = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
-                        cMediaArray.frameOffset, cMediaArray.frameLength);
-                medias_arrays.put(cMediaArray, result);
-            } else if (imageMedia.getClass() == CMediaAnimation.class) {
-                CMediaAnimation cMediaAnimation = (CMediaAnimation) imageMedia;
-                TextureRegion[] result = splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
-                        cMediaAnimation.frameOffset, cMediaAnimation.frameLength);
-                Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
-                medias_animations.put(cMediaAnimation, animation);
-            } else if (imageMedia.getClass() == CMediaFont.class) {
-                CMediaFont cMediaFont = (CMediaFont) imageMedia;
-                BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
-                medias_fonts.put(cMediaFont, bitmapFont);
+            // 1. Load Image Data Into Pixmap Packer
+            for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+                CMedia imageMedia = imageCMediaLoadStack.get(i);
+                String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
+                TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
+                textureData.prepare();
+                pixmapPacker.pack(imageMedia.file, textureData.consumePixmap());
+                textureData.disposePixmap();
+                step++;
+                if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
             }
 
+            // 2. Create TextureAtlas
+            this.textureAtlas = new TextureAtlas();
+            pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
 
-            step++;
-            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file, step, stepsMax);
+            // 3. Fill medias_ with TextureAtlas Data
+            for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
+                CMedia imageMedia = imageCMediaLoadStack.get(i);
+                if (imageMedia.getClass() == CMediaImage.class) {
+                    CMediaImage cMediaImage = (CMediaImage) imageMedia;
+                    medias_images.put(cMediaImage, textureAtlas.findRegion(imageMedia.file));
+                } else if (imageMedia.getClass() == CMediaCursor.class) {
+                    CMediaCursor cMediaCursor = (CMediaCursor) imageMedia;
+                    medias_cursors.put(cMediaCursor, textureAtlas.findRegion(imageMedia.file));
+                } else if (imageMedia.getClass() == CMediaArray.class) {
+                    CMediaArray cMediaArray = (CMediaArray) imageMedia;
+                    TextureRegion[] result = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
+                            cMediaArray.frameOffset, cMediaArray.frameLength);
+                    medias_arrays.put(cMediaArray, result);
+                } else if (imageMedia.getClass() == CMediaAnimation.class) {
+                    CMediaAnimation cMediaAnimation = (CMediaAnimation) imageMedia;
+                    TextureRegion[] result = splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
+                            cMediaAnimation.frameOffset, cMediaAnimation.frameLength);
+                    Animation<TextureRegion> animation = new Animation<>(cMediaAnimation.animation_speed, result);
+                    medias_animations.put(cMediaAnimation, animation);
+                } else if (imageMedia.getClass() == CMediaFont.class) {
+                    CMediaFont cMediaFont = (CMediaFont) imageMedia;
+                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file), textureAtlas.findRegion(cMediaFont.file));
+                    medias_fonts.put(cMediaFont, bitmapFont);
+                }
+            }
+            pixmapPacker.dispose();
         }
-
 
         // 4. Load Sound Data
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
@@ -181,7 +172,6 @@ public class MediaManager {
         imageCMediaLoadStack.clear();
         soundCMediaLoadStack.clear();
         preparedForLoad.clear();
-        pixmapPacker.dispose();
         this.loaded = true;
         return true;
     }
