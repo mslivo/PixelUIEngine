@@ -17,6 +17,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -93,16 +94,14 @@ public class MediaManager {
             if (!preparedForLoad.contains(loadMedia)) {
                 if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
                     imageCMediaLoadStack.add(loadMedia);
-                    preparedForLoad.add(loadMedia);
-                    stepsMax ++;
                     anyImageData = true;
                 } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                     soundCMediaLoadStack.add(loadMedia);
-                    preparedForLoad.add(loadMedia);
-                    stepsMax ++;
                 } else {
                     throw new RuntimeException("Unknown CMedia Format. File \"" + loadMedia.file + "\", Format: \"" + loadMedia.getClass().getSimpleName() + "\"");
                 }
+                preparedForLoad.add(loadMedia);
+                stepsMax ++;
             }
         }
 
