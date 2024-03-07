@@ -1,56 +1,56 @@
 package org.mslivo.core.engine.tools.rendering.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import org.mslivo.core.engine.ui_engine.render.ShaderBatch;
+import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
 
 /*
  * Particle System must be extended and implemented
  */
-public abstract class ShaderParticleSystem<T> extends ParticleSystem<T> {
+public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
     private Color backup;
 
-    public ShaderParticleSystem(int particleLimit) {
+    public ImmediateParticleSystem(int particleLimit) {
         this(particleLimit, null);
     }
 
-    public ShaderParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
+    public ImmediateParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
         super(particleLimit, particleDataProvider);
         backup = new Color();
     }
 
-    public void render(ShaderBatch shaderBatch) {
+    public void render(ImmediateBatch immediateBatch) {
         if (particles.size() == 0) return;
-        backup.r = shaderBatch.getColor().r;
-        backup.g = shaderBatch.getColor().g;
-        backup.b = shaderBatch.getColor().b;
-        backup.a = shaderBatch.getColor().a;
+        backup.r = immediateBatch.getColor().r;
+        backup.g = immediateBatch.getColor().g;
+        backup.b = immediateBatch.getColor().b;
+        backup.a = immediateBatch.getColor().a;
 
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            shaderBatch.setColor(particle.r, particle.g, particle.b, particle.a);
+            immediateBatch.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
-                case SHADER_PIXEL -> {
-                    shaderBatch.drawPoint(particle.x, particle.y);
+                case IMMEDAITE_POINT -> {
+                    immediateBatch.drawPoint(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
         }
-        shaderBatch.setColor(backup);
+        immediateBatch.setColor(backup);
     }
 
 
-    /* ------- PIXEL ------- */
+    /* ------- Point ------- */
     protected Particle<T> addParticle(float x, float y, float r, float g, float b) {
-        Particle<T> particle = particleNew(ParticleType.SHADER_PIXEL, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.IMMEDAITE_POINT, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected Particle<T> addParticle(float x, float y, float r, float g, float b, float a) {
-        Particle<T> particle = particleNew(ParticleType.SHADER_PIXEL, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.IMMEDAITE_POINT, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }

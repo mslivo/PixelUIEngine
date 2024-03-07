@@ -25,7 +25,7 @@ import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.render.GrayScaleShader;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.render.ShaderBatch;
+import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -129,7 +129,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.internalResolutionHeight = Tools.Calc.lowerBounds(internalResolutionHeight, TILE_SIZE * 2);
         newInputState.viewportMode = viewPortMode;
         newInputState.spriteRenderer = spriteRenderer;
-        newInputState.shaderRenderer = shaderRenderer;
+        newInputState.immediateRenderer = shaderRenderer;
         newInputState.gamePadSupport = gamePadSupport;
         // ----- Config
         newInputState.config = new Config();
@@ -141,9 +141,9 @@ public class UIEngine<T extends UIAdapter> {
             newInputState.spriteBatch_game = null;
         }
         if (shaderRenderer) {
-            newInputState.shaderBatch_game = new ShaderBatch();
+            newInputState.immediateBatch_game = new ImmediateBatch(internalResolutionWidth, internalResolutionHeight);
         } else {
-            newInputState.shaderBatch_game = null;
+            newInputState.immediateBatch_game = null;
         }
         newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -158,7 +158,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.spriteBatch_ui = new SpriteBatch(8191);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
-            newInputState.shaderBatch_ui = new ShaderBatch();
+            newInputState.immediateBatch_ui = new ImmediateBatch(internalResolutionWidth, internalResolutionHeight);
         }
         newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -1894,15 +1894,15 @@ public class UIEngine<T extends UIAdapter> {
     private void render_setUIProjectionMatrix(OrthographicCamera camera){
         if (inputState.spriteRenderer)
             inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
-        if (inputState.shaderRenderer)
-            inputState.shaderBatch_ui.setProjectionMatrix(camera.combined);
+        if (inputState.immediateRenderer)
+            inputState.immediateBatch_ui.setProjectionMatrix(camera.combined);
     }
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera){
         if (inputState.spriteRenderer)
             inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
-        if (inputState.shaderRenderer)
-            inputState.shaderBatch_game.setProjectionMatrix(camera.combined);
+        if (inputState.immediateRenderer)
+            inputState.immediateBatch_game.setProjectionMatrix(camera.combined);
     }
     public void render() {
         render(true);
@@ -1915,7 +1915,7 @@ public class UIEngine<T extends UIAdapter> {
             // Draw Main FrameBuffer
             inputState.frameBuffer_game.begin();
             render_setGameProjectionMatrix(inputState.camera_game);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderBatch_game, null);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateBatch_game, null);
             inputState.frameBuffer_game.end();
             // Draw GUI GameViewPort FrameBuffers
             for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
@@ -1929,9 +1929,9 @@ public class UIEngine<T extends UIAdapter> {
             render_setUIProjectionMatrix(inputState.camera_ui);
             Gdx.gl.glClearColor(0, 0, 0, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.shaderBatch_ui);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.immediateBatch_ui);
             this.renderUI();
-            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.shaderBatch_ui);
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.immediateBatch_ui);
             inputState.frameBuffer_ui.end();
         }
 
@@ -1966,7 +1966,7 @@ public class UIEngine<T extends UIAdapter> {
             // draw to frambuffer
             gameViewPort.frameBuffer.begin();
             render_setGameProjectionMatrix(gameViewPort.camera);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.shaderBatch_game, gameViewPort);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateBatch_game, gameViewPort);
             gameViewPort.frameBuffer.end();
             gameViewPort.updateTimer = System.currentTimeMillis();
         }
@@ -3018,8 +3018,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.shaderRenderer) inputState.shaderBatch_game.dispose();
-        if (inputState.shaderRenderer) inputState.shaderBatch_ui.dispose();
+        if (inputState.immediateRenderer) inputState.immediateBatch_game.dispose();
+        if (inputState.immediateRenderer) inputState.immediateBatch_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
@@ -3050,7 +3050,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public boolean isImmediateRendererEnabled() {
-        return inputState.shaderRenderer;
+        return inputState.immediateRenderer;
     }
 
     public int getViewPortScreenX() {

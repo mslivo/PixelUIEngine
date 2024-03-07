@@ -9,7 +9,7 @@ import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.render.ShaderBatch;
+import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
 import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
@@ -129,7 +129,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(SpriteBatch batch, ShaderBatch shaderBatch, GameViewPort gameViewPort) {
+    public void render(SpriteBatch batch, ImmediateBatch immediateBatch, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -144,16 +144,14 @@ public class ExampleUIAdapter implements UIAdapter {
         }
         batch.end();
 
-        shaderBatch.begin();
+        immediateBatch.begin();
         for(int ix=0;ix<10;ix++){
             for(int iy=0;iy<10;iy++){
-                shaderBatch.setColor(ix/10f,iy/10f,1f,0.5f);
-                shaderBatch.drawPoint(100+ix,100+iy);
-                //shaderBatch.drawLine(50+ix, 50+iy,0,0);
+                immediateBatch.setColor(ix/10f,iy/10f,1f,0.5f);
+                immediateBatch.drawPoint(100+ix,100+iy);
             }
         }
-        //shaderBatch.drawTriangle(0,0,100,100,200,0);
-        shaderBatch.end();
+        immediateBatch.end();
 
     }
 
