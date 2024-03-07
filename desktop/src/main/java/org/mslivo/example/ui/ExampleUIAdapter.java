@@ -149,10 +149,10 @@ public class ExampleUIAdapter implements UIAdapter {
             for(int iy=0;iy<10;iy++){
                 shaderBatch.setColor(ix/10f,iy/10f,1f,0.5f);
                 shaderBatch.drawPoint(100+ix,100+iy);
-                shaderBatch.drawLine(50+ix, 50+iy,0,0);
+                //shaderBatch.drawLine(50+ix, 50+iy,0,0);
             }
         }
-        shaderBatch.drawTriangle(0,0,100,100,200,0);
+        //shaderBatch.drawTriangle(0,0,100,100,200,0);
         shaderBatch.end();
 
     }
