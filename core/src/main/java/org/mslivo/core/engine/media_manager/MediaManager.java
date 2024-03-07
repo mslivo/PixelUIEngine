@@ -114,6 +114,11 @@ public class MediaManager {
                 case CMediaArray cMediaArray -> arraysMax++;
                 case CMediaAnimation cMediaAnimation -> animationsMax++;
                 case CMediaFont cMediaFont -> fontsMax++;
+                default -> throw new IllegalStateException("Unexpected value: " + imageCMediaLoadStack.get(i));
+            }
+        }
+        for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
+            switch (soundCMediaLoadStack.get(i)) {
                 case CMediaSound cMediaSound -> soundMax++;
                 case CMediaMusic cMediaMusic -> musicMax++;
                 default -> throw new IllegalStateException("Unexpected value: " + imageCMediaLoadStack.get(i));
@@ -187,8 +192,8 @@ public class MediaManager {
                     medias_sounds[soundIdx++] = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file));
                 }
                 case CMediaMusic cMediaMusic -> {
-                    cMediaMusic.mediaManagerIndex = musicIdx++;
-                    medias_music[musicIdx] = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
+                    cMediaMusic.mediaManagerIndex = musicIdx;
+                    medias_music[musicIdx++] = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file));
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + soundMedia);
             }
