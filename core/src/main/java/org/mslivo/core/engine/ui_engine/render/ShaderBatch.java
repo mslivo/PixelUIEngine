@@ -92,7 +92,8 @@ public class ShaderBatch {
     }
 
     public void setOffset(float x, float y) {
-        this.offsetX = offsetX;
+        this.offsetX = x;
+        this.offsetY = y;
     }
 
     public float getOffsetX() {
