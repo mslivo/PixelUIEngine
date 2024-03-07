@@ -6,14 +6,14 @@ import org.mslivo.core.engine.ui_engine.render.ShaderBatch;
 /*
  * Particle System must be extended and implemented
  */
-public abstract class ShaderRenderParticleSystem<T> extends ParticleSystem<T> {
+public abstract class ShaderParticleSystem<T> extends ParticleSystem<T> {
     private Color backup;
 
-    public ShaderRenderParticleSystem(int particleLimit) {
+    public ShaderParticleSystem(int particleLimit) {
         this(particleLimit, null);
     }
 
-    public ShaderRenderParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
+    public ShaderParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
         super(particleLimit, particleDataProvider);
         backup = new Color();
     }
