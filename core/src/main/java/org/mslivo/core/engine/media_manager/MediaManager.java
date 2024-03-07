@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
@@ -28,13 +30,13 @@ public class MediaManager {
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
     private boolean loaded;
-    private final HashMap<CMediaSound, Sound> medias_sounds = new HashMap<>();
-    private final HashMap<CMediaMusic, Music> medias_music = new HashMap<>();
-    private final HashMap<CMediaImage, TextureRegion> medias_images = new HashMap<>();
-    private final HashMap<CMediaCursor, TextureRegion> medias_cursors = new HashMap<>();
-    private final HashMap<CMediaFont, BitmapFont> medias_fonts = new HashMap<>();
-    private final HashMap<CMediaArray, TextureRegion[]> medias_arrays = new HashMap<>();
-    private final HashMap<CMediaAnimation, Animation> medias_animations = new HashMap<>();
+    private final ObjectMap<CMediaSound, Sound> medias_sounds = new ObjectMap<>();
+    private final ObjectMap<CMediaMusic, Music> medias_music = new ObjectMap<>();
+    private final ObjectMap<CMediaImage, TextureRegion> medias_images = new ObjectMap<>();
+    private final ObjectMap<CMediaCursor, TextureRegion> medias_cursors = new ObjectMap<>();
+    private final ObjectMap<CMediaFont, BitmapFont> medias_fonts = new ObjectMap<>();
+    private final ObjectMap<CMediaArray, TextureRegion[]> medias_arrays = new ObjectMap<>();
+    private final ObjectMap<CMediaAnimation, Animation> medias_animations = new ObjectMap<>();
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private TextureAtlas textureAtlas;
 
@@ -234,13 +236,13 @@ public class MediaManager {
         this.medias_arrays.clear();
         this.medias_animations.clear();
         // Sounds
-        for (CMediaSound cMediaSound : medias_sounds.keySet()) medias_sounds.get(cMediaSound).dispose();
+        for (CMediaSound cMediaSound : medias_sounds.keys()) medias_sounds.get(cMediaSound).dispose();
         this.medias_sounds.clear();
         //Music
-        for (CMediaMusic cMediaMusic : medias_music.keySet()) medias_music.get(cMediaMusic).dispose();
+        for (CMediaMusic cMediaMusic : medias_music.keys()) medias_music.get(cMediaMusic).dispose();
         this.medias_music.clear();
         // Fonts
-        for (CMediaFont cMediaFont : medias_fonts.keySet()) medias_fonts.get(cMediaFont).dispose();
+        for (CMediaFont cMediaFont : medias_fonts.keys()) medias_fonts.get(cMediaFont).dispose();
         this.medias_fonts.clear();
 
         this.loadMediaList.clear();

@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongMap;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaFont;
@@ -1156,10 +1158,9 @@ public class UIEngine<T extends UIAdapter> {
                         case Button button -> {
                             inputState.pressedButton = button;
                             switch (button.mode){
-                                case DEFAULT -> UICommons.button_release(button);
+                                case DEFAULT -> UICommons.button_press(button);
                                 case TOGGLE -> UICommons.button_toggle(button);
                             }
-                            UICommons.button_press(inputState.pressedButton);
                         }
                         case ContextMenuItem contextMenuItem -> {
                             inputState.pressedContextMenuItem = contextMenuItem;
@@ -2094,12 +2095,16 @@ public class UIEngine<T extends UIAdapter> {
         }
     }
 
+    private int render_getListDragCMediaIndex(int x, int width) {
+        return x == 0 ? 0 : x == (width - 1) ? 2 : 1;
+    }
+
     private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitleBar) {
         if (hasTitleBar) {
             if (y == (height - 1)) {
                 if (x == 0) {
                     return 12;
-                } else if (x == width - 1) {
+                } else if (x == (width - 1)) {
                     return 14;
                 } else {
                     return 13;
@@ -2110,11 +2115,7 @@ public class UIEngine<T extends UIAdapter> {
         } else {
             return render_get16TilesCMediaIndex(x, y, width, height);
         }
-    }
 
-
-    private int render_getListDragCMediaIndex(int x, int width) {
-        return x == 0 ? 0 : x == (width - 1) ? 2 : 1;
     }
 
     private int render_get16TilesCMediaIndex(int x, int y, int width, int height) {
