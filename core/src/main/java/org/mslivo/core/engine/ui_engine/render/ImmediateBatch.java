@@ -40,13 +40,16 @@ public class ImmediateBatch {
     private Mesh mesh;
     private float vertices[];
     private int colorOffset, vertexIdx, vertexSize;
+    private int uProjModelViewLocation;
 
     public ImmediateBatch() {
         this.primitiveType = GL20.GL_POINTS;
         this.blend = false;
         this.color = new Color(Color.WHITE);
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
+        this.uProjModelViewLocation = shader.getUniformLocation("u_projModelView");
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
+
 
         this.vertices = new float[MESH_RESIZE_STEP];
         this.mesh = createMesh(MESH_RESIZE_STEP);
@@ -72,7 +75,7 @@ public class ImmediateBatch {
     public void end() {
         if (vertexIdx == 0) return;
         shader.bind();
-        shader.setUniformMatrix("u_projModelView", this.projection);
+        shader.setUniformMatrix(uProjModelViewLocation, this.projection);
         mesh.setVertices(vertices, 0, vertexIdx);
         mesh.render(shader, this.primitiveType);
         vertexIdx = 0;
