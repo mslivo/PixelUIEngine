@@ -9,10 +9,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 import java.nio.FloatBuffer;
 
 public class ShaderBatch {
-    private static final byte OPERATION_SETCOLOR = 1;
-    private static final byte OPERATION_POINTS = 2;
-    private static final byte OPERATION_LINE = 3;
-    private static final byte OPERATION_TRIANGLE = 4;
     private ShaderProgram shader;
     private Mesh mesh;
     private Matrix4 projection;
