@@ -30,7 +30,7 @@ public class UIBaseMedia {
     public static final CMediaArray UI_COMBOBOX_OPEN = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "combobox_open.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_COMBOBOX_LIST = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "combobox_list.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_COMBOBOX_LIST_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "combobox_list_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
-    public static final CMediaArray UI_KNOB_BACKGROUND = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "knob_background.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
+    public static final CMediaImage UI_KNOB_BACKGROUND = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "knob_background.png");
     public static final CMediaArray UI_KNOB = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "knob.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
     public static final CMediaArray UI_KNOB_ENDLESS = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "knob_endless.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE * 2);
     public static final CMediaArray UI_SEPARATOR_HORIZONTAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "separator_horizontal.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
