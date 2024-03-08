@@ -2176,7 +2176,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawComponentTopLayer(Window window, Component component) {
         if (render_isComponentNotRendered(component)) return;
-        float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
+        float alpha = (window != null ? (component.color_a * window.color_alpha) : component.color_a);
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
         switch (component) {
             case ComboBox comboBox -> {
@@ -2432,7 +2432,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
+        render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_alpha);
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
                 for (int iy = 0; iy < window.height; iy++) {
@@ -2444,7 +2444,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
+            render_drawFont(window.font, window.title, window.color_alpha, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2472,8 +2472,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
 
-        float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        float alpha2 = (component.addedToWindow != null ? (component.color2_a * component.addedToWindow.color_a) : component.color2_a);
+        float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_alpha) : component.color_a);
         boolean disableShaderState = render_GrayScaleShaderEnabled();
         if (component.disabled) render_enableGrayScaleShader(true);
 
@@ -2491,11 +2490,11 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.font, textButton.text, alpha2, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconIndex);
+                        render_drawFont(textButton.font, textButton.text, alpha, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconIndex);
                     }
                 } else if (button instanceof ImageButton imageButton) {
                     render_saveTempColorBatch();
-                    render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha2);
+                    render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha);
                     render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.offset_content_y - pressed_offset, imageButton.arrayIndex);
                     render_loadTempColorBatch();
                 }
@@ -2519,7 +2518,7 @@ public class UIEngine<T extends UIAdapter> {
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
                     int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
-                    render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha2);
+                    render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha);
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
@@ -2530,7 +2529,7 @@ public class UIEngine<T extends UIAdapter> {
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
                     int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
-                    render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha2);
+                    render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha);
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
@@ -2616,7 +2615,7 @@ public class UIEngine<T extends UIAdapter> {
                     float color_b = comboBox.selectedItem != null ? comboBox.selectedItem.color_b : comboBox.color_b;
 
                     render_saveTempColorBatch();
-                    render_batchSetColor(color_r, color_g, color_b, alpha2);
+                    render_batchSetColor(color_r, color_g, color_b, alpha);
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, comboMedia, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox), index);
                     render_loadTempColorBatch();
 
@@ -2629,7 +2628,7 @@ public class UIEngine<T extends UIAdapter> {
             case Knob knob -> {
                 mediaManager.drawCMediaImage(inputState.spriteBatch_ui, UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
                 render_saveTempColorBatch();
-                render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha2);
+                render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha);
                 if (knob.endless) {
                     int index = MathUtils.round(knob.turned * 31);
                     mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
@@ -2846,7 +2845,7 @@ public class UIEngine<T extends UIAdapter> {
 
                 // Bar
                 render_saveTempColorBatch();
-                render_batchSetColor(progressBar.color2_r, progressBar.color2_g, progressBar.color2_b, alpha2);
+                render_batchSetColor(progressBar.color2_r, progressBar.color2_g, progressBar.color2_b, alpha);
                 int pixels = MathUtils.round(progressBar.progress * (progressBar.width * TILE_SIZE));
                 for (int ix = 0; ix < progressBar.width; ix++) {
                     int xOffset = ix * TILE_SIZE;

@@ -2804,7 +2804,7 @@ public class API {
             window.color_r = inputState.config.window_defaultColor.r;
             window.color_g = inputState.config.window_defaultColor.g;
             window.color_b = inputState.config.window_defaultColor.b;
-            window.color_a = inputState.config.window_defaultColor.a;
+            window.color_alpha = inputState.config.window_defaultColor.a;
             window.font = inputState.config.window_defaultFont;
             window.hasTitleBar = hasTitleBar;
             window.visible = visible;
@@ -3075,12 +3075,12 @@ public class API {
             window.color_r = r;
             window.color_g = g;
             window.color_b = b;
-            window.color_a = a;
+            window.color_alpha = a;
         }
 
         public void setAlpha(Window window, float transparency) {
             if (window == null) return;
-            window.color_a = transparency;
+            window.color_alpha = transparency;
         }
 
         public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {
@@ -3568,15 +3568,14 @@ public class API {
 
         public void setColor2(Component component, Color color) {
             if (component == null || color == null) return;
-            setColor2(component, color.r, color.g, color.b, color.a);
+            setColor2(component, color.r, color.g, color.b);
         }
 
-        public void setColor2(Component component, float r, float g, float b, float a) {
+        public void setColor2(Component component, float r, float g, float b) {
             if (component == null) return;
             component.color2_r = r;
             component.color2_g = g;
             component.color2_b = b;
-            component.color2_a = a;
         }
 
         public void setColor1And2(Component component, Color color) {
@@ -3593,14 +3592,14 @@ public class API {
             }
         }
 
-        public void setAlpha(Component component, float alpha) {
-            if (component == null) return;
-            component.color_a = alpha;
-        }
-
         public void setAlpha(Component[] components, float alpha) {
             if (components == null) return;
             for (int i = 0; i < components.length; i++) setAlpha(components[i], alpha);
+        }
+
+        public void setAlpha(Component component, float alpha) {
+            if (component == null) return;
+            component.color_a = alpha;
         }
 
         private void setComponentCommonInitValues(Component component, int x, int y, int width, int height) {
@@ -3611,19 +3610,18 @@ public class API {
             setComponentCommonInitValues(component, x, y, width, height, color, color);
         }
 
-        private void setComponentCommonInitValues(Component component, int x, int y, int widht, int height, Color color1, Color color2) {
+        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height, Color color1, Color color2) {
             component.x = x;
             component.y = y;
-            component.width = widht;
+            component.width = width;
             component.height = height;
+            component.color_a = 1f;
             component.color_r = color1.r;
             component.color_g = color1.g;
             component.color_b = color1.b;
-            component.color_a = color1.a;
             component.color2_r = color2.r;
             component.color2_g = color2.g;
             component.color2_b = color2.b;
-            component.color2_a = color2.a;
             component.disabled = false;
             component.updateActions = new ArrayList<>();
             component.data = null;

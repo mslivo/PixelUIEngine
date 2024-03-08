@@ -8,9 +8,7 @@ import java.util.ArrayList;
 public class ToolTip {
     public String[] lines;
     public boolean displayFistLineAsTitle;
-
     public CMediaFont font;
-
     public float color_r, color_g, color_b, color_a;
     public ToolTipAction toolTipAction;
     public int minWidth, minHeight;

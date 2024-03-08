@@ -28,7 +28,8 @@ public class Window {
 
     public Object data;
 
-    public float color_r, color_g, color_b, color_a;
+    public float color_alpha;
+    public float color_r, color_g, color_b;
     public boolean alwaysOnTop;
     public boolean folded;
     public boolean moveAble;
