@@ -2099,23 +2099,19 @@ public class UIEngine<T extends UIAdapter> {
         return x == 0 ? 0 : x == (width - 1) ? 2 : 1;
     }
 
+
     private int render_getWindowCMediaIndex(int x, int y, int width, int height, boolean hasTitleBar) {
-        if (hasTitleBar) {
-            if (y == (height - 1)) {
-                if (x == 0) {
-                    return 12;
-                } else if (x == (width - 1)) {
-                    return 14;
-                } else {
-                    return 13;
-                }
+        if (hasTitleBar && y == (height - 1)) {
+            if (x == 0) {
+                return 12;
+            } else if (x == (width - 1)) {
+                return 14;
             } else {
-                return render_get16TilesCMediaIndex(x, y, width, height);
+                return 13;
             }
         } else {
             return render_get16TilesCMediaIndex(x, y, width, height);
         }
-
     }
 
     private int render_get16TilesCMediaIndex(int x, int y, int width, int height) {

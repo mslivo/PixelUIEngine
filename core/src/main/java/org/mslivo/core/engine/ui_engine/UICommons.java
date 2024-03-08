@@ -86,9 +86,8 @@ class UICommons {
     }
 
     static void window_unFold(Window window) {
-        window.folded = true;
+        window.folded = false;
         if (window.windowAction != null) window.windowAction.onUnfold();
-
     }
 
     static void window_receiveMessage(Window window, String message_type, Object... content) {

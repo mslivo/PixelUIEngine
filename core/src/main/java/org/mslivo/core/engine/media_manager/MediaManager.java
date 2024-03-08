@@ -77,6 +77,10 @@ public class MediaManager {
         return loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
+    private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in a MediaManager";
+    private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
+    private static final String ERROR_UNKNOWN_FORMAT = "CMedia File \"%s\": unknown format: %s";
+
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
@@ -88,41 +92,32 @@ public class MediaManager {
 
         // split into Image and Sound data, skip duplicates, check format and index
         CMedia loadMedia;
-        while ((loadMedia = loadMediaList.poll()) != null) {
-            if (!duplicateCheck.contains(loadMedia)) {
-                if (loadMedia.mediaManagerIndex != CMedia.MEDIAMANGER_INDEX_NONE)
-                    throw new RuntimeException("CMedia File\"" + loadMedia.file + "\": already loaded in a MediaManager");
-                if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
-                    imageCMediaLoadStack.add(loadMedia);
-                } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
-                    soundCMediaLoadStack.add(loadMedia);
-                } else {
-                    throw new RuntimeException("CMedia File \"" + loadMedia.file + "\", CMedia Format unknown: \"" + loadMedia.getClass().getSimpleName() + "\"");
-                }
-                duplicateCheck.add(loadMedia);
-                stepsMax++;
-            }
-        }
-        duplicateCheck.clear();
-
-        // 2. Create medias_ arrays
         int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
-        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-            switch (imageCMediaLoadStack.get(i)) {
+        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0;;
+        while ((loadMedia = loadMediaList.poll()) != null) {
+            if (duplicateCheck.contains(loadMedia))
+                throw new RuntimeException(String.format(ERROR_DUPLICATE, loadMedia.file));
+            if (loadMedia.mediaManagerIndex != CMedia.MEDIAMANGER_INDEX_NONE)
+                throw new RuntimeException(String.format(ERROR_ALREADY_LOADED_OTHER, loadMedia.file));
+            if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
+                imageCMediaLoadStack.add(loadMedia);
+            } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
+                soundCMediaLoadStack.add(loadMedia);
+            } else {
+                throw new RuntimeException(String.format(ERROR_UNKNOWN_FORMAT, loadMedia.file, loadMedia.getClass().getSimpleName()));
+            }
+            switch (loadMedia){
                 case CMediaImage cMediaImage -> imagesMax++;
                 case CMediaCursor cMediaCursor -> cursorMax++;
                 case CMediaArray cMediaArray -> arraysMax++;
                 case CMediaAnimation cMediaAnimation -> animationsMax++;
                 case CMediaFont cMediaFont -> fontsMax++;
-                default -> throw new IllegalStateException("Unexpected value: " + imageCMediaLoadStack.get(i));
-            }
-        }
-        for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
-            switch (soundCMediaLoadStack.get(i)) {
                 case CMediaSound cMediaSound -> soundMax++;
                 case CMediaMusic cMediaMusic -> musicMax++;
-                default -> throw new IllegalStateException("Unexpected value: " + imageCMediaLoadStack.get(i));
+                default -> {}
             }
+            duplicateCheck.add(loadMedia);
+            stepsMax++;
         }
         medias_images = new TextureRegion[imagesMax];
         medias_cursors = new TextureRegion[cursorMax];
@@ -131,8 +126,9 @@ public class MediaManager {
         medias_fonts = new BitmapFont[fontsMax];
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
+        duplicateCheck.clear();
 
-        // 3. Load Image Data Into Pixmap Packer
+        // 2. Load Image Data Into Pixmap Packer
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
             String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file.replace(".fnt", ".png") : imageMedia.file;
@@ -149,7 +145,6 @@ public class MediaManager {
         pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
 
         // 5. Fill arrays with TextureAtlas Data
-        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0;
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
             switch (imageMedia) {
@@ -168,8 +163,9 @@ public class MediaManager {
                 }
                 case CMediaAnimation cMediaAnimation -> {
                     cMediaAnimation.mediaManagerIndex = animationsIdx;
-                    medias_animations[animationsIdx++] = new Animation<>(cMediaAnimation.animation_speed, splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height,
-                            cMediaAnimation.frameOffset, cMediaAnimation.frameLength));
+                    medias_animations[animationsIdx++] = new Animation<>(cMediaAnimation.animation_speed,
+                            splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height, cMediaAnimation.frameOffset, cMediaAnimation.frameLength)
+                    );
                 }
                 case CMediaFont cMediaFont -> {
                     cMediaFont.mediaManagerIndex = fontsIdx;
@@ -183,7 +179,6 @@ public class MediaManager {
         imageCMediaLoadStack.clear();
 
         // 6. Fill arrays with Sound Data
-        int soundIdx = 0, musicIdx = 0;
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
             CMedia soundMedia = soundCMediaLoadStack.get(i);
             switch (soundMedia) {
