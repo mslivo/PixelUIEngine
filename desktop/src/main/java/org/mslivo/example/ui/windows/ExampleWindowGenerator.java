@@ -11,6 +11,9 @@ import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.tools.sound.SoundPlayer;
 import org.mslivo.core.engine.ui_engine.API;
+import org.mslivo.core.engine.ui_engine.UIBaseMedia;
+import org.mslivo.core.engine.ui_engine.UIEngine;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import org.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -23,10 +26,11 @@ import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import org.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import org.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
-import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
+import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
+import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -42,8 +46,6 @@ import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
-import org.mslivo.core.engine.ui_engine.UIBaseMedia;
-import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
@@ -88,10 +90,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ArrayList<Component> components_tab4 = createTab4(window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
-        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE,0, components_tab1.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN,0, components_tab2.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE,0, components_tab3.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE,0, components_tab4.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE, 0, components_tab1.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN, 0, components_tab2.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab3.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab4.toArray(new Component[]{})));
 
 
         ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
@@ -140,13 +142,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         // Shape
         Shape oval = api.component.shape.create(11, 3, 4, 4, ShapeType.OVAL);
-        api.component.setColor(oval,Color.GREEN);
+        api.component.setColor(oval, Color.GREEN);
 
         Shape rect = api.component.shape.create(11, 8, 2, 2, ShapeType.RECT);
-        api.component.setColor(rect,Color.YELLOW);
+        api.component.setColor(rect, Color.YELLOW);
 
         Shape triangle = api.component.shape.create(14, 8, 2, 2, ShapeType.TRIANGLE_LEFT_DOWN);
-        api.component.setColor(triangle,Color.BLUE);
+        api.component.setColor(triangle, Color.BLUE);
 
         ScrollBarHorizontal scrollBarHorizontalR = api.component.scrollBar.horizontalScrollbar.create(4, 8, 6, new ScrollBarAction() {
             @Override
@@ -277,7 +279,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         CheckBox checkBox2 = api.component.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
 
-        GameViewPort gameViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null,100, 100, 1);
+        GameViewPort gameViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null, 100, 100, 1);
 
         TextField osKeyBoardTextInput = api.component.textField.create(18, 13, 10, "", null, 128);
         api.component.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
@@ -325,7 +327,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             public void onToggle(boolean value) {
 
             }
-        }, null,0, ButtonMode.TOGGLE);
+        }, null, 0, ButtonMode.TOGGLE);
         api.component.tabBar.tab.addTabComponent(tabTextButton, textBtn1);
         api.component.button.centerContent(textBtn1);
         api.component.setColor(textBtn1, Color.ORANGE);
@@ -368,11 +370,11 @@ public class ExampleWindowGenerator extends WindowGenerator {
                         }
                         , null, 1f));
             }
-        }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1,0);
+        }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0);
         api.component.setColor(textBtn4, Color.LIGHT_GRAY);
         api.component.button.centerContent(textBtn4);
 
-        TextButton textBtn5 = api.component.button.textButton.create(10, 9, 8, 1, "Viewport", new ButtonAction() {
+        TextButton textBtn5 = api.component.button.textButton.create(10, 9, 8, 2, "Viewport", new ButtonAction() {
             @Override
             public void onRelease() {
                 switch (api.viewportMode()) {
@@ -383,8 +385,29 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5});
-        api.component.tabBar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5});
+        Canvas canvas = api.component.canvas.create(19, 5, 5, 5);
+        api.component.canvas.setCanvasAction(canvas, new CanvasAction() {
+            @Override
+            public void onPress(int x, int y) {
+                api.component.canvas.setAllPoints(canvas,Color.WHITE);
+            }
+        });
+        api.component.addUpdateAction(canvas, new UpdateAction() {
+            @Override
+            public void onUpdate() {
+                for(int i=0;i<20;i++)
+                api.component.canvas.setPoint(canvas,
+                        MathUtils.random(0, canvas.width * UIEngine.TILE_SIZE),
+                        MathUtils.random(0, canvas.height * UIEngine.TILE_SIZE),
+                        MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
+                );
+
+            }
+        });
+
+
+        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas});
+        api.component.tabBar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas});
 
         // Image Buttons Tab
 
@@ -392,7 +415,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ImageButton imageButton1 = api.component.button.imageButton.create(3, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE);
 
-        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY, 0,null,ButtonMode.DEFAULT,0,0);
+        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY, 0, null, ButtonMode.DEFAULT, 0, 0);
         ButtonAction imageButton2Action = new ButtonAction() {
             @Override
             public void onRelease() {
@@ -406,7 +429,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         };
         api.component.button.setButtonAction(imageButton2, imageButton2Action);
 
-        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE,0,0,true);
+        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE, 0, 0, true);
         ImageButton imageButton4 = api.component.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 0, null, ButtonMode.TOGGLE);
         ImageButton imageButton5 = api.component.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 0, null, ButtonMode.TOGGLE);
         ImageButton imageButton6 = api.component.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_4, 0, null, ButtonMode.TOGGLE);
@@ -421,7 +444,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.component.setColor(imageButton5, Color.YELLOW);
         api.component.setColor(imageButton6, Color.ORANGE);
 
-        ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), null,null,true, 3, 4);
+        ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), null, null, true, 3, 4);
 
         api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 0));
         api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 1, 1));
@@ -449,7 +472,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
         Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
-        api.component.text.setFont(text2,UIBaseMedia.UI_FONT_WHITE);
+        api.component.text.setFont(text2, UIBaseMedia.UI_FONT_WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabBar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 
@@ -511,7 +534,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public void onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " +listItem));
+                api.addNotification(api.notification.create("Selected: " + listItem));
             }
 
             @Override
@@ -559,7 +582,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public void onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " +listItem));
+                api.addNotification(api.notification.create("Selected: " + listItem));
             }
 
             @Override
@@ -601,7 +624,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
             }
 
             @Override
@@ -616,7 +639,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public void onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " +listItem));
+                api.addNotification(api.notification.create("Selected: " + listItem));
             }
         };
         api.component.grid.setGridAction(grid1, gridAction1);
@@ -646,7 +669,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
             }
 
             @Override
@@ -658,9 +681,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
             public boolean canDragFromGrid(Grid fromInventory) {
                 return true;
             }
+
             @Override
             public void onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " +listItem));
+                api.addNotification(api.notification.create("Selected: " + listItem));
             }
         };
         api.component.grid.setGridAction(grid2, gridAction2);
@@ -689,7 +713,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
             @Override
             public ToolTip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text,"An item"));
+                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
             }
 
             @Override
@@ -717,7 +741,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.window.addComponent(window, grid3);
 
         components.addAll(Arrays.asList(new Component[]{
-                list1,list1ScrollBar,list2,list2ScrollBar, grid1, grid2, grid3
+                list1, list1ScrollBar, list2, list2ScrollBar, grid1, grid2, grid3
         }));
 
         return components;
@@ -727,7 +751,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
     private void moveToList(ArrayList fromList, int fromIndex, ArrayList toList, int toIndex) {
         Object object = fromList.get(fromIndex);
-        if(fromList == toList && toIndex == toList.size()) toIndex--;
+        if (fromList == toList && toIndex == toList.size()) toIndex--;
         fromList.remove(fromIndex);
         toList.add(toIndex, object);
     }
@@ -783,7 +807,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         int rnd;
         rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
-            list.add(new ListItem(prefix + "Item " + i, switch (MathUtils.random(1,3)){
+            list.add(new ListItem(prefix + "Item " + i, switch (MathUtils.random(1, 3)) {
                 case 1 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_1;
                 case 2 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_2;
                 case 3 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_3;

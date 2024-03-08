@@ -87,10 +87,12 @@ public class UIBaseMedia {
     public static final CMediaImage UI_SHAPE_TRIANGLE_RIGHT_UP = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "shape_right_triangle_ru.png");
     public static final CMediaImage UI_COLOR_SELECTOR = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "colors.png");
     public static final CMediaImage UI_COLOR_SELECTOR_OVERLAY = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "colors_overlay.png");
+    public static final CMediaImage UI_PIXEL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "pixel.png");
 
     // Fonts
     public static final CMediaFont UI_FONT_BLACK = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_black.fnt", 0, 5);
     public static final CMediaFont UI_FONT_WHITE = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_white.fnt", 0, 5);
+
 
 
     public static final CMedia[] ALL = new CMedia[]{
@@ -166,5 +168,6 @@ public class UIBaseMedia {
             UI_OSTEXTINPUT_SELECTED,
             UI_FONT_BLACK,
             UI_FONT_WHITE,
+            UI_PIXEL
     };
 }

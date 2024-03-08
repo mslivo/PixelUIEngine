@@ -44,6 +44,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import org.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import org.mslivo.core.engine.ui_engine.ui.components.list.List;
 import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
+import org.mslivo.core.engine.ui_engine.ui.components.map.CanvasImage;
 import org.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
@@ -1952,6 +1953,8 @@ public class UIEngine<T extends UIAdapter> {
             if (drawToScreen) {
                 inputState.viewport_screen.apply();
                 inputState.spriteBatch_screen.begin();
+                Gdx.gl.glClearColor(0, 0, 0, 1);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 inputState.spriteBatch_screen.draw(inputState.texture_screen, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
                 inputState.spriteBatch_screen.end();
             }
@@ -2634,19 +2637,40 @@ public class UIEngine<T extends UIAdapter> {
                 render_loadTempColorBatch();
             }
             case Canvas canvas -> {
-                inputState.spriteBatch_ui.draw(canvas.texture, UICommons.component_getAbsoluteX(canvas), UICommons.component_getAbsoluteY(canvas));
-
-                canvas.canvasImages.removeIf(mapOverlay -> {
-                    if (mapOverlay.fadeOut) {
-                        mapOverlay.color_a = 1 - ((System.currentTimeMillis() - mapOverlay.timer) / (float) mapOverlay.fadeOutTime);
-                        if (mapOverlay.color_a <= 0) return true;
+                int width = canvas.width*UIEngine.TILE_SIZE;
+                int height = canvas.height*UIEngine.TILE_SIZE;
+                render_saveTempColorBatch();
+                for(int ix=0;ix<width;ix++){
+                    for(int iy=0;iy<height;iy++){
+                        render_batchSetColor(canvas.map[ix][iy].r, canvas.map[ix][iy].g, canvas.map[ix][iy].b, (canvas.map[ix][iy].a*alpha));
+                        render_drawCMediaGFX(UIBaseMedia.UI_PIXEL,UICommons.component_getAbsoluteX(canvas)+ix, UICommons.component_getAbsoluteY(canvas)+iy);
                     }
-                    render_saveTempColorBatch();
-                    render_batchSetColor(mapOverlay.color_r, mapOverlay.color_g, mapOverlay.color_b, alpha * mapOverlay.color_a);
-                    render_drawCMediaGFX(mapOverlay.image, UICommons.component_getAbsoluteX(canvas) + mapOverlay.x, UICommons.component_getAbsoluteY(canvas) + mapOverlay.y, mapOverlay.arrayIndex);
-                    render_loadTempColorBatch();
-                    return false;
-                });
+                }
+                render_loadTempColorBatch();
+
+
+                for(int i = (canvas.canvasImages.size()-1); i >= 0; i--){
+                    CanvasImage canvasImage = canvas.canvasImages.get(i);
+                    if (canvasImage.fadeOut) {
+                        canvasImage.color_a = 1 - ((System.currentTimeMillis() - canvasImage.timer) / (float) canvasImage.fadeOutTime);
+                        if (canvasImage.color_a <= 0){
+                            canvas.canvasImages.remove(i);
+                            continue;
+                        };
+                    }
+                    if(UICommons.canvas_isInsideCanvas(canvas, canvasImage.x,canvasImage.y)){
+                        render_saveTempColorBatch();
+                        render_batchSetColor(canvasImage.color_r*alpha, canvasImage.color_g, canvasImage.color_b, (canvasImage.color_a*alpha));
+                        int imageWidthOffset = mediaManager.imageWidth(canvasImage.image)/2;
+                        int imageHeightOffset = mediaManager.imageHeight(canvasImage.image)/2;
+                        render_drawCMediaGFX(canvasImage.image,
+                                UICommons.component_getAbsoluteX(canvas) + canvasImage.x - imageWidthOffset,
+                                UICommons.component_getAbsoluteY(canvas) + canvasImage.y - imageHeightOffset,
+                                canvasImage.arrayIndex);
+                        render_loadTempColorBatch();
+                    }
+
+                }
             }
             case TextField textField -> {
                 for (int ix = 0; ix < textField.width; ix++) {

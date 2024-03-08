@@ -586,17 +586,15 @@ public class API {
             for (int x = 0; x < colorTexture.getRegionWidth(); x++) {
                 for (int y = 0; y < colorTexture.getRegionHeight(); y++) {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
-                    component.canvas.drawPixel(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
+                    component.canvas.setPoint(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
                         component.canvas.canvasImage.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
                     }
                 }
             }
 
-            component.canvas.updateTexture(colorCanvas);
-
             final boolean[] drag = {false};
-            component.canvas.setMapAction(colorCanvas, new CanvasAction() {
+            component.canvas.setCanvasAction(colorCanvas, new CanvasAction() {
 
                 @Override
                 public void onPress(int x, int y) {
@@ -622,7 +620,7 @@ public class API {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = component.canvas.getPixelColor(colorCanvas, x, y - 1);
+                            currentColor = component.canvas.getPoint(colorCanvas, x, y - 1);
                             component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
                             component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
@@ -921,14 +919,8 @@ public class API {
             for (int iy = 0; iy < mapHeight; iy++) {
                 Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
                 for (int ix = 0; ix < mapWidth; ix++) {
-                    component.canvas.drawPixel(canvas, ix, iy, color.r, color.g, color.b, color.a);
+                    component.canvas.setPoint(canvas, ix, iy, color.r, color.g, color.b, color.a);
                 }
-            }
-
-            if (values.size == 0) {
-                // No values available
-                component.canvas.updateTexture(canvas);
-                return null;
             }
 
             // Calculate index/value at position
@@ -970,9 +962,9 @@ public class API {
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
-                        component.canvas.drawPixel(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.canvas.setPoint(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     } else {
-                        component.canvas.drawPixel(canvas, ix, y, color.r, color.g, color.b, color.a);
+                        component.canvas.setPoint(canvas, ix, y, color.r, color.g, color.b, color.a);
                     }
                 }
 
@@ -980,12 +972,12 @@ public class API {
                 if (indexChange && ix != 0) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        component.canvas.drawPixel(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                        component.canvas.setPoint(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
                     }
                 } else if (nextIndexChange) {
                     for (int iy = 0; iy < heightPixels; iy++) {
                         int y = mapHeight - iy;
-                        component.canvas.drawPixel(canvas, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                        component.canvas.setPoint(canvas, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
                     }
                 }
 
@@ -993,7 +985,6 @@ public class API {
                 lastValue = value;
             }
 
-            component.canvas.updateTexture(canvas);
             return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
         }
 
@@ -3542,7 +3533,7 @@ public class API {
                 UICommons.gameViewPort_resizeCameraTextureAndFrameBuffer(gameViewPort);
             }
             if (component instanceof Canvas canvas) {
-                UICommons.canvas_resizePixMap(canvas);
+                UICommons.canvas_resizeMap(canvas);
             }
         }
 
@@ -4621,13 +4612,13 @@ public class API {
 
             public final _CanvasImage canvasImage = new _CanvasImage();
 
-            private CanvasAction defaultMapAction() {
+            private CanvasAction defaultCanvasAction() {
                 return new CanvasAction() {
                 };
             }
 
             public Canvas create(int x, int y, int width, int height) {
-                return create(x, y, width, height, defaultMapAction(), null);
+                return create(x, y, width, height, defaultCanvasAction(), null);
             }
 
             public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
@@ -4637,7 +4628,10 @@ public class API {
             public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
                 Canvas canvas = new Canvas();
                 setComponentCommonInitValues(canvas, x, y, width, height, Color.WHITE);
-                canvas.pixmap = new Pixmap(width * UIEngine.TILE_SIZE, height * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
+                canvas.map = new Color[width*UIEngine.TILE_SIZE][height*UIEngine.TILE_SIZE];
+                for(int ix = 0; ix<canvas.map.length; ix++)
+                    for(int iy = 0; iy<canvas.map[0].length; iy++)
+                        canvas.map[ix][iy] = new Color(1f,1f,1f,1f);
                 canvas.canvasAction = canvasAction;
                 canvas.canvasImages = new ArrayList<>();
                 if (canvasImages != null) {
@@ -4648,72 +4642,37 @@ public class API {
                         }
                     }
                 }
-                canvas.texture = new Texture(canvas.pixmap);
+
                 return canvas;
             }
 
-            public void setMapAction(Canvas canvas, CanvasAction canvasAction) {
+            public void setCanvasAction(Canvas canvas, CanvasAction canvasAction) {
                 if (canvas == null) return;
                 canvas.canvasAction = canvasAction;
             }
 
-            public void updateTexture(Canvas canvas) {
-                if (canvas == null) return;
-                UICommons.canvas_updateTexture(canvas);
-            }
-
-            public Color getPixelColor(Canvas canvas, int x, int y) {
+            public Color getPoint(Canvas canvas, int x, int y) {
                 if (canvas == null) return null;
-                return new Color(canvas.pixmap.getPixel(x, y));
+                Color color = UICommons.canvas_getPoint(canvas,x,y);
+                return color != null ? new Color(color) : null;
             }
 
-            public void clearCanvas(Canvas canvas, Color color) {
-                clearCanvas(canvas, color.r, color.g, color.b, color.a);
+            public void setAllPoints(Canvas canvas, Color color) {
+                setAllPoints(canvas, color.r, color.g, color.b, color.a);
             }
 
-            public void clearCanvas(Canvas canvas, float r, float g, float b, float a) {
+            public void setAllPoints(Canvas canvas, float r, float g, float b, float a) {
                 if (canvas == null) return;
-                UICommons.canvas_clear(canvas, r, g, b, a);
+                UICommons.canvas_setAllPoints(canvas, r, g, b, a);
             }
 
-            public void drawPixel(Canvas canvas, int x, int y, Color color) {
-                drawPixel(canvas, x, y, color.r, color.g, color.b, color.a);
+            public void setPoint(Canvas canvas, int x, int y, Color color) {
+                setPoint(canvas, x, y, color.r, color.g, color.b, color.a);
             }
 
-            public void drawPixel(Canvas canvas, int x, int y, float r, float g, float b, float a) {
+            public void setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
                 if (canvas == null) return;
-                canvas.pixmap.setColor(r, g, b, a);
-                canvas.pixmap.drawPixel(x, y);
-            }
-
-            public void drawLine(Canvas canvas, int x1, int y1, int x2, int y2, Color Color) {
-                drawLine(canvas, x1, y1, x2, y2, Color.r, Color.g, Color.b, Color.a);
-            }
-
-            public void drawLine(Canvas canvas, int x1, int y1, int x2, int y2, float r, float g, float b, float a) {
-                if (canvas == null) return;
-                canvas.pixmap.setColor(r, g, b, a);
-                canvas.pixmap.drawLine(x1, y1, x2, y2);
-            }
-
-            public void drawRect(Canvas canvas, int x1, int y1, int width, int height, Color Color) {
-                drawRect(canvas, x1, y1, width, height, Color.r, Color.g, Color.b, Color.a);
-            }
-
-            public void drawRect(Canvas canvas, int x1, int y1, int width, int height, float r, float g, float b, float a) {
-                if (canvas == null) return;
-                canvas.pixmap.setColor(r, g, b, a);
-                canvas.pixmap.drawRectangle(x1, y1, width, height);
-            }
-
-            public void drawCircle(Canvas canvas, int x, int y, int radius, Color Color) {
-                drawCircle(canvas, x, y, radius, Color.r, Color.g, Color.b, Color.a);
-            }
-
-            public void drawCircle(Canvas canvas, int x, int y, int radius, float r, float g, float b, float a) {
-                if (canvas == null) return;
-                canvas.pixmap.setColor(r, g, b, a);
-                canvas.pixmap.drawCircle(x, y, radius);
+                UICommons.canvas_setPoint(canvas,x,y,r,g,b,a);
             }
 
             public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {

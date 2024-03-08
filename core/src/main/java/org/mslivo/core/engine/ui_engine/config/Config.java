@@ -7,7 +7,7 @@ import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 
 import java.io.Serializable;
 
-public class Config implements Serializable {
+public class Config implements Serializable, Cloneable {
     public CMediaCursor ui_cursor;
     public boolean ui_keyInteractionsDisabled;
     public boolean ui_mouseInteractionsDisabled;

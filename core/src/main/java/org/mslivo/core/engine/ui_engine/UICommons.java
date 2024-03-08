@@ -2,6 +2,7 @@ package org.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -52,13 +53,16 @@ import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 
+import java.util.Arrays;
+
 class UICommons {
 
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();
+
     static {
-        textFieldControlKeys.addAll(KeyCode.Key.LEFT,KeyCode.Key.RIGHT,KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME,Input.Keys.END, Input.Keys.ENTER);
-        textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT,KeyCode.Key.RIGHT,KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
+        textFieldControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME, Input.Keys.END, Input.Keys.ENTER);
+        textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
     }
 
     static void emulatedMouse_setPosition(InputState inputState, int x, int y) {
@@ -91,7 +95,7 @@ class UICommons {
     }
 
     static void window_receiveMessage(Window window, String message_type, Object... content) {
-        if(message_type == null) return;
+        if (message_type == null) return;
         for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
             MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
             if (messageReceiverAction.messageType.equals(message_type)) {
@@ -141,6 +145,7 @@ class UICommons {
             window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
         }
     }
+
     static void window_addToScreen(InputState inputState, Window window) {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
@@ -275,24 +280,24 @@ class UICommons {
         }
     }
 
-    static void hotkey_press(HotKey hotKey){
+    static void hotkey_press(HotKey hotKey) {
         hotKey.pressed = true;
-        if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
+        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
     }
 
-    static void hotkey_release(HotKey hotKey){
+    static void hotkey_release(HotKey hotKey) {
         hotKey.pressed = false;
-        if(hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
     }
 
-    static void checkbox_check(CheckBox checkBox){
+    static void checkbox_check(CheckBox checkBox) {
         checkBox.checked = true;
-        if(checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
     }
 
-    static void checkbox_unCheck(CheckBox checkBox){
+    static void checkbox_unCheck(CheckBox checkBox) {
         checkBox.checked = false;
-        if(checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
     }
 
     static void resetActivelyUsedUIReferences(InputState inputState) {
@@ -416,7 +421,7 @@ class UICommons {
         inputState.notifications.remove(notification);
     }
 
-    static boolean contextMenu_openAtMousePosition(InputState inputState,MediaManager mediaManager, ContextMenu contextMenu) {
+    static boolean contextMenu_openAtMousePosition(InputState inputState, MediaManager mediaManager, ContextMenu contextMenu) {
         boolean success = contextMenu_open(inputState, mediaManager, contextMenu, inputState.mouse_ui.x, inputState.mouse_ui.y);
         if (success && (inputState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
@@ -426,7 +431,7 @@ class UICommons {
         return success;
     }
 
-    static boolean contextMenu_open(InputState inputState,MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
+    static boolean contextMenu_open(InputState inputState, MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
         if (contextMenu.items.size() == 0) return false;
         // Close open ContextMenus
         if (inputState.openContextMenu != null) {
@@ -471,7 +476,7 @@ class UICommons {
     }
 
     static void tabBar_selectTab(TabBar tabBar, Tab tab) {
-        if(tab.addedToTabBar != tabBar) return;
+        if (tab.addedToTabBar != tabBar) return;
         for (int i = 0; i < tabBar.tabs.size(); i++) {
             if (tabBar.tabs.get(i) == tab) {
                 UICommons.tabBar_selectTab(tabBar, i);
@@ -489,50 +494,48 @@ class UICommons {
     }
 
 
-
-    static void button_press(Button button){
-        if(button.pressed || button.mode != ButtonMode.DEFAULT) return;
+    static void button_press(Button button) {
+        if (button.pressed || button.mode != ButtonMode.DEFAULT) return;
         button.pressed = true;
         if (button.buttonAction != null) button.buttonAction.onPress();
     }
 
-    static void button_release(Button button){
-        if(!button.pressed || button.mode != ButtonMode.DEFAULT) return;
+    static void button_release(Button button) {
+        if (!button.pressed || button.mode != ButtonMode.DEFAULT) return;
         button.pressed = false;
         if (button.buttonAction != null) button.buttonAction.onRelease();
     }
 
-    static void button_toggle(Button button){
+    static void button_toggle(Button button) {
         button_toggle(button, !button.pressed);
     }
 
-    static void progressbar_setProgress(ProgressBar progressBar, float progress){
-        progressBar.progress = Tools.Calc.inBounds(progress,0f,1f);
+    static void progressbar_setProgress(ProgressBar progressBar, float progress) {
+        progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
     }
 
-    static void button_toggle(Button button, boolean pressed){
-        if(button.toggleDisabled || button.pressed == pressed || button.mode != ButtonMode.TOGGLE) return;
+    static void button_toggle(Button button, boolean pressed) {
+        if (button.toggleDisabled || button.pressed == pressed || button.mode != ButtonMode.TOGGLE) return;
         button.pressed = pressed;
         if (button.buttonAction != null) button.buttonAction.onToggle(button.pressed);
     }
 
-    static void button_centerContent(MediaManager mediaManager, Button button){
+    static void button_centerContent(MediaManager mediaManager, Button button) {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
-            imageButton.offset_content_x  = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
-            imageButton.offset_content_y  = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
+            imageButton.offset_content_x = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
+            imageButton.offset_content_y = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
             int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
             int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
-            textButton.offset_content_x  = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-            textButton.offset_content_y  = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
+            textButton.offset_content_x = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
+            textButton.offset_content_y = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
         }
     }
-
 
 
     static boolean grid_positionValid(Grid grid, int x, int y) {
@@ -552,7 +555,7 @@ class UICommons {
         if (grid.items != null) {
             grid.width = grid.items.length * factor;
             grid.height = grid.items[0].length * factor;
-        }else{
+        } else {
             grid.width = 1;
             grid.height = 1;
         }
@@ -596,20 +599,22 @@ class UICommons {
                     UICommons.textField_setContent(textField, newContent);
                 }
             }
-            case Input.Keys.FORWARD_DEL ->{
+            case Input.Keys.FORWARD_DEL -> {
                 if (!textField.content.isEmpty() && textField.markerPosition < textField.content.length()) {
                     String newContent = textField.content.substring(0, textField.markerPosition) + textField.content.substring(textField.markerPosition + 1);
                     UICommons.textField_setContent(textField, newContent);
                 }
             }
             case Input.Keys.HOME -> UICommons.textField_setMarkerPosition(mediaManager, textField, 0);
-            case Input.Keys.END -> UICommons.textField_setMarkerPosition(mediaManager, textField, textField.content.length());
-            case Input.Keys.ENTER,Input.Keys.NUMPAD_ENTER ->{
+            case Input.Keys.END ->
+                    UICommons.textField_setMarkerPosition(mediaManager, textField, textField.content.length());
+            case Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
                 UICommons.textField_unFocus(inputState, textField); // Unfocus
                 if (textField.textFieldAction != null)
                     textField.textFieldAction.onEnter(textField.content, textField.contentValid);
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -624,7 +629,7 @@ class UICommons {
     }
 
     static void textField_setContent(TextField textField, String content) {
-        if (content.length() > textField.contentMaxLength) content = content.substring(0,textField.contentMaxLength);
+        if (content.length() > textField.contentMaxLength) content = content.substring(0, textField.contentMaxLength);
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
         if (textField.textFieldAction != null) {
@@ -720,8 +725,8 @@ class UICommons {
         contextMenu.items.remove(contextMenuItem);
     }
 
-    static void contextMenu_selectItem(InputState inputState, ContextMenuItem contextMenuItem){
-        if(contextMenuItem.addedToContextMenu == null) return;
+    static void contextMenu_selectItem(InputState inputState, ContextMenuItem contextMenuItem) {
+        if (contextMenuItem.addedToContextMenu == null) return;
         ContextMenu ContextMenu = contextMenuItem.addedToContextMenu;
         if (contextMenuItem.contextMenuItemAction != null)
             contextMenuItem.contextMenuItemAction.onSelect();
@@ -730,8 +735,8 @@ class UICommons {
         UICommons.contextMenu_close(inputState, ContextMenu);
     }
 
-    static void comboBox_selectItem(InputState inputState, ComboBoxItem comboBoxItem){
-        if(comboBoxItem.addedToComboBox == null) return;
+    static void comboBox_selectItem(InputState inputState, ComboBoxItem comboBoxItem) {
+        if (comboBoxItem.addedToComboBox == null) return;
         ComboBox comboBox = comboBoxItem.addedToComboBox;
         comboBox.selectedItem = comboBoxItem;
         if (comboBoxItem.comboBoxItemAction != null)
@@ -761,8 +766,15 @@ class UICommons {
         canvas.canvasImages.add(canvasImage);
     }
 
-    static void canvas_resizePixMap(Canvas canvas) {
-        canvas.pixmap = new Pixmap(canvas.width * UIEngine.TILE_SIZE, canvas.width * UIEngine.TILE_SIZE, Pixmap.Format.RGBA8888);
+    static void canvas_resizeMap(Canvas canvas) {
+        int newWidth = canvas.width*UIEngine.TILE_SIZE;
+        int newHeight = canvas.height*UIEngine.TILE_SIZE;
+        Color[][] newMap;
+        newMap = Arrays.copyOf(canvas.map,newWidth);
+        for(int ix=0;ix<newWidth;ix++){
+            newMap[ix] = Arrays.copyOf(canvas.map[ix],newHeight);
+        }
+        canvas.map = newMap;
     }
 
     static void canvas_removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
@@ -771,12 +783,6 @@ class UICommons {
         canvas.canvasImages.remove(canvasImage);
     }
 
-    static void canvas_clear(Canvas canvas, float r, float g, float b, float a) {
-        canvas.pixmap.setColor(r, g, b, a);
-        for (int iy = 0; iy < canvas.pixmap.getHeight(); iy++) {
-            canvas.pixmap.drawLine(0, iy, canvas.pixmap.getWidth(), iy);
-        }
-    }
 
     static void toolTip_addToolTipImage(ToolTip toolTip, ToolTipImage toolTipImage) {
         if (toolTipImage.addedToToolTip != null) return;
@@ -861,7 +867,7 @@ class UICommons {
         }
         float oldValue = knob.turned;
         knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
-        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, (newValue-oldValue));
+        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, (newValue - oldValue));
     }
 
     static boolean list_canDragIntoScreen(List list) {
@@ -998,16 +1004,16 @@ class UICommons {
         }
     }
 
-    static void text_setLines(MediaManager mediaManager, Text text, String[] lines){
+    static void text_setLines(MediaManager mediaManager, Text text, String[] lines) {
         text.lines = Tools.Text.validStringArrayCopy(lines);
         UICommons.text_updateSize(mediaManager, text);
     }
 
-    static void tooltip_setLines(ToolTip toolTip, String[] lines){
+    static void tooltip_setLines(ToolTip toolTip, String[] lines) {
         toolTip.lines = Tools.Text.validStringArrayCopy(lines);
     }
 
-    static void text_updateSize(MediaManager mediaManager, Text text){
+    static void text_updateSize(MediaManager mediaManager, Text text) {
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
             int widthT = mediaManager.textWidth(text.font, text.lines[i]);
@@ -1022,7 +1028,7 @@ class UICommons {
         UICommons.image_updateSize(mediaManager, imageC);
     }
 
-    static void image_updateSize(MediaManager mediaManager, Image imageC){
+    static void image_updateSize(MediaManager mediaManager, Image imageC) {
         imageC.width = imageC.image != null ? mediaManager.imageWidth(imageC.image) / UIEngine.TILE_SIZE : 0;
         imageC.height = imageC.image != null ? mediaManager.imageHeight(imageC.image) / UIEngine.TILE_SIZE : 0;
     }
@@ -1037,15 +1043,16 @@ class UICommons {
         if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
     }
 
-    static void scrollBar_pressButton(ScrollBar scrollBar){
-        if(scrollBar.buttonPressed) return;
+    static void scrollBar_pressButton(ScrollBar scrollBar) {
+        if (scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = true;
-        if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
+        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
     }
-    static void scrollBar_releaseButton(ScrollBar scrollBar){
-        if(!scrollBar.buttonPressed) return;
+
+    static void scrollBar_releaseButton(ScrollBar scrollBar) {
+        if (!scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = false;
-        if(scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
+        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
     }
 
     static float scrollBar_calculateScrolled(ScrollBar scrollBar, int mouse_ui_x, int mouse_ui_y) {
@@ -1074,8 +1081,32 @@ class UICommons {
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
     }
 
-    static void canvas_updateTexture(Canvas canvas) {
-        canvas.texture = new Texture(canvas.pixmap);
+    static void canvas_setAllPoints(Canvas canvas, float r, float g, float b, float a) {
+        int width = canvas.width*UIEngine.TILE_SIZE;
+        int height = canvas.height*UIEngine.TILE_SIZE;
+        for (int ix = 0; ix <= width; ix++) {
+            for (int iy = 0; iy <= height; iy++) {
+                canvas_setPoint(canvas, ix, iy, r, g, b, a);
+            }
+        }
+    }
+
+    static boolean canvas_isInsideCanvas(Canvas canvas, int x, int y){
+        return x >= 0 && x < canvas.map.length && y >= 0 && y < canvas.map[0].length;
+    }
+
+    static void canvas_setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
+        if (!canvas_isInsideCanvas(canvas,x,y))return;
+        canvas.map[x][y].set(
+                r,
+                g,
+                b,
+                a);
+    }
+
+    static Color canvas_getPoint(Canvas canvas, int x, int y) {
+        if (x < 0 || x > (canvas.map.length - 1) || y < 0 || y > (canvas.map.length - 1)) return null;
+        return canvas.map[x][y];
     }
 
     static void gameViewPort_resizeCameraTextureAndFrameBuffer(GameViewPort gameViewPort) {
