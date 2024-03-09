@@ -23,9 +23,7 @@ import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.input.InputEvents;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
 import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
-import org.mslivo.core.engine.ui_engine.render.GrayScaleShader;
-import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
-import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import org.mslivo.core.engine.ui_engine.render.*;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -156,7 +154,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_game.flip(false, true);
 
         // -----  GUI
-        newInputState.spriteBatch_ui = new SpriteBatch(8191);
+        newInputState.spriteBatch_ui = new UISpriteBatch();
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
             newInputState.immediateBatch_ui = new ImmediateBatch();
@@ -1982,8 +1980,6 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_ui.begin();
         render_batchSetColorWhite(1f);
 
-        if (inputState.modalWindow != null) render_enableGrayScaleShader(true);
-
         /* Draw Screen Components */
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
             Component component = inputState.screenComponents.get(i);
@@ -1999,11 +1995,8 @@ public class UIEngine<T extends UIAdapter> {
         /* Draw Windows */
         for (int i = 0; i < inputState.windows.size(); i++) {
             Window window = inputState.windows.get(i);
-            if (inputState.modalWindow != null && inputState.modalWindow == window) render_enableGrayScaleShader(false);
             render_drawWindow(window);
         }
-
-        render_enableGrayScaleShader(false);
 
         /* Notifications */
         render_drawNotifications();
@@ -2442,6 +2435,9 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
+        boolean preWindowGrayScaleShaderState = render_isGrayScaleShaderEnabled();
+        if(inputState.modalWindow != null && inputState.modalWindow != window) render_enableGrayScaleShader(true);
+
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
@@ -2476,6 +2472,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         render_batchSetColorWhite(1f);
+        render_enableGrayScaleShader(preWindowGrayScaleShaderState);
     }
 
 
@@ -2483,7 +2480,7 @@ public class UIEngine<T extends UIAdapter> {
         if (render_isComponentNotRendered(component)) return;
 
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        boolean disableShaderState = render_GrayScaleShaderEnabled();
+        boolean preComponentGrayScaleState = render_isGrayScaleShaderEnabled();
         if (component.disabled) render_enableGrayScaleShader(true);
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
@@ -2564,10 +2561,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore = render_GrayScaleShaderEnabled();
-                if (dragEnabled && !dragValid) {
-                    render_enableGrayScaleShader(true);
-                }
+                boolean preListGrayScaleState = render_isGrayScaleShaderEnabled();
+                if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
 
                 // List
                 for (int iy = 0; iy < list.height; iy++) {
@@ -2582,7 +2577,6 @@ public class UIEngine<T extends UIAdapter> {
 
                     boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
 
-                    // Cell
                     Color cellColor = null;
                     if (list.listAction != null && list.items != null) {
                         if (itemIndex < list.items.size()) {
@@ -2611,7 +2605,7 @@ public class UIEngine<T extends UIAdapter> {
                         mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
-                render_enableGrayScaleShader(grayScaleBefore);
+                render_enableGrayScaleShader(preListGrayScaleState);
             }
             case ComboBox comboBox -> {
                 // Box
@@ -2737,7 +2731,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore = render_GrayScaleShaderEnabled();
+                boolean grayScaleBefore = render_isGrayScaleShaderEnabled();
                 if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
 
                 for (int ix = 0; ix < gridWidth; ix++) {
@@ -2888,7 +2882,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        render_enableGrayScaleShader(disableShaderState);
+        render_enableGrayScaleShader(preComponentGrayScaleState);
         render_batchSetColorWhite(1f);
     }
 
@@ -2925,14 +2919,17 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private boolean render_GrayScaleShaderEnabled() {
-        return inputState.spriteBatch_ui.getShader() == inputState.grayScaleShader;
+    private boolean render_isGrayScaleShaderEnabled() {
+        //return inputState.spriteBatch_ui.getShader() == inputState.grayScaleShader;
+        return false;
     }
 
-    private void render_enableGrayScaleShader(boolean enable) {
-        inputState.spriteBatch_ui.setShader(enable ? inputState.grayScaleShader : null);
+    private void render_enableGrayScaleShader(boolean enabled) {
+        //if(enabled == render_isGrayScaleShaderEnabled())return;
+        //ShaderProgram shaderProgram = inputState.spriteBatch_ui.getShader();
+        //shaderProgram.bind();
+        //shaderProgram.setUniformf(shaderProgram.getUniformLocation("u_saturation"), enabled ? 0f : 1.0f);
     }
-
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
         render_drawFont(font, text, alpha, x, y, 0, 0, FONT_MAXWIDTH_NONE, null, 0);
@@ -2984,19 +2981,17 @@ public class UIEngine<T extends UIAdapter> {
         return mediaManager.getCMediaFont(font).getColor();
     }
 
-
-    private void render_batchSetColor(float r, float g, float b, float a) {
-        inputState.spriteBatch_ui.setColor(r, g, b, a);
-    }
-
     private void render_batchSetColorWhite(float alpha) {
-        inputState.spriteBatch_ui.setColor(1, 1, 1, alpha);
+        inputState.spriteBatch_ui.setColor(1f, 1f, 1f, alpha);
     }
 
     private Color render_batchGetColor() {
         return inputState.spriteBatch_ui.getColor();
     }
 
+    private void render_batchSetColor(float r, float g, float b, float a) {
+        inputState.spriteBatch_ui.setColor(r, g, b, a);
+    }
 
     private void render_saveTempColorBatch() {
         inputState.tempSaveColor.set(inputState.spriteBatch_ui.getColor());

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
 import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
+import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -63,7 +64,7 @@ public class InputState {
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
-    public SpriteBatch spriteBatch_ui;
+    public UISpriteBatch spriteBatch_ui;
     public ImmediateBatch immediateBatch_ui;
     public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
