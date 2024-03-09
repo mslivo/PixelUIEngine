@@ -62,7 +62,7 @@ public class Config implements Serializable, Cloneable {
     public CMediaFont mouseTextInput_defaultFont;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
-
+    public Color mouseTextInput_defaultColor;
     public Config() {
         // ##### UI Default Values #####
         ui_cursor = UIBaseMedia.UI_CURSOR_ARROW;
@@ -131,6 +131,7 @@ public class Config implements Serializable, Cloneable {
         tooltip_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         tooltip_FadeInTime = 50;
         tooltip_FadeInDelayTime = 25;
+        // ##### MouseTextInput Default Values #####
         mouseTextInput_defaultLowerCaseCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
@@ -148,6 +149,7 @@ public class Config implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
         mouseTextInput_defaultFont = UIBaseMedia.UI_FONT_BLACK;
+        mouseTextInput_defaultColor = Color.WHITE.cpy();
     }
 
 

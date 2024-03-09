@@ -122,9 +122,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ScrollBarVertical scrollBarVertical = api.component.scrollBar.verticalScrollbar.create(2, 2, 12, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                window.color_alpha = scrolled;
+                window.color_a = scrolled;
             }
-        }, window.color_alpha);
+        }, window.color_a);
 
         Knob knob = api.component.knob.create(4, 2, null, false);
         api.component.knob.setTurned(knob, knob.color_a);
@@ -301,6 +301,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                             }
                         }, null
                 );
+
                 api.component.textField.setMarkerPosition(osKeyBoardTextInput, osKeyBoardTextInput.content.length());
             }
         });

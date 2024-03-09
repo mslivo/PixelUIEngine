@@ -2029,7 +2029,13 @@ public class UIEngine<T extends UIAdapter> {
     private void render_mouseTextInput() {
         if (inputState.openMouseTextInput == null) return;
         MouseTextInput mouseTextInput = inputState.openMouseTextInput;
-        render_batchSetColorWhite(mouseTextInput.alpha);
+        float r = inputState.openMouseTextInput.color_r;
+        float g = inputState.openMouseTextInput.color_g;
+        float b = inputState.openMouseTextInput.color_b;
+        float alpha = inputState.openMouseTextInput.color_a;
+        float r2 = inputState.openMouseTextInput.color2_r;
+        float g2 = inputState.openMouseTextInput.color2_g;
+        float b2 = inputState.openMouseTextInput.color2_b;
         final int CHARACTERS = 4;
         char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
@@ -2037,24 +2043,27 @@ public class UIEngine<T extends UIAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), r,g,b, alpha, mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(mouseTextInput.font, chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), r,g,b,alpha,mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
-        render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, mouseTextInput.upperCase, inputState.mTextInputMouse1Pressed);
+        render_mouseTextInputCharacter(mouseTextInput.font, chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, r,g,b,alpha, mouseTextInput.upperCase, inputState.mTextInputMouse1Pressed);
 
         // Selection
+        render_batchSetColor(r2,g2,b2,alpha);
         mediaManager.drawCMediaImage(inputState.spriteBatch_ui,UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
+        render_fontSetColorWhite();
     }
 
-    private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, boolean upperCase, boolean pressed) {
+    private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, float r, float g, float b, float alpha, boolean upperCase, boolean pressed) {
+        render_batchSetColor(r,g,b,alpha);
         int pressedIndex = pressed ? 1 : 0;
         mediaManager.drawCMediaArray(inputState.spriteBatch_ui,UIBaseMedia.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
@@ -2070,6 +2079,7 @@ public class UIEngine<T extends UIAdapter> {
             int offset = pressed ? 1 : 0;
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2 - offset);
         }
+        render_fontSetColorWhite();
     }
 
     private void render_drawCursor() {
@@ -2176,7 +2186,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawComponentTopLayer(Window window, Component component) {
         if (render_isComponentNotRendered(component)) return;
-        float alpha = (window != null ? (component.color_a * window.color_alpha) : component.color_a);
+        float alpha = (window != null ? (component.color_a * window.color_a) : component.color_a);
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
         switch (component) {
             case ComboBox comboBox -> {
@@ -2432,7 +2442,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_alpha);
+        render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
                 for (int iy = 0; iy < window.height; iy++) {
@@ -2444,7 +2454,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_alpha, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
+            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + (window.height * TILE_SIZE) - TILE_SIZE, 1, 1, (window.width - 1) * TILE_SIZE, window.icon, window.iconIndex);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2472,7 +2482,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
 
-        float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_alpha) : component.color_a);
+        float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
         boolean disableShaderState = render_GrayScaleShaderEnabled();
         if (component.disabled) render_enableGrayScaleShader(true);
 

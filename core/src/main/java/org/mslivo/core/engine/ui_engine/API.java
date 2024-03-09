@@ -57,6 +57,7 @@ import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
+import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import org.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
@@ -1509,58 +1510,62 @@ public class API {
         }
 
         public void open(int x, int y) {
-
             open(x, y, defaultMouseTextInputConfirmAction(),
                     null,
                     inputState.config.mouseTextInput_defaultLowerCaseCharacters,
-                    inputState.config.mouseTextInput_defaultUpperCaseCharacters,
-                    inputState.config.mouseTextInput_defaultFont, 1f);
+                    inputState.config.mouseTextInput_defaultUpperCaseCharacters);
         }
 
         public void open(int x, int y, MouseTextInputAction onConfirm) {
-            open(x, y,
-                    onConfirm, null,
+            open(x, y, onConfirm,
+                    null,
                     inputState.config.mouseTextInput_defaultLowerCaseCharacters,
-                    inputState.config.mouseTextInput_defaultUpperCaseCharacters,
-                    inputState.config.mouseTextInput_defaultFont, 1f);
+                    inputState.config.mouseTextInput_defaultUpperCaseCharacters);
         }
+
+
 
         public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
-            open(x, y,
-                    onConfirm, selectedCharacter,
-                    inputState.config.mouseTextInput_defaultLowerCaseCharacters,
-                    inputState.config.mouseTextInput_defaultUpperCaseCharacters,
-                    inputState.config.mouseTextInput_defaultFont, 1f);
-        }
-
-
-        public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
             open(x, y, onConfirm,
                     selectedCharacter,
-                    charactersLC,
-                    charactersUC,
-                    inputState.config.mouseTextInput_defaultFont, 1f);
+                    inputState.config.mouseTextInput_defaultLowerCaseCharacters,
+                    inputState.config.mouseTextInput_defaultUpperCaseCharacters);
         }
 
-        public void open(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter,
-                         char[] charactersLC, char[] charactersUC, CMediaFont font, float alpha) {
-            if (charactersLC == null || charactersUC == null || font == null) return;
+        public void open(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+            if (charactersLC == null || charactersUC == null) return;
             if (inputState.openMouseTextInput != null) return;
-            org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput mouseTextInput = new org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput();
+            MouseTextInput mouseTextInput = new org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput();
+            mouseTextInput.color_r = inputState.config.mouseTextInput_defaultColor.r;
+            mouseTextInput.color_g = inputState.config.mouseTextInput_defaultColor.g;
+            mouseTextInput.color_b = inputState.config.mouseTextInput_defaultColor.b;
+            mouseTextInput.color_a = inputState.config.mouseTextInput_defaultColor.a;
+            mouseTextInput.color2_r = 0f;
+            mouseTextInput.color2_g = 0f;
+            mouseTextInput.color2_b = 0f;
+            mouseTextInput.font = inputState.config.mouseTextInput_defaultFont;
+            mouseTextInput.x = x - 6;
+            mouseTextInput.y = y - 12;
+            mouseTextInput.mouseTextInputAction = mouseTextInputAction;
+            mouseTextInput.upperCase = false;
+            mouseTextInput.selectedIndex = 0;
+            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
+            mouseTextInput.charactersLC = new char[maxCharacters + 3];
+            mouseTextInput.charactersUC = new char[maxCharacters + 3];
+            for (int i = 0; i < maxCharacters; i++) {
+                mouseTextInput.charactersLC[i] = charactersLC[i];
+                mouseTextInput.charactersUC[i] = charactersUC[i];
+                if(selectedCharacter != null && (mouseTextInput.charactersLC[i] == selectedCharacter || mouseTextInput.charactersUC[i] == selectedCharacter)){
+                    mouseTextInput.selectedIndex = i;
+                    mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectedCharacter;
+                }
+            }
+            mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
+            mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
+            mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] =  '\n';
             inputState.mTextInputMouseX = Gdx.input.getX();
             inputState.mTextInputUnlock = false;
             inputState.openMouseTextInput = mouseTextInput;
-            setFont(font);
-            setMouseTextInputAction(mouseTextInputAction);
-            enterChangeCase(false);
-            setPosition(x, y);
-            setAlpha(alpha);
-            setCharacters(charactersLC, charactersUC);
-            if (selectedCharacter != null) {
-                selectCharacter(selectedCharacter);
-            } else {
-                selectIndex(0);
-            }
         }
 
         public void close() {
@@ -1599,7 +1604,6 @@ public class API {
             for (int i = 0; i < characters.length; i++) enterCharacter(characters[i]);
         }
 
-
         public void enterCharacter(char character) {
             if (inputState.openMouseTextInput == null) return;
             inputState.mTextInputAPICharacterQueue.add(character);
@@ -1615,43 +1619,54 @@ public class API {
             UICommons.mouseTextInput_selectIndex(inputState.openMouseTextInput, index);
         }
 
-        private void setCharacters(char[] charactersLC, char[] charactersUC) {
+        public void setCharacters(char[] charactersLC, char[] charactersUC) {
             if (inputState.openMouseTextInput == null) return;
             if (charactersLC == null || charactersUC == null) return;
-            int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
-            inputState.openMouseTextInput.charactersLC = new char[maxCharacters + 3];
-            inputState.openMouseTextInput.charactersUC = new char[maxCharacters + 3];
-            for (int i = 0; i < maxCharacters; i++) {
-                if (Character.isISOControl(charactersLC[i]) || Character.isISOControl(charactersUC[i]))
-                    throw new RuntimeException("ISO Control character not allowed");
-                inputState.openMouseTextInput.charactersLC[i] = charactersLC[i];
-                inputState.openMouseTextInput.charactersUC[i] = charactersUC[i];
-            }
-            inputState.openMouseTextInput.charactersLC[maxCharacters] = '\t';
-            inputState.openMouseTextInput.charactersUC[maxCharacters] = '\t';
-            inputState.openMouseTextInput.charactersLC[maxCharacters + 1] = '\b';
-            inputState.openMouseTextInput.charactersUC[maxCharacters + 1] = '\b';
-            inputState.openMouseTextInput.charactersLC[maxCharacters + 2] = '\n';
-            inputState.openMouseTextInput.charactersUC[maxCharacters + 2] = '\n';
+            UICommons.mouseTextInput_setCharacters(inputState.openMouseTextInput, charactersLC, charactersUC);
         }
 
-        private void setAlpha(float a) {
+        public void setAlpha(float a) {
             if (inputState.openMouseTextInput == null) return;
-            inputState.openMouseTextInput.alpha = a;
+            inputState.openMouseTextInput.color_a = a;
         }
 
-        private void setPosition(int x, int y) {
+        public void setColor(Color color) {
+            if (inputState.openMouseTextInput == null) return;
+            setColor(color.r,color.g,color.b,color.a);
+        }
+
+        public void setColor(float r, float g, float b, float a) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.color_r = r;
+            inputState.openMouseTextInput.color_g = g;
+            inputState.openMouseTextInput.color_b = b;
+            inputState.openMouseTextInput.color_a = a;
+        }
+
+        public void setColor2(Color color2) {
+            if (inputState.openMouseTextInput == null) return;
+            setColor2(color2.r,color2.g,color2.b);
+        }
+
+        public void setColor2(float r, float g, float b) {
+            if (inputState.openMouseTextInput == null) return;
+            inputState.openMouseTextInput.color2_r = r;
+            inputState.openMouseTextInput.color2_g = g;
+            inputState.openMouseTextInput.color2_b = b;
+        }
+
+        public void setPosition(int x, int y) {
             if (inputState.openMouseTextInput == null) return;
             inputState.openMouseTextInput.x = x - 6;
             inputState.openMouseTextInput.y = y - 12;
         }
 
-        private void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction) {
+        public void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction) {
             if (inputState.openMouseTextInput == null) return;
             inputState.openMouseTextInput.mouseTextInputAction = mouseTextInputAction;
         }
 
-        private void setFont(CMediaFont font) {
+        public void setFont(CMediaFont font) {
             if (inputState.openMouseTextInput == null) return;
             inputState.openMouseTextInput.font = font;
         }
@@ -2804,7 +2819,7 @@ public class API {
             window.color_r = inputState.config.window_defaultColor.r;
             window.color_g = inputState.config.window_defaultColor.g;
             window.color_b = inputState.config.window_defaultColor.b;
-            window.color_alpha = inputState.config.window_defaultColor.a;
+            window.color_a = inputState.config.window_defaultColor.a;
             window.font = inputState.config.window_defaultFont;
             window.hasTitleBar = hasTitleBar;
             window.visible = visible;
@@ -3075,12 +3090,12 @@ public class API {
             window.color_r = r;
             window.color_g = g;
             window.color_b = b;
-            window.color_alpha = a;
+            window.color_a = a;
         }
 
         public void setAlpha(Window window, float transparency) {
             if (window == null) return;
-            window.color_alpha = transparency;
+            window.color_a = transparency;
         }
 
         public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {

@@ -992,16 +992,30 @@ class UICommons {
     static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar) {
         findCharLoop:
         for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
-            if (mouseTextInput.charactersLC[i] == selectChar) {
+            if (mouseTextInput.charactersLC[i] == selectChar || mouseTextInput.charactersUC[i] == selectChar) {
                 mouseTextInput_selectIndex(mouseTextInput, i);
-                mouseTextInput.upperCase = false;
-                break findCharLoop;
-            } else if (mouseTextInput.charactersUC[i] == selectChar) {
-                mouseTextInput_selectIndex(mouseTextInput, i);
-                mouseTextInput.upperCase = true;
+                mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectChar;
                 break findCharLoop;
             }
         }
+    }
+
+    static void mouseTextInput_setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
+        if (charactersLC == null || charactersUC == null) return;
+        int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
+        mouseTextInput.charactersLC = new char[maxCharacters + 3];
+        mouseTextInput.charactersUC = new char[maxCharacters + 3];
+        for (int i = 0; i < maxCharacters; i++) {
+            if (Character.isISOControl(charactersLC[i]) || Character.isISOControl(charactersUC[i]))
+                throw new RuntimeException("ISO Control character not allowed");
+            mouseTextInput.charactersLC[i] = charactersLC[i];
+            mouseTextInput.charactersUC[i] = charactersUC[i];
+        }
+        // Control Buttons
+        mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
+        mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
+        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] =  '\n';
+
     }
 
     static void text_setLines(MediaManager mediaManager, Text text, String[] lines) {
