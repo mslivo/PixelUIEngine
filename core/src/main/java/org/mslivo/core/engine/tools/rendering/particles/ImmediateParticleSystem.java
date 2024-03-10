@@ -1,7 +1,7 @@
 package org.mslivo.core.engine.tools.rendering.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import org.mslivo.core.engine.ui_engine.render.UIImmediateBatch;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 
 /*
  * Particle System must be extended and implemented
@@ -18,27 +18,27 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
         backup = new Color();
     }
 
-    public void render(UIImmediateBatch uIImmediateBatch) {
+    public void render(ImmediateRenderer immediateRenderer) {
         if (particles.size() == 0) return;
-        backup.r = uIImmediateBatch.getColor().r;
-        backup.g = uIImmediateBatch.getColor().g;
-        backup.b = uIImmediateBatch.getColor().b;
-        backup.a = uIImmediateBatch.getColor().a;
+        backup.r = immediateRenderer.getColor().r;
+        backup.g = immediateRenderer.getColor().g;
+        backup.b = immediateRenderer.getColor().b;
+        backup.a = immediateRenderer.getColor().a;
 
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            uIImmediateBatch.setColor(particle.r, particle.g, particle.b, particle.a);
+            immediateRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDAITE_POINT -> {
-                    uIImmediateBatch.vertex(particle.x, particle.y);
+                    immediateRenderer.vertex(particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
         }
-        uIImmediateBatch.setColor(backup);
+        immediateRenderer.setColor(backup);
     }
 
 

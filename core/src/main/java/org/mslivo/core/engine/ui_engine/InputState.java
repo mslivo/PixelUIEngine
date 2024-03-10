@@ -11,8 +11,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
-import org.mslivo.core.engine.ui_engine.render.UIImmediateBatch;
-import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import org.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import org.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -56,15 +56,15 @@ public class InputState {
     public Config config;
 
     /* #################### Graphics: Game #################### */
-    public UISpriteBatch spriteBatch_game;
-    public UIImmediateBatch uIImmediateBatch_game;
+    public SpriteRenderer spriteBatch_game;
+    public ImmediateRenderer immediateRenderer_game;
     public TextureRegion texture_game;
     public OrthographicCamera camera_game;
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
-    public UISpriteBatch spriteBatch_ui;
-    public UIImmediateBatch uIImmediateBatch_ui;
+    public SpriteRenderer spriteBatch_ui;
+    public ImmediateRenderer immediateRenderer_ui;
     public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;
@@ -74,7 +74,7 @@ public class InputState {
     public TextureRegion texture_screen;
     public Texture.TextureFilter textureFilter_screen;
     public NestedFrameBuffer frameBuffer_screen;
-    public UISpriteBatch spriteBatch_screen;
+    public SpriteRenderer spriteBatch_screen;
     public Viewport viewport_screen;
     public OrthographicCamera camera_screen;
 

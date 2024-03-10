@@ -1,4 +1,5 @@
 package org.mslivo.core.engine.ui_engine.render;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -18,79 +19,79 @@ import java.nio.Buffer;
  * Taken and modified from
  * https://github.com/tommyettinger/colorful-gdx/blob/master/colorful/src/test/java/com/github/tommyettinger/colorful/rgb/UISpriteBatch.java
  */
-public class UISpriteBatch implements Batch {
+public class SpriteRenderer implements Batch {
     private static final String VERTEX_SHADER = """
-                attribute vec4 a_position;
-                attribute vec4 a_color;
-                attribute vec2 a_texCoord0;
-                attribute vec4 a_tweak;
-                uniform mat4 u_projTrans;
-                varying vec4 v_color;
-                varying vec4 v_tweak;
-                varying vec2 v_texCoords;
-                                
-                void main()
-                {
-                   v_color = a_color;
-                   v_color.a = v_color.a * (255.0/254.0);
-                   v_tweak = a_tweak;
-                   v_tweak.a = v_tweak.a * (255.0/254.0);
-                   v_texCoords = a_texCoord0;
-                   gl_Position =  u_projTrans * a_position;
-                }
-                                
-                """;
-    private static final String FRAGMENT_SHADER =
-            """
-            #ifdef GL_ES
-            #define LOWP lowp
-            precision mediump float;
-            #else
-            #define LOWP\s
-            #endif
+            attribute vec4 a_position;
+            attribute vec4 a_color;
+            attribute vec2 a_texCoord0;
+            attribute vec4 a_tweak;
+            uniform mat4 u_projTrans;
+            varying vec4 v_color;
+            varying vec4 v_tweak;
             varying vec2 v_texCoords;
-            varying LOWP vec4 v_color;
-            varying LOWP vec4 v_tweak;
-            uniform sampler2D u_texture;
-            const float eps = 1.0e-10;
-            vec4 rgb2hsl(vec4 c)
-            {
-                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                float d = q.x - min(q.w, q.y);
-                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-            }
-            
-            vec4 hsl2rgb(vec4 c)
-            {
-                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
-            }
                             
             void main()
             {
-              vec4 tgt = texture2D( u_texture, v_texCoords );
-              
-              // Apply sepia effect with variable strength
-              vec3 sepiaColor = vec3(1.0, 0.9, 0.7); // Warm sepia color
-              tgt.rgb = mix(tgt.rgb, tgt.rgb * sepiaColor, v_tweak.w);
-              
-              tgt = rgb2hsl(tgt);
-              tgt.xz += v_tweak.xz;
-              tgt.x = fract(tgt.x);
-              //tgt.z = clamp(tgt.z + rough * v_tweak.w, 0.0, 1.0);
-              tgt.y *= v_tweak.y;
-              
-              // Adjust v_color based on the HSL saturation
-              v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, v_tweak.y);
-              
-              gl_FragColor = hsl2rgb(tgt) * v_color.rgba;
-            }       
-             """;
+               v_color = a_color;
+               v_color.a = v_color.a * (255.0/254.0);
+               v_tweak = a_tweak;
+               v_tweak.a = v_tweak.a * (255.0/254.0);
+               v_texCoords = a_texCoord0;
+               gl_Position =  u_projTrans * a_position;
+            }
+                            
+            """;
+    private static final String FRAGMENT_SHADER =
+            """
+                    #ifdef GL_ES
+                    #define LOWP lowp
+                    precision mediump float;
+                    #else
+                    #define LOWP\s
+                    #endif
+                    varying vec2 v_texCoords;
+                    varying LOWP vec4 v_color;
+                    varying LOWP vec4 v_tweak;
+                    uniform sampler2D u_texture;
+                    const float eps = 1.0e-10;
+                    vec4 rgb2hsl(vec4 c)
+                    {
+                        const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+                        vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
+                        vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+                        float d = q.x - min(q.w, q.y);
+                        float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
+                        return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
+                    }
+                                
+                    vec4 hsl2rgb(vec4 c)
+                    {
+                        const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                        vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
+                        float v = (c.z + c.y * min(c.z, 1.0 - c.z));
+                        return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
+                    }
+                                    
+                    void main()
+                    {
+                      vec4 tgt = texture2D( u_texture, v_texCoords );
+                      
+                      tgt = rgb2hsl(tgt);
+                      tgt.xz += v_tweak.xz;
+                      tgt.x = fract(tgt.x);
+                      //tgt.z = clamp(tgt.z + rough * v_tweak.w, 0.0, 1.0);
+                      tgt.y *= v_tweak.y;
+                      
+                      // Adjust v_color based on the HSL saturation
+                      v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, v_tweak.y);
+                      // Multiplay with HSLS Values
+                      vec4 color = hsl2rgb(tgt) * v_color.rgba;
+                      // Apply sepia Effect 
+                      color.rgb = mix(color.rgb, color.rgb * vec3(1.0, 0.9, 0.7), v_tweak.w);
+                      
+                      gl_FragColor = color;
+                    }       
+                     """;
     public static final int SPRITE_SIZE = 24;
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
     private final Mesh mesh;
@@ -112,22 +113,22 @@ public class UISpriteBatch implements Batch {
     private boolean ownsShader;
     protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
     private final Color tempColor = new Color(1f, 1f, 1f, 1f);
-    private static final float TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 0f);
-    protected float tweak = TWEAK_RESET;
+    private static final float HSLS_TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 0f);
+    protected float hslsTweak = HSLS_TWEAK_RESET;
     public int renderCalls = 0;
     public int totalRenderCalls = 0;
     public int maxSpritesInBatch = 0;
 
-    public UISpriteBatch() {
+    public SpriteRenderer() {
         this(1000, null);
     }
 
 
-    public UISpriteBatch(int size) {
+    public SpriteRenderer(int size) {
         this(size, null);
     }
 
-    public UISpriteBatch(int size, ShaderProgram defaultShader) {
+    public SpriteRenderer(int size, ShaderProgram defaultShader) {
         if (size > 16383) throw new IllegalArgumentException("Can't have more than 16383 sprites per batch: " + size);
 
         Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
@@ -147,24 +148,25 @@ public class UISpriteBatch implements Batch {
         short j = 0;
         for (int i = 0; i < len; i += 6, j += 4) {
             indices[i] = j;
-            indices[i + 1] = (short)(j + 1);
-            indices[i + 2] = (short)(j + 2);
-            indices[i + 3] = (short)(j + 2);
-            indices[i + 4] = (short)(j + 3);
+            indices[i + 1] = (short) (j + 1);
+            indices[i + 2] = (short) (j + 2);
+            indices[i + 3] = (short) (j + 2);
+            indices[i + 4] = (short) (j + 3);
             indices[i + 5] = j;
         }
         mesh.setIndices(indices);
 
         if (defaultShader == null) {
             shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-            if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());;
+            if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+            ;
             ownsShader = true;
         } else
             shader = defaultShader;
     }
 
     @Override
-    public void begin () {
+    public void begin() {
         if (drawing) throw new IllegalStateException("UISpriteBatch.end must be called before begin.");
         renderCalls = 0;
 
@@ -179,7 +181,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void end () {
+    public void end() {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before end.");
         if (idx > 0) flush();
         lastTexture = null;
@@ -191,16 +193,16 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void setColor (Color tint) {
+    public void setColor(Color tint) {
         color = tint.toFloatBits();
     }
 
     @Override
-    public void setColor (float red, float green, float blue, float alpha) {
+    public void setColor(float red, float green, float blue, float alpha) {
         color = rgbPacked(red, green, blue, alpha);
     }
 
-    public void setColor (final float color) {
+    public void setColor(final float color) {
         setPackedColor(color);
     }
 
@@ -209,35 +211,92 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void setPackedColor (final float color) {
+    public void setPackedColor(final float color) {
         this.color = color;
     }
 
     @Override
-    public Color getColor () {
+    public Color getColor() {
         Color.abgr8888ToColor(tempColor, color);
         return tempColor;
     }
 
     @Override
-    public float getPackedColor () {
+    public float getPackedColor() {
         return color;
     }
 
-    public void setTweak (float hue, float saturation, float lightness, float sepia) {
-        tweak = rgbPacked(hue, saturation, lightness, sepia);
+    public float getHue() {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        float a = ((c & 0xff000000) >>> 24) / 255f;
+        float b = ((c & 0x00ff0000) >>> 16) / 255f;
+        float g = ((c & 0x0000ff00) >>> 8) / 255f;
+        float r = ((c & 0x000000ff)) / 255f;
+        return ((c & 0x000000ff)) / 255;
     }
 
-    public void setTweak (final float tweak) {
-        this.tweak = tweak;
+    public float getSaturation() {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public void setTweakReset() {
-        this.tweak = TWEAK_RESET;
+    public float getLightness() {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getTweak () {
-        return tweak;
+    public float getSepia() {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        return ((c & 0xff000000) >>> 24) / 255f;
+    }
+
+
+    public void setHue(float hue) {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        float a = ((c & 0xff000000) >>> 24) / 255f;
+        float b = ((c & 0x00ff0000) >>> 16) / 255f;
+        float g = ((c & 0x0000ff00) >>> 8) / 255f;
+        hslsTweak = rgbPacked(hue, g, b, a);
+    }
+
+    public void setSaturation(float saturation) {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        float a = ((c & 0xff000000) >>> 24) / 255f;
+        float b = ((c & 0x00ff0000) >>> 16) / 255f;
+        float r = ((c & 0x000000ff)) / 255f;
+        hslsTweak = rgbPacked(r, saturation, b, a);
+    }
+
+    public void setLightness(float lightness) {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        float a = ((c & 0xff000000) >>> 24) / 255f;
+        float g = ((c & 0x0000ff00) >>> 8) / 255f;
+        float r = ((c & 0x000000ff)) / 255f;
+        hslsTweak = rgbPacked(r, g, lightness, a);
+    }
+
+    public void setSepia(float sepia) {
+        int c = NumberUtils.floatToIntColor(hslsTweak);
+        float b = ((c & 0x00ff0000) >>> 16) / 255f;
+        float g = ((c & 0x0000ff00) >>> 8) / 255f;
+        float r = ((c & 0x000000ff)) / 255f;
+        hslsTweak = rgbPacked(r, g, b, sepia);
+    }
+
+    public void setHSLS(float hue, float saturation, float lightness, float sepia) {
+        hslsTweak = rgbPacked(hue, saturation, lightness, sepia);
+    }
+
+    public void setPackedHSLS(final float tweak) {
+        this.hslsTweak = tweak;
+    }
+
+    public void setHSLSReset() {
+        this.hslsTweak = HSLS_TWEAK_RESET;
+    }
+
+    public float getPackedHSLS() {
+        return hslsTweak;
     }
 
     private float rgbPacked(float red, float green, float blue, float alpha) {
@@ -245,34 +304,25 @@ public class UISpriteBatch implements Batch {
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
-    /**
-     * Takes the tweak as an int in the format: red (8 bits), green (8 bits), blue (8 bits), roughness (7 bits),
-     * (1 ignored bit at the end).
-     * @param tweak the tweak to use as an integer, with hue in the most significant bits and roughness in least
-     */
-    public void setIntTweak(final int tweak) {
-        this.tweak = NumberUtils.intBitsToFloat(Integer.reverseBytes(tweak & -2));
-    }
 
-
-    public void setTweakedColor(final float color, final float tweak) {
+    public void setColorHSLS(final float color, final float tweak) {
         setColor(color);
-        setTweak(tweak);
+        setPackedHSLS(tweak);
     }
 
 
-    public void setTweakedColor (final float r, final float g,
-                                 final float b, final float a,
-                                 final float hue, final float sat,
-                                 final float light, final float roughness) {
+    public void setColorHSLS(final float r, final float g,
+                             final float b, final float a,
+                             final float hue, final float sat,
+                             final float light, final float roughness) {
         setColor(r, g, b, a);
-        setTweak(hue, sat, light, roughness);
+        setHSLS(hue, sat, light, roughness);
     }
 
 
     @Override
-    public void draw (Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
-                      float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
+    public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
+                     float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -374,7 +424,7 @@ public class UISpriteBatch implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -407,8 +457,8 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
-                      int srcHeight, boolean flipX, boolean flipY) {
+    public void draw(Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
+                     int srcHeight, boolean flipX, boolean flipY) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -438,7 +488,7 @@ public class UISpriteBatch implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -471,7 +521,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
+    public void draw(Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -489,7 +539,7 @@ public class UISpriteBatch implements Batch {
         final float fy2 = y + srcHeight;
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -522,7 +572,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (Texture texture, float x, float y, float width, float height, float u, float v, float u2, float v2) {
+    public void draw(Texture texture, float x, float y, float width, float height, float u, float v, float u2, float v2) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -536,7 +586,7 @@ public class UISpriteBatch implements Batch {
         final float fy2 = y + height;
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -569,12 +619,12 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (Texture texture, float x, float y) {
+    public void draw(Texture texture, float x, float y) {
         draw(texture, x, y, texture.getWidth(), texture.getHeight());
     }
 
     @Override
-    public void draw (Texture texture, float x, float y, float width, float height) {
+    public void draw(Texture texture, float x, float y, float width, float height) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -592,7 +642,7 @@ public class UISpriteBatch implements Batch {
         final float v2 = 0;
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -628,13 +678,14 @@ public class UISpriteBatch implements Batch {
      * This is very different from the other overloads in this class; it assumes the float array it is given is in the
      * format libGDX uses to give to SpriteBatch, that is, in groups of 20 floats per sprite. UISpriteBatch uses 24
      * floats per sprite, to add tweak per color, so this does some conversion.
-     * @param texture the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
+     *
+     * @param texture        the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
      * @param spriteVertices not the same format as {@link #vertices} in this class; should have a length that's a multiple of 20
-     * @param offset where to start drawing vertices from {@code spriteVertices}
-     * @param count how many vertices to draw from {@code spriteVertices} (20 vertices is one sprite)
+     * @param offset         where to start drawing vertices from {@code spriteVertices}
+     * @param count          how many vertices to draw from {@code spriteVertices} (20 vertices is one sprite)
      */
     @Override
-    public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
+    public void draw(Texture texture, float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         count = (count / 5) * 6;
@@ -650,7 +701,7 @@ public class UISpriteBatch implements Batch {
             }
         }
         int copyCount = Math.min(remainingVertices, count);
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
 
         ////old way, breaks when libGDX code expects SPRITE_SIZE to be 20
         //System.arraycopy(spriteVertices, offset, vertices, idx, copyCount);
@@ -689,12 +740,13 @@ public class UISpriteBatch implements Batch {
      * Meant for code that uses UISpriteBatch specifically and can set an extra float (for the color tweak) per vertex,
      * this is just like {@link #draw(Texture, float[], int, int)} when used in other Batch implementations, but expects
      * {@code spriteVertices} to have a length that is a multiple of 24 instead of 20.
-     * @param texture the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
+     *
+     * @param texture        the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
      * @param spriteVertices vertices formatted as this class uses them; length should be a multiple of 24
-     * @param offset where to start drawing vertices from {@code spriteVertices}
-     * @param count how many vertices to draw from {@code spriteVertices} (24 vertices is one sprite)
+     * @param offset         where to start drawing vertices from {@code spriteVertices}
+     * @param count          how many vertices to draw from {@code spriteVertices} (24 vertices is one sprite)
      */
-    public void drawExactly (Texture texture, float[] spriteVertices, int offset, int count) {
+    public void drawExactly(Texture texture, float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         int verticesLength = vertices.length;
@@ -724,12 +776,12 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (TextureRegion region, float x, float y) {
+    public void draw(TextureRegion region, float x, float y) {
         draw(region, x, y, region.getRegionWidth(), region.getRegionHeight());
     }
 
     @Override
-    public void draw (TextureRegion region, float x, float y, float width, float height) {
+    public void draw(TextureRegion region, float x, float y, float width, float height) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -748,7 +800,7 @@ public class UISpriteBatch implements Batch {
         final float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -781,8 +833,8 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
-                      float scaleX, float scaleY, float rotation) {
+    public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
+                     float scaleX, float scaleY, float rotation) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -873,7 +925,7 @@ public class UISpriteBatch implements Batch {
         final float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -906,8 +958,8 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
-                      float scaleX, float scaleY, float rotation, boolean clockwise) {
+    public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
+                     float scaleX, float scaleY, float rotation, boolean clockwise) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -1014,7 +1066,7 @@ public class UISpriteBatch implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1047,7 +1099,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void draw (TextureRegion region, float width, float height, Affine2 transform) {
+    public void draw(TextureRegion region, float width, float height, Affine2 transform) {
         if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -1075,7 +1127,7 @@ public class UISpriteBatch implements Batch {
         float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.tweak;
+        final float tweak = this.hslsTweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1109,7 +1161,7 @@ public class UISpriteBatch implements Batch {
 
     @SuppressWarnings("RedundantCast") // These casts are absolutely not redundant! Java 9 changed Buffer ABI.
     @Override
-    public void flush () {
+    public void flush() {
         if (idx == 0) return;
 
         renderCalls++;
@@ -1121,14 +1173,15 @@ public class UISpriteBatch implements Batch {
         lastTexture.bind();
         Mesh mesh = this.mesh;
         mesh.setVertices(vertices, 0, idx);
-        ((Buffer)mesh.getIndicesBuffer()).position(0);
-        ((Buffer)mesh.getIndicesBuffer()).limit(count);
+        ((Buffer) mesh.getIndicesBuffer()).position(0);
+        ((Buffer) mesh.getIndicesBuffer()).limit(count);
 
         if (blendingDisabled) {
             Gdx.gl.glDisable(GL20.GL_BLEND);
         } else {
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+            if (blendSrcFunc != -1)
+                Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
         }
 
         mesh.render(customShader != null ? customShader : shader, GL20.GL_TRIANGLES, 0, count);
@@ -1137,27 +1190,28 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void disableBlending () {
+    public void disableBlending() {
         if (blendingDisabled) return;
         flush();
         blendingDisabled = true;
     }
 
     @Override
-    public void enableBlending () {
+    public void enableBlending() {
         if (!blendingDisabled) return;
         flush();
         blendingDisabled = false;
     }
 
     @Override
-    public void setBlendFunction (int srcFunc, int dstFunc) {
+    public void setBlendFunction(int srcFunc, int dstFunc) {
         setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
     }
 
     @Override
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
-        if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha && blendDstFuncAlpha == dstFuncAlpha) return;
+        if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha && blendDstFuncAlpha == dstFuncAlpha)
+            return;
         flush();
         blendSrcFunc = srcFuncColor;
         blendDstFunc = dstFuncColor;
@@ -1166,12 +1220,12 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public int getBlendSrcFunc () {
+    public int getBlendSrcFunc() {
         return blendSrcFunc;
     }
 
     @Override
-    public int getBlendDstFunc () {
+    public int getBlendDstFunc() {
         return blendDstFunc;
     }
 
@@ -1186,36 +1240,36 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void dispose () {
+    public void dispose() {
         mesh.dispose();
         if (ownsShader && shader != null) shader.dispose();
     }
 
     @Override
-    public Matrix4 getProjectionMatrix () {
+    public Matrix4 getProjectionMatrix() {
         return projectionMatrix;
     }
 
     @Override
-    public Matrix4 getTransformMatrix () {
+    public Matrix4 getTransformMatrix() {
         return transformMatrix;
     }
 
     @Override
-    public void setProjectionMatrix (Matrix4 projection) {
+    public void setProjectionMatrix(Matrix4 projection) {
         if (drawing) flush();
         projectionMatrix.set(projection);
         if (drawing) setupMatrices();
     }
 
     @Override
-    public void setTransformMatrix (Matrix4 transform) {
+    public void setTransformMatrix(Matrix4 transform) {
         if (drawing) flush();
         transformMatrix.set(transform);
         if (drawing) setupMatrices();
     }
 
-    protected void setupMatrices () {
+    protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
         if (customShader != null) {
             customShader.setUniformMatrix("u_projTrans", combinedMatrix);
@@ -1226,7 +1280,7 @@ public class UISpriteBatch implements Batch {
         }
     }
 
-    protected void switchTexture (Texture texture) {
+    protected void switchTexture(Texture texture) {
         flush();
         lastTexture = texture;
         invTexWidth = 1.0f / texture.getWidth();
@@ -1234,7 +1288,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public void setShader (ShaderProgram shader) {
+    public void setShader(ShaderProgram shader) {
         if (drawing) {
             flush();
         }
@@ -1249,7 +1303,7 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public ShaderProgram getShader () {
+    public ShaderProgram getShader() {
         if (customShader == null) {
             return shader;
         }
@@ -1257,36 +1311,11 @@ public class UISpriteBatch implements Batch {
     }
 
     @Override
-    public boolean isBlendingEnabled () {
+    public boolean isBlendingEnabled() {
         return !blendingDisabled;
     }
 
-    public boolean isDrawing () {
+    public boolean isDrawing() {
         return drawing;
     }
-
-    public static final int X1 = 0;
-    public static final int Y1 = 1;
-    public static final int C1 = 2;
-    public static final int U1 = 3;
-    public static final int V1 = 4;
-    public static final int T1 = 5;
-    public static final int X2 = 6;
-    public static final int Y2 = 7;
-    public static final int C2 = 8;
-    public static final int U2 = 9;
-    public static final int V2 = 10;
-    public static final int T2 = 11;
-    public static final int X3 = 12;
-    public static final int Y3 = 13;
-    public static final int C3 = 14;
-    public static final int U3 = 15;
-    public static final int V3 = 16;
-    public static final int T3 = 17;
-    public static final int X4 = 18;
-    public static final int Y4 = 19;
-    public static final int C4 = 20;
-    public static final int U4 = 21;
-    public static final int V4 = 22;
-    public static final int T4 = 23;
 }

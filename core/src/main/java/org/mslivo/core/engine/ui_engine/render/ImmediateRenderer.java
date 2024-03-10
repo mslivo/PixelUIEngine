@@ -2,12 +2,13 @@ package org.mslivo.core.engine.ui_engine.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-public class UIImmediateBatch {
+public class ImmediateRenderer {
 
     private int primitiveType;
     private static final String VERTEX = """
@@ -42,7 +43,7 @@ public class UIImmediateBatch {
     private int colorOffset, vertexIdx, vertexSize;
     private int uProjModelViewLocation;
 
-    public UIImmediateBatch() {
+    public ImmediateRenderer() {
         this.primitiveType = GL20.GL_POINTS;
         this.blend = false;
         this.color = new Color(Color.WHITE);

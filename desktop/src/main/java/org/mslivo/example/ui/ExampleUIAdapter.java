@@ -8,8 +8,8 @@ import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.render.UIImmediateBatch;
-import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
+import org.mslivo.core.engine.ui_engine.render.SpriteRenderer;
+import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
@@ -129,7 +129,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(UISpriteBatch batch, UIImmediateBatch uIImmediateBatch, GameViewPort gameViewPort) {
+    public void render(SpriteRenderer batch, ImmediateRenderer immediateRenderer, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -144,27 +144,27 @@ public class ExampleUIAdapter implements UIAdapter {
         }
         batch.end();
 
-        uIImmediateBatch.begin();
+        immediateRenderer.begin();
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {
-                uIImmediateBatch.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                uIImmediateBatch.vertex(100 + ix, 100 + iy);
+                immediateRenderer.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                immediateRenderer.vertex(100 + ix, 100 + iy);
             }
         }
-        uIImmediateBatch.end();
+        immediateRenderer.end();
 
-        uIImmediateBatch.begin(GL20.GL_LINES);
+        immediateRenderer.begin(GL20.GL_LINES);
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {
-                uIImmediateBatch.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                uIImmediateBatch.vertex(0, 0, 100 + ix, 100 + iy);
+                immediateRenderer.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                immediateRenderer.vertex(0, 0, 100 + ix, 100 + iy);
             }
         }
-        uIImmediateBatch.end();
+        immediateRenderer.end();
 
-        uIImmediateBatch.begin(GL20.GL_TRIANGLES);
-        uIImmediateBatch.vertex(0, 0, 100, 100, 200, 0);
-        uIImmediateBatch.end();
+        immediateRenderer.begin(GL20.GL_TRIANGLES);
+        immediateRenderer.vertex(0, 0, 100, 100, 200, 0);
+        immediateRenderer.end();
 
     }
 

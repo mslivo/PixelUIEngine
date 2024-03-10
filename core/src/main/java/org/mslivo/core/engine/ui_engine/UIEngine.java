@@ -133,15 +133,15 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.config = new Config();
         // -----  Game
         if (spriteRenderer) {
-            newInputState.spriteBatch_game = new UISpriteBatch(16383);
+            newInputState.spriteBatch_game = new SpriteRenderer(16383);
             newInputState.spriteBatch_game.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
             newInputState.spriteBatch_game = null;
         }
         if (shaderRenderer) {
-            newInputState.uIImmediateBatch_game = new UIImmediateBatch();
+            newInputState.immediateRenderer_game = new ImmediateRenderer();
         } else {
-            newInputState.uIImmediateBatch_game = null;
+            newInputState.immediateRenderer_game = null;
         }
         newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -153,10 +153,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_game.flip(false, true);
 
         // -----  GUI
-        newInputState.spriteBatch_ui = new UISpriteBatch(16383);
+        newInputState.spriteBatch_ui = new SpriteRenderer(16383);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
-            newInputState.uIImmediateBatch_ui = new UIImmediateBatch();
+            newInputState.immediateRenderer_ui = new ImmediateRenderer();
         }
         newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -172,7 +172,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
         newInputState.texture_screen.flip(false, true);
         // ----- Screen
-        newInputState.spriteBatch_screen = new UISpriteBatch(2);
+        newInputState.spriteBatch_screen = new SpriteRenderer(2);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
         newInputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -1892,14 +1892,14 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.spriteRenderer)
             inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
         if (inputState.immediateRenderer)
-            inputState.uIImmediateBatch_ui.setProjectionMatrix(camera.combined);
+            inputState.immediateRenderer_ui.setProjectionMatrix(camera.combined);
     }
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera) {
         if (inputState.spriteRenderer)
             inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
         if (inputState.immediateRenderer)
-            inputState.uIImmediateBatch_game.setProjectionMatrix(camera.combined);
+            inputState.immediateRenderer_game.setProjectionMatrix(camera.combined);
     }
 
     public void render() {
@@ -1914,7 +1914,7 @@ public class UIEngine<T extends UIAdapter> {
             // Draw Main FrameBuffer
             inputState.frameBuffer_game.begin();
             render_setGameProjectionMatrix(inputState.camera_game);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.uIImmediateBatch_game, null);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateRenderer_game, null);
             inputState.frameBuffer_game.end();
             // Draw GUI GameViewPort FrameBuffers
             for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
@@ -1928,9 +1928,9 @@ public class UIEngine<T extends UIAdapter> {
             render_setUIProjectionMatrix(inputState.camera_ui);
             Gdx.gl.glClearColor(0, 0, 0, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.uIImmediateBatch_ui);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.immediateRenderer_ui);
             this.renderUI();
-            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.uIImmediateBatch_ui);
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.immediateRenderer_ui);
             inputState.frameBuffer_ui.end();
         }
 
@@ -1939,7 +1939,8 @@ public class UIEngine<T extends UIAdapter> {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
                     inputState.texture_game, inputState.texture_ui,
-                    inputState.internalResolutionWidth, inputState.internalResolutionHeight
+                    inputState.internalResolutionWidth, inputState.internalResolutionHeight,
+                    inputState.modalWindow != null
             );
             inputState.frameBuffer_screen.end();
         }
@@ -1967,7 +1968,7 @@ public class UIEngine<T extends UIAdapter> {
             // draw to frambuffer
             gameViewPort.frameBuffer.begin();
             render_setGameProjectionMatrix(gameViewPort.camera);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.uIImmediateBatch_game, gameViewPort);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateRenderer_game, gameViewPort);
             gameViewPort.frameBuffer.end();
             gameViewPort.updateTimer = System.currentTimeMillis();
         }
@@ -2435,8 +2436,8 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        boolean preWindowGrayScaleShaderState = render_isGrayScaleShaderEnabled();
-        if(inputState.modalWindow != null && inputState.modalWindow != window) render_enableGrayScaleShader(true);
+        boolean preWindowGrayScaleShaderState = render_isGrayScaleEnabled();
+        if(inputState.modalWindow != null && inputState.modalWindow != window) render_enableGrayScale(true);
 
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
         for (int ix = 0; ix < window.width; ix++) {
@@ -2472,7 +2473,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         render_batchSetColorWhite(1f);
-        render_enableGrayScaleShader(preWindowGrayScaleShaderState);
+        render_enableGrayScale(preWindowGrayScaleShaderState);
     }
 
 
@@ -2480,8 +2481,8 @@ public class UIEngine<T extends UIAdapter> {
         if (render_isComponentNotRendered(component)) return;
 
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        boolean preComponentGrayScaleState = render_isGrayScaleShaderEnabled();
-        if (component.disabled) render_enableGrayScaleShader(true);
+        boolean preComponentGrayScaleState = render_isGrayScaleEnabled();
+        if (component.disabled) render_enableGrayScale(true);
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
 
@@ -2561,8 +2562,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean preListGrayScaleState = render_isGrayScaleShaderEnabled();
-                if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
+                boolean preListGrayScaleState = render_isGrayScaleEnabled();
+                if (dragEnabled && !dragValid) render_enableGrayScale(true);
 
                 // List
                 for (int iy = 0; iy < list.height; iy++) {
@@ -2605,7 +2606,7 @@ public class UIEngine<T extends UIAdapter> {
                         mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
-                render_enableGrayScaleShader(preListGrayScaleState);
+                render_enableGrayScale(preListGrayScaleState);
             }
             case ComboBox comboBox -> {
                 // Box
@@ -2731,8 +2732,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore = render_isGrayScaleShaderEnabled();
-                if (dragEnabled && !dragValid) render_enableGrayScaleShader(true);
+                boolean grayScaleBefore = render_isGrayScaleEnabled();
+                if (dragEnabled && !dragValid) render_enableGrayScale(true);
 
                 for (int ix = 0; ix < gridWidth; ix++) {
                     for (int iy = 0; iy < gridHeight; iy++) {
@@ -2772,7 +2773,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                 }
-                render_enableGrayScaleShader(grayScaleBefore);
+                render_enableGrayScale(grayScaleBefore);
             }
             case TabBar tabBar -> {
                 int tabXOffset = tabBar.tabOffset;
@@ -2883,7 +2884,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        render_enableGrayScaleShader(preComponentGrayScaleState);
+        render_enableGrayScale(preComponentGrayScaleState);
         render_batchSetColorWhite(1f);
     }
 
@@ -2920,20 +2921,12 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private boolean render_isGrayScaleShaderEnabled() {
-        //return inputState.spriteBatch_ui.getShader() == inputState.grayScaleShader;
-
-        return false;
+    private boolean render_isGrayScaleEnabled() {
+        return inputState.spriteBatch_ui.getSaturation() == 0f;
     }
 
-    private void render_enableGrayScaleShader(boolean enabled) {
-        // tODO: inputState.spriteBatch_ui.setTweak(0f,1f,0f,1f);
-
-
-        //if(enabled == render_isGrayScaleShaderEnabled())return;
-        //ShaderProgram shaderProgram = inputState.spriteBatch_ui.getShader();
-        //shaderProgram.bind();
-        //shaderProgram.setUniformf(shaderProgram.getUniformLocation("u_saturation"), enabled ? 0f : 1.0f);
+    private void render_enableGrayScale(boolean enabled) {
+        inputState.spriteBatch_ui.setSaturation(enabled ? 0f : 1f);
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
@@ -3049,8 +3042,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.immediateRenderer) inputState.uIImmediateBatch_game.dispose();
-        if (inputState.immediateRenderer) inputState.uIImmediateBatch_ui.dispose();
+        if (inputState.immediateRenderer) inputState.immediateRenderer_game.dispose();
+        if (inputState.immediateRenderer) inputState.immediateRenderer_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
