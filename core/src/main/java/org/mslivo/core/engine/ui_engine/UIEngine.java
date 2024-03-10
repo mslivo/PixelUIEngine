@@ -3,7 +3,6 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
@@ -134,15 +133,15 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.config = new Config();
         // -----  Game
         if (spriteRenderer) {
-            newInputState.spriteBatch_game = new SpriteBatch(8191);
+            newInputState.spriteBatch_game = new UISpriteBatch(16383);
             newInputState.spriteBatch_game.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
             newInputState.spriteBatch_game = null;
         }
         if (shaderRenderer) {
-            newInputState.immediateBatch_game = new ImmediateBatch();
+            newInputState.uIImmediateBatch_game = new UIImmediateBatch();
         } else {
-            newInputState.immediateBatch_game = null;
+            newInputState.uIImmediateBatch_game = null;
         }
         newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -154,10 +153,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_game.flip(false, true);
 
         // -----  GUI
-        newInputState.spriteBatch_ui = new UISpriteBatch();
+        newInputState.spriteBatch_ui = new UISpriteBatch(16383);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (shaderRenderer) {
-            newInputState.immediateBatch_ui = new ImmediateBatch();
+            newInputState.uIImmediateBatch_ui = new UIImmediateBatch();
         }
         newInputState.camera_ui = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_ui.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -173,7 +172,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
         newInputState.texture_screen.flip(false, true);
         // ----- Screen
-        newInputState.spriteBatch_screen = new SpriteBatch(1);
+        newInputState.spriteBatch_screen = new UISpriteBatch(2);
         newInputState.camera_screen = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
         newInputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, newInputState.camera_screen, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
@@ -1893,14 +1892,14 @@ public class UIEngine<T extends UIAdapter> {
         if (inputState.spriteRenderer)
             inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
         if (inputState.immediateRenderer)
-            inputState.immediateBatch_ui.setProjectionMatrix(camera.combined);
+            inputState.uIImmediateBatch_ui.setProjectionMatrix(camera.combined);
     }
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera) {
         if (inputState.spriteRenderer)
             inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
         if (inputState.immediateRenderer)
-            inputState.immediateBatch_game.setProjectionMatrix(camera.combined);
+            inputState.uIImmediateBatch_game.setProjectionMatrix(camera.combined);
     }
 
     public void render() {
@@ -1908,13 +1907,12 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void render(boolean drawToScreen) {
-
         // Draw Game
         {
             // Draw Main FrameBuffer
             inputState.frameBuffer_game.begin();
             render_setGameProjectionMatrix(inputState.camera_game);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateBatch_game, null);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.uIImmediateBatch_game, null);
             inputState.frameBuffer_game.end();
             // Draw GUI GameViewPort FrameBuffers
             for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
@@ -1928,9 +1926,9 @@ public class UIEngine<T extends UIAdapter> {
             render_setUIProjectionMatrix(inputState.camera_ui);
             Gdx.gl.glClearColor(0, 0, 0, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.immediateBatch_ui);
+            this.uiAdapter.renderBeforeUI(inputState.spriteBatch_ui, inputState.uIImmediateBatch_ui);
             this.renderUI();
-            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.immediateBatch_ui);
+            this.uiAdapter.renderAfterUI(inputState.spriteBatch_ui, inputState.uIImmediateBatch_ui);
             inputState.frameBuffer_ui.end();
         }
 
@@ -1967,7 +1965,7 @@ public class UIEngine<T extends UIAdapter> {
             // draw to frambuffer
             gameViewPort.frameBuffer.begin();
             render_setGameProjectionMatrix(gameViewPort.camera);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateBatch_game, gameViewPort);
+            this.uiAdapter.render(inputState.spriteBatch_game, inputState.uIImmediateBatch_game, gameViewPort);
             gameViewPort.frameBuffer.end();
             gameViewPort.updateTimer = System.currentTimeMillis();
         }
@@ -2836,6 +2834,7 @@ public class UIEngine<T extends UIAdapter> {
                         case TRIANGLE_LEFT_UP -> UIBaseMedia.UI_SHAPE_TRIANGLE_LEFT_UP;
                         case TRIANGLE_RIGHT_UP -> UIBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_UP;
                     };
+
                     mediaManager.drawCMediaImage(inputState.spriteBatch_ui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
                             0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
                 }
@@ -2921,10 +2920,14 @@ public class UIEngine<T extends UIAdapter> {
 
     private boolean render_isGrayScaleShaderEnabled() {
         //return inputState.spriteBatch_ui.getShader() == inputState.grayScaleShader;
+
         return false;
     }
 
     private void render_enableGrayScaleShader(boolean enabled) {
+        // tODO: inputState.spriteBatch_ui.setTweak(0f,1f,0f,0f);
+
+
         //if(enabled == render_isGrayScaleShaderEnabled())return;
         //ShaderProgram shaderProgram = inputState.spriteBatch_ui.getShader();
         //shaderProgram.bind();
@@ -2983,6 +2986,7 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_batchSetColorWhite(float alpha) {
         inputState.spriteBatch_ui.setColor(1f, 1f, 1f, alpha);
+        inputState.spriteBatch_ui.getColor();
     }
 
     private Color render_batchGetColor() {
@@ -3043,8 +3047,8 @@ public class UIEngine<T extends UIAdapter> {
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.immediateRenderer) inputState.immediateBatch_game.dispose();
-        if (inputState.immediateRenderer) inputState.immediateBatch_ui.dispose();
+        if (inputState.immediateRenderer) inputState.uIImmediateBatch_game.dispose();
+        if (inputState.immediateRenderer) inputState.uIImmediateBatch_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();

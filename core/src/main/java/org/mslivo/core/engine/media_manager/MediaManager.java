@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import org.mslivo.core.engine.media_manager.media.*;
 import org.mslivo.core.engine.tools.Tools;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
+import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -345,11 +346,11 @@ public class MediaManager {
 
 
     /* -----  CMediaGFX ----- */
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y) {
         drawCMediaGFX(batch, cMedia, x, y, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y);
@@ -361,11 +362,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y);
@@ -378,11 +379,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -397,11 +398,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, rotation, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFX(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -416,19 +417,19 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut) {
+    public void drawCMediaGFXCut(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut) {
         drawCMediaGFXCut(batch, cMedia, x, y, widthCut, heightCut, 0, 0);
     }
 
-    public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXCut(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
         drawCMediaGFXCut(batch, cMedia, x, y, 0, 0, widthCut, heightCut, animationTimer, arrayIndex);
     }
 
-    public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
+    public void drawCMediaGFXCut(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
         drawCMediaGFXCut(batch, cMedia, x, y, srcX, srcY, widthCut, heightCut, 0, 0);
     }
 
-    public void drawCMediaGFXCut(SpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXCut(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -443,19 +444,19 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
+    public void drawCMediaGFXScale(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, 0, 0);
     }
 
-    public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXScale(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, animationTimer, arrayIndex);
     }
 
-    public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+    public void drawCMediaGFXScale(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation, 0, 0);
     }
 
-    public void drawCMediaGFXScale(SpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXScale(UISpriteBatch batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -503,7 +504,7 @@ public class MediaManager {
 
     /* ----- CMediaCursor ----- */
 
-    public void drawCMediaCursor(SpriteBatch batch, CMediaCursor cMedia, float x, float y) {
+    public void drawCMediaCursor(UISpriteBatch batch, CMediaCursor cMedia, float x, float y) {
         TextureRegion texture = getCMediaCursor(cMedia);
         batch.draw(texture, x - cMedia.hotspot_x, y - cMedia.hotspot_y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
@@ -515,42 +516,42 @@ public class MediaManager {
 
     /* ----- CMediaImage ----- */
 
-    public void drawCMediaImage(SpriteBatch batch, CMediaImage cMedia, float x, float y) {
+    public void drawCMediaImage(UISpriteBatch batch, CMediaImage cMedia, float x, float y) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaImage(SpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y) {
+    public void drawCMediaImage(UISpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaImage(SpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
+    public void drawCMediaImage(UISpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
-    public void drawCMediaImage(SpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
+    public void drawCMediaImage(UISpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
-    public void drawCMediaImageCut(SpriteBatch batch, CMediaImage cMedia, float x, float y, int widthCut, int heightCut) {
+    public void drawCMediaImageCut(UISpriteBatch batch, CMediaImage cMedia, float x, float y, int widthCut, int heightCut) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture.getTexture(), x, y, texture.getRegionX(), texture.getRegionY(), widthCut, heightCut);
     }
 
-    public void drawCMediaImageCut(SpriteBatch batch, CMediaImage cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
+    public void drawCMediaImageCut(UISpriteBatch batch, CMediaImage cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture.getTexture(), x, y, texture.getRegionX() + srcX, texture.getRegionY() + srcY, widthCut, heightCut);
     }
 
-    public void drawCMediaImageScale(SpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
+    public void drawCMediaImageScale(UISpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, 0);
     }
 
-    public void drawCMediaImageScale(SpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+    public void drawCMediaImageScale(UISpriteBatch batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
         TextureRegion texture = getCMediaImage(cMedia);
         batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, rotation);
     }
@@ -565,41 +566,41 @@ public class MediaManager {
 
     /* --- CMediaAnimation  --- */
 
-    public void drawCMediaAnimation(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer) {
+    public void drawCMediaAnimation(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaAnimation(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y) {
+    public void drawCMediaAnimation(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaAnimation(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height) {
+    public void drawCMediaAnimation(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
-    public void drawCMediaAnimation(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height, float rotation) {
+    public void drawCMediaAnimation(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height, float rotation) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
-    public void drawCMediaAnimationCut(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int widthCut, int heightCut) {
+    public void drawCMediaAnimationCut(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int widthCut, int heightCut) {
         drawCMediaAnimationCut(batch, cMedia, x, y, animationTimer, 0, 0, widthCut, heightCut);
     }
 
-    public void drawCMediaAnimationCut(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int srcX, int srcY, int widthCut, int heightCut) {
+    public void drawCMediaAnimationCut(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int srcX, int srcY, int widthCut, int heightCut) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
     }
 
-    public void drawCMediaAnimationScale(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY) {
+    public void drawCMediaAnimationScale(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
     }
 
-    public void drawCMediaAnimationScale(SpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+    public void drawCMediaAnimationScale(UISpriteBatch batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
         TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
     }
@@ -614,41 +615,41 @@ public class MediaManager {
 
     /* --- CMediaArray  --- */
 
-    public void drawCMediaArray(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex) {
+    public void drawCMediaArray(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaArray(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y) {
+    public void drawCMediaArray(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
-    public void drawCMediaArray(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height) {
+    public void drawCMediaArray(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
-    public void drawCMediaArray(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height, float rotation) {
+    public void drawCMediaArray(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height, float rotation) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
-    public void drawCMediaArrayCut(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, int widthCut, int heightCut) {
+    public void drawCMediaArrayCut(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, int widthCut, int heightCut) {
         drawCMediaArrayCut(batch, cMedia, x, y, arrayIndex, 0, 0, widthCut, heightCut);
     }
 
-    public void drawCMediaArrayCut(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, int srcX, int srcY, int widthCut, int heightCut) {
+    public void drawCMediaArrayCut(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, int srcX, int srcY, int widthCut, int heightCut) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
     }
 
-    public void drawCMediaArrayScale(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY) {
+    public void drawCMediaArrayScale(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
     }
 
-    public void drawCMediaArrayScale(SpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+    public void drawCMediaArrayScale(UISpriteBatch batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
         TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
         batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
     }
@@ -662,12 +663,12 @@ public class MediaManager {
     }
     /* --- CMediaFont  --- */
 
-    public void drawCMediaFont(SpriteBatch batch, CMediaFont cMedia, float x, float y, String text) {
+    public void drawCMediaFont(UISpriteBatch batch, CMediaFont cMedia, float x, float y, String text) {
         BitmapFont bitmapFont = getCMediaFont(cMedia);
         bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y));
     }
 
-    public void drawCMediaFont(SpriteBatch batch, CMediaFont cMedia, float x, float y, String text, int maxWidth) {
+    public void drawCMediaFont(UISpriteBatch batch, CMediaFont cMedia, float x, float y, String text, int maxWidth) {
         BitmapFont bitmapFont = getCMediaFont(cMedia);
         bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
     }

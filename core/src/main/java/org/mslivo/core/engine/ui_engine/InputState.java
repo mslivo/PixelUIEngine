@@ -3,7 +3,6 @@ package org.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
@@ -12,7 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
-import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
+import org.mslivo.core.engine.ui_engine.render.UIImmediateBatch;
 import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
 import org.mslivo.core.engine.ui_engine.ui.Window;
 import org.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -57,15 +56,15 @@ public class InputState {
     public Config config;
 
     /* #################### Graphics: Game #################### */
-    public SpriteBatch spriteBatch_game;
-    public ImmediateBatch immediateBatch_game;
+    public UISpriteBatch spriteBatch_game;
+    public UIImmediateBatch uIImmediateBatch_game;
     public TextureRegion texture_game;
     public OrthographicCamera camera_game;
     public NestedFrameBuffer frameBuffer_game;
 
     /* #################### Graphics: GUI #################### */
     public UISpriteBatch spriteBatch_ui;
-    public ImmediateBatch immediateBatch_ui;
+    public UIImmediateBatch uIImmediateBatch_ui;
     public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;
@@ -75,7 +74,7 @@ public class InputState {
     public TextureRegion texture_screen;
     public Texture.TextureFilter textureFilter_screen;
     public NestedFrameBuffer frameBuffer_screen;
-    public SpriteBatch spriteBatch_screen;
+    public UISpriteBatch spriteBatch_screen;
     public Viewport viewport_screen;
     public OrthographicCamera camera_screen;
 

@@ -2,14 +2,14 @@ package org.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.engine.GameEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
 import org.mslivo.core.engine.ui_engine.input.KeyCode;
-import org.mslivo.core.engine.ui_engine.render.ImmediateBatch;
+import org.mslivo.core.engine.ui_engine.render.UIImmediateBatch;
+import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
 import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
@@ -58,7 +58,7 @@ public class ExampleUIAdapter implements UIAdapter {
             public void onRelease() {
                 api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
             }
-        }, null,0, ButtonMode.DEFAULT);
+        }, null, 0, ButtonMode.DEFAULT);
 
         api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
@@ -129,7 +129,7 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(SpriteBatch batch, ImmediateBatch immediateBatch, GameViewPort gameViewPort) {
+    public void render(UISpriteBatch batch, UIImmediateBatch uIImmediateBatch, GameViewPort gameViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -144,27 +144,27 @@ public class ExampleUIAdapter implements UIAdapter {
         }
         batch.end();
 
-        immediateBatch.begin();
-        for(int ix=0;ix<10;ix++){
-            for(int iy=0;iy<10;iy++){
-                immediateBatch.setColor(ix/10f,iy/10f,1f,0.5f);
-                immediateBatch.vertex(100+ix,100+iy);
+        uIImmediateBatch.begin();
+        for (int ix = 0; ix < 10; ix++) {
+            for (int iy = 0; iy < 10; iy++) {
+                uIImmediateBatch.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                uIImmediateBatch.vertex(100 + ix, 100 + iy);
             }
         }
-        immediateBatch.end();
+        uIImmediateBatch.end();
 
-        immediateBatch.begin(GL20.GL_LINES);
-        for(int ix=0;ix<10;ix++){
-            for(int iy=0;iy<10;iy++){
-                immediateBatch.setColor(ix/10f,iy/10f,1f,0.5f);
-                immediateBatch.vertex(0,0,100+ix,100+iy);
+        uIImmediateBatch.begin(GL20.GL_LINES);
+        for (int ix = 0; ix < 10; ix++) {
+            for (int iy = 0; iy < 10; iy++) {
+                uIImmediateBatch.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                uIImmediateBatch.vertex(0, 0, 100 + ix, 100 + iy);
             }
         }
-        immediateBatch.end();
+        uIImmediateBatch.end();
 
-        immediateBatch.begin(GL20.GL_TRIANGLES);
-        immediateBatch.vertex(0,0,100,100,200,0);
-        immediateBatch.end();
+        uIImmediateBatch.begin(GL20.GL_TRIANGLES);
+        uIImmediateBatch.vertex(0, 0, 100, 100, 200, 0);
+        uIImmediateBatch.end();
 
     }
 

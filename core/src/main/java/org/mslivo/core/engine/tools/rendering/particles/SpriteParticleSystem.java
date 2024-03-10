@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.media_manager.media.*;
+import org.mslivo.core.engine.ui_engine.render.UISpriteBatch;
 
 /*
  * Particle System must be extended and implemented
@@ -25,11 +26,11 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
         backup_font = new Color();
     }
 
-    public void render(SpriteBatch batch) {
+    public void render(UISpriteBatch batch) {
         render(batch, 0);
     }
 
-    public void render(SpriteBatch batch, float animation_timer) {
+    public void render(UISpriteBatch batch, float animation_timer) {
         if (particles.size() == 0) return;
         backup.r = batch.getColor().r;
         backup.g = batch.getColor().g;

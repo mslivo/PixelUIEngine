@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-public class ImmediateBatch {
+public class UIImmediateBatch {
 
     private int primitiveType;
     private static final String VERTEX = """
@@ -42,7 +42,7 @@ public class ImmediateBatch {
     private int colorOffset, vertexIdx, vertexSize;
     private int uProjModelViewLocation;
 
-    public ImmediateBatch() {
+    public UIImmediateBatch() {
         this.primitiveType = GL20.GL_POINTS;
         this.blend = false;
         this.color = new Color(Color.WHITE);
