@@ -1907,6 +1907,8 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public void render(boolean drawToScreen) {
+
+
         // Draw Game
         {
             // Draw Main FrameBuffer
@@ -2925,7 +2927,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_enableGrayScaleShader(boolean enabled) {
-        // tODO: inputState.spriteBatch_ui.setTweak(0f,1f,0f,0f);
+        // tODO: inputState.spriteBatch_ui.setTweak(0f,1f,0f,1f);
 
 
         //if(enabled == render_isGrayScaleShaderEnabled())return;

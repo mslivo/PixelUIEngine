@@ -16,7 +16,7 @@ import java.nio.Buffer;
  * color's worth of channels, called the "tweak" and used to modify the color with HSL changes, while the primary color
  * tints the color.
  * Taken and modified from
- * https://github.com/tommyettinger/colorful-gdx/blob/master/colorful/src/test/java/com/github/tommyettinger/colorful/rgb/RGBHSLBatch.java
+ * https://github.com/tommyettinger/colorful-gdx/blob/master/colorful/src/test/java/com/github/tommyettinger/colorful/rgb/UISpriteBatch.java
  */
 public class UISpriteBatch implements Batch {
     private static final String VERTEX_SHADER = """
@@ -74,11 +74,15 @@ public class UISpriteBatch implements Batch {
             void main()
             {
               vec4 tgt = texture2D( u_texture, v_texCoords );
-              float rough = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+              
+              // Apply sepia effect with variable strength
+              vec3 sepiaColor = vec3(1.0, 0.9, 0.7); // Warm sepia color
+              tgt.rgb = mix(tgt.rgb, tgt.rgb * sepiaColor, v_tweak.w);
+              
               tgt = rgb2hsl(tgt);
               tgt.xz += v_tweak.xz;
               tgt.x = fract(tgt.x);
-              tgt.z = clamp(tgt.z + rough * v_tweak.w, 0.0, 1.0);
+              //tgt.z = clamp(tgt.z + rough * v_tweak.w, 0.0, 1.0);
               tgt.y *= v_tweak.y;
               
               // Adjust v_color based on the HSL saturation
@@ -108,7 +112,7 @@ public class UISpriteBatch implements Batch {
     private boolean ownsShader;
     protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
     private final Color tempColor = new Color(1f, 1f, 1f, 1f);
-    public static final float TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 0f);
+    private static final float TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 0f);
     protected float tweak = TWEAK_RESET;
     public int renderCalls = 0;
     public int totalRenderCalls = 0;
@@ -161,7 +165,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void begin () {
-        if (drawing) throw new IllegalStateException("RGBHSLBatch.end must be called before begin.");
+        if (drawing) throw new IllegalStateException("UISpriteBatch.end must be called before begin.");
         renderCalls = 0;
 
         Gdx.gl.glDepthMask(false);
@@ -176,7 +180,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void end () {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before end.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before end.");
         if (idx > 0) flush();
         lastTexture = null;
         drawing = false;
@@ -220,22 +224,16 @@ public class UISpriteBatch implements Batch {
         return color;
     }
 
-    /**
-     * Sets the HSL and roughness parts of the shader's color changes. 0.0 is a neutral value for hue, lightness, and
-     * roughness, but 1.0 is neutral for saturation; using {@code (0.0f, 1.0f, 0.0f, 0.0f)} will effectively remove the
-     * tweak. You can also use {@link #setTweak(float)} with {@link #TWEAK_RESET}, which is very slightly more
-     * efficient, to remove the tweak or set it to a neutral value.
-     * @param hue multiplicative hue channel, from 0 to 1; 0.5 is neutral
-     * @param saturation multiplicative saturation channel, from 0 to 1; 1.0 is neutral
-     * @param lightness multiplicative lightness channel, from 0 to 1; 0.0 is neutral
-     * @param roughness affects how lightness changes, from 0 (no extra roughness, smooth) to 1 (high roughness, chaotic look look); 0.0 is neutral
-     */
-    public void setTweak (float hue, float saturation, float lightness, float roughness) {
-        tweak = rgbPacked(hue, saturation, lightness, roughness);
+    public void setTweak (float hue, float saturation, float lightness, float sepia) {
+        tweak = rgbPacked(hue, saturation, lightness, sepia);
     }
 
     public void setTweak (final float tweak) {
         this.tweak = tweak;
+    }
+
+    public void setTweakReset() {
+        this.tweak = TWEAK_RESET;
     }
 
     public float getTweak () {
@@ -275,7 +273,7 @@ public class UISpriteBatch implements Batch {
     @Override
     public void draw (Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
                       float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -411,7 +409,7 @@ public class UISpriteBatch implements Batch {
     @Override
     public void draw (Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
                       int srcHeight, boolean flipX, boolean flipY) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -474,7 +472,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void draw (Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -525,7 +523,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void draw (Texture texture, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -577,7 +575,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void draw (Texture texture, float x, float y, float width, float height) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -628,7 +626,7 @@ public class UISpriteBatch implements Batch {
 
     /**
      * This is very different from the other overloads in this class; it assumes the float array it is given is in the
-     * format libGDX uses to give to SpriteBatch, that is, in groups of 20 floats per sprite. RGBHSLBatch uses 24
+     * format libGDX uses to give to SpriteBatch, that is, in groups of 20 floats per sprite. UISpriteBatch uses 24
      * floats per sprite, to add tweak per color, so this does some conversion.
      * @param texture the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
      * @param spriteVertices not the same format as {@link #vertices} in this class; should have a length that's a multiple of 20
@@ -637,7 +635,7 @@ public class UISpriteBatch implements Batch {
      */
     @Override
     public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         count = (count / 5) * 6;
         int verticesLength = vertices.length;
@@ -688,7 +686,7 @@ public class UISpriteBatch implements Batch {
     }
 
     /**
-     * Meant for code that uses RGBHSLBatch specifically and can set an extra float (for the color tweak) per vertex,
+     * Meant for code that uses UISpriteBatch specifically and can set an extra float (for the color tweak) per vertex,
      * this is just like {@link #draw(Texture, float[], int, int)} when used in other Batch implementations, but expects
      * {@code spriteVertices} to have a length that is a multiple of 24 instead of 20.
      * @param texture the Texture being drawn from; usually an atlas or some parent Texture with lots of TextureRegions
@@ -697,7 +695,7 @@ public class UISpriteBatch implements Batch {
      * @param count how many vertices to draw from {@code spriteVertices} (24 vertices is one sprite)
      */
     public void drawExactly (Texture texture, float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         int verticesLength = vertices.length;
         int remainingVertices = verticesLength;
@@ -732,7 +730,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void draw (TextureRegion region, float x, float y, float width, float height) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -785,7 +783,7 @@ public class UISpriteBatch implements Batch {
     @Override
     public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                       float scaleX, float scaleY, float rotation) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -910,7 +908,7 @@ public class UISpriteBatch implements Batch {
     @Override
     public void draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                       float scaleX, float scaleY, float rotation, boolean clockwise) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -1050,7 +1048,7 @@ public class UISpriteBatch implements Batch {
 
     @Override
     public void draw (TextureRegion region, float width, float height, Affine2 transform) {
-        if (!drawing) throw new IllegalStateException("RGBHSLBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
