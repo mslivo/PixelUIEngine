@@ -1293,6 +1293,10 @@ public class API {
         return inputState.modalWindow;
     }
 
+    public boolean isModalOpen(){
+        return UICommons.window_isModalOpen(inputState);
+    }
+
     public void addWindow(Window window) {
         if (window == null) return;
         UICommons.window_addToScreen(inputState, window);

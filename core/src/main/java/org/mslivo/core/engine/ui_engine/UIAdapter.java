@@ -24,6 +24,7 @@ public interface UIAdapter {
 
     default void renderFinalScreen(SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
                                    int internalResolutionWidth, int internalResolutionHeight, boolean appGrayScale) {
+
         spriteRenderer.begin();
         // Draw App Framebuffer
         if(appGrayScale) spriteRenderer.setSaturation(0f);

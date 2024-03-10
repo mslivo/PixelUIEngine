@@ -172,7 +172,6 @@ public class InputState {
 
     public float animation_timer_ui;
     public Color tempSaveColor;
-    public ShaderProgram grayScaleShader;
     public OrthographicCamera camera_frustum; // camera for frustum testing
     public InputEvents inputEvents;
     public UIEngineInputProcessor inputProcessor;

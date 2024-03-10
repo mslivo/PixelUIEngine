@@ -83,6 +83,9 @@ class UICommons {
     static int window_getRealWidth(Window window) {
         return window.width * UIEngine.TILE_SIZE;
     }
+    static boolean window_isModalOpen(InputState inputState) {
+        return inputState.modalWindow != null;
+    }
 
     static void window_fold(Window window) {
         window.folded = true;

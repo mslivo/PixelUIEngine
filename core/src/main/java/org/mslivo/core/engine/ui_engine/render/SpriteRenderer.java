@@ -79,7 +79,6 @@ public class SpriteRenderer implements Batch {
                       tgt = rgb2hsl(tgt);
                       tgt.xz += v_tweak.xz;
                       tgt.x = fract(tgt.x);
-                      //tgt.z = clamp(tgt.z + rough * v_tweak.w, 0.0, 1.0);
                       tgt.y *= v_tweak.y;
                       
                       // Adjust v_color based on the HSL saturation
