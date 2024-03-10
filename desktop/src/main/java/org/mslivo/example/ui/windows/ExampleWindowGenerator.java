@@ -8,7 +8,7 @@ import org.mslivo.core.engine.media_manager.media.CMediaArray;
 import org.mslivo.core.engine.media_manager.media.CMediaGFX;
 import org.mslivo.core.engine.media_manager.media.CMediaImage;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.engine.GameEngine;
+import org.mslivo.core.engine.tools.engine.AppEngine;
 import org.mslivo.core.engine.tools.sound.SoundPlayer;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
@@ -41,7 +41,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
@@ -60,7 +60,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         super(api);
     }
 
-    private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
+    private AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
 
     private MediaManager mediaManager;
 
@@ -69,7 +69,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
     @Override
     public Window create(Object[] p) {
         String title = (String) p[0];
-        this.gameEngine = (GameEngine) p[1];
+        this.appEngine = (AppEngine) p[1];
         this.mediaManager = (MediaManager) p[2];
 
         this.soundPlayer = new SoundPlayer(mediaManager);
@@ -279,7 +279,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         CheckBox checkBox2 = api.component.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
 
-        GameViewPort gameViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null, 100, 100, 1);
+        AppViewPort appViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null, 100, 100, 1);
 
         TextField osKeyBoardTextInput = api.component.textField.create(18, 13, 10, "", null, 128);
         api.component.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
@@ -306,7 +306,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         });
 
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(gameViewPort, comboBox, checkBox, checkBox2,
+        ArrayList<Component> components = new ArrayList<>(Arrays.asList(appViewPort, comboBox, checkBox, checkBox2,
                 modal1, modal2, modal3, modal4, soundBtn,
                 number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR,
                 scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput));
@@ -364,7 +364,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                                     @Override
                                     public void onSelect() {
                                         api.addNotification(api.notification.create("3"));
-                                        api.setGameToolTip(null);
+                                        api.setAppToolTip(null);
                                         api.removeAllWindows();
                                     }
                                 }),

@@ -51,7 +51,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -1188,12 +1188,12 @@ public class API {
 
     }
 
-    public void setGameToolTip(ToolTip toolTip) {
-        inputState.gameToolTip = toolTip;
+    public void setAppToolTip(ToolTip toolTip) {
+        inputState.appToolTip = toolTip;
     }
 
-    public boolean isGameToolTipDisplayed() {
-        return inputState.gameToolTip != null;
+    public boolean isAppToolTipDisplayed() {
+        return inputState.appToolTip != null;
     }
 
     public void executeSingleUpdateAction(UpdateAction updateAction) {
@@ -1964,12 +1964,12 @@ public class API {
                 inputState.config.component_defaultFont = components_defaultFont;
             }
 
-            public int getGameViewportDefaultUpdateTime() {
-                return inputState.config.component_gameViewportDefaultUpdateTime;
+            public int getAppViewportDefaultUpdateTime() {
+                return inputState.config.component_appViewportDefaultUpdateTime;
             }
 
-            public void setGameViewportDefaultUpdateTime(int gameViewport_defaultUpdateTime) {
-                inputState.config.component_gameViewportDefaultUpdateTime = gameViewport_defaultUpdateTime;
+            public void setAppViewportDefaultUpdateTime(int gameViewport_defaultUpdateTime) {
+                inputState.config.component_appViewportDefaultUpdateTime = gameViewport_defaultUpdateTime;
             }
 
             public float getListDragAlpha() {
@@ -2248,11 +2248,11 @@ public class API {
 
             public class _State {
                 public int x() {
-                    return inputState.mouse_game.x;
+                    return inputState.mouse_app.x;
                 }
 
                 public int y() {
-                    return inputState.mouse_game.y;
+                    return inputState.mouse_app.y;
                 }
 
                 public int xUI() {
@@ -3326,26 +3326,26 @@ public class API {
     public class _Camera {
 
         public boolean pointVisible(float x, float y) {
-            setTestingCamera(inputState.camera_game);
+            setTestingCamera(inputState.camera_app);
             if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) {
                 return true;
             }
-            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
-                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCamera(gameViewPort.camera);
+            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                AppViewPort appViewPort = inputState.appViewPorts.get(i);
+                setTestingCamera(appViewPort.camera);
                 if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
             }
             return false;
         }
 
         public boolean boundsVisible(float x, float y, float halfWidth, float halfHeight) {
-            setTestingCamera(inputState.camera_game);
+            setTestingCamera(inputState.camera_app);
             if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
                 return true;
             }
-            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
-                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCamera(gameViewPort.camera);
+            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                AppViewPort appViewPort = inputState.appViewPorts.get(i);
+                setTestingCamera(appViewPort.camera);
                 if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f))
                     return true;
             }
@@ -3353,13 +3353,13 @@ public class API {
         }
 
         public boolean sphereVisible(float x, float y, float radius) {
-            setTestingCamera(inputState.camera_game);
+            setTestingCamera(inputState.camera_app);
             if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) {
                 return true;
             }
-            for (int i = 0; i < inputState.gameViewPorts.size(); i++) {
-                GameViewPort gameViewPort = inputState.gameViewPorts.get(i);
-                setTestingCamera(gameViewPort.camera);
+            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                AppViewPort appViewPort = inputState.appViewPorts.get(i);
+                setTestingCamera(appViewPort.camera);
                 if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             }
             return false;
@@ -3386,63 +3386,63 @@ public class API {
         }
 
         public void move(float x, float y, float z) {
-            setPosition(inputState.camera_game.position.x += x, inputState.camera_game.position.y += y, inputState.camera_game.position.z += z);
+            setPosition(inputState.camera_app.position.x += x, inputState.camera_app.position.y += y, inputState.camera_app.position.z += z);
         }
 
         public void setPosition(float x, float y) {
-            setPosition(x, y, inputState.camera_game.position.z);
+            setPosition(x, y, inputState.camera_app.position.z);
         }
 
         public void setPosition(float x, float y, float z) {
-            inputState.camera_game.position.set(x, y, z);
+            inputState.camera_app.position.set(x, y, z);
         }
 
         public void setX(float x) {
-            inputState.camera_game.position.x = x;
+            inputState.camera_app.position.x = x;
         }
 
         public void moveX(float x) {
-            inputState.camera_game.position.x += x;
+            inputState.camera_app.position.x += x;
         }
 
         public void setY(float y) {
-            inputState.camera_game.position.y = y;
+            inputState.camera_app.position.y = y;
         }
 
         public void moveY(float y) {
-            inputState.camera_game.position.y += y;
+            inputState.camera_app.position.y += y;
         }
 
         public void setZ(float z) {
-            inputState.camera_game.position.z = z;
+            inputState.camera_app.position.z = z;
         }
 
         public void moveZ(float z) {
-            inputState.camera_game.position.z += z;
+            inputState.camera_app.position.z += z;
         }
 
         public void setZoom(float zoom) {
-            inputState.camera_game.zoom = zoom;
+            inputState.camera_app.zoom = zoom;
         }
 
         public float x() {
-            return inputState.camera_game.position.x;
+            return inputState.camera_app.position.x;
         }
 
         public float y() {
-            return inputState.camera_game.position.y;
+            return inputState.camera_app.position.y;
         }
 
         public float z() {
-            return inputState.camera_game.position.z;
+            return inputState.camera_app.position.z;
         }
 
         public float zoom() {
-            return inputState.camera_game.zoom;
+            return inputState.camera_app.zoom;
         }
 
         public Matrix4 combined(){
-            return inputState.camera_game.combined;
+            return inputState.camera_app.combined;
         }
     }
 
@@ -3544,8 +3544,8 @@ public class API {
             component.width = Tools.Calc.lowerBounds(width, 1);
             component.height = Tools.Calc.lowerBounds(height, 1);
 
-            if (component instanceof GameViewPort gameViewPort) {
-                UICommons.gameViewPort_resizeCameraTextureAndFrameBuffer(gameViewPort);
+            if (component instanceof AppViewPort appViewPort) {
+                UICommons.appViewPort_resizeCameraTextureAndFrameBuffer(appViewPort);
             }
             if (component instanceof Canvas canvas) {
                 UICommons.canvas_resizeMap(canvas);
@@ -3692,130 +3692,130 @@ public class API {
 
         public class _GameViewPort {
 
-            public GameViewPort create(int x, int y, int width, int height) {
-                return create(x, y, width, height, null, 0, 0, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
+            public AppViewPort create(int x, int y, int width, int height) {
+                return create(x, y, width, height, null, 0, 0, 1f, inputState.config.component_appViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction) {
-                return create(x, y, width, height, gameViewPortAction, 0, 0, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
+            public AppViewPort create(int x, int y, int width, int height, AppViewPortAction appViewPortAction) {
+                return create(x, y, width, height, appViewPortAction, 0, 0, 1f, inputState.config.component_appViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY) {
-                return create(x, y, width, height, gameViewPortAction, camPositionX, camPositionY, 1f, inputState.config.component_gameViewportDefaultUpdateTime);
+            public AppViewPort create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY) {
+                return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, 1f, inputState.config.component_appViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY, float camZoom) {
-                return create(x, y, width, height, gameViewPortAction, camPositionX, camPositionY, camZoom, inputState.config.component_gameViewportDefaultUpdateTime);
+            public AppViewPort create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom) {
+                return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, camZoom, inputState.config.component_appViewportDefaultUpdateTime);
             }
 
-            public GameViewPort create(int x, int y, int width, int height, GameViewPortAction gameViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
-                GameViewPort gameViewPort = new GameViewPort();
-                gameViewPort.updateTimer = 0;
-                setComponentCommonInitValues(gameViewPort, x, y, width, height, Color.WHITE);
-                int viewportWidth = gameViewPort.width * UIEngine.TILE_SIZE;
-                int viewportHeight = gameViewPort.height * UIEngine.TILE_SIZE;
-                gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
-                Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
+            public AppViewPort create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
+                AppViewPort appViewPort = new AppViewPort();
+                appViewPort.updateTimer = 0;
+                setComponentCommonInitValues(appViewPort, x, y, width, height, Color.WHITE);
+                int viewportWidth = appViewPort.width * UIEngine.TILE_SIZE;
+                int viewportHeight = appViewPort.height * UIEngine.TILE_SIZE;
+                appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+                Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
                 texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-                gameViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
-                gameViewPort.textureRegion.flip(false, true);
-                gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
-                gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
-                gameViewPort.camera.position.set(camPositionX, camPositionY, 0f);
-                gameViewPort.camera.zoom = camZoom;
-                gameViewPort.updateTime = updateTime;
-                gameViewPort.gameViewPortAction = gameViewPortAction;
-                return gameViewPort;
+                appViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
+                appViewPort.textureRegion.flip(false, true);
+                appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
+                appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
+                appViewPort.camera.position.set(camPositionX, camPositionY, 0f);
+                appViewPort.camera.zoom = camZoom;
+                appViewPort.updateTime = updateTime;
+                appViewPort.appViewPortAction = appViewPortAction;
+                return appViewPort;
             }
 
-            public void setGameViewPortAction(GameViewPort gameViewPort, GameViewPortAction gameViewPortAction) {
-                if (gameViewPort == null) return;
-                gameViewPort.gameViewPortAction = gameViewPortAction;
+            public void setAppViewPortAction(AppViewPort appViewPort, AppViewPortAction appViewPortAction) {
+                if (appViewPort == null) return;
+                appViewPort.appViewPortAction = appViewPortAction;
             }
 
-            public void setUpdateTime(GameViewPort gameViewPort, int updateTime) {
-                if (gameViewPort == null) return;
-                gameViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
+            public void setUpdateTime(AppViewPort appViewPort, int updateTime) {
+                if (appViewPort == null) return;
+                appViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
-            public void camMove(GameViewPort gameViewPort, float x, float y) {
-                if (gameViewPort == null) return;
-                camMove(gameViewPort, x, y, 0f);
+            public void camMove(AppViewPort appViewPort, float x, float y) {
+                if (appViewPort == null) return;
+                camMove(appViewPort, x, y, 0f);
             }
 
-            public void camMove(GameViewPort gameViewPort, float x, float y, float z) {
-                if (gameViewPort == null) return;
-                setCamPosition(gameViewPort, gameViewPort.camera.position.x += x, gameViewPort.camera.position.y += y, gameViewPort.camera.position.z += z);
+            public void camMove(AppViewPort appViewPort, float x, float y, float z) {
+                if (appViewPort == null) return;
+                setCamPosition(appViewPort, appViewPort.camera.position.x += x, appViewPort.camera.position.y += y, appViewPort.camera.position.z += z);
             }
 
-            public void setCamPosition(GameViewPort gameViewPort, float x, float y) {
-                if (gameViewPort == null) return;
-                setCamPosition(gameViewPort, x, y, gameViewPort.camera.position.z);
+            public void setCamPosition(AppViewPort appViewPort, float x, float y) {
+                if (appViewPort == null) return;
+                setCamPosition(appViewPort, x, y, appViewPort.camera.position.z);
             }
 
-            public void setCamPosition(GameViewPort gameViewPort, float x, float y, float z) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.set(x, y, z);
+            public void setCamPosition(AppViewPort appViewPort, float x, float y, float z) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.set(x, y, z);
             }
 
-            public void setCamX(GameViewPort gameViewPort, float x) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.x = x;
+            public void setCamX(AppViewPort appViewPort, float x) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.x = x;
             }
 
-            public void moveCamX(GameViewPort gameViewPort, float x) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.x += x;
+            public void moveCamX(AppViewPort appViewPort, float x) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.x += x;
             }
 
-            public void setCamY(GameViewPort gameViewPort, float y) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.y = y;
+            public void setCamY(AppViewPort appViewPort, float y) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.y = y;
             }
 
-            public void moveCamY(GameViewPort gameViewPort, float y) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.y += y;
+            public void moveCamY(AppViewPort appViewPort, float y) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.y += y;
             }
 
-            public void setCamZ(GameViewPort gameViewPort, float z) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.z = z;
+            public void setCamZ(AppViewPort appViewPort, float z) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.z = z;
             }
 
-            public void moveCamZ(GameViewPort gameViewPort, float z) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.position.z += z;
+            public void moveCamZ(AppViewPort appViewPort, float z) {
+                if (appViewPort == null) return;
+                appViewPort.camera.position.z += z;
             }
 
-            public void setCamZoom(GameViewPort gameViewPort, float zoom) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.zoom = zoom;
+            public void setCamZoom(AppViewPort appViewPort, float zoom) {
+                if (appViewPort == null) return;
+                appViewPort.camera.zoom = zoom;
             }
 
-            public void camZoom(GameViewPort gameViewPort, float zoom) {
-                if (gameViewPort == null) return;
-                gameViewPort.camera.zoom += zoom;
+            public void camZoom(AppViewPort appViewPort, float zoom) {
+                if (appViewPort == null) return;
+                appViewPort.camera.zoom += zoom;
             }
 
-            public float camX(GameViewPort gameViewPort) {
-                if (gameViewPort == null) return 0f;
-                return gameViewPort.camera.position.x;
+            public float camX(AppViewPort appViewPort) {
+                if (appViewPort == null) return 0f;
+                return appViewPort.camera.position.x;
             }
 
-            public float camY(GameViewPort gameViewPort) {
-                if (gameViewPort == null) return 0f;
-                return gameViewPort.camera.position.y;
+            public float camY(AppViewPort appViewPort) {
+                if (appViewPort == null) return 0f;
+                return appViewPort.camera.position.y;
             }
 
-            public float camZ(GameViewPort gameViewPort) {
-                if (gameViewPort == null) return 0f;
-                return gameViewPort.camera.position.z;
+            public float camZ(AppViewPort appViewPort) {
+                if (appViewPort == null) return 0f;
+                return appViewPort.camera.position.z;
             }
 
-            public float camZoom(GameViewPort gameViewPort) {
-                if (gameViewPort == null) return 0f;
-                return gameViewPort.camera.zoom;
+            public float camZoom(AppViewPort appViewPort) {
+                if (appViewPort == null) return 0f;
+                return appViewPort.camera.zoom;
             }
 
         }

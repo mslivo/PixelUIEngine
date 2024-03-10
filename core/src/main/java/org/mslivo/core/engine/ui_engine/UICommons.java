@@ -44,7 +44,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -319,7 +319,7 @@ class UICommons {
         inputState.tooltip_delay_timer = 0;
         inputState.tooltip_fadeIn_timer = 0;
         inputState.tooltip_lastHoverObject = null;
-        inputState.gameToolTip = null;
+        inputState.appToolTip = null;
 
         // Knob
         inputState.turnedKnob = null;
@@ -327,8 +327,8 @@ class UICommons {
         // Map
         inputState.pressedCanvas = null;
 
-        // GameViewport
-        inputState.pressedGameViewPort = null;
+        // AppViewport
+        inputState.pressedAppViewPort = null;
 
         // TextField
         inputState.pressedTextField = null;
@@ -391,7 +391,7 @@ class UICommons {
         if (inputState.turnedKnob != null) return inputState.turnedKnob;
         if (inputState.pressedCanvas != null) return inputState.pressedCanvas;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
-        if (inputState.pressedGameViewPort != null) return inputState.pressedGameViewPort;
+        if (inputState.pressedAppViewPort != null) return inputState.pressedAppViewPort;
         if (inputState.pressedGrid != null) return inputState.pressedGrid;
         if (inputState.pressedList != null) return inputState.pressedList;
         if (inputState.pressedContextMenuItem != null) return inputState.pressedContextMenuItem;
@@ -644,7 +644,7 @@ class UICommons {
     static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.add(gameViewPort);
+        if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.add(appViewPort);
         component.addedToWindow = window;
         window.components.add(component);
         resetActivelyUsedUIReferences(inputState);
@@ -653,7 +653,7 @@ class UICommons {
     static void component_addToScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
-        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.add(gameViewPort);
+        if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.add(appViewPort);
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
         resetActivelyUsedUIReferences(inputState);
@@ -664,7 +664,7 @@ class UICommons {
         if (!component.addedToScreen) return;
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
+        if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
         component.addedToScreen = true;
         inputState.screenComponents.remove(component);
         resetActivelyUsedUIReferences(inputState);
@@ -675,7 +675,7 @@ class UICommons {
         if (component.addedToScreen) return;
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component instanceof GameViewPort gameViewPort) inputState.gameViewPorts.remove(gameViewPort);
+        if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
         component.addedToWindow = null;
         component.addedToWindow.components.remove(component);
         resetActivelyUsedUIReferences(inputState);
@@ -1123,23 +1123,30 @@ class UICommons {
         return canvas.map[x][y];
     }
 
-    static void gameViewPort_resizeCameraTextureAndFrameBuffer(GameViewPort gameViewPort) {
+    static void appViewPort_resizeCameraTextureAndFrameBuffer(AppViewPort appViewPort) {
         // Clean Up
-        if (gameViewPort.camera != null) gameViewPort.camera = null;
-        if (gameViewPort.textureRegion != null) gameViewPort.textureRegion.getTexture().dispose();
-        if (gameViewPort.frameBuffer != null) gameViewPort.frameBuffer.dispose();
-        // Set
-        int viewportWidth = gameViewPort.width * UIEngine.TILE_SIZE;
-        int viewportHeight = gameViewPort.height * UIEngine.TILE_SIZE;
-        gameViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
-        Texture texture = gameViewPort.frameBuffer.getColorBufferTexture();
+        if (appViewPort.camera != null) appViewPort.camera = null;
+        if (appViewPort.textureRegion != null) appViewPort.textureRegion.getTexture().dispose();
+        if (appViewPort.frameBuffer != null) appViewPort.frameBuffer.dispose();
+
+        int viewportWidth = appViewPort.width * UIEngine.TILE_SIZE;
+        int viewportHeight = appViewPort.height * UIEngine.TILE_SIZE;
+        // FrameBuffer
+        appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+        // Texture
+        Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        gameViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
-        gameViewPort.textureRegion.flip(false, true);
-        gameViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
-        gameViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        gameViewPort.camera.position.set(gameViewPort.camera.position.x, gameViewPort.camera.position.y, gameViewPort.camera.position.z);
-        gameViewPort.camera.zoom = gameViewPort.camera.zoom;
+        appViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
+        appViewPort.textureRegion.flip(false, true);
+        // Camera
+        float x = appViewPort.camera.position.x;
+        float y = appViewPort.camera.position.y;
+        float z = appViewPort.camera.position.z;
+        float zoom = appViewPort.camera.zoom;
+        appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
+        appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
+        appViewPort.camera.position.set(x, y, z);
+        appViewPort.camera.zoom = zoom;
     }
 
     static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {

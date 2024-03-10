@@ -3,7 +3,7 @@ package org.mslivo.example.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import org.mslivo.core.engine.media_manager.MediaManager;
-import org.mslivo.core.engine.tools.engine.GameEngine;
+import org.mslivo.core.engine.tools.engine.AppEngine;
 import org.mslivo.core.engine.ui_engine.API;
 import org.mslivo.core.engine.ui_engine.UIAdapter;
 import org.mslivo.core.engine.ui_engine.UIBaseMedia;
@@ -14,7 +14,7 @@ import org.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import org.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import org.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import org.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.engine.ExampleEngineAdapter;
 import org.mslivo.example.ui.media.ExampleBaseMedia;
@@ -26,16 +26,16 @@ public class ExampleUIAdapter implements UIAdapter {
 
     private MediaManager mediaManager;
 
-    private final GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
+    private final AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
 
     private final ExampleData data;
 
     private float animation_timer;
     private boolean resetPressed;
 
-    public ExampleUIAdapter(GameEngine<ExampleEngineAdapter, ExampleData> gameEngine) {
-        this.gameEngine = gameEngine;
-        this.data = gameEngine.getData();
+    public ExampleUIAdapter(AppEngine<ExampleEngineAdapter, ExampleData> appEngine) {
+        this.appEngine = appEngine;
+        this.data = appEngine.getData();
     }
 
     public void setResetPressed(boolean resetPressed) {
@@ -56,7 +56,7 @@ public class ExampleUIAdapter implements UIAdapter {
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", gameEngine, mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", appEngine, mediaManager));
             }
         }, null, 0, ButtonMode.DEFAULT);
 
@@ -107,14 +107,14 @@ public class ExampleUIAdapter implements UIAdapter {
     @Override
     public void update() {
         // Process Outputs
-        while (gameEngine.nextOutput()) {
-            int type = gameEngine.getOutputType();
-            Object[] params = gameEngine.getOutputParams();
+        while (appEngine.nextOutput()) {
+            int type = appEngine.getOutputType();
+            Object[] params = appEngine.getOutputParams();
         }
 
 
         // Create Inputs
-        // gameEngine.input(new EngineInput(0,"TestInput"));
+        // appEngine.input(new EngineInput(0,"TestInput"));
 
         API._Input._KeyBoard keyBoard = api.input.keyboard;
         while (keyBoard.event.keyDownHasNext()) {
@@ -129,11 +129,11 @@ public class ExampleUIAdapter implements UIAdapter {
 
 
     @Override
-    public void render(SpriteRenderer batch, ImmediateRenderer immediateRenderer, GameViewPort gameViewPort) {
+    public void render(SpriteRenderer batch, ImmediateRenderer immediateRenderer, AppViewPort appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Draw game based on data
+        // Draw app based on data
 
         batch.begin();
         for (int x = 0; x < api.resolutionWidth(); x += 16) {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.tools.Tools;
-import org.mslivo.core.engine.tools.engine.GameEngine;
+import org.mslivo.core.engine.tools.engine.AppEngine;
 import org.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import org.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
 import org.mslivo.core.engine.ui_engine.UIEngine;
@@ -27,7 +27,7 @@ public class ExampleMain extends ApplicationAdapter {
     private MediaManager mediaManager;
     private ExampleData data;
     public ExampleEngineAdapter engineAdapter;
-    private GameEngine<ExampleEngineAdapter, ExampleData> gameEngine;
+    private AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
     private UIEngine<ExampleUIAdapter> uiEngine;
     private UIEngine<ExampleUIAdapter> uiEngine_transition;
 
@@ -61,13 +61,13 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.Log.inProgress("Starting Engine");
         this.data = ExampleDataGenerator.create_exampleData();
         this.engineAdapter = new ExampleEngineAdapter();
-        this.gameEngine = new GameEngine<>(this.engineAdapter, this.data);
+        this.appEngine = new AppEngine<>(this.engineAdapter, this.data);
         Tools.Log.done();
 
         // Input/Render
         Tools.Log.inProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
-                new ExampleUIAdapter(this.gameEngine),
+                new ExampleUIAdapter(this.appEngine),
                 this.mediaManager,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.viewportMode, true, true, true);
@@ -85,9 +85,9 @@ public class ExampleMain extends ApplicationAdapter {
                     profile_time_gui = System.currentTimeMillis();
                     this.uiEngine.update();
                     profile_time_gui = System.currentTimeMillis() - profile_time_gui;
-                    // 2. Update Game Engine -> Process Input & Create Output
+                    // 2. Update AppEngine -> Process Input & Create Output
                     profile_time_engine = System.currentTimeMillis();
-                    this.gameEngine.update();
+                    this.appEngine.update();
                     profile_time_engine = System.currentTimeMillis() - profile_time_engine;
                 }
 
@@ -100,7 +100,7 @@ public class ExampleMain extends ApplicationAdapter {
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
-                            new ExampleUIAdapter(this.gameEngine),
+                            new ExampleUIAdapter(this.appEngine),
                             this.mediaManager,
                             ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.viewportMode, true, true ,true);
@@ -146,7 +146,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     private void shutdownEngine() {
         this.uiEngine.shutdown();
-        this.gameEngine.shutdown();
+        this.appEngine.shutdown();
         this.mediaManager.shutdown();
         this.transitionManager.shutdown();
     }

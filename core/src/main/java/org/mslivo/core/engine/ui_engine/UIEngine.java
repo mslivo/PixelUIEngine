@@ -48,7 +48,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import org.mslivo.core.engine.ui_engine.ui.components.tabbar.TabBar;
 import org.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -67,7 +67,7 @@ import java.util.Arrays;
 /**
  * UI Engine
  * Handles UI Elements, Input, Cameras
- * Game needs to be implemented inside the uiAdapter
+ * App needs to be implemented inside the uiAdapter
  */
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIAdapter> {
@@ -131,26 +131,26 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.gamePadSupport = gamePadSupport;
         // ----- Config
         newInputState.config = new Config();
-        // -----  Game
+        // -----  App
         if (spriteRenderer) {
-            newInputState.spriteBatch_game = new SpriteRenderer(16383);
-            newInputState.spriteBatch_game.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            newInputState.spriteBatch_app = new SpriteRenderer(16383);
+            newInputState.spriteBatch_app.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
-            newInputState.spriteBatch_game = null;
+            newInputState.spriteBatch_app = null;
         }
         if (shaderRenderer) {
-            newInputState.immediateRenderer_game = new ImmediateRenderer();
+            newInputState.immediateRenderer_app = new ImmediateRenderer();
         } else {
-            newInputState.immediateRenderer_game = null;
+            newInputState.immediateRenderer_app = null;
         }
-        newInputState.camera_game = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.camera_game.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
-        newInputState.camera_game.position.set(0, 0, 0);
-        newInputState.camera_game.zoom = 1f;
-        newInputState.frameBuffer_game = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
-        newInputState.frameBuffer_game.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newInputState.texture_game = new TextureRegion(newInputState.frameBuffer_game.getColorBufferTexture());
-        newInputState.texture_game.flip(false, true);
+        newInputState.camera_app = new OrthographicCamera(newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.camera_app.setToOrtho(false, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight);
+        newInputState.camera_app.position.set(0, 0, 0);
+        newInputState.camera_app.zoom = 1f;
+        newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.internalResolutionWidth, newInputState.internalResolutionHeight, false);
+        newInputState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newInputState.texture_app = new TextureRegion(newInputState.frameBuffer_app.getColorBufferTexture());
+        newInputState.texture_app.flip(false, true);
 
         // -----  GUI
         newInputState.spriteBatch_ui = new SpriteRenderer(16383);
@@ -206,7 +206,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.focusedTextField = null;
         newInputState.notifications = new ArrayList<>();
         newInputState.hotKeys = new ArrayList<>();
-        newInputState.gameViewPorts = new ArrayList<>();
+        newInputState.appViewPorts = new ArrayList<>();
         newInputState.singleUpdateActions = new ArrayList<>();
         newInputState.singleUpdateActionsRemoveQ = new ArrayDeque<>();
         // ----- Temp GUI Variables
@@ -241,7 +241,7 @@ public class UIEngine<T extends UIAdapter> {
         // ----- Controls
         newInputState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
         newInputState.mouse_ui = new GridPoint2(internalResolutionWidth / 2, internalResolutionHeight / 2);
-        newInputState.mouse_game = new GridPoint2(0, 0);
+        newInputState.mouse_app = new GridPoint2(0, 0);
         newInputState.mouse_delta = new Vector2(0, 0);
         newInputState.lastUIMouseHover = null;
         newInputState.cursor = null;
@@ -921,9 +921,9 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.x = inputState.mouse_ui.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_ui.y;
         inputState.vector_fboCursor.z = 1;
-        inputState.camera_game.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        this.inputState.mouse_game.x = (int) inputState.vector_fboCursor.x;
-        this.inputState.mouse_game.y = (int) inputState.vector_fboCursor.y;
+        inputState.camera_app.unproject(inputState.vector_fboCursor, 0, 0, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
+        this.inputState.mouse_app.x = (int) inputState.vector_fboCursor.x;
+        this.inputState.mouse_app.y = (int) inputState.vector_fboCursor.y;
     }
 
     private void mouseControl_updateHardwareMouse() {
@@ -952,10 +952,10 @@ public class UIEngine<T extends UIAdapter> {
 
 
     private void updateCameras() {
-        // Game Camera
-        inputState.camera_game.update();
+        // App Camera
+        inputState.camera_app.update();
         // Viewport Camera
-        for (int i = 0; i < inputState.gameViewPorts.size(); i++) inputState.gameViewPorts.get(i).camera.update();
+        for (int i = 0; i < inputState.appViewPorts.size(); i++) inputState.appViewPorts.get(i).camera.update();
     }
 
     private void updateMouseCursor() {
@@ -1107,7 +1107,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                        inputState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, inputState.mouse_game.x, inputState.mouse_game.y);
+                        inputState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, inputState.mouse_app.x, inputState.mouse_app.y);
                     }
 
                 }
@@ -1210,11 +1210,11 @@ public class UIEngine<T extends UIAdapter> {
                                     UICommons.component_getRelativeMouseY(inputState.mouse_ui.y, canvas));
                             inputState.pressedCanvas = canvas;
                         }
-                        case GameViewPort gameViewPort -> {
-                            if (gameViewPort.gameViewPortAction != null) gameViewPort.gameViewPortAction.onPress(
-                                    UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, gameViewPort),
-                                    UICommons.component_getRelativeMouseY(inputState.mouse_ui.y, gameViewPort));
-                            inputState.pressedGameViewPort = gameViewPort;
+                        case AppViewPort appViewPort -> {
+                            if (appViewPort.appViewPortAction != null) appViewPort.appViewPortAction.onPress(
+                                    UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, appViewPort),
+                                    UICommons.component_getRelativeMouseY(inputState.mouse_ui.y, appViewPort));
+                            inputState.pressedAppViewPort = appViewPort;
                         }
                         case TextField textField -> {
                             inputState.pressedTextFieldMouseX = UICommons.component_getRelativeMouseX(inputState.mouse_ui.x, textField);
@@ -1312,7 +1312,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (inputState.mouseTool != null && inputState.mouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
-                        inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse_game.x, inputState.mouse_game.y);
+                        inputState.mouseTool.mouseToolAction.onPress(mouseDownButton, inputState.mouse_app.x, inputState.mouse_app.y);
                         inputState.mouseToolPressed = true;
                     }
                 }
@@ -1461,10 +1461,10 @@ public class UIEngine<T extends UIAdapter> {
                         UICommons.textField_focus(inputState, textField);
                         inputState.pressedTextField = null;
                     }
-                    case GameViewPort gameViewPort -> {
-                        if (gameViewPort.gameViewPortAction != null)
-                            gameViewPort.gameViewPortAction.onRelease();
-                        inputState.pressedGameViewPort = null;
+                    case AppViewPort appViewPort -> {
+                        if (appViewPort.appViewPortAction != null)
+                            appViewPort.appViewPortAction.onRelease();
+                        inputState.pressedAppViewPort = null;
                     }
                     case Button button -> {
                         UICommons.button_release(button);
@@ -1536,7 +1536,7 @@ public class UIEngine<T extends UIAdapter> {
                 if (pressedMouseTool.mouseToolAction != null) {
                     for (int ib = 0; ib < inputState.inputEvents.mouseUpButtons.size; ib++) {
                         int mouseUpButton = inputState.inputEvents.mouseUpButtons.get(ib);
-                        pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse_game.x, inputState.mouse_game.y);
+                        pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, inputState.mouse_app.x, inputState.mouse_app.y);
                     }
                 }
                 inputState.mouseToolPressed = false;
@@ -1578,7 +1578,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                 MouseTool draggedMouseTool = inputState.mouseTool;
                 if (draggedMouseTool.mouseToolAction != null)
-                    draggedMouseTool.mouseToolAction.onDrag(inputState.mouse_game.x, inputState.mouse_game.y);
+                    draggedMouseTool.mouseToolAction.onDrag(inputState.mouse_app.x, inputState.mouse_app.y);
             }
 
         }
@@ -1588,7 +1588,7 @@ public class UIEngine<T extends UIAdapter> {
             if (inputState.mouseTool != null) {
                 MouseTool movedMouseTool = inputState.mouseTool;
                 if (movedMouseTool.mouseToolAction != null)
-                    movedMouseTool.mouseToolAction.onMove(inputState.mouse_game.x, inputState.mouse_game.y);
+                    movedMouseTool.mouseToolAction.onMove(inputState.mouse_app.x, inputState.mouse_app.y);
             }
         }
         // ------ MOUSE SCROLLED ------
@@ -1759,10 +1759,10 @@ public class UIEngine<T extends UIAdapter> {
                 }
             }
         } else {
-            // Set Game Tooltip
-            if (inputState.lastUIMouseHover == null && inputState.gameToolTip != null) {
-                if (inputState.tooltip != inputState.gameToolTip) {
-                    inputState.tooltip = inputState.gameToolTip;
+            // Set App Tooltip
+            if (inputState.lastUIMouseHover == null && inputState.appToolTip != null) {
+                if (inputState.tooltip != inputState.appToolTip) {
+                    inputState.tooltip = inputState.appToolTip;
                     inputState.tooltip_wait_delay = true;
                     inputState.tooltip_delay_timer = System.currentTimeMillis();
                 }
@@ -1865,7 +1865,7 @@ public class UIEngine<T extends UIAdapter> {
             case Notification notification -> notification.notificationAction;
             case Button button -> button.buttonAction;
             case ComboBox comboBox -> comboBox.comboBoxAction;
-            case GameViewPort gameViewPort -> gameViewPort.gameViewPortAction;
+            case AppViewPort appViewPort -> appViewPort.appViewPortAction;
             case Image image -> image.imageAction;
             case Grid grid -> grid.gridAction;
             case List list -> list.listAction;
@@ -1897,9 +1897,9 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera) {
         if (inputState.spriteRenderer)
-            inputState.spriteBatch_game.setProjectionMatrix(camera.combined);
+            inputState.spriteBatch_app.setProjectionMatrix(camera.combined);
         if (inputState.immediateRenderer)
-            inputState.immediateRenderer_game.setProjectionMatrix(camera.combined);
+            inputState.immediateRenderer_app.setProjectionMatrix(camera.combined);
     }
 
     public void render() {
@@ -1909,16 +1909,16 @@ public class UIEngine<T extends UIAdapter> {
     public void render(boolean drawToScreen) {
 
 
-        // Draw Game
+        // Draw App
         {
             // Draw Main FrameBuffer
-            inputState.frameBuffer_game.begin();
-            render_setGameProjectionMatrix(inputState.camera_game);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateRenderer_game, null);
-            inputState.frameBuffer_game.end();
-            // Draw GUI GameViewPort FrameBuffers
-            for (int i = 0; i < this.inputState.gameViewPorts.size(); i++) {
-                renderGameViewPortFrameBuffer(inputState.gameViewPorts.get(i));
+            inputState.frameBuffer_app.begin();
+            render_setGameProjectionMatrix(inputState.camera_app);
+            this.uiAdapter.render(inputState.spriteBatch_app, inputState.immediateRenderer_app, null);
+            inputState.frameBuffer_app.end();
+            // Draw UI AppViewport FrameBuffers
+            for (int i = 0; i < this.inputState.appViewPorts.size(); i++) {
+                renderGameViewPortFrameBuffer(inputState.appViewPorts.get(i));
             }
         }
 
@@ -1934,11 +1934,11 @@ public class UIEngine<T extends UIAdapter> {
             inputState.frameBuffer_ui.end();
         }
 
-        { // Draw to Screen Buffer, Combine GUI+Game Buffer and Upscale
+        { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
             inputState.frameBuffer_screen.begin();
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
-                    inputState.texture_game, inputState.texture_ui,
+                    inputState.texture_app, inputState.texture_ui,
                     inputState.internalResolutionWidth, inputState.internalResolutionHeight,
                     inputState.modalWindow != null
             );
@@ -1962,15 +1962,15 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private void renderGameViewPortFrameBuffer(GameViewPort gameViewPort) {
-        if (render_isComponentNotRendered(gameViewPort)) return;
-        if (System.currentTimeMillis() - gameViewPort.updateTimer > gameViewPort.updateTime) {
+    private void renderGameViewPortFrameBuffer(AppViewPort appViewPort) {
+        if (render_isComponentNotRendered(appViewPort)) return;
+        if (System.currentTimeMillis() - appViewPort.updateTimer > appViewPort.updateTime) {
             // draw to frambuffer
-            gameViewPort.frameBuffer.begin();
-            render_setGameProjectionMatrix(gameViewPort.camera);
-            this.uiAdapter.render(inputState.spriteBatch_game, inputState.immediateRenderer_game, gameViewPort);
-            gameViewPort.frameBuffer.end();
-            gameViewPort.updateTimer = System.currentTimeMillis();
+            appViewPort.frameBuffer.begin();
+            render_setGameProjectionMatrix(appViewPort.camera);
+            this.uiAdapter.render(inputState.spriteBatch_app, inputState.immediateRenderer_app, appViewPort);
+            appViewPort.frameBuffer.end();
+            appViewPort.updateTimer = System.currentTimeMillis();
         }
     }
 
@@ -2877,8 +2877,8 @@ public class UIEngine<T extends UIAdapter> {
                 mediaManager.drawCMediaArray(inputState.spriteBatch_ui, checkBoxGraphic, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
                 render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
             }
-            case GameViewPort gameViewPort -> {
-                inputState.spriteBatch_ui.draw(gameViewPort.textureRegion, UICommons.component_getAbsoluteX(gameViewPort), UICommons.component_getAbsoluteY(gameViewPort));
+            case AppViewPort appViewPort -> {
+                inputState.spriteBatch_ui.draw(appViewPort.textureRegion, UICommons.component_getAbsoluteX(appViewPort), UICommons.component_getAbsoluteY(appViewPort));
             }
             default -> {
             }
@@ -3035,19 +3035,19 @@ public class UIEngine<T extends UIAdapter> {
         inputState.singleUpdateActions.clear();
         inputState.screenComponents.clear();
         inputState.notifications.clear();
-        inputState.gameViewPorts.clear();
+        inputState.appViewPorts.clear();
 
         // SpriteBatch
-        if (inputState.spriteRenderer) inputState.spriteBatch_game.dispose();
+        if (inputState.spriteRenderer) inputState.spriteBatch_app.dispose();
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.immediateRenderer) inputState.immediateRenderer_game.dispose();
+        if (inputState.immediateRenderer) inputState.immediateRenderer_app.dispose();
         if (inputState.immediateRenderer) inputState.immediateRenderer_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
-        inputState.texture_game.getTexture().dispose();
+        inputState.texture_app.getTexture().dispose();
         inputState.texture_ui.getTexture().dispose();
         inputState.texture_screen.getTexture().dispose();
 
@@ -3101,11 +3101,11 @@ public class UIEngine<T extends UIAdapter> {
         return inputState.texture_screen;
     }
 
-    public TextureRegion getTextureGame() {
-        return inputState.texture_game;
+    public TextureRegion getTextureApp() {
+        return inputState.texture_app;
     }
 
     public TextureRegion getTextureUI() {
-        return inputState.texture_game;
+        return inputState.texture_ui;
     }
 }

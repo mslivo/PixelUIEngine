@@ -27,7 +27,7 @@ import org.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import org.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
 import org.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
-import org.mslivo.core.engine.ui_engine.ui.components.viewport.GameViewPort;
+import org.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import org.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import org.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -55,12 +55,12 @@ public class InputState {
     public boolean gamePadSupport;
     public Config config;
 
-    /* #################### Graphics: Game #################### */
-    public SpriteRenderer spriteBatch_game;
-    public ImmediateRenderer immediateRenderer_game;
-    public TextureRegion texture_game;
-    public OrthographicCamera camera_game;
-    public NestedFrameBuffer frameBuffer_game;
+    /* #################### Graphics: App #################### */
+    public SpriteRenderer spriteBatch_app;
+    public ImmediateRenderer immediateRenderer_app;
+    public TextureRegion texture_app;
+    public OrthographicCamera camera_app;
+    public NestedFrameBuffer frameBuffer_app;
 
     /* #################### Graphics: GUI #################### */
     public SpriteRenderer spriteBatch_ui;
@@ -86,7 +86,7 @@ public class InputState {
     public ArrayDeque<Window> modalWindowQueue;
     public ArrayList<Notification> notifications;
     public ArrayList<HotKey> hotKeys;
-    public ArrayList<GameViewPort> gameViewPorts;
+    public ArrayList<AppViewPort> appViewPorts;
     public ArrayList<UpdateAction> singleUpdateActions;
     public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
 
@@ -100,11 +100,11 @@ public class InputState {
     public float tooltip_fadeIn_pct;
     public boolean tooltip_wait_delay;
     public long tooltip_delay_timer, tooltip_fadeIn_timer;
-    public ToolTip gameToolTip;
+    public ToolTip appToolTip;
     public Object tooltip_lastHoverObject;
     public Knob turnedKnob;
     public Canvas pressedCanvas;
-    public GameViewPort pressedGameViewPort;
+    public AppViewPort pressedAppViewPort;
     public TextField pressedTextField;
     public int pressedTextFieldMouseX;
     public TextField focusedTextField;
@@ -149,7 +149,7 @@ public class InputState {
     /* #################### Control #################### */
     public Object lastUIMouseHover; // Last GUI Element the mouse hovered over
     public MOUSE_CONTROL_MODE currentControlMode;
-    public GridPoint2 mouse_game;
+    public GridPoint2 mouse_app;
     public Vector2 mouse_emulated; // Mouse Position for Keyboard/Gamepad mouse control
     public GridPoint2 mouse_ui;
     public Vector2 mouse_delta;

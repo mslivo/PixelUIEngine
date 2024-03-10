@@ -42,7 +42,7 @@ public class Config implements Serializable, Cloneable {
     public CMediaFont window_defaultFont;
     public Color component_defaultColor;
     public CMediaFont component_defaultFont;
-    public int component_gameViewportDefaultUpdateTime;
+    public int component_appViewportDefaultUpdateTime;
     public float component_listDragAlpha;
     public float component_gridDragAlpha;
     public float component_knobSensitivity;
@@ -101,7 +101,7 @@ public class Config implements Serializable, Cloneable {
         window_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_defaultColor = Color.WHITE.cpy();
         component_defaultFont = UIBaseMedia.UI_FONT_BLACK;
-        component_gameViewportDefaultUpdateTime = 200;
+        component_appViewportDefaultUpdateTime = 200;
         component_listDragAlpha = 0.8f;
         component_gridDragAlpha = 0.8f;
         component_knobSensitivity = 1f;

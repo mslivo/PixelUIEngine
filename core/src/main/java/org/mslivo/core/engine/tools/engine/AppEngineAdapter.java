@@ -1,6 +1,6 @@
 package org.mslivo.core.engine.tools.engine;
 
-public interface GameEngineAdapter<D> {
+public interface AppEngineAdapter<D> {
 
     void init(D data, Output outputs);
 

@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
  * Modifies Data Structure 1 update step at a time.
  * Sends input to adapter & gathers outputs using object pooling.
  */
-public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
+public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     class EngineIO {
         private int type;
         private Object[] params;
@@ -18,13 +18,13 @@ public class GameEngine<A extends GameEngineAdapter<D>, D extends Object> {
     private final ArrayDeque<EngineIO> inputPool;
     private final ArrayDeque<EngineIO> outputs;
     private final ArrayDeque<EngineIO> outputPool;
-    private final String errorMessageNull = "Cannot initialize GameEngine: %s is null";
+    private final String errorMessageNull = "Cannot initialize AppEngine: %s is null";
     private int outputType;
     private Object[] outputParams;
     private long lastUpdateTime;
     private long ticks;
 
-    public GameEngine(A adapter, D data) {
+    public AppEngine(A adapter, D data) {
         if(data == null) throw new RuntimeException(String.format(errorMessageNull, "data"));
         if(adapter == null) throw new RuntimeException(String.format(errorMessageNull, "adapter"));
 
