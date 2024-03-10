@@ -179,5 +179,6 @@ public class InputState {
     public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;
     public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_gridValid;
+    public boolean grayScaleMode;
 
 }

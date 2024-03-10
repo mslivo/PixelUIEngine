@@ -274,7 +274,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.itemInfo_listValid = false;
         newInputState.itemInfo_tabBarValid = false;
         newInputState.itemInfo_gridValid = false;
-
+        newInputState.grayScaleMode = false;
         return newInputState;
     }
 
@@ -1979,7 +1979,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.animation_timer_ui = inputState.animation_timer_ui + Gdx.graphics.getDeltaTime();
 
         inputState.spriteBatch_ui.begin();
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
 
         /* Draw Screen Components */
         for (int i = 0; i < inputState.screenComponents.size(); i++) {
@@ -2053,7 +2053,6 @@ public class UIEngine<T extends UIAdapter> {
         // Selection
         render_batchSetColor(r2, g2, b2, alpha);
         mediaManager.drawCMediaImage(inputState.spriteBatch_ui, UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
-        render_fontSetColorWhite();
     }
 
     private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, float r, float g, float b, float alpha, boolean upperCase, boolean pressed) {
@@ -2073,13 +2072,12 @@ public class UIEngine<T extends UIAdapter> {
             int offset = pressed ? 1 : 0;
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2 - offset);
         }
-        render_fontSetColorWhite();
     }
 
     private void render_drawCursor() {
         if (inputState.cursor != null) {
             mediaManager.drawCMediaCursor(inputState.spriteBatch_ui, inputState.cursor, inputState.mouse_ui.x, inputState.mouse_ui.y);
-            render_batchSetColorWhite(1f);
+            render_batchSetColorWhite();
         }
     }
 
@@ -2216,7 +2214,7 @@ public class UIEngine<T extends UIAdapter> {
             default -> {
             }
         }
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
     }
 
     private void render_drawContextMenu() {
@@ -2255,7 +2253,7 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
     }
 
     private void render_drawTooltip() {
@@ -2404,13 +2402,12 @@ public class UIEngine<T extends UIAdapter> {
         }
 
 
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
     }
 
     private void render_drawNotifications() {
         if (inputState.notifications.size() == 0) return;
         int width = (inputState.internalResolutionWidth % TILE_SIZE == 0) ? (inputState.internalResolutionWidth / TILE_SIZE) : ((inputState.internalResolutionWidth / TILE_SIZE) + 1);
-
 
         int y = 0;
         int yOffsetSlideFade = 0;
@@ -2431,13 +2428,13 @@ public class UIEngine<T extends UIAdapter> {
             render_loadTempColorBatch();
         }
 
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
     }
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        boolean preWindowGrayScaleShaderState = render_isGrayScaleEnabled();
-        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window) render_enableGrayScale(true);
+        boolean preWindowGrayScaleShaderState = inputState.grayScaleMode;
+        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window) render_grayScaleModeEnabled(true);
 
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
 
@@ -2473,16 +2470,16 @@ public class UIEngine<T extends UIAdapter> {
             if (!window.folded) render_drawComponentTopLayer(window, component);
         }
 
-        render_batchSetColorWhite(1f);
-        render_enableGrayScale(preWindowGrayScaleShaderState);
+        render_batchSetColorWhite();
+        render_grayScaleModeEnabled(preWindowGrayScaleShaderState);
     }
 
 
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        boolean preComponentGrayScaleState = render_isGrayScaleEnabled();
-        if (component.disabled) render_enableGrayScale(true);
+        boolean preComponentGrayScaleState = inputState.grayScaleMode;
+        if (component.disabled) render_grayScaleModeEnabled(true);
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
 
@@ -2562,8 +2559,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean preListGrayScaleState = render_isGrayScaleEnabled();
-                if (dragEnabled && !dragValid) render_enableGrayScale(true);
+                boolean preListGrayScaleState = inputState.grayScaleMode;
+                if (dragEnabled && !dragValid) render_grayScaleModeEnabled(true);
 
                 // List
                 for (int iy = 0; iy < list.height; iy++) {
@@ -2604,7 +2601,7 @@ public class UIEngine<T extends UIAdapter> {
                         mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
-                render_enableGrayScale(preListGrayScaleState);
+                render_grayScaleModeEnabled(preListGrayScaleState);
             }
             case ComboBox comboBox -> {
                 // Box
@@ -2730,8 +2727,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore = render_isGrayScaleEnabled();
-                if (dragEnabled && !dragValid) render_enableGrayScale(true);
+                boolean grayScaleBefore = inputState.grayScaleMode;
+                if (dragEnabled && !dragValid) render_grayScaleModeEnabled(true);
 
                 for (int ix = 0; ix < gridWidth; ix++) {
                     for (int iy = 0; iy < gridHeight; iy++) {
@@ -2771,7 +2768,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                 }
-                render_enableGrayScale(grayScaleBefore);
+                render_grayScaleModeEnabled(grayScaleBefore);
             }
             case TabBar tabBar -> {
                 int tabXOffset = tabBar.tabOffset;
@@ -2882,8 +2879,8 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        render_enableGrayScale(preComponentGrayScaleState);
-        render_batchSetColorWhite(1f);
+        render_grayScaleModeEnabled(preComponentGrayScaleState);
+        render_batchSetColorWhite();
     }
 
     private void render_drawCursorDragAndDrop() {
@@ -2916,29 +2913,13 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        render_batchSetColorWhite(1f);
+        render_batchSetColorWhite();
     }
 
-
-    private boolean render_isGrayScaleEnabled() {
-        return inputState.spriteBatch_ui.getSaturation() == 0f;
-    }
-
-    private void render_enableGrayScale(boolean enabled) {
+    private void render_grayScaleModeEnabled(boolean enabled) {
+        if(inputState.grayScaleMode == enabled) return;
         inputState.spriteBatch_ui.setSaturation(enabled ? 0f : 1f);
-        Color color = inputState.spriteBatch_ui.getColor();
-        final float AMNT = 0.2f;
-        if (enabled) {
-            render_batchSetColor(
-                    Tools.Calc.inBounds01(color.r - AMNT),
-                    Tools.Calc.inBounds01(color.g - AMNT),
-                    Tools.Calc.inBounds01(color.b - AMNT), color.a);
-        } else {
-            render_batchSetColor(
-                    Tools.Calc.inBounds01(color.r + AMNT),
-                    Tools.Calc.inBounds01(color.g + AMNT),
-                    Tools.Calc.inBounds01(color.b + AMNT), color.a);
-        }
+        inputState.grayScaleMode = enabled;
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
@@ -2983,16 +2964,24 @@ public class UIEngine<T extends UIAdapter> {
         mediaManager.getCMediaFont(font).setColor(1, 1, 1, a);
     }
 
-    private void render_fontSetColorWhite() {
-        inputState.spriteBatch_ui.setColor(1, 1, 1, 1);
+    private void render_batchSetColorWhite() {
+        render_batchSetColor(1f, 1f, 1f, 1f);
     }
-
     private void render_batchSetColorWhite(float alpha) {
         render_batchSetColor(1f, 1f, 1f, alpha);
     }
 
     private void render_batchSetColor(float r, float g, float b, float a) {
-        inputState.spriteBatch_ui.setColor(r, g, b, a);
+        if(inputState.grayScaleMode){
+            final float AMNT = 0.8f;
+            inputState.spriteBatch_ui.setColor(
+                   Tools.Calc.inBounds01(r*AMNT),
+                   Tools.Calc.inBounds01(g*AMNT),
+                   Tools.Calc.inBounds01(b*AMNT),
+                    a);
+        }else{
+            inputState.spriteBatch_ui.setColor(r, g, b, a);
+        }
     }
 
     private void render_saveTempColorBatch() {

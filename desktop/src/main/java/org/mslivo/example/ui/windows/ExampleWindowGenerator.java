@@ -135,7 +135,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             }
         };
         api.component.knob.setKnobAction(knob, knobAction);
-        api.component.setColor(knob, Color.BLUE);
+        api.component.setColor(knob, new Color(0.9f,0.8f,0.5f, 1f));
 
         Knob knobe = api.component.knob.create(4, 5, null, true);
         api.component.setColor(knobe, Color.RED);
