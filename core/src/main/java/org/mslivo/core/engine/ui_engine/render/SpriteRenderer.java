@@ -76,30 +76,20 @@ public class SpriteRenderer implements Batch {
                     void main()
                     {
                       vec4 tgt = texture2D( u_texture, v_texCoords );
-                      tgt = rgb2hsl(tgt);
+                      tgt = rgb2hsl(tgt); // convert to HSL
                       
+                      // tweak HSL
                       tgt.x += v_tweak.x;
                       tgt.x = fract(tgt.x);
                       tgt.y *= v_tweak.y;
                       tgt.z += v_tweak.z;
                       
+                      vec4 color = hsl2rgb(tgt); // convert back to RGB 
+                      vec4 color_tinted = color*v_color; // multiply with batch tint color
+                      color = mix(color, color_tinted, v_tweak.w); // mixed with tinted color based on tweak.tint
+                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb, v_tweak.y);  // remove colors based on tweak.saturation
                       
-                      vec4 color = hsl2rgb(tgt);
-                      vec4 color_multiplied = color*v_color;
-                      vec4 color_final = mix(color, color_multiplied, v_tweak.w);
-                      color_final.rgb = mix(vec3(dot(color_final.rgb, vec3(0.3333))), color_final.rgb, v_tweak.y); 
-                      
-                      // Adjust v_color based on the HSL saturation
-                      //color_final.rgb = mix(vec3(dot(color_final.rgb, vec3(0.3333))), color_final.rgb, v_tweak.y); 
-                      
-                      // Adjust v_color based on the HSL saturation
-                      //v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, v_tweak.y);
-                      // Multiplay with HSLS Values
-                      //vec4 color = hsl2rgb(tgt) * v_color.rgba;
-                      // Apply sepia Effect 
-                      //color.rgb = mix(color.rgb, color.rgb * vec3(1.0, 0.9, 0.7), v_tweak.w);
-                      
-                      gl_FragColor = color_final;
+                      gl_FragColor = color;
                     }       
                      """;
     public static final int SPRITE_SIZE = 24;
