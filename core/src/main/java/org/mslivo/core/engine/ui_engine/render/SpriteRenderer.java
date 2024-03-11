@@ -47,13 +47,14 @@ public class SpriteRenderer implements Batch {
                     #define LOWP lowp
                     precision mediump float;
                     #else
-                    #define LOWP\s
+                    #define LOWP
                     #endif
                     varying vec2 v_texCoords;
                     varying LOWP vec4 v_color;
                     varying LOWP vec4 v_tweak;
                     uniform sampler2D u_texture;
                     const float eps = 1.0e-10;
+                    
                     vec4 rgb2hsl(vec4 c)
                     {
                         const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -75,20 +76,30 @@ public class SpriteRenderer implements Batch {
                     void main()
                     {
                       vec4 tgt = texture2D( u_texture, v_texCoords );
-                      
                       tgt = rgb2hsl(tgt);
-                      tgt.xz += v_tweak.xz;
+                      
+                      tgt.x += v_tweak.x;
                       tgt.x = fract(tgt.x);
                       tgt.y *= v_tweak.y;
+                      tgt.z += v_tweak.z;
+                      
+                      
+                      vec4 color = hsl2rgb(tgt);
+                      vec4 color_multiplied = color*v_color;
+                      vec4 color_final = mix(color, color_multiplied, v_tweak.w);
+                      color_final.rgb = mix(vec3(dot(color_final.rgb, vec3(0.3333))), color_final.rgb, v_tweak.y); 
                       
                       // Adjust v_color based on the HSL saturation
-                      v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, v_tweak.y);
-                      // Multiplay with HSLS Values
-                      vec4 color = hsl2rgb(tgt) * v_color.rgba;
-                      // Apply sepia Effect 
-                      color.rgb = mix(color.rgb, color.rgb * vec3(1.0, 0.9, 0.7), v_tweak.w);
+                      //color_final.rgb = mix(vec3(dot(color_final.rgb, vec3(0.3333))), color_final.rgb, v_tweak.y); 
                       
-                      gl_FragColor = color;
+                      // Adjust v_color based on the HSL saturation
+                      //v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, v_tweak.y);
+                      // Multiplay with HSLS Values
+                      //vec4 color = hsl2rgb(tgt) * v_color.rgba;
+                      // Apply sepia Effect 
+                      //color.rgb = mix(color.rgb, color.rgb * vec3(1.0, 0.9, 0.7), v_tweak.w);
+                      
+                      gl_FragColor = color_final;
                     }       
                      """;
     public static final int SPRITE_SIZE = 24;
@@ -112,8 +123,8 @@ public class SpriteRenderer implements Batch {
     private boolean ownsShader;
     protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
     private final Color tempColor = new Color(1f, 1f, 1f, 1f);
-    private static final float HSLS_TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 0f);
-    protected float hslsTweak = HSLS_TWEAK_RESET;
+    private static final float HSLT_TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 1f);
+    protected float hslsTweak = HSLT_TWEAK_RESET;
     public int renderCalls = 0;
     public int totalRenderCalls = 0;
     public int maxSpritesInBatch = 0;
@@ -158,7 +169,6 @@ public class SpriteRenderer implements Batch {
         if (defaultShader == null) {
             shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
-            ;
             ownsShader = true;
         } else
             shader = defaultShader;
@@ -166,7 +176,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void begin() {
-        if (drawing) throw new IllegalStateException("UISpriteBatch.end must be called before begin.");
+        if (drawing) throw new IllegalStateException("SpriteRenderer.end must be called before begin.");
         renderCalls = 0;
 
         Gdx.gl.glDepthMask(false);
@@ -181,7 +191,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void end() {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before end.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before end.");
         if (idx > 0) flush();
         lastTexture = null;
         drawing = false;
@@ -291,7 +301,7 @@ public class SpriteRenderer implements Batch {
     }
 
     public void setHSLSReset() {
-        this.hslsTweak = HSLS_TWEAK_RESET;
+        this.hslsTweak = HSLT_TWEAK_RESET;
     }
 
     public float getPackedHSLS() {
@@ -322,7 +332,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
                      float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -458,7 +468,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
                      int srcHeight, boolean flipX, boolean flipY) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 

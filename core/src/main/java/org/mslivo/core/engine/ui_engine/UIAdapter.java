@@ -1,5 +1,6 @@
 package org.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.mslivo.core.engine.media_manager.MediaManager;
 import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
@@ -25,6 +26,8 @@ public interface UIAdapter {
     default void renderFinalScreen(SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
                                    int internalResolutionWidth, int internalResolutionHeight, boolean appGrayScale) {
 
+        spriteRenderer.setHSLS(0,1f,0f,0f);
+        spriteRenderer.setColor(Color.BLUE);
         spriteRenderer.begin();
         // Draw App Framebuffer
         if(appGrayScale) spriteRenderer.setSaturation(0f);
