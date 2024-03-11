@@ -8,6 +8,7 @@ import org.mslivo.core.engine.tools.engine.AppEngine;
 import org.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import org.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
 import org.mslivo.core.engine.ui_engine.UIEngine;
+import org.mslivo.core.engine.ui_engine.UIStartConfig;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.data.ExampleDataGenerator;
 import org.mslivo.example.engine.ExampleEngineAdapter;
@@ -69,8 +70,8 @@ public class ExampleMain extends ApplicationAdapter {
         this.uiEngine = new UIEngine<>(
                 new ExampleUIAdapter(this.appEngine),
                 this.mediaManager,
-                ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                ExampleMainConstants.viewportMode, true, true, true);
+                new UIStartConfig(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                        ExampleMainConstants.viewportMode));
         Tools.Log.done();
 
         this.state = STATE.RUN;
@@ -102,8 +103,8 @@ public class ExampleMain extends ApplicationAdapter {
                     this.uiEngine_transition = new UIEngine<>(
                             new ExampleUIAdapter(this.appEngine),
                             this.mediaManager,
-                            ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                            ExampleMainConstants.viewportMode, true, true ,true);
+                            new UIStartConfig(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                                    ExampleMainConstants.viewportMode));
                     this.uiEngine_transition.update();
                     this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     this.transitionManager.render();

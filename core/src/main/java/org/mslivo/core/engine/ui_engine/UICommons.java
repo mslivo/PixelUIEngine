@@ -69,6 +69,13 @@ class UICommons {
         textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
     }
 
+    static int uiResolutionWidth(InputState inputState){
+        return inputState.startConfig.resolutionWidth /inputState.startConfig.uiScale;
+    }
+    static int uiResolutionHeight(InputState inputState){
+        return inputState.startConfig.resolutionHeight /inputState.startConfig.uiScale;
+    }
+
     static void emulatedMouse_setPosition(InputState inputState, int x, int y) {
         if (!inputState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
@@ -104,17 +111,17 @@ class UICommons {
         }
         windowComponentsVisibleOrder.clear();
         windowComponentsVisibleOrderSet.clear();
-        int fromX = activeWindow != null ? activeWindow.x : inputState.internalResolutionWidth;
-        int fromY = activeWindow != null ? activeWindow.y : inputState.internalResolutionHeight;
-        int toX = activeWindow != null ? fromX + UICommons.window_getAbsoluteWidth(activeWindow) : inputState.internalResolutionWidth;
-        int toY = activeWindow != null ? fromY + UICommons.window_getAbsoluteHeight(activeWindow) : inputState.internalResolutionHeight;
+        int fromX = activeWindow != null ? activeWindow.x : 0;
+        int fromY = activeWindow != null ? activeWindow.y : 0;
+        int toX = activeWindow != null ? fromX + UICommons.window_getAbsoluteWidth(activeWindow) : uiResolutionWidth(inputState);
+        int toY = activeWindow != null ? fromY + UICommons.window_getAbsoluteHeight(activeWindow) : uiResolutionHeight(inputState);
 
         int nearestIndex = -1;
         float nearestDistance = Float.MAX_VALUE;
 
         for (int iy = toY; iy >= fromY; iy -= UIEngine.TILE_SIZE) {
-            for (int ix = fromX; ix < toX; ix += UIEngine.TILE_SIZE) {
-                Object object = UICommons.component_getComponentAtPosition(inputState, ix, iy);
+            for (int ix = fromX; ix <= toX; ix += UIEngine.TILE_SIZE) {
+                Object object = UICommons.component_getUIObjectAtPosition(inputState, ix, iy);
                 if(!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)){
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
@@ -215,11 +222,11 @@ class UICommons {
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getAbsoluteWidth(window);
-        window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
+        window.x = Tools.Calc.inBounds(window.x, 0, uiResolutionWidth(inputState) - wndWidth);
         if (window.folded) {
-            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height) * UIEngine.TILE_SIZE);
+            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), uiResolutionHeight(inputState) - (window.height) * UIEngine.TILE_SIZE);
         } else {
-            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getAbsoluteHeight(window));
+            window.y = Tools.Calc.inBounds(window.y, 0, uiResolutionHeight(inputState) - window_getAbsoluteHeight(window));
         }
     }
 
@@ -234,7 +241,7 @@ class UICommons {
     static void window_removeFromScreen(InputState inputState, Window window) {
         if (!window.addedToScreen) return;
         if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
-        if (inputState.modalWindow != null && inputState.modalWindow == window) inputState.modalWindow = null;
+        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow == window) inputState.modalWindow = null;
         window.addedToScreen = false;
         inputState.windows.remove(window);
         resetActivelyUsedUIReferences(inputState);
@@ -274,13 +281,13 @@ class UICommons {
         return component.height * UIEngine.TILE_SIZE;
     }
 
-    static Object component_getComponentAtPosition(InputState inputState, int x, int y) {
+    static Object component_getUIObjectAtPosition(InputState inputState, int x, int y) {
         // Notification Collision
         for (int i = 0; i < inputState.notifications.size(); i++) {
             Notification notification = inputState.notifications.get(i);
-            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y,
-                    0, inputState.internalResolutionWidth - ((i + 1) * UIEngine.TILE_SIZE),
-                    inputState.internalResolutionWidth, UIEngine.TILE_SIZE)) {
+            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(x, y,
+                    0, uiResolutionWidth(inputState) - ((i + 1) * UIEngine.TILE_SIZE),
+                    uiResolutionWidth(inputState), UIEngine.TILE_SIZE)) {
                 return notification;
             }
         }
@@ -296,7 +303,7 @@ class UICommons {
 
         // Combobox Open Menu collision
         if (inputState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE), inputState.openComboBox.width * UIEngine.TILE_SIZE, (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE))) {
+            if (Tools.Calc.pointRectsCollide(x, y, UICommons.component_getAbsoluteX(inputState.openComboBox), UICommons.component_getAbsoluteY(inputState.openComboBox) - (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE), inputState.openComboBox.width * UIEngine.TILE_SIZE, (inputState.openComboBox.comboBoxItems.size() * UIEngine.TILE_SIZE))) {
                 return inputState.openComboBox;
             }
         }
@@ -312,7 +319,7 @@ class UICommons {
             int wndWidth = UICommons.window_getAbsoluteWidth(window);
             int wndHeight = window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window);
 
-            boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, wndX, wndY, wndWidth, wndHeight);
+            boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
                 for (int ic = window.components.size() - 1; ic >= 0; ic--) {
                     Component component = window.components.get(ic);
@@ -1226,8 +1233,8 @@ class UICommons {
         appViewPort.camera.zoom = zoom;
     }
 
-    static int viewport_determineUpscaleFactor(VIEWPORT_MODE VIEWPORTMODE, int internalResolutionWidth, int internalResolutionHeight) {
-        switch (VIEWPORTMODE) {
+    static int viewport_determineUpscaleFactor(VIEWPORT_MODE viewPortMode, int internalResolutionWidth, int internalResolutionHeight) {
+        switch (viewPortMode) {
             case PIXEL_PERFECT -> {
                 return 1;
             }
@@ -1241,13 +1248,33 @@ class UICommons {
                 return upSampling;
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + VIEWPORTMODE);
+            default -> throw new IllegalStateException("Unexpected value: " + viewPortMode);
         }
     }
 
+    static void viewport_changeViewPortMode(InputState inputState, VIEWPORT_MODE viewPortMode) {
+        if (viewPortMode == null || viewPortMode == inputState.startConfig.viewportMode) return;
+        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewPortMode, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionWidth);
+        inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewPortMode);
+        // frameBuffer_upScale
+        inputState.frameBuffer_screen.dispose();
+        inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.startConfig.resolutionWidth * inputState.upscaleFactor_screen, inputState.startConfig.resolutionHeight * inputState.upscaleFactor_screen, false);
+        inputState.frameBuffer_screen.getColorBufferTexture().setFilter(inputState.textureFilter_screen, inputState.textureFilter_screen);
+        // texture_upScale
+        inputState.texture_screen.getTexture().dispose();
+        inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
+        inputState.texture_screen.flip(false, true);
+        // viewport_screen
+        inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_screen, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionHeight);
+        inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        // viewportMode
+        inputState.startConfig.viewportMode = viewPortMode;
 
-    static Viewport viewport_createViewport(VIEWPORT_MODE VIEWPORTMODE, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
-        return switch (VIEWPORTMODE) {
+    }
+
+
+    static Viewport viewport_createViewport(VIEWPORT_MODE viewportMode, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
+        return switch (viewportMode) {
             case FIT -> new FitViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
             case PIXEL_PERFECT ->
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
@@ -1255,8 +1282,8 @@ class UICommons {
         };
     }
 
-    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE VIEWPORTMODE) {
-        return switch (VIEWPORTMODE) {
+    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE viewportMode) {
+        return switch (viewportMode) {
             case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
             case FIT, STRETCH -> Texture.TextureFilter.Linear;
         };

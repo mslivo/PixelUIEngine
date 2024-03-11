@@ -1362,7 +1362,7 @@ public class API {
     }
 
     public void removeCurrentModalWindow() {
-        if (inputState.modalWindow != null) {
+        if (UICommons.window_isModalOpen(inputState)) {
             removeWindow(inputState.modalWindow);
             inputState.modalWindow = null;
             addNextModal();
@@ -1376,7 +1376,7 @@ public class API {
     }
 
     public boolean closeCurrentModalWindow() {
-        if (inputState.modalWindow != null) {
+        if (UICommons.window_isModalOpen(inputState)) {
             if (closeWindow(inputState.modalWindow)) {
                 inputState.modalWindow = null;
                 addNextModal();
@@ -2557,8 +2557,8 @@ public class API {
             notification.notificationAction = notificationAction;
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
-            if (textWidth > inputState.internalResolutionWidth) {
-                int tooMuch = (textWidth - inputState.internalResolutionWidth);
+            if (textWidth > UICommons.uiResolutionHeight(inputState)) {
+                int tooMuch = (textWidth - UICommons.uiResolutionWidth(inputState));
                 notification.state = STATE_NOTIFICATION.INIT_SCROLL;
                 notification.scroll = -(tooMuch / 2) - 4;
                 notification.scrollMax = (tooMuch / 2) + 4;
@@ -3048,8 +3048,8 @@ public class API {
 
         public void center(Window window) {
             if (window == null) return;
-            int centerX = (inputState.internalResolutionWidth / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
-            int centerY = (inputState.internalResolutionHeight / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
+            int centerX = (UICommons.uiResolutionWidth(inputState) / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
+            int centerY = (UICommons.uiResolutionHeight(inputState) / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
             setPosition(window, centerX, centerY);
         }
 
@@ -3306,34 +3306,20 @@ public class API {
     }
 
     public int resolutionWidth() {
-        return inputState.internalResolutionWidth;
+        return inputState.startConfig.resolutionWidth;
     }
 
     public int resolutionHeight() {
-        return inputState.internalResolutionHeight;
+        return inputState.startConfig.resolutionHeight;
     }
 
     public VIEWPORT_MODE viewportMode() {
-        return inputState.viewportMode;
+        return inputState.startConfig.viewportMode;
     }
 
-    public void setViewportMode(VIEWPORT_MODE VIEWPORTMODE) {
-        if (VIEWPORTMODE == null || VIEWPORTMODE == inputState.viewportMode) return;
-        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(VIEWPORTMODE, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(VIEWPORTMODE);
-        // frameBuffer_upScale
-        inputState.frameBuffer_screen.dispose();
-        inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.internalResolutionWidth * inputState.upscaleFactor_screen, inputState.internalResolutionHeight * inputState.upscaleFactor_screen, false);
-        inputState.frameBuffer_screen.getColorBufferTexture().setFilter(inputState.textureFilter_screen, inputState.textureFilter_screen);
-        // texture_upScale
-        inputState.texture_screen.getTexture().dispose();
-        inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
-        inputState.texture_screen.flip(false, true);
-        // viewport_screen
-        inputState.viewport_screen = UICommons.viewport_createViewport(VIEWPORTMODE, inputState.camera_screen, inputState.internalResolutionWidth, inputState.internalResolutionHeight);
-        inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        // viewportMode
-        inputState.viewportMode = VIEWPORTMODE;
+    public void setViewportMode(VIEWPORT_MODE viewPortMode) {
+        if (viewPortMode == null) return;
+        UICommons.viewport_changeViewPortMode(inputState,viewPortMode);
     }
 
     public class _Camera {

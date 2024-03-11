@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.mslivo.core.engine.media_manager.media.CMediaCursor;
+import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import org.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import org.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import org.mslivo.core.engine.ui_engine.ui.Window;
@@ -40,7 +40,6 @@ import org.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import org.mslivo.core.engine.ui_engine.config.Config;
 import org.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import org.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
-import org.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -48,11 +47,9 @@ import java.util.ArrayList;
 public class InputState {
 
     /* ################ Constructor Parameters ################# */
-    public int internalResolutionWidth, internalResolutionHeight;
-    public VIEWPORT_MODE viewportMode;
-    public boolean spriteRenderer;
-    public boolean immediateRenderer;
-    public boolean gamePadSupport;
+    public UIStartConfig startConfig;
+
+    /* ##################### Config ########################## */
     public Config config;
 
     /* #################### Graphics: App #################### */

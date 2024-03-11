@@ -52,15 +52,15 @@ public class TransitionManager {
     public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed, boolean updateUIEngine) {
         if(from == null) throw new RuntimeException("UIEngine from is null");
         if(to == null) throw new RuntimeException("UIEngine to is null");
-        if (from.getInternalResolutionWidth() != to.getInternalResolutionWidth())
+        if (from.getResolutionWidth() != to.getResolutionWidth())
             throw new RuntimeException("UIEngine internalResolutionWidth does not match");
-        if (from.getInternalResolutionHeight() != to.getInternalResolutionHeight())
+        if (from.getResolutionHeight() != to.getResolutionHeight())
             throw new RuntimeException("UIEngine internalResolutionHeight does not match");
         if (from.getViewportMode() != to.getViewportMode()) throw new RuntimeException("viewportMode does not match");
         this.from = from;
         this.to = to;
-        int resolutionWidth = from.getInternalResolutionWidth();
-        int resolutionHeight = from.getInternalResolutionHeight();
+        int resolutionWidth = from.getResolutionWidth();
+        int resolutionHeight = from.getResolutionHeight();
         VIEWPORT_MODE VIEWPORTMODE = from.getViewportMode();
         this.transition = transition == null ? new FadeTransition() : transition;
         this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
