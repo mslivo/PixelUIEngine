@@ -1083,7 +1083,7 @@ public class UIEngine<T extends UIAdapter> {
                     for (int ib = 0; ib < inputState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = inputState.inputEvents.mouseDownButtons.get(ib);
                         if (inputState.config.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
-                            if (window.hasTitleBar && Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getRealWidth(window), TILE_SIZE)) {
+                            if (window.hasTitleBar && Tools.Calc.pointRectsCollide(inputState.mouse_ui.x, inputState.mouse_ui.y, window.x, window.y + ((window.height - 1) * TILE_SIZE), UICommons.window_getAbsoluteWidth(window), TILE_SIZE)) {
                                 if (window.folded) {
                                     UICommons.window_unFold(window);
                                 } else {

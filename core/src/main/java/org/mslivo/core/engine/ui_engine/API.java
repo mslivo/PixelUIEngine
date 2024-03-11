@@ -2161,6 +2161,15 @@ public class API {
                 public void setPositionComponent(Component component) {
                     UICommons.emulatedMouse_setPositionComponent(inputState, component);
                 }
+
+                public void setPositionNextComponent(){
+                    UICommons.emulatedMouse_setPositionNextComponent(inputState,false);
+                }
+
+                public void setPositionPreviousComponent(){
+                    UICommons.emulatedMouse_setPositionNextComponent(inputState, true);
+                }
+
             }
 
 
@@ -2961,11 +2970,11 @@ public class API {
         }
 
         public int getRealWidth(Window window) {
-            return UICommons.window_getRealWidth(window);
+            return UICommons.window_getAbsoluteWidth(window);
         }
 
         public int getRealHeight(Window window) {
-            return UICommons.window_getRealHeight(window);
+            return UICommons.window_getAbsoluteHeight(window);
         }
 
         public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
@@ -3039,8 +3048,8 @@ public class API {
 
         public void center(Window window) {
             if (window == null) return;
-            int centerX = (inputState.internalResolutionWidth / 2) - (UICommons.window_getRealWidth(window) / 2);
-            int centerY = (inputState.internalResolutionHeight / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getRealHeight(window)) / 2);
+            int centerX = (inputState.internalResolutionWidth / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
+            int centerY = (inputState.internalResolutionHeight / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
             setPosition(window, centerX, centerY);
         }
 

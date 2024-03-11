@@ -53,12 +53,16 @@ import org.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 class UICommons {
 
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();
+    private static ArrayList<Component> windowComponentsVisibleOrder = new ArrayList<>();
+    private static HashSet<Component> windowComponentsVisibleOrderSet = new HashSet<>();
 
     static {
         textFieldControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME, Input.Keys.END, Input.Keys.ENTER);
@@ -75,14 +79,84 @@ class UICommons {
     static void emulatedMouse_setPositionComponent(InputState inputState, Component component) {
         if (component == null) return;
         if (component.addedToWindow == null && !component.addedToScreen) return;
-        int x = component_getAbsoluteX(component) + (component_getRealWidth(component) / 2);
-        int y = component_getAbsoluteY(component) + (component_getRealHeight(component) / 2);
+        int x = component_getAbsoluteX(component) + (component_getAbsoluteWidth(component) / 2);
+        int y = component_getAbsoluteY(component) + (component_getAbsoluteHeight(component) / 2);
         emulatedMouse_setPosition(inputState, x, y);
     }
 
-    static int window_getRealWidth(Window window) {
+    private static boolean emulatedMouse_isInteractAbleComponent(Component component) {
+        if (!(component instanceof Image || component instanceof Text)) {
+            if (component.visible && !component.disabled && !component_isHiddenByTab(component)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static void emulatedMouse_setPositionNextComponent(InputState inputState, boolean backwards) {
+        Window activeWindow = window_findTopInteractableWindow(inputState);
+        if (activeWindow != null && activeWindow.folded) {
+            emulatedMouse_setPosition(inputState,
+                    activeWindow.x + (window_getAbsoluteWidth(activeWindow) / 2),
+                    activeWindow.y + (window_getAbsoluteHeight(activeWindow) - 4)
+            );
+            return;
+        }
+        windowComponentsVisibleOrder.clear();
+        windowComponentsVisibleOrderSet.clear();
+        int fromX = activeWindow != null ? activeWindow.x : inputState.internalResolutionWidth;
+        int fromY = activeWindow != null ? activeWindow.y : inputState.internalResolutionHeight;
+        int toX = activeWindow != null ? fromX + UICommons.window_getAbsoluteWidth(activeWindow) : inputState.internalResolutionWidth;
+        int toY = activeWindow != null ? fromY + UICommons.window_getAbsoluteHeight(activeWindow) : inputState.internalResolutionHeight;
+
+        int nearestIndex = -1;
+        float nearestDistance = Float.MAX_VALUE;
+
+        for (int iy = toY; iy >= fromY; iy -= UIEngine.TILE_SIZE) {
+            for (int ix = fromX; ix < toX; ix += UIEngine.TILE_SIZE) {
+                Object object = UICommons.component_getComponentAtPosition(inputState, ix, iy);
+                if(!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)){
+                    windowComponentsVisibleOrder.add(component);
+                    windowComponentsVisibleOrderSet.add(component);
+                    float distance = Tools.Calc.distanceFast(component_getAbsoluteX(component) + (component_getAbsoluteWidth(component) / 2),
+                            component_getAbsoluteY(component) + (component_getAbsoluteHeight(component) / 2), inputState.mouse_emulated.x, inputState.mouse_emulated.y);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestIndex = windowComponentsVisibleOrder.size() - 1;
+                    }
+                }
+            }
+        }
+
+        if (nearestIndex != -1) {
+            if (backwards) {
+                nearestIndex--;
+                if (nearestIndex < 0) nearestIndex = (windowComponentsVisibleOrder.size() - 1);
+            } else {
+                nearestIndex++;
+                if (nearestIndex > (windowComponentsVisibleOrder.size() - 1)) nearestIndex = 0;
+            }
+
+            emulatedMouse_setPositionComponent(inputState, windowComponentsVisibleOrder.get(nearestIndex));
+        }
+
+        return;
+    }
+
+
+    static Window window_findTopInteractableWindow(InputState inputState) {
+        if (inputState.windows.isEmpty()) return null;
+        for (int i = (inputState.windows.size() - 1); i >= 0; i--) {
+            Window window = inputState.windows.get(i);
+            if (window.visible) return window;
+        }
+        return null;
+    }
+
+    static int window_getAbsoluteWidth(Window window) {
         return window.width * UIEngine.TILE_SIZE;
     }
+
     static boolean window_isModalOpen(InputState inputState) {
         return inputState.modalWindow != null;
     }
@@ -128,7 +202,7 @@ class UICommons {
         }
     }
 
-    static int window_getRealHeight(Window window) {
+    static int window_getAbsoluteHeight(Window window) {
         return window.height * UIEngine.TILE_SIZE;
     }
 
@@ -140,12 +214,12 @@ class UICommons {
 
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
-        int wndWidth = window_getRealWidth(window);
+        int wndWidth = window_getAbsoluteWidth(window);
         window.x = Tools.Calc.inBounds(window.x, 0, inputState.internalResolutionWidth - wndWidth);
         if (window.folded) {
             window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.internalResolutionHeight - (window.height) * UIEngine.TILE_SIZE);
         } else {
-            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getRealHeight(window));
+            window.y = Tools.Calc.inBounds(window.y, 0, inputState.internalResolutionHeight - window_getAbsoluteHeight(window));
         }
     }
 
@@ -192,11 +266,11 @@ class UICommons {
     }
 
 
-    static int component_getRealWidth(Component component) {
+    static int component_getAbsoluteWidth(Component component) {
         return component.width * UIEngine.TILE_SIZE;
     }
 
-    static int component_getRealHeight(Component component) {
+    static int component_getAbsoluteHeight(Component component) {
         return component.height * UIEngine.TILE_SIZE;
     }
 
@@ -235,8 +309,8 @@ class UICommons {
 
             int wndX = window.x;
             int wndY = window.y + (window.folded ? ((window.height - 1) * UIEngine.TILE_SIZE) : 0);
-            int wndWidth = UICommons.window_getRealWidth(window);
-            int wndHeight = window.folded ? UIEngine.TILE_SIZE : UICommons.window_getRealHeight(window);
+            int wndWidth = UICommons.window_getAbsoluteWidth(window);
+            int wndHeight = window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window);
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, inputState.mouse_ui.y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
@@ -770,12 +844,12 @@ class UICommons {
     }
 
     static void canvas_resizeMap(Canvas canvas) {
-        int newWidth = canvas.width*UIEngine.TILE_SIZE;
-        int newHeight = canvas.height*UIEngine.TILE_SIZE;
+        int newWidth = canvas.width * UIEngine.TILE_SIZE;
+        int newHeight = canvas.height * UIEngine.TILE_SIZE;
         Color[][] newMap;
-        newMap = Arrays.copyOf(canvas.map,newWidth);
-        for(int ix=0;ix<newWidth;ix++){
-            newMap[ix] = Arrays.copyOf(canvas.map[ix],newHeight);
+        newMap = Arrays.copyOf(canvas.map, newWidth);
+        for (int ix = 0; ix < newWidth; ix++) {
+            newMap[ix] = Arrays.copyOf(canvas.map[ix], newHeight);
         }
         canvas.map = newMap;
     }
@@ -1017,7 +1091,7 @@ class UICommons {
         // Control Buttons
         mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
         mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
-        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] =  '\n';
+        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = '\n';
 
     }
 
@@ -1099,8 +1173,8 @@ class UICommons {
     }
 
     static void canvas_setAllPoints(Canvas canvas, float r, float g, float b, float a) {
-        int width = canvas.width*UIEngine.TILE_SIZE;
-        int height = canvas.height*UIEngine.TILE_SIZE;
+        int width = canvas.width * UIEngine.TILE_SIZE;
+        int height = canvas.height * UIEngine.TILE_SIZE;
         for (int ix = 0; ix <= width; ix++) {
             for (int iy = 0; iy <= height; iy++) {
                 canvas_setPoint(canvas, ix, iy, r, g, b, a);
@@ -1108,12 +1182,12 @@ class UICommons {
         }
     }
 
-    static boolean canvas_isInsideCanvas(Canvas canvas, int x, int y){
+    static boolean canvas_isInsideCanvas(Canvas canvas, int x, int y) {
         return x >= 0 && x < canvas.map.length && y >= 0 && y < canvas.map[0].length;
     }
 
     static void canvas_setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
-        if (!canvas_isInsideCanvas(canvas,x,y))return;
+        if (!canvas_isInsideCanvas(canvas, x, y)) return;
         canvas.map[x][y].set(
                 r,
                 g,

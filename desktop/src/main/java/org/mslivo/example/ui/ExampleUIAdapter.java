@@ -120,9 +120,10 @@ public class ExampleUIAdapter implements UIAdapter {
         while (keyBoard.event.keyDownHasNext()) {
             int key = keyBoard.event.keyDownNext();
             switch (key) {
-                case KeyCode.Key.Q -> {
-                    api.input.mouse.emulated.setPosition(10, 10);
-                }
+                case KeyCode.Key.Q -> api.input.mouse.emulated.setPosition(10, 10);
+                case KeyCode.Key.W -> api.input.mouse.emulated.setPositionPreviousComponent();
+                case KeyCode.Key.E -> api.input.mouse.emulated.setPositionNextComponent();
+
             }
         }
     }
