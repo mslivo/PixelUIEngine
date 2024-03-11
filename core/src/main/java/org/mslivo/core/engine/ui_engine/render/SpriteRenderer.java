@@ -78,16 +78,14 @@ public class SpriteRenderer implements Batch {
                       vec4 tgt = texture2D( u_texture, v_texCoords );
                       tgt = rgb2hsl(tgt); // convert to HSL
                       
-                      // tweak HSL
-                      tgt.x += v_tweak.x;
-                      tgt.x = fract(tgt.x);
-                      tgt.y *= v_tweak.y;
-                      tgt.z += v_tweak.z;
+                      tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
+                      tgt.y *= (v_tweak.y*2); // tweak Saturation
+                      tgt.z += (v_tweak.z-0.5); // tweak Lightness
                       
                       vec4 color = hsl2rgb(tgt); // convert back to RGB 
                       vec4 color_tinted = color*v_color; // multiply with batch tint color
-                      color = mix(color, color_tinted, v_tweak.w); // mixed with tinted color based on tweak.tint
-                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb, v_tweak.y);  // remove colors based on tweak.saturation
+                      color = mix(color, color_tinted, v_tweak.w); // mixed with tinted color based on tweak Tint
+                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2));  // remove colors based on tweak.saturation
                       
                       gl_FragColor = color;
                     }       
@@ -113,7 +111,7 @@ public class SpriteRenderer implements Batch {
     private boolean ownsShader;
     protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
     private final Color tempColor = new Color(1f, 1f, 1f, 1f);
-    private static final float HSLT_TWEAK_RESET = Color.toFloatBits(0f, 1f, 0f, 1f);
+    private static final float HSLT_TWEAK_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     protected float hslsTweak = HSLT_TWEAK_RESET;
     public int renderCalls = 0;
     public int totalRenderCalls = 0;
@@ -122,7 +120,6 @@ public class SpriteRenderer implements Batch {
     public SpriteRenderer() {
         this(1000, null);
     }
-
 
     public SpriteRenderer(int size) {
         this(size, null);
@@ -205,13 +202,13 @@ public class SpriteRenderer implements Batch {
         setPackedColor(color);
     }
 
-    public void setIntColor(final int color) {
-        this.color = NumberUtils.intBitsToFloat(Integer.reverseBytes(color & -2));
-    }
-
     @Override
     public void setPackedColor(final float color) {
         this.color = color;
+    }
+
+    public void setPackedColor(final int color) {
+        setPackedColor(NumberUtils.intBitsToFloat(Integer.reverseBytes(color & -2)));
     }
 
     @Override
@@ -244,11 +241,10 @@ public class SpriteRenderer implements Batch {
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getSepia() {
+    public float getTint() {
         int c = NumberUtils.floatToIntColor(hslsTweak);
         return ((c & 0xff000000) >>> 24) / 255f;
     }
-
 
     public void setHue(float hue) {
         int c = NumberUtils.floatToIntColor(hslsTweak);
@@ -274,16 +270,16 @@ public class SpriteRenderer implements Batch {
         hslsTweak = rgbPacked(r, g, lightness, a);
     }
 
-    public void setSepia(float sepia) {
+    public void setTint(float tint) {
         int c = NumberUtils.floatToIntColor(hslsTweak);
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        hslsTweak = rgbPacked(r, g, b, sepia);
+        hslsTweak = rgbPacked(r, g, b, tint);
     }
 
-    public void setHSLS(float hue, float saturation, float lightness, float sepia) {
-        hslsTweak = rgbPacked(hue, saturation, lightness, sepia);
+    public void setHSLS(float hue, float saturation, float lightness, float tint) {
+        hslsTweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
     public void setPackedHSLS(final float tweak) {
@@ -521,7 +517,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -572,7 +568,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -624,7 +620,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y, float width, float height) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -685,7 +681,7 @@ public class SpriteRenderer implements Batch {
      */
     @Override
     public void draw(Texture texture, float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         count = (count / 5) * 6;
         int verticesLength = vertices.length;
@@ -746,7 +742,7 @@ public class SpriteRenderer implements Batch {
      * @param count          how many vertices to draw from {@code spriteVertices} (24 vertices is one sprite)
      */
     public void drawExactly(Texture texture, float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         int verticesLength = vertices.length;
         int remainingVertices = verticesLength;
@@ -781,7 +777,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(TextureRegion region, float x, float y, float width, float height) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -834,7 +830,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                      float scaleX, float scaleY, float rotation) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -959,7 +955,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                      float scaleX, float scaleY, float rotation, boolean clockwise) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 
@@ -1099,7 +1095,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(TextureRegion region, float width, float height, Affine2 transform) {
-        if (!drawing) throw new IllegalStateException("UISpriteBatch.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
 

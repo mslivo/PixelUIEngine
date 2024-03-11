@@ -274,7 +274,6 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.itemInfo_listValid = false;
         newInputState.itemInfo_tabBarValid = false;
         newInputState.itemInfo_gridValid = false;
-        newInputState.grayScaleMode = false;
         return newInputState;
     }
 
@@ -1937,7 +1936,7 @@ public class UIEngine<T extends UIAdapter> {
         { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
             inputState.frameBuffer_screen.begin();
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
-            this.uiAdapter.renderFinalScreen(inputState.spriteBatch_screen,
+            this.uiAdapter.renderComposite(inputState.spriteBatch_screen,
                     inputState.texture_app, inputState.texture_ui,
                     inputState.internalResolutionWidth, inputState.internalResolutionHeight,
                     UICommons.window_isModalOpen(inputState)
@@ -2433,8 +2432,8 @@ public class UIEngine<T extends UIAdapter> {
 
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
-        boolean preWindowGrayScaleShaderState = inputState.grayScaleMode;
-        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window) render_grayScaleModeEnabled(true);
+        boolean preWindowGrayScaleShaderState = render_isGrayscaleEnabled();
+        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window) render_setGrayscaleEnabled(true);
 
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
 
@@ -2471,15 +2470,15 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         render_batchSetColorWhite();
-        render_grayScaleModeEnabled(preWindowGrayScaleShaderState);
+        render_setGrayscaleEnabled(preWindowGrayScaleShaderState);
     }
 
 
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        boolean preComponentGrayScaleState = inputState.grayScaleMode;
-        if (component.disabled) render_grayScaleModeEnabled(true);
+        boolean preComponentGrayScaleState =  render_isGrayscaleEnabled();
+        if (component.disabled) render_setGrayscaleEnabled(true);
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
 
@@ -2559,8 +2558,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean preListGrayScaleState = inputState.grayScaleMode;
-                if (dragEnabled && !dragValid) render_grayScaleModeEnabled(true);
+                boolean preListGrayScaleState =  render_isGrayscaleEnabled();
+                if (dragEnabled && !dragValid) render_setGrayscaleEnabled(true);
 
                 // List
                 for (int iy = 0; iy < list.height; iy++) {
@@ -2601,7 +2600,7 @@ public class UIEngine<T extends UIAdapter> {
                         mediaManager.drawCMediaArray(inputState.spriteBatch_ui, UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
-                render_grayScaleModeEnabled(preListGrayScaleState);
+                render_setGrayscaleEnabled(preListGrayScaleState);
             }
             case ComboBox comboBox -> {
                 // Box
@@ -2727,8 +2726,8 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore = inputState.grayScaleMode;
-                if (dragEnabled && !dragValid) render_grayScaleModeEnabled(true);
+                boolean grayScaleBefore =  render_isGrayscaleEnabled();
+                if (dragEnabled && !dragValid) render_setGrayscaleEnabled(true);
 
                 for (int ix = 0; ix < gridWidth; ix++) {
                     for (int iy = 0; iy < gridHeight; iy++) {
@@ -2768,7 +2767,7 @@ public class UIEngine<T extends UIAdapter> {
                         }
                     }
                 }
-                render_grayScaleModeEnabled(grayScaleBefore);
+                render_setGrayscaleEnabled(grayScaleBefore);
             }
             case TabBar tabBar -> {
                 int tabXOffset = tabBar.tabOffset;
@@ -2879,7 +2878,7 @@ public class UIEngine<T extends UIAdapter> {
             }
         }
 
-        render_grayScaleModeEnabled(preComponentGrayScaleState);
+        render_setGrayscaleEnabled(preComponentGrayScaleState);
         render_batchSetColorWhite();
     }
 
@@ -2916,10 +2915,14 @@ public class UIEngine<T extends UIAdapter> {
         render_batchSetColorWhite();
     }
 
-    private void render_grayScaleModeEnabled(boolean enabled) {
-        if(inputState.grayScaleMode == enabled) return;
-        inputState.spriteBatch_ui.setSaturation(enabled ? 0f : 1f);
-        inputState.grayScaleMode = enabled;
+    private boolean render_isGrayscaleEnabled() {
+        return inputState.spriteBatch_ui.getSaturation() == 0f;
+    }
+
+    private void render_setGrayscaleEnabled(boolean enabled) {
+        if(render_isGrayscaleEnabled() == enabled) return;
+        inputState.spriteBatch_ui.setSaturation(enabled ? 0f : 0.5f);
+        inputState.spriteBatch_ui.setLightness(enabled ? 0.45f : 0.5f);
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
@@ -2972,7 +2975,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_batchSetColor(float r, float g, float b, float a) {
-        if(inputState.grayScaleMode){
+        if(render_isGrayscaleEnabled()){
             final float AMNT = 0.8f;
             inputState.spriteBatch_ui.setColor(
                    Tools.Calc.inBounds01(r*AMNT),
