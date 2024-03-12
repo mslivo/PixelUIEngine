@@ -79,13 +79,13 @@ public class SpriteRenderer implements Batch {
                       tgt = rgb2hsl(tgt); // convert to HSL
                       
                       tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
-                      tgt.y *= (v_tweak.y*2); // tweak Saturation
+                      tgt.y *= (v_tweak.y*2.0); // tweak Saturation
                       tgt.z += (v_tweak.z-0.5); // tweak Lightness
                       
                       vec4 color = hsl2rgb(tgt); // convert back to RGB 
                       vec4 color_tinted = color*v_color; // multiply with batch tint color
                       color = mix(color, color_tinted, v_tweak.w); // mixed with tinted color based on tweak Tint
-                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2));  // remove colors based on tweak.saturation
+                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2.0));  // remove colors based on tweak.saturation
                       
                       gl_FragColor = color;
                     }       
