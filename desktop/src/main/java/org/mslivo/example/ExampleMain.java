@@ -8,7 +8,6 @@ import org.mslivo.core.engine.tools.engine.AppEngine;
 import org.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import org.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
 import org.mslivo.core.engine.ui_engine.UIEngine;
-import org.mslivo.core.engine.ui_engine.UIStartConfig;
 import org.mslivo.example.data.ExampleData;
 import org.mslivo.example.data.ExampleDataGenerator;
 import org.mslivo.example.engine.ExampleEngineAdapter;
@@ -23,6 +22,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     private STATE state;
     private TransitionManager transitionManager;
+
     /* Subsystems */
 
     private MediaManager mediaManager;
@@ -69,9 +69,8 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.Log.inProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
                 new ExampleUIAdapter(this.appEngine),
-                this.mediaManager,
-                new UIStartConfig(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                        ExampleMainConstants.viewportMode));
+                this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                        ExampleMainConstants.viewportMode);
         Tools.Log.done();
 
         this.state = STATE.RUN;
@@ -102,9 +101,8 @@ public class ExampleMain extends ApplicationAdapter {
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
                             new ExampleUIAdapter(this.appEngine),
-                            this.mediaManager,
-                            new UIStartConfig(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                                    ExampleMainConstants.viewportMode));
+                            this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                                    ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
                     this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     this.transitionManager.render();

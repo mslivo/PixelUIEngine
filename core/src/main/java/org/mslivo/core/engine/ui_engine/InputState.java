@@ -47,8 +47,13 @@ import java.util.ArrayList;
 public class InputState {
 
     /* ################ Constructor Parameters ################# */
-    public UIStartConfig startConfig;
-
+    public int resolutionWidth, resolutionHeight;
+    public int resolutionWidth_ui, resolutionHeight_ui;
+    public VIEWPORT_MODE viewportMode;
+    public boolean gamePadSupport;
+    public int uiScale;
+    public boolean spriteRenderer;
+    public boolean immediateRenderer;
     /* ##################### Config ########################## */
     public Config config;
 

@@ -2557,8 +2557,8 @@ public class API {
             notification.notificationAction = notificationAction;
             notification.timer = 0;
             int textWidth = mediaManager.textWidth(notification.font, notification.text);
-            if (textWidth > UICommons.uiResolutionHeight(inputState)) {
-                int tooMuch = (textWidth - UICommons.uiResolutionWidth(inputState));
+            if (textWidth > inputState.resolutionWidth_ui) {
+                int tooMuch = (textWidth - inputState.resolutionWidth_ui);
                 notification.state = STATE_NOTIFICATION.INIT_SCROLL;
                 notification.scroll = -(tooMuch / 2) - 4;
                 notification.scrollMax = (tooMuch / 2) + 4;
@@ -3048,8 +3048,8 @@ public class API {
 
         public void center(Window window) {
             if (window == null) return;
-            int centerX = (UICommons.uiResolutionWidth(inputState) / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
-            int centerY = (UICommons.uiResolutionHeight(inputState) / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
+            int centerX = (inputState.resolutionWidth_ui / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
+            int centerY = (inputState.resolutionHeight_ui / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
             setPosition(window, centerX, centerY);
         }
 
@@ -3306,15 +3306,20 @@ public class API {
     }
 
     public int resolutionWidth() {
-        return inputState.startConfig.resolutionWidth;
+        return inputState.resolutionWidth;
     }
-
     public int resolutionHeight() {
-        return inputState.startConfig.resolutionHeight;
+        return inputState.resolutionHeight;
+    }
+    public int resolutionWidthUI() {
+        return inputState.resolutionWidth_ui;
+    }
+    public int resolutionHeightUI() {
+        return inputState.resolutionHeight_ui;
     }
 
     public VIEWPORT_MODE viewportMode() {
-        return inputState.startConfig.viewportMode;
+        return inputState.viewportMode;
     }
 
     public void setViewportMode(VIEWPORT_MODE viewPortMode) {

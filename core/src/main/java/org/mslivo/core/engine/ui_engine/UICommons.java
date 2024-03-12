@@ -69,13 +69,6 @@ class UICommons {
         textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
     }
 
-    static int uiResolutionWidth(InputState inputState){
-        return inputState.startConfig.resolutionWidth /inputState.startConfig.uiScale;
-    }
-    static int uiResolutionHeight(InputState inputState){
-        return inputState.startConfig.resolutionHeight /inputState.startConfig.uiScale;
-    }
-
     static void emulatedMouse_setPosition(InputState inputState, int x, int y) {
         if (!inputState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
@@ -113,8 +106,8 @@ class UICommons {
         windowComponentsVisibleOrderSet.clear();
         int fromX = activeWindow != null ? activeWindow.x : 0;
         int fromY = activeWindow != null ? activeWindow.y : 0;
-        int toX = activeWindow != null ? fromX + UICommons.window_getAbsoluteWidth(activeWindow) : uiResolutionWidth(inputState);
-        int toY = activeWindow != null ? fromY + UICommons.window_getAbsoluteHeight(activeWindow) : uiResolutionHeight(inputState);
+        int toX = activeWindow != null ? fromX + UICommons.window_getAbsoluteWidth(activeWindow) : inputState.resolutionWidth_ui;
+        int toY = activeWindow != null ? fromY + UICommons.window_getAbsoluteHeight(activeWindow) : inputState.resolutionHeight_ui;
 
         int nearestIndex = -1;
         float nearestDistance = Float.MAX_VALUE;
@@ -222,11 +215,11 @@ class UICommons {
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getAbsoluteWidth(window);
-        window.x = Tools.Calc.inBounds(window.x, 0, uiResolutionWidth(inputState) - wndWidth);
+        window.x = Tools.Calc.inBounds(window.x, 0, inputState.resolutionWidth_ui - wndWidth);
         if (window.folded) {
-            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), uiResolutionHeight(inputState) - (window.height) * UIEngine.TILE_SIZE);
+            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.resolutionHeight_ui - (window.height) * UIEngine.TILE_SIZE);
         } else {
-            window.y = Tools.Calc.inBounds(window.y, 0, uiResolutionHeight(inputState) - window_getAbsoluteHeight(window));
+            window.y = Tools.Calc.inBounds(window.y, 0, inputState.resolutionHeight_ui - window_getAbsoluteHeight(window));
         }
     }
 
@@ -286,8 +279,8 @@ class UICommons {
         for (int i = 0; i < inputState.notifications.size(); i++) {
             Notification notification = inputState.notifications.get(i);
             if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(x, y,
-                    0, uiResolutionWidth(inputState) - ((i + 1) * UIEngine.TILE_SIZE),
-                    uiResolutionWidth(inputState), UIEngine.TILE_SIZE)) {
+                    0, inputState.resolutionWidth_ui - ((i + 1) * UIEngine.TILE_SIZE),
+                    inputState.resolutionWidth_ui, UIEngine.TILE_SIZE)) {
                 return notification;
             }
         }
@@ -1253,22 +1246,22 @@ class UICommons {
     }
 
     static void viewport_changeViewPortMode(InputState inputState, VIEWPORT_MODE viewPortMode) {
-        if (viewPortMode == null || viewPortMode == inputState.startConfig.viewportMode) return;
-        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewPortMode, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionWidth);
+        if (viewPortMode == null || viewPortMode == inputState.viewportMode) return;
+        inputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(viewPortMode, inputState.resolutionWidth, inputState.resolutionHeight);
         inputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(viewPortMode);
         // frameBuffer_upScale
         inputState.frameBuffer_screen.dispose();
-        inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.startConfig.resolutionWidth * inputState.upscaleFactor_screen, inputState.startConfig.resolutionHeight * inputState.upscaleFactor_screen, false);
+        inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.resolutionWidth * inputState.upscaleFactor_screen, inputState.resolutionHeight * inputState.upscaleFactor_screen, false);
         inputState.frameBuffer_screen.getColorBufferTexture().setFilter(inputState.textureFilter_screen, inputState.textureFilter_screen);
         // texture_upScale
         inputState.texture_screen.getTexture().dispose();
         inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
         inputState.texture_screen.flip(false, true);
         // viewport_screen
-        inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_screen, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionHeight);
+        inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_screen, inputState.resolutionWidth, inputState.resolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // viewportMode
-        inputState.startConfig.viewportMode = viewPortMode;
+        inputState.viewportMode = viewPortMode;
 
     }
 

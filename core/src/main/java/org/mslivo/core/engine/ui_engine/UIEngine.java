@@ -63,7 +63,6 @@ import org.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 
 /**
@@ -74,12 +73,12 @@ import java.util.Objects;
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIAdapter> {
 
-    // Attributes
+    // Basic Configuration
     private final T uiAdapter;
     private InputState inputState;
     private final API api;
     private final MediaManager mediaManager;
-    private UIStartConfig startConfiguration;
+
     // Constants
     public static final int TILE_SIZE = 8;
     public static final float TILE_SIZE_F = TILE_SIZE;
@@ -92,14 +91,31 @@ public class UIEngine<T extends UIAdapter> {
         return uiAdapter;
     }
 
-    public UIEngine(T uiAdapter, MediaManager mediaManager, UIStartConfig startConfiguration) {
-        if (uiAdapter == null || mediaManager == null || startConfiguration == null) {
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight) {
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, VIEWPORT_MODE.PIXEL_PERFECT, true, 1, true, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode) {
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, true, 1, true, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport) {
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, 1, true, true);
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, int uiScale) {
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, uiScale, true, true);
+
+    }
+
+    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, int uiScale, boolean spriteRenderer, boolean immediateRenderer) {
+        if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize UIEngine: missing parameters");
         }
         this.uiAdapter = uiAdapter;
         this.mediaManager = mediaManager;
         /* Setup */
-        this.inputState = initializeInputState(startConfiguration);
+        this.inputState = initializeInputState(resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, uiScale, spriteRenderer, immediateRenderer);
         this.api = new API(this.inputState, mediaManager);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
         Gdx.gl.glClearColor(0, 0, 0, 0);
@@ -109,31 +125,39 @@ public class UIEngine<T extends UIAdapter> {
     }
 
 
-    private InputState initializeInputState(UIStartConfig startConfiguration) {
+    private InputState initializeInputState(int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, int uiScale, boolean spriteRenderer, boolean immediateRenderer) {
         InputState newInputState = new InputState();
 
-        //  ----- Parameters
-        newInputState.startConfig = startConfiguration.clone();
+        //  ----- Paramters
+        newInputState.resolutionWidth = Tools.Calc.lowerBounds(resolutionWidth, 16);
+        newInputState.resolutionWidth_ui = newInputState.resolutionWidth / uiScale;
+        newInputState.resolutionHeight = Tools.Calc.lowerBounds(resolutionHeight, 16);
+        newInputState.resolutionHeight_ui = newInputState.resolutionHeight / uiScale;
+        newInputState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
+        newInputState.gamePadSupport = gamePadSupport;
+        newInputState.uiScale = Tools.Calc.lowerBounds(uiScale, 1);
+        newInputState.spriteRenderer = spriteRenderer;
+        newInputState.immediateRenderer = immediateRenderer;
 
         // ----- Config
         newInputState.config = new Config();
         // -----  App
-        if (startConfiguration.spriteRenderer) {
+        if (newInputState.spriteRenderer) {
             newInputState.spriteBatch_app = new SpriteRenderer(16383);
             newInputState.spriteBatch_app.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         } else {
             newInputState.spriteBatch_app = null;
         }
-        if (startConfiguration.immediateRenderer) {
+        if (newInputState.immediateRenderer) {
             newInputState.immediateRenderer_app = new ImmediateRenderer();
         } else {
             newInputState.immediateRenderer_app = null;
         }
-        newInputState.camera_app = new OrthographicCamera(startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
-        newInputState.camera_app.setToOrtho(false, startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
+        newInputState.camera_app = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
+        newInputState.camera_app.setToOrtho(false, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.camera_app.position.set(0, 0, 0);
         newInputState.camera_app.zoom = 1f;
-        newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, startConfiguration.resolutionWidth, startConfiguration.resolutionHeight, false);
+        newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, false);
         newInputState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_app = new TextureRegion(newInputState.frameBuffer_app.getColorBufferTexture());
         newInputState.texture_app.flip(false, true);
@@ -141,27 +165,27 @@ public class UIEngine<T extends UIAdapter> {
         // -----  GUI
         newInputState.spriteBatch_ui = new SpriteRenderer(16383);
         newInputState.spriteBatch_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        if (startConfiguration.immediateRenderer) {
+        if (newInputState.immediateRenderer) {
             newInputState.immediateRenderer_ui = new ImmediateRenderer();
         }
-        newInputState.camera_ui = new OrthographicCamera(UICommons.uiResolutionWidth(newInputState),UICommons.uiResolutionHeight(newInputState));
-        newInputState.camera_ui.setToOrtho(false, UICommons.uiResolutionWidth(newInputState),UICommons.uiResolutionHeight(newInputState));
-        newInputState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, UICommons.uiResolutionWidth(newInputState),UICommons.uiResolutionHeight(newInputState), false);
+        newInputState.camera_ui = new OrthographicCamera(newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui);
+        newInputState.camera_ui.setToOrtho(false, newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui);
+        newInputState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui, false);
         newInputState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_ui = new TextureRegion(newInputState.frameBuffer_ui.getColorBufferTexture());
         newInputState.texture_ui.flip(false, true);
         // ----- UpScaler
-        newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(startConfiguration.viewportMode, startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
-        newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(startConfiguration.viewportMode);
-        newInputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, startConfiguration.resolutionWidth * newInputState.upscaleFactor_screen, startConfiguration.resolutionHeight * newInputState.upscaleFactor_screen, false);
+        newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(newInputState.viewportMode, newInputState.resolutionWidth, newInputState.resolutionHeight);
+        newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(newInputState.viewportMode);
+        newInputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.resolutionWidth * newInputState.upscaleFactor_screen, newInputState.resolutionHeight * newInputState.upscaleFactor_screen, false);
         newInputState.frameBuffer_screen.getColorBufferTexture().setFilter(newInputState.textureFilter_screen, newInputState.textureFilter_screen);
         newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
         newInputState.texture_screen.flip(false, true);
         // ----- Screen
         newInputState.spriteBatch_screen = new SpriteRenderer(2);
-        newInputState.camera_screen = new OrthographicCamera(startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
+        newInputState.camera_screen = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.camera_screen.setToOrtho(false);
-        newInputState.viewport_screen = UICommons.viewport_createViewport(startConfiguration.viewportMode, newInputState.camera_screen, startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
+        newInputState.viewport_screen = UICommons.viewport_createViewport(newInputState.viewportMode, newInputState.camera_screen, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         // -----  GUI
@@ -226,7 +250,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.pressedCheckBox = null;
         // ----- Controls
         newInputState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
-        newInputState.mouse_ui = new GridPoint2(UICommons.uiResolutionHeight(newInputState) / 2, UICommons.uiResolutionHeight(newInputState) / 2);
+        newInputState.mouse_ui = new GridPoint2(newInputState.resolutionWidth_ui / 2, newInputState.resolutionHeight_ui / 2);
         newInputState.mouse_app = new GridPoint2(0, 0);
         newInputState.mouse_delta = new Vector2(0, 0);
         newInputState.lastUIMouseHover = null;
@@ -235,7 +259,7 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.mouseToolPressed = false;
         newInputState.vector_fboCursor = new Vector3(0, 0, 0);
         newInputState.vector2_unproject = new Vector2(0, 0);
-        newInputState.mouse_emulated = new Vector2(UICommons.uiResolutionHeight(newInputState) / 2, UICommons.uiResolutionHeight(newInputState) / 2);
+        newInputState.mouse_emulated = new Vector2(newInputState.resolutionWidth_ui / 2, newInputState.resolutionHeight_ui / 2);
         newInputState.emulatedMouseLastMouseClick = 0;
         newInputState.keyBoardMouseSpeedUp = new Vector2(0, 0);
         newInputState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
@@ -248,10 +272,10 @@ public class UIEngine<T extends UIAdapter> {
         newInputState.animation_timer_ui = 0f;
         newInputState.tempSaveColor = new Color(Color.WHITE);
 
-        newInputState.camera_frustum = new OrthographicCamera(startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
-        newInputState.camera_frustum.setToOrtho(false, startConfiguration.resolutionWidth, startConfiguration.resolutionHeight);
+        newInputState.camera_frustum = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
+        newInputState.camera_frustum.setToOrtho(false, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.inputEvents = new InputEvents();
-        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents, startConfiguration.gamePadSupport);
+        newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents, newInputState.gamePadSupport);
 
         newInputState.itemInfo_listIndex = 0;
         newInputState.itemInfo_tabBarTabIndex = 0;
@@ -735,8 +759,8 @@ public class UIEngine<T extends UIAdapter> {
         }
 
         // Set to final
-        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, UICommons.uiResolutionWidth(inputState));
-        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, UICommons.uiResolutionHeight(inputState));
+        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.resolutionWidth_ui);
+        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.resolutionHeight_ui);
         inputState.mouse_delta.x = deltaX;
         inputState.mouse_delta.y = -deltaY;
         inputState.mouse_ui.x = MathUtils.round(inputState.mouse_emulated.x);
@@ -893,11 +917,11 @@ public class UIEngine<T extends UIAdapter> {
 
     private void mouseControl_enforceUIMouseBounds() {
         if (inputState.mouse_ui.x < 0) inputState.mouse_ui.x = 0;
-        if (inputState.mouse_ui.x > UICommons.uiResolutionWidth(inputState))
-            inputState.mouse_ui.x = UICommons.uiResolutionWidth(inputState);
+        if (inputState.mouse_ui.x > inputState.resolutionWidth_ui)
+            inputState.mouse_ui.x = inputState.resolutionWidth_ui;
         if (inputState.mouse_ui.y < 0) inputState.mouse_ui.y = 0;
-        if (inputState.mouse_ui.y > UICommons.uiResolutionHeight(inputState))
-            inputState.mouse_ui.y = UICommons.uiResolutionHeight(inputState);
+        if (inputState.mouse_ui.y > inputState.resolutionHeight_ui)
+            inputState.mouse_ui.y = inputState.resolutionHeight_ui;
     }
 
     private void mouseControl_updateGameMouseXY() {
@@ -905,7 +929,7 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.x = inputState.mouse_ui.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.mouse_ui.y;
         inputState.vector_fboCursor.z = 1;
-        inputState.camera_app.unproject(inputState.vector_fboCursor, 0, 0, inputState.startConfig.resolutionWidth,inputState.startConfig.resolutionHeight);
+        inputState.camera_app.unproject(inputState.vector_fboCursor, 0, 0, inputState.resolutionWidth_ui, inputState.resolutionHeight_ui);
         this.inputState.mouse_app.x = (int) inputState.vector_fboCursor.x;
         this.inputState.mouse_app.y = (int) inputState.vector_fboCursor.y;
     }
@@ -921,13 +945,13 @@ public class UIEngine<T extends UIAdapter> {
         inputState.vector_fboCursor.x = inputState.vector2_unproject.x;
         inputState.vector_fboCursor.y = Gdx.graphics.getHeight() - inputState.vector2_unproject.y;
         inputState.vector_fboCursor.z = 1;
-        inputState.camera_ui.unproject(inputState.vector_fboCursor, 0, 0, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionHeight);
+        inputState.camera_ui.unproject(inputState.vector_fboCursor, 0, 0, inputState.resolutionWidth_ui, inputState.resolutionHeight_ui);
 
         // Set to final
         inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_ui.x);
         inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_ui.y);
-        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, UICommons.uiResolutionWidth(inputState));
-        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, UICommons.uiResolutionHeight(inputState));
+        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.resolutionWidth_ui);
+        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.resolutionHeight_ui);
     }
 
     private void mouseControl_updateLastUIMouseHover() {
@@ -1873,16 +1897,16 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_setUIProjectionMatrix(OrthographicCamera camera) {
-        if (inputState.startConfig.spriteRenderer)
+        if (inputState.spriteRenderer)
             inputState.spriteBatch_ui.setProjectionMatrix(camera.combined);
-        if (inputState.startConfig.immediateRenderer)
+        if (inputState.immediateRenderer)
             inputState.immediateRenderer_ui.setProjectionMatrix(camera.combined);
     }
 
     private void render_setGameProjectionMatrix(OrthographicCamera camera) {
-        if (inputState.startConfig.spriteRenderer)
+        if (inputState.spriteRenderer)
             inputState.spriteBatch_app.setProjectionMatrix(camera.combined);
-        if (inputState.startConfig.immediateRenderer)
+        if (inputState.immediateRenderer)
             inputState.immediateRenderer_app.setProjectionMatrix(camera.combined);
     }
 
@@ -1923,7 +1947,7 @@ public class UIEngine<T extends UIAdapter> {
             inputState.spriteBatch_screen.setProjectionMatrix(inputState.camera_screen.combined);
             this.uiAdapter.renderComposite(inputState.spriteBatch_screen,
                     inputState.texture_app, inputState.texture_ui,
-                    inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionHeight,
+                    inputState.resolutionWidth, inputState.resolutionHeight,
                     UICommons.window_isModalOpen(inputState)
             );
             inputState.frameBuffer_screen.end();
@@ -1937,7 +1961,7 @@ public class UIEngine<T extends UIAdapter> {
                 inputState.spriteBatch_screen.begin();
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                inputState.spriteBatch_screen.draw(inputState.texture_screen, 0, 0, inputState.startConfig.resolutionWidth, inputState.startConfig.resolutionHeight);
+                inputState.spriteBatch_screen.draw(inputState.texture_screen, 0, 0, inputState.resolutionWidth, inputState.resolutionHeight);
                 inputState.spriteBatch_screen.end();
             }
         }
@@ -2279,7 +2303,7 @@ public class UIEngine<T extends UIAdapter> {
         boolean collidesDown = true;
 
 
-        if (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= UICommons.uiResolutionWidth(inputState)) {
+        if (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.resolutionWidth_ui) {
             collidesRight = false;
             //direction = 1;
         }
@@ -2291,7 +2315,7 @@ public class UIEngine<T extends UIAdapter> {
             collidesDown = false;
             //direction = 3;
         }
-        if (inputState.mouse_ui.y + ((tooltip_height + 2) * TILE_SIZE) <= UICommons.uiResolutionHeight(inputState)) { // Push down
+        if (inputState.mouse_ui.y + ((tooltip_height + 2) * TILE_SIZE) <= inputState.resolutionHeight_ui) { // Push down
             collidesUp = false;
             //direction = 4;
         }
@@ -2392,8 +2416,8 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawNotifications() {
         if (inputState.notifications.size() == 0) return;
         boolean grayscalePreNotification = render_isGrayscaleEnabled();
-        if(UICommons.window_isModalOpen(inputState)) render_setGrayscaleEnabled(true);
-        int width = (UICommons.uiResolutionWidth(inputState) % TILE_SIZE == 0) ? (UICommons.uiResolutionWidth(inputState) / TILE_SIZE) : ((UICommons.uiResolutionWidth(inputState) / TILE_SIZE) + 1);
+        if (UICommons.window_isModalOpen(inputState)) render_setGrayscaleEnabled(true);
+        int width = (inputState.resolutionWidth_ui % TILE_SIZE == 0) ? (inputState.resolutionWidth_ui / TILE_SIZE) : ((inputState.resolutionWidth_ui / TILE_SIZE) + 1);
 
         int y = 0;
         int yOffsetSlideFade = 0;
@@ -2406,10 +2430,10 @@ public class UIEngine<T extends UIAdapter> {
             render_saveTempColorBatch();
             render_batchSetColor(notification.color_r, notification.color_g, notification.color_b, notification.color_a);
             for (int ix = 0; ix < width; ix++) {
-                mediaManager.drawCMediaImage(inputState.spriteBatch_ui, UIBaseMedia.UI_NOTIFICATION_BAR, (ix * TILE_SIZE), UICommons.uiResolutionHeight(inputState) - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
+                mediaManager.drawCMediaImage(inputState.spriteBatch_ui, UIBaseMedia.UI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.resolutionHeight_ui - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
             }
             int xOffset = ((width * TILE_SIZE) / 2) - (render_textWidth(notification.font, notification.text) / 2) - notification.scroll;
-            render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (UICommons.uiResolutionHeight(inputState) - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
+            render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (inputState.resolutionHeight_ui - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
             y = y + 1;
             render_loadTempColorBatch();
         }
@@ -2421,7 +2445,8 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawWindow(Window window) {
         if (!window.visible) return;
         boolean preWindowGrayScaleShaderState = render_isGrayscaleEnabled();
-        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window) render_setGrayscaleEnabled(true);
+        if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow != window)
+            render_setGrayscaleEnabled(true);
 
         render_batchSetColor(window.color_r, window.color_g, window.color_b, window.color_a);
 
@@ -2465,7 +2490,7 @@ public class UIEngine<T extends UIAdapter> {
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
         float alpha = (component.addedToWindow != null ? (component.color_a * component.addedToWindow.color_a) : component.color_a);
-        boolean preComponentGrayScaleState =  render_isGrayscaleEnabled();
+        boolean preComponentGrayScaleState = render_isGrayscaleEnabled();
         if (component.disabled) render_setGrayscaleEnabled(true);
 
         render_batchSetColor(component.color_r, component.color_g, component.color_b, alpha);
@@ -2546,7 +2571,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean preListGrayScaleState =  render_isGrayscaleEnabled();
+                boolean preListGrayScaleState = render_isGrayscaleEnabled();
                 if (dragEnabled && !dragValid) render_setGrayscaleEnabled(true);
 
                 // List
@@ -2714,7 +2739,7 @@ public class UIEngine<T extends UIAdapter> {
                     }
                 }
 
-                boolean grayScaleBefore =  render_isGrayscaleEnabled();
+                boolean grayScaleBefore = render_isGrayscaleEnabled();
                 if (dragEnabled && !dragValid) render_setGrayscaleEnabled(true);
 
                 for (int ix = 0; ix < gridWidth; ix++) {
@@ -2908,7 +2933,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     private void render_setGrayscaleEnabled(boolean enabled) {
-        if(render_isGrayscaleEnabled() == enabled) return;
+        if (render_isGrayscaleEnabled() == enabled) return;
         inputState.spriteBatch_ui.setSaturation(enabled ? 0f : 0.5f);
         inputState.spriteBatch_ui.setLightness(enabled ? 0.45f : 0.5f);
     }
@@ -2958,19 +2983,20 @@ public class UIEngine<T extends UIAdapter> {
     private void render_batchSetColorWhite() {
         render_batchSetColor(1f, 1f, 1f, 1f);
     }
+
     private void render_batchSetColorWhite(float alpha) {
         render_batchSetColor(1f, 1f, 1f, alpha);
     }
 
     private void render_batchSetColor(float r, float g, float b, float a) {
-        if(render_isGrayscaleEnabled()){
+        if (render_isGrayscaleEnabled()) {
             final float AMNT = 0.8f;
             inputState.spriteBatch_ui.setColor(
-                   Tools.Calc.inBounds01(r*AMNT),
-                   Tools.Calc.inBounds01(g*AMNT),
-                   Tools.Calc.inBounds01(b*AMNT),
+                    Tools.Calc.inBounds01(r * AMNT),
+                    Tools.Calc.inBounds01(g * AMNT),
+                    Tools.Calc.inBounds01(b * AMNT),
                     a);
-        }else{
+        } else {
             inputState.spriteBatch_ui.setColor(r, g, b, a);
         }
     }
@@ -3021,12 +3047,12 @@ public class UIEngine<T extends UIAdapter> {
         inputState.appViewPorts.clear();
 
         // SpriteBatch
-        if (inputState.startConfig.spriteRenderer) inputState.spriteBatch_app.dispose();
+        if (inputState.spriteRenderer) inputState.spriteBatch_app.dispose();
         inputState.spriteBatch_ui.dispose();
 
         // ImmediateRenderer
-        if (inputState.startConfig.immediateRenderer) inputState.immediateRenderer_app.dispose();
-        if (inputState.startConfig.immediateRenderer) inputState.immediateRenderer_ui.dispose();
+        if (inputState.immediateRenderer) inputState.immediateRenderer_app.dispose();
+        if (inputState.immediateRenderer) inputState.immediateRenderer_ui.dispose();
 
         // Textures
         inputState.spriteBatch_screen.dispose();
@@ -3039,23 +3065,23 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public int getResolutionWidth() {
-        return inputState.startConfig.resolutionWidth;
+        return inputState.resolutionWidth;
     }
 
     public int getResolutionHeight() {
-        return inputState.startConfig.resolutionHeight;
+        return inputState.resolutionHeight;
     }
 
     public VIEWPORT_MODE getViewportMode() {
-        return inputState.startConfig.viewportMode;
+        return inputState.viewportMode;
     }
 
     public boolean isSpriteRendererEnabled() {
-        return inputState.startConfig.spriteRenderer;
+        return inputState.spriteRenderer;
     }
 
     public boolean isImmediateRendererEnabled() {
-        return inputState.startConfig.immediateRenderer;
+        return inputState.immediateRenderer;
     }
 
     public int getViewPortScreenX() {
@@ -3075,7 +3101,7 @@ public class UIEngine<T extends UIAdapter> {
     }
 
     public boolean isGamePadSupport() {
-        return inputState.startConfig.gamePadSupport;
+        return inputState.gamePadSupport;
     }
 
     public TextureRegion getTextureScreen() {
