@@ -2121,54 +2121,32 @@ public class UIEngine<T extends UIAdapter> {
                 return 12;
             } else if (x == (width - 1)) {
                 return 14;
-            } else {
-                return 13;
             }
-        } else {
-            return render_get16TilesCMediaIndex(x, y, width, height);
+            return 13;
         }
+        return render_get16TilesCMediaIndex(x, y, width, height);
     }
 
     private int render_get16TilesCMediaIndex(int x, int y, int width, int height) {
         if (width == 1 && height == 1) return 3;
         if (width == 1) {
-            if (y == 0) {
-                return 7;
-            } else if (y == height - 1) {
-                return 15;
-            } else {
-                return 11;
-            }
+            if (y == 0) return 7;
+            if (y == height - 1) return 15;
+            return 11;
         } else if (height == 1) {
-            if (x == 0) {
-                return 12;
-            } else if (x == width - 1) {
-                return 14;
-            } else {
-                return 13;
-            }
+            if (x == 0) return 12;
+            if (x == width - 1) return 14;
+            return 13;
         } else {
-            if (x == 0 && y == 0) {
-                return 8;
-            } else if (x == width - 1 && y == height - 1) {
-                return 2;
-            } else if (x == width - 1 && y == 0) {
-                return 10;
-            } else if (x == 0 && y == height - 1) {
-                return 0;
-            } else {
-                if (x == 0) {
-                    return 4;
-                } else if (x == width - 1) {
-                    return 6;
-                } else if (y == 0) {
-                    return 9;
-                } else if (y == height - 1) {
-                    return 1;
-                } else {
-                    return 5;
-                }
-            }
+            if (x == 0 && y == 0) return 8;
+            if (x == width - 1 && y == height - 1) return 2;
+            if (x == width - 1 && y == 0) return 10;
+            if (x == 0 && y == height - 1) return 0;
+            if (x == 0) return 4;
+            if (x == width - 1) return 6;
+            if (y == 0) return 9;
+            if (y == height - 1) return 1;
+            return 5;
         }
     }
 
