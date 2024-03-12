@@ -670,7 +670,7 @@ public class MediaManager {
 
     public void drawCMediaFont(SpriteRenderer batch, CMediaFont cMedia, float x, float y, String text, int maxWidth) {
         BitmapFont bitmapFont = getCMediaFont(cMedia);
-        bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
+        bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, true, "");
     }
 
     public void setCMediaFontColorWhite(CMediaFont font) {

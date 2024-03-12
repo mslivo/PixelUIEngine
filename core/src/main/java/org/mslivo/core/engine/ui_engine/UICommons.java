@@ -250,11 +250,11 @@ class UICommons {
     }
 
     static int component_getAbsoluteX(Component component) {
-        return component_getParentWindowX(component) + (component.x * UIEngine.TILE_SIZE) + component.offset_x;
+        return component_getParentWindowX(component) + component.x;
     }
 
     static int component_getAbsoluteY(Component component) {
-        return component_getParentWindowY(component) + (component.y * UIEngine.TILE_SIZE) + component.offset_y;
+        return component_getParentWindowY(component) + component.y;
     }
 
     static int component_getRelativeMouseX(int mouse_ui_x, Component component) {

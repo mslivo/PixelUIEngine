@@ -2582,7 +2582,7 @@ public class UIEngine<T extends UIAdapter> {
                     // Text
                     if (item != null) {
                         String text = list.listAction.text(item);
-                        render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, list.width * TILE_SIZE, list.listAction.icon(item), list.listAction.iconIndex(item));
+                        render_drawFont(list.font, text, alpha, UICommons.component_getAbsoluteX(list), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE, 1, 2, (list.width * TILE_SIZE), list.listAction.icon(item), list.listAction.iconIndex(item));
                     }
                 }
 
@@ -2949,7 +2949,9 @@ public class UIEngine<T extends UIAdapter> {
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             mediaManager.drawCMediaFont(inputState.spriteBatch_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
-            mediaManager.drawCMediaFont(inputState.spriteBatch_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text, maxWidth);
+            if(withIcon) maxWidth -= UIEngine.TILE_SIZE;
+            mediaManager.drawCMediaFont(inputState.spriteBatch_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text,
+                    maxWidth);
         }
         render_loadTempColorFont(font);
     }

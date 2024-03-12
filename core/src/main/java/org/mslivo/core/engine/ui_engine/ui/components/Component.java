@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public abstract class Component {
     public int x, y, width, height;
-    public int offset_x, offset_y;
     public ToolTip toolTip;
     public boolean updateToolTip;
     public float color_r, color_g, color_b,color_a;

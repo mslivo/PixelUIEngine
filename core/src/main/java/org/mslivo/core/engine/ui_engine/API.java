@@ -487,14 +487,13 @@ public class API {
         }
 
         public ScrollBarVertical list_CreateScrollBar(List list) {
-            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(list.x + list.width, list.y, list.height, new ScrollBarAction() {
+            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(0, 0, list.height, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolled) {
                     component.list.setScrolled(list, 1f - scrolled);
                 }
             });
-
-            component.setOffset(scrollBarVertical, list.offset_x, list.offset_y);
+            component.setPosition(scrollBarVertical, list.x+(list.width*UIEngine.TILE_SIZE), list.y);
 
             component.addUpdateAction(scrollBarVertical, new UpdateAction() {
                 float scrolledLast = -1;
@@ -635,8 +634,8 @@ public class API {
 
 
             Component[] componentl = new Component[]{colorCanvas, ok};
-            component.setOffset(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            component.setOffset(colorCanvas, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.move(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.move(colorCanvas, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             window.addComponents(modal, componentl);
 
             return modal;
@@ -824,8 +823,8 @@ public class API {
 
 
             Component[] componentArr = componentsList.toArray(new Component[]{});
-            component.setOffset(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            component.setOffset(inputTextField, UIEngine.TILE_SIZE / 2, 0);
+            component.move(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.move(inputTextField, UIEngine.TILE_SIZE / 2, 0);
             window.addComponents(modalWnd, componentArr);
             window.setWindowAction(modalWnd, new WindowAction() {
                 @Override
@@ -869,7 +868,7 @@ public class API {
 
 
             Component[] componentsArr = componentsList.toArray(new Component[]{});
-            component.setOffset(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.move(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             window.addComponents(modal, componentsArr);
             return modal;
         }
@@ -1028,7 +1027,7 @@ public class API {
             component.button.centerContent(noC);
 
             Component[] componentsl = new Component[]{textC, yesC, noC};
-            component.setOffset(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            component.move(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
             window.addComponents(modal, componentsl);
             return modal;
         }
@@ -3131,9 +3130,24 @@ public class API {
             UICommons.window_setPosition(inputState, window, x, y);
         }
 
-        public void move(Window window, int xRel, int yRel) {
+        public void setPositionGrid(Window window, int x, int y) {
             if (window == null) return;
-            setPosition(window, window.x + xRel, window.y + yRel);
+            setPosition(window, x*UIEngine.TILE_SIZE, y*UIEngine.TILE_SIZE);
+        }
+
+        public void move(Window window, int x, int y) {
+            if (window == null) return;
+            setPosition(window, window.x + x, window.y + y);
+        }
+
+        public void moveX(Window window, int x) {
+            if (window == null) return;
+            setPosition(window, window.x + x, window.y);
+        }
+
+        public void moveY(Window window, int y) {
+            if (window == null) return;
+            setPosition(window, window.x, window.y+y);
         }
 
         public void setSize(Window window, int width, int height) {
@@ -3452,17 +3466,14 @@ public class API {
 
     public class _Component {
         public final _Shape shape = new _Shape();
-
         public final _Button button = new _Button();
         public final _TabBar tabBar = new _TabBar();
         public final _Grid grid = new _Grid();
         public final _ScrollBar scrollBar = new _ScrollBar();
-
         public final _List list = new _List();
         public final _TextField textField = new _TextField();
         public final _Canvas canvas = new _Canvas();
         public final _Knob knob = new _Knob();
-
         public final _Text text = new _Text();
         public final _Image image = new _Image();
         public final _ComboBox comboBox = new _ComboBox();
@@ -3486,16 +3497,39 @@ public class API {
             component.y = y;
         }
 
-        public void setOffset(Component component, int x, int y) {
+        public void setPositionGrid(Component component, int x, int y) {
             if (component == null) return;
-            component.offset_x = x;
-            component.offset_y = y;
+            setPosition(component, x*UIEngine.TILE_SIZE, y*UIEngine.TILE_SIZE);
         }
 
+        public void moveX(Component[] components, int x){
+            if(component == null) return;
+            for(int i=0;i<components.length;i++) moveX(components[i],x);
+        }
 
-        public void setOffset(Component[] components, int x, int y) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setOffset(components[i], x, y);
+        public void moveX(Component component, int x){
+            if(component == null) return;
+            setPosition(component, component.x+x, component.y);
+        }
+
+        public void moveY(Component[] components, int y){
+            if(component == null) return;
+            for(int i=0;i<components.length;i++) moveY(components[i],y);
+        }
+
+        public void moveY(Component component, int y){
+            if(component == null) return;
+            setPosition(component, component.x, component.y+y);
+        }
+
+        public void move(Component[] components, int x, int y){
+            if(component == null) return;
+            for(int i=0;i<components.length;i++) move(components[i],x,y);
+        }
+
+        public void move(Component component, int x, int y){
+            if(component == null) return;
+            setPosition(component, component.x+x, component.y+y);
         }
 
         public void setDisabled(Component component, boolean disabled) {
@@ -3554,12 +3588,6 @@ public class API {
             if (component instanceof Canvas canvas) {
                 UICommons.canvas_resizeMap(canvas);
             }
-        }
-
-        public void setDimensions(Component component, int x, int y, int width, int height) {
-            if (component == null) return;
-            setPosition(component, x, y);
-            setSize(component, width, height);
         }
 
         public void setColor(Component[] components, Color color) {
@@ -3630,8 +3658,9 @@ public class API {
         }
 
         private void setComponentCommonInitValues(Component component, int x, int y, int width, int height, Color color1, Color color2) {
-            component.x = x;
-            component.y = y;
+            // Align to grid per default
+            component.x = (x * UIEngine.TILE_SIZE);
+            component.y = (y * UIEngine.TILE_SIZE);
             component.width = width;
             component.height = height;
             component.color_a = 1f;
@@ -3645,7 +3674,6 @@ public class API {
             component.updateActions = new ArrayList<>();
             component.data = null;
             component.name = "";
-            component.offset_x = component.offset_y = 0;
             component.visible = true;
             component.updateToolTip = false;
             component.addedToTab = null;
@@ -3666,22 +3694,22 @@ public class API {
 
         public int getAbsoluteX(Component component) {
             if (component == null) return 0;
-            return UICommons.component_getParentWindowX(component) + (component.x * UIEngine.TILE_SIZE) + component.offset_x;
+            return UICommons.component_getAbsoluteX(component);
         }
 
         public int getAbsoluteY(Component component) {
             if (component == null) return 0;
-            return UICommons.component_getParentWindowY(component) + (component.y * UIEngine.TILE_SIZE) + component.offset_y;
+            return UICommons.component_getAbsoluteY(component);
         }
 
-        public int getRealWidth(Component component) {
+        public int getAbsoluteWidt(Component component) {
             if (component == null) return 0;
-            return component.width * UIEngine.TILE_SIZE;
+            return UICommons.component_getAbsoluteWidth(component);
         }
 
-        public int getRealHeight(Component component) {
+        public int getAbsoluteHeight(Component component) {
             if (component == null) return 0;
-            return component.height * UIEngine.TILE_SIZE;
+            return UICommons.component_getAbsoluteHeight(component);
         }
 
         public boolean isAddedToWindow(Component component, Window window) {
@@ -3691,7 +3719,7 @@ public class API {
 
         public boolean isAddedToScreen(Component component) {
             if (component == null) return false;
-            return component != null && component.addedToScreen;
+            return component.addedToScreen;
         }
 
         public class _GameViewPort {
@@ -3962,15 +3990,14 @@ public class API {
                 button.offset_content_y = y;
             }
 
-            public void setToggleDisabled(Button button, boolean disabled){
-                button.toggleDisabled = disabled;
-            }
-
             public void setOffsetContent(Button[] buttons, int x, int y) {
                 if (buttons == null) return;
                 for (int i = 0; i < buttons.length; i++) setOffsetContent(buttons[i], x, y);
             }
 
+            public void setToggleDisabled(Button button, boolean disabled){
+                button.toggleDisabled = disabled;
+            }
 
             public void centerContent(Button[] buttons) {
                 if (buttons == null) return;
@@ -4777,6 +4804,11 @@ public class API {
                     if (canvasImage == null) return;
                     canvasImage.x = x;
                     canvasImage.y = y;
+                }
+
+                public void move(CanvasImage canvasImage, int x, int y) {
+                    if (canvasImage == null) return;
+                    setPosition(canvasImage, canvasImage.x+x, canvasImage.y+y);
                 }
 
                 public void setImage(CanvasImage canvasImage, CMediaGFX image) {
