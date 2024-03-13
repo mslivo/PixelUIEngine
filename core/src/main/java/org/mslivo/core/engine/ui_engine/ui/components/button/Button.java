@@ -8,6 +8,6 @@ public abstract class Button extends Component {
     public boolean pressed;
     public ButtonMode mode;
     public boolean toggleDisabled;
-    public int offset_content_x;
-    public int offset_content_y;
+    public int contentOffset_x;
+    public int contentOffset_y;
 }

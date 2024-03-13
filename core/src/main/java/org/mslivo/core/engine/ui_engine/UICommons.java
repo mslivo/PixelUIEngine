@@ -115,7 +115,7 @@ class UICommons {
         for (int iy = toY; iy >= fromY; iy -= UIEngine.TILE_SIZE) {
             for (int ix = fromX; ix <= toX; ix += UIEngine.TILE_SIZE) {
                 Object object = UICommons.component_getUIObjectAtPosition(inputState, ix, iy);
-                if(!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)){
+                if (!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)) {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
                     float distance = Tools.Calc.distanceFast(component_getAbsoluteX(component) + (component_getAbsoluteWidth(component) / 2),
@@ -224,7 +224,7 @@ class UICommons {
     }
 
     static void window_addToScreenAsModal(InputState inputState, Window window) {
-        if(inputState.modalWindow == null) {
+        if (inputState.modalWindow == null) {
             window.alwaysOnTop = true;
             window.visible = true;
             window.folded = false;
@@ -232,12 +232,12 @@ class UICommons {
             inputState.modalWindow = window;
             UICommons.window_center(inputState, window);
             UICommons.window_addToScreen(inputState, window);
-        }else{
+        } else {
             inputState.modalWindowQueue.add(window);
         }
     }
 
-    static void window_center(InputState inputState, Window window){
+    static void window_center(InputState inputState, Window window) {
         int centerX = (inputState.resolutionWidth_ui / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
         int centerY = (inputState.resolutionHeight_ui / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
         window_setPosition(inputState, window, centerX, centerY);
@@ -251,9 +251,9 @@ class UICommons {
         if (window.windowAction != null) window.windowAction.onAdd();
     }
 
-    static boolean window_close(InputState inputState, Window window){
-        for (int i = 0; i < window.components.size(); i++){
-            if(window.components.get(i).name.equals(UIEngine.WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton){
+    static boolean window_close(InputState inputState, Window window) {
+        for (int i = 0; i < window.components.size(); i++) {
+            if (window.components.get(i).name.equals(UIEngine.WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton) {
                 if (closeButton.buttonAction != null) {
                     UICommons.button_press(closeButton);
                     UICommons.button_release(closeButton);
@@ -273,7 +273,20 @@ class UICommons {
         resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onRemove();
         // Add Next Modal if in queue
-        if(inputState.modalWindowQueue.size() > 0) window_addToScreenAsModal(inputState,inputState.modalWindowQueue.poll());
+        if (inputState.modalWindowQueue.size() > 0)
+            window_addToScreenAsModal(inputState, inputState.modalWindowQueue.poll());
+    }
+
+    static void component_setSize(InputState inputState, Component component, int width, int height) {
+        component.width = Tools.Calc.lowerBounds(width, 1);
+        component.height = Tools.Calc.lowerBounds(height, 1);
+
+        if (component instanceof AppViewPort appViewPort) {
+            appViewPort_resizeCameraTextureAndFrameBuffer(appViewPort);
+        }
+        if (component instanceof Canvas canvas) {
+            canvas_resizeMap(canvas);
+        }
     }
 
     static int component_getParentWindowX(Component component) {
@@ -403,11 +416,13 @@ class UICommons {
     }
 
     static void checkbox_check(CheckBox checkBox) {
+        if (checkBox.checked) return;
         checkBox.checked = true;
         if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
     }
 
     static void checkbox_unCheck(CheckBox checkBox) {
+        if (!checkBox.checked) return;
         checkBox.checked = false;
         if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
     }
@@ -636,16 +651,16 @@ class UICommons {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
-            imageButton.offset_content_x = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
-            imageButton.offset_content_y = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
+            imageButton.contentOffset_x = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
+            imageButton.contentOffset_y = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
             int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
             int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
-            textButton.offset_content_x = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
-            textButton.offset_content_y = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
+            textButton.contentOffset_x = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
+            textButton.contentOffset_y = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
         }
     }
 
@@ -792,7 +807,6 @@ class UICommons {
         component.addedToWindow.components.remove(component);
         resetActivelyUsedUIReferences(inputState);
     }
-
 
     static void tab_removeComponent(Tab tab, Component component) {
         if (component.addedToTab != tab) return;
@@ -983,27 +997,27 @@ class UICommons {
     }
 
     static boolean list_canDragIntoScreen(List list) {
-        return list.listAction != null && list.listAction.canDragIntoScreen();
+        return list.dragEnabled && list.dragOutEnabled && list.listAction != null && list.listAction.canDragIntoScreen();
     }
 
     static boolean grid_canDragIntoScreen(Grid grid) {
-        return grid.gridAction != null && grid.gridAction.canDragIntoScreen();
+        return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction != null && grid.gridAction.canDragIntoScreen();
     }
 
     static boolean list_canDragIntoList(InputState inputState, List list) {
-        if (list == null) return false;
-        if (inputState.draggedList != null) {
-            if (inputState.draggedList == list) return true; // into itself
-            return list.dragInEnabled &&
-                    !list.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromList(inputState.draggedList);
-        } else if (inputState.draggedGrid != null) {
-            return list.dragInEnabled &&
-                    !list.disabled && !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
-                    list.listAction != null && list.listAction.canDragFromGrid(inputState.draggedGrid);
-        } else {
-            return false;
+        List draggedList = inputState.draggedList;
+        Grid draggedGrid = inputState.draggedGrid;
+
+        if (draggedList != null && draggedList == list && draggedList.dragEnabled) return true; // Into itself
+
+        if (list.dragInEnabled && !list.disabled && list.listAction != null) {
+            return !draggedList.disabled && draggedList.dragOutEnabled &&
+                    list.listAction.canDragFromList(inputState.draggedList);
+        } else if (draggedGrid != null) {
+            return !draggedGrid.disabled && draggedGrid.dragOutEnabled &&
+                    list.listAction.canDragFromGrid(draggedGrid);
         }
+        return false;
     }
 
     static void tabBar_updateItemInfoAtMousePosition(InputState inputState, TabBar tabBar) {
@@ -1085,21 +1099,23 @@ class UICommons {
 
 
     static boolean grid_canDragIntoGrid(InputState inputState, Grid grid) {
-        if (inputState.draggedGridItem != null) {
-            if (inputState.draggedGrid == null || grid == null) return false;
-            if (inputState.draggedGrid == grid) return true; // into itself
-            return grid.dragInEnabled &&
-                    !grid.disabled && !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
-                    grid.gridAction != null && grid.gridAction.canDragFromGrid(inputState.draggedGrid);
-        } else if (inputState.draggedListItem != null) {
-            if (inputState.draggedList == null || grid == null) return false;
-            return grid.dragInEnabled &&
-                    !grid.disabled && !inputState.draggedList.disabled && inputState.draggedList.dragOutEnabled &&
-                    grid.gridAction != null && grid.gridAction.canDragFromList(inputState.draggedList);
-        } else {
-            return false;
+        List draggedList = inputState.draggedList;
+        Grid draggedGrid = inputState.draggedGrid;
+
+        if (draggedGrid != null && draggedGrid == grid && draggedGrid.dragEnabled) return true; // Into itself
+
+        if (grid.dragInEnabled && !grid.disabled && grid.gridAction != null) {
+            if (inputState.draggedGridItem != null) {
+                return !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
+                        grid.gridAction.canDragFromGrid(inputState.draggedGrid);
+            } else if (inputState.draggedListItem != null) {
+                return !draggedList.disabled && draggedList.dragOutEnabled &&
+                        grid.gridAction.canDragFromList(draggedList);
+            }
         }
+        return false;
     }
+
 
     static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar) {
         findCharLoop:

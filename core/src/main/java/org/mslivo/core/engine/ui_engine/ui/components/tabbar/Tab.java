@@ -16,7 +16,6 @@ public class Tab {
     public CMediaGFX icon;
     public ArrayList<Component> components;
     public int iconIndex;
-    public int content_offset_x;
     public String name;
     public Object data;
 }

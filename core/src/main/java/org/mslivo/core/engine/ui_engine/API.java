@@ -107,6 +107,7 @@ public class API {
         this.inputState = inputState;
         this.mediaManager = mediaManager;
     }
+
     // ##### PRIVATE Fields #####
     private final InputState inputState;
     private final MediaManager mediaManager;
@@ -119,31 +120,31 @@ public class API {
         }
 
         public Window create(int x, int y, int width, int height) {
-            return create(x,y,width, height,"",null,0,null, false,true, true, true);
+            return create(x, y, width, height, "", null, 0, null, false, true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title) {
-            return create(x,y,width, height,title,null,0,null, false,true, true, true);
+            return create(x, y, width, height, title, null, 0, null, false, true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex) {
-            return create(x,y,width, height,title,icon,iconIndex,null, false,true, true, true);
+            return create(x, y, width, height, title, icon, iconIndex, null, false, true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction) {
-            return create(x,y,width, height,title,icon,iconIndex,windowAction, false,true, true, true);
+            return create(x, y, width, height, title, icon, iconIndex, windowAction, false, true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
-            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,true, true, true);
+            return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, true, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
-            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,moveAble, true, true);
+            return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, true, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-            return create(x,y,width, height,title,icon,iconIndex,windowAction, alwaysOnTop,moveAble, hasTitleBar, true);
+            return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, hasTitleBar, true);
         }
 
         public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
@@ -174,7 +175,6 @@ public class API {
             window.components = new ArrayList<>();
             return window;
         }
-
 
         public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
             if (window == null || messageReceiverAction == null) return;
@@ -239,67 +239,43 @@ public class API {
             return window.addedToScreen;
         }
 
-        private void setColorFunction(Window window, Color color, int setColorMode, Class[] classes,
-                                      boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
-            if (classes == null) classes = new Class[]{};
-            if (windowColor) setColor(window, color);
-            for (int i = 0; i < window.components.size(); i++) {
-                Component component = window.components.get(i);
-                boolean match = setColorMode == 1 ? false : true;
-                classLoop:
-                for (int i2 = 0; i2 < classes.length; i2++) {
-                    if (classes[i2] == component.getClass()) {
-                        match = setColorMode == 1 ? true : false;
-                        break classLoop;
-                    }
-                }
-                if (match) {
-                    if (componentColor1) API.this.component.setColor(component, color);
-                    if (componentColor2) API.this.component.setColor2(component, color);
-                    if (component instanceof ComboBox comboBox) {
-                        for (int i2 = 0; i2 < comboBox.comboBoxItems.size(); i2++)
-                            API.this.component.comboBox.item.setColor(comboBox.comboBoxItems.get(i2), color);
-                    }
-                }
-            }
-        }
 
         public void setColorEverything(Window window, Color color) {
-            setColorFunction(window, color, 2, null,
+            setColorInternal(window, color, 2, null,
                     true, true, true, true);
         }
 
         public void setColorEverything(Window window, Color color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, 2, null,
+            setColorInternal(window, color, 2, null,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
         public void setColorEverythingExcept(Window window, Color color, Class[] exceptions) {
-            setColorFunction(window, color, 2, exceptions,
+            setColorInternal(window, color, 2, exceptions,
                     true, true, true, true);
         }
 
         public void setColorEverythingExcept(Window window, Color color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, 2, exceptions,
+            setColorInternal(window, color, 2, exceptions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
 
         public void setColorEverythingInclude(Window window, Color color, Class[] inclusions) {
-            setColorFunction(window, color, 1, inclusions,
+            setColorInternal(window, color, 1, inclusions,
                     true, true, true, true);
         }
 
         public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
-            setColorFunction(window, color, 1, inclusions,
+            setColorInternal(window, color, 1, inclusions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
-        public int getRealWidth(Window window) {
+        public int realWidth(Window window) {
             return UICommons.window_getAbsoluteWidth(window);
         }
 
-        public int getRealHeight(Window window) {
+        public int realHeight(Window window) {
             return UICommons.window_getAbsoluteHeight(window);
         }
 
@@ -457,7 +433,7 @@ public class API {
 
         public void setPositionGrid(Window window, int x, int y) {
             if (window == null) return;
-            setPosition(window, x*UIEngine.TILE_SIZE, y*UIEngine.TILE_SIZE);
+            setPosition(window, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
         }
 
         public void move(Window window, int x, int y) {
@@ -472,7 +448,7 @@ public class API {
 
         public void moveY(Window window, int y) {
             if (window == null) return;
-            setPosition(window, window.x, window.y+y);
+            setPosition(window, window.x, window.y + y);
         }
 
         public void setSize(Window window, int width, int height) {
@@ -485,7 +461,34 @@ public class API {
             if (window == null) return;
             window.title = Tools.Text.validString(title);
         }
+
+        private void setColorInternal(Window window, Color color, int setColorMode, Class[] classes,
+                                      boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
+            if (classes == null) classes = new Class[]{};
+            if (windowColor) setColor(window, color);
+            for (int i = 0; i < window.components.size(); i++) {
+                Component c = window.components.get(i);
+                boolean match = setColorMode == 1 ? false : true;
+                classLoop:
+                for (int i2 = 0; i2 < classes.length; i2++) {
+                    if (classes[i2] == c.getClass()) {
+                        match = setColorMode == 1 ? true : false;
+                        break classLoop;
+                    }
+                }
+                if (match) {
+                    if (componentColor1) component.setColor(c, color);
+                    if (componentColor2) component.setColor2(c, color);
+                    if (comboBoxItemColor && c instanceof ComboBox comboBox) {
+                        for (int i2 = 0; i2 < comboBox.comboBoxItems.size(); i2++)
+                            component.comboBox.item.setColor(comboBox.comboBoxItems.get(i2), color);
+                    }
+                }
+            }
+        }
+
     }
+
     public class _Component {
         public final _Shape shape = new _Shape();
         public final _Button button = new _Button();
@@ -502,247 +505,6 @@ public class API {
         public final _ProgressBar progressBar = new _ProgressBar();
         public final _CheckBox checkBox = new _CheckBox();
         public final _GameViewPort gameViewPort = new _GameViewPort();
-
-        public void setToolTip(Component component, ToolTip tooltip) {
-            if (component == null) return;
-            component.toolTip = tooltip;
-        }
-
-        public void forceToolTipUpdate(Component component) {
-            if (component == null) return;
-            component.updateToolTip = true;
-        }
-
-        public void setPosition(Component component, int x, int y) {
-            if (component == null) return;
-            component.x = x;
-            component.y = y;
-        }
-
-        public void setPositionGrid(Component component, int x, int y) {
-            if (component == null) return;
-            setPosition(component, x*UIEngine.TILE_SIZE, y*UIEngine.TILE_SIZE);
-        }
-
-        public void moveX(Component[] components, int x){
-            if(component == null) return;
-            for(int i=0;i<components.length;i++) moveX(components[i],x);
-        }
-
-        public void moveX(Component component, int x){
-            if(component == null) return;
-            setPosition(component, component.x+x, component.y);
-        }
-
-        public void moveY(Component[] components, int y){
-            if(component == null) return;
-            for(int i=0;i<components.length;i++) moveY(components[i],y);
-        }
-
-        public void moveY(Component component, int y){
-            if(component == null) return;
-            setPosition(component, component.x, component.y+y);
-        }
-
-        public void move(Component[] components, int x, int y){
-            if(component == null) return;
-            for(int i=0;i<components.length;i++) move(components[i],x,y);
-        }
-
-        public void move(Component component, int x, int y){
-            if(component == null) return;
-            setPosition(component, component.x+x, component.y+y);
-        }
-
-        public void setDisabled(Component component, boolean disabled) {
-            if (component == null) return;
-            component.disabled = disabled;
-        }
-
-        public void setDisabled(Component[] components, boolean disabled) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setDisabled(components, disabled);
-        }
-
-        public void addUpdateAction(Component component, UpdateAction updateAction) {
-            if (component == null || updateAction == null) return;
-            component.updateActions.add(updateAction);
-        }
-
-        public void addUpdateActions(Component component, UpdateAction[] updateActions) {
-            if (component == null || updateActions == null) return;
-            for (int i = 0; i < updateActions.length; i++) addUpdateAction(component, updateActions[i]);
-        }
-
-        public void removeUpdateAction(Component component, UpdateAction updateAction) {
-            if (component == null || updateAction == null) return;
-            component.updateActions.remove(updateAction);
-        }
-
-        public void removeUpdateActions(Component component, UpdateAction[] updateActions) {
-            if (component == null || updateActions == null) return;
-            for (int i = 0; i < updateActions.length; i++) removeUpdateAction(component, updateActions[i]);
-        }
-
-        public void removeAllUpdateActions(Component component) {
-            if (component == null) return;
-            removeUpdateActions(component, component.updateActions.toArray(new UpdateAction[]{}));
-        }
-
-        public void setName(Component component, String name) {
-            if (component == null) return;
-            component.name = Tools.Text.validString(name);
-        }
-
-        public void setCustomData(Component component, Object customData) {
-            if (component == null) return;
-            component.data = customData;
-        }
-
-        public void setSize(Component component, int width, int height) {
-            if (component == null) return;
-            component.width = Tools.Calc.lowerBounds(width, 1);
-            component.height = Tools.Calc.lowerBounds(height, 1);
-
-            if (component instanceof AppViewPort appViewPort) {
-                UICommons.appViewPort_resizeCameraTextureAndFrameBuffer(appViewPort);
-            }
-            if (component instanceof Canvas canvas) {
-                UICommons.canvas_resizeMap(canvas);
-            }
-        }
-
-        public void setColor(Component[] components, Color color) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setColor(components[i], color);
-        }
-
-        public void setColor(Component component, Color color) {
-            if (component == null || color == null) return;
-            setColor(component, color.r, color.g, color.b, color.a);
-        }
-
-        public void setColor(Component component, float r, float g, float b, float a) {
-            if (component == null) return;
-            component.color_r = r;
-            component.color_g = g;
-            component.color_b = b;
-            component.color_a = a;
-        }
-
-        public void setColor2(Component[] components, Color color2) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setColor2(components[i], color2);
-        }
-
-        public void setColor2(Component component, Color color) {
-            if (component == null || color == null) return;
-            setColor2(component, color.r, color.g, color.b);
-        }
-
-        public void setColor2(Component component, float r, float g, float b) {
-            if (component == null) return;
-            component.color2_r = r;
-            component.color2_g = g;
-            component.color2_b = b;
-        }
-
-        public void setColor1And2(Component component, Color color) {
-            if (component == null) return;
-            setColor(component, color);
-            setColor2(component, color);
-        }
-
-        public void setColor1And2(Component[] components, Color color) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) {
-                setColor(components[i], color);
-                setColor2(components[i], color);
-            }
-        }
-
-        public void setAlpha(Component[] components, float alpha) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setAlpha(components[i], alpha);
-        }
-
-        public void setAlpha(Component component, float alpha) {
-            if (component == null) return;
-            component.color_a = alpha;
-        }
-
-        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height) {
-            setComponentCommonInitValues(component, x, y, width, height, inputState.config.component_defaultColor, inputState.config.component_defaultColor);
-        }
-
-        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height, Color color) {
-            setComponentCommonInitValues(component, x, y, width, height, color, color);
-        }
-
-        private void setComponentCommonInitValues(Component component, int x, int y, int width, int height, Color color1, Color color2) {
-            // Align to grid per default
-            component.x = (x * UIEngine.TILE_SIZE);
-            component.y = (y * UIEngine.TILE_SIZE);
-            component.width = width;
-            component.height = height;
-            component.color_a = 1f;
-            component.color_r = color1.r;
-            component.color_g = color1.g;
-            component.color_b = color1.b;
-            component.color2_r = color2.r;
-            component.color2_g = color2.g;
-            component.color2_b = color2.b;
-            component.disabled = false;
-            component.updateActions = new ArrayList<>();
-            component.data = null;
-            component.name = "";
-            component.visible = true;
-            component.updateToolTip = false;
-            component.addedToTab = null;
-            component.addedToWindow = null;
-            component.toolTip = null;
-            component.addedToScreen = false;
-        }
-
-        public void setVisible(Component component, boolean visible) {
-            if (component == null) return;
-            component.visible = visible;
-        }
-
-        public void setVisible(Component[] components, boolean visible) {
-            if (components == null) return;
-            for (int i = 0; i < components.length; i++) setVisible(components[i], visible);
-        }
-
-        public int getAbsoluteX(Component component) {
-            if (component == null) return 0;
-            return UICommons.component_getAbsoluteX(component);
-        }
-
-        public int getAbsoluteY(Component component) {
-            if (component == null) return 0;
-            return UICommons.component_getAbsoluteY(component);
-        }
-
-        public int getAbsoluteWidt(Component component) {
-            if (component == null) return 0;
-            return UICommons.component_getAbsoluteWidth(component);
-        }
-
-        public int getAbsoluteHeight(Component component) {
-            if (component == null) return 0;
-            return UICommons.component_getAbsoluteHeight(component);
-        }
-
-        public boolean isAddedToWindow(Component component, Window window) {
-            if (component == null || window == null) return false;
-            return component.addedToWindow != null && component.addedToWindow == window;
-        }
-
-        public boolean isAddedToScreen(Component component) {
-            if (component == null) return false;
-            return component.addedToScreen;
-        }
 
         public class _GameViewPort {
 
@@ -765,7 +527,7 @@ public class API {
             public AppViewPort create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
                 AppViewPort appViewPort = new AppViewPort();
                 appViewPort.updateTimer = 0;
-                setComponentCommonInitValues(appViewPort, x, y, width, height, Color.WHITE);
+                setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.WHITE);
                 int viewportWidth = appViewPort.width * UIEngine.TILE_SIZE;
                 int viewportHeight = appViewPort.height * UIEngine.TILE_SIZE;
                 appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
@@ -877,20 +639,20 @@ public class API {
         public class _ProgressBar {
 
             public ProgressBar create(int x, int y, int width) {
-                return create(x,y,width,0f, true, false);
+                return create(x, y, width, 0f, true, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress) {
-                return create(x,y,width,progress,true, false);
+                return create(x, y, width, progress, true, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText) {
-                return create(x,y,width,progress,progressText, false);
+                return create(x, y, width, progress, progressText, false);
             }
 
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
                 ProgressBar progressBar = new ProgressBar();
-                setComponentCommonInitValues(progressBar, x, y, width, 1, inputState.config.component_defaultColor);
+                setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, inputState.config.component_defaultColor);
                 progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
                 progressBar.progressText = progressText;
                 progressBar.progressText2Decimal = progressText2Decimal;
@@ -924,7 +686,7 @@ public class API {
 
             public Shape create(int x, int y, int width, int height, ShapeType shapeType) {
                 Shape shape = new Shape();
-                setComponentCommonInitValues(shape, x, y, width, height, inputState.config.component_defaultColor);
+                setComponentCommonInitValuesInternal(shape, x, y, width, height, inputState.config.component_defaultColor);
                 shape.shapeType = shapeType;
                 return shape;
             }
@@ -942,125 +704,32 @@ public class API {
 
             public final _ImageButton imageButton = new _ImageButton();
 
-            private void setButtonCommonInitValues(Button button, ButtonAction buttonAction, ButtonMode buttonMode, boolean togglePressed) {
-                button.buttonAction = buttonAction;
-                button.mode = buttonMode;
-                button.offset_content_x = 0;
-                button.offset_content_y = 0;
-                button.pressed = button.mode == ButtonMode.TOGGLE ? togglePressed : false;
-                button.toggleDisabled = false;
-            }
-
             private ButtonAction defaultButtonAction() {
                 return new ButtonAction() {
                 };
             }
 
-            public void setButtonAction(Button button, ButtonAction buttonAction) {
-                if (button == null) return;
-                button.buttonAction = buttonAction;
-            }
-
-            public void press(Button button) {
-                if (button == null) return;
-                UICommons.button_press(button);
-            }
-
-            public void press(Button[] buttons, boolean pressed) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) press(buttons[i]);
-            }
-
-            public void release(Button button) {
-                if (button == null) return;
-                UICommons.button_release(button);
-            }
-
-            public void release(Button[] buttons, boolean pressed) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) release(buttons[i]);
-            }
-
-            public void toggle(Button button) {
-                if (button == null) return;
-                UICommons.button_toggle(button);
-            }
-
-            public void toggle(Button[] buttons) {
-                if (button == null) return;
-                for (int i = 0; i < buttons.length; i++) toggle(buttons[i]);
-            }
-
-            public void toggle(Button button, boolean pressed) {
-                if (button == null) return;
-                UICommons.button_toggle(button, pressed);
-            }
-
-            public void toggle(Button[] buttons, boolean pressed) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) toggle(buttons[i], pressed);
-            }
-
-            public void setButtonMode(Button button, ButtonMode buttonMode) {
-                if (button == null) return;
-                button.mode = buttonMode;
-            }
-
-            public void setOffsetContent(Button button, int x, int y) {
-                if (button == null) return;
-                button.offset_content_x = x;
-                button.offset_content_y = y;
-            }
-
-            public void setOffsetContent(Button[] buttons, int x, int y) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) setOffsetContent(buttons[i], x, y);
-            }
-
-            public void setToggleDisabled(Button button, boolean disabled){
-                button.toggleDisabled = disabled;
-            }
-
-            public void centerContent(Button[] buttons) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) centerContent(buttons[i]);
-            }
-
-            public void disableAndRemoveAction(Button button) {
-                setDisabled(button, true);
-                setButtonAction(button, null);
-            }
-
-            public void disableAndRemoveAction(Button[] buttons) {
-                if (buttons == null) return;
-                for (int i = 0; i < buttons.length; i++) disableAndRemoveAction(buttons[i]);
-            }
-
-            public void centerContent(Button button) {
-                UICommons.button_centerContent(mediaManager, button);
-            }
-
             public class _TextButton {
                 public TextButton create(int x, int y, int width, int height, String text) {
-                    return create(x, y, width, height, text, defaultButtonAction(), null,0, ButtonMode.DEFAULT, false);
+                    return create(x, y, width, height, text, defaultButtonAction(), null, 0, ButtonMode.DEFAULT, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                    return create(x, y, width, height, text, buttonAction, null,0, ButtonMode.DEFAULT, false);
+                    return create(x, y, width, height, text, buttonAction, null, 0, ButtonMode.DEFAULT, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex) {
-                    return create(x, y, width, height, text, buttonAction, icon,iconIndex, ButtonMode.DEFAULT, false);
+                    return create(x, y, width, height, text, buttonAction, icon, iconIndex, ButtonMode.DEFAULT, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode) {
-                    return create(x, y, width, height, text, buttonAction, icon,iconIndex, buttonMode, false);
+                    return create(x, y, width, height, text, buttonAction, icon, iconIndex, buttonMode, false);
                 }
 
                 public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode, boolean togglePressed) {
                     TextButton textButton = new TextButton();
-                    setComponentCommonInitValues(textButton, x, y, width, height);
-                    setButtonCommonInitValues(textButton, buttonAction, buttonMode,  togglePressed);
+                    setComponentCommonInitValuesInternal(textButton, x, y, width, height);
+                    setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                     textButton.text = Tools.Text.validString(text);
                     textButton.font = inputState.config.component_defaultFont;
                     textButton.icon = icon;
@@ -1078,7 +747,6 @@ public class API {
                     if (textButton == null) return;
                     textButton.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
                 }
-
 
                 public void setText(TextButton textButton, String text) {
                     if (textButton == null) return;
@@ -1112,8 +780,8 @@ public class API {
 
                 public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, boolean togglePressed) {
                     ImageButton imageButton = new ImageButton();
-                    setComponentCommonInitValues(imageButton, x, y, width, height, inputState.config.component_defaultColor, Color.WHITE);
-                    setButtonCommonInitValues(imageButton, buttonAction, buttonMode, togglePressed);
+                    setComponentCommonInitValuesInternal(imageButton, x, y, width, height, inputState.config.component_defaultColor, Color.WHITE);
+                    setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                     imageButton.image = image;
                     imageButton.arrayIndex = arrayIndex;
                     UICommons.button_centerContent(mediaManager, imageButton);
@@ -1130,6 +798,88 @@ public class API {
                     imageButton.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                 }
 
+            }
+
+            public void setButtonAction(Button button, ButtonAction buttonAction) {
+                if (button == null) return;
+                button.buttonAction = buttonAction;
+            }
+
+            public void press(Button button) {
+                if (button == null) return;
+                UICommons.button_press(button);
+            }
+
+            public void press(Button[] buttons, boolean pressed) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) press(buttons[i]);
+            }
+
+            public void release(Button button) {
+                if (button == null) return;
+                UICommons.button_release(button);
+            }
+
+            public void release(Button[] buttons) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) release(buttons[i]);
+            }
+
+            public void toggle(Button button) {
+                if (button == null) return;
+                UICommons.button_toggle(button);
+            }
+
+            public void toggle(Button[] buttons) {
+                if (button == null) return;
+                for (int i = 0; i < buttons.length; i++) toggle(buttons[i]);
+            }
+
+            public void toggle(Button button, boolean pressed) {
+                if (button == null) return;
+                UICommons.button_toggle(button, pressed);
+            }
+
+            public void toggle(Button[] buttons, boolean pressed) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) toggle(buttons[i], pressed);
+            }
+
+            public void setButtonMode(Button button, ButtonMode buttonMode) {
+                if (button == null) return;
+                button.mode = buttonMode;
+            }
+
+            public void setContentOffset(Button button, int x, int y) {
+                if (button == null) return;
+                button.contentOffset_x = x;
+                button.contentOffset_y = y;
+            }
+
+            public void setContentOffset(Button[] buttons, int x, int y) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) setContentOffset(buttons[i], x, y);
+            }
+
+            public void setToggleDisabled(Button button, boolean disabled) {
+                button.toggleDisabled = disabled;
+            }
+
+            public void centerContent(Button button) {
+                UICommons.button_centerContent(mediaManager, button);
+            }
+            public void centerContent(Button[] buttons) {
+                if (buttons == null) return;
+                for (int i = 0; i < buttons.length; i++) centerContent(buttons[i]);
+            }
+
+            private void setButtonCommonInitValuesInternal(Button button, ButtonAction buttonAction, ButtonMode buttonMode, boolean togglePressed) {
+                button.buttonAction = buttonAction;
+                button.mode = buttonMode;
+                button.contentOffset_x = 0;
+                button.contentOffset_y = 0;
+                button.pressed = button.mode == ButtonMode.TOGGLE ? togglePressed : false;
+                button.toggleDisabled = false;
             }
 
         }
@@ -1150,7 +900,7 @@ public class API {
 
             public CheckBox create(int x, int y, String text, CheckBoxStyle checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked) {
                 CheckBox checkBox = new CheckBox();
-                setComponentCommonInitValues(checkBox, x, y, 1, 1, Color.WHITE);
+                setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, Color.WHITE);
                 checkBox.text = Tools.Text.validString(text);
                 checkBox.checkBoxStyle = checkBoxStyle;
                 checkBox.checkBoxAction = checkBoxAction;
@@ -1169,12 +919,22 @@ public class API {
                 checkBox.font = font;
             }
 
+            public void check(CheckBox checkBox) {
+                if (checkBox == null) return;
+                UICommons.checkbox_check(checkBox);
+            }
+
+            public void unCheck(CheckBox checkBox) {
+                if (checkBox == null) return;
+                UICommons.checkbox_unCheck(checkBox);
+            }
+
             public void setChecked(CheckBox checkBox, boolean checked) {
                 if (checkBox == null) return;
                 if (checked) {
-                    UICommons.checkbox_check(checkBox);
+                    check(checkBox);
                 } else {
-                    UICommons.checkbox_unCheck(checkBox);
+                    unCheck(checkBox);
                 }
             }
 
@@ -1216,7 +976,7 @@ public class API {
 
             public TabBar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
                 TabBar tabBar = new TabBar();
-                setComponentCommonInitValues(tabBar, x, y, width, (bigIconMode ? 2 : 1));
+                setComponentCommonInitValuesInternal(tabBar, x, y, width, (bigIconMode ? 2 : 1));
                 tabBar.tabBarAction = tabBarAction;
                 tabBar.border = border;
                 tabBar.borderHeight = Tools.Calc.lowerBounds(borderHeight, 0);
@@ -1258,22 +1018,22 @@ public class API {
                 tabBar.tabBarAction = tabBarAction;
             }
 
-            public Tab getSelectedTab(TabBar tabBar) {
+            public Tab selectedTab(TabBar tabBar) {
                 if (tabBar == null) return null;
                 return UICommons.tabBar_getSelectedTab(tabBar);
             }
 
-            public int getSelectedTabIndex(TabBar tabBar) {
+            public int selectedTabIndex(TabBar tabBar) {
                 if (tabBar == null) return 0;
                 return tabBar.selectedTab;
             }
 
-            public Tab getTab(TabBar tabBar, int index) {
+            public Tab tab(TabBar tabBar, int index) {
                 if (tabBar == null) return null;
                 return tabBar.tabs.get(Tools.Calc.inBounds(index, 0, tabBar.tabs.size() - 1));
             }
 
-            public Tab[] getTabs(TabBar tabBar) {
+            public Tab[] tabs(TabBar tabBar) {
                 return tabBar.tabs.toArray(new Tab[0]);
             }
 
@@ -1341,7 +1101,7 @@ public class API {
                 return false;
             }
 
-            public int getTabsWidth(TabBar tabBar) {
+            public int tabsWidth(TabBar tabBar) {
                 if (tabBar == null) return 0;
                 int width = 0;
                 for (int i = 0; i < tabBar.tabs.size(); i++) width += tabBar.tabs.get(i).width;
@@ -1363,7 +1123,6 @@ public class API {
                     return create(title, icon, iconIndex, null, defaultTabAction(), 0);
                 }
 
-
                 public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components) {
                     return create(title, icon, iconIndex, components, defaultTabAction(), 0);
                 }
@@ -1379,7 +1138,6 @@ public class API {
                     tab.icon = icon;
                     tab.iconIndex = iconIndex;
                     tab.font = inputState.config.component_defaultFont;
-                    tab.content_offset_x = 0;
                     tab.name = "";
                     tab.data = null;
                     if (width == 0) {
@@ -1409,30 +1167,20 @@ public class API {
                     tab.data = data;
                 }
 
-                public void setContentOffset(Tab tab, int content_offset_x) {
-                    if (tab == null) return;
-                    tab.content_offset_x = content_offset_x;
-                }
-
-                public void centerTitle(Tab tab) {
-                    if (tab == null) return;
-                    tab.content_offset_x = ((tab.width * UIEngine.TILE_SIZE) / 2) - ((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0)) / 2) - 2;
-                }
-
                 public void setIconIndex(Tab tab, int iconIndex) {
                     if (tab == null) return;
                     tab.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+                }
+
+                public void addTabComponent(Tab tab, Component component) {
+                    if (tab == null || component == null) return;
+                    UICommons.tab_addComponent(tab, component);
                 }
 
                 public void setTabComponents(Tab tab, Component[] components) {
                     if (tab == null || components == null) return;
                     removeAllTabComponents(tab);
                     for (int i = 0; i < components.length; i++) addTabComponent(tab, components[i]);
-                }
-
-                public void addTabComponent(Tab tab, Component component) {
-                    if (tab == null || component == null) return;
-                    UICommons.tab_addComponent(tab, component);
                 }
 
                 public void addTabComponents(Tab tab, Component[] components) {
@@ -1518,7 +1266,7 @@ public class API {
                     width = items.length * (doubleSized ? 2 : 1);
                     height = items[0].length * (doubleSized ? 2 : 1);
                 }
-                setComponentCommonInitValues(grid, x, y, width, height);
+                setComponentCommonInitValuesInternal(grid, x, y, width, height);
                 grid.items = items;
                 grid.gridAction = gridAction;
                 grid.dragEnabled = dragEnabled;
@@ -1597,7 +1345,7 @@ public class API {
 
             public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
                 TextField textField = new TextField();
-                setComponentCommonInitValues(textField, x, y, width, 1, Color.WHITE);
+                setComponentCommonInitValuesInternal(textField, x, y, width, 1, Color.WHITE);
                 textField.font = inputState.config.component_defaultFont;
                 textField.allowedCharacters = new IntSet();
                 for (int i = 0; i < allowedCharacters.length; i++)
@@ -1685,11 +1433,11 @@ public class API {
 
             public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
                 Canvas canvas = new Canvas();
-                setComponentCommonInitValues(canvas, x, y, width, height, Color.WHITE);
-                canvas.map = new Color[width*UIEngine.TILE_SIZE][height*UIEngine.TILE_SIZE];
-                for(int ix = 0; ix<canvas.map.length; ix++)
-                    for(int iy = 0; iy<canvas.map[0].length; iy++)
-                        canvas.map[ix][iy] = new Color(1f,1f,1f,1f);
+                setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
+                canvas.map = new Color[width * UIEngine.TILE_SIZE][height * UIEngine.TILE_SIZE];
+                for (int ix = 0; ix < canvas.map.length; ix++)
+                    for (int iy = 0; iy < canvas.map[0].length; iy++)
+                        canvas.map[ix][iy] = new Color(1f, 1f, 1f, 1f);
                 canvas.canvasAction = canvasAction;
                 canvas.canvasImages = new ArrayList<>();
                 if (canvasImages != null) {
@@ -1709,9 +1457,9 @@ public class API {
                 canvas.canvasAction = canvasAction;
             }
 
-            public Color getPoint(Canvas canvas, int x, int y) {
+            public Color point(Canvas canvas, int x, int y) {
                 if (canvas == null) return null;
-                Color color = UICommons.canvas_getPoint(canvas,x,y);
+                Color color = UICommons.canvas_getPoint(canvas, x, y);
                 return color != null ? new Color(color) : null;
             }
 
@@ -1730,7 +1478,7 @@ public class API {
 
             public void setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
                 if (canvas == null) return;
-                UICommons.canvas_setPoint(canvas,x,y,r,g,b,a);
+                UICommons.canvas_setPoint(canvas, x, y, r, g, b, a);
             }
 
             public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
@@ -1774,7 +1522,7 @@ public class API {
 
             public class _CanvasImage {
                 public CanvasImage create(CMediaGFX image, int x, int y) {
-                    return create(image, x, y,  0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
+                    return create(image, x, y, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
                 public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex) {
@@ -1822,7 +1570,7 @@ public class API {
 
                 public void move(CanvasImage canvasImage, int x, int y) {
                     if (canvasImage == null) return;
-                    setPosition(canvasImage, canvasImage.x+x, canvasImage.y+y);
+                    setPosition(canvasImage, canvasImage.x + x, canvasImage.y + y);
                 }
 
                 public void setImage(CanvasImage canvasImage, CMediaGFX image) {
@@ -1881,7 +1629,7 @@ public class API {
 
             public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
                 Knob knob = new Knob();
-                setComponentCommonInitValues(knob, x, y, 2, 2, inputState.config.component_defaultColor, Color.BLACK);
+                setComponentCommonInitValuesInternal(knob, x, y, 2, 2, inputState.config.component_defaultColor, Color.BLACK);
                 knob.endless = endless;
                 knob.turned = Tools.Calc.inBounds(turned, 0f, 1f);
                 knob.knobAction = knobAction;
@@ -1913,7 +1661,7 @@ public class API {
             }
 
             public Text create(int x, int y, String[] lines) {
-                return create(x, y, lines , defaultTextAction());
+                return create(x, y, lines, defaultTextAction());
             }
 
             public Text create(int x, int y, String[] lines, TextAction textAction) {
@@ -1929,7 +1677,7 @@ public class API {
                     width = width / UIEngine.TILE_SIZE;
                     height = lines.length;
                 }
-                setComponentCommonInitValues(text, x, y, width, height);
+                setComponentCommonInitValuesInternal(text, x, y, width, height);
                 text.textAction = textAction;
                 text.lines = Tools.Text.validStringArrayCopy(lines);
                 return text;
@@ -1964,18 +1712,18 @@ public class API {
             }
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex) {
-                return create(x, y, image, arrayIndex,defaultImageAction(), 0f);
+                return create(x, y, image, arrayIndex, defaultImageAction(), 0f);
             }
 
             public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset) {
                 return create(x, y, image, arrayIndex, defaultImageAction(), animation_offset);
             }
 
-            public Image create(int x, int y, CMediaGFX image,int arrayIndex, ImageAction imageAction, float animation_offset) {
+            public Image create(int x, int y, CMediaGFX image, int arrayIndex, ImageAction imageAction, float animation_offset) {
                 Image imageC = new Image();
                 int width = image != null ? mediaManager.imageWidth(image) / UIEngine.TILE_SIZE : 0;
                 int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
-                setComponentCommonInitValues(imageC, x, y, width, height, Color.WHITE);
+                setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
                 imageC.image = image;
                 imageC.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
                 imageC.animationOffset = animation_offset;
@@ -2019,7 +1767,7 @@ public class API {
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems) {
-                return create(x, y, width, combobBoxItems,defaultComboBoxAction() , false, null);
+                return create(x, y, width, combobBoxItems, defaultComboBoxAction(), false, null);
             }
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
@@ -2032,7 +1780,7 @@ public class API {
 
             public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboBoxItem selectedItem) {
                 ComboBox comboBox = new ComboBox();
-                setComponentCommonInitValues(comboBox, x, y, width, 1);
+                setComponentCommonInitValuesInternal(comboBox, x, y, width, 1);
                 comboBox.useIcons = useIcons;
                 comboBox.comboBoxAction = comboBoxAction;
                 comboBox.comboBoxItems = new ArrayList<>();
@@ -2231,7 +1979,7 @@ public class API {
 
                 public ScrollBarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                     ScrollBarHorizontal scrollBarHorizontal = new ScrollBarHorizontal();
-                    setComponentCommonInitValues(scrollBarHorizontal, x, y, length, 1);
+                    setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1);
                     scrollBarHorizontal.scrollBarAction = scrollBarAction;
                     scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
                     return scrollBarHorizontal;
@@ -2251,7 +1999,7 @@ public class API {
 
                 public ScrollBarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                     ScrollBarVertical scrollBarVertical = new ScrollBarVertical();
-                    setComponentCommonInitValues(scrollBarVertical, x, y, 1, length);
+                    setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length);
                     scrollBarVertical.scrollBarAction = scrollBarAction;
                     scrollBarVertical.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
                     return scrollBarVertical;
@@ -2295,7 +2043,7 @@ public class API {
 
             public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
                 List list = new List();
-                setComponentCommonInitValues(list, x, y, width, height);
+                setComponentCommonInitValuesInternal(list, x, y, width, height);
                 list.selectedItem = null;
                 list.selectedItems = new HashSet<>();
                 list.items = items;
@@ -2319,7 +2067,7 @@ public class API {
                 list.dragOutEnabled = dragOutEnabled;
             }
 
-            public void setDragEnabled(List list, boolean dragEnabled) {
+            public void setdragEnabled(List list, boolean dragEnabled) {
                 if (list == null) return;
                 list.dragEnabled = dragEnabled;
             }
@@ -2366,7 +2114,240 @@ public class API {
 
         }
 
+        public void setToolTip(Component component, ToolTip tooltip) {
+            if (component == null) return;
+            component.toolTip = tooltip;
+        }
+
+        public void setPosition(Component component, int x, int y) {
+            if (component == null) return;
+            component.x = x;
+            component.y = y;
+        }
+
+        public void setPositionGrid(Component component, int x, int y) {
+            if (component == null) return;
+            setPosition(component, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
+        }
+
+        public void moveX(Component[] components, int x) {
+            if (component == null) return;
+            for (int i = 0; i < components.length; i++) moveX(components[i], x);
+        }
+
+        public void moveX(Component component, int x) {
+            if (component == null) return;
+            setPosition(component, component.x + x, component.y);
+        }
+
+        public void moveY(Component[] components, int y) {
+            if (component == null) return;
+            for (int i = 0; i < components.length; i++) moveY(components[i], y);
+        }
+
+        public void moveY(Component component, int y) {
+            if (component == null) return;
+            setPosition(component, component.x, component.y + y);
+        }
+
+        public void move(Component[] components, int x, int y) {
+            if (component == null) return;
+            for (int i = 0; i < components.length; i++) move(components[i], x, y);
+        }
+
+        public void move(Component component, int x, int y) {
+            if (component == null) return;
+            setPosition(component, component.x + x, component.y + y);
+        }
+
+        public void setDisabled(Component component, boolean disabled) {
+            if (component == null) return;
+            component.disabled = disabled;
+        }
+
+        public void setDisabled(Component[] components, boolean disabled) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) setDisabled(components, disabled);
+        }
+
+        public void addUpdateAction(Component component, UpdateAction updateAction) {
+            if (component == null || updateAction == null) return;
+            component.updateActions.add(updateAction);
+        }
+
+        public void addUpdateActions(Component component, UpdateAction[] updateActions) {
+            if (component == null || updateActions == null) return;
+            for (int i = 0; i < updateActions.length; i++) addUpdateAction(component, updateActions[i]);
+        }
+
+        public void removeUpdateAction(Component component, UpdateAction updateAction) {
+            if (component == null || updateAction == null) return;
+            component.updateActions.remove(updateAction);
+        }
+
+        public void removeUpdateActions(Component component, UpdateAction[] updateActions) {
+            if (component == null || updateActions == null) return;
+            for (int i = 0; i < updateActions.length; i++) removeUpdateAction(component, updateActions[i]);
+        }
+
+        public void removeAllUpdateActions(Component component) {
+            if (component == null) return;
+            removeUpdateActions(component, component.updateActions.toArray(new UpdateAction[]{}));
+        }
+
+        public void setName(Component component, String name) {
+            if (component == null) return;
+            component.name = Tools.Text.validString(name);
+        }
+
+        public void setCustomData(Component component, Object customData) {
+            if (component == null) return;
+            component.data = customData;
+        }
+
+        public void setSize(Component component, int width, int height) {
+            if (component == null) return;
+            UICommons.component_setSize(inputState, component, width, height);
+        }
+
+        public void setColor(Component[] components, Color color) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) setColor(components[i], color);
+        }
+
+        public void setColor(Component component, Color color) {
+            if (component == null || color == null) return;
+            setColor(component, color.r, color.g, color.b, color.a);
+        }
+
+        public void setColor(Component component, float r, float g, float b, float a) {
+            if (component == null) return;
+            component.color_r = Tools.Calc.inBounds01(r);
+            component.color_g = Tools.Calc.inBounds01(g);
+            component.color_b = Tools.Calc.inBounds01(b);
+            component.color_a = Tools.Calc.inBounds01(a);
+        }
+
+        public void setColor2(Component[] components, Color color2) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) setColor2(components[i], color2);
+        }
+
+        public void setColor2(Component component, Color color) {
+            if (component == null || color == null) return;
+            setColor2(component, color.r, color.g, color.b);
+        }
+
+        public void setColor2(Component component, float r, float g, float b) {
+            if (component == null) return;
+            component.color2_r = Tools.Calc.inBounds01(r);
+            component.color2_g = Tools.Calc.inBounds01(g);
+            component.color2_b = Tools.Calc.inBounds01(b);
+        }
+
+        public void setColor1And2(Component component, Color color) {
+            if (component == null) return;
+            setColor(component, color);
+            setColor2(component, color);
+        }
+
+        public void setColor1And2(Component[] components, Color color) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) {
+                setColor(components[i], color);
+                setColor2(components[i], color);
+            }
+        }
+
+        public void setAlpha(Component component, float alpha) {
+            if (component == null) return;
+            component.color_a = Tools.Calc.inBounds01(alpha);
+        }
+
+        public void setAlpha(Component[] components, float alpha) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) setAlpha(components[i], alpha);
+        }
+
+        public void setVisible(Component component, boolean visible) {
+            if (component == null) return;
+            component.visible = visible;
+        }
+
+        public void setVisible(Component[] components, boolean visible) {
+            if (components == null) return;
+            for (int i = 0; i < components.length; i++) setVisible(components[i], visible);
+        }
+
+        public int absoluteX(Component component) {
+            if (component == null) return 0;
+            return UICommons.component_getAbsoluteX(component);
+        }
+
+        public int absoluteY(Component component) {
+            if (component == null) return 0;
+            return UICommons.component_getAbsoluteY(component);
+        }
+
+        public int absoluteWidth(Component component) {
+            if (component == null) return 0;
+            return UICommons.component_getAbsoluteWidth(component);
+        }
+
+        public int absoluteHeight(Component component) {
+            if (component == null) return 0;
+            return UICommons.component_getAbsoluteHeight(component);
+        }
+
+        public boolean isAddedToWindow(Component component, Window window) {
+            if (component == null || window == null) return false;
+            return component.addedToWindow != null && component.addedToWindow == window;
+        }
+
+        public boolean isAddedToScreen(Component component) {
+            if (component == null) return false;
+            return component.addedToScreen;
+        }
+
+        public void forceToolTipUpdate(Component component) {
+            if (component == null) return;
+            component.updateToolTip = true;
+        }
+
+        private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
+            setComponentCommonInitValuesInternal(component, x, y, width, height, inputState.config.component_defaultColor, inputState.config.component_defaultColor);
+        }
+
+        private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color) {
+            setComponentCommonInitValuesInternal(component, x, y, width, height, color, color);
+        }
+
+        private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
+            // Align to grid per default
+            component.x = (x * UIEngine.TILE_SIZE);
+            component.y = (y * UIEngine.TILE_SIZE);
+            component.width = width;
+            component.height = height;
+            component.color_a = 1f;
+            component.color_r = color1.r;
+            component.color_g = color1.g;
+            component.color_b = color1.b;
+            component.color2_r = color2.r;
+            component.color2_g = color2.g;
+            component.color2_b = color2.b;
+            component.disabled = false;
+            component.updateActions = new ArrayList<>();
+            component.data = null;
+            component.name = "";
+            component.visible = true;
+            component.updateToolTip = false;
+            component.addedToTab = null;
+            component.addedToWindow = null;
+            component.toolTip = null;
+            component.addedToScreen = false;
+        }
     }
+
     public class _ContextMenu {
 
         private ContextMenuAction defaultContextMenuAction() {
@@ -2537,6 +2518,7 @@ public class API {
         }
 
     }
+
     public class _Notification {
 
         private NotificationAction defaultNotificationAction() {
@@ -2547,6 +2529,7 @@ public class API {
         public Notification create(String text) {
             return create(text, defaultNotificationAction(), inputState.config.notification_defaultDisplayTime);
         }
+
         public Notification create(String text, NotificationAction notificationAction) {
             return create(text, notificationAction, inputState.config.notification_defaultDisplayTime);
         }
@@ -2619,6 +2602,7 @@ public class API {
         }
 
     }
+
     public class _ToolTip {
 
         public final _ToolTipImage toolTipImage = new _ToolTipImage();
@@ -2626,7 +2610,7 @@ public class API {
         public class _ToolTipImage {
 
             public ToolTipImage create(CMediaGFX image) {
-                return create(image, 0,0);
+                return create(image, 0, 0);
             }
 
             public ToolTipImage create(CMediaGFX image, int x, int y) {
@@ -2693,7 +2677,7 @@ public class API {
             ToolTip tooltip = new ToolTip();
             tooltip.lines = Tools.Text.validStringArrayCopy(lines);
             tooltip.images = new ArrayList<>();
-            if(images != null) {
+            if (images != null) {
                 for (int i = 0; i < images.length; i++) {
                     tooltip.images.add(images[0]);
                     images[i].addedToToolTip = tooltip;
@@ -2701,8 +2685,8 @@ public class API {
             }
             tooltip.toolTipAction = toolTipAction;
             tooltip.displayFistLineAsTitle = displayFistLineAsTitle;
-            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth,1);
-            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight,1);
+            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth, 1);
+            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
             tooltip.font = inputState.config.tooltip_defaultFont;
             tooltip.color_r = inputState.config.component_defaultColor.r;
             tooltip.color_g = inputState.config.component_defaultColor.g;
@@ -2775,6 +2759,7 @@ public class API {
         }
 
     }
+
     public class _HotKey {
 
         public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
@@ -2807,7 +2792,7 @@ public class API {
             hotKey.data = data;
         }
 
-        public String getKeysAsText(HotKey hotKey) {
+        public String keysAsText(HotKey hotKey) {
             String[] names = new String[hotKey.keyCodes.length];
             for (int i = 0; i < hotKey.keyCodes.length; i++) {
                 names[i] = com.badlogic.gdx.Input.Keys.toString(hotKey.keyCodes[i]);
@@ -2815,6 +2800,7 @@ public class API {
             return String.join("+", names);
         }
     }
+
     public class _MouseTool {
 
         public MouseTool create(String name, Object data, CMediaCursor cursor) {
@@ -2865,6 +2851,7 @@ public class API {
         }
 
     }
+
     public class _MouseTextInput {
         private MouseTextInputAction defaultMouseTextInputConfirmAction() {
             return new MouseTextInputAction() {
@@ -2884,7 +2871,6 @@ public class API {
                     inputState.config.mouseTextInput_defaultLowerCaseCharacters,
                     inputState.config.mouseTextInput_defaultUpperCaseCharacters);
         }
-
 
 
         public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
@@ -2917,14 +2903,14 @@ public class API {
             for (int i = 0; i < maxCharacters; i++) {
                 mouseTextInput.charactersLC[i] = charactersLC[i];
                 mouseTextInput.charactersUC[i] = charactersUC[i];
-                if(selectedCharacter != null && (mouseTextInput.charactersLC[i] == selectedCharacter || mouseTextInput.charactersUC[i] == selectedCharacter)){
+                if (selectedCharacter != null && (mouseTextInput.charactersLC[i] == selectedCharacter || mouseTextInput.charactersUC[i] == selectedCharacter)) {
                     mouseTextInput.selectedIndex = i;
                     mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectedCharacter;
                 }
             }
             mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
             mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
-            mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] =  '\n';
+            mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = '\n';
             inputState.mTextInputMouseX = Gdx.input.getX();
             inputState.mTextInputUnlock = false;
             inputState.openMouseTextInput = mouseTextInput;
@@ -2994,7 +2980,7 @@ public class API {
 
         public void setColor(Color color) {
             if (inputState.openMouseTextInput == null) return;
-            setColor(color.r,color.g,color.b,color.a);
+            setColor(color.r, color.g, color.b, color.a);
         }
 
         public void setColor(float r, float g, float b, float a) {
@@ -3007,7 +2993,7 @@ public class API {
 
         public void setColor2(Color color2) {
             if (inputState.openMouseTextInput == null) return;
-            setColor2(color2.r,color2.g,color2.b);
+            setColor2(color2.r, color2.g, color2.b);
         }
 
         public void setColor2(float r, float g, float b) {
@@ -3035,6 +3021,7 @@ public class API {
 
 
     }
+
     public class _Input {
         public final _Mouse mouse = new _Mouse();
         public final _KeyBoard keyboard = new _KeyBoard();
@@ -3059,11 +3046,11 @@ public class API {
                     UICommons.emulatedMouse_setPositionComponent(inputState, component);
                 }
 
-                public void setPositionNextComponent(){
-                    UICommons.emulatedMouse_setPositionNextComponent(inputState,false);
+                public void setPositionNextComponent() {
+                    UICommons.emulatedMouse_setPositionNextComponent(inputState, false);
                 }
 
-                public void setPositionPreviousComponent(){
+                public void setPositionPreviousComponent() {
                     UICommons.emulatedMouse_setPositionNextComponent(inputState, true);
                 }
 
@@ -3427,6 +3414,7 @@ public class API {
 
 
     }
+
     public class _Camera {
 
         public boolean pointVisible(float x, float y) {
@@ -3545,10 +3533,11 @@ public class API {
             return inputState.camera_app.zoom;
         }
 
-        public Matrix4 combined(){
+        public Matrix4 combined() {
             return inputState.camera_app.combined;
         }
     }
+
     public class _Config {
         public final _UIConfig ui = new _UIConfig();
         public final _InputConfig input = new _InputConfig();
@@ -4007,6 +3996,7 @@ public class API {
             }
         }
     }
+
     public class _PreConfigured {
 
         public class GraphInfo {
@@ -4230,8 +4220,8 @@ public class API {
                     if (Tools.Calc.pointRectsCollide(
                             input.mouse.state.xUI(),
                             input.mouse.state.yUI(),
-                            component.getAbsoluteX(hlText),
-                            component.getAbsoluteY(hlText),
+                            component.absoluteX(hlText),
+                            component.absoluteY(hlText),
                             hlText.width * UIEngine.TILE_SIZE,
                             hlText.height * UIEngine.TILE_SIZE
                     )) {
@@ -4290,7 +4280,7 @@ public class API {
                     component.list.setScrolled(list, 1f - scrolled);
                 }
             });
-            component.setPosition(scrollBarVertical, list.x+(list.width*UIEngine.TILE_SIZE), list.y);
+            component.setPosition(scrollBarVertical, list.x + (list.width * UIEngine.TILE_SIZE), list.y);
 
             component.addUpdateAction(scrollBarVertical, new UpdateAction() {
                 float scrolledLast = -1;
@@ -4410,14 +4400,14 @@ public class API {
                 @Override
                 public void onUpdate() {
                     if (drag[0]) {
-                        int x = input.mouse.state.xUI() - component.getAbsoluteX(colorCanvas);
-                        int yInv = (input.mouse.state.yUI() - component.getAbsoluteY(colorCanvas));
+                        int x = input.mouse.state.xUI() - component.absoluteX(colorCanvas);
+                        int yInv = (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
                         int y = colorTexture.getRegionHeight() - yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = component.canvas.getPoint(colorCanvas, x, y - 1);
+                            currentColor = component.canvas.point(colorCanvas, x, y - 1);
                             component.setColor(ok, currentColor);
                             float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
                             component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
@@ -5034,16 +5024,17 @@ public class API {
 
     /* #################### Context Menu #################### */
 
-    public ContextMenu contextMenu(){
+    public ContextMenu contextMenu() {
         return inputState.openContextMenu;
     }
+
     public void openContextMenu(ContextMenu contextMenu) {
-        UICommons.contextMenu_openAtMousePosition(inputState,mediaManager,contextMenu);
+        UICommons.contextMenu_openAtMousePosition(inputState, mediaManager, contextMenu);
     }
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        UICommons.contextMenu_open(inputState , mediaManager, contextMenu, x, y);
+        UICommons.contextMenu_open(inputState, mediaManager, contextMenu, x, y);
     }
 
     public void closeContextMenu(ContextMenu contextMenu) {
@@ -5104,11 +5095,13 @@ public class API {
 
     public void sendMessageToWindows(String message_type, Object... content) {
         if (message_type == null) return;
-        for (int i = 0; i < inputState.windows.size(); i++) sendMessageToWindow(inputState.windows.get(i), message_type, content);
+        for (int i = 0; i < inputState.windows.size(); i++)
+            sendMessageToWindow(inputState.windows.get(i), message_type, content);
     }
 
     public void windowsEnforceScreenBounds() {
-        for (int i = 0; i < inputState.windows.size(); i++) UICommons.window_enforceScreenBounds(inputState, inputState.windows.get(i));
+        for (int i = 0; i < inputState.windows.size(); i++)
+            UICommons.window_enforceScreenBounds(inputState, inputState.windows.get(i));
     }
 
     /* #################### Modal #################### */
@@ -5122,8 +5115,8 @@ public class API {
         UICommons.window_addToScreenAsModal(inputState, modalWindow);
     }
 
-    public void removeCurrentModalWindow(){
-        if(inputState.modalWindow == null) return;
+    public void removeCurrentModalWindow() {
+        if (inputState.modalWindow == null) return;
         UICommons.window_removeFromScreen(inputState, inputState.modalWindow);
     }
 
@@ -5132,13 +5125,13 @@ public class API {
         return false;
     }
 
-    public boolean isModalOpen(){
+    public boolean isModalOpen() {
         return UICommons.window_isModalOpen(inputState);
     }
 
     /* #################### Screen Components #################### */
 
-    public ArrayList<Component> screenComponents(){
+    public ArrayList<Component> screenComponents() {
         return new ArrayList<>(inputState.screenComponents);
     }
 
@@ -5285,7 +5278,7 @@ public class API {
 
     public void setViewportMode(VIEWPORT_MODE viewPortMode) {
         if (viewPortMode == null) return;
-        UICommons.viewport_changeViewPortMode(inputState,viewPortMode);
+        UICommons.viewport_changeViewPortMode(inputState, viewPortMode);
     }
 
     public int resolutionWidth() {

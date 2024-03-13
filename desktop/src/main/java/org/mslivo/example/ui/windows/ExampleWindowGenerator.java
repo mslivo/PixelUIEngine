@@ -291,8 +291,8 @@ public class ExampleWindowGenerator extends WindowGenerator {
             @Override
             public void onFocus() {
                 api.mouseTextInput.open(
-                        api.component.getAbsoluteX(osKeyBoardTextInput),
-                        api.component.getAbsoluteY(osKeyBoardTextInput)
+                        api.component.absoluteX(osKeyBoardTextInput),
+                        api.component.absoluteY(osKeyBoardTextInput)
                         , new MouseTextInputAction() {
                             @Override
                             public boolean onConfirm() {
@@ -501,7 +501,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         addRandomItemsToList(listItems1, "L1 ");
 
 
-        List list1 = api.component.list.create(2, 2, 6, 12, listItems1, null, false, true, true, true);
+        List list1 = api.component.list.create(2, 2, 6, 12, listItems1, null, true, true, true);
         ListAction list1Action = new ListAction<ListItem>() {
             @Override
             public CMediaGFX icon(ListItem listItem) {
@@ -548,7 +548,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ArrayList<ListItem> listItems2 = new ArrayList<>();
         addRandomItemsToList(listItems2, "L2 ");
 
-        List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, false, true, true, true);
+        List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null,  true, true, true, true);
         ListAction list2Action = new ListAction<ListItem>() {
             @Override
             public CMediaGFX icon(ListItem listItem) {
@@ -605,7 +605,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ListItem[][] invItems = new ListItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
-        Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true, false);
+        Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true);
 
         GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
@@ -650,7 +650,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ListItem[][] invItems2 = new ListItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
-        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true, false);
+        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true);
 
         GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
@@ -694,7 +694,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Grid grid3 = api.component.grid.create(32, 2, invItems3, null, true, false, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null, true, false, false,true);
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override

@@ -2485,12 +2485,12 @@ public class UIEngine<T extends UIAdapter> {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.font, textButton.text, alpha, UICommons.component_getAbsoluteX(textButton) + textButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.offset_content_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconIndex);
+                        render_drawFont(textButton.font, textButton.text, alpha, UICommons.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, UICommons.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset, 1, 2, button.width * TILE_SIZE, textButton.icon, textButton.iconIndex);
                     }
                 } else if (button instanceof ImageButton imageButton) {
                     render_saveTempColorBatch();
                     render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha);
-                    render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.offset_content_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.offset_content_y - pressed_offset, imageButton.arrayIndex);
+                    render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset, imageButton.arrayIndex);
                     render_loadTempColorBatch();
                 }
             }
