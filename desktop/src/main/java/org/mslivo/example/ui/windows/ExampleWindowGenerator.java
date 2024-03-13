@@ -397,7 +397,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
             @Override
             public void onUpdate() {
                 for(int i=0;i<20;i++)
-                api.component.canvas.setPoint(canvas,
+                api.component.canvas.point(canvas,
                         MathUtils.random(0, canvas.width * UIEngine.TILE_SIZE),
                         MathUtils.random(0, canvas.height * UIEngine.TILE_SIZE),
                         MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f

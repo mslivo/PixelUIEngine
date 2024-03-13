@@ -101,7 +101,7 @@ public class API {
     public final _Input input = new _Input();
     public final _Camera camera = new _Camera();
     public final _Config config = new _Config();
-    public final _PreConfigured preConfigured = new _PreConfigured();
+    public final _Preset preConfigured = new _Preset();
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
@@ -868,6 +868,7 @@ public class API {
             public void centerContent(Button button) {
                 UICommons.button_centerContent(mediaManager, button);
             }
+
             public void centerContent(Button[] buttons) {
                 if (buttons == null) return;
                 for (int i = 0; i < buttons.length; i++) centerContent(buttons[i]);
@@ -1457,14 +1458,19 @@ public class API {
                 canvas.canvasAction = canvasAction;
             }
 
+            public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
+                if (canvas == null) return;
+                UICommons.canvas_setPoint(canvas, x, y, r, g, b, a);
+            }
+
             public Color point(Canvas canvas, int x, int y) {
                 if (canvas == null) return null;
                 Color color = UICommons.canvas_getPoint(canvas, x, y);
                 return color != null ? new Color(color) : null;
             }
 
-            public void setAllPoints(Canvas canvas, Color color) {
-                setAllPoints(canvas, color.r, color.g, color.b, color.a);
+            public void point(Canvas canvas, int x, int y, Color color) {
+                point(canvas, x, y, color.r, color.g, color.b, color.a);
             }
 
             public void setAllPoints(Canvas canvas, float r, float g, float b, float a) {
@@ -1472,13 +1478,8 @@ public class API {
                 UICommons.canvas_setAllPoints(canvas, r, g, b, a);
             }
 
-            public void setPoint(Canvas canvas, int x, int y, Color color) {
-                setPoint(canvas, x, y, color.r, color.g, color.b, color.a);
-            }
-
-            public void setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
-                if (canvas == null) return;
-                UICommons.canvas_setPoint(canvas, x, y, r, g, b, a);
+            public void setAllPoints(Canvas canvas, Color color) {
+                setAllPoints(canvas, color.r, color.g, color.b, color.a);
             }
 
             public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
@@ -1501,7 +1502,7 @@ public class API {
                 for (int i = 0; i < canvasImages.length; i++) removeCanvasImage(canvas, canvasImages[i]);
             }
 
-            public void removeAllMapOverlays(Canvas canvas) {
+            public void removeAllCanvasImages(Canvas canvas) {
                 if (canvas == null) return;
                 removeCanvasImages(canvas, canvas.canvasImages.toArray(new CanvasImage[]{}));
             }
@@ -1539,7 +1540,7 @@ public class API {
                     canvasImage.x = x;
                     canvasImage.y = y;
                     canvasImage.fadeOut = fadeOut;
-                    canvasImage.fadeOutTime = fadeOutTime;
+                    canvasImage.fadeOutTime = Tools.Calc.lowerBounds(fadeOutTime, 0);
                     canvasImage.color_r = Color.WHITE.r;
                     canvasImage.color_g = Color.WHITE.g;
                     canvasImage.color_b = Color.WHITE.b;
@@ -1578,16 +1579,16 @@ public class API {
                     canvasImage.image = image;
                 }
 
-                public void setColor(CanvasImage canvasImage, Color color) {
-                    setColor(canvasImage, color.r, color.b, color.g, color.a);
-                }
-
                 public void setColor(CanvasImage canvasImage, float r, float g, float b, float a) {
                     if (canvasImage == null) return;
                     canvasImage.color_r = r;
                     canvasImage.color_g = g;
                     canvasImage.color_b = b;
                     canvasImage.color_a = a;
+                }
+
+                public void setColor(CanvasImage canvasImage, Color color) {
+                    setColor(canvasImage, color.r, color.b, color.g, color.a);
                 }
 
                 public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
@@ -1754,7 +1755,6 @@ public class API {
         }
 
         public class _ComboBox {
-
             public final _ComboBox._ComboBoxItem item = new _ComboBox._ComboBoxItem();
 
             private ComboBoxAction defaultComboBoxAction() {
@@ -1903,7 +1903,6 @@ public class API {
                 public void setName(ComboBoxItem comboBoxItem, String name) {
                     if (comboBoxItem == null) return;
                     comboBoxItem.name = Tools.Text.validString(name);
-
                 }
 
                 public void setData(ComboBoxItem comboBoxItem, Object data) {
@@ -1957,16 +1956,6 @@ public class API {
                 };
             }
 
-            public void setScrolled(ScrollBar scrollBar, float scrolled) {
-                if (scrollBar == null) return;
-                UICommons.scrollBar_scroll(scrollBar, scrolled);
-            }
-
-            public void setScrollBarAction(ScrollBar scrollBar, ScrollBarAction scrollBarAction) {
-                if (scrollBar == null) return;
-                scrollBar.scrollBarAction = scrollBarAction;
-            }
-
             public class _HorizontalScrollbar {
 
                 public ScrollBarHorizontal create(int x, int y, int length) {
@@ -2005,6 +1994,16 @@ public class API {
                     return scrollBarVertical;
                 }
 
+            }
+
+            public void setScrolled(ScrollBar scrollBar, float scrolled) {
+                if (scrollBar == null) return;
+                UICommons.scrollBar_scroll(scrollBar, scrolled);
+            }
+
+            public void setScrollBarAction(ScrollBar scrollBar, ScrollBarAction scrollBarAction) {
+                if (scrollBar == null) return;
+                scrollBar.scrollBarAction = scrollBarAction;
             }
 
         }
@@ -2067,7 +2066,7 @@ public class API {
                 list.dragOutEnabled = dragOutEnabled;
             }
 
-            public void setdragEnabled(List list, boolean dragEnabled) {
+            public void setDragEnabled(List list, boolean dragEnabled) {
                 if (list == null) return;
                 list.dragEnabled = dragEnabled;
             }
@@ -2110,7 +2109,6 @@ public class API {
                 for (int i = 0; i < selectedItems.length; i++)
                     if (selectedItems[i] != null) list.selectedItems.add(selectedItems[i]);
             }
-
 
         }
 
@@ -2357,80 +2355,6 @@ public class API {
 
         public final _ContextMenuItem item = new _ContextMenuItem();
 
-        public ContextMenu create(ContextMenuItem[] contextMenuItems) {
-            return create(contextMenuItems, defaultContextMenuAction(), 1f);
-        }
-
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
-            return create(contextMenuItems, contextMenuAction, 1f);
-        }
-
-        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
-            ContextMenu contextMenu = new ContextMenu();
-            contextMenu.items = new ArrayList<>();
-            if (contextMenuItems != null) {
-                for (int i = 0; i < contextMenuItems.length; i++) {
-                    if (contextMenuItems[i].addedToContextMenu == null) {
-                        contextMenu.items.add(contextMenuItems[i]);
-                        contextMenuItems[i].addedToContextMenu = contextMenu;
-                    }
-                }
-            }
-            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
-            contextMenu.contextMenuAction = contextMenuAction;
-            return contextMenu;
-        }
-
-        public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
-            if (contextMenu == null) return;
-            contextMenu.contextMenuAction = contextMenuAction;
-        }
-
-        public void setAlpha(ContextMenu contextMenu, float alpha) {
-            if (contextMenu == null) return;
-            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
-        }
-
-        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
-            if (contextMenu == null || contextMenuItem == null) return;
-            UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
-        }
-
-        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
-            if (contextMenu == null || contextMenuItems == null) return;
-            for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
-        }
-
-        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
-            if (contextMenu == null || contextMenuItem == null) return;
-            UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
-        }
-
-        public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
-            if (contextMenu == null || contextMenuItems == null) return;
-            for (int i = 0; i < contextMenuItems.length; i++)
-                removeContextMenuItem(contextMenu, contextMenuItems[i]);
-        }
-
-        public void removeAllContextMenuItems(ContextMenu contextMenu) {
-            if (contextMenu == null) return;
-            removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
-        }
-
-        public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
-            if (contextMenu == null || name == null) return new ArrayList<>();
-            ArrayList<ContextMenuItem> result = new ArrayList<>();
-            for (int i = 0; i < contextMenu.items.size(); i++)
-                if (name.equals(contextMenu.items.get(i).name)) result.add(contextMenu.items.get(i));
-            return result;
-        }
-
-        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
-            if (contextMenu == null || name == null) return null;
-            ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
-            return result.size() > 0 ? result.getFirst() : null;
-        }
-
         public class _ContextMenuItem {
 
             private ContextMenuItemAction defaultContextMenuItemAction() {
@@ -2517,6 +2441,80 @@ public class API {
 
         }
 
+        public ContextMenu create(ContextMenuItem[] contextMenuItems) {
+            return create(contextMenuItems, defaultContextMenuAction(), 1f);
+        }
+
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+            return create(contextMenuItems, contextMenuAction, 1f);
+        }
+
+        public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction, float alpha) {
+            ContextMenu contextMenu = new ContextMenu();
+            contextMenu.items = new ArrayList<>();
+            if (contextMenuItems != null) {
+                for (int i = 0; i < contextMenuItems.length; i++) {
+                    if (contextMenuItems[i].addedToContextMenu == null) {
+                        contextMenu.items.add(contextMenuItems[i]);
+                        contextMenuItems[i].addedToContextMenu = contextMenu;
+                    }
+                }
+            }
+            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
+            contextMenu.contextMenuAction = contextMenuAction;
+            return contextMenu;
+        }
+
+        public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
+            if (contextMenu == null) return;
+            contextMenu.contextMenuAction = contextMenuAction;
+        }
+
+        public void setAlpha(ContextMenu contextMenu, float alpha) {
+            if (contextMenu == null) return;
+            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
+        }
+
+        public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+            if (contextMenu == null || contextMenuItem == null) return;
+            UICommons.contextMenu_addItem(contextMenu, contextMenuItem);
+        }
+
+        public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+            if (contextMenu == null || contextMenuItems == null) return;
+            for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
+        }
+
+        public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+            if (contextMenu == null || contextMenuItem == null) return;
+            UICommons.contextMenu_removeItem(contextMenu, contextMenuItem);
+        }
+
+        public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
+            if (contextMenu == null || contextMenuItems == null) return;
+            for (int i = 0; i < contextMenuItems.length; i++)
+                removeContextMenuItem(contextMenu, contextMenuItems[i]);
+        }
+
+        public void removeAllContextMenuItems(ContextMenu contextMenu) {
+            if (contextMenu == null) return;
+            removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
+        }
+
+        public ArrayList<ContextMenuItem> findContextMenuItemsByName(ContextMenu contextMenu, String name) {
+            if (contextMenu == null || name == null) return new ArrayList<>();
+            ArrayList<ContextMenuItem> result = new ArrayList<>();
+            for (int i = 0; i < contextMenu.items.size(); i++)
+                if (name.equals(contextMenu.items.get(i).name)) result.add(contextMenu.items.get(i));
+            return result;
+        }
+
+        public ContextMenuItem findContextMenuItemByName(ContextMenu contextMenu, String name) {
+            if (contextMenu == null || name == null) return null;
+            ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
+            return result.size() > 0 ? result.getFirst() : null;
+        }
+
     }
 
     public class _Notification {
@@ -2578,17 +2576,17 @@ public class API {
             notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
         }
 
-        public void setColor(Notification notification, Color color) {
-            if (notification == null || color == null) return;
-            setColor(notification, color.r, color.g, color.b, color.a);
-        }
-
         public void setColor(Notification notification, float r, float g, float b, float a) {
             if (notification == null) return;
             notification.color_r = r;
             notification.color_g = g;
             notification.color_b = b;
             notification.color_a = a;
+        }
+
+        public void setColor(Notification notification, Color color) {
+            if (notification == null || color == null) return;
+            setColor(notification, color.r, color.g, color.b, color.a);
         }
 
         public void setFont(Notification notification, CMediaFont font) {
@@ -2606,6 +2604,11 @@ public class API {
     public class _ToolTip {
 
         public final _ToolTipImage toolTipImage = new _ToolTipImage();
+
+        private ToolTipAction defaultToolTipAction() {
+            return new ToolTipAction() {
+            };
+        }
 
         public class _ToolTipImage {
 
@@ -2636,11 +2639,6 @@ public class API {
                 toolTipImage.y = y;
             }
 
-            public void setColor(ToolTipImage toolTipImage, Color color) {
-                if (toolTipImage == null) return;
-                setColor(toolTipImage, color.r, color.g, color.b, color.a);
-            }
-
             public void setColor(ToolTipImage toolTipImage, float r, float g, float b, float a) {
                 if (toolTipImage == null) return;
                 toolTipImage.color_r = r;
@@ -2649,17 +2647,16 @@ public class API {
                 toolTipImage.color_a = a;
             }
 
-        }
+            public void setColor(ToolTipImage toolTipImage, Color color) {
+                if (toolTipImage == null) return;
+                setColor(toolTipImage, color.r, color.g, color.b, color.a);
+            }
 
-        private ToolTipAction defaultToolTipAction() {
-            return new ToolTipAction() {
-            };
         }
 
         public ToolTip create(String[] lines) {
             return create(lines, null, defaultToolTipAction(), true, 1, 1);
         }
-
 
         public ToolTip create(String[] lines, ToolTipImage[] images) {
             return create(lines, images, defaultToolTipAction(), true, 1, 1);
@@ -2721,6 +2718,7 @@ public class API {
         }
 
         public void setToolTipAction(ToolTip toolTip, ToolTipAction toolTipAction) {
+            if (toolTip == null) return;
             toolTip.toolTipAction = toolTipAction;
         }
 
@@ -2740,17 +2738,17 @@ public class API {
             tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
         }
 
-        public void setColor(ToolTip tooltip, Color color) {
-            if (tooltip == null || color == null) return;
-            setColor(tooltip, color.r, color.g, color.b, color.a);
-        }
-
         public void setColor(ToolTip tooltip, float r, float g, float b, float a) {
             if (tooltip == null) return;
             tooltip.color_r = r;
             tooltip.color_g = g;
             tooltip.color_b = b;
             tooltip.color_a = a;
+        }
+
+        public void setColor(ToolTip tooltip, Color color) {
+            if (tooltip == null || color == null) return;
+            setColor(tooltip, color.r, color.g, color.b, color.a);
         }
 
         public void setFont(ToolTip tooltip, CMediaFont font) {
@@ -2871,7 +2869,6 @@ public class API {
                     inputState.config.mouseTextInput_defaultLowerCaseCharacters,
                     inputState.config.mouseTextInput_defaultUpperCaseCharacters);
         }
-
 
         public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
             open(x, y, onConfirm,
@@ -3027,14 +3024,9 @@ public class API {
         public final _KeyBoard keyboard = new _KeyBoard();
         public final _GamePad gamepad = new _GamePad();
 
-        public InputMethod lastUsedInputMethod() {
-            return inputState.inputEvents.lastUsedInputMethod;
-        }
-
         public class _Mouse {
             public final _Event event = new _Event();
             public final _State state = new _State();
-
             public final _Emulated emulated = new _Emulated();
 
             public class _Emulated {
@@ -3055,7 +3047,6 @@ public class API {
                 }
 
             }
-
 
             private String mouseUIObjectName(Object mouseObject) {
                 if (mouseObject != null) {
@@ -3292,7 +3283,6 @@ public class API {
         }
 
         public class _GamePad {
-
             public final _Event event = new _Event();
             public final _State state = new _State();
 
@@ -3412,73 +3402,46 @@ public class API {
 
         }
 
+        public InputMethod lastUsedInputMethod() {
+            return inputState.inputEvents.lastUsedInputMethod;
+        }
 
     }
 
     public class _Camera {
 
-        public boolean pointVisible(float x, float y) {
-            setTestingCamera(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) {
-                return true;
-            }
+        public boolean isPointVisible(float x, float y) {
+            setTestingCameraInternal(inputState.camera_app);
+            if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCamera(appViewPort.camera);
+                setTestingCameraInternal(appViewPort.camera);
                 if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
             }
             return false;
         }
 
-        public boolean boundsVisible(float x, float y, float halfWidth, float halfHeight) {
-            setTestingCamera(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f)) {
-                return true;
-            }
+        public boolean isRectVisible(float x, float y, float width, float height) {
+            setTestingCameraInternal(inputState.camera_app);
+            if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, width, height, 0f)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCamera(appViewPort.camera);
-                if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, halfWidth, halfHeight, 0f))
+                setTestingCameraInternal(appViewPort.camera);
+                if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, width, height, 0f))
                     return true;
             }
             return false;
         }
 
-        public boolean sphereVisible(float x, float y, float radius) {
-            setTestingCamera(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) {
-                return true;
-            }
+        public boolean isSphereVisible(float x, float y, float radius) {
+            setTestingCameraInternal(inputState.camera_app);
+            if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCamera(appViewPort.camera);
+                setTestingCameraInternal(appViewPort.camera);
                 if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             }
             return false;
-        }
-
-        private void setTestingCamera(OrthographicCamera camera) {
-            inputState.camera_frustum.position.set(camera.position);
-            inputState.camera_frustum.zoom = camera.zoom;
-            inputState.camera_frustum.viewportWidth = camera.viewportWidth;
-            inputState.camera_frustum.viewportHeight = camera.viewportHeight;
-            inputState.camera_frustum.update();
-        }
-
-        public float viewPortStretchFactorWidth() {
-            return inputState.viewport_screen.getWorldWidth() / (float) inputState.viewport_screen.getScreenWidth();
-        }
-
-        public float viewPortStretchFactorHeight() {
-            return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
-        }
-
-        public void move(float x, float y) {
-            move(x, y, 0f);
-        }
-
-        public void move(float x, float y, float z) {
-            setPosition(inputState.camera_app.position.x += x, inputState.camera_app.position.y += y, inputState.camera_app.position.z += z);
         }
 
         public void setPosition(float x, float y) {
@@ -3487,6 +3450,14 @@ public class API {
 
         public void setPosition(float x, float y, float z) {
             inputState.camera_app.position.set(x, y, z);
+        }
+
+        public void move(float x, float y) {
+            move(x, y, 0f);
+        }
+
+        public void move(float x, float y, float z) {
+            setPosition(inputState.camera_app.position.x += x, inputState.camera_app.position.y += y, inputState.camera_app.position.z += z);
         }
 
         public void setX(float x) {
@@ -3533,8 +3504,24 @@ public class API {
             return inputState.camera_app.zoom;
         }
 
-        public Matrix4 combined() {
+        public Matrix4 projection() {
             return inputState.camera_app.combined;
+        }
+
+        public float viewPortStretchFactorWidth() {
+            return inputState.viewport_screen.getWorldWidth() / (float) inputState.viewport_screen.getScreenWidth();
+        }
+
+        public float viewPortStretchFactorHeight() {
+            return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
+        }
+
+        private void setTestingCameraInternal(OrthographicCamera camera) {
+            inputState.camera_frustum.position.set(camera.position);
+            inputState.camera_frustum.zoom = camera.zoom;
+            inputState.camera_frustum.viewportWidth = camera.viewportWidth;
+            inputState.camera_frustum.viewportHeight = camera.viewportHeight;
+            inputState.camera_frustum.update();
         }
     }
 
@@ -3997,7 +3984,7 @@ public class API {
         }
     }
 
-    public class _PreConfigured {
+    public class _Preset {
 
         public class GraphInfo {
             public final long lowestValue;
@@ -4020,8 +4007,9 @@ public class API {
         }
 
         private final char[] numbersAllowedCharacters = new char[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
         private final char[] decimalsAllowedCharacters = new char[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        /* #################### Preset - List #################### */
 
         public TextField list_CreateSearchBar(List list) {
             return list_CreateSearchBar(list, null, false, false);
@@ -4053,7 +4041,7 @@ public class API {
                             component.list.setItems(list, originalList);
                         } else {
                             itemsSearched.clear();
-                            searchItems(list, originalList, itemsSearched, searchText, searchTooltips, searchArrayLists);
+                            list_searchBarSearchItemsInternal(list, originalList, itemsSearched, searchText, searchTooltips, searchArrayLists);
                             component.list.setItems(list, itemsSearched);
                         }
 
@@ -4065,28 +4053,37 @@ public class API {
             return textField;
         }
 
+        public ScrollBarVertical list_CreateScrollBar(List list) {
+            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(0, 0, list.height, new ScrollBarAction() {
+                @Override
+                public void onScrolled(float scrolled) {
+                    component.list.setScrolled(list, 1f - scrolled);
+                }
+            });
+            component.setPosition(scrollBarVertical, list.x + (list.width * UIEngine.TILE_SIZE), list.y);
 
-        private void searchItems(List list, ArrayList searchList, ArrayList resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
-            for (int i = 0; i < searchList.size(); i++) {
-                Object item = searchList.get(i);
-                if (searchArrayLists && item instanceof ArrayList itemList) {
-                    searchItems(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
-                } else if (list.listAction != null && list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
-                    resultList.add(item);
-                } else if (searchTooltips) {
-                    ToolTip tooltip = list.listAction.toolTip(item);
-                    if (tooltip != null) {
-                        linesLoop:
-                        for (int i2 = 0; i2 < tooltip.lines.length; i2++) {
-                            if (tooltip.lines[i] != null && tooltip.lines[i].trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
-                                resultList.add(item);
-                                break linesLoop;
-                            }
-                        }
+            component.addUpdateAction(scrollBarVertical, new UpdateAction() {
+                float scrolledLast = -1;
+
+                @Override
+                public void onUpdate() {
+                    if (scrolledLast != list.scrolled) {
+                        component.scrollBar.setScrolled(scrollBarVertical, 1 - list.scrolled);
+                        scrolledLast = list.scrolled;
+                    }
+                    // disable scrollbar
+                    if (list.items != null && list.items.size() <= list.height) {
+                        component.setDisabled(scrollBarVertical, true);
+                        component.scrollBar.setScrolled(scrollBarVertical, 1f);
+                    } else {
+                        component.setDisabled(scrollBarVertical, false);
                     }
                 }
-            }
+            });
+            return scrollBarVertical;
         }
+
+        /* #################### Preset - Text #################### */
 
         public Text[][] text_CreateTable(int x, int y, String[] column1Text, int col1Width) {
             Text[][] ret = new Text[2][column1Text.length];
@@ -4201,7 +4198,6 @@ public class API {
             }, textHover, fontHover);
         }
 
-
         public Text text_CreateClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick) {
             return text_CreateClickableText(x, y, text, font, onClick, text, font);
         }
@@ -4237,6 +4233,8 @@ public class API {
         }
 
 
+        /* #################### Preset - HotKey #################### */
+
         public HotKeyAction hotkey_CreateForButton(Button button) {
             HotKeyAction hotKeyAction = new HotKeyAction() {
                 @Override
@@ -4252,7 +4250,10 @@ public class API {
             return hotKeyAction;
         }
 
-        public void checkbox_MakeExclusive(CheckBox[] checkboxes, Consumer<CheckBox> checkedFunction) {
+
+        /* #################### Preset - Checkbox #################### */
+
+        public void checkbox_exclusiveRadio(CheckBox[] checkboxes, Consumer<CheckBox> checkedFunction) {
             if (checkboxes == null || checkedFunction == null) return;
             for (int i = 0; i < checkboxes.length; i++) {
                 int iF = i;
@@ -4273,35 +4274,7 @@ public class API {
             }
         }
 
-        public ScrollBarVertical list_CreateScrollBar(List list) {
-            ScrollBarVertical scrollBarVertical = component.scrollBar.verticalScrollbar.create(0, 0, list.height, new ScrollBarAction() {
-                @Override
-                public void onScrolled(float scrolled) {
-                    component.list.setScrolled(list, 1f - scrolled);
-                }
-            });
-            component.setPosition(scrollBarVertical, list.x + (list.width * UIEngine.TILE_SIZE), list.y);
-
-            component.addUpdateAction(scrollBarVertical, new UpdateAction() {
-                float scrolledLast = -1;
-
-                @Override
-                public void onUpdate() {
-                    if (scrolledLast != list.scrolled) {
-                        component.scrollBar.setScrolled(scrollBarVertical, 1 - list.scrolled);
-                        scrolledLast = list.scrolled;
-                    }
-                    // disable scrollbar
-                    if (list.items != null && list.items.size() <= list.height) {
-                        component.setDisabled(scrollBarVertical, true);
-                        component.scrollBar.setScrolled(scrollBarVertical, 1f);
-                    } else {
-                        component.setDisabled(scrollBarVertical, false);
-                    }
-                }
-            });
-            return scrollBarVertical;
-        }
+        /* #################### Preset - Image #################### */
 
         public ArrayList<Component> image_CreateSeparatorHorizontal(int x, int y, int size) {
             ArrayList<Component> returnComponents = new ArrayList<>();
@@ -4324,6 +4297,35 @@ public class API {
             }
             return returnComponents;
         }
+
+        public ArrayList<Component> image_createBorder(int x, int y, int width, int height) {
+            return image_createBorder(x, y, width, height, 0);
+        }
+
+        public ArrayList<Component> image_createBorder(int x, int y, int width, int height, int gap) {
+            ArrayList<Component> borders = new ArrayList<>();
+            width = Tools.Calc.lowerBounds(width, 1);
+            height = Tools.Calc.lowerBounds(height, 1);
+
+
+            for (int ix = 0; ix < width; ix++) {
+
+                borders.add(component.image.create(x + ix, y, UIBaseMedia.UI_BORDERS, 2));
+
+                if (ix >= gap) {
+                    borders.add(component.image.create(x + ix, y + (height - 1), UIBaseMedia.UI_BORDERS, 3));
+                }
+            }
+
+            for (int iy = 0; iy < height; iy++) {
+                borders.add(component.image.create(x, y + iy, UIBaseMedia.UI_BORDERS, 0));
+                borders.add(component.image.create(x + (width - 1), y + iy, UIBaseMedia.UI_BORDERS, 1));
+            }
+
+            return borders;
+        }
+
+        /* #################### Preset - Modal #################### */
 
         public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
             return modal_CreateColorModal(caption, selectColorFunction, initColor, UIBaseMedia.UI_COLOR_SELECTOR);
@@ -4373,7 +4375,7 @@ public class API {
             for (int x = 0; x < colorTexture.getRegionWidth(); x++) {
                 for (int y = 0; y < colorTexture.getRegionHeight(); y++) {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
-                    component.canvas.setPoint(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
+                    component.canvas.point(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
                         component.canvas.canvasImage.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
                     }
@@ -4429,38 +4431,390 @@ public class API {
         }
 
         public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, false, null, null, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, false, null, null, 11);
         }
 
         public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, false, null, null, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, false, null, null, 11);
         }
 
         public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, 11);
         }
 
         public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int windowMinWidth) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, windowMinWidth);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, windowMinWidth);
         }
 
         public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
         }
 
         public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
         }
 
         public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, 11);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, 11);
         }
 
         public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
-            return modal_CreateTextInputModal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, windowMinWidth);
+            return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, windowMinWidth);
         }
 
-        private Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
+        public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
+            int longest = 0;
+            for (int i = 0; i < lines.length; i++) {
+                int len = mediaManager.textWidth(inputState.config.component_defaultFont, lines[i]);
+                if (len > longest) longest = len;
+            }
+            ArrayList<Component> componentsList = new ArrayList<>();
+            final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
+            final int HEIGHT = 4 + lines.length;
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
+
+            Text[] texts = new Text[lines.length];
+            for (int i = 0; i < lines.length; i++) {
+                texts[i] = component.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
+                componentsList.add(texts[i]);
+            }
+
+            Button okBtn = component.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+                @Override
+                public void onRelease() {
+                    if (closeFunction != null) {
+                        closeFunction.run();
+                    }
+                    removeCurrentModalWindow();
+                }
+            });
+            component.button.centerContent(okBtn);
+            componentsList.add(okBtn);
+
+
+            Component[] componentsArr = componentsList.toArray(new Component[]{});
+            component.move(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            window.addComponents(modal, componentsArr);
+            return modal;
+        }
+
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
+            return modal_CreateYesNoRequester(caption, text, choiceFunction, "Yes", "No");
+        }
+
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
+
+            int textWidthMin = Math.max(
+                    (mediaManager.textWidth(inputState.config.component_defaultFont, caption) + 8),
+                    mediaManager.textWidth(inputState.config.component_defaultFont, text)
+            );
+
+            int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
+            if (width % 2 == 0) width++;
+            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
+
+            int width1 = MathUtils.round(width / 2f) - 1;
+            int width2 = width - width1 - 1;
+
+            Text textC = component.text.create(0, 2, new String[]{text});
+            int xOffset = 0;
+            Button yesC = component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
+                @Override
+                public void onRelease() {
+                    if (choiceFunction != null) choiceFunction.accept(true);
+                    removeCurrentModalWindow();
+                }
+            });
+            component.button.centerContent(yesC);
+            xOffset += width1;
+            Button noC = component.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
+                @Override
+                public void onRelease() {
+                    if (choiceFunction != null) choiceFunction.accept(false);
+                    removeCurrentModalWindow();
+                }
+            });
+            component.button.centerContent(noC);
+
+            Component[] componentsl = new Component[]{textC, yesC, noC};
+            component.move(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+            window.addComponents(modal, componentsl);
+            return modal;
+        }
+
+        /* #################### Preset - Canvas #################### */
+
+        public GraphInfo canvas_drawGraph(Canvas canvas, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+            int mapWidth = canvas.width * UIEngine.TILE_SIZE;
+            int mapHeight = canvas.height * UIEngine.TILE_SIZE;
+            int[] indexAtPosition = new int[mapWidth];
+            long[] valueAtPosition = new long[mapWidth];
+            boolean[] dataAvailableAtPosition = new boolean[mapWidth];
+            long lowestValue = Integer.MAX_VALUE;
+            long highestValue = Integer.MIN_VALUE;
+            // Get Values
+            IntArray indexes = new IntArray();
+            LongArray values = new LongArray();
+            BooleanArray dataAvailables = new BooleanArray();
+            int startIndex = (itemCount - 1) - (steps * stepSize);
+            int indexAndValueCount = 0;
+            long valueBefore = (startIndex - stepSize) > 0 ? drawGraphFunctions.getValueAtIndex((startIndex - stepSize)) : Long.MIN_VALUE;
+            boolean oneValueFound = false;
+            for (int i = startIndex; i < itemCount; i += stepSize) {
+                if (i >= 0) {
+                    long value = drawGraphFunctions.getValueAtIndex(i);
+                    lowestValue = Math.min(value, lowestValue);
+                    highestValue = Math.max(value, highestValue);
+                    indexes.add(i);
+                    values.add(value);
+                    dataAvailables.add(true);
+                    oneValueFound = true;
+                } else {
+                    indexes.add(i);
+                    values.add(0L);
+                    dataAvailables.add(false);
+                }
+                indexAndValueCount++;
+            }
+            if (!oneValueFound) {
+                lowestValue = 0;
+                highestValue = 0;
+            }
+            long loReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[0] : lowestValue;
+            long hiReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[1] : highestValue;
+
+
+            // Draw Background
+            Color colorBackGroundDarker = colorBackGround.sub(0.02f, 0.02f, 0.02f, 0f).cpy();
+            for (int iy = 0; iy < mapHeight; iy++) {
+                Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
+                for (int ix = 0; ix < mapWidth; ix++) {
+                    component.canvas.point(canvas, ix, iy, color.r, color.g, color.b, color.a);
+                }
+            }
+
+            // Calculate index/value at position
+            for (int ix = 0; ix < mapWidth; ix++) {
+                int indexAndValueIndex = MathUtils.round((ix / (float) mapWidth) * (indexAndValueCount - 1));
+                indexAtPosition[ix] = indexes.get(indexAndValueIndex);
+                valueAtPosition[ix] = values.get(indexAndValueIndex);
+                dataAvailableAtPosition[ix] = dataAvailables.get(indexAndValueIndex);
+            }
+
+            // Draw Bars
+            long lastValue = valueBefore;
+            int lastIndex = -1;
+            final float SHADING = 0.1f;
+            Color color = drawGraphFunctions.getColorForValues(lastValue, valueBefore);
+            Color colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
+            Color colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
+            drawLoop:
+            for (int ix = 0; ix < mapWidth; ix++) {
+                int index = indexAtPosition[ix];
+                long value = valueAtPosition[ix];
+                boolean dataAvailable = dataAvailableAtPosition[ix];
+
+                if (!dataAvailable) continue drawLoop;
+
+                boolean indexChange = false;
+                boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
+                if (index != lastIndex) {
+                    color = drawGraphFunctions.getColorForValues(value, lastValue);
+                    colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
+                    colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
+                    indexChange = true;
+                    lastIndex = index;
+                }
+
+
+                float heightPct = (value - loReference) / (float) (hiReference - loReference);
+                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct), 2);
+                for (int iy = 0; iy < heightPixels; iy++) {
+                    int y = mapHeight - iy;
+                    if (iy == heightPixels - 1) {
+                        component.canvas.point(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                    } else {
+                        component.canvas.point(canvas, ix, y, color.r, color.g, color.b, color.a);
+                    }
+                }
+
+                // Draw Shading
+                if (indexChange && ix != 0) {
+                    for (int iy = 0; iy < heightPixels; iy++) {
+                        int y = mapHeight - iy;
+                        component.canvas.point(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
+                    }
+                } else if (nextIndexChange) {
+                    for (int iy = 0; iy < heightPixels; iy++) {
+                        int y = mapHeight - iy;
+                        component.canvas.point(canvas, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
+                    }
+                }
+
+
+                lastValue = value;
+            }
+
+            return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
+        }
+
+        /* #################### Preset - Button #################### */
+
+        public ImageButton button_CreateWindowCloseButton(Window window) {
+            return button_CreateWindowCloseButton(window, null);
+        }
+
+        public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
+            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.UI_ICON_CLOSE);
+            component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
+            component.button.setButtonAction(closeButton, new ButtonAction() {
+
+                @Override
+                public void onRelease() {
+                    removeWindow(window);
+                    if (closeFunction != null) closeFunction.accept(window);
+                }
+            });
+            return closeButton;
+        }
+
+        /* #################### Preset - TextField #################### */
+
+        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, DoubleConsumer onChange) {
+            TextField textField = component.textField.create(x, y, width);
+            component.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
+            component.textField.setTextFieldAction(textField, new TextFieldAction() {
+                @Override
+                public boolean isContentValid(String newContent) {
+                    float value;
+                    try {
+                        value = Float.parseFloat(newContent);
+                    } catch (NumberFormatException e) {
+                        return false;
+                    }
+                    return (value >= min && value <= max);
+                }
+
+                @Override
+                public void onEnter(String content, boolean valid) {
+                    float value;
+                    try {
+                        value = Float.parseFloat(content);
+                        onChange.accept(value);
+                    } catch (NumberFormatException e) {
+                        component.textField.focus(textField);
+                    }
+                }
+            });
+            return textField;
+        }
+
+        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, IntConsumer onChange) {
+            TextField textField = component.textField.create(x, y, width);
+            component.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
+            component.textField.setTextFieldAction(textField, new TextFieldAction() {
+                @Override
+                public boolean isContentValid(String newContent) {
+                    int value;
+                    try {
+                        value = Integer.parseInt(newContent);
+                    } catch (NumberFormatException e) {
+                        return false;
+                    }
+                    return (value >= min && value <= max);
+                }
+
+                @Override
+                public void onEnter(String content, boolean valid) {
+                    int value;
+                    try {
+                        value = Integer.parseInt(content);
+                        onChange.accept(value);
+                    } catch (NumberFormatException e) {
+                        component.textField.focus(textField);
+                    }
+                }
+            });
+            return textField;
+        }
+
+        /* #################### Preset - TabBar #################### */
+
+        public ArrayList<Component> tabBar_createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
+            ArrayList<Component> ret = new ArrayList<>();
+
+            width = Tools.Calc.lowerBounds(width, 1);
+            TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
+            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.UI_ICON_EXTEND);
+
+            updateExtendableTabBarButtonInternal(tabBar, extendButton);
+
+            ret.add(extendButton);
+            ret.add(tabBar);
+
+            return ret;
+        }
+
+        /* #################### Private #################### */
+
+        private void updateExtendableTabBarButtonInternal(TabBar tabBar, ImageButton extendButton) {
+            ArrayList<Tab> invisibleTabs = new ArrayList<>();
+            for (int i = 0; i < tabBar.tabs.size(); i++)
+                if (!component.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
+            if (invisibleTabs.size() > 0) {
+                component.button.setButtonAction(extendButton, new ButtonAction() {
+                    @Override
+                    public void onRelease() {
+                        ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
+                        for (int i2 = 0; i2 < invisibleTabs.size(); i2++) {
+                            Tab invisibleTab = invisibleTabs.get(i2);
+                            contextMenuItems.add(contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
+                                @Override
+                                public void onSelect() {
+                                    component.tabBar.removeTab(tabBar, invisibleTab);
+                                    component.tabBar.addTab(tabBar, invisibleTab, 0);
+                                    component.tabBar.selectTab(tabBar, 0);
+                                    updateExtendableTabBarButtonInternal(tabBar, extendButton);
+                                }
+                            }, invisibleTab.icon, 0));
+                        }
+                        ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        openContextMenu(selectTabMenu);
+                    }
+                });
+                component.setDisabled(extendButton, false);
+
+            } else {
+                component.button.setButtonAction(extendButton, null);
+                component.setDisabled(extendButton, true);
+            }
+
+
+        }
+
+        private void list_searchBarSearchItemsInternal(List list, ArrayList searchList, ArrayList resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
+            for (int i = 0; i < searchList.size(); i++) {
+                Object item = searchList.get(i);
+                if (searchArrayLists && item instanceof ArrayList itemList) {
+                    list_searchBarSearchItemsInternal(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
+                } else if (list.listAction != null && list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                    resultList.add(item);
+                } else if (searchTooltips) {
+                    ToolTip tooltip = list.listAction.toolTip(item);
+                    if (tooltip != null) {
+                        linesLoop:
+                        for (int i2 = 0; i2 < tooltip.lines.length; i2++) {
+                            if (tooltip.lines[i] != null && tooltip.lines[i].trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                                resultList.add(item);
+                                break linesLoop;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private Window modal_CreateTextInputModalInternal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
             int maxCharacters = 0;
             if (showTouchInputs) {
                 if (lowerCaseCharacters == null || upperCaseCharacters == null) return null;
@@ -4624,357 +4978,10 @@ public class API {
             return modalWnd;
         }
 
-        public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
-            int longest = 0;
-            for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.textWidth(inputState.config.component_defaultFont, lines[i]);
-                if (len > longest) longest = len;
-            }
-            ArrayList<Component> componentsList = new ArrayList<>();
-            final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
-            final int HEIGHT = 4 + lines.length;
-            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
-
-            Text[] texts = new Text[lines.length];
-            for (int i = 0; i < lines.length; i++) {
-                texts[i] = component.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
-                componentsList.add(texts[i]);
-            }
-
-            Button okBtn = component.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
-                @Override
-                public void onRelease() {
-                    if (closeFunction != null) {
-                        closeFunction.run();
-                    }
-                    removeCurrentModalWindow();
-                }
-            });
-            component.button.centerContent(okBtn);
-            componentsList.add(okBtn);
-
-
-            Component[] componentsArr = componentsList.toArray(new Component[]{});
-            component.move(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            window.addComponents(modal, componentsArr);
-            return modal;
-        }
-
-
-        public GraphInfo map_drawGraph(Canvas canvas, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
-            int mapWidth = canvas.width * UIEngine.TILE_SIZE;
-            int mapHeight = canvas.height * UIEngine.TILE_SIZE;
-            int[] indexAtPosition = new int[mapWidth];
-            long[] valueAtPosition = new long[mapWidth];
-            boolean[] dataAvailableAtPosition = new boolean[mapWidth];
-            long lowestValue = Integer.MAX_VALUE;
-            long highestValue = Integer.MIN_VALUE;
-            // Get Values
-            IntArray indexes = new IntArray();
-            LongArray values = new LongArray();
-            BooleanArray dataAvailables = new BooleanArray();
-            int startIndex = (itemCount - 1) - (steps * stepSize);
-            int indexAndValueCount = 0;
-            long valueBefore = (startIndex - stepSize) > 0 ? drawGraphFunctions.getValueAtIndex((startIndex - stepSize)) : Long.MIN_VALUE;
-            boolean oneValueFound = false;
-            for (int i = startIndex; i < itemCount; i += stepSize) {
-                if (i >= 0) {
-                    long value = drawGraphFunctions.getValueAtIndex(i);
-                    lowestValue = Math.min(value, lowestValue);
-                    highestValue = Math.max(value, highestValue);
-                    indexes.add(i);
-                    values.add(value);
-                    dataAvailables.add(true);
-                    oneValueFound = true;
-                } else {
-                    indexes.add(i);
-                    values.add(0L);
-                    dataAvailables.add(false);
-                }
-                indexAndValueCount++;
-            }
-            if (!oneValueFound) {
-                lowestValue = 0;
-                highestValue = 0;
-            }
-            long loReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[0] : lowestValue;
-            long hiReference = hiAndLowValueReference != null && hiAndLowValueReference.length == 2 ? hiAndLowValueReference[1] : highestValue;
-
-
-            // Draw Background
-            Color colorBackGroundDarker = colorBackGround.sub(0.02f, 0.02f, 0.02f, 0f).cpy();
-            for (int iy = 0; iy < mapHeight; iy++) {
-                Color color = drawBackGroundLines ? (iy % 4 == 0 ? colorBackGroundDarker : colorBackGround) : colorBackGround;
-                for (int ix = 0; ix < mapWidth; ix++) {
-                    component.canvas.setPoint(canvas, ix, iy, color.r, color.g, color.b, color.a);
-                }
-            }
-
-            // Calculate index/value at position
-            for (int ix = 0; ix < mapWidth; ix++) {
-                int indexAndValueIndex = MathUtils.round((ix / (float) mapWidth) * (indexAndValueCount - 1));
-                indexAtPosition[ix] = indexes.get(indexAndValueIndex);
-                valueAtPosition[ix] = values.get(indexAndValueIndex);
-                dataAvailableAtPosition[ix] = dataAvailables.get(indexAndValueIndex);
-            }
-
-            // Draw Bars
-            long lastValue = valueBefore;
-            int lastIndex = -1;
-            final float SHADING = 0.1f;
-            Color color = drawGraphFunctions.getColorForValues(lastValue, valueBefore);
-            Color colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
-            Color colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
-            drawLoop:
-            for (int ix = 0; ix < mapWidth; ix++) {
-                int index = indexAtPosition[ix];
-                long value = valueAtPosition[ix];
-                boolean dataAvailable = dataAvailableAtPosition[ix];
-
-                if (!dataAvailable) continue drawLoop;
-
-                boolean indexChange = false;
-                boolean nextIndexChange = (ix + 1) < mapWidth && indexAtPosition[ix + 1] != index;
-                if (index != lastIndex) {
-                    color = drawGraphFunctions.getColorForValues(value, lastValue);
-                    colorBrighter = color.add(SHADING, SHADING, SHADING, 0f).cpy();
-                    colorDarker = color.sub(SHADING, SHADING, SHADING, 0f).cpy();
-                    indexChange = true;
-                    lastIndex = index;
-                }
-
-
-                float heightPct = (value - loReference) / (float) (hiReference - loReference);
-                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct), 2);
-                for (int iy = 0; iy < heightPixels; iy++) {
-                    int y = mapHeight - iy;
-                    if (iy == heightPixels - 1) {
-                        component.canvas.setPoint(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
-                    } else {
-                        component.canvas.setPoint(canvas, ix, y, color.r, color.g, color.b, color.a);
-                    }
-                }
-
-                // Draw Shading
-                if (indexChange && ix != 0) {
-                    for (int iy = 0; iy < heightPixels; iy++) {
-                        int y = mapHeight - iy;
-                        component.canvas.setPoint(canvas, ix, y, colorBrighter.r, colorBrighter.g, colorBrighter.b, colorBrighter.a);
-                    }
-                } else if (nextIndexChange) {
-                    for (int iy = 0; iy < heightPixels; iy++) {
-                        int y = mapHeight - iy;
-                        component.canvas.setPoint(canvas, ix, y, colorDarker.r, colorDarker.g, colorDarker.b, colorDarker.a);
-                    }
-                }
-
-
-                lastValue = value;
-            }
-
-            return new GraphInfo(lowestValue, highestValue, indexAtPosition, valueAtPosition);
-        }
-
-        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
-            return modal_CreateYesNoRequester(caption, text, choiceFunction, "Yes", "No");
-        }
-
-        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
-
-            int textWidthMin = Math.max(
-                    (mediaManager.textWidth(inputState.config.component_defaultFont, caption) + 8),
-                    mediaManager.textWidth(inputState.config.component_defaultFont, text)
-            );
-
-            int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
-            if (width % 2 == 0) width++;
-            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
-
-            int width1 = MathUtils.round(width / 2f) - 1;
-            int width2 = width - width1 - 1;
-
-            Text textC = component.text.create(0, 2, new String[]{text});
-            int xOffset = 0;
-            Button yesC = component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
-                @Override
-                public void onRelease() {
-                    if (choiceFunction != null) choiceFunction.accept(true);
-                    removeCurrentModalWindow();
-                }
-            });
-            component.button.centerContent(yesC);
-            xOffset += width1;
-            Button noC = component.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
-                @Override
-                public void onRelease() {
-                    if (choiceFunction != null) choiceFunction.accept(false);
-                    removeCurrentModalWindow();
-                }
-            });
-            component.button.centerContent(noC);
-
-            Component[] componentsl = new Component[]{textC, yesC, noC};
-            component.move(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            window.addComponents(modal, componentsl);
-            return modal;
-        }
-
-        public ImageButton button_CreateWindowCloseButton(Window window) {
-            return button_CreateWindowCloseButton(window, null);
-        }
-
-        public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.UI_ICON_CLOSE);
-            component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
-            component.button.setButtonAction(closeButton, new ButtonAction() {
-
-                @Override
-                public void onRelease() {
-                    removeWindow(window);
-                    if (closeFunction != null) closeFunction.accept(window);
-                }
-            });
-            return closeButton;
-        }
-
-        public TextField textField_createDecimalInputField(int x, int y, int width, float min, float max, DoubleConsumer onChange) {
-            TextField textField = component.textField.create(x, y, width);
-            component.textField.setAllowedCharacters(textField, decimalsAllowedCharacters);
-            component.textField.setTextFieldAction(textField, new TextFieldAction() {
-                @Override
-                public boolean isContentValid(String newContent) {
-                    float value;
-                    try {
-                        value = Float.parseFloat(newContent);
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                    return (value >= min && value <= max);
-                }
-
-                @Override
-                public void onEnter(String content, boolean valid) {
-                    float value;
-                    try {
-                        value = Float.parseFloat(content);
-                        onChange.accept(value);
-                    } catch (NumberFormatException e) {
-                        component.textField.focus(textField);
-                    }
-                }
-            });
-            return textField;
-        }
-
-        public TextField textField_createIntegerInputField(int x, int y, int width, int min, int max, IntConsumer onChange) {
-            TextField textField = component.textField.create(x, y, width);
-            component.textField.setAllowedCharacters(textField, numbersAllowedCharacters);
-            component.textField.setTextFieldAction(textField, new TextFieldAction() {
-                @Override
-                public boolean isContentValid(String newContent) {
-                    int value;
-                    try {
-                        value = Integer.parseInt(newContent);
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                    return (value >= min && value <= max);
-                }
-
-                @Override
-                public void onEnter(String content, boolean valid) {
-                    int value;
-                    try {
-                        value = Integer.parseInt(content);
-                        onChange.accept(value);
-                    } catch (NumberFormatException e) {
-                        component.textField.focus(textField);
-                    }
-                }
-            });
-            return textField;
-        }
-
-        public ArrayList<Component> image_createBorder(int x, int y, int width, int height) {
-            return image_createBorder(x, y, width, height, 0);
-        }
-
-        public ArrayList<Component> image_createBorder(int x, int y, int width, int height, int gap) {
-            ArrayList<Component> borders = new ArrayList<>();
-            width = Tools.Calc.lowerBounds(width, 1);
-            height = Tools.Calc.lowerBounds(height, 1);
-
-
-            for (int ix = 0; ix < width; ix++) {
-
-                borders.add(component.image.create(x + ix, y, UIBaseMedia.UI_BORDERS, 2));
-
-                if (ix >= gap) {
-                    borders.add(component.image.create(x + ix, y + (height - 1), UIBaseMedia.UI_BORDERS, 3));
-                }
-            }
-
-            for (int iy = 0; iy < height; iy++) {
-                borders.add(component.image.create(x, y + iy, UIBaseMedia.UI_BORDERS, 0));
-                borders.add(component.image.create(x + (width - 1), y + iy, UIBaseMedia.UI_BORDERS, 1));
-            }
-
-            return borders;
-        }
-
-        public ArrayList<Component> tabBar_createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
-            ArrayList<Component> ret = new ArrayList<>();
-
-            width = Tools.Calc.lowerBounds(width, 1);
-            TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.UI_ICON_EXTEND);
-
-            updateExtendableTabBarButton(tabBar, extendButton);
-
-            ret.add(extendButton);
-            ret.add(tabBar);
-
-            return ret;
-        }
-
-        private void updateExtendableTabBarButton(TabBar tabBar, ImageButton extendButton) {
-            ArrayList<Tab> invisibleTabs = new ArrayList<>();
-            for (int i = 0; i < tabBar.tabs.size(); i++)
-                if (!component.tabBar.isTabVisible(tabBar, tabBar.tabs.get(i))) invisibleTabs.add(tabBar.tabs.get(i));
-            if (invisibleTabs.size() > 0) {
-                component.button.setButtonAction(extendButton, new ButtonAction() {
-                    @Override
-                    public void onRelease() {
-                        ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
-                        for (int i2 = 0; i2 < invisibleTabs.size(); i2++) {
-                            Tab invisibleTab = invisibleTabs.get(i2);
-                            contextMenuItems.add(contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
-                                @Override
-                                public void onSelect() {
-                                    component.tabBar.removeTab(tabBar, invisibleTab);
-                                    component.tabBar.addTab(tabBar, invisibleTab, 0);
-                                    component.tabBar.selectTab(tabBar, 0);
-                                    updateExtendableTabBarButton(tabBar, extendButton);
-                                }
-                            }, invisibleTab.icon, 0));
-                        }
-                        ContextMenu selectTabMenu = contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
-                        openContextMenu(selectTabMenu);
-                    }
-                });
-                component.setDisabled(extendButton, false);
-
-            } else {
-                component.button.setButtonAction(extendButton, null);
-                component.setDisabled(extendButton, true);
-            }
-
-
-        }
-
     }
 
     /* #################### Notifications #################### */
+
     public ArrayList<Notification> notifications() {
         return new ArrayList<>(inputState.notifications);
     }
@@ -5046,6 +5053,7 @@ public class API {
     }
 
     /* #################### Windows #################### */
+
     public ArrayList<Window> windows() {
         return new ArrayList<>(inputState.windows);
     }

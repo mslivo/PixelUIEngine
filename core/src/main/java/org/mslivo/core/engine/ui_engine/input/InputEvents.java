@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 public class InputEvents {
     public InputMethod lastUsedInputMethod;
+
     /* --- Hardware Mouse --- */
     public boolean mouseDown;
     public boolean mouseDoubleClick;
