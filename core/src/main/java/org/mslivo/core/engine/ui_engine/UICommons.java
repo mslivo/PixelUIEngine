@@ -223,12 +223,45 @@ class UICommons {
         }
     }
 
+    static void window_addToScreenAsModal(InputState inputState, Window window) {
+        if(inputState.modalWindow == null) {
+            window.alwaysOnTop = true;
+            window.visible = true;
+            window.folded = false;
+            window.enforceScreenBounds = true;
+            inputState.modalWindow = window;
+            UICommons.window_center(inputState, window);
+            UICommons.window_addToScreen(inputState, window);
+        }else{
+            inputState.modalWindowQueue.add(window);
+        }
+    }
+
+    static void window_center(InputState inputState, Window window){
+        int centerX = (inputState.resolutionWidth_ui / 2) - (UICommons.window_getAbsoluteWidth(window) / 2);
+        int centerY = (inputState.resolutionHeight_ui / 2) - ((window.folded ? UIEngine.TILE_SIZE : UICommons.window_getAbsoluteHeight(window)) / 2);
+        window_setPosition(inputState, window, centerX, centerY);
+    }
+
     static void window_addToScreen(InputState inputState, Window window) {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         inputState.windows.add(window);
         resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onAdd();
+    }
+
+    static boolean window_close(InputState inputState, Window window){
+        for (int i = 0; i < window.components.size(); i++){
+            if(window.components.get(i).name.equals(UIEngine.WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton){
+                if (closeButton.buttonAction != null) {
+                    UICommons.button_press(closeButton);
+                    UICommons.button_release(closeButton);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     static void window_removeFromScreen(InputState inputState, Window window) {
@@ -239,6 +272,8 @@ class UICommons {
         inputState.windows.remove(window);
         resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onRemove();
+        // Add Next Modal if in queue
+        if(inputState.modalWindowQueue.size() > 0) window_addToScreenAsModal(inputState,inputState.modalWindowQueue.poll());
     }
 
     static int component_getParentWindowX(Component component) {
