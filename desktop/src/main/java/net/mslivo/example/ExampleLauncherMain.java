@@ -30,7 +30,7 @@ public class ExampleLauncherMain {
             new Lwjgl3Application(new ExampleMain(), config);
         } catch (Exception e) {
             Tools.Log.error(e);
-            Tools.Log.errorToFile(e, Path.of("exception.log"));
+            Tools.Log.errorToFile(e, Path.of("error.log"));
         }
     }
 }

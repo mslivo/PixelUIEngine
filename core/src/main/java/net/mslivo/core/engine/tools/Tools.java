@@ -56,7 +56,7 @@ public class Tools {
         private static final StringBuilder logMessageBuilder = new StringBuilder();
         private static boolean stdOutEnabled = true;
 
-        public static void setStdOutEnabled(boolean enabled){
+        public static void setStdOutLogEnabled(boolean enabled){
             stdOutEnabled = enabled;
         }
 
@@ -126,6 +126,7 @@ public class Tools {
         public static void errorToFile(Exception e, Path file) {
             try {
                 reset();
+                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured");
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);
                 printWriter.write(logMessageBuilder.toString());
