@@ -13,7 +13,8 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- core dependencies -->
+
+			<!-- GDX Core dependencies -->
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx</artifactId>
@@ -21,7 +22,8 @@
 				<scope>compile</scope>
 			</dependency>
 
-			<!-- desktop-specific dependencies -->
+			<!-- GDX desktop-specific dependencies -->
+
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-backend-lwjgl3</artifactId>
@@ -37,7 +39,7 @@
 				<scope>compile</scope>
 			</dependency>
 
-			<!-- Controller support -->
+			<!-- GDX Controller support -->
 
 			<dependency>
 				<groupId>com.badlogicgames.gdx-controllers</groupId>
@@ -52,7 +54,6 @@
 				<version>${gdx-controllers.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 
