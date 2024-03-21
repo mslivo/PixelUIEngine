@@ -1,6 +1,9 @@
 package net.mslivo.core.engine.tools;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
@@ -26,22 +29,22 @@ public class Tools {
     private static final DecimalFormat decimalFormat_6decimal = new DecimalFormat("#.######");
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
-    public static class Update {
+    public static class App {
         private static float skipFrameAccumulator = 0f;
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
 
-        public static void setUpdatesPerSecond(int maxUpdatesPerSecond){
-            Update.maxUpdatesPerSecond = Tools.Calc.lowerBounds(maxUpdatesPerSecond,1);
-            timeStep = (1f/(float) Update.maxUpdatesPerSecond);
-            timeStepX2 = timeStep*2f;
+        public static void setTargetUpdates(int updatesPerSecond) {
+            App.maxUpdatesPerSecond = Tools.Calc.lowerBounds(updatesPerSecond, 1);
+            timeStep = (1f / (float) App.maxUpdatesPerSecond);
+            timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
         }
 
-        public static boolean runUpdate() {
+        public static boolean isRunUpdate() {
             // Accumulate 2 frames max
-            skipFrameAccumulator = Tools.Calc.upperBounds(skipFrameAccumulator+Gdx.graphics.getDeltaTime(), timeStepX2);
+            skipFrameAccumulator = Tools.Calc.upperBounds(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), timeStepX2);
             if (skipFrameAccumulator < timeStep) {
                 return false;
             } else {
@@ -50,22 +53,50 @@ public class Tools {
             }
         }
 
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight){
+            launch(applicationAdapter,appTile,resolutionWidth,resolutionHeight,60);
+        }
+
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps){
+            Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+            config.setResizable(true);
+            config.setWindowedMode(resolutionWidth, resolutionHeight);
+            config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
+            config.setTitle(appTile);
+            config.setDecorated(true);
+            config.setMaximized(true);
+            config.setForegroundFPS(fps);
+            config.useVsync(false);
+            config.setWindowPosition(-1, -1);
+            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+            try {
+                new Lwjgl3Application(applicationAdapter, config);
+            } catch (Exception e) {
+                Log.message(e);
+                Log.toFile(e, Path.of("error.log"));
+            }
+        }
     }
+
 
     public static class Log {
         private static final StringBuilder logMessageBuilder = new StringBuilder();
-        private static boolean stdOutEnabled = true;
+        private static boolean stdOutLogEnabled = true;
+        private static boolean FileLogEnabled = true;
 
-        public static void setStdOutLogEnabled(boolean enabled){
-            stdOutEnabled = enabled;
+        public static void setStdOutLogEnabled(boolean enabled) {
+            stdOutLogEnabled = enabled;
+        }
+
+        public static void setFileLogEnabled(boolean enabled) {
+            FileLogEnabled = enabled;
         }
 
         public static void benchmark(String... customValues) {
-            if(!stdOutEnabled) return;
+            if (!stdOutLogEnabled) return;
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
                 custom.append(" | ").append(String.format("%1$10s", customValues[i]));
-
             reset();
             logMessageBuilder.append(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()));
             logMessageBuilder.append(" FPS | ");
@@ -76,42 +107,36 @@ public class Tools {
         }
 
         public static void message(String msg) {
-            if(!stdOutEnabled) return;
+            if (!stdOutLogEnabled) return;
             reset();
             logMessageBuilder.append(msg);
             System.out.println(logMessageBuilder);
         }
 
-        public static void error(String msg) {
-            if(!stdOutEnabled) return;
+        public static void message(Exception e) {
+            if (!stdOutLogEnabled) return;
             reset();
-            logMessageBuilder.append(msg);
-            System.err.println(logMessageBuilder);
-        }
-
-        public static void error(Exception e) {
-            if(!stdOutEnabled) return;
-            reset();
-            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured");
-            System.err.println(logMessageBuilder);
-            e.printStackTrace();
+            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured"+System.lineSeparator());
+            System.out.println(logMessageBuilder);
+            e.printStackTrace(System.out);
         }
 
         public static void inProgress(String what) {
-            if(!stdOutEnabled) return;
+            if (!stdOutLogEnabled) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append(what).append("...");
             System.out.println(logMessageBuilder);
         }
 
         public static void done() {
-            if(!stdOutEnabled) return;
+            if (!stdOutLogEnabled) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append("Done.");
             System.out.println(logMessageBuilder);
         }
 
-        public static void errorToFile(String error, Path file) {
+        public static void toFile(String error, Path file) {
+            if(!FileLogEnabled) return;
             try {
                 reset();
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
@@ -123,10 +148,11 @@ public class Tools {
             }
         }
 
-        public static void errorToFile(Exception e, Path file) {
+        public static void toFile(Exception e, Path file) {
+            if(!FileLogEnabled) return;
             try {
                 reset();
-                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured");
+                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured"+System.lineSeparator());
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);
                 printWriter.write(logMessageBuilder.toString());
@@ -139,7 +165,7 @@ public class Tools {
 
         private static void reset() {
             logMessageBuilder.setLength(0);
-            logMessageBuilder.append(Text.ANSI_BLUE).append( sdf.format(new Date())).append(Text.ANSI_RESET);
+            logMessageBuilder.append(Text.ANSI_BLUE).append(sdf.format(new Date())).append(Text.ANSI_RESET);
         }
     }
 
@@ -246,14 +272,14 @@ public class Tools {
         }
 
         public static String[] validStringArrayCopy(String[] string) {
-            if(string == null){
+            if (string == null) {
                 return new String[]{};
-            }else{
+            } else {
                 String[] validString = new String[string.length];
-                for(int i=0;i<string.length;i++){
-                    if(string[i] != null){
+                for (int i = 0; i < string.length; i++) {
+                    if (string[i] != null) {
                         validString[i] = string[i];
-                    }else{
+                    } else {
                         validString[i] = "";
                     }
                 }
@@ -311,7 +337,7 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.Log.error(e);
+                Tools.Log.message(e);
                 return false;
             }
         }

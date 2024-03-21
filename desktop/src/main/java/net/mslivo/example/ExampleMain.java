@@ -48,7 +48,7 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void create() {
-        Tools.Update.setUpdatesPerSecond(ExampleMainConstants.UPDATE_RATE);
+        Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = new TransitionManager();
         // Load Assets
         Tools.Log.inProgress("Loading Assets");
@@ -80,7 +80,7 @@ public class ExampleMain extends ApplicationAdapter {
     public void render() {
         switch (state) {
             case RUN -> {
-                if (Tools.Update.runUpdate()) {
+                if (Tools.App.isRunUpdate()) {
                     // 1. Update UI Engine -> Gather Input & Process Output
                     profile_time_gui = System.currentTimeMillis();
                     this.uiEngine.update();
@@ -112,7 +112,7 @@ public class ExampleMain extends ApplicationAdapter {
 
             }
             case TRANSITION -> {
-                if (Tools.Update.runUpdate()) {
+                if (Tools.App.isRunUpdate()) {
                     boolean finished = this.transitionManager.update();
                     if (finished) {
                         // Replace with new UIEngine after Reset
