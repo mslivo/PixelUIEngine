@@ -71,7 +71,7 @@ import java.util.Arrays;
  * App needs to be implemented inside the uiAdapter
  */
 @SuppressWarnings("ForLoopReplaceableByForEach")
-public class UIEngine<T extends UIAdapter> {
+public class UIEngine<T extends UIEngineAdapter> {
 
     // Basic Configuration
     private final T uiAdapter;

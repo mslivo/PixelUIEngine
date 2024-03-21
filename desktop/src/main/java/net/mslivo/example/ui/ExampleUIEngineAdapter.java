@@ -8,7 +8,7 @@ import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.engine.AppEngine;
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.UIAdapter;
+import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
@@ -20,7 +20,7 @@ import net.mslivo.example.data.ExampleData;
 import net.mslivo.example.engine.ExampleEngineAdapter;
 import net.mslivo.example.ui.windows.ExampleWindowGenerator;
 
-public class ExampleUIAdapter implements UIAdapter {
+public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
     private API api;
 
@@ -33,7 +33,7 @@ public class ExampleUIAdapter implements UIAdapter {
     private float animation_timer;
     private boolean resetPressed;
 
-    public ExampleUIAdapter(AppEngine<ExampleEngineAdapter, ExampleData> appEngine) {
+    public ExampleUIEngineAdapter(AppEngine<ExampleEngineAdapter, ExampleData> appEngine) {
         this.appEngine = appEngine;
         this.data = appEngine.getData();
     }

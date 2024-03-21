@@ -6,7 +6,7 @@ import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 
-public interface UIAdapter {
+public interface UIEngineAdapter {
 
     void init(API api, MediaManager mediaManager);
 

@@ -2,7 +2,7 @@ package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import net.mslivo.example.ui.ExampleUIAdapter;
+import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -29,8 +29,8 @@ public class ExampleMain extends ApplicationAdapter {
     private ExampleData data;
     public ExampleEngineAdapter engineAdapter;
     private AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
-    private UIEngine<ExampleUIAdapter> uiEngine;
-    private UIEngine<ExampleUIAdapter> uiEngine_transition;
+    private UIEngine<ExampleUIEngineAdapter> uiEngine;
+    private UIEngine<ExampleUIEngineAdapter> uiEngine_transition;
 
     /* --- */
 
@@ -68,7 +68,7 @@ public class ExampleMain extends ApplicationAdapter {
         // Input/Render
         Tools.Log.inProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
-                new ExampleUIAdapter(this.appEngine),
+                new ExampleUIEngineAdapter(this.appEngine),
                 this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                         ExampleMainConstants.viewportMode);
         Tools.Log.done();
@@ -100,7 +100,7 @@ public class ExampleMain extends ApplicationAdapter {
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
-                            new ExampleUIAdapter(this.appEngine),
+                            new ExampleUIEngineAdapter(this.appEngine),
                             this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                                     ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
