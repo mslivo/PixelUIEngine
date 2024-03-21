@@ -22,7 +22,7 @@
 				<scope>compile</scope>
 			</dependency>
 
-			<!-- GDX desktop-specific dependencies -->
+			<!-- GDX Desktop-Specific dependencies -->
 
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
@@ -30,7 +30,6 @@
 				<version>${gdx.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-platform</artifactId>
@@ -47,7 +46,6 @@
 				<version>${gdx-controllers.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
 			<dependency>
 				<groupId>com.badlogicgames.gdx-controllers</groupId>
 				<artifactId>gdx-controllers-desktop</artifactId>
