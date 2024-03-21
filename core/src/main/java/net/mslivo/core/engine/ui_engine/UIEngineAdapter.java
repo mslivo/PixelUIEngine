@@ -7,21 +7,13 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 
 public interface UIEngineAdapter {
-
     void init(API api, MediaManager mediaManager);
-
     void update();
-
     void render(SpriteRenderer batch, ImmediateRenderer immediateRenderer, AppViewPort appViewPort);
-
-    void shutdown();
-
     default void renderBeforeUI(SpriteRenderer spriteRenderer, ImmediateRenderer immediateRenderer) {
     }
-
     default void renderAfterUI(SpriteRenderer spriteRenderer, ImmediateRenderer immediateRenderer) {
     }
-
     default void renderComposite(SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
                                  int internalResolutionWidth, int internalResolutionHeight, boolean appGrayScale) {
         spriteRenderer.begin();
@@ -33,5 +25,5 @@ public interface UIEngineAdapter {
         spriteRenderer.draw(texture_ui, 0, 0, internalResolutionWidth, internalResolutionHeight);
         spriteRenderer.end();
     }
-
+    void shutdown();
 }
