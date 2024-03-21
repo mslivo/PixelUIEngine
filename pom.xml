@@ -18,6 +18,7 @@
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx</artifactId>
 				<version>${gdx.version}</version>
+				<scope>compile</scope>
 			</dependency>
 
 			<!-- desktop-specific dependencies -->
@@ -25,6 +26,7 @@
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-backend-lwjgl3</artifactId>
 				<version>${gdx.version}</version>
+				<scope>compile</scope>
 			</dependency>
 
 			<dependency>
@@ -32,6 +34,7 @@
 				<artifactId>gdx-platform</artifactId>
 				<version>${gdx.version}</version>
 				<classifier>natives-desktop</classifier>
+				<scope>compile</scope>
 			</dependency>
 
 			<!-- Controller support -->
@@ -40,12 +43,14 @@
 				<groupId>com.badlogicgames.gdx-controllers</groupId>
 				<artifactId>gdx-controllers-core</artifactId>
 				<version>${gdx-controllers.version}</version>
+				<scope>compile</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>com.badlogicgames.gdx-controllers</groupId>
 				<artifactId>gdx-controllers-desktop</artifactId>
 				<version>${gdx-controllers.version}</version>
+				<scope>compile</scope>
 			</dependency>
 
 		</dependencies>
