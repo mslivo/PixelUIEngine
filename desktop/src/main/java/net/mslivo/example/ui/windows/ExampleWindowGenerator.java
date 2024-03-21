@@ -8,8 +8,6 @@ import net.mslivo.core.engine.media_manager.media.CMediaArray;
 import net.mslivo.core.engine.media_manager.media.CMediaGFX;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.engine.AppEngine;
-import net.mslivo.core.engine.tools.sound.SoundPlayer;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngine;
@@ -46,8 +44,6 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
-import net.mslivo.example.data.ExampleData;
-import net.mslivo.example.engine.ExampleEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
@@ -60,19 +56,12 @@ public class ExampleWindowGenerator extends WindowGenerator {
         super(api);
     }
 
-    private AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
-
     private MediaManager mediaManager;
-
-    private SoundPlayer soundPlayer;
 
     @Override
     public Window create(Object[] p) {
         String title = (String) p[0];
-        this.appEngine = (AppEngine) p[1];
-        this.mediaManager = (MediaManager) p[2];
-
-        this.soundPlayer = new SoundPlayer(mediaManager);
+        this.mediaManager = (MediaManager) p[1];
         /* Window */
         Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, 0);
         api.window.setEnforceScreenBounds(window, true);

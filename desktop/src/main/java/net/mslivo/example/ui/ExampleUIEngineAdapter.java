@@ -2,40 +2,28 @@ package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.ui_engine.API;
+import net.mslivo.core.engine.ui_engine.UIBaseMedia;
+import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
+import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
-import net.mslivo.example.ui.media.ExampleBaseMedia;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.tools.engine.AppEngine;
-import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
-import net.mslivo.core.engine.ui_engine.UIBaseMedia;
-import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
-import net.mslivo.example.data.ExampleData;
-import net.mslivo.example.engine.ExampleEngineAdapter;
+import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGenerator;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-
     private API api;
-
     private MediaManager mediaManager;
-
-    private final AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
-
-    private final ExampleData data;
-
     private float animation_timer;
     private boolean resetPressed;
 
-    public ExampleUIEngineAdapter(AppEngine<ExampleEngineAdapter, ExampleData> appEngine) {
-        this.appEngine = appEngine;
-        this.data = appEngine.getData();
+    public ExampleUIEngineAdapter() {
     }
 
     public void setResetPressed(boolean resetPressed) {
@@ -56,7 +44,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", appEngine, mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", mediaManager));
             }
         }, null, 0, ButtonMode.DEFAULT);
 
@@ -106,16 +94,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
     @Override
     public void update() {
-        // Process Outputs
-        while (appEngine.nextOutput()) {
-            int type = appEngine.getOutputType();
-            Object[] params = appEngine.getOutputParams();
-        }
-
-
-        // Create Inputs
-        // appEngine.input(new EngineInput(0,"TestInput"));
-
         API._Input._KeyBoard keyBoard = api.input.keyboard;
         while (keyBoard.event.keyDownHasNext()) {
             int key = keyBoard.event.keyDownNext();

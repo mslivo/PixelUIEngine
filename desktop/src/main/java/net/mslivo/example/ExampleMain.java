@@ -2,40 +2,26 @@ package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import net.mslivo.example.ui.ExampleUIEngineAdapter;
-import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.engine.AppEngine;
-import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import net.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
+import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.example.data.ExampleData;
-import net.mslivo.example.data.ExampleDataGenerator;
-import net.mslivo.example.engine.ExampleEngineAdapter;
+import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
+import net.mslivo.example.ui.ExampleUIEngineAdapter;
+import net.mslivo.example.ui.media.ExampleBaseMedia;
 
 public class ExampleMain extends ApplicationAdapter {
-
     enum STATE {
         RUN, TRANSITION
     }
 
     private STATE state;
     private TransitionManager transitionManager;
-
-    /* Subsystems */
-
     private MediaManager mediaManager;
-    private ExampleData data;
-    public ExampleEngineAdapter engineAdapter;
-    private AppEngine<ExampleEngineAdapter, ExampleData> appEngine;
     private UIEngine<ExampleUIEngineAdapter> uiEngine;
     private UIEngine<ExampleUIEngineAdapter> uiEngine_transition;
-
-    /* --- */
-
-    private long profile_time_gui, profile_time_engine, profile_time_render;
-
     private long timer_debug_info;
 
     public ExampleMain() {
@@ -58,19 +44,12 @@ public class ExampleMain extends ApplicationAdapter {
         this.mediaManager.loadAssets();
         Tools.Log.done();
 
-        // Engine
-        Tools.Log.inProgress("Starting Engine");
-        this.data = ExampleDataGenerator.create_exampleData();
-        this.engineAdapter = new ExampleEngineAdapter();
-        this.appEngine = new AppEngine<>(this.engineAdapter, this.data);
-        Tools.Log.done();
-
         // Input/Render
         Tools.Log.inProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
-                new ExampleUIEngineAdapter(this.appEngine),
-                this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                        ExampleMainConstants.viewportMode);
+                new ExampleUIEngineAdapter(),
+                this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                ExampleMainConstants.viewportMode);
         Tools.Log.done();
 
         this.state = STATE.RUN;
@@ -81,28 +60,19 @@ public class ExampleMain extends ApplicationAdapter {
         switch (state) {
             case RUN -> {
                 if (Tools.App.isRunUpdate()) {
-                    // 1. Update UI Engine -> Gather Input & Process Output
-                    profile_time_gui = System.currentTimeMillis();
                     this.uiEngine.update();
-                    profile_time_gui = System.currentTimeMillis() - profile_time_gui;
-                    // 2. Update AppEngine -> Process Input & Create Output
-                    profile_time_engine = System.currentTimeMillis();
-                    this.appEngine.update();
-                    profile_time_engine = System.currentTimeMillis() - profile_time_engine;
                 }
 
-                // 3. Render Everything
-                profile_time_render = System.currentTimeMillis();
                 this.uiEngine.render();
-                profile_time_render = System.currentTimeMillis() - profile_time_render;
+
 
 
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
-                            new ExampleUIEngineAdapter(this.appEngine),
-                            this.mediaManager,ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                                    ExampleMainConstants.viewportMode);
+                            new ExampleUIEngineAdapter(),
+                            this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                            ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
                     this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
                     this.transitionManager.render();
@@ -129,7 +99,7 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.Log.benchmark("UI: " + profile_time_gui + "ms", "Render: " + profile_time_render + "ms");
+            Tools.Log.benchmark();
             timer_debug_info = System.currentTimeMillis();
         }
     }
@@ -145,7 +115,6 @@ public class ExampleMain extends ApplicationAdapter {
 
     private void shutdownEngine() {
         this.uiEngine.shutdown();
-        this.appEngine.shutdown();
         this.mediaManager.shutdown();
         this.transitionManager.shutdown();
     }
