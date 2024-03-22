@@ -53,11 +53,15 @@ public class Tools {
             }
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight){
-            launch(applicationAdapter,appTile,resolutionWidth,resolutionHeight,60);
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null);
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps){
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps) {
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null);
+        }
+
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
             config.setWindowedMode(resolutionWidth, resolutionHeight);
@@ -69,6 +73,7 @@ public class Tools {
             config.useVsync(false);
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+            if (iconPath != null) config.setWindowIcon(iconPath);
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
@@ -116,7 +121,7 @@ public class Tools {
         public static void message(Exception e) {
             if (!stdOutLogEnabled) return;
             reset();
-            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured"+System.lineSeparator());
+            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
             System.out.println(logMessageBuilder);
             e.printStackTrace(System.out);
         }
@@ -136,7 +141,7 @@ public class Tools {
         }
 
         public static void toFile(String error, Path file) {
-            if(!FileLogEnabled) return;
+            if (!FileLogEnabled) return;
             try {
                 reset();
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
@@ -149,10 +154,10 @@ public class Tools {
         }
 
         public static void toFile(Exception e, Path file) {
-            if(!FileLogEnabled) return;
+            if (!FileLogEnabled) return;
             try {
                 reset();
-                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured"+System.lineSeparator());
+                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
                 FileWriter fileWriter = new FileWriter(file.toString(), true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);
                 printWriter.write(logMessageBuilder.toString());
