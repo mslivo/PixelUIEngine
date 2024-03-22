@@ -56,7 +56,7 @@ public class Tools {
                 return true;
             }
         }
-        public static float updadeDelta(){
+        public static float updateDeltaTime(){
             return updateDelta;
         }
 
