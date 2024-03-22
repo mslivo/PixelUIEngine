@@ -75,6 +75,7 @@ public class ImmediateRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before end.");
+        this.drawing = false;
         if (vertexIdx == 0) return;
         shader.bind();
         shader.setUniformMatrix(uProjModelViewLocation, this.projection);
