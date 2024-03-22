@@ -34,6 +34,8 @@ public class Tools {
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
+        private static long lastUpdate;
+        private static float updateDelta;
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Tools.Calc.lowerBounds(updatesPerSecond, 1);
@@ -49,8 +51,13 @@ public class Tools {
                 return false;
             } else {
                 skipFrameAccumulator -= timeStep;
+                updateDelta = (System.currentTimeMillis()-lastUpdate)/1000f;
+                lastUpdate = System.currentTimeMillis();
                 return true;
             }
+        }
+        public static float updadeDelta(){
+            return updateDelta;
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
@@ -128,14 +135,14 @@ public class Tools {
 
         public static void inProgress(String what) {
             if (!stdOutLogEnabled) return;
-            logMessageBuilder.setLength(0);
+            reset();
             logMessageBuilder.append(what).append("...");
             System.out.println(logMessageBuilder);
         }
 
         public static void done() {
             if (!stdOutLogEnabled) return;
-            logMessageBuilder.setLength(0);
+            reset();
             logMessageBuilder.append("Done.");
             System.out.println(logMessageBuilder);
         }
