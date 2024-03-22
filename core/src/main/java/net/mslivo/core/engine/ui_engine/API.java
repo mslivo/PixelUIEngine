@@ -4823,10 +4823,10 @@ public class API {
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Tools.Calc.lowerBounds(windowMinWidth, 11);
             int wnd_width = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, windowMinWidth);
-            int wnd_height = 6;
+            int wnd_height = 5;
             if (showOKButton) wnd_height++;
             if (showTouchInputs) {
-                wnd_height += (wnd_width % 2 == 0 ? 3 : 1);
+                wnd_height += 1+(wnd_width % 2 == 0 ? 3 : 1);
                 int ixt = 0;
                 for (int i = 0; i < maxCharacters; i++) {
                     ixt += 2;
@@ -4842,10 +4842,12 @@ public class API {
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
+            component.move(textC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
             componentsList.add(textC);
 
             TextField inputTextField = component.textField.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
             componentsList.add(inputTextField);
+            component.move(inputTextField, UIEngine.TILE_SIZE_2, 0);
 
             Button okBtn = null;
             if (showOKButton) {
@@ -4878,6 +4880,7 @@ public class API {
                                 component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
+                        component.move(charButtonLC,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
                         componentsList.add(charButtonLC);
                         lowerCaseButtonsList.add(charButtonLC);
                         TextButton charButtonUC = component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
@@ -4887,6 +4890,7 @@ public class API {
                                 component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
+                        component.move(charButtonUC,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
                         componentsList.add(charButtonUC);
                         component.setVisible(charButtonUC, false);
                         upperCaseButtonsList.add(charButtonUC);
@@ -4909,6 +4913,7 @@ public class API {
                                     component.setVisible(upperCaseButtonsList.get(i2), value);
                             }
                         }, ButtonMode.TOGGLE);
+                component.move(caseButton,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
                 componentsList.add(caseButton);
                 ix += 2;
                 if (ix >= (wnd_width - 2)) {
@@ -4926,6 +4931,7 @@ public class API {
                                 }
                             }
                         }, ButtonMode.DEFAULT);
+                component.move(delButton,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
                 componentsList.add(delButton);
 
 
@@ -4959,12 +4965,12 @@ public class API {
                     component.textField.focus(inputTextField);
                 }
             });
+            component.move(okBtn, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
 
 
-            Component[] componentArr = componentsList.toArray(new Component[]{});
-            component.move(componentArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-            component.move(inputTextField, UIEngine.TILE_SIZE / 2, 0);
-            window.addComponents(modalWnd, componentArr);
+
+            //
+            window.addComponents(modalWnd, componentsList.toArray(new Component[]{}));
             window.setWindowAction(modalWnd, new WindowAction() {
                 @Override
                 public void onAdd() {
