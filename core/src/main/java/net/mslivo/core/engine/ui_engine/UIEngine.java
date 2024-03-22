@@ -155,7 +155,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
         newInputState.camera_app = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.camera_app.setToOrtho(false, newInputState.resolutionWidth, newInputState.resolutionHeight);
-        newInputState.camera_app.position.set(0, 0, 0);
+        newInputState.camera_app.position.set((newInputState.resolutionWidth/2), (newInputState.resolutionHeight/2), 0);
         newInputState.camera_app.zoom = 1f;
         newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, false);
         newInputState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
