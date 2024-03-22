@@ -2,14 +2,11 @@ package net.mslivo.core.engine.ui_engine.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ImmediateRenderer {
-
-    private int primitiveType;
     private static final String VERTEX = """
                 attribute vec4 a_position;
                 attribute vec4 a_color;
@@ -31,7 +28,7 @@ public class ImmediateRenderer {
                    gl_FragColor = v_col;
                 }
             """;
-
+    private int primitiveType;
     private final int MESH_RESIZE_STEP = 5000 * 4;
     private Matrix4 projection;
     private Color color;
@@ -41,6 +38,7 @@ public class ImmediateRenderer {
     private float vertices[];
     private int colorOffset, vertexIdx, vertexSize;
     private int uProjModelViewLocation;
+    private boolean drawing;
 
     public ImmediateRenderer() {
         this.primitiveType = GL20.GL_POINTS;
@@ -56,7 +54,7 @@ public class ImmediateRenderer {
         this.colorOffset = mesh.getVertexAttribute(VertexAttributes.Usage.ColorPacked).offset / 4;
         this.vertexIdx = 0;
         this.vertexSize = mesh.getVertexAttributes().vertexSize / 4;
-        new ImmediateModeRenderer20(false, true, 0);
+        this.drawing = false;
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -68,18 +66,22 @@ public class ImmediateRenderer {
     }
 
     public void begin(int primitiveType) {
+        if (drawing) throw new IllegalStateException("ImmediateRenderer.end must be called before begin.");
         this.primitiveType = primitiveType;
         this.blend = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         if (!blend) Gdx.gl.glEnable(GL20.GL_BLEND);
+        this.drawing = true;
     }
 
     public void end() {
+        if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before end.");
         if (vertexIdx == 0) return;
         shader.bind();
         shader.setUniformMatrix(uProjModelViewLocation, this.projection);
         mesh.setVertices(vertices, 0, vertexIdx);
         mesh.render(shader, this.primitiveType);
         vertexIdx = 0;
+        this.drawing = false;
     }
 
     public void setColor(Color color) {
@@ -106,6 +108,7 @@ public class ImmediateRenderer {
     }
 
     public void vertex(float x, float y) {
+        if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
         checkMeshSize(vertexSize);
         vertices[vertexIdx] = x;
         vertices[vertexIdx + 1] = y;
@@ -124,6 +127,9 @@ public class ImmediateRenderer {
         vertex(x3, y3);
     }
 
+    public boolean isDrawing() {
+        return drawing;
+    }
 
     private void checkMeshSize(int size) {
         if ((vertexIdx + size) > mesh.getMaxVertices()) {
