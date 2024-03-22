@@ -28,7 +28,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;

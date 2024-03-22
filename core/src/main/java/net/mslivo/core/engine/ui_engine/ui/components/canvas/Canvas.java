@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.ui_engine.ui.components.map;
+package net.mslivo.core.engine.ui_engine.ui.components.canvas;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.actions.CanvasAction;

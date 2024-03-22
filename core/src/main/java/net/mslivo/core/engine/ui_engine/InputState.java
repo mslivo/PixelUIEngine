@@ -18,7 +18,7 @@ import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
-import net.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;

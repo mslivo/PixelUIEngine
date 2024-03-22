@@ -39,8 +39,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.components.map.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.map.CanvasImage;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -62,8 +62,7 @@ import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-
-import java.awt.*;
+import java.awt.Desktop;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,36 +118,36 @@ public class API {
             };
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height) {
+        public Window create(int x, int y, int width, int height) {
             return create(x, y, width, height, "", null, 0, null, false, true, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title) {
+        public Window create(int x, int y, int width, int height, String title) {
             return create(x, y, width, height, title, null, 0, null, false, true, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex) {
             return create(x, y, width, height, title, icon, iconIndex, null, false, true, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, false, true, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, true, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, true, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, hasTitleBar, true);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
-            net.mslivo.core.engine.ui_engine.ui.Window window = new net.mslivo.core.engine.ui_engine.ui.Window();
+        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
+            Window window = new Window();
             window.x = x;
             window.y = y;
             window.width = Tools.Calc.lowerBounds(width, 2);
@@ -176,110 +175,110 @@ public class API {
             return window;
         }
 
-        public void addMessageReceiverAction(net.mslivo.core.engine.ui_engine.ui.Window window, MessageReceiverAction messageReceiverAction) {
+        public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
             if (window == null || messageReceiverAction == null) return;
             window.messageReceiverActions.add(messageReceiverAction);
         }
 
-        public void addMessageReceiverActions(net.mslivo.core.engine.ui_engine.ui.Window window, MessageReceiverAction[] messageReceiverActions) {
+        public void addMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
             for (int i = 0; i < messageReceiverActions.length; i++)
                 addMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
-        public void removeMessageReceiverAction(net.mslivo.core.engine.ui_engine.ui.Window window, MessageReceiverAction messageReceiverAction) {
+        public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
             if (window == null || messageReceiverAction == null) return;
             window.messageReceiverActions.remove(messageReceiverAction);
         }
 
-        public void removeMessageReceiverActions(net.mslivo.core.engine.ui_engine.ui.Window window, MessageReceiverAction[] messageReceiverActions) {
+        public void removeMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
             if (window == null || messageReceiverActions == null) return;
             for (int i = 0; i < messageReceiverActions.length; i++)
                 removeMessageReceiverAction(window, messageReceiverActions[i]);
         }
 
-        public void removeAllMessageReceiverActions(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public void removeAllMessageReceiverActions(Window window) {
             if (window == null) return;
             removeMessageReceiverActions(window, window.messageReceiverActions.toArray(new MessageReceiverAction[]{}));
         }
 
 
-        public void setEnforceScreenBounds(net.mslivo.core.engine.ui_engine.ui.Window window, boolean enforceScreenBounds) {
+        public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
             if (window == null) return;
             window.enforceScreenBounds = enforceScreenBounds;
         }
 
-        public void setIcon(net.mslivo.core.engine.ui_engine.ui.Window window, CMediaGFX icon) {
+        public void setIcon(Window window, CMediaGFX icon) {
             if (window == null) return;
             window.icon = icon;
         }
 
-        public void setIconIndex(net.mslivo.core.engine.ui_engine.ui.Window window, int iconIndex) {
+        public void setIconIndex(Window window, int iconIndex) {
             if (window == null) return;
             window.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
         }
 
-        public void setVisible(net.mslivo.core.engine.ui_engine.ui.Window window, boolean visible) {
+        public void setVisible(Window window, boolean visible) {
             if (window == null) return;
             window.visible = visible;
         }
 
-        public void setHasTitleBar(net.mslivo.core.engine.ui_engine.ui.Window window, boolean hasTitleBar) {
+        public void setHasTitleBar(Window window, boolean hasTitleBar) {
             if (window == null) return;
             window.hasTitleBar = hasTitleBar;
         }
 
-        public void setWindowAction(net.mslivo.core.engine.ui_engine.ui.Window window, WindowAction windowAction) {
+        public void setWindowAction(Window window, WindowAction windowAction) {
             if (window == null) return;
             window.windowAction = windowAction;
         }
 
-        public boolean isAddedToScreen(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public boolean isAddedToScreen(Window window) {
             if (window == null) return false;
             return window.addedToScreen;
         }
 
 
-        public void setColorEverything(net.mslivo.core.engine.ui_engine.ui.Window window, Color color) {
+        public void setColorEverything(Window window, Color color) {
             setColorInternal(window, color, 2, null,
                     true, true, true, true);
         }
 
-        public void setColorEverything(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverything(Window window, Color color, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorInternal(window, color, 2, null,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
-        public void setColorEverythingExcept(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, Class[] exceptions) {
+        public void setColorEverythingExcept(Window window, Color color, Class[] exceptions) {
             setColorInternal(window, color, 2, exceptions,
                     true, true, true, true);
         }
 
-        public void setColorEverythingExcept(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverythingExcept(Window window, Color color, Class[] exceptions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorInternal(window, color, 2, exceptions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
 
-        public void setColorEverythingInclude(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, Class[] inclusions) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions) {
             setColorInternal(window, color, 1, inclusions,
                     true, true, true, true);
         }
 
-        public void setColorEverythingInclude(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItems) {
             setColorInternal(window, color, 1, inclusions,
                     windowColor, componentColor1, componentColor2, comboBoxItems);
         }
 
-        public int realWidth(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public int realWidth(Window window) {
             return UICommons.window_getAbsoluteWidth(window);
         }
 
-        public int realHeight(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public int realHeight(Window window) {
             return UICommons.window_getAbsoluteHeight(window);
         }
 
-        public void setColorEverythingInclude(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
+        public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
             if (window == null) return;
             if (inclusions != null) {
                 for (int i = 0; i < window.components.size(); i++) {
@@ -299,37 +298,37 @@ public class API {
         }
 
 
-        public net.mslivo.core.engine.ui_engine.ui.Window createFromGenerator(WindowGenerator windowGenerator, Object... params) {
+        public Window createFromGenerator(WindowGenerator windowGenerator, Object... params) {
             if (windowGenerator == null) return null;
             return windowGenerator.create(params);
         }
 
-        public void addComponent(net.mslivo.core.engine.ui_engine.ui.Window window, Component component) {
+        public void addComponent(Window window, Component component) {
             if (window == null || component == null) return;
             UICommons.component_addToWindow(component, inputState, window);
         }
 
-        public void addComponents(net.mslivo.core.engine.ui_engine.ui.Window window, Component[] components) {
+        public void addComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
             for (int i = 0; i < components.length; i++) addComponent(window, components[i]);
         }
 
-        public void removeComponent(net.mslivo.core.engine.ui_engine.ui.Window window, Component component) {
+        public void removeComponent(Window window, Component component) {
             if (window == null || component == null) return;
             UICommons.component_removeFromWindow(component, window, inputState);
         }
 
-        public void removeComponents(net.mslivo.core.engine.ui_engine.ui.Window window, Component[] components) {
+        public void removeComponents(Window window, Component[] components) {
             if (window == null || components == null) return;
             for (int i = 0; i < components.length; i++) removeComponent(window, components[i]);
         }
 
-        public void removeAllComponents(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public void removeAllComponents(Window window) {
             if (window == null) return;
             removeComponents(window, window.components.toArray(new Component[]{}));
         }
 
-        public ArrayList<Component> findComponentsByName(net.mslivo.core.engine.ui_engine.ui.Window window, String name) {
+        public ArrayList<Component> findComponentsByName(Window window, String name) {
             if (window == null || name == null) return new ArrayList<>();
             ArrayList<Component> result = new ArrayList<>();
             for (int i = 0; i < window.components.size(); i++)
@@ -337,68 +336,68 @@ public class API {
             return result;
         }
 
-        public Component findComponentByName(net.mslivo.core.engine.ui_engine.ui.Window window, String name) {
+        public Component findComponentByName(Window window, String name) {
             if (window == null || name == null) return null;
             ArrayList<Component> result = findComponentsByName(window, name);
             return result.size() > 0 ? result.getFirst() : null;
         }
 
-        public void bringToFront(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public void bringToFront(Window window) {
             if (window == null) return;
             UICommons.window_bringToFront(inputState, window);
         }
 
-        public void center(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public void center(Window window) {
             if (window == null) return;
             UICommons.window_center(inputState, window);
         }
 
-        public void setFont(net.mslivo.core.engine.ui_engine.ui.Window window, CMediaFont font) {
+        public void setFont(Window window, CMediaFont font) {
             if (window == null) return;
             window.font = font;
         }
 
-        public void addUpdateAction(net.mslivo.core.engine.ui_engine.ui.Window window, UpdateAction updateAction) {
+        public void addUpdateAction(Window window, UpdateAction updateAction) {
             if (window == null || updateAction == null) return;
             window.updateActions.add(updateAction);
         }
 
-        public void addUpdateActions(net.mslivo.core.engine.ui_engine.ui.Window window, UpdateAction[] updateActions) {
+        public void addUpdateActions(Window window, UpdateAction[] updateActions) {
             if (window == null || updateActions == null) return;
             for (int i = 0; i < updateActions.length; i++) addUpdateAction(window, updateActions[i]);
         }
 
-        public void removeUpdateAction(net.mslivo.core.engine.ui_engine.ui.Window window, UpdateAction updateAction) {
+        public void removeUpdateAction(Window window, UpdateAction updateAction) {
             if (window == null || updateAction == null) return;
             window.updateActions.remove(updateAction);
         }
 
-        public void removeUpdateActions(net.mslivo.core.engine.ui_engine.ui.Window window, UpdateAction[] updateActions) {
+        public void removeUpdateActions(Window window, UpdateAction[] updateActions) {
             if (window == null || updateActions == null) return;
             for (int i = 0; i < updateActions.length; i++) removeUpdateAction(window, updateActions[i]);
         }
 
-        public void removeAllUpdateActions(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public void removeAllUpdateActions(Window window) {
             if (window == null) return;
             removeUpdateActions(window, window.updateActions.toArray(new UpdateAction[]{}));
         }
 
-        public void setName(net.mslivo.core.engine.ui_engine.ui.Window window, String name) {
+        public void setName(Window window, String name) {
             if (window == null) return;
             window.name = Tools.Text.validString(name);
         }
 
-        public void setData(net.mslivo.core.engine.ui_engine.ui.Window window, Object data) {
+        public void setData(Window window, Object data) {
             if (window == null) return;
             window.data = data;
         }
 
-        public void setColor(net.mslivo.core.engine.ui_engine.ui.Window window, Color color) {
+        public void setColor(Window window, Color color) {
             if (window == null || color == null) return;
             setColor(window, color.r, color.g, color.b, color.a);
         }
 
-        public void setColor(net.mslivo.core.engine.ui_engine.ui.Window window, float r, float g, float b, float a) {
+        public void setColor(Window window, float r, float g, float b, float a) {
             if (window == null) return;
             window.color_r = r;
             window.color_g = g;
@@ -406,63 +405,63 @@ public class API {
             window.color_a = a;
         }
 
-        public void setAlpha(net.mslivo.core.engine.ui_engine.ui.Window window, float transparency) {
+        public void setAlpha(Window window, float transparency) {
             if (window == null) return;
             window.color_a = transparency;
         }
 
-        public void setAlwaysOnTop(net.mslivo.core.engine.ui_engine.ui.Window window, boolean alwaysOnTop) {
+        public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {
             if (window == null) return;
             window.alwaysOnTop = alwaysOnTop;
         }
 
-        public void setFolded(net.mslivo.core.engine.ui_engine.ui.Window window, boolean folded) {
+        public void setFolded(Window window, boolean folded) {
             if (window == null) return;
             window.folded = folded;
         }
 
-        public void setMoveAble(net.mslivo.core.engine.ui_engine.ui.Window window, boolean moveAble) {
+        public void setMoveAble(Window window, boolean moveAble) {
             if (window == null) return;
             window.moveAble = moveAble;
         }
 
-        public void setPosition(net.mslivo.core.engine.ui_engine.ui.Window window, int x, int y) {
+        public void setPosition(Window window, int x, int y) {
             if (window == null) return;
             UICommons.window_setPosition(inputState, window, x, y);
         }
-
-        public void setPositionGrid(net.mslivo.core.engine.ui_engine.ui.Window window, int x, int y) {
+        
+        public void setPositionGrid(Window window, int x, int y) {
             if (window == null) return;
             setPosition(window, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
         }
 
-        public void move(net.mslivo.core.engine.ui_engine.ui.Window window, int x, int y) {
+        public void move(Window window, int x, int y) {
             if (window == null) return;
             setPosition(window, window.x + x, window.y + y);
         }
 
-        public void moveX(net.mslivo.core.engine.ui_engine.ui.Window window, int x) {
+        public void moveX(Window window, int x) {
             if (window == null) return;
             setPosition(window, window.x + x, window.y);
         }
 
-        public void moveY(net.mslivo.core.engine.ui_engine.ui.Window window, int y) {
+        public void moveY(Window window, int y) {
             if (window == null) return;
             setPosition(window, window.x, window.y + y);
         }
 
-        public void setSize(net.mslivo.core.engine.ui_engine.ui.Window window, int width, int height) {
+        public void setSize(Window window, int width, int height) {
             if (window == null) return;
             window.width = Tools.Calc.lowerBounds(width, 2);
             window.height = Tools.Calc.lowerBounds(height, 2);
         }
 
-        public void setTitle(net.mslivo.core.engine.ui_engine.ui.Window window, String title) {
+        public void setTitle(Window window, String title) {
             if (window == null) return;
             window.title = Tools.Text.validString(title);
         }
 
-        private void setColorInternal(net.mslivo.core.engine.ui_engine.ui.Window window, Color color, int setColorMode, Class[] classes,
+        private void setColorInternal(Window window, Color color, int setColorMode, Class[] classes,
                                       boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
             if (classes == null) classes = new Class[]{};
             if (windowColor) setColor(window, color);
@@ -1424,16 +1423,16 @@ public class API {
                 };
             }
 
-            public net.mslivo.core.engine.ui_engine.ui.components.map.Canvas create(int x, int y, int width, int height) {
+            public Canvas create(int x, int y, int width, int height) {
                 return create(x, y, width, height, defaultCanvasAction(), null);
             }
 
-            public net.mslivo.core.engine.ui_engine.ui.components.map.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
+            public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
                 return create(x, y, width, height, canvasAction, null);
             }
 
-            public net.mslivo.core.engine.ui_engine.ui.components.map.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
-                net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas = new net.mslivo.core.engine.ui_engine.ui.components.map.Canvas();
+            public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
+                Canvas canvas = new Canvas();
                 setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
                 canvas.map = new Color[width * UIEngine.TILE_SIZE][height * UIEngine.TILE_SIZE];
                 for (int ix = 0; ix < canvas.map.length; ix++)
@@ -1453,61 +1452,61 @@ public class API {
                 return canvas;
             }
 
-            public void setCanvasAction(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, CanvasAction canvasAction) {
+            public void setCanvasAction(Canvas canvas, CanvasAction canvasAction) {
                 if (canvas == null) return;
                 canvas.canvasAction = canvasAction;
             }
 
-            public void point(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, int x, int y, float r, float g, float b, float a) {
+            public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
                 if (canvas == null) return;
                 UICommons.canvas_setPoint(canvas, x, y, r, g, b, a);
             }
 
-            public Color point(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, int x, int y) {
+            public Color point(Canvas canvas, int x, int y) {
                 if (canvas == null) return null;
                 Color color = UICommons.canvas_getPoint(canvas, x, y);
                 return color != null ? new Color(color) : null;
             }
 
-            public void point(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, int x, int y, Color color) {
+            public void point(Canvas canvas, int x, int y, Color color) {
                 point(canvas, x, y, color.r, color.g, color.b, color.a);
             }
 
-            public void setAllPoints(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, float r, float g, float b, float a) {
+            public void setAllPoints(Canvas canvas, float r, float g, float b, float a) {
                 if (canvas == null) return;
                 UICommons.canvas_setAllPoints(canvas, r, g, b, a);
             }
 
-            public void setAllPoints(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, Color color) {
+            public void setAllPoints(Canvas canvas, Color color) {
                 setAllPoints(canvas, color.r, color.g, color.b, color.a);
             }
 
-            public void addCanvasImage(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, CanvasImage canvasImage) {
+            public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
                 if (canvas == null || canvasImage == null) return;
                 UICommons.canvas_addCanvasImage(canvas, canvasImage);
             }
 
-            public void addCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, CanvasImage[] canvasImages) {
+            public void addCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
                 if (canvas == null || canvasImages == null) return;
                 for (int i = 0; i < canvasImages.length; i++) addCanvasImage(canvas, canvasImages[i]);
             }
 
-            public void removeCanvasImage(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, CanvasImage canvasImage) {
+            public void removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
                 if (canvas == null || canvasImage == null) return;
                 UICommons.canvas_removeCanvasImage(canvas, canvasImage);
             }
 
-            public void removeCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, CanvasImage[] canvasImages) {
+            public void removeCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
                 if (canvas == null || canvasImages == null) return;
                 for (int i = 0; i < canvasImages.length; i++) removeCanvasImage(canvas, canvasImages[i]);
             }
 
-            public void removeAllCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas) {
+            public void removeAllCanvasImages(Canvas canvas) {
                 if (canvas == null) return;
                 removeCanvasImages(canvas, canvas.canvasImages.toArray(new CanvasImage[]{}));
             }
 
-            public ArrayList<CanvasImage> findMapOverlaysByName(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, String name) {
+            public ArrayList<CanvasImage> findMapOverlaysByName(Canvas canvas, String name) {
                 if (canvas == null || name == null) return new ArrayList<>();
                 ArrayList<CanvasImage> result = new ArrayList<>();
                 for (int i = 0; i < canvas.canvasImages.size(); i++)
@@ -1515,7 +1514,7 @@ public class API {
                 return result;
             }
 
-            public CanvasImage findMapOverlayByName(net.mslivo.core.engine.ui_engine.ui.components.map.Canvas canvas, String name) {
+            public CanvasImage findMapOverlayByName(Canvas canvas, String name) {
                 if (canvas == null || name == null) return null;
                 ArrayList<CanvasImage> result = findMapOverlaysByName(canvas, name);
                 return result.size() > 0 ? result.getFirst() : null;
@@ -2297,7 +2296,7 @@ public class API {
             return UICommons.component_getAbsoluteHeight(component);
         }
 
-        public boolean isAddedToWindow(Component component, net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public boolean isAddedToWindow(Component component, Window window) {
             if (component == null || window == null) return false;
             return component.addedToWindow != null && component.addedToWindow == window;
         }
@@ -3052,7 +3051,7 @@ public class API {
                 if (mouseObject != null) {
                     if (mouseObject instanceof Component component) {
                         return component.name;
-                    } else if (mouseObject instanceof net.mslivo.core.engine.ui_engine.ui.Window window) {
+                    } else if (mouseObject instanceof Window window) {
                         return window.name;
                     }
                 }
@@ -4326,18 +4325,18 @@ public class API {
 
         /* #################### Preset - Modal #################### */
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
+        public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
             return modal_CreateColorModal(caption, selectColorFunction, initColor, UIBaseMedia.UI_COLOR_SELECTOR);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
+        public Window modal_CreateColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            net.mslivo.core.engine.ui_engine.ui.Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.UI_ICON_COLOR, 0);
+            Window modal = window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIBaseMedia.UI_ICON_COLOR, 0);
             ImageButton closeButton = preConfigured.button_CreateWindowCloseButton(modal);
             component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -4359,7 +4358,7 @@ public class API {
             component.setColor(ok, initColor);
 
 
-            net.mslivo.core.engine.ui_engine.ui.components.map.Canvas colorCanvas = component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
+            Canvas colorCanvas = component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
             CanvasImage cursorOverlay = component.canvas.canvasImage.create(UIBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4);
@@ -4429,39 +4428,39 @@ public class API {
             return modal;
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, false, null, null, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, false, null, null, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton) {
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int windowMinWidth) {
+        public Window modal_CreateTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, int windowMinWidth) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, showOKButton, false, null, null, windowMinWidth);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, inputState.config.mouseTextInput_defaultLowerCaseCharacters, inputState.config.mouseTextInput_defaultUpperCaseCharacters, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, 11);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
+        public Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
             return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, lowerCaseCharacters, upperCaseCharacters, windowMinWidth);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
+        public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
                 int len = mediaManager.textWidth(inputState.config.component_defaultFont, lines[i]);
@@ -4470,7 +4469,7 @@ public class API {
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            net.mslivo.core.engine.ui_engine.ui.Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
+            Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -4497,11 +4496,11 @@ public class API {
             return modal;
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction) {
             return modal_CreateYesNoRequester(caption, text, choiceFunction, "Yes", "No");
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
+        public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
                     (mediaManager.textWidth(inputState.config.component_defaultFont, caption) + 8),
@@ -4510,7 +4509,7 @@ public class API {
 
             int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
             if (width % 2 == 0) width++;
-            net.mslivo.core.engine.ui_engine.ui.Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
+            Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -4659,11 +4658,11 @@ public class API {
 
         /* #################### Preset - Button #################### */
 
-        public ImageButton button_CreateWindowCloseButton(net.mslivo.core.engine.ui_engine.ui.Window window) {
+        public ImageButton button_CreateWindowCloseButton(Window window) {
             return button_CreateWindowCloseButton(window, null);
         }
 
-        public ImageButton button_CreateWindowCloseButton(net.mslivo.core.engine.ui_engine.ui.Window window, Consumer<net.mslivo.core.engine.ui_engine.ui.Window> closeFunction) {
+        public ImageButton button_CreateWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIBaseMedia.UI_ICON_CLOSE);
             component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
             component.button.setButtonAction(closeButton, new ButtonAction() {
@@ -4813,7 +4812,7 @@ public class API {
             }
         }
 
-        private net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTextInputModalInternal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
+        private Window modal_CreateTextInputModalInternal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, boolean showOKButton, boolean showTouchInputs, char[] lowerCaseCharacters, char[] upperCaseCharacters, int windowMinWidth) {
             int maxCharacters = 0;
             if (showTouchInputs) {
                 if (lowerCaseCharacters == null || upperCaseCharacters == null) return null;
@@ -4839,7 +4838,7 @@ public class API {
 
             }
 
-            net.mslivo.core.engine.ui_engine.ui.Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
+            Window modalWnd = window.create(0, 0, wnd_width, wnd_height, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -5053,49 +5052,49 @@ public class API {
 
     /* #################### Windows #################### */
 
-    public ArrayList<net.mslivo.core.engine.ui_engine.ui.Window> windows() {
+    public ArrayList<Window> windows() {
         return new ArrayList<>(inputState.windows);
     }
 
-    public void addWindow(net.mslivo.core.engine.ui_engine.ui.Window window) {
+    public void addWindow(Window window) {
         if (window == null) return;
         UICommons.window_addToScreen(inputState, window);
     }
 
-    public void addWindows(net.mslivo.core.engine.ui_engine.ui.Window[] windows) {
+    public void addWindows(Window[] windows) {
         if (windows == null) return;
         for (int i = 0; i < windows.length; i++) addWindow(windows[i]);
     }
 
-    public void removeWindow(net.mslivo.core.engine.ui_engine.ui.Window window) {
+    public void removeWindow(Window window) {
         if (window == null) return;
         UICommons.window_removeFromScreen(inputState, window);
     }
 
-    public void removeWindows(net.mslivo.core.engine.ui_engine.ui.Window[] windows) {
+    public void removeWindows(Window[] windows) {
         if (windows == null) return;
         for (int i = 0; i < windows.length; i++) removeWindow(windows[i]);
     }
 
     public void removeAllWindows() {
-        removeWindows(inputState.windows.toArray(new net.mslivo.core.engine.ui_engine.ui.Window[]{}));
+        removeWindows(inputState.windows.toArray(new Window[]{}));
     }
 
-    public boolean closeWindow(net.mslivo.core.engine.ui_engine.ui.Window window) {
+    public boolean closeWindow(Window window) {
         if (window == null) return false;
         return UICommons.window_close(inputState, window);
     }
 
-    public void closeWindows(net.mslivo.core.engine.ui_engine.ui.Window[] windows) {
+    public void closeWindows(Window[] windows) {
         if (windows == null) return;
         for (int i = 0; i < windows.length; i++) closeWindow(windows[i]);
     }
 
     public void closeAllWindows() {
-        closeWindows(inputState.windows.toArray(new net.mslivo.core.engine.ui_engine.ui.Window[]{}));
+        closeWindows(inputState.windows.toArray(new Window[]{}));
     }
 
-    public void sendMessageToWindow(net.mslivo.core.engine.ui_engine.ui.Window window, String message_type, Object... content) {
+    public void sendMessageToWindow(Window window, String message_type, Object... content) {
         if (window == null || message_type == null) return;
         UICommons.window_receiveMessage(window, message_type, content);
     }
@@ -5113,11 +5112,11 @@ public class API {
 
     /* #################### Modal #################### */
 
-    public net.mslivo.core.engine.ui_engine.ui.Window modalWindow() {
+    public Window modalWindow() {
         return inputState.modalWindow;
     }
 
-    public void addWindowAsModal(net.mslivo.core.engine.ui_engine.ui.Window modalWindow) {
+    public void addWindowAsModal(Window modalWindow) {
         if (modalWindow == null) return;
         UICommons.window_addToScreenAsModal(inputState, modalWindow);
     }
@@ -5244,15 +5243,15 @@ public class API {
         return result.size() > 0 ? result.getFirst() : null;
     }
 
-    public ArrayList<net.mslivo.core.engine.ui_engine.ui.Window> findWindowsByName(String name) {
+    public ArrayList<Window> findWindowsByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<net.mslivo.core.engine.ui_engine.ui.Window> result = new ArrayList<>();
+        ArrayList<Window> result = new ArrayList<>();
         for (int i = 0; i < inputState.windows.size(); i++)
             if (name.equals(inputState.windows.get(i).name)) result.add(inputState.windows.get(i));
         return result;
     }
 
-    public net.mslivo.core.engine.ui_engine.ui.Window findWindowByName(String name) {
+    public Window findWindowByName(String name) {
         if (name == null) return null;
         ArrayList<Window> result = findWindowsByName(name);
         return result.size() > 0 ? result.getFirst() : null;
