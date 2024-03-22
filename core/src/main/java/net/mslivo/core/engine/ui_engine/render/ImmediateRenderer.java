@@ -86,6 +86,10 @@ public class ImmediateRenderer {
         setColor(color.r, color.g, color.b, color.a);
     }
 
+    public void setColor(float r, float g, float b) {
+        setColor(r, g, b, 1f);
+    }
+
     public void setColor(float r, float g, float b, float a) {
         checkMeshSize(vertexSize);
         this.color.set(r, g, b, a);
