@@ -429,7 +429,7 @@ public class API {
             if (window == null) return;
             UICommons.window_setPosition(inputState, window, x, y);
         }
-        
+
         public void setPositionGrid(Window window, int x, int y) {
             if (window == null) return;
             setPosition(window, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
@@ -1353,7 +1353,7 @@ public class API {
                 textField.offset = 0;
                 textField.content = Tools.Text.validString(content);
                 textField.textFieldAction = textFieldAction;
-                textField.markerPosition = 0;
+                textField.markerPosition = textField.content.length();
                 textField.contentMaxLength = Tools.Calc.lowerBounds(contentMaxLength, 0);
                 textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
                 return textField;
