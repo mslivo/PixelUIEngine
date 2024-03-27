@@ -12,16 +12,16 @@ import java.util.concurrent.Executors;
 /**
  * Threadpool that can be used to iterate over subsets of lists
  */
-public class LThreadUpdater {
+public class LThreadUpdater<T> {
     private final ExecutorService threadPool;
-    private final LItemUpdater lThreadPoolUpdater;
+    private final LItemUpdater<T> lThreadPoolUpdater;
     private final int objectsPerWorker;
     private final ArrayList<Worker> tasks;
     private int taskSizeLast;
-    private final List updateObjects;
+    private final List<T> updateObjects;
     private final ArrayDeque<Worker> freeWorkerPool;
 
-    public LThreadUpdater(List updateObjects, LItemUpdater LItemUpdater, int objectsPerWorker) {
+    public LThreadUpdater(List<T> updateObjects, LItemUpdater LItemUpdater, int objectsPerWorker) {
         this.lThreadPoolUpdater = LItemUpdater;
         this.updateObjects = updateObjects;
         this.objectsPerWorker = Tools.Calc.lowerBounds(objectsPerWorker, 1);
@@ -31,7 +31,7 @@ public class LThreadUpdater {
         this.taskSizeLast = -1;
     }
 
-    private Worker getNextWorker(List objects, int fromIndex, int toIndex) {
+    private Worker getNextWorker(List<T> objects, int fromIndex, int toIndex) {
         if (freeWorkerPool.size() > 0) {
             Worker worker = freeWorkerPool.pop();
             worker.objects = objects;
@@ -77,9 +77,9 @@ public class LThreadUpdater {
 
         private int fromIndex, toIndex;
 
-        private List objects;
+        private List<T> objects;
 
-        public Worker(List objects, int fromIndex, int toIndex) {
+        public Worker(List<T> objects, int fromIndex, int toIndex) {
             this.objects = objects;
             this.fromIndex = fromIndex;
             this.toIndex = Math.min(toIndex, (objects.size() - 1));
@@ -96,6 +96,10 @@ public class LThreadUpdater {
 
     public void shutdown() {
         this.threadPool.shutdown();
+    }
+
+    public List<T> getUpdateObjects() {
+        return updateObjects;
     }
 
 }
