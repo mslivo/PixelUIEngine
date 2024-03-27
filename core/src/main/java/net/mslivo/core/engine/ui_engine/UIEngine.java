@@ -294,11 +294,13 @@ public class UIEngine<T extends UIEngineAdapter> {
         // UI
         this.updateMouseControl();
         this.updateUI(); // Main UI Updates happen here
-        this.updateCameras();
         this.updateMouseCursor();
 
         // Update Game
         this.uiAdapter.update();
+
+        // Update Cameras
+        this.updateCameras();
 
         // Reset Input Events
         this.inputState.inputEvents.reset();

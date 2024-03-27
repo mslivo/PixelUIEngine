@@ -94,9 +94,7 @@ public class ImmediateRenderer {
     }
 
     public void setColor(float r, float g, float b, float a) {
-        checkMeshSize(vertexSize);
         this.color.set(r, g, b, a);
-        vertices[vertexIdx + colorOffset] = Color.toFloatBits(r, g, b, a);
     }
 
     public Color getColor() {
@@ -111,6 +109,7 @@ public class ImmediateRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
         checkMeshSize(vertexSize);
+        vertices[vertexIdx + colorOffset] = Color.toFloatBits(this.color.r, this.color.g, this.color.b, this.color.a);
         vertices[vertexIdx] = x;
         vertices[vertexIdx + 1] = y;
         vertices[vertexIdx + 2] = 0;
