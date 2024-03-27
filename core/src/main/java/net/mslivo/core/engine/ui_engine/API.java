@@ -31,6 +31,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
@@ -39,8 +41,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -62,7 +62,8 @@ import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import java.awt.Desktop;
+
+import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -537,7 +538,8 @@ public class API {
                 appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
                 appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
                 appViewPort.camera.position.set(camPositionX, camPositionY, 0f);
-                appViewPort.camera.zoom = camZoom;
+                appViewPort.camera.zoom = Tools.Calc.lowerBounds(camZoom,0f);
+                appViewPort.camera.update();
                 appViewPort.updateTime = updateTime;
                 appViewPort.appViewPortAction = appViewPortAction;
                 return appViewPort;
@@ -553,84 +555,91 @@ public class API {
                 appViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
-            public void camMove(AppViewPort appViewPort, float x, float y) {
-                if (appViewPort == null) return;
-                camMove(appViewPort, x, y, 0f);
+            public void setPosition(AppViewPort appViewPort,float x, float y, float z) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera, x, y, z);
             }
 
-            public void camMove(AppViewPort appViewPort, float x, float y, float z) {
-                if (appViewPort == null) return;
-                setCamPosition(appViewPort, appViewPort.camera.position.x += x, appViewPort.camera.position.y += y, appViewPort.camera.position.z += z);
+            public void setPosition(AppViewPort appViewPort,float x, float y) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera, x, y);
             }
 
-            public void setCamPosition(AppViewPort appViewPort, float x, float y) {
-                if (appViewPort == null) return;
-                setCamPosition(appViewPort, x, y, appViewPort.camera.position.z);
+            public void move(AppViewPort appViewPort,float x, float y, float z) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        (appViewPort.camera.position.x + x),
+                        (appViewPort.camera.position.y + y),
+                        (appViewPort.camera.position.z + z)
+                );
             }
 
-            public void setCamPosition(AppViewPort appViewPort, float x, float y, float z) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.set(x, y, z);
+            public void move(AppViewPort appViewPort,float x, float y) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        (appViewPort.camera.position.x + x),
+                        (appViewPort.camera.position.y + y),
+                        appViewPort.camera.position.z
+                );
             }
 
-            public void setCamX(AppViewPort appViewPort, float x) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.x = x;
+            public void setX(AppViewPort appViewPort,float x) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        x,
+                        appViewPort.camera.position.y,
+                        appViewPort.camera.position.z
+                );
             }
 
-            public void moveCamX(AppViewPort appViewPort, float x) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.x += x;
+            public void moveX(AppViewPort appViewPort,float x) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        (appViewPort.camera.position.x + x),
+                        appViewPort.camera.position.y,
+                        appViewPort.camera.position.z
+                );
             }
 
-            public void setCamY(AppViewPort appViewPort, float y) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.y = y;
+            public void setY(AppViewPort appViewPort,float y) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        appViewPort.camera.position.x,
+                        y,
+                        appViewPort.camera.position.z
+                );
             }
 
-            public void moveCamY(AppViewPort appViewPort, float y) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.y += y;
+            public void moveY(AppViewPort appViewPort,float y) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        appViewPort.camera.position.x,
+                        (appViewPort.camera.position.y + y),
+                        appViewPort.camera.position.z
+                );
             }
 
-            public void setCamZ(AppViewPort appViewPort, float z) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.z = z;
+            public void setZ(AppViewPort appViewPort,float z) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        appViewPort.camera.position.x,
+                        appViewPort.camera.position.y,
+                        z
+                );
             }
 
-            public void moveCamZ(AppViewPort appViewPort, float z) {
-                if (appViewPort == null) return;
-                appViewPort.camera.position.z += z;
+            public void moveZ(AppViewPort appViewPort,float z) {
+                if(appViewPort == null)return;
+                UICommons.camera_setPosition(appViewPort.camera,
+                        appViewPort.camera.position.x,
+                        appViewPort.camera.position.y,
+                        (appViewPort.camera.position.z + z)
+                );
             }
 
-            public void setCamZoom(AppViewPort appViewPort, float zoom) {
-                if (appViewPort == null) return;
-                appViewPort.camera.zoom = zoom;
-            }
-
-            public void camZoom(AppViewPort appViewPort, float zoom) {
-                if (appViewPort == null) return;
-                appViewPort.camera.zoom += zoom;
-            }
-
-            public float camX(AppViewPort appViewPort) {
-                if (appViewPort == null) return 0f;
-                return appViewPort.camera.position.x;
-            }
-
-            public float camY(AppViewPort appViewPort) {
-                if (appViewPort == null) return 0f;
-                return appViewPort.camera.position.y;
-            }
-
-            public float camZ(AppViewPort appViewPort) {
-                if (appViewPort == null) return 0f;
-                return appViewPort.camera.position.z;
-            }
-
-            public float camZoom(AppViewPort appViewPort) {
-                if (appViewPort == null) return 0f;
-                return appViewPort.camera.zoom;
+            public void setZoom(AppViewPort appViewPort,float zoom) {
+                if(appViewPort == null)return;
+                UICommons.camera_setZoom(appViewPort.camera, zoom);
             }
 
         }
@@ -3443,48 +3452,80 @@ public class API {
             return false;
         }
 
-        public void setPosition(float x, float y) {
-            setPosition(x, y, inputState.camera_app.position.z);
-        }
-
         public void setPosition(float x, float y, float z) {
-            inputState.camera_app.position.set(x, y, z);
+            UICommons.camera_setPosition(inputState.camera_app, x, y, z);
         }
 
-        public void move(float x, float y) {
-            move(x, y, 0f);
+        public void setPosition(float x, float y) {
+            UICommons.camera_setPosition(inputState.camera_app, x, y);
         }
 
         public void move(float x, float y, float z) {
-            setPosition(inputState.camera_app.position.x += x, inputState.camera_app.position.y += y, inputState.camera_app.position.z += z);
+            UICommons.camera_setPosition(inputState.camera_app,
+                    (inputState.camera_app.position.x + x),
+                    (inputState.camera_app.position.y + y),
+                    (inputState.camera_app.position.z + z)
+            );
+        }
+
+        public void move(float x, float y) {
+            UICommons.camera_setPosition(inputState.camera_app,
+                    (inputState.camera_app.position.x + x),
+                    (inputState.camera_app.position.y + y),
+                    inputState.camera_app.position.z
+            );
         }
 
         public void setX(float x) {
-            inputState.camera_app.position.x = x;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    x,
+                    inputState.camera_app.position.y,
+                    inputState.camera_app.position.z
+            );
         }
 
         public void moveX(float x) {
-            inputState.camera_app.position.x += x;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    (inputState.camera_app.position.x + x),
+                    inputState.camera_app.position.y,
+                    inputState.camera_app.position.z
+            );
         }
 
         public void setY(float y) {
-            inputState.camera_app.position.y = y;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    inputState.camera_app.position.x,
+                    y,
+                    inputState.camera_app.position.z
+            );
         }
 
         public void moveY(float y) {
-            inputState.camera_app.position.y += y;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    inputState.camera_app.position.x,
+                    (inputState.camera_app.position.y + y),
+                    inputState.camera_app.position.z
+            );
         }
 
         public void setZ(float z) {
-            inputState.camera_app.position.z = z;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    inputState.camera_app.position.x,
+                    inputState.camera_app.position.y,
+                    z
+            );
         }
 
         public void moveZ(float z) {
-            inputState.camera_app.position.z += z;
+            UICommons.camera_setPosition(inputState.camera_app,
+                    inputState.camera_app.position.x,
+                    inputState.camera_app.position.y,
+                    (inputState.camera_app.position.z + z)
+            );
         }
 
         public void setZoom(float zoom) {
-            inputState.camera_app.zoom = zoom;
+            UICommons.camera_setZoom(inputState.camera_app, zoom);
         }
 
         public float x() {
@@ -4826,7 +4867,7 @@ public class API {
             int wnd_height = 5;
             if (showOKButton) wnd_height++;
             if (showTouchInputs) {
-                wnd_height += 1+(wnd_width % 2 == 0 ? 3 : 1);
+                wnd_height += 1 + (wnd_width % 2 == 0 ? 3 : 1);
                 int ixt = 0;
                 for (int i = 0; i < maxCharacters; i++) {
                     ixt += 2;
@@ -4880,7 +4921,7 @@ public class API {
                                 component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
-                        component.move(charButtonLC,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
+                        component.move(charButtonLC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
                         componentsList.add(charButtonLC);
                         lowerCaseButtonsList.add(charButtonLC);
                         TextButton charButtonUC = component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
@@ -4890,7 +4931,7 @@ public class API {
                                 component.textField.setMarkerPosition(inputTextField, inputTextField.content.length());
                             }
                         });
-                        component.move(charButtonUC,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
+                        component.move(charButtonUC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
                         componentsList.add(charButtonUC);
                         component.setVisible(charButtonUC, false);
                         upperCaseButtonsList.add(charButtonUC);
@@ -4913,7 +4954,7 @@ public class API {
                                     component.setVisible(upperCaseButtonsList.get(i2), value);
                             }
                         }, ButtonMode.TOGGLE);
-                component.move(caseButton,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
+                component.move(caseButton, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
                 componentsList.add(caseButton);
                 ix += 2;
                 if (ix >= (wnd_width - 2)) {
@@ -4931,7 +4972,7 @@ public class API {
                                 }
                             }
                         }, ButtonMode.DEFAULT);
-                component.move(delButton,UIEngine.TILE_SIZE_2,UIEngine.TILE_SIZE_2);
+                component.move(delButton, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
                 componentsList.add(delButton);
 
 
@@ -4966,7 +5007,6 @@ public class API {
                 }
             });
             component.move(okBtn, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
-
 
 
             //

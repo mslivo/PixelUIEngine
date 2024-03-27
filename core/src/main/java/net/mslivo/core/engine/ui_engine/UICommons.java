@@ -12,34 +12,31 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
-import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
-import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
-import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
+import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
+import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
@@ -50,8 +47,11 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1274,7 +1274,8 @@ class UICommons {
         appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
         appViewPort.camera.position.set(x, y, z);
-        appViewPort.camera.zoom = zoom;
+        camera_setZoom(appViewPort.camera, zoom);
+        camera_setPosition(appViewPort.camera, x, y, z);
     }
 
     static int viewport_determineUpscaleFactor(VIEWPORT_MODE viewPortMode, int internalResolutionWidth, int internalResolutionHeight) {
@@ -1333,5 +1334,19 @@ class UICommons {
         };
     }
 
+    static void camera_setPosition(OrthographicCamera camera, float x, float y) {
+        camera.position.set(x, y, 0f);
+        camera.update();
+    }
+
+    static void camera_setPosition(OrthographicCamera camera, float x, float y, float z) {
+        camera.position.set(x, y, z);
+        camera.update();
+    }
+
+    static void camera_setZoom(OrthographicCamera camera, float zoom) {
+        camera.zoom = Tools.Calc.lowerBounds(zoom, 0f);
+        camera.update();
+    }
 
 }
