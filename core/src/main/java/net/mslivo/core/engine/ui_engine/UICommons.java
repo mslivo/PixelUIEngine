@@ -1273,9 +1273,8 @@ class UICommons {
         float zoom = appViewPort.camera.zoom;
         appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        appViewPort.camera.position.set(x, y, z);
         camera_setZoom(appViewPort.camera, zoom);
-        camera_setPosition(appViewPort.camera, x, y, z);
+        camera_setPosition(appViewPort.camera, x, y);
     }
 
     static int viewport_determineUpscaleFactor(VIEWPORT_MODE viewPortMode, int internalResolutionWidth, int internalResolutionHeight) {
@@ -1336,11 +1335,6 @@ class UICommons {
 
     static void camera_setPosition(OrthographicCamera camera, float x, float y) {
         camera.position.set(x, y, 0f);
-        camera.update();
-    }
-
-    static void camera_setPosition(OrthographicCamera camera, float x, float y, float z) {
-        camera.position.set(x, y, z);
         camera.update();
     }
 

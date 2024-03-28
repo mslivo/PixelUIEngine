@@ -555,31 +555,17 @@ public class API {
                 appViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
             }
 
-            public void setPosition(AppViewPort appViewPort,float x, float y, float z) {
-                if(appViewPort == null)return;
-                UICommons.camera_setPosition(appViewPort.camera, x, y, z);
-            }
-
             public void setPosition(AppViewPort appViewPort,float x, float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera, x, y);
             }
 
-            public void move(AppViewPort appViewPort,float x, float y, float z) {
-                if(appViewPort == null)return;
-                UICommons.camera_setPosition(appViewPort.camera,
-                        (appViewPort.camera.position.x + x),
-                        (appViewPort.camera.position.y + y),
-                        (appViewPort.camera.position.z + z)
-                );
-            }
 
             public void move(AppViewPort appViewPort,float x, float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
-                        (appViewPort.camera.position.y + y),
-                        appViewPort.camera.position.z
+                        (appViewPort.camera.position.y + y)
                 );
             }
 
@@ -587,8 +573,7 @@ public class API {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         x,
-                        appViewPort.camera.position.y,
-                        appViewPort.camera.position.z
+                        appViewPort.camera.position.y
                 );
             }
 
@@ -596,8 +581,7 @@ public class API {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
-                        appViewPort.camera.position.y,
-                        appViewPort.camera.position.z
+                        appViewPort.camera.position.y
                 );
             }
 
@@ -605,8 +589,7 @@ public class API {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
-                        y,
-                        appViewPort.camera.position.z
+                        y
                 );
             }
 
@@ -614,26 +597,7 @@ public class API {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
-                        (appViewPort.camera.position.y + y),
-                        appViewPort.camera.position.z
-                );
-            }
-
-            public void setZ(AppViewPort appViewPort,float z) {
-                if(appViewPort == null)return;
-                UICommons.camera_setPosition(appViewPort.camera,
-                        appViewPort.camera.position.x,
-                        appViewPort.camera.position.y,
-                        z
-                );
-            }
-
-            public void moveZ(AppViewPort appViewPort,float z) {
-                if(appViewPort == null)return;
-                UICommons.camera_setPosition(appViewPort.camera,
-                        appViewPort.camera.position.x,
-                        appViewPort.camera.position.y,
-                        (appViewPort.camera.position.z + z)
+                        (appViewPort.camera.position.y + y)
                 );
             }
 
@@ -3452,75 +3416,43 @@ public class API {
             return false;
         }
 
-        public void setPosition(float x, float y, float z) {
-            UICommons.camera_setPosition(inputState.camera_app, x, y, z);
-        }
-
         public void setPosition(float x, float y) {
             UICommons.camera_setPosition(inputState.camera_app, x, y);
         }
 
-        public void move(float x, float y, float z) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    (inputState.camera_app.position.x + x),
-                    (inputState.camera_app.position.y + y),
-                    (inputState.camera_app.position.z + z)
-            );
-        }
 
         public void move(float x, float y) {
             UICommons.camera_setPosition(inputState.camera_app,
                     (inputState.camera_app.position.x + x),
-                    (inputState.camera_app.position.y + y),
-                    inputState.camera_app.position.z
+                    (inputState.camera_app.position.y + y)
             );
         }
 
         public void setX(float x) {
             UICommons.camera_setPosition(inputState.camera_app,
                     x,
-                    inputState.camera_app.position.y,
-                    inputState.camera_app.position.z
+                    inputState.camera_app.position.y
             );
         }
 
         public void moveX(float x) {
             UICommons.camera_setPosition(inputState.camera_app,
                     (inputState.camera_app.position.x + x),
-                    inputState.camera_app.position.y,
-                    inputState.camera_app.position.z
+                    inputState.camera_app.position.y
             );
         }
 
         public void setY(float y) {
             UICommons.camera_setPosition(inputState.camera_app,
                     inputState.camera_app.position.x,
-                    y,
-                    inputState.camera_app.position.z
+                    y
             );
         }
 
         public void moveY(float y) {
             UICommons.camera_setPosition(inputState.camera_app,
                     inputState.camera_app.position.x,
-                    (inputState.camera_app.position.y + y),
-                    inputState.camera_app.position.z
-            );
-        }
-
-        public void setZ(float z) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    inputState.camera_app.position.x,
-                    inputState.camera_app.position.y,
-                    z
-            );
-        }
-
-        public void moveZ(float z) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    inputState.camera_app.position.x,
-                    inputState.camera_app.position.y,
-                    (inputState.camera_app.position.z + z)
+                    (inputState.camera_app.position.y + y)
             );
         }
 
