@@ -54,7 +54,7 @@ public class LThreadUpdater<T> {
                 freeWorkerPool.addAll(tasks);
                 tasks.clear();
             }
-            if (updateObjects.size() > objectsPerWorker) {
+            if (updateObjects.size() > (objectsPerWorker+rest)) {
                 for (int i = 0; i < updateObjects.size(); i = i + objectsPerWorker) {
                     int fromIndex = i;
                     int toIndex = i+(objectsPerWorker - 1) + (i == (updateObjects.size()-1) ? rest : 0);
