@@ -79,7 +79,7 @@ public class Tools {
             config.setForegroundFPS(fps);
             config.useVsync(false);
             config.setWindowPosition(-1, -1);
-            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
             if (iconPath != null) config.setWindowIcon(iconPath);
             try {
                 new Lwjgl3Application(applicationAdapter, config);
