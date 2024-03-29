@@ -64,7 +64,7 @@ public class LThreadUpdater<T> {
             }else{
                 tasks.add(getNextWorker(this.updateObjects, 0, (this.updateObjects.size() - 1)));
             }
-
+            taskSizeLast = updateObjects.size();
         }
 
         if (tasks.size() > 1) {
