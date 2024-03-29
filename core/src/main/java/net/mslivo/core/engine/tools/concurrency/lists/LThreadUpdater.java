@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.tools.concurrency.lists;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +14,7 @@ public class LThreadUpdater<T> {
     private final LItemUpdater<T> lThreadPoolUpdater;
     private final int cpuCount;
     private final ArrayDeque<Worker> tasks;
-    private int taskSizeLast;
+    private int objectsSizeLast;
     private final List<T> updateObjects;
     private final ArrayDeque<Worker> freeWorkerPool;
 
@@ -30,7 +29,7 @@ public class LThreadUpdater<T> {
         this.threadPool = executorService;
         this.tasks = new ArrayDeque<>();
         this.freeWorkerPool = new ArrayDeque<>();
-        this.taskSizeLast = -1;
+        this.objectsSizeLast = -1;
     }
 
     private Worker getNextWorker(List<T> objects, int fromIndex, int toIndex) {
@@ -48,7 +47,7 @@ public class LThreadUpdater<T> {
     public void update() {
         if (updateObjects.size() == 0) return;
 
-        if (updateObjects.size() != taskSizeLast) {
+        if (updateObjects.size() != objectsSizeLast) {
             int objectsPerWorker = updateObjects.size()/cpuCount;
             int rest = updateObjects.size()%cpuCount;
             if (tasks.size() > 0) {
@@ -64,7 +63,7 @@ public class LThreadUpdater<T> {
             }else{
                 tasks.add(getNextWorker(this.updateObjects, 0, (this.updateObjects.size() - 1)));
             }
-            taskSizeLast = updateObjects.size();
+            objectsSizeLast = updateObjects.size();
         }
 
         if (tasks.size() > 1) {
