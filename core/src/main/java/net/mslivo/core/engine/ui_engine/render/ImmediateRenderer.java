@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.NumberUtils;
 
 public class ImmediateRenderer {
     private static final String VERTEX = """
@@ -109,7 +110,7 @@ public class ImmediateRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
         checkMeshSize(vertexSize);
-        vertices[vertexIdx + colorOffset] = Color.toFloatBits(this.color.r, this.color.g, this.color.b, this.color.a);
+        vertices[vertexIdx + colorOffset] = NumberUtils.intToFloatColor(((int)(255 * this.color.a) << 24) | ((int)(255 * this.color.b) << 16) | ((int)(255 * this.color.g) << 8) | ((int)(255 * this.color.r)))
         vertices[vertexIdx] = x;
         vertices[vertexIdx + 1] = y;
         vertices[vertexIdx + 2] = 0;
