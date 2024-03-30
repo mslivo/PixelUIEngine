@@ -3383,35 +3383,29 @@ public class API {
     public class _Camera {
 
         public boolean isPointVisible(float x, float y) {
-            setTestingCameraInternal(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
+            if (inputState.camera_app.frustum.pointInFrustum(x, y, 0f)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCameraInternal(appViewPort.camera);
-                if (inputState.camera_frustum.frustum.pointInFrustum(x, y, 0f)) return true;
+                if (appViewPort.camera.frustum.pointInFrustum(x, y, 0f)) return true;
             }
             return false;
         }
 
         public boolean isRectVisible(float x, float y, float width, float height) {
-            setTestingCameraInternal(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, width, height, 0f)) return true;
+            if (inputState.camera_app.frustum.boundsInFrustum(x, y, 0f, width, height, 0f)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCameraInternal(appViewPort.camera);
-                if (inputState.camera_frustum.frustum.boundsInFrustum(x, y, 0f, width, height, 0f))
+                if (appViewPort.camera.frustum.boundsInFrustum(x, y, 0f, width, height, 0f))
                     return true;
             }
             return false;
         }
 
         public boolean isSphereVisible(float x, float y, float radius) {
-            setTestingCameraInternal(inputState.camera_app);
-            if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
+            if (inputState.camera_app.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             for (int i = 0; i < inputState.appViewPorts.size(); i++) {
                 AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                setTestingCameraInternal(appViewPort.camera);
-                if (inputState.camera_frustum.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
+                if (appViewPort.camera.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
             }
             return false;
         }
@@ -3488,13 +3482,7 @@ public class API {
             return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
         }
 
-        private void setTestingCameraInternal(OrthographicCamera camera) {
-            inputState.camera_frustum.position.set(camera.position);
-            inputState.camera_frustum.zoom = camera.zoom;
-            inputState.camera_frustum.viewportWidth = camera.viewportWidth;
-            inputState.camera_frustum.viewportHeight = camera.viewportHeight;
-            inputState.camera_frustum.update();
-        }
+
     }
 
     public class _Config {

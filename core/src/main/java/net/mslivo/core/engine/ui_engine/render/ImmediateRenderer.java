@@ -110,7 +110,7 @@ public class ImmediateRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
         checkMeshSize(vertexSize);
-        vertices[vertexIdx + colorOffset] = NumberUtils.intToFloatColor(((int)(255 * this.color.a) << 24) | ((int)(255 * this.color.b) << 16) | ((int)(255 * this.color.g) << 8) | ((int)(255 * this.color.r)))
+        vertices[vertexIdx + colorOffset] = NumberUtils.intToFloatColor(((int)(255 * this.color.a) << 24) | ((int)(255 * this.color.b) << 16) | ((int)(255 * this.color.g) << 8) | ((int)(255 * this.color.r)));
         vertices[vertexIdx] = x;
         vertices[vertexIdx + 1] = y;
         vertices[vertexIdx + 2] = 0;

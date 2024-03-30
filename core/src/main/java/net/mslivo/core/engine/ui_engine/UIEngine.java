@@ -274,8 +274,6 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.animation_timer_ui = 0f;
         newInputState.tempSaveColor = new Color(Color.WHITE);
 
-        newInputState.camera_frustum = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
-        newInputState.camera_frustum.setToOrtho(false, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.inputEvents = new InputEvents();
         newInputState.inputProcessor = new UIEngineInputProcessor(newInputState.inputEvents, newInputState.gamePadSupport);
 
