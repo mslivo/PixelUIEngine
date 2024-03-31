@@ -49,17 +49,17 @@ public class ImmediateRenderer {
         this.uProjModelViewLocation = shader.getUniformLocation("u_projModelView");
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
 
-
         this.vertices = new float[MESH_RESIZE_STEP];
         this.mesh = createMesh(MESH_RESIZE_STEP);
         this.colorOffset = mesh.getVertexAttribute(VertexAttributes.Usage.ColorPacked).offset / 4;
         this.vertexIdx = 0;
         this.vertexSize = mesh.getVertexAttributes().vertexSize / 4;
+        this.projection = new Matrix4();
         this.drawing = false;
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
-        this.projection = projection;
+        this.projection.set(projection);
     }
 
     public void begin() {
@@ -71,6 +71,7 @@ public class ImmediateRenderer {
         this.primitiveType = primitiveType;
         this.blend = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         if (!blend) Gdx.gl.glEnable(GL20.GL_BLEND);
+        shader.setUniformMatrix(uProjModelViewLocation, this.projection);
         this.drawing = true;
     }
 
@@ -79,7 +80,6 @@ public class ImmediateRenderer {
         this.drawing = false;
         if (vertexIdx == 0) return;
         shader.bind();
-        shader.setUniformMatrix(uProjModelViewLocation, this.projection);
         mesh.setVertices(vertices, 0, vertexIdx);
         mesh.render(shader, this.primitiveType);
         vertexIdx = 0;

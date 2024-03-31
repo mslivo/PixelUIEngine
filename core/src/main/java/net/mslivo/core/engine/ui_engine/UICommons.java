@@ -1311,7 +1311,7 @@ class UICommons {
         inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
         inputState.texture_screen.flip(false, true);
         // viewport_screen
-        inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_screen, inputState.resolutionWidth, inputState.resolutionHeight);
+        inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_ui, inputState.resolutionWidth, inputState.resolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // viewportMode
         inputState.viewportMode = viewPortMode;

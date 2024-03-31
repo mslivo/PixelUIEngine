@@ -1267,10 +1267,10 @@ public class SpriteRenderer implements Batch {
     protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
         if (customShader != null) {
-            customShader.setUniformMatrix("u_projTrans", combinedMatrix);
+            customShader.setUniformMatrix("u_projTrans", projectionMatrix);
             customShader.setUniformi("u_texture", 0);
         } else {
-            shader.setUniformMatrix("u_projTrans", combinedMatrix);
+            shader.setUniformMatrix("u_projTrans", projectionMatrix);
             shader.setUniformi("u_texture", 0);
         }
     }

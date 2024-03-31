@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
-import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
@@ -52,21 +51,16 @@ public class InputState {
     public VIEWPORT_MODE viewportMode;
     public boolean gamePadSupport;
     public int uiScale;
-    public boolean spriteRenderer;
-    public boolean immediateRenderer;
     /* ##################### Config ########################## */
     public Config config;
 
     /* #################### Graphics: App #################### */
-    public SpriteRenderer spriteBatch_app;
-    public ImmediateRenderer immediateRenderer_app;
     public TextureRegion texture_app;
     public OrthographicCamera camera_app;
     public NestedFrameBuffer frameBuffer_app;
 
     /* #################### Graphics: GUI #################### */
-    public SpriteRenderer spriteBatch_ui;
-    public ImmediateRenderer immediateRenderer_ui;
+    public SpriteRenderer spriteRenderer_ui;
     public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;
@@ -76,9 +70,7 @@ public class InputState {
     public TextureRegion texture_screen;
     public Texture.TextureFilter textureFilter_screen;
     public NestedFrameBuffer frameBuffer_screen;
-    public SpriteRenderer spriteBatch_screen;
     public Viewport viewport_screen;
-    public OrthographicCamera camera_screen;
 
     /* #################### UI: Added Elements #################### */
 

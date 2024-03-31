@@ -2,6 +2,7 @@ package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
@@ -107,12 +108,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     }
 
 
+    SpriteRenderer batch = new SpriteRenderer();
+    ImmediateRenderer immediateRenderer = new ImmediateRenderer();
     @Override
-    public void render(SpriteRenderer batch, ImmediateRenderer immediateRenderer, AppViewPort appViewPort) {
+    public void render(OrthographicCamera camera, AppViewPort appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Draw app based on data
+
+        batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
@@ -123,6 +128,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
         batch.end();
 
+        immediateRenderer.setProjectionMatrix(camera.combined);
         immediateRenderer.begin();
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {

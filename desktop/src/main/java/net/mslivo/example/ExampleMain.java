@@ -109,8 +109,6 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.Log.inProgress("Shutting down...");
         this.shutdownEngine();
         Tools.Log.done();
-        Gdx.app.exit();
-        System.exit(0);
     }
 
     private void shutdownEngine() {
