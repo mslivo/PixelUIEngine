@@ -11,8 +11,8 @@ import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransi
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
+import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.render.misc.PixelPerfectViewport;
 
 public class TransitionManager {
     private NestedFrameBuffer frameBuffer_from;

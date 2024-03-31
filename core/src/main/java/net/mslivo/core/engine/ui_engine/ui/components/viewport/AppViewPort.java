@@ -2,7 +2,7 @@ package net.mslivo.core.engine.ui_engine.ui.components.viewport;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import net.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.actions.AppViewPortAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 

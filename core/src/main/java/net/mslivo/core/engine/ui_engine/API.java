@@ -22,7 +22,7 @@ import net.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.input.InputMethod;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
-import net.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;

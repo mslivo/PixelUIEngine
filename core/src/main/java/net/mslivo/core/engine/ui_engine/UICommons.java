@@ -17,8 +17,8 @@ import net.mslivo.core.engine.media_manager.media.CMediaGFX;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
-import net.mslivo.core.engine.ui_engine.render.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.render.PixelPerfectViewport;
+import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.render.misc.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -1010,12 +1010,14 @@ class UICommons {
 
         if (draggedList != null && draggedList == list && draggedList.dragEnabled) return true; // Into itself
 
-        if (list.dragInEnabled && !list.disabled && list.listAction != null) {
-            return !draggedList.disabled && draggedList.dragOutEnabled &&
-                    list.listAction.canDragFromList(inputState.draggedList);
-        } else if (draggedGrid != null) {
-            return !draggedGrid.disabled && draggedGrid.dragOutEnabled &&
-                    list.listAction.canDragFromGrid(draggedGrid);
+        if ( list.dragInEnabled && !list.disabled && list.listAction != null) {
+            if (draggedGrid != null) {
+                return !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
+                        list.listAction.canDragFromGrid(inputState.draggedGrid);
+            }else if(draggedList != null){
+                return !draggedList.disabled && draggedList.dragOutEnabled &&
+                        list.listAction.canDragFromList(draggedList);
+            }
         }
         return false;
     }

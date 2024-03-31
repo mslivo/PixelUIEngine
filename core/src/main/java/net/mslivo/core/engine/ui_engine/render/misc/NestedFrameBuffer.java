@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.ui_engine.render;
+package net.mslivo.core.engine.ui_engine.render.misc;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
