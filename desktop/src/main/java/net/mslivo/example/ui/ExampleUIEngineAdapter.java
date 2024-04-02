@@ -171,8 +171,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         rotation += 1f;
 
-            modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP, 200, 200, 50,
-                    50, 50, 106f, 107f, 108, rotation);
+            modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP, 100, 100, 50,
+                    50, 50 , rotation,0, rotation);
 
 
         modelRenderer.end();

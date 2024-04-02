@@ -24,6 +24,7 @@ public class ModelRenderer {
     private Environment environment;
     private final ModelBatch modelBatch;
     private boolean drawing;
+    private Quaternion rotation;
 
     public ModelRenderer(MediaManager mediaManager, Environment environment) {
         this(mediaManager, environment, null);
@@ -34,6 +35,7 @@ public class ModelRenderer {
         this.modelInstances = new HashMap<>();
         this.modelBatch = new ModelBatch(shaderProvider);
         this.environment = environment;
+        this.rotation = new Quaternion();
         this.camera = null;
         drawing = false;
     }
@@ -60,19 +62,19 @@ public class ModelRenderer {
     }
 
     public void drawCMediaModel(CMediaModel cMediaModel, float x, float y) {
-        drawCMediaModel(cMediaModel, x, y, 10f, 10f, 10f,0f,0f,0f,0f);
+        drawCMediaModel(cMediaModel, x, y, 10f, 10f, 10f,0f,0f,0f);
     }
 
     public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scale) {
-        drawCMediaModel(cMediaModel, x, y, scale, scale, scale,0f,0f,0f,0f);
+        drawCMediaModel(cMediaModel, x, y, scale, scale, scale,0f,0f,0f);
     }
 
     public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scaleX, float scaleY, float scaleZ) {
-        drawCMediaModel(cMediaModel, x, y, scaleX, scaleY, scaleZ,0f,0f,0f,0f);
+        drawCMediaModel(cMediaModel, x, y, scaleX, scaleY, scaleZ,0f,0f,0f);
     }
 
     public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scaleX, float scaleY, float scaleZ,
-                                float rotateX, float rotateY, float rotateZ, float rotateDegrees) {
+                                float pitch, float yaw, float roll) {
         ModelInstance modelInstance = this.modelInstances.get(cMediaModel);
         if (modelInstance == null) {
             modelInstance = new ModelInstance(mediaManager.getCMediaModel(cMediaModel));
@@ -82,7 +84,8 @@ public class ModelRenderer {
         modelInstance.transform.idt();
         modelInstance.transform.trn(x,y,MODEL_Z);
         modelInstance.transform.scl(scaleX, scaleY, scaleZ);
-        modelInstance.transform.rotate(rotateX,rotateY,rotateZ, rotateDegrees);
+        rotation.setEulerAngles(pitch,yaw,roll);
+        modelInstance.transform.rotate(rotation);
         modelBatch.render(modelInstance, environment);
     }
 
