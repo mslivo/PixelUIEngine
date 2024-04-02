@@ -2,7 +2,7 @@ package net.mslivo.core.engine.media_manager.media;
 
 import java.io.Serializable;
 
-public class CMediaArray extends CMediaGFX implements Serializable {
+public class CMediaArray extends CMediaSprite implements Serializable {
 
     public int tile_width;
 

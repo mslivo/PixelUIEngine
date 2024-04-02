@@ -5,7 +5,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 
 import java.util.ArrayList;
 
@@ -28,7 +28,7 @@ public class Window {
     public boolean visible;
     public boolean enforceScreenBounds;
     public WindowAction windowAction;
-    public CMediaGFX icon;
+    public CMediaSprite icon;
     public int iconIndex;
     public ArrayList<MessageReceiverAction> messageReceiverActions;
     public boolean addedToScreen;

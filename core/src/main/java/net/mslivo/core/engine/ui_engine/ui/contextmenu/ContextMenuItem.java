@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine.ui.contextmenu;
 
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 
 public class ContextMenuItem {
@@ -12,7 +12,7 @@ public class ContextMenuItem {
 
     public CMediaFont font;
 
-    public CMediaGFX icon;
+    public CMediaSprite icon;
 
     public int iconIndex;
 

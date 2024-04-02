@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaArray;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
@@ -63,7 +63,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         String title = (String) p[0];
         this.mediaManager = (MediaManager) p[1];
         /* Window */
-        Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.GUI_ICON_EXAMPLE_WINDOW, 0);
+        Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.ICON_EXAMPLE_WINDOW, 0);
         api.window.setEnforceScreenBounds(window, true);
         api.window.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
@@ -79,10 +79,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         ArrayList<Component> components_tab4 = createTab4(window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
-        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_BLUE, 0, components_tab1.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_GREEN, 0, components_tab2.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab3.toArray(new Component[]{})));
-        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.GUI_ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab4.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE, 0, components_tab1.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab II", ExampleBaseMedia.ICON_EXAMPLE_BULLET_GREEN, 0, components_tab2.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Tab III", ExampleBaseMedia.ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab3.toArray(new Component[]{})));
+        tabs.add(api.component.tabBar.tab.create("Font", ExampleBaseMedia.ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab4.toArray(new Component[]{})));
 
 
         ArrayList<Component> tabBarComponents = api.preConfigured.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
@@ -365,7 +365,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
                         }
                         , null, 1f));
             }
-        }, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0);
+        }, ExampleBaseMedia.ICON_EXAMPLE_1, 0);
         api.component.setColor(textBtn4, Color.LIGHT_GRAY);
         api.component.button.centerContent(textBtn4);
 
@@ -408,9 +408,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Tab tabImageButton = api.component.tabBar.tab.create("Buttons 2");
 
-        ImageButton imageButton1 = api.component.button.imageButton.create(3, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE);
+        ImageButton imageButton1 = api.component.button.imageButton.create(3, 11, 2, 1, ExampleBaseMedia.EXAMPLE_ANIMATION);
 
-        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.GUI_ICON_BUTTON_ANIM_EXAMPLE_ARRAY, 0, null, ButtonMode.DEFAULT);
+        ImageButton imageButton2 = api.component.button.imageButton.create(6, 11, 2, 1, ExampleBaseMedia.BUTTON_ANIM_EXAMPLE_ARRAY, 0, null, ButtonMode.DEFAULT);
         ButtonAction imageButton2Action = new ButtonAction() {
             @Override
             public void onRelease() {
@@ -424,10 +424,10 @@ public class ExampleWindowGenerator extends WindowGenerator {
         };
         api.component.button.setButtonAction(imageButton2, imageButton2Action);
 
-        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE, true);
-        ImageButton imageButton4 = api.component.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 0, null, ButtonMode.TOGGLE);
-        ImageButton imageButton5 = api.component.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 0, null, ButtonMode.TOGGLE);
-        ImageButton imageButton6 = api.component.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.GUI_ICON_EXAMPLE_4, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_1, 0, null, ButtonMode.TOGGLE, true);
+        ImageButton imageButton4 = api.component.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_2, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton5 = api.component.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_3, 0, null, ButtonMode.TOGGLE);
+        ImageButton imageButton6 = api.component.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_4, 0, null, ButtonMode.TOGGLE);
 
         api.component.button.centerContent(imageButton3);
         api.component.button.centerContent(imageButton4);
@@ -441,9 +441,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         ToolTip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), null, null, true, 3, 4);
 
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_1, 0, 0));
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_2, 1, 1));
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.GUI_ICON_EXAMPLE_3, 3, 2));
+        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_1, 0, 0));
+        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_2, 1, 1));
+        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_3, 3, 2));
 
         api.component.setToolTip(imageButton3, imageToolTip);
         api.component.setToolTip(imageButton4, api.toolTip.create(Tools.Text.toArray("Button 2", "ppPPP", "yyGG", "WWAXY")));
@@ -462,7 +462,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         Tab tabTextImage = api.component.tabBar.tab.create("Text/Image");
 
-        Image image1 = api.component.image.create(3, 4, ExampleBaseMedia.GUI_ICON_EXAMPLE_ANIMATION_2);
+        Image image1 = api.component.image.create(3, 4, ExampleBaseMedia.EXAMPLE_ANIMATION_2);
 
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
@@ -498,7 +498,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         List list1 = api.component.list.create(2, 2, 6, 12, listItems1, null, true, true, true);
         ListAction list1Action = new ListAction<ListItem>() {
             @Override
-            public CMediaGFX icon(ListItem listItem) {
+            public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
             }
 
@@ -545,7 +545,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, true, true, true, true);
         ListAction list2Action = new ListAction<ListItem>() {
             @Override
-            public CMediaGFX icon(ListItem listItem) {
+            public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
             }
 
@@ -603,7 +603,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
-            public CMediaGFX icon(ListItem listItem) {
+            public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
             }
 
@@ -648,7 +648,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
-            public CMediaGFX icon(ListItem listItem) {
+            public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
             }
 
@@ -692,7 +692,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override
-            public CMediaGFX icon(ListItem listItem) {
+            public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
             }
 
@@ -782,20 +782,20 @@ public class ExampleWindowGenerator extends WindowGenerator {
         int rnd;
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_1);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_1);
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_2);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_2);
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_3);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_3);
     }
 
     private void addRandomItemsToBigInventory(Object[][] inventory, String prefix) {
         int rnd;
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.GUI_ICON_EXAMPLE_DOUBLE);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_DOUBLE);
     }
 
     private void addRandomItemsToList(ArrayList list, String prefix) {
@@ -803,9 +803,9 @@ public class ExampleWindowGenerator extends WindowGenerator {
         rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
             list.add(new ListItem(prefix + "Item " + i, switch (MathUtils.random(1, 3)) {
-                case 1 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_1;
-                case 2 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_2;
-                case 3 -> ExampleBaseMedia.GUI_ICON_EXAMPLE_3;
+                case 1 -> ExampleBaseMedia.ICON_EXAMPLE_1;
+                case 2 -> ExampleBaseMedia.ICON_EXAMPLE_2;
+                case 3 -> ExampleBaseMedia.ICON_EXAMPLE_3;
                 default -> throw new IllegalStateException("Unexpected value: " + MathUtils.random(1, 3));
             }));
     }

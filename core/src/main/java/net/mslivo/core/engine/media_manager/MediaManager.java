@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.media_manager;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -8,7 +9,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
+import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.JsonReader;
 import net.mslivo.core.engine.media_manager.media.*;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
@@ -22,11 +27,16 @@ import java.util.HashSet;
  * Created by Admin on 07.02.2019.
  */
 public class MediaManager {
-    public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND_FX = "sound/";
+    public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/",  DIR_MODELS = "models/";
+    private static final String ERROR_FILE_MISSING = "file missing";
+    private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in another MediaManager";
+    private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
+    private static final String ERROR_UNKNOWN_FORMAT = "CMedia File \"%s\": class \"%s\" not supported";
+    private static final String ERROR_UNKNOWN_3D_FORMAT = "CMedia File \"%s\": 3D model format not supported";
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
-    private boolean loaded;
+    private boolean loaded = false;
     private Sound[] medias_sounds = null;
     private Music[] medias_music = null;
     private TextureRegion[] medias_images = null;
@@ -34,14 +44,15 @@ public class MediaManager {
     private BitmapFont[] medias_fonts = null;
     private TextureRegion[][] medias_arrays = null;
     private Animation[] medias_animations = null;
+    private Model[] medias_models = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
-    private TextureAtlas textureAtlas;
-
+    private TextureAtlas textureAtlas = null;
+    private ObjLoader objLoader = null;
+    private G3dModelLoader g3dLoader = null;
     public MediaManager() {
         unloadAndReset();
     }
-
 
     /* ----- Prepare ----- */
     public boolean prepareUICMedia() {
@@ -78,34 +89,32 @@ public class MediaManager {
         return loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
-    private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in a MediaManager";
-    private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
-    private static final String ERROR_UNKNOWN_FORMAT = "CMedia File \"%s\": unknown format: %s";
-
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
+        ArrayList<CMedia> modelCMediaLoadStack = new ArrayList<>();
         HashSet<CMedia> duplicateCheck = new HashSet<>();
         int step = 0;
         int stepsMax = 0;
 
         // split into Image and Sound data, skip duplicates, check format and index
         CMedia loadMedia;
-        int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
-        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0;
-        ;
+        int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0, modelMax = 0;
+        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0, modelIdx = 0;
         while ((loadMedia = loadMediaList.poll()) != null) {
             if (duplicateCheck.contains(loadMedia))
                 throw new RuntimeException(String.format(ERROR_DUPLICATE, loadMedia.file));
             if (loadMedia.mediaManagerIndex != CMedia.MEDIAMANGER_INDEX_NONE)
                 throw new RuntimeException(String.format(ERROR_ALREADY_LOADED_OTHER, loadMedia.file));
-            if (loadMedia instanceof CMediaGFX || loadMedia.getClass() == CMediaFont.class) {
+            if (loadMedia instanceof CMediaSprite || loadMedia.getClass() == CMediaFont.class) {
                 imageCMediaLoadStack.add(loadMedia);
             } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                 soundCMediaLoadStack.add(loadMedia);
-            } else {
+            } else if(loadMedia.getClass() == CMediaModel.class){
+                modelCMediaLoadStack.add(loadMedia);
+            }else {
                 throw new RuntimeException(String.format(ERROR_UNKNOWN_FORMAT, loadMedia.file, loadMedia.getClass().getSimpleName()));
             }
             switch (loadMedia) {
@@ -116,6 +125,7 @@ public class MediaManager {
                 case CMediaFont cMediaFont -> fontsMax++;
                 case CMediaSound cMediaSound -> soundMax++;
                 case CMediaMusic cMediaMusic -> musicMax++;
+                case CMediaModel cMediaModel -> modelMax++;
                 default -> {
                 }
             }
@@ -129,6 +139,7 @@ public class MediaManager {
         medias_fonts = new BitmapFont[fontsMax];
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
+        medias_models = new Model[modelMax];
         duplicateCheck.clear();
 
         // 2. Load Image Data Into Pixmap Packer
@@ -147,7 +158,7 @@ public class MediaManager {
         this.textureAtlas = new TextureAtlas();
         pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
 
-        // 5. Fill arrays with TextureAtlas Data
+        // 5. Fill CMedia Arrays with TextureAtlas Data
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
             switch (imageMedia) {
@@ -181,7 +192,7 @@ public class MediaManager {
         pixmapPacker.dispose();
         imageCMediaLoadStack.clear();
 
-        // 6. Fill arrays with Sound Data
+        // 6. Fill CMedia Arrays with Sound Data
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
             CMedia soundMedia = soundCMediaLoadStack.get(i);
             switch (soundMedia) {
@@ -201,6 +212,25 @@ public class MediaManager {
         }
         soundCMediaLoadStack.clear();
 
+        // 7. Fill CMedia Arrays with 3D-Model Data
+        for (int i = 0; i < modelCMediaLoadStack.size(); i++) {
+            CMediaModel cMediaModel = (CMediaModel) modelCMediaLoadStack.get(i);
+            ModelLoader modelLoader =null;
+            if(cMediaModel.file.toLowerCase().endsWith(".obj")){
+                this.objLoader = objLoader == null ? new ObjLoader() : objLoader;
+                modelLoader = objLoader;
+            }else if(cMediaModel.file.toLowerCase().endsWith(".g3dj") || cMediaModel.file.toLowerCase().endsWith(".g3db")){
+                this.g3dLoader = g3dLoader == null ? new G3dModelLoader(new JsonReader()) : g3dLoader;
+                modelLoader = objLoader;
+            }else{
+                throw new RuntimeException(String.format(ERROR_UNKNOWN_3D_FORMAT,cMediaModel.file));
+            }
+            medias_models[modelIdx++] = modelLoader.loadModel(Tools.File.findResource(cMediaModel.file));
+            loadedMediaList.add(cMediaModel);
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(cMediaModel.file, step, stepsMax);
+        }
+        modelCMediaLoadStack.clear();
         // 5. Finished
         this.loaded = true;
         return true;
@@ -287,12 +317,12 @@ public class MediaManager {
     /* ----- Statics ---- */
 
     public static CMediaImage create_CMediaImage(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(" file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaImage(file);
     }
 
     public static CMediaCursor create_CMediaCursor(String file, int hotspot_x, int hotspot_y) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaCursor cMediaCursor = new CMediaCursor(file);
         cMediaCursor.hotspot_x = hotspot_x;
         cMediaCursor.hotspot_y = hotspot_y;
@@ -304,7 +334,7 @@ public class MediaManager {
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
         cMediaAnimation.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
         cMediaAnimation.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
@@ -315,7 +345,7 @@ public class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaFont cMediaFont = new CMediaFont(file);
         cMediaFont.offset_x = offset_x;
         cMediaFont.offset_y = offset_y;
@@ -323,12 +353,12 @@ public class MediaManager {
     }
 
     public static CMediaMusic create_CMediaMusic(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaMusic(file);
     }
 
     public static CMediaSound create_CMediaSound(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaSound(file);
     }
 
@@ -337,7 +367,7 @@ public class MediaManager {
     }
 
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException("file missing");
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaArray cMediaArray = new CMediaArray(file);
         cMediaArray.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
         cMediaArray.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
@@ -346,13 +376,18 @@ public class MediaManager {
         return cMediaArray;
     }
 
+    public static CMediaModel create_CMediaModel(String file){
+        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
+        CMediaModel cMediaModel = new CMediaModel(file);
+        return cMediaModel;
+    }
 
-    /* -----  CMediaGFX ----- */
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y) {
+    /* -----  CMediaSprite ----- */
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y) {
         drawCMediaGFX(batch, cMedia, x, y, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y);
@@ -364,11 +399,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y);
@@ -381,11 +416,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -400,11 +435,11 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, rotation, 0, 0);
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -419,19 +454,19 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut) {
+    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int widthCut, int heightCut) {
         drawCMediaGFXCut(batch, cMedia, x, y, widthCut, heightCut, 0, 0);
     }
 
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
         drawCMediaGFXCut(batch, cMedia, x, y, 0, 0, widthCut, heightCut, animationTimer, arrayIndex);
     }
 
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
+    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
         drawCMediaGFXCut(batch, cMedia, x, y, srcX, srcY, widthCut, heightCut, 0, 0);
     }
 
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -446,19 +481,19 @@ public class MediaManager {
         }
     }
 
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
+    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, 0, 0);
     }
 
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, animationTimer, arrayIndex);
     }
 
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
         drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation, 0, 0);
     }
 
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaGFX cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
+    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
@@ -473,11 +508,11 @@ public class MediaManager {
         }
     }
 
-    public int imageWidth(CMediaGFX cMedia) {
+    public int imageWidth(CMediaSprite cMedia) {
         return imageWidth(cMedia, true);
     }
 
-    public int imageWidth(CMediaGFX cMedia, boolean tileWidth) {
+    public int imageWidth(CMediaSprite cMedia, boolean tileWidth) {
         if (tileWidth) {
             if (cMedia.getClass() == CMediaArray.class) {
                 return ((CMediaArray) cMedia).tile_width;
@@ -488,12 +523,12 @@ public class MediaManager {
         return textureAtlas.findRegion(cMedia.file).getRegionWidth();
     }
 
-    public int imageHeight(CMediaGFX cMedia) {
+    public int imageHeight(CMediaSprite cMedia) {
         return imageHeight(cMedia, true);
     }
 
 
-    public int imageHeight(CMediaGFX cMedia, boolean tileHeight) {
+    public int imageHeight(CMediaSprite cMedia, boolean tileHeight) {
         if (tileHeight) {
             if (cMedia.getClass() == CMediaArray.class) {
                 return ((CMediaArray) cMedia).tile_height;
@@ -735,14 +770,18 @@ public class MediaManager {
         return getCMediaSound(cMediaSound).loop(volume, pitch, pan);
     }
 
-    public Sound getCMediaSound(CMediaSound cMedia) {
-        return medias_sounds[cMedia.mediaManagerIndex];
+    public Sound getCMediaSound(CMediaSound cMediaSound) {
+        return medias_sounds[cMediaSound.mediaManagerIndex];
     }
 
-    public Music getCMediaMusic(CMediaMusic cMedia) {
-        return medias_music[cMedia.mediaManagerIndex];
+    public Music getCMediaMusic(CMediaMusic cMediaMusic) {
+        return medias_music[cMediaMusic.mediaManagerIndex];
     }
 
+    /* Models */
+    public Model getCMediaModel(CMediaModel cMediaModel){
+        return medias_models[cMediaModel.mediaManagerIndex];
+    }
 
     /* ---- Shutdown ---- */
     public void shutdown() {

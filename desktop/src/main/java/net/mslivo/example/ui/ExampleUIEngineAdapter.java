@@ -122,7 +122,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         batch.begin();
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
-                mediaManager.drawCMediaAnimation(batch, ExampleBaseMedia.GUI_BACKGROUND,
+                mediaManager.drawCMediaAnimation(batch, ExampleBaseMedia.BACKGROUND,
                         x, y, animation_timer);
             }
         }

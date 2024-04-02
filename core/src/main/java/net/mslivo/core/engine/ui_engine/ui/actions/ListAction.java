@@ -2,7 +2,7 @@ package net.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 
@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 public abstract class ListAction<T> extends CommonActions {
 
-    public CMediaGFX icon(T listItem) {
+    public CMediaSprite icon(T listItem) {
         return null;
     }
 

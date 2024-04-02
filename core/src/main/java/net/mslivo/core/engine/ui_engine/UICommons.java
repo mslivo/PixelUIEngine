@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
@@ -1167,7 +1167,7 @@ class UICommons {
         text.height = text.lines.length;
     }
 
-    static void image_setImage(MediaManager mediaManager, Image imageC, CMediaGFX image) {
+    static void image_setImage(MediaManager mediaManager, Image imageC, CMediaSprite image) {
         imageC.image = image;
         UICommons.image_updateSize(mediaManager, imageC);
     }

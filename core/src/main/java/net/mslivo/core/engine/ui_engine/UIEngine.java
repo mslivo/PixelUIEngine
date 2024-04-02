@@ -27,7 +27,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaArray;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.config.Config;
@@ -2704,7 +2704,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                             mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, cellGraphic, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), index);
 
                             // Draw Icon
-                            CMediaGFX cellIcon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
+                            CMediaSprite cellIcon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
                             if (cellIcon != null) {
                                 render_batchSetColorWhite(alpha);
                                 int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(grid.items[ix][iy]) : 0;
@@ -2837,7 +2837,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             Object dragItem = inputState.draggedGridItem;
             if (dragGrid.gridAction != null) {
                 render_batchSetColorWhite(inputState.config.component_gridDragAlpha);
-                CMediaGFX icon = dragGrid.gridAction.icon(dragItem);
+                CMediaSprite icon = dragGrid.gridAction.icon(dragItem);
                 if (icon != null)
                     render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconIndex(dragItem));
             }
@@ -2890,7 +2890,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         return mediaManager.textWidth(font, text);
     }
 
-    private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaGFX icon, int iconIndex) {
+    private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex) {
         if (font == null) return;
         boolean withIcon = icon != null;
         if (withIcon) {
@@ -2953,19 +2953,19 @@ public class UIEngine<T extends UIEngineAdapter> {
         mediaManager.getCMediaFont(font).setColor(inputState.tempSaveColor);
     }
 
-    private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y) {
+    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y) {
         render_drawCMediaGFX(cMedia, x, y, 0, 0);
     }
 
-    private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex) {
+    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex) {
         render_drawCMediaGFX(cMedia, x, y, arrayIndex, 0);
     }
 
-    private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
+    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
         mediaManager.drawCMediaGFX(inputState.spriteRenderer_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
-    private void render_drawCMediaGFX(CMediaGFX cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
+    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
         mediaManager.drawCMediaGFX(inputState.spriteRenderer_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 

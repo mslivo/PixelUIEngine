@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.LongArray;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
@@ -127,27 +127,27 @@ public class API {
             return create(x, y, width, height, title, null, 0, null, false, true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex) {
             return create(x, y, width, height, title, icon, iconIndex, null, false, true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, false, true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, true, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, true, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
             return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, hasTitleBar, true);
         }
 
-        public Window create(int x, int y, int width, int height, String title, CMediaGFX icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
+        public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
             Window window = new Window();
             window.x = x;
             window.y = y;
@@ -209,7 +209,7 @@ public class API {
             window.enforceScreenBounds = enforceScreenBounds;
         }
 
-        public void setIcon(Window window, CMediaGFX icon) {
+        public void setIcon(Window window, CMediaSprite icon) {
             if (window == null) return;
             window.icon = icon;
         }
@@ -690,15 +690,15 @@ public class API {
                     return create(x, y, width, height, text, buttonAction, null, 0, ButtonMode.DEFAULT, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex) {
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex) {
                     return create(x, y, width, height, text, buttonAction, icon, iconIndex, ButtonMode.DEFAULT, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode) {
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex, ButtonMode buttonMode) {
                     return create(x, y, width, height, text, buttonAction, icon, iconIndex, buttonMode, false);
                 }
 
-                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaGFX icon, int iconIndex, ButtonMode buttonMode, boolean togglePressed) {
+                public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex, ButtonMode buttonMode, boolean togglePressed) {
                     TextButton textButton = new TextButton();
                     setComponentCommonInitValuesInternal(textButton, x, y, width, height);
                     setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
@@ -710,7 +710,7 @@ public class API {
                     return textButton;
                 }
 
-                public void setIcon(TextButton textButton, CMediaGFX icon) {
+                public void setIcon(TextButton textButton, CMediaSprite icon) {
                     if (textButton == null) return;
                     textButton.icon = icon;
                 }
@@ -734,23 +734,23 @@ public class API {
 
             public class _ImageButton {
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image) {
+                public ImageButton create(int x, int y, int width, int height, CMediaSprite image) {
                     return create(x, y, width, height, image, 0, defaultButtonAction(), ButtonMode.DEFAULT, false);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex) {
+                public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex) {
                     return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), ButtonMode.DEFAULT, false);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction) {
+                public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction) {
                     return create(x, y, width, height, image, arrayIndex, buttonAction, ButtonMode.DEFAULT, false);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode) {
+                public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode) {
                     return create(x, y, width, height, image, arrayIndex, buttonAction, buttonMode, false);
                 }
 
-                public ImageButton create(int x, int y, int width, int height, CMediaGFX image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, boolean togglePressed) {
+                public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction, ButtonMode buttonMode, boolean togglePressed) {
                     ImageButton imageButton = new ImageButton();
                     setComponentCommonInitValuesInternal(imageButton, x, y, width, height, inputState.config.component_defaultColor, Color.WHITE);
                     setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
@@ -760,7 +760,7 @@ public class API {
                     return imageButton;
                 }
 
-                public void setImage(ImageButton imageButton, CMediaGFX image) {
+                public void setImage(ImageButton imageButton, CMediaSprite image) {
                     if (imageButton == null) return;
                     imageButton.image = image;
                 }
@@ -1092,19 +1092,19 @@ public class API {
                     return create(title, null, 0, null, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, int iconIndex) {
+                public Tab create(String title, CMediaSprite icon, int iconIndex) {
                     return create(title, icon, iconIndex, null, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components) {
+                public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components) {
                     return create(title, icon, iconIndex, components, defaultTabAction(), 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components, TabAction tabAction) {
+                public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components, TabAction tabAction) {
                     return create(title, icon, iconIndex, components, tabAction, 0);
                 }
 
-                public Tab create(String title, CMediaGFX icon, int iconIndex, Component[] components, TabAction tabAction, int width) {
+                public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components, TabAction tabAction, int width) {
                     Tab tab = new Tab();
                     tab.title = Tools.Text.validString(title);
                     tab.tabAction = tabAction;
@@ -1176,7 +1176,7 @@ public class API {
                     removeTabComponents(tab, tab.components.toArray(new Component[]{}));
                 }
 
-                public void setIcon(Tab tab, CMediaGFX icon) {
+                public void setIcon(Tab tab, CMediaSprite icon) {
                     if (tab == null) return;
                     tab.icon = icon;
                 }
@@ -1494,19 +1494,19 @@ public class API {
             }
 
             public class _CanvasImage {
-                public CanvasImage create(CMediaGFX image, int x, int y) {
+                public CanvasImage create(CMediaSprite image, int x, int y) {
                     return create(image, x, y, 0, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex) {
+                public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex) {
                     return create(image, x, y, arrayIndex, false, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex, boolean fadeOut) {
+                public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut) {
                     return create(image, x, y, arrayIndex, fadeOut, inputState.config.component_mapOverlayDefaultFadeoutTime);
                 }
 
-                public CanvasImage create(CMediaGFX image, int x, int y, int arrayIndex, boolean fadeOut, int fadeOutTime) {
+                public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut, int fadeOutTime) {
                     CanvasImage canvasImage = new CanvasImage();
                     canvasImage.image = image;
                     canvasImage.x = x;
@@ -1546,7 +1546,7 @@ public class API {
                     setPosition(canvasImage, canvasImage.x + x, canvasImage.y + y);
                 }
 
-                public void setImage(CanvasImage canvasImage, CMediaGFX image) {
+                public void setImage(CanvasImage canvasImage, CMediaSprite image) {
                     if (canvasImage == null) return;
                     canvasImage.image = image;
                 }
@@ -1680,19 +1680,19 @@ public class API {
                 };
             }
 
-            public Image create(int x, int y, CMediaGFX image) {
+            public Image create(int x, int y, CMediaSprite image) {
                 return create(x, y, image, 0, defaultImageAction(), 0f);
             }
 
-            public Image create(int x, int y, CMediaGFX image, int arrayIndex) {
+            public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
                 return create(x, y, image, arrayIndex, defaultImageAction(), 0f);
             }
 
-            public Image create(int x, int y, CMediaGFX image, int arrayIndex, float animation_offset) {
+            public Image create(int x, int y, CMediaSprite image, int arrayIndex, float animation_offset) {
                 return create(x, y, image, arrayIndex, defaultImageAction(), animation_offset);
             }
 
-            public Image create(int x, int y, CMediaGFX image, int arrayIndex, ImageAction imageAction, float animation_offset) {
+            public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, float animation_offset) {
                 Image imageC = new Image();
                 int width = image != null ? mediaManager.imageWidth(image) / UIEngine.TILE_SIZE : 0;
                 int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
@@ -1719,7 +1719,7 @@ public class API {
                 image.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
             }
 
-            public void setImage(Image imageC, CMediaGFX image) {
+            public void setImage(Image imageC, CMediaSprite image) {
                 if (imageC == null) return;
                 UICommons.image_setImage(mediaManager, imageC, image);
             }
@@ -1857,7 +1857,7 @@ public class API {
                     return create(text, comboBoxItemAction, null, 0);
                 }
 
-                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaGFX icon, int iconIndex) {
+                public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaSprite icon, int iconIndex) {
                     ComboBoxItem comboBoxItem = new ComboBoxItem();
                     comboBoxItem.text = Tools.Text.validString(text);
                     comboBoxItem.font = inputState.config.component_defaultFont;
@@ -1904,7 +1904,7 @@ public class API {
                     comboBoxItem.text = Tools.Text.validString(text);
                 }
 
-                public void setIcon(ComboBoxItem comboBoxItem, CMediaGFX icon) {
+                public void setIcon(ComboBoxItem comboBoxItem, CMediaSprite icon) {
                     if (comboBoxItem == null) return;
                     comboBoxItem.icon = icon;
                 }
@@ -2342,7 +2342,7 @@ public class API {
                 return create(text, contextMenuItemAction, null, 0);
             }
 
-            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaGFX icon, int iconIndex) {
+            public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaSprite icon, int iconIndex) {
                 ContextMenuItem contextMenuItem = new ContextMenuItem();
                 contextMenuItem.text = Tools.Text.validString(text);
                 contextMenuItem.font = inputState.config.component_defaultFont;
@@ -2396,7 +2396,7 @@ public class API {
                 contextMenuItem.text = Tools.Text.validString(text);
             }
 
-            public void setIcon(ContextMenuItem contextMenuItem, CMediaGFX icon) {
+            public void setIcon(ContextMenuItem contextMenuItem, CMediaSprite icon) {
                 if (contextMenuItem == null) return;
                 contextMenuItem.icon = icon;
             }
@@ -2584,11 +2584,11 @@ public class API {
 
         public class _ToolTipImage {
 
-            public ToolTipImage create(CMediaGFX image) {
+            public ToolTipImage create(CMediaSprite image) {
                 return create(image, 0, 0);
             }
 
-            public ToolTipImage create(CMediaGFX image, int x, int y) {
+            public ToolTipImage create(CMediaSprite image, int x, int y) {
                 ToolTipImage toolTipImage = new ToolTipImage();
                 toolTipImage.image = image;
                 toolTipImage.x = x;
@@ -2600,7 +2600,7 @@ public class API {
                 return toolTipImage;
             }
 
-            public void setImage(ToolTipImage toolTipImage, CMediaGFX image) {
+            public void setImage(ToolTipImage toolTipImage, CMediaSprite image) {
                 if (toolTipImage == null) return;
                 toolTipImage.image = image;
             }

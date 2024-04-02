@@ -1,9 +1,9 @@
 package net.mslivo.core.engine.ui_engine.ui.components.canvas;
 
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 
 public class CanvasImage {
-    public CMediaGFX image;
+    public CMediaSprite image;
     public int x;
     public int y;
     public String name;

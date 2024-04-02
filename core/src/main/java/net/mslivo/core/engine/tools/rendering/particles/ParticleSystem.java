@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.tools.rendering.particles;
 
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaGFX;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 
 import java.util.ArrayDeque;
@@ -24,7 +24,7 @@ abstract class ParticleSystem<T>{
         this.particlePool = new ArrayDeque<>(particleLimit);
     }
 
-    Particle particleNew(ParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaGFX appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
+    Particle particleNew(ParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaSprite appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
         if (!canAddParticle()) return null;
         Particle<T> particle = particlePool.size() > 0 ? particlePool.pop() : new Particle<>();
         particle.type = type;
