@@ -8,6 +8,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class ImmediateRenderer {
+    private static final String ERROR_END_BEGIN = "ImmediateRenderer.end must be called before begin.";
+    private static final String ERROR_BEGIN_END = "ImmediateRenderer.begin must be called before end.";
+
     private static final String VERTEX = """
                 attribute vec4 a_position;
                 attribute vec4 a_color;
@@ -38,7 +41,7 @@ public class ImmediateRenderer {
     private Mesh mesh;
     private float vertices[];
     private int colorOffset, vertexIdx, vertexSize;
-    private int uProjModelViewLocation;
+    private int u_projModelView;
     private boolean drawing;
 
     public ImmediateRenderer() {
@@ -46,7 +49,7 @@ public class ImmediateRenderer {
         this.blend = false;
         this.color = new Color(Color.WHITE);
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
-        this.uProjModelViewLocation = shader.getUniformLocation("u_projModelView");
+        this.u_projModelView = shader.getUniformLocation("u_projModelView");
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
 
         this.vertices = new float[MESH_RESIZE_STEP];
@@ -67,16 +70,16 @@ public class ImmediateRenderer {
     }
 
     public void begin(int primitiveType) {
-        if (drawing) throw new IllegalStateException("ImmediateRenderer.end must be called before begin.");
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         this.primitiveType = primitiveType;
         this.blend = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
         if (!blend) Gdx.gl.glEnable(GL20.GL_BLEND);
-        shader.setUniformMatrix(uProjModelViewLocation, this.projection);
+        shader.setUniformMatrix(u_projModelView, this.projection);
         this.drawing = true;
     }
 
     public void end() {
-        if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before end.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         this.drawing = false;
         if (vertexIdx == 0) return;
         shader.bind();

@@ -113,11 +113,12 @@ public class SpriteRenderer implements Batch {
     private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
     private int blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
     private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-    private final ShaderProgram shader;
-    private ShaderProgram customShader = null;
-    private boolean ownsShader;
+    private ShaderProgram shader;
+    private boolean defaultShader;
     protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
     private MediaManager mediaManager;
+    private int u_projTrans;
+    private int u_texture;
     public int renderCalls = 0;
     public int totalRenderCalls = 0;
     public int maxSpritesInBatch = 0;
@@ -134,7 +135,7 @@ public class SpriteRenderer implements Batch {
         this(mediaManager, size, null);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, int size, ShaderProgram defaultShader) {
+    public SpriteRenderer(MediaManager mediaManager, int size, ShaderProgram shader) {
         if (size > 16383) throw new IllegalArgumentException("Can't have more than 16383 sprites per batch: " + size);
 
         Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
@@ -162,13 +163,16 @@ public class SpriteRenderer implements Batch {
         }
         mesh.setIndices(indices);
 
-        if (defaultShader == null) {
-            shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-            if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
-            ownsShader = true;
-        } else
-            shader = defaultShader;
-
+        if (shader == null) {
+            this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+            if (!this.shader.isCompiled())
+                throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
+            defaultShader = true;
+        } else {
+            this.shader = shader;
+        }
+        this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
+        this.u_texture = this.shader.getUniformLocation("u_texture");
         this.mediaManager = mediaManager;
     }
 
@@ -178,10 +182,7 @@ public class SpriteRenderer implements Batch {
         renderCalls = 0;
 
         Gdx.gl.glDepthMask(false);
-        if (customShader != null)
-            customShader.bind();
-        else
-            shader.bind();
+        shader.bind();
         setupMatrices();
 
         drawing = true;
@@ -1190,7 +1191,7 @@ public class SpriteRenderer implements Batch {
                 Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
         }
 
-        mesh.render(customShader != null ? customShader : shader, GL20.GL_TRIANGLES, 0, count);
+        mesh.render(shader, GL20.GL_TRIANGLES, 0, count);
 
         idx = 0;
     }
@@ -1248,7 +1249,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void dispose() {
         mesh.dispose();
-        if (ownsShader && shader != null) shader.dispose();
+        if (defaultShader && shader != null) shader.dispose();
     }
 
     @Override
@@ -1277,13 +1278,8 @@ public class SpriteRenderer implements Batch {
 
     protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
-        if (customShader != null) {
-            customShader.setUniformMatrix("u_projTrans", projectionMatrix);
-            customShader.setUniformi("u_texture", 0);
-        } else {
-            shader.setUniformMatrix("u_projTrans", projectionMatrix);
-            shader.setUniformi("u_texture", 0);
-        }
+        shader.setUniformMatrix(u_projTrans, combinedMatrix);
+        shader.setUniformi(u_texture, 0);
     }
 
     protected void switchTexture(Texture texture) {
@@ -1298,22 +1294,15 @@ public class SpriteRenderer implements Batch {
         if (drawing) {
             flush();
         }
-        customShader = shader;
-        if (drawing) {
-            if (customShader != null)
-                customShader.bind();
-            else
-                this.shader.bind();
-            setupMatrices();
-        }
+        this.shader = shader;
+        this.u_projTrans = shader.getUniformLocation("u_projTrans");
+        this.u_texture = shader.getUniformLocation("u_texture");
+        this.shader.bind();
     }
 
     @Override
     public ShaderProgram getShader() {
-        if (customShader == null) {
-            return shader;
-        }
-        return customShader;
+        return this.shader;
     }
 
     @Override

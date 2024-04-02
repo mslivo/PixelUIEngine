@@ -1,14 +1,19 @@
 package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import net.mslivo.core.engine.ui_engine.render.ModelRenderer;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -23,8 +28,10 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
-    SpriteRenderer batch;
-    ImmediateRenderer immediateRenderer;
+    private SpriteRenderer batch;
+    private ImmediateRenderer immediateRenderer;
+    private ModelRenderer modelRenderer;
+    private float rotation = 0f;
 
     public ExampleUIEngineAdapter() {
     }
@@ -44,6 +51,13 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.animation_timer = 0;
         this.batch = new SpriteRenderer(mediaManager);
         this.immediateRenderer = new ImmediateRenderer();
+
+        Environment environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
+        environment.add(new DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f));
+        this.modelRenderer = new ModelRenderer(mediaManager, environment);
+
+
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
@@ -117,6 +131,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         // Draw app based on data
 
+
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
@@ -150,6 +165,17 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         immediateRenderer.begin(GL20.GL_TRIANGLES);
         immediateRenderer.vertex(0, 0, 100, 100, 200, 0);
         immediateRenderer.end();
+
+        modelRenderer.setCamera(camera);
+        modelRenderer.begin();
+
+        rotation += 1f;
+
+            modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP, 200, 200, 50,
+                    50, 50, 106f, 107f, 108, rotation);
+
+
+        modelRenderer.end();
 
     }
 

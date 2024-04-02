@@ -225,6 +225,7 @@ public class MediaManager {
             }else{
                 throw new RuntimeException(String.format(ERROR_UNKNOWN_3D_FORMAT,cMediaModel.file));
             }
+            cMediaModel.mediaManagerIndex = modelIdx;
             medias_models[modelIdx++] = modelLoader.loadModel(Tools.File.findResource(cMediaModel.file));
             loadedMediaList.add(cMediaModel);
             step++;
