@@ -314,8 +314,6 @@ public class MediaManager {
         return true;
     }
 
-    /* ----- Statics ---- */
-
     public static CMediaImage create_CMediaImage(String file) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaImage(file);
@@ -382,130 +380,41 @@ public class MediaManager {
         return cMediaModel;
     }
 
-    /* -----  CMediaSprite ----- */
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y) {
-        drawCMediaGFX(batch, cMedia, x, y, 0, 0);
+    public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
+        return medias_cursors[cMedia.mediaManagerIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int arrayIndex, float animationTimer) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y);
-            case CMediaAnimation cMediaAnimation -> drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer);
-            case CMediaArray cMediaArray -> drawCMediaArray(batch, cMediaArray, x, y, arrayIndex);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
+    public TextureRegion getCMediaImage(CMediaImage cMedia) {
+        return medias_images[cMedia.mediaManagerIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, 0, 0);
+    public TextureRegion getCMediaAnimation(CMediaAnimation cMedia, float animationTimer) {
+        return (TextureRegion) medias_animations[cMedia.mediaManagerIndex].getKeyFrame(animationTimer, true);
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage -> drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y);
-            case CMediaArray cMediaArray -> drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
+    public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
+        return medias_arrays[cMedia.mediaManagerIndex][arrayIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, 0, 0);
+    public Model getCMediaModel(CMediaModel cMediaModel){
+        return medias_models[cMediaModel.mediaManagerIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage ->
-                    drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y, width, height);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, width, height);
-            case CMediaArray cMediaArray ->
-                    drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, width, height);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
+    public Sound getCMediaSound(CMediaSound cMediaSound) {
+        return medias_sounds[cMediaSound.mediaManagerIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, width, height, rotation, 0, 0);
+    public Music getCMediaMusic(CMediaMusic cMediaMusic) {
+        return medias_music[cMediaMusic.mediaManagerIndex];
     }
 
-    public void drawCMediaGFX(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage ->
-                    drawCMediaImage(batch, cMediaImage, x, y, origin_x, origin_y, width, height, rotation);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimation(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, width, height, rotation);
-            case CMediaArray cMediaArray ->
-                    drawCMediaArray(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, width, height, rotation);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
+
+    public boolean isCMediaAnimationFinished(CMediaAnimation cMedia, float animationTimer) {
+        return medias_animations[cMedia.mediaManagerIndex].isAnimationFinished(animationTimer);
     }
 
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int widthCut, int heightCut) {
-        drawCMediaGFXCut(batch, cMedia, x, y, widthCut, heightCut, 0, 0);
-    }
-
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
-        drawCMediaGFXCut(batch, cMedia, x, y, 0, 0, widthCut, heightCut, animationTimer, arrayIndex);
-    }
-
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
-        drawCMediaGFXCut(batch, cMedia, x, y, srcX, srcY, widthCut, heightCut, 0, 0);
-    }
-
-    public void drawCMediaGFXCut(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage ->
-                    drawCMediaImageCut(batch, cMediaImage, x, y, srcX, srcY, widthCut, heightCut);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimationCut(batch, cMediaAnimation, x, y, animationTimer, srcX, srcY, widthCut, heightCut);
-            case CMediaArray cMediaArray ->
-                    drawCMediaArrayCut(batch, cMediaArray, x, y, arrayIndex, srcX, srcY, widthCut, heightCut);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
-    }
-
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, 0, 0);
-    }
-
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, animationTimer, arrayIndex);
-    }
-
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        drawCMediaGFX(batch, cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation, 0, 0);
-    }
-
-    public void drawCMediaGFXScale(SpriteRenderer batch, CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
-        if (cMedia == null) return;
-        switch (cMedia) {
-            case CMediaImage cMediaImage ->
-                    drawCMediaImageScale(batch, cMediaImage, x, y, origin_x, origin_y, scaleX, scaleY, rotation);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimationScale(batch, cMediaAnimation, x, y, animationTimer, origin_x, origin_y, scaleX, scaleY, rotation);
-            case CMediaArray cMediaArray ->
-                    drawCMediaArrayScale(batch, cMediaArray, x, y, arrayIndex, origin_x, origin_y, scaleX, scaleY, rotation);
-            case CMediaCursor cMediaCursor -> drawCMediaCursor(batch, cMediaCursor, x, y);
-            default -> {
-            }
-        }
+    public int getCMediaAnimationKeyFrameIndex(CMediaAnimation cMedia, float animationTimer) {
+        return medias_animations[cMedia.mediaManagerIndex].getKeyFrameIndex(animationTimer);
     }
 
     public int imageWidth(CMediaSprite cMedia) {
@@ -527,7 +436,6 @@ public class MediaManager {
         return imageHeight(cMedia, true);
     }
 
-
     public int imageHeight(CMediaSprite cMedia, boolean tileHeight) {
         if (tileHeight) {
             if (cMedia.getClass() == CMediaArray.class) {
@@ -539,175 +447,8 @@ public class MediaManager {
         return textureAtlas.findRegion(cMedia.file).getRegionHeight();
     }
 
-    /* ----- CMediaCursor ----- */
-
-    public void drawCMediaCursor(SpriteRenderer batch, CMediaCursor cMedia, float x, float y) {
-        TextureRegion texture = getCMediaCursor(cMedia);
-        batch.draw(texture, x - cMedia.hotspot_x, y - cMedia.hotspot_y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
-    }
-
-    public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
-        return medias_cursors[cMedia.mediaManagerIndex];
-    }
-
-
-    /* ----- CMediaImage ----- */
-
-    public void drawCMediaImage(SpriteRenderer batch, CMediaImage cMedia, float x, float y) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaImage(SpriteRenderer batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaImage(SpriteRenderer batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, 0);
-    }
-
-    public void drawCMediaImage(SpriteRenderer batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
-    }
-
-    public void drawCMediaImageCut(SpriteRenderer batch, CMediaImage cMedia, float x, float y, int widthCut, int heightCut) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture.getTexture(), x, y, texture.getRegionX(), texture.getRegionY(), widthCut, heightCut);
-    }
-
-    public void drawCMediaImageCut(SpriteRenderer batch, CMediaImage cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture.getTexture(), x, y, texture.getRegionX() + srcX, texture.getRegionY() + srcY, widthCut, heightCut);
-    }
-
-    public void drawCMediaImageScale(SpriteRenderer batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, 0);
-    }
-
-    public void drawCMediaImageScale(SpriteRenderer batch, CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        TextureRegion texture = getCMediaImage(cMedia);
-        batch.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, rotation);
-    }
-
-    public TextureRegion getCMediaImage(CMediaImage cMedia) {
-        return medias_images[cMedia.mediaManagerIndex];
-    }
-
-    public TextureRegion getCMediaAnimation(CMediaAnimation cMedia, float animationTimer) {
-        return (TextureRegion) medias_animations[cMedia.mediaManagerIndex].getKeyFrame(animationTimer, true);
-    }
-
-    /* --- CMediaAnimation  --- */
-
-    public void drawCMediaAnimation(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaAnimation(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaAnimation(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
-    }
-
-    public void drawCMediaAnimation(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height, float rotation) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
-    }
-
-    public void drawCMediaAnimationCut(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int widthCut, int heightCut) {
-        drawCMediaAnimationCut(batch, cMedia, x, y, animationTimer, 0, 0, widthCut, heightCut);
-    }
-
-    public void drawCMediaAnimationCut(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, int srcX, int srcY, int widthCut, int heightCut) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
-    }
-
-    public void drawCMediaAnimationScale(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
-    }
-
-    public void drawCMediaAnimationScale(SpriteRenderer batch, CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        TextureRegion textureRegion = getCMediaAnimation(cMedia, animationTimer);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
-    }
-
-    public boolean isCMediaAnimationFinished(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations[cMedia.mediaManagerIndex].isAnimationFinished(animationTimer);
-    }
-
-    public int getCMediaAnimationKeyFrameIndex(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations[cMedia.mediaManagerIndex].getKeyFrameIndex(animationTimer);
-    }
-
-    /* --- CMediaArray  --- */
-
-    public void drawCMediaArray(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaArray(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
-    }
-
-    public void drawCMediaArray(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
-    }
-
-    public void drawCMediaArray(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height, float rotation) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
-    }
-
-    public void drawCMediaArrayCut(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, int widthCut, int heightCut) {
-        drawCMediaArrayCut(batch, cMedia, x, y, arrayIndex, 0, 0, widthCut, heightCut);
-    }
-
-    public void drawCMediaArrayCut(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, int srcX, int srcY, int widthCut, int heightCut) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
-    }
-
-    public void drawCMediaArrayScale(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
-    }
-
-    public void drawCMediaArrayScale(SpriteRenderer batch, CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        TextureRegion textureRegion = getCMediaArray(cMedia, arrayIndex);
-        batch.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
-    }
-
     public int getCMediaArraySize(CMediaArray cMedia) {
         return medias_arrays[cMedia.mediaManagerIndex].length;
-    }
-
-    public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
-        return medias_arrays[cMedia.mediaManagerIndex][arrayIndex];
-    }
-    /* --- CMediaFont  --- */
-
-    public void drawCMediaFont(SpriteRenderer batch, CMediaFont cMedia, float x, float y, String text) {
-        BitmapFont bitmapFont = getCMediaFont(cMedia);
-        bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y));
-    }
-
-    public void drawCMediaFont(SpriteRenderer batch, CMediaFont cMedia, float x, float y, String text, int maxWidth) {
-        BitmapFont bitmapFont = getCMediaFont(cMedia);
-        bitmapFont.draw(batch, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, true, "");
     }
 
     public void setCMediaFontColorWhite(CMediaFont font) {
@@ -734,53 +475,6 @@ public class MediaManager {
     public int textHeight(CMediaFont font, String text) {
         glyphLayout.setText(getCMediaFont(font), text);
         return (int) glyphLayout.height;
-    }
-
-    /* ----- CMediaSound ----- */
-
-    public long playCMediaSound(CMediaSound cMedia) {
-        return getCMediaSound(cMedia).play(1, 1, 0);
-    }
-
-    public long playCMediaSound(CMediaSound cMedia, float volume) {
-        return getCMediaSound(cMedia).play(volume, 1, 0);
-    }
-
-    public long playCMediaSound(CMediaSound cMedia, float volume, float pan) {
-        return getCMediaSound(cMedia).play(volume, 1, pan);
-    }
-
-    public long playCMediaSound(CMediaSound cMedia, float volume, float pitch, float pan) {
-        return getCMediaSound(cMedia).play(volume, pitch, pan);
-    }
-
-    public long loopCMediaSound(CMediaSound cMediaSound) {
-        return loopCMediaSound(cMediaSound, 1, 1, 0);
-    }
-
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume) {
-        return loopCMediaSound(cMediaSound, volume, 1, 0);
-    }
-
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch) {
-        return loopCMediaSound(cMediaSound, volume, pitch, 0);
-    }
-
-    public long loopCMediaSound(CMediaSound cMediaSound, float volume, float pitch, float pan) {
-        return getCMediaSound(cMediaSound).loop(volume, pitch, pan);
-    }
-
-    public Sound getCMediaSound(CMediaSound cMediaSound) {
-        return medias_sounds[cMediaSound.mediaManagerIndex];
-    }
-
-    public Music getCMediaMusic(CMediaMusic cMediaMusic) {
-        return medias_music[cMediaMusic.mediaManagerIndex];
-    }
-
-    /* Models */
-    public Model getCMediaModel(CMediaModel cMediaModel){
-        return medias_models[cMediaModel.mediaManagerIndex];
     }
 
     /* ---- Shutdown ---- */

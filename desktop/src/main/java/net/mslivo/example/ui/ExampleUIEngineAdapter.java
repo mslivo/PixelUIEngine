@@ -23,6 +23,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
+    SpriteRenderer batch;
+    ImmediateRenderer immediateRenderer;
 
     public ExampleUIEngineAdapter() {
     }
@@ -40,7 +42,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-
+        this.batch = new SpriteRenderer(mediaManager);
+        this.immediateRenderer = new ImmediateRenderer();
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
@@ -64,7 +67,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         });
         api.component.button.centerContent(transitionBtn);
         api.addScreenComponent(transitionBtn);
-
 
         // HotKey
         api.addHotKey(api.hotkey.create(new int[]{com.badlogic.gdx.Input.Keys.ESCAPE}, new HotKeyAction() {
@@ -102,14 +104,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 case KeyCode.Key.Q -> api.input.mouse.emulated.setPosition(10, 10);
                 case KeyCode.Key.W -> api.input.mouse.emulated.setPositionPreviousComponent();
                 case KeyCode.Key.E -> api.input.mouse.emulated.setPositionNextComponent();
-
             }
         }
     }
 
 
-    SpriteRenderer batch = new SpriteRenderer();
-    ImmediateRenderer immediateRenderer = new ImmediateRenderer();
+
     @Override
     public void render(OrthographicCamera camera, AppViewPort appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
@@ -122,7 +122,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         batch.begin();
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
-                mediaManager.drawCMediaAnimation(batch, ExampleBaseMedia.BACKGROUND,
+                batch.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,
                         x, y, animation_timer);
             }
         }

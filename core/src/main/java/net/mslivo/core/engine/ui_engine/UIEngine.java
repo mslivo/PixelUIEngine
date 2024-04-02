@@ -9,40 +9,36 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
+import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.media_manager.media.CMediaArray;
+import net.mslivo.core.engine.media_manager.media.CMediaFont;
+import net.mslivo.core.engine.media_manager.media.CMediaImage;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.config.Config;
 import net.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
+import net.mslivo.core.engine.ui_engine.input.InputEvents;
+import net.mslivo.core.engine.ui_engine.input.KeyCode;
+import net.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
-import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
-import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaArray;
-import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
-import net.mslivo.core.engine.media_manager.media.CMediaImage;
-import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.config.Config;
-import net.mslivo.core.engine.ui_engine.input.InputEvents;
-import net.mslivo.core.engine.ui_engine.input.KeyCode;
-import net.mslivo.core.engine.ui_engine.input.UIEngineInputProcessor;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBox;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.CheckBoxStyle;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
+import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
@@ -55,9 +51,13 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInput;
+import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -137,7 +137,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         // -----  App
         newInputState.camera_app = new OrthographicCamera(newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.camera_app.setToOrtho(false, newInputState.resolutionWidth, newInputState.resolutionHeight);
-        newInputState.camera_app.position.set((newInputState.resolutionWidth/2), (newInputState.resolutionHeight/2), 0);
+        newInputState.camera_app.position.set((newInputState.resolutionWidth / 2), (newInputState.resolutionHeight / 2), 0);
         newInputState.camera_app.zoom = 1f;
         newInputState.camera_app.update();
         newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, false);
@@ -146,7 +146,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.texture_app.flip(false, true);
 
         // -----  GUI
-        newInputState.spriteRenderer_ui = new SpriteRenderer(16383);
+        newInputState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, 8192);
         newInputState.camera_ui = new OrthographicCamera(newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui);
         newInputState.camera_ui.setToOrtho(false, newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui);
         newInputState.camera_ui.update();
@@ -931,8 +931,6 @@ public class UIEngine<T extends UIEngineAdapter> {
     private void mouseControl_updateLastUIMouseHover() {
         inputState.lastUIMouseHover = UICommons.component_getUIObjectAtPosition(inputState, inputState.mouse_ui.x, inputState.mouse_ui.y);
     }
-
-
 
 
     private void updateMouseCursor() {
@@ -2016,22 +2014,22 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         // Selection
         render_batchSetColor(r2, g2, b2, alpha);
-        mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
+        inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
     }
 
     private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, float r, float g, float b, float alpha, boolean upperCase, boolean pressed) {
         render_batchSetColor(r, g, b, alpha);
         int pressedIndex = pressed ? 1 : 0;
-        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
+        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
-            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
+            inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
         }
         if (c == '\t') {
             CMediaArray caseGraphic = upperCase ? UIBaseMedia.UI_OSTEXTINPUT_UPPERCASE : UIBaseMedia.UI_OSTEXTINPUT_LOWERCASE;
-            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, caseGraphic, x, y, pressedIndex);
+            inputState.spriteRenderer_ui.drawCMediaArray(caseGraphic, x, y, pressedIndex);
         }
         if (c == '\b') {
-            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
+            inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
         } else {
             int offset = pressed ? 1 : 0;
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2 - offset);
@@ -2040,7 +2038,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawCursor() {
         if (inputState.cursor != null) {
-            mediaManager.drawCMediaCursor(inputState.spriteRenderer_ui, inputState.cursor, inputState.mouse_ui.x, inputState.mouse_ui.y);
+            inputState.spriteRenderer_ui.drawCMediaCursor(inputState.cursor, inputState.mouse_ui.x, inputState.mouse_ui.y);
             render_batchSetColorWhite();
         }
     }
@@ -2141,7 +2139,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                             }
                             render_saveTempColorBatch();
                             render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
-                            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, comboMenuGraphic, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox) - (iy * TILE_SIZE) - TILE_SIZE, index);
+                            inputState.spriteRenderer_ui.drawCMediaArray(comboMenuGraphic, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox) - (iy * TILE_SIZE) - TILE_SIZE, index);
                             render_loadTempColorBatch();
                         }
                     }
@@ -2181,7 +2179,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                     render_saveTempColorBatch();
                     render_batchSetColor(contextMenuItem.color_r, contextMenuItem.color_g, contextMenuItem.color_b, alpha);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, contextMenuGraphic, contextMenu.x + (ix * TILE_SIZE), contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(contextMenuGraphic, contextMenu.x + (ix * TILE_SIZE), contextMenu.y - (iy * TILE_SIZE) - TILE_SIZE, index);
                     render_loadTempColorBatch();
                 }
             }
@@ -2286,20 +2284,20 @@ public class UIEngine<T extends UIEngineAdapter> {
         // Lines
         switch (direction) {
             case 1 -> {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x, inputState.mouse_ui.y);
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x, inputState.mouse_ui.y);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
             }
             case 2 -> {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
             }
             case 3 -> {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y);
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y + TILE_SIZE);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y + TILE_SIZE);
             }
             case 4 -> {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - TILE_SIZE);
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - (TILE_SIZE * 2));
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - TILE_SIZE);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - (TILE_SIZE * 2));
             }
         }
 
@@ -2308,9 +2306,9 @@ public class UIEngine<T extends UIEngineAdapter> {
             for (int ty = 0; ty < tooltip_height; ty++) {
                 if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
                     int titleIndex = (tx == 0 ? 0 : ((tx == tooltip_width - 1) ? 2 : 1));
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
                 } else {
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
                 }
             }
         }
@@ -2339,7 +2337,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
             int toolTipImageX = tooltip_x + (toolTipImage.x * UIEngine.TILE_SIZE);
             int toolTipImageY = tooltip_y + (toolTipImage.y * UIEngine.TILE_SIZE);
-            render_drawCMediaGFX(toolTipImage.image, toolTipImageX, toolTipImageY);
+            render_drawCMediaSprite(toolTipImage.image, toolTipImageX, toolTipImageY);
             render_loadTempColorBatch();
         }
 
@@ -2364,7 +2362,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             render_saveTempColorBatch();
             render_batchSetColor(notification.color_r, notification.color_g, notification.color_b, notification.color_a);
             for (int ix = 0; ix < width; ix++) {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.resolutionHeight_ui - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_NOTIFICATION_BAR, (ix * TILE_SIZE), inputState.resolutionHeight_ui - TILE_SIZE - (y * TILE_SIZE) + yOffsetSlideFade);
             }
             int xOffset = ((width * TILE_SIZE) / 2) - (render_textWidth(notification.font, notification.text) / 2) - notification.scroll;
             render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (inputState.resolutionHeight_ui - TILE_SIZE - (y * TILE_SIZE)) + 1 + yOffsetSlideFade);
@@ -2387,10 +2385,10 @@ public class UIEngine<T extends UIEngineAdapter> {
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
                 for (int iy = 0; iy < window.height; iy++) {
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + (iy * TILE_SIZE), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + (iy * TILE_SIZE), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
                 }
             } else {
-                mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + ((window.height - 1) * TILE_SIZE), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
+                inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_WINDOW, window.x + (ix * TILE_SIZE), window.y + ((window.height - 1) * TILE_SIZE), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
             }
         }
 
@@ -2436,7 +2434,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                 for (int ix = 0; ix < button.width; ix++) {
                     for (int iy = 0; iy < button.height; iy++) {
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, buttonGraphic, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_get16TilesCMediaIndex(ix, iy, button.width, button.height));
+                        inputState.spriteRenderer_ui.drawCMediaArray(buttonGraphic, UICommons.component_getAbsoluteX(button) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(button) + (iy * TILE_SIZE), render_get16TilesCMediaIndex(ix, iy, button.width, button.height));
                     }
                 }
                 if (button instanceof TextButton textButton) {
@@ -2446,13 +2444,13 @@ public class UIEngine<T extends UIEngineAdapter> {
                 } else if (button instanceof ImageButton imageButton) {
                     render_saveTempColorBatch();
                     render_batchSetColor(imageButton.color2_r, imageButton.color2_g, imageButton.color2_b, alpha);
-                    render_drawCMediaGFX(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset, imageButton.arrayIndex);
+                    render_drawCMediaSprite(imageButton.image, UICommons.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommons.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset, imageButton.arrayIndex);
                     render_loadTempColorBatch();
                 }
             }
             case Image image -> {
                 if (image.image != null) {
-                    render_drawCMediaGFX(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex, image.animationOffset);
+                    render_drawCMediaSprite(image.image, UICommons.component_getAbsoluteX(image), UICommons.component_getAbsoluteY(image), image.arrayIndex, image.animationOffset);
                 }
             }
             case Text text -> {
@@ -2466,22 +2464,22 @@ public class UIEngine<T extends UIEngineAdapter> {
             case ScrollBarVertical scrollBarVertical -> {
                 for (int i = 0; i < scrollBarVertical.height; i++) {
                     int index = (i == 0 ? 2 : (i == (scrollBarVertical.height - 1) ? 0 : 1));
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_SCROLLBAR_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + (i * TILE_SIZE), index);
                     int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * ((scrollBarVertical.height - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_SCROLLBAR_BUTTON_VERTICAL, UICommons.component_getAbsoluteX(scrollBarVertical), UICommons.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
             case ScrollBarHorizontal scrollBarHorizontal -> {
                 for (int i = 0; i < scrollBarHorizontal.width; i++) {
                     int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_SCROLLBAR_HORIZONTAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + (i * TILE_SIZE), UICommons.component_getAbsoluteY(scrollBarHorizontal), index);
                     int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * ((scrollBarHorizontal.width - 1) * TILE_SIZE));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommons.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommons.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
@@ -2531,7 +2529,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                     for (int ix = 0; ix < list.width; ix++) {
                         CMediaImage listSelectedGraphic = selected ? UIBaseMedia.UI_LIST_SELECTED : UIBaseMedia.UI_LIST;
-                        mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, listSelectedGraphic, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
+                        inputState.spriteRenderer_ui.drawCMediaImage(listSelectedGraphic, UICommons.component_getAbsoluteX(list) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(list) + itemOffsetY * TILE_SIZE);
                     }
                     if (cellColor != null) render_loadTempColorBatch();
 
@@ -2544,7 +2542,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                 if (dragEnabled && dragValid) {
                     for (int ix = 0; ix < list.width; ix++) {
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
+                        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_LIST_DRAG, drag_x + (ix * TILE_SIZE), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
                 render_setGrayscaleEnabled(preListGrayScaleState);
@@ -2562,7 +2560,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                     render_saveTempColorBatch();
                     render_batchSetColor(color_r, color_g, color_b, alpha);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, comboMedia, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(comboMedia, UICommons.component_getAbsoluteX(comboBox) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(comboBox), index);
                     render_loadTempColorBatch();
 
                 }
@@ -2572,15 +2570,15 @@ public class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Knob knob -> {
-                mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
+                inputState.spriteRenderer_ui.drawCMediaImage( UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
                 render_saveTempColorBatch();
                 render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha);
                 if (knob.endless) {
                     int index = MathUtils.round(knob.turned * 31);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_KNOB_ENDLESS, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 } else {
                     int index = MathUtils.round(knob.turned * 25);
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_KNOB, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob), index);
                 }
                 render_loadTempColorBatch();
             }
@@ -2591,7 +2589,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 for (int ix = 0; ix < width; ix++) {
                     for (int iy = 0; iy < height; iy++) {
                         render_batchSetColor(canvas.map[ix][iy].r, canvas.map[ix][iy].g, canvas.map[ix][iy].b, (canvas.map[ix][iy].a * alpha));
-                        mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, UIBaseMedia.UI_PIXEL, UICommons.component_getAbsoluteX(canvas) + ix, UICommons.component_getAbsoluteY(canvas) + iy);
+                        inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_PIXEL, UICommons.component_getAbsoluteX(canvas) + ix, UICommons.component_getAbsoluteY(canvas) + iy);
                     }
                 }
                 render_loadTempColorBatch();
@@ -2612,7 +2610,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         render_batchSetColor(canvasImage.color_r * alpha, canvasImage.color_g, canvasImage.color_b, (canvasImage.color_a * alpha));
                         int imageWidthOffset = mediaManager.imageWidth(canvasImage.image) / 2;
                         int imageHeightOffset = mediaManager.imageHeight(canvasImage.image) / 2;
-                        render_drawCMediaGFX(canvasImage.image,
+                        render_drawCMediaSprite(canvasImage.image,
                                 UICommons.component_getAbsoluteX(canvas) + canvasImage.x - imageWidthOffset,
                                 UICommons.component_getAbsoluteY(canvas) + canvasImage.y - imageHeightOffset,
                                 canvasImage.arrayIndex);
@@ -2626,12 +2624,12 @@ public class UIEngine<T extends UIEngineAdapter> {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
 
                     CMediaArray textFieldGraphic = inputState.focusedTextField == textField ? UIBaseMedia.UI_TEXTFIELD_FOCUSED : UIBaseMedia.UI_TEXTFIELD;
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, textFieldGraphic, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(textFieldGraphic, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
 
                     if (!textField.contentValid) {
                         render_saveTempColorBatch();
                         render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, (alpha * 0.2f));
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                         render_loadTempColorBatch();
                     }
 
@@ -2640,7 +2638,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         if (UICommons.textField_isFocused(inputState, textField)) {
                             int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                             if (xOffset < textField.width * TILE_SIZE) {
-                                mediaManager.drawCMediaAnimation(inputState.spriteRenderer_ui, UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
+                                inputState.spriteRenderer_ui.drawCMediaAnimation( UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
                             }
                         }
                     }
@@ -2701,14 +2699,14 @@ public class UIEngine<T extends UIEngineAdapter> {
                                 render_batchSetColorWhite(alpha);
                             }
                             int index = grid.doubleSized ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
-                            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, cellGraphic, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), index);
+                            inputState.spriteRenderer_ui.drawCMediaArray(cellGraphic, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), index);
 
                             // Draw Icon
                             CMediaSprite cellIcon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
                             if (cellIcon != null) {
                                 render_batchSetColorWhite(alpha);
                                 int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(grid.items[ix][iy]) : 0;
-                                render_drawCMediaGFX(cellIcon, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex);
+                                render_drawCMediaSprite(cellIcon, UICommons.component_getAbsoluteX(grid) + (ix * tileSize), UICommons.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex);
                             }
                             render_loadTempColorBatch();
                         }
@@ -2728,16 +2726,16 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                     if (tabBar.bigIconMode) {
                         CMediaImage tabGraphic = selected ? UIBaseMedia.UI_TAB_BIGICON_SELECTED : UIBaseMedia.UI_TAB_BIGICON;
-                        mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
+                        inputState.spriteRenderer_ui.drawCMediaImage(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar));
                         // Icon
                         if (tab.icon != null) {
                             int selected_offset = selected ? 0 : 1;
-                            render_drawCMediaGFX(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
+                            render_drawCMediaSprite(tab.icon, UICommons.component_getAbsoluteX(tabBar) + (tabXOffset * TILE_SIZE) + selected_offset, UICommons.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex);
                         }
                     } else {
                         CMediaArray tabGraphic = selected ? UIBaseMedia.UI_TAB_SELECTED : UIBaseMedia.UI_TAB;
                         for (int ix = 0; ix < tabWidth; ix++) {
-                            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
+                            inputState.spriteRenderer_ui.drawCMediaArray(tabGraphic, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE) + (tabXOffset * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
                         }
                     }
 
@@ -2751,19 +2749,19 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                 // Top Border Top
                 for (int ix = 0; ix < topBorder; ix++) {
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabXOffset + ix) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar), 2);
                 }
 
                 if (tabBar.border) {
                     // Bottom
                     for (int ix = 0; ix < tabBar.width; ix++) {
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
+                        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - (tabBar.borderHeight * TILE_SIZE), 2);
                     }
                     // Left/Right
                     for (int iy = 0; iy < tabBar.borderHeight; iy++) {
                         int yOffset = (iy + 1) * TILE_SIZE;
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
-                        mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
+                        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar), UICommons.component_getAbsoluteY(tabBar) - yOffset, 0);
+                        inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TAB_BORDERS, UICommons.component_getAbsoluteX(tabBar) + ((tabBar.width - 1) * TILE_SIZE), UICommons.component_getAbsoluteY(tabBar) - yOffset, 1);
                     }
                 }
             }
@@ -2779,7 +2777,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         case TRIANGLE_RIGHT_UP -> UIBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_UP;
                     };
 
-                    mediaManager.drawCMediaImage(inputState.spriteRenderer_ui, shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
+                    inputState.spriteRenderer_ui.drawCMediaImage(shapeImage, UICommons.component_getAbsoluteX(shape), UICommons.component_getAbsoluteY(shape),
                             0, 0, shape.width * TILE_SIZE, shape.height * TILE_SIZE);
                 }
             }
@@ -2787,7 +2785,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Background
                 for (int ix = 0; ix < progressBar.width; ix++) {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
-                    mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
+                    inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_PROGRESSBAR, UICommons.component_getAbsoluteX(progressBar) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(progressBar), index);
                 }
 
                 // Bar
@@ -2799,9 +2797,9 @@ public class UIEngine<T extends UIEngineAdapter> {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
                     if (xOffset < pixels) {
                         if (pixels - xOffset < TILE_SIZE) {
-                            mediaManager.drawCMediaArrayCut(inputState.spriteRenderer_ui, UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
+                            inputState.spriteRenderer_ui.drawCMediaArrayCut(UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index, pixels - xOffset, TILE_SIZE);
                         } else {
-                            mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
+                            inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_PROGRESSBAR_BAR, UICommons.component_getAbsoluteX(progressBar) + xOffset, UICommons.component_getAbsoluteY(progressBar), index);
                         }
                     }
                 }
@@ -2815,7 +2813,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             }
             case CheckBox checkBox -> {
                 CMediaArray checkBoxGraphic = checkBox.checkBoxStyle == CheckBoxStyle.CHECKBOX ? UIBaseMedia.UI_CHECKBOX_CHECKBOX : UIBaseMedia.UI_CHECKBOX_RADIO;
-                mediaManager.drawCMediaArray(inputState.spriteRenderer_ui, checkBoxGraphic, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
+                inputState.spriteRenderer_ui.drawCMediaArray(checkBoxGraphic, UICommons.component_getAbsoluteX(checkBox), UICommons.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
                 render_drawFont(checkBox.font, checkBox.text, alpha, UICommons.component_getAbsoluteX(checkBox) + TILE_SIZE, UICommons.component_getAbsoluteY(checkBox), 1, 1);
             }
             case AppViewPort appViewPort -> {
@@ -2839,7 +2837,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 render_batchSetColorWhite(inputState.config.component_gridDragAlpha);
                 CMediaSprite icon = dragGrid.gridAction.icon(dragItem);
                 if (icon != null)
-                    render_drawCMediaGFX(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconIndex(dragItem));
+                    render_drawCMediaSprite(icon, inputState.mouse_ui.x - dragOffsetX, inputState.mouse_ui.y - dragOffsetY, dragGrid.gridAction.iconIndex(dragItem));
             }
         } else if (inputState.draggedList != null) {
             List dragList = inputState.draggedList;
@@ -2850,7 +2848,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // List
                 render_batchSetColor(dragList.color_r, dragList.color_g, dragList.color_b, Math.min(dragList.color_a, inputState.config.component_listDragAlpha));
                 for (int ix = 0; ix < dragList.width; ix++) {
-                    this.render_drawCMediaGFX(UIBaseMedia.UI_LIST_SELECTED, inputState.mouse_ui.x - dragOffsetX + (ix * TILE_SIZE), inputState.mouse_ui.y - dragOffsetY);
+                    this.render_drawCMediaSprite(UIBaseMedia.UI_LIST_SELECTED, inputState.mouse_ui.x - dragOffsetX + (ix * TILE_SIZE), inputState.mouse_ui.y - dragOffsetY);
                 }
                 // Text
                 String text = dragList.listAction.text(dragItem);
@@ -2896,17 +2894,17 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (withIcon) {
             render_saveTempColorBatch();
             render_batchSetColorWhite(alpha);
-            render_drawCMediaGFX(icon, x, y, iconIndex);
+            render_drawCMediaSprite(icon, x, y, iconIndex);
             render_loadTempColorBatch();
         }
 
         render_saveTempColorFont(font);
         render_fontSetAlpha(font, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            mediaManager.drawCMediaFont(inputState.spriteRenderer_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
+            inputState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text);
         } else {
-            if(withIcon) maxWidth -= UIEngine.TILE_SIZE;
-            mediaManager.drawCMediaFont(inputState.spriteRenderer_ui, font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text,
+            if (withIcon) maxWidth -= UIEngine.TILE_SIZE;
+            inputState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TILE_SIZE : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
         render_loadTempColorFont(font);
@@ -2953,20 +2951,20 @@ public class UIEngine<T extends UIEngineAdapter> {
         mediaManager.getCMediaFont(font).setColor(inputState.tempSaveColor);
     }
 
-    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y) {
-        render_drawCMediaGFX(cMedia, x, y, 0, 0);
+    private void render_drawCMediaSprite(CMediaSprite cMedia, int x, int y) {
+        render_drawCMediaSprite(cMedia, x, y, 0, 0);
     }
 
-    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex) {
-        render_drawCMediaGFX(cMedia, x, y, arrayIndex, 0);
+    private void render_drawCMediaSprite(CMediaSprite cMedia, int x, int y, int arrayIndex) {
+        render_drawCMediaSprite(cMedia, x, y, arrayIndex, 0);
     }
 
-    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
-        mediaManager.drawCMediaGFX(inputState.spriteRenderer_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
+    private void render_drawCMediaSprite(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset) {
+        inputState.spriteRenderer_ui.drawCMediaSprite(cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
-    private void render_drawCMediaGFX(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
-        mediaManager.drawCMediaGFX(inputState.spriteRenderer_ui, cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
+    private void render_drawCMediaSprite(CMediaSprite cMedia, int x, int y, int arrayIndex, float animation_timer_offset, int area_x, int area_y, int area_w, int area_h) {
+        inputState.spriteRenderer_ui.drawCMediaSprite(cMedia, x, y, arrayIndex, (inputState.animation_timer_ui + animation_timer_offset));
     }
 
     public void shutdown() {
