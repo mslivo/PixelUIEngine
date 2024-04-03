@@ -80,11 +80,11 @@ public class ImmediateRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        this.drawing = false;
         if(vertexIdx == 0) return;
         mesh.setVertices(vertices, 0, vertexIdx);
         mesh.render(shader, this.primitiveType);
         vertexIdx = 0;
-        this.drawing = false;
     }
 
     public void setColor(Color color) {
