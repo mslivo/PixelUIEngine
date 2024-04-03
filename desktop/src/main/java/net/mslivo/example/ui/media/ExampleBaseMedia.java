@@ -19,7 +19,6 @@ public class ExampleBaseMedia {
     public static final CMediaAnimation EXAMPLE_ANIMATION_2 = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png", UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 8, 0.1f);
     public static final CMediaAnimation EXAMPLE_ANIMATION = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation.png", UIEngine.TILE_SIZE * 2, UIEngine.TILE_SIZE, 0.1f);
     public static final CMediaAnimation BACKGROUND = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 16, 16, 0.2f);
-    public static final CMediaModel MODEL_SHIP = MediaManager.create_CMediaModel(MediaManager.DIR_MODELS + "ship.obj");
     public static final CMedia[] ALL = new CMedia[]{
             EXAMPLE_ANIMATION,
             BUTTON_ANIM_EXAMPLE_ARRAY,
@@ -33,8 +32,7 @@ public class ExampleBaseMedia {
             ICON_EXAMPLE_BULLET_ORANGE,
             ICON_EXAMPLE_WINDOW,
             EXAMPLE_ANIMATION_2,
-            BACKGROUND,
-            MODEL_SHIP
+            BACKGROUND
     };
 
 }
