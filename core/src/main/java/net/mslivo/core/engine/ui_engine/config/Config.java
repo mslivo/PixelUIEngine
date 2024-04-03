@@ -103,7 +103,7 @@ public class Config implements Serializable, Cloneable {
         window_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_defaultColor = Color.WHITE.cpy();
         component_defaultFont = UIBaseMedia.UI_FONT_BLACK;
-        component_appViewportDefaultUpdateTime = 200;
+        component_appViewportDefaultUpdateTime = 0;
         component_listDragAlpha = 0.8f;
         component_gridDragAlpha = 0.8f;
         component_knobSensitivity = 1f;

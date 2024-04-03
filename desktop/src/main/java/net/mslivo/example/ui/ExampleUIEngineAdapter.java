@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -123,7 +124,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     }
 
 
-
     @Override
     public void render(OrthographicCamera camera, AppViewPort appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
@@ -170,9 +170,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         modelRenderer.begin();
 
         rotation += 1f;
-
-            modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP, 100, 100, 50,
-                    50, 50 , rotation,0, rotation);
+        ModelInstance modelInstance = modelRenderer.getModelInstance(ExampleBaseMedia.MODEL_SHIP);
+        modelInstance.transform.idt();
+        modelInstance.transform.trn(100, 100, -50);
+        modelInstance.transform.scl(50f);
+        modelInstance.transform.rotate(1f, 1f, 1f, rotation);
+        modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP);
 
 
         modelRenderer.end();

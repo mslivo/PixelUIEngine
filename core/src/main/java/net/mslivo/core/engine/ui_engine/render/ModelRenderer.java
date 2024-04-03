@@ -61,33 +61,30 @@ public class ModelRenderer {
         this.drawing = false;
     }
 
-    public void drawCMediaModel(CMediaModel cMediaModel, float x, float y) {
-        drawCMediaModel(cMediaModel, x, y, 10f, 10f, 10f,0f,0f,0f);
+    public void drawCMediaModel(CMediaModel cMediaModel) {
+        modelBatch.render(getModel(cMediaModel), environment);
     }
 
-    public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scale) {
-        drawCMediaModel(cMediaModel, x, y, scale, scale, scale,0f,0f,0f);
+    public ModelInstance getModelInstance(CMediaModel cMediaModel){
+        return getModel(cMediaModel);
     }
 
-    public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scaleX, float scaleY, float scaleZ) {
-        drawCMediaModel(cMediaModel, x, y, scaleX, scaleY, scaleZ,0f,0f,0f);
+
+    private ModelInstance getAndTranslateModel(CMediaModel cMediaModel, float x, float y, float scaleX, float scaleY, float scaleZ){
+        ModelInstance modelInstance = getModel(cMediaModel);
+        modelInstance.transform.idt();
+        modelInstance.transform.trn(x,y,MODEL_Z);
+        modelInstance.transform.scl(scaleX, scaleY, scaleZ);
+        return modelInstance;
     }
 
-    public void drawCMediaModel(CMediaModel cMediaModel, float x, float y, float scaleX, float scaleY, float scaleZ,
-                                float pitch, float yaw, float roll) {
+    private ModelInstance getModel(CMediaModel cMediaModel){
         ModelInstance modelInstance = this.modelInstances.get(cMediaModel);
         if (modelInstance == null) {
             modelInstance = new ModelInstance(mediaManager.getCMediaModel(cMediaModel));
             this.modelInstances.put(cMediaModel, modelInstance);
         }
-
-        modelInstance.transform.idt();
-        modelInstance.transform.trn(x,y,MODEL_Z);
-        modelInstance.transform.scl(scaleX, scaleY, scaleZ);
-        rotation.setEulerAngles(pitch,yaw,roll);
-        modelInstance.transform.rotate(rotation);
-        modelBatch.render(modelInstance, environment);
+        return modelInstance;
     }
-
 
 }
