@@ -44,7 +44,6 @@ public class MediaManager {
     private BitmapFont[] medias_fonts = null;
     private TextureRegion[][] medias_arrays = null;
     private Animation[] medias_animations = null;
-    private Model[] medias_models = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -94,15 +93,14 @@ public class MediaManager {
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
-        ArrayList<CMedia> modelCMediaLoadStack = new ArrayList<>();
         HashSet<CMedia> duplicateCheck = new HashSet<>();
         int step = 0;
         int stepsMax = 0;
 
         // split into Image and Sound data, skip duplicates, check format and index
         CMedia loadMedia;
-        int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0, modelMax = 0;
-        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0, modelIdx = 0;
+        int imagesMax = 0, cursorMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
+        int imagesIdx = 0, cursorIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0;
         while ((loadMedia = loadMediaList.poll()) != null) {
             if (duplicateCheck.contains(loadMedia))
                 throw new RuntimeException(String.format(ERROR_DUPLICATE, loadMedia.file));
@@ -112,9 +110,7 @@ public class MediaManager {
                 imageCMediaLoadStack.add(loadMedia);
             } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
                 soundCMediaLoadStack.add(loadMedia);
-            } else if(loadMedia.getClass() == CMediaModel.class){
-                modelCMediaLoadStack.add(loadMedia);
-            }else {
+            } else {
                 throw new RuntimeException(String.format(ERROR_UNKNOWN_FORMAT, loadMedia.file, loadMedia.getClass().getSimpleName()));
             }
             switch (loadMedia) {
@@ -125,7 +121,6 @@ public class MediaManager {
                 case CMediaFont cMediaFont -> fontsMax++;
                 case CMediaSound cMediaSound -> soundMax++;
                 case CMediaMusic cMediaMusic -> musicMax++;
-                case CMediaModel cMediaModel -> modelMax++;
                 default -> {
                 }
             }
@@ -139,7 +134,6 @@ public class MediaManager {
         medias_fonts = new BitmapFont[fontsMax];
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
-        medias_models = new Model[modelMax];
         duplicateCheck.clear();
 
         // 2. Load Image Data Into Pixmap Packer
@@ -212,27 +206,7 @@ public class MediaManager {
         }
         soundCMediaLoadStack.clear();
 
-        // 7. Fill CMedia Arrays with 3D-Model Data
-        for (int i = 0; i < modelCMediaLoadStack.size(); i++) {
-            CMediaModel cMediaModel = (CMediaModel) modelCMediaLoadStack.get(i);
-            ModelLoader modelLoader =null;
-            if(cMediaModel.file.toLowerCase().endsWith(".obj")){
-                this.objLoader = objLoader == null ? new ObjLoader() : objLoader;
-                modelLoader = objLoader;
-            }else if(cMediaModel.file.toLowerCase().endsWith(".g3dj") || cMediaModel.file.toLowerCase().endsWith(".g3db")){
-                this.g3dLoader = g3dLoader == null ? new G3dModelLoader(new JsonReader()) : g3dLoader;
-                modelLoader = objLoader;
-            }else{
-                throw new RuntimeException(String.format(ERROR_UNKNOWN_3D_FORMAT,cMediaModel.file));
-            }
-            cMediaModel.mediaManagerIndex = modelIdx;
-            medias_models[modelIdx++] = modelLoader.loadModel(Tools.File.findResource(cMediaModel.file));
-            loadedMediaList.add(cMediaModel);
-            step++;
-            if (loadProgress != null) loadProgress.onLoadStep(cMediaModel.file, step, stepsMax);
-        }
-        modelCMediaLoadStack.clear();
-        // 5. Finished
+        // 7. Finished
         this.loaded = true;
         return true;
     }
@@ -375,12 +349,6 @@ public class MediaManager {
         return cMediaArray;
     }
 
-    public static CMediaModel create_CMediaModel(String file){
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
-        CMediaModel cMediaModel = new CMediaModel(file);
-        return cMediaModel;
-    }
-
     public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
         return medias_cursors[cMedia.mediaManagerIndex];
     }
@@ -395,10 +363,6 @@ public class MediaManager {
 
     public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
         return medias_arrays[cMedia.mediaManagerIndex][arrayIndex];
-    }
-
-    public Model getCMediaModel(CMediaModel cMediaModel){
-        return medias_models[cMediaModel.mediaManagerIndex];
     }
 
     public Sound getCMediaSound(CMediaSound cMediaSound) {

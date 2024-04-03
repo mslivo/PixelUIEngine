@@ -14,7 +14,6 @@ import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
-import net.mslivo.core.engine.ui_engine.render.ModelRenderer;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -31,7 +30,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private boolean resetPressed;
     private SpriteRenderer batch;
     private ImmediateRenderer immediateRenderer;
-    private ModelRenderer modelRenderer;
     private float rotation = 0f;
 
     public ExampleUIEngineAdapter() {
@@ -56,8 +54,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         Environment environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
         environment.add(new DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f));
-        this.modelRenderer = new ModelRenderer(mediaManager, environment);
-
 
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
@@ -166,19 +162,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         immediateRenderer.vertex(0, 0, 100, 100, 200, 0);
         immediateRenderer.end();
 
-        modelRenderer.setCamera(camera);
-        modelRenderer.begin();
 
-        rotation += 1f;
-        ModelInstance modelInstance = modelRenderer.getModelInstance(ExampleBaseMedia.MODEL_SHIP);
-        modelInstance.transform.idt();
-        modelInstance.transform.trn(100, 100, -50);
-        modelInstance.transform.scl(50f);
-        modelInstance.transform.rotate(1f, 1f, 1f, rotation);
-        modelRenderer.drawCMediaModel(ExampleBaseMedia.MODEL_SHIP);
-
-
-        modelRenderer.end();
 
     }
 
