@@ -201,8 +201,8 @@ public class SpriteRenderer implements Batch {
     }
 
     @Override
-    public void setColor(Color tint) {
-        color = tint.toFloatBits();
+    public void setColor(Color color) {
+        this.color = color.toFloatBits();
     }
 
     @Override
