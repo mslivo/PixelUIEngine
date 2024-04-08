@@ -1,7 +1,9 @@
 # PixelUI Engine
 ![](logo.png)
 
-UI-System on top of LibGDX which provides a tiny 8x8-tile based Window and Component system suited for low-resolution games. 
+Java UI-System on top of LibGDX which provides a tiny 8x8-tile based Window and Component system
+suited for low-resolution game and graphical applications.
+This is a work in progress and subject to change - no maven release exists.
 
 This library was used in the game [Sandtrix](https://www.sandtrix.net).
 
@@ -25,7 +27,7 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
   - Shapes
   - Tabbars & Tabs
   - Textfield
-  - GameViewPort
+  - AppViewPort
  - ToolTips
  - Context Menus
  - Notifications
@@ -39,6 +41,8 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
  - Input handling
  - High performance, low library size (~300kb)
  - Utility classes
+  - Improved Sprite renderer
+  - Immediate-Mode renderer
   - Particle system
   - Transition effects
   - Music & Sound players
