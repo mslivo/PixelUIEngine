@@ -530,7 +530,7 @@ public class API {
                 setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.WHITE);
                 int viewportWidth = appViewPort.width * UIEngine.TILE_SIZE;
                 int viewportHeight = appViewPort.height * UIEngine.TILE_SIZE;
-                appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+                appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
                 Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
                 texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
                 appViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);

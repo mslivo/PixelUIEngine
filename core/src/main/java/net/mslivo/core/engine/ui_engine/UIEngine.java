@@ -140,7 +140,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.camera_app.position.set((newInputState.resolutionWidth / 2), (newInputState.resolutionHeight / 2), 0);
         newInputState.camera_app.zoom = 1f;
         newInputState.camera_app.update();
-        newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, false);
+        newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, true);
         newInputState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         newInputState.texture_app = new TextureRegion(newInputState.frameBuffer_app.getColorBufferTexture());
         newInputState.texture_app.flip(false, true);
