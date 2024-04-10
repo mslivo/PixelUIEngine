@@ -153,13 +153,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {
                 immediateRenderer.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                immediateRenderer.vertex(0, 0, 100 + ix, 100 + iy);
+                immediateRenderer.vertex(0, 0);
+                immediateRenderer.vertex(100 + ix, 100 + iy);
             }
         }
         immediateRenderer.end();
 
         immediateRenderer.begin(GL20.GL_TRIANGLES);
-        immediateRenderer.vertex(0, 0, 100, 100, 200, 0);
+        immediateRenderer.vertex(0, 0);
+        immediateRenderer.vertex(0100, 100);
+        immediateRenderer.vertex( 200, 0);
         immediateRenderer.end();
 
 

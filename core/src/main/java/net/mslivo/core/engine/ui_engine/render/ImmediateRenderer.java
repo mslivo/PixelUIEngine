@@ -108,26 +108,20 @@ public class ImmediateRenderer {
         projection = null;
     }
 
-    public void vertex(float x, float y) {
+    public void vertex(float x, float y, float z) {
         if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
         checkMeshSize(vertexSize);
         vertices[vertexIdx + colorOffset] = NumberUtils.intToFloatColor(((int)(255 * this.color.a) << 24) | ((int)(255 * this.color.b) << 16) | ((int)(255 * this.color.g) << 8) | ((int)(255 * this.color.r)));
         vertices[vertexIdx] = x;
         vertices[vertexIdx + 1] = y;
-        vertices[vertexIdx + 2] = 0;
+        vertices[vertexIdx + 2] = z;
         vertexIdx += vertexSize;
     }
 
-    public void vertex(float x, float y, float x2, float y2) {
-        vertex(x, y);
-        vertex(x2, y2);
+    public void vertex(float x, float y) {
+        vertex(x, y,0f);
     }
 
-    public void vertex(float x, float y, float x2, float y2, float x3, float y3) {
-        vertex(x, y);
-        vertex(x2, y2);
-        vertex(x3, y3);
-    }
 
     public boolean isDrawing() {
         return drawing;
