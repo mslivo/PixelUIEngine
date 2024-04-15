@@ -41,6 +41,9 @@ public class ImmediateRenderer {
     private Mesh mesh;
     private float vertices[];
     private int colorOffset, vertexIdx, vertexSize;
+
+
+
     private int u_projModelView;
     private boolean drawing;
 
@@ -144,6 +147,10 @@ public class ImmediateRenderer {
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE)
         );
+    }
+
+    public int getPrimitiveType() {
+        return primitiveType;
     }
 
 }
