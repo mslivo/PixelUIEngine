@@ -128,6 +128,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         // Draw app based on data
 
 
+        batch.setLightness(0.5f);
+        batch.setTint(1f);
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
