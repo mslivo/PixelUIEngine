@@ -84,7 +84,7 @@ public class SpriteRenderer implements Batch {
                       
                       tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
                       tgt.y *= (v_tweak.y*2.0); // tweak Saturation
-                      tgt.z *= (v_tweak.z*2.0); // tweak Lightness
+                      tgt.z += (v_tweak.z-0.5) * 2.0; // tweak Lightness
                       
                       vec4 color = hsl2rgb(tgt); // convert back to RGB 
                       vec4 color_tinted = color*v_color; // multiply with batch tint color

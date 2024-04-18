@@ -129,6 +129,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         batch.setLightness(0.5f);
+        batch.setSaturation(1f);
         batch.setTint(1f);
         batch.setProjectionMatrix(camera.combined);
 
