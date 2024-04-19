@@ -40,8 +40,8 @@ public class ImmediateRenderer {
                    vec4 vertexColor = a_vertexColor;
                    vertexColor.a *= 255.0 / 254.0;
                    
-                   vec4 color = a_color;
-                   color.a *= 255.0 / 254.0;
+                   vec4 vcolor = a_color;
+                   vcolor.a *= 255.0 / 254.0;
                    
                    vec4 tweak = a_tweak;
                    tweak.a *= 255.0 / 254.0;
@@ -54,8 +54,8 @@ public class ImmediateRenderer {
                    tgt.x = fract(tgt.x+tweak.x); // tweak Hue
                    tgt.y *= (tweak.y*2.0); // tweak Saturation
                    tgt.z += (tweak.z-0.5) * 2.0; // tweak Lightness
-                   color = hsl2rgb(tgt); // convert back to RGB 
-                   v_color = mix(color, (color*v_color), tweak.w); // mixed with tinted color based on tweak Tint
+                   vec4 color = hsl2rgb(tgt); // convert back to RGB 
+                   v_color = mix(color, (color*vcolor), tweak.w); // mixed with tinted color based on tweak Tint
                    v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, (tweak.y*2.0));  // remove colors based on tweak.saturation
                 }
             """;
