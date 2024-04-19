@@ -256,8 +256,16 @@ public class ImmediateRenderer {
         this.vertexColor = rgbPacked(r, g, b, a);
     }
 
+    public void setPackedVertexColor(float vertexColor) {
+        this.vertexColor = color;
+    }
+
     public void setColor(Color color) {
         setColor(color.r, color.g, color.b, color.a);
+    }
+
+    public void setPackedColor(float color) {
+        this.color = color;
     }
 
     public void setColor(float r, float g, float b) {
