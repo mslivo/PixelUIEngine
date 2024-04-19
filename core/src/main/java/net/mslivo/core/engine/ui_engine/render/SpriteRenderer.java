@@ -47,83 +47,81 @@ public class SpriteRenderer implements Batch {
             }
                             
             """;
-    private static final String FRAGMENT_SHADER =
-            """
-                    #ifdef GL_ES
-                    #define LOWP lowp
-                    precision mediump float;
-                    #else
-                    #define LOWP
-                    #endif
-                    varying vec2 v_texCoords;
-                    varying LOWP vec4 v_color;
-                    varying LOWP vec4 v_tweak;
-                    uniform sampler2D u_texture;
-                    const float eps = 1.0e-10;
-                                        
-                    vec4 rgb2hsl(vec4 c)
-                    {
-                        const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                        vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                        vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                        float d = q.x - min(q.w, q.y);
-                        float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                        return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-                    }
+    private static final String FRAGMENT_SHADER = """
+            #ifdef GL_ES
+            #define LOWP lowp
+            precision mediump float;
+            #else
+            #define LOWP
+            #endif
+            varying vec2 v_texCoords;
+            varying LOWP vec4 v_color;
+            varying LOWP vec4 v_tweak;
+            uniform sampler2D u_texture;
+            const float eps = 1.0e-10;
                                 
-                    vec4 hsl2rgb(vec4 c)
-                    {
-                        const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                        vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                        float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                        return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
-                    }
-                                    
-                    void main()
-                    {
-                      vec4 tgt = texture2D( u_texture, v_texCoords );
-                      tgt = rgb2hsl(tgt); // convert to HSL
-                      
-                      tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
-                      tgt.y *= (v_tweak.y*2.0); // tweak Saturation
-                      tgt.z += (v_tweak.z-0.5) * 2.0; // tweak Lightness
-                      
-                      vec4 color = hsl2rgb(tgt); // convert back to RGB 
-                      vec4 color_tinted = color*v_color; // multiply with batch tint color
-                      color = mix(color, color_tinted, v_tweak.w); // mixed with tinted color based on tweak Tint
-                      color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2.0));  // remove colors based on tweak.saturation
-                      
-                      gl_FragColor = color;
-                    }       
-                     """;
+            vec4 rgb2hsl(vec4 c)
+            {
+                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
+                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+                float d = q.x - min(q.w, q.y);
+                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
+                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
+            }
+                        
+            vec4 hsl2rgb(vec4 c)
+            {
+                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
+                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
+                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
+            }
+                            
+            void main()
+            {
+              vec4 tgt = rgb2hsl(texture2D( u_texture, v_texCoords )); // convert to HSL
+              
+              tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
+              tgt.y *= (v_tweak.y*2.0); // tweak Saturation
+              tgt.z += (v_tweak.z-0.5) * 2.0; // tweak Lightness
+              
+              vec4 color = hsl2rgb(tgt); // convert back to RGB 
+              color = mix(color, (color*v_color), v_tweak.w); // mixed with tinted color based on tweak Tint
+              color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2.0));  // remove colors based on tweak.saturation
+              
+              gl_FragColor = color;
+            }       
+            """;
     public static final int SPRITE_SIZE = 24;
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
+
     private static final float TWEAK_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
-    private final Color TEMP_COLOR = new Color(1f, 1f, 1f, 1f);
+    private final Color tempColor;
     private final Mesh mesh;
     private final float[] vertices;
-    private float tweak = TWEAK_RESET;
-    private int idx = 0;
-    private Texture lastTexture = null;
-    private float invTexWidth = 0, invTexHeight = 0;
-    private boolean drawing = false;
-    private final Matrix4 transformMatrix = new Matrix4();
-    private final Matrix4 projectionMatrix = new Matrix4();
-    private final Matrix4 combinedMatrix = new Matrix4();
+    private float tweak;
+    private int idx;
+    private Texture lastTexture;
+    private float invTexWidth, invTexHeight;
+    private boolean drawing;
+    private final Matrix4 transformMatrix;
+    private final Matrix4 projectionMatrix;
+    private final Matrix4 combinedMatrix;
     private boolean blendingDisabled = false;
-    private int blendSrcFunc = GL20.GL_SRC_ALPHA;
-    private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
-    private int blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
-    private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+    private int blendSrcFunc;
+    private int blendDstFunc;
+    private int blendSrcFuncAlpha;
+    private int blendDstFuncAlpha;
     private ShaderProgram shader;
     private boolean defaultShader;
-    protected float color = Color.toFloatBits(1f, 1f, 1f, 1f);
+    protected float color;
     private MediaManager mediaManager;
     private int u_projTrans;
     private int u_texture;
-    public int renderCalls = 0;
-    public int totalRenderCalls = 0;
-    public int maxSpritesInBatch = 0;
+    public int renderCalls;
+    public int totalRenderCalls;
+    public int maxSpritesInBatch;
 
     public SpriteRenderer() {
         this(null, 1024, null);
@@ -139,19 +137,38 @@ public class SpriteRenderer implements Batch {
 
     public SpriteRenderer(MediaManager mediaManager, int size, ShaderProgram shader) {
         if (size > 16383) throw new IllegalArgumentException("Can't have more than 16383 sprites per batch: " + size);
-
-        Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
-
-        mesh = new Mesh(vertexDataType, false, size * 4, size * 6,
+        if (shader == null) {
+            this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+            if (!this.shader.isCompiled())
+                throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
+            defaultShader = true;
+        } else {
+            this.shader = shader;
+        }
+        this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
+        this.u_texture = this.shader.getUniformLocation("u_texture");
+        this.drawing = false;
+        this.idx = 0;
+        this.lastTexture = null;
+        this.transformMatrix = new Matrix4();
+        this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.combinedMatrix = new Matrix4();
+        this.tempColor = new Color(Color.WHITE);
+        this.color = Color.toFloatBits(1f, 1f, 1f, 1f);
+        this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
+        this.invTexWidth = this.invTexHeight = 0;
+        this.tweak = TWEAK_RESET;
+        this.blendSrcFunc = GL20.GL_SRC_ALPHA;
+        this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
+        this.blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.vertices = new float[size * SPRITE_SIZE];
+        this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
+                false, size * 4, size * 6,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
-
-        projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        vertices = new float[size * SPRITE_SIZE];
-
         int len = size * 6;
         short[] indices = new short[len];
         short j = 0;
@@ -163,20 +180,10 @@ public class SpriteRenderer implements Batch {
             indices[i + 4] = (short) (j + 3);
             indices[i + 5] = j;
         }
-        mesh.setIndices(indices);
-
-        if (shader == null) {
-            this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-            if (!this.shader.isCompiled())
-                throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
-            defaultShader = true;
-        } else {
-            this.shader = shader;
-        }
-        this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
-        this.u_texture = this.shader.getUniformLocation("u_texture");
+        this.mesh.setIndices(indices);
         this.mediaManager = mediaManager;
     }
+
 
     @Override
     public void begin() {
@@ -227,8 +234,8 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public Color getColor() {
-        Color.abgr8888ToColor(TEMP_COLOR, color);
-        return TEMP_COLOR;
+        Color.abgr8888ToColor(tempColor, color);
+        return tempColor;
     }
 
     @Override
@@ -292,19 +299,19 @@ public class SpriteRenderer implements Batch {
         tweak = rgbPacked(r, g, b, tint);
     }
 
-    public void setHSLS(float hue, float saturation, float lightness, float tint) {
+    public void setHSLT(float hue, float saturation, float lightness, float tint) {
         tweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
-    public void setPackedHSLS(final float tweak) {
+    public void setPackedHSLT(final float tweak) {
         this.tweak = tweak;
     }
 
-    public void setHSLSReset() {
+    public void setHSLTReset() {
         this.tweak = TWEAK_RESET;
     }
 
-    public float getPackedHSLS() {
+    public float getPackedHSLT() {
         return tweak;
     }
 
@@ -312,22 +319,6 @@ public class SpriteRenderer implements Batch {
         return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
-
-
-    public void setColorHSLS(final float color, final float tweak) {
-        setColor(color);
-        setPackedHSLS(tweak);
-    }
-
-
-    public void setColorHSLS(final float r, final float g,
-                             final float b, final float a,
-                             final float hue, final float sat,
-                             final float light, final float roughness) {
-        setColor(r, g, b, a);
-        setHSLS(hue, sat, light, roughness);
-    }
-
 
     @Override
     public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
