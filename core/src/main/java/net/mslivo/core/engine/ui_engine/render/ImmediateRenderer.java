@@ -15,36 +15,9 @@ public class ImmediateRenderer {
                 attribute vec4 a_color;
                 attribute vec4 a_tweak;
                 uniform mat4 u_projTrans;
-                varying vec4 v_vertexColor;
                 varying vec4 v_color;
-                varying vec4 v_tweak;
-                
-                void main() {
-                   v_vertexColor = a_vertexColor;
-                   v_vertexColor.a *= 255.0 / 254.0;
-                   
-                   v_color = a_color;
-                   v_color.a *= 255.0 / 254.0;
-                   
-                   v_tweak = a_tweak;
-                   v_tweak.a = v_tweak.a * (255.0/254.0);
-                   
-                   gl_PointSize = 1.0;
-                   gl_Position = u_projTrans * a_position;
-                }
-            """;
-    private static final String FRAGMENT = """
-                #ifdef GL_ES
-                #define LOWP lowp
-                 precision mediump float;
-                #else
-                 #define LOWP
-                #endif
-                varying LOWP vec4 v_vertexColor;
-                varying LOWP vec4 v_color;
-                varying LOWP vec4 v_tweak;
                 const float eps = 1.0e-10;
-                
+
                 vec4 rgb2hsl(vec4 c)
                 {
                     const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -54,7 +27,7 @@ public class ImmediateRenderer {
                     float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
                     return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
                 }
-                                
+
                 vec4 hsl2rgb(vec4 c)
                 {
                     const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -62,18 +35,41 @@ public class ImmediateRenderer {
                     float v = (c.z + c.y * min(c.z, 1.0 - c.z));
                     return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
                 }
-                
+
                 void main() {
-                   vec4 tgt = rgb2hsl(v_vertexColor); // convert to HSL
+                   vec4 vertexColor = a_vertexColor;
+                   vertexColor.a *= 255.0 / 254.0;
                    
-                   tgt.x = fract(tgt.x+v_tweak.x); // tweak Hue
-                   tgt.y *= (v_tweak.y*2.0); // tweak Saturation
-                   tgt.z += (v_tweak.z-0.5) * 2.0; // tweak Lightness
+                   vec4 vcolor = a_color;
+                   vcolor.a *= 255.0 / 254.0;
+                   
+                   vec4 tweak = a_tweak;
+                   tweak.a *= 255.0 / 254.0;
+                   
+                   gl_PointSize = 1.0;
+                   gl_Position = u_projTrans * a_position;
+                   
+                   vec4 tgt = rgb2hsl(vertexColor); // convert to HSL
+                   
+                   tgt.x = fract(tgt.x+tweak.x); // tweak Hue
+                   tgt.y *= (tweak.y*2.0); // tweak Saturation
+                   tgt.z += (tweak.z-0.5) * 2.0; // tweak Lightness
                    vec4 color = hsl2rgb(tgt); // convert back to RGB 
-                   color = mix(color, (color*v_color), v_tweak.w); // mixed with tinted color based on tweak Tint
-                   color.rgb = mix(vec3(dot(color.rgb, vec3(0.3333))), color.rgb,  (v_tweak.y*2.0));  // remove colors based on tweak.saturation
-                   
-                   gl_FragColor = color;
+                   v_color = mix(color, (color*vcolor), tweak.w); // mixed with tinted color based on tweak Tint
+                   v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, (tweak.y*2.0));  // remove colors based on tweak.saturation
+                }
+            """;
+    private static final String FRAGMENT = """
+                #ifdef GL_ES
+                #define LOWP lowp
+                 precision mediump float;
+                #else
+                 #define LOWP
+                #endif
+                varying LOWP vec4 v_color;
+                
+                void main() {                   
+                   gl_FragColor = v_color;
                 }
             """;
 
