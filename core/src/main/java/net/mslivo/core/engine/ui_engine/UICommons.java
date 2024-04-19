@@ -215,11 +215,11 @@ class UICommons {
 
     static void window_enforceScreenBounds(InputState inputState, Window window) {
         int wndWidth = window_getAbsoluteWidth(window);
-        window.x = Tools.Calc.inBounds(window.x, 0, inputState.resolutionWidth_ui - wndWidth);
+        window.x = Math.clamp(window.x, 0, inputState.resolutionWidth_ui - wndWidth);
         if (window.folded) {
-            window.y = Tools.Calc.inBounds(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.resolutionHeight_ui - (window.height) * UIEngine.TILE_SIZE);
+            window.y = Math.clamp(window.y, -((window.height - 1) * UIEngine.TILE_SIZE), inputState.resolutionHeight_ui - (window.height) * UIEngine.TILE_SIZE);
         } else {
-            window.y = Tools.Calc.inBounds(window.y, 0, inputState.resolutionHeight_ui - window_getAbsoluteHeight(window));
+            window.y = Math.clamp(window.y, 0, inputState.resolutionHeight_ui - window_getAbsoluteHeight(window));
         }
     }
 
@@ -278,8 +278,8 @@ class UICommons {
     }
 
     static void component_setSize(InputState inputState, Component component, int width, int height) {
-        component.width = Tools.Calc.lowerBounds(width, 1);
-        component.height = Tools.Calc.lowerBounds(height, 1);
+        component.width = Math.clamp(width, 1, Integer.MAX_VALUE);
+        component.height = Math.clamp(height, 1, Integer.MAX_VALUE);
 
         if (component instanceof AppViewPort appViewPort) {
             appViewPort_resizeCameraTextureAndFrameBuffer(appViewPort);
@@ -599,7 +599,7 @@ class UICommons {
 
     static Tab tabBar_getSelectedTab(TabBar tabBar) {
         if (tabBar == null) return null;
-        return tabBar.tabs.get(Tools.Calc.inBounds(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
+        return tabBar.tabs.get(Math.clamp(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
     }
 
     static void tabBar_selectTab(TabBar tabBar, Tab tab) {
@@ -613,7 +613,7 @@ class UICommons {
     }
 
     static void tabBar_selectTab(TabBar tabBar, int index) {
-        tabBar.selectedTab = Tools.Calc.inBounds(index, 0, tabBar.tabs.size() - 1);
+        tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size() - 1);
         Tab tab = tabBar.tabs.get(tabBar.selectedTab);
         if (tab.tabAction != null) tab.tabAction.onSelect();
         if (tabBar.tabBarAction != null)
@@ -638,7 +638,7 @@ class UICommons {
     }
 
     static void progressbar_setProgress(ProgressBar progressBar, float progress) {
-        progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
+        progressBar.progress = Math.clamp(progress, 0f, 1f);
     }
 
     static void button_toggle(Button button, boolean pressed) {
@@ -690,7 +690,7 @@ class UICommons {
 
 
     static void textField_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
-        textField.markerPosition = Tools.Calc.inBounds(position, 0, textField.content.length());
+        textField.markerPosition = Math.clamp(position, 0, textField.content.length());
         if (textField.markerPosition < textField.offset) {
             while (textField.markerPosition < textField.offset) {
                 textField.offset--;
@@ -758,7 +758,7 @@ class UICommons {
     static void textField_setContent(TextField textField, String content) {
         if (content.length() > textField.contentMaxLength) content = content.substring(0, textField.contentMaxLength);
         textField.content = Tools.Text.validString(content);
-        textField.markerPosition = Tools.Calc.inBounds(textField.markerPosition, 0, textField.content.length());
+        textField.markerPosition = Math.clamp(textField.markerPosition, 0, textField.content.length());
         if (textField.textFieldAction != null) {
             textField.contentValid = textField.textFieldAction.isContentValid(content);
             textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
@@ -992,7 +992,7 @@ class UICommons {
             }
         }
         float oldValue = knob.turned;
-        knob.turned = Tools.Calc.inBounds(newValue, 0f, 1f);
+        knob.turned = Math.clamp(newValue, 0f, 1f);
         if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, (newValue - oldValue));
     }
 
@@ -1052,7 +1052,7 @@ class UICommons {
     static void list_updateItemInfoAtMousePosition(InputState inputState, List list) {
         if (list.items != null && list.listAction != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-            itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
+            itemFrom = Math.clamp(itemFrom, 0, Integer.MAX_VALUE);
             int x_list = UICommons.component_getAbsoluteX(list);
             int y_list = UICommons.component_getAbsoluteY(list);
             // insert between other items
@@ -1179,11 +1179,11 @@ class UICommons {
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
         int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
-        mouseTextInput.selectedIndex = Tools.Calc.inBounds(index, 0, (maxCharacters - 1));
+        mouseTextInput.selectedIndex = Math.clamp(index, 0, (maxCharacters - 1));
     }
 
     static void scrollBar_scroll(ScrollBar scrollBar, float scrolled) {
-        scrollBar.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+        scrollBar.scrolled = Math.clamp(scrolled, 0f, 1f);
         if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
     }
 
@@ -1221,7 +1221,7 @@ class UICommons {
     }
 
     static void list_scroll(List list, float scrolled) {
-        list.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+        list.scrolled = Math.clamp(scrolled, 0f, 1f);
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
     }
 
@@ -1341,7 +1341,7 @@ class UICommons {
     }
 
     static void camera_setZoom(OrthographicCamera camera, float zoom) {
-        camera.zoom = Tools.Calc.lowerBounds(zoom, 0f);
+        camera.zoom = Math.clamp(zoom, 0f, Float.MAX_VALUE);
         camera.update();
     }
 

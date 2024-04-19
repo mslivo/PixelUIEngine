@@ -151,8 +151,8 @@ public class API {
             Window window = new Window();
             window.x = x;
             window.y = y;
-            window.width = Tools.Calc.lowerBounds(width, 2);
-            window.height = Tools.Calc.lowerBounds(height, 2);
+            window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
+            window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
             window.title = Tools.Text.validString(title);
             window.alwaysOnTop = alwaysOnTop;
             window.moveAble = moveAble;
@@ -216,7 +216,7 @@ public class API {
 
         public void setIconIndex(Window window, int iconIndex) {
             if (window == null) return;
-            window.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+            window.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
         }
 
         public void setVisible(Window window, boolean visible) {
@@ -453,8 +453,8 @@ public class API {
 
         public void setSize(Window window, int width, int height) {
             if (window == null) return;
-            window.width = Tools.Calc.lowerBounds(width, 2);
-            window.height = Tools.Calc.lowerBounds(height, 2);
+            window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
+            window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
         }
 
         public void setTitle(Window window, String title) {
@@ -538,7 +538,7 @@ public class API {
                 appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
                 appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
                 appViewPort.camera.position.set(camPositionX, camPositionY, 0f);
-                appViewPort.camera.zoom = Tools.Calc.lowerBounds(camZoom,0f);
+                appViewPort.camera.zoom = Math.clamp(camZoom, 0f, Float.MAX_VALUE);
                 appViewPort.camera.update();
                 appViewPort.updateTime = updateTime;
                 appViewPort.appViewPortAction = appViewPortAction;
@@ -552,7 +552,7 @@ public class API {
 
             public void setUpdateTime(AppViewPort appViewPort, int updateTime) {
                 if (appViewPort == null) return;
-                appViewPort.updateTime = Tools.Calc.lowerBounds(updateTime, 0);
+                appViewPort.updateTime = Math.clamp(updateTime, 0, Integer.MAX_VALUE);
             }
 
             public void setPosition(AppViewPort appViewPort,float x, float y) {
@@ -625,7 +625,7 @@ public class API {
             public ProgressBar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
                 ProgressBar progressBar = new ProgressBar();
                 setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, inputState.config.component_defaultColor);
-                progressBar.progress = Tools.Calc.inBounds(progress, 0f, 1f);
+                progressBar.progress = Math.clamp(progress, 0f, 1f);
                 progressBar.progressText = progressText;
                 progressBar.progressText2Decimal = progressText2Decimal;
                 progressBar.font = inputState.config.component_defaultFont;
@@ -717,7 +717,7 @@ public class API {
 
                 public void setIconIndex(TextButton textButton, int iconIndex) {
                     if (textButton == null) return;
-                    textButton.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+                    textButton.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
                 }
 
                 public void setText(TextButton textButton, String text) {
@@ -767,7 +767,7 @@ public class API {
 
                 public void setArrayIndex(ImageButton imageButton, int arrayIndex) {
                     if (imageButton == null) return;
-                    imageButton.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                    imageButton.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 }
 
             }
@@ -952,8 +952,8 @@ public class API {
                 setComponentCommonInitValuesInternal(tabBar, x, y, width, (bigIconMode ? 2 : 1));
                 tabBar.tabBarAction = tabBarAction;
                 tabBar.border = border;
-                tabBar.borderHeight = Tools.Calc.lowerBounds(borderHeight, 0);
-                tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
+                tabBar.borderHeight = Math.clamp(borderHeight, 0, Integer.MAX_VALUE);
+                tabBar.tabOffset = Math.clamp(tabOffset, 0, Integer.MAX_VALUE);
                 tabBar.bigIconMode = bigIconMode;
                 tabBar.tabs = new ArrayList<>();
                 if (tabs != null) {
@@ -964,13 +964,13 @@ public class API {
                         }
                     }
                 }
-                tabBar.selectedTab = Tools.Calc.inBounds(selectedTab, 0, tabBar.tabs.size() - 1);
+                tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size() - 1);
                 return tabBar;
             }
 
             public void setTabOffset(TabBar tabBar, int tabOffset) {
                 if (tabBar == null) return;
-                tabBar.tabOffset = Tools.Calc.lowerBounds(tabOffset, 0);
+                tabBar.tabOffset = Math.clamp(tabOffset, 0, Integer.MAX_VALUE);
             }
 
             public void setBigIconMode(TabBar tabBar, boolean bigIconMode) {
@@ -983,7 +983,7 @@ public class API {
             }
 
             public void setBorderHeight(TabBar tabBar, int borderHeight) {
-                tabBar.borderHeight = Tools.Calc.lowerBounds(borderHeight, 0);
+                tabBar.borderHeight = Math.clamp(borderHeight, 0, Integer.MAX_VALUE);
             }
 
             public void setTabBarAction(TabBar tabBar, TabBarAction tabBarAction) {
@@ -1003,7 +1003,7 @@ public class API {
 
             public Tab tab(TabBar tabBar, int index) {
                 if (tabBar == null) return null;
-                return tabBar.tabs.get(Tools.Calc.inBounds(index, 0, tabBar.tabs.size() - 1));
+                return tabBar.tabs.get(Math.clamp(index, 0, tabBar.tabs.size() - 1));
             }
 
             public Tab[] tabs(TabBar tabBar) {
@@ -1142,7 +1142,7 @@ public class API {
 
                 public void setIconIndex(Tab tab, int iconIndex) {
                     if (tab == null) return;
-                    tab.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+                    tab.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
                 }
 
                 public void addTabComponent(Tab tab, Component component) {
@@ -1198,7 +1198,7 @@ public class API {
 
                 public void setWidth(Tab tab, int width) {
                     if (tab == null) return;
-                    tab.width = Tools.Calc.lowerBounds(width, 1);
+                    tab.width = Math.clamp(width, 1, Integer.MAX_VALUE);
                 }
 
             }
@@ -1327,7 +1327,7 @@ public class API {
                 textField.content = Tools.Text.validString(content);
                 textField.textFieldAction = textFieldAction;
                 textField.markerPosition = textField.content.length();
-                textField.contentMaxLength = Tools.Calc.lowerBounds(contentMaxLength, 0);
+                textField.contentMaxLength = Math.clamp(contentMaxLength, 0, Integer.MAX_VALUE);
                 textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
                 return textField;
             }
@@ -1355,7 +1355,7 @@ public class API {
 
             public void setContentMaxLength(TextField textField, int contentMaxLength) {
                 if (textField == null) return;
-                textField.contentMaxLength = Tools.Calc.lowerBounds(contentMaxLength, 0);
+                textField.contentMaxLength = Math.clamp(contentMaxLength, 0, Integer.MAX_VALUE);
             }
 
             public void setAllowedCharacters(TextField textField, char[] allowedCharacters) {
@@ -1512,12 +1512,12 @@ public class API {
                     canvasImage.x = x;
                     canvasImage.y = y;
                     canvasImage.fadeOut = fadeOut;
-                    canvasImage.fadeOutTime = Tools.Calc.lowerBounds(fadeOutTime, 0);
+                    canvasImage.fadeOutTime = Math.clamp(fadeOutTime, 0, Integer.MAX_VALUE);
                     canvasImage.color_r = Color.WHITE.r;
                     canvasImage.color_g = Color.WHITE.g;
                     canvasImage.color_b = Color.WHITE.b;
                     canvasImage.color_a = Color.WHITE.a;
-                    canvasImage.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                    canvasImage.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                     canvasImage.name = Tools.Text.validString("");
                     canvasImage.data = null;
                     canvasImage.timer = fadeOut ? System.currentTimeMillis() : 0;
@@ -1532,7 +1532,7 @@ public class API {
 
                 public void setFadeOutTime(CanvasImage canvasImage, int fadeoutTime) {
                     if (canvasImage == null) return;
-                    canvasImage.fadeOutTime = Tools.Calc.lowerBounds(fadeoutTime, 0);
+                    canvasImage.fadeOutTime = Math.clamp(fadeoutTime, 0, Integer.MAX_VALUE);
                 }
 
                 public void setPosition(CanvasImage canvasImage, int x, int y) {
@@ -1565,7 +1565,7 @@ public class API {
 
                 public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
                     if (canvasImage == null) return;
-                    canvasImage.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                    canvasImage.arrayIndex = Math.clamp(arrayIndex, 0,Integer.MAX_VALUE);
                 }
 
                 public void setName(CanvasImage canvasImage, String name) {
@@ -1604,7 +1604,7 @@ public class API {
                 Knob knob = new Knob();
                 setComponentCommonInitValuesInternal(knob, x, y, 2, 2, inputState.config.component_defaultColor, Color.BLACK);
                 knob.endless = endless;
-                knob.turned = Tools.Calc.inBounds(turned, 0f, 1f);
+                knob.turned = Math.clamp(turned, 0f, 1f);
                 knob.knobAction = knobAction;
                 return knob;
             }
@@ -1698,7 +1698,7 @@ public class API {
                 int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
                 setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
                 imageC.image = image;
-                imageC.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 imageC.animationOffset = animation_offset;
                 imageC.imageAction = imageAction;
                 return imageC;
@@ -1716,7 +1716,7 @@ public class API {
 
             public void setArrayIndex(Image image, int arrayIndex) {
                 if (image == null) return;
-                image.arrayIndex = Tools.Calc.lowerBounds(arrayIndex, 0);
+                image.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
             }
 
             public void setImage(Image imageC, CMediaSprite image) {
@@ -1865,7 +1865,7 @@ public class API {
                     comboBoxItem.color_g = inputState.config.component_defaultColor.g;
                     comboBoxItem.color_b = inputState.config.component_defaultColor.b;
                     comboBoxItem.icon = icon;
-                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(iconIndex, 0);
+                    comboBoxItem.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
                     comboBoxItem.comboBoxItemAction = comboBoxItemAction;
                     comboBoxItem.name = "";
                     comboBoxItem.data = null;
@@ -1911,7 +1911,7 @@ public class API {
 
                 public void setIconIndex(ComboBoxItem comboBoxItem, int index) {
                     if (comboBoxItem == null) return;
-                    comboBoxItem.iconIndex = Tools.Calc.lowerBounds(index, 0);
+                    comboBoxItem.iconIndex = Math.clamp(index, 0, Integer.MAX_VALUE);
                 }
 
             }
@@ -1942,7 +1942,7 @@ public class API {
                     ScrollBarHorizontal scrollBarHorizontal = new ScrollBarHorizontal();
                     setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1);
                     scrollBarHorizontal.scrollBarAction = scrollBarAction;
-                    scrollBarHorizontal.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+                    scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                     return scrollBarHorizontal;
                 }
 
@@ -1962,7 +1962,7 @@ public class API {
                     ScrollBarVertical scrollBarVertical = new ScrollBarVertical();
                     setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length);
                     scrollBarVertical.scrollBarAction = scrollBarAction;
-                    scrollBarVertical.scrolled = Tools.Calc.inBounds(scrolled, 0f, 1f);
+                    scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                     return scrollBarVertical;
                 }
 
@@ -2192,10 +2192,10 @@ public class API {
 
         public void setColor(Component component, float r, float g, float b, float a) {
             if (component == null) return;
-            component.color_r = Tools.Calc.inBounds01(r);
-            component.color_g = Tools.Calc.inBounds01(g);
-            component.color_b = Tools.Calc.inBounds01(b);
-            component.color_a = Tools.Calc.inBounds01(a);
+            component.color_r = Math.clamp(r,0f,1f);
+            component.color_g = Math.clamp(g,0f,1f);
+            component.color_b = Math.clamp(b,0f,1f);
+            component.color_a = Math.clamp(a,0f,1f);
         }
 
         public void setColor2(Component[] components, Color color2) {
@@ -2210,9 +2210,9 @@ public class API {
 
         public void setColor2(Component component, float r, float g, float b) {
             if (component == null) return;
-            component.color2_r = Tools.Calc.inBounds01(r);
-            component.color2_g = Tools.Calc.inBounds01(g);
-            component.color2_b = Tools.Calc.inBounds01(b);
+            component.color2_r = Math.clamp(r,0f,1f);
+            component.color2_g = Math.clamp(g,0f,1f);
+            component.color2_b = Math.clamp(b,0f,1f);
         }
 
         public void setColor1And2(Component component, Color color) {
@@ -2231,7 +2231,7 @@ public class API {
 
         public void setAlpha(Component component, float alpha) {
             if (component == null) return;
-            component.color_a = Tools.Calc.inBounds01(alpha);
+            component.color_a = Math.clamp(alpha,0f,1f);
         }
 
         public void setAlpha(Component[] components, float alpha) {
@@ -2403,7 +2403,7 @@ public class API {
 
             public void setIconIndex(ContextMenuItem contextMenuItem, int index) {
                 if (contextMenuItem == null) return;
-                contextMenuItem.iconIndex = Tools.Calc.lowerBounds(index, 0);
+                contextMenuItem.iconIndex = Math.clamp(index, 0, Integer.MAX_VALUE);
             }
 
             public void selectItem(ContextMenuItem contextMenuItem) {
@@ -2432,7 +2432,7 @@ public class API {
                     }
                 }
             }
-            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
+            contextMenu.color_a = Math.clamp(alpha, 0f, 1f);
             contextMenu.contextMenuAction = contextMenuAction;
             return contextMenu;
         }
@@ -2444,7 +2444,7 @@ public class API {
 
         public void setAlpha(ContextMenu contextMenu, float alpha) {
             if (contextMenu == null) return;
-            contextMenu.color_a = Tools.Calc.inBounds(alpha, 0f, 1f);
+            contextMenu.color_a = Math.clamp(alpha, 0f, 1f);
         }
 
         public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -2545,7 +2545,7 @@ public class API {
 
         public void setDisplayTime(Notification notification, int displayTime) {
             if (notification == null) return;
-            notification.displayTime = Tools.Calc.lowerBounds(displayTime, 0);
+            notification.displayTime = Math.clamp(displayTime, 0, Integer.MAX_VALUE);
         }
 
         public void setColor(Notification notification, float r, float g, float b, float a) {
@@ -2654,8 +2654,8 @@ public class API {
             }
             tooltip.toolTipAction = toolTipAction;
             tooltip.displayFistLineAsTitle = displayFistLineAsTitle;
-            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth, 1);
-            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
+            tooltip.minWidth = Math.clamp(minWidth, 1, Integer.MAX_VALUE);
+            tooltip.minHeight = Math.clamp(minHeight, 1, Integer.MAX_VALUE);
             tooltip.font = inputState.config.tooltip_defaultFont;
             tooltip.color_r = inputState.config.component_defaultColor.r;
             tooltip.color_g = inputState.config.component_defaultColor.g;
@@ -2706,8 +2706,8 @@ public class API {
 
         public void setSizeMin(ToolTip tooltip, int minWidth, int minHeight) {
             if (tooltip == null) return;
-            tooltip.minWidth = Tools.Calc.lowerBounds(minWidth, 1);
-            tooltip.minHeight = Tools.Calc.lowerBounds(minHeight, 1);
+            tooltip.minWidth = Math.clamp(minWidth, 1, Integer.MAX_VALUE);
+            tooltip.minHeight = Math.clamp(minHeight, 1, Integer.MAX_VALUE);
         }
 
         public void setColor(ToolTip tooltip, float r, float g, float b, float a) {
@@ -4103,7 +4103,7 @@ public class API {
             component.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Tools.Calc.lowerBounds(textConverted.length, 1)) * input.mouse.event.scrolledAmount();
+                    float scrollAmount = (-1 / (float) Math.clamp(textConverted.length, 1, Integer.MAX_VALUE)) * input.mouse.event.scrolledAmount();
                     UICommons.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
                 }
             });
@@ -4263,9 +4263,8 @@ public class API {
 
         public ArrayList<Component> image_createBorder(int x, int y, int width, int height, int gap) {
             ArrayList<Component> borders = new ArrayList<>();
-            width = Tools.Calc.lowerBounds(width, 1);
-            height = Tools.Calc.lowerBounds(height, 1);
-
+            width = Math.clamp(width, 1, Integer.MAX_VALUE);
+            height = Math.clamp(height, 1, Integer.MAX_VALUE);
 
             for (int ix = 0; ix < width; ix++) {
 
@@ -4428,7 +4427,7 @@ public class API {
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
-            final int WIDTH = Tools.Calc.lowerBounds(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12);
+            final int WIDTH = Math.clamp(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
             final int HEIGHT = 4 + lines.length;
             Window modal = window.create(0, 0, WIDTH, HEIGHT, caption, UIBaseMedia.UI_ICON_INFORMATION, 0);
 
@@ -4468,7 +4467,7 @@ public class API {
                     mediaManager.textWidth(inputState.config.component_defaultFont, text)
             );
 
-            int width = Tools.Calc.lowerBounds(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12);
+            int width = Math.clamp(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
             if (width % 2 == 0) width++;
             Window modal = window.create(0, 0, width, 5, caption, UIBaseMedia.UI_ICON_QUESTION, 0);
 
@@ -4587,7 +4586,7 @@ public class API {
 
 
                 float heightPct = (value - loReference) / (float) (hiReference - loReference);
-                int heightPixels = Tools.Calc.lowerBounds(MathUtils.round(mapHeight * heightPct), 2);
+                int heightPixels = Math.clamp(MathUtils.round(mapHeight * heightPct), 2, Integer.MAX_VALUE);
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
@@ -4702,7 +4701,7 @@ public class API {
         public ArrayList<Component> tabBar_createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
             ArrayList<Component> ret = new ArrayList<>();
 
-            width = Tools.Calc.lowerBounds(width, 1);
+            width = Math.clamp(width, 1, Integer.MAX_VALUE);
             TabBar tabBar = component.tabBar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
             ImageButton extendButton = component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIBaseMedia.UI_ICON_EXTEND);
 
@@ -4782,8 +4781,10 @@ public class API {
 
             showOKButton = showTouchInputs ? true : showOKButton;
             originalText = Tools.Text.validString(originalText);
-            windowMinWidth = Tools.Calc.lowerBounds(windowMinWidth, 11);
-            int wnd_width = Tools.Calc.lowerBounds(MathUtils.round(mediaManager.textWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2, windowMinWidth);
+            windowMinWidth = Math.clamp(windowMinWidth, 11, Integer.MAX_VALUE);
+            int wnd_width = Math.clamp(
+                    MathUtils.round(mediaManager.textWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
+                    windowMinWidth, Integer.MAX_VALUE);
             int wnd_height = 5;
             if (showOKButton) wnd_height++;
             if (showTouchInputs) {

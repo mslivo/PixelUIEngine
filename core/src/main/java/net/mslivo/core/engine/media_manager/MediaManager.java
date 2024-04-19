@@ -215,7 +215,7 @@ public class MediaManager {
         TextureRegion textureRegion = textureAtlas.findRegion(file);
         int width = (textureRegion.getRegionWidth() / tile_width);
         int height = (textureRegion.getRegionHeight() / tile_height);
-        int maxFrames = Tools.Calc.upperBounds(width * height, frameLength);
+        int maxFrames = Math.clamp(width * height, 0,frameLength);
 
         int frameCount = maxFrames - frameOffset;
         if (frameCount == 0) return new TextureRegion[]{};
@@ -309,10 +309,10 @@ public class MediaManager {
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
-        cMediaAnimation.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
-        cMediaAnimation.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
+        cMediaAnimation.tile_width = Math.clamp(tileWidth, 1,Integer.MAX_VALUE);
+        cMediaAnimation.tile_height = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
         cMediaAnimation.animation_speed = animation_speed;
-        cMediaAnimation.frameOffset = Tools.Calc.lowerBounds(frameOffset, 0);
+        cMediaAnimation.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
         cMediaAnimation.frameLength = frameLength;
         return cMediaAnimation;
     }
@@ -342,9 +342,9 @@ public class MediaManager {
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaArray cMediaArray = new CMediaArray(file);
-        cMediaArray.tile_width = Tools.Calc.lowerBounds(tileWidth, 1);
-        cMediaArray.tile_height = Tools.Calc.lowerBounds(tileHeight, 1);
-        cMediaArray.frameOffset = Tools.Calc.lowerBounds(frameOffset, 0);
+        cMediaArray.tile_width = Math.clamp(tileWidth, 1, Integer.MAX_VALUE);
+        cMediaArray.tile_height = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
+        cMediaArray.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
         cMediaArray.frameLength = frameLength;
         return cMediaArray;
     }

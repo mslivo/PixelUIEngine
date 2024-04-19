@@ -123,13 +123,13 @@ public class UIEngine<T extends UIEngineAdapter> {
         InputState newInputState = new InputState();
 
         //  ----- Paramters
-        newInputState.resolutionWidth = Tools.Calc.lowerBounds(resolutionWidth, 16);
+        newInputState.resolutionWidth = Math.clamp(resolutionWidth, 16, Integer.MAX_VALUE);
         newInputState.resolutionWidth_ui = newInputState.resolutionWidth / uiScale;
-        newInputState.resolutionHeight = Tools.Calc.lowerBounds(resolutionHeight, 16);
+        newInputState.resolutionHeight = Math.clamp(resolutionHeight, 16, Integer.MAX_VALUE);
         newInputState.resolutionHeight_ui = newInputState.resolutionHeight / uiScale;
         newInputState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newInputState.gamePadSupport = gamePadSupport;
-        newInputState.uiScale = Tools.Calc.lowerBounds(uiScale, 1);
+        newInputState.uiScale = Math.clamp(uiScale, 1, Integer.MAX_VALUE);
 
 
         // ----- Config
@@ -471,7 +471,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         // Scroll Forward/Backwards
         if (scrollDirection != 0) {
-            mouseTextInput.selectedIndex = Tools.Calc.inBounds(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+            mouseTextInput.selectedIndex = Math.clamp(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
         }
 
         // Confirm Character from Input
@@ -733,8 +733,8 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Set to final
-        inputState.mouse_emulated.x = Tools.Calc.inBounds(inputState.mouse_emulated.x + deltaX, 0, inputState.resolutionWidth_ui);
-        inputState.mouse_emulated.y = Tools.Calc.inBounds(inputState.mouse_emulated.y - deltaY, 0, inputState.resolutionHeight_ui);
+        inputState.mouse_emulated.x = Math.clamp(inputState.mouse_emulated.x + deltaX, 0, inputState.resolutionWidth_ui);
+        inputState.mouse_emulated.y = Math.clamp(inputState.mouse_emulated.y - deltaY, 0, inputState.resolutionHeight_ui);
         inputState.mouse_delta.x = deltaX;
         inputState.mouse_delta.y = -deltaY;
         inputState.mouse_ui.x = MathUtils.round(inputState.mouse_emulated.x);
@@ -872,12 +872,12 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         final float SPEEDUP_SPEED = 0.1f;
         if (buttonLeft || buttonRight) {
-            inputState.keyBoardMouseSpeedUp.x = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
+            inputState.keyBoardMouseSpeedUp.x = Math.clamp(inputState.keyBoardMouseSpeedUp.x < 1f ? inputState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.x, 0f, 1f);
         } else {
             inputState.keyBoardMouseSpeedUp.set(0, inputState.keyBoardMouseSpeedUp.y);
         }
         if (buttonUp || buttonDown) {
-            inputState.keyBoardMouseSpeedUp.y = Tools.Calc.inBounds(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
+            inputState.keyBoardMouseSpeedUp.y = Math.clamp(inputState.keyBoardMouseSpeedUp.y < 1f ? inputState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : inputState.keyBoardMouseSpeedUp.y, 0f, 1f);
         } else {
             inputState.keyBoardMouseSpeedUp.set(inputState.keyBoardMouseSpeedUp.x, 0);
         }
@@ -924,8 +924,8 @@ public class UIEngine<T extends UIEngineAdapter> {
         // Set to final
         inputState.mouse_delta.x = MathUtils.round(inputState.vector_fboCursor.x - inputState.mouse_ui.x);
         inputState.mouse_delta.y = MathUtils.round(inputState.vector_fboCursor.y - inputState.mouse_ui.y);
-        inputState.mouse_ui.x = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.resolutionWidth_ui);
-        inputState.mouse_ui.y = Tools.Calc.inBounds(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.resolutionHeight_ui);
+        inputState.mouse_ui.x = Math.clamp(MathUtils.round(inputState.vector_fboCursor.x), 0, inputState.resolutionWidth_ui);
+        inputState.mouse_ui.y = Math.clamp(MathUtils.round(inputState.vector_fboCursor.y), 0, inputState.resolutionHeight_ui);
     }
 
     private void mouseControl_updateLastUIMouseHover() {
@@ -1572,7 +1572,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 switch (inputState.lastUIMouseHover) {
                     case List list -> {
                         int size = list.items != null ? list.items.size() : 0;
-                        float amount = (1 / (float) Tools.Calc.lowerBounds(size, 1)) * inputState.inputEvents.mouseScrolledAmount;
+                        float amount = (1 / (float) Math.clamp(size, 1, Integer.MAX_VALUE)) * inputState.inputEvents.mouseScrolledAmount;
                         UICommons.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
@@ -1759,7 +1759,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                 }
             } else if (inputState.tooltip_fadeIn_pct < 1f) {
-                inputState.tooltip_fadeIn_pct = Tools.Calc.upperBounds(((System.currentTimeMillis() - inputState.tooltip_fadeIn_timer) / (float) inputState.config.tooltip_FadeInTime), 1f);
+                inputState.tooltip_fadeIn_pct = Math.clamp(((System.currentTimeMillis() - inputState.tooltip_fadeIn_timer) / (float) inputState.config.tooltip_FadeInTime), 0f, 1f);
             } else {
                 if (inputState.tooltip.toolTipAction != null) {
                     inputState.tooltip.toolTipAction.onUpdate();
@@ -2210,8 +2210,8 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (line_width > text_width_max) text_width_max = line_width;
         }
 
-        int tooltip_width = Tools.Calc.lowerBounds(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float) TILE_SIZE), tooltip.minWidth);
-        int tooltip_height = Tools.Calc.lowerBounds(tooltip.lines.length, tooltip.minHeight);
+        int tooltip_width = Math.clamp(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float) TILE_SIZE), tooltip.minWidth, Integer.MAX_VALUE);
+        int tooltip_height = Math.clamp(tooltip.lines.length, tooltip.minHeight, Integer.MAX_VALUE);
 
         for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
@@ -2488,7 +2488,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 int itemFrom = 0;
                 if (itemsValid) {
                     itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-                    itemFrom = Tools.Calc.lowerBounds(itemFrom, 0);
+                    itemFrom = Math.clamp(itemFrom, 0, Integer.MAX_VALUE);
                 }
                 boolean dragEnabled = false;
                 boolean dragValid = false;
@@ -2570,7 +2570,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Knob knob -> {
-                inputState.spriteRenderer_ui.drawCMediaImage( UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
+                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_KNOB_BACKGROUND, UICommons.component_getAbsoluteX(knob), UICommons.component_getAbsoluteY(knob));
                 render_saveTempColorBatch();
                 render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha);
                 if (knob.endless) {
@@ -2638,7 +2638,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         if (UICommons.textField_isFocused(inputState, textField)) {
                             int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                             if (xOffset < textField.width * TILE_SIZE) {
-                                inputState.spriteRenderer_ui.drawCMediaAnimation( UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
+                                inputState.spriteRenderer_ui.drawCMediaAnimation(UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
                             }
                         }
                     }
@@ -2926,9 +2926,9 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (render_isGrayscaleEnabled()) {
             final float AMNT = 0.8f;
             inputState.spriteRenderer_ui.setColor(
-                    Tools.Calc.inBounds01(r * AMNT),
-                    Tools.Calc.inBounds01(g * AMNT),
-                    Tools.Calc.inBounds01(b * AMNT),
+                    Math.clamp(r * AMNT, 0f, 1f),
+                    Math.clamp(g * AMNT, 0f, 1f),
+                    Math.clamp(b * AMNT, 0f, 1f),
                     a);
         } else {
             inputState.spriteRenderer_ui.setColor(r, g, b, a);

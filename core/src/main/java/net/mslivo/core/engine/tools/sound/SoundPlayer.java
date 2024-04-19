@@ -32,11 +32,11 @@ public class SoundPlayer {
     }
 
     public void setVolume(float volume) {
-        this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
+        this.volume = Math.clamp(volume, 0f, 1f);
     }
 
     private void setRange2D(int range2D) {
-        this.range = Tools.Calc.lowerBounds(range2D, 1);
+        this.range = Math.clamp(range2D, 1, Integer.MAX_VALUE);
     }
 
     public long playSound(CMediaSound cMediaSound) {
@@ -107,13 +107,13 @@ public class SoundPlayer {
     }
 
     private long playSound2DInternal(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch, boolean loop) {
-        float playVolume = (range - (Tools.Calc.inBounds(Tools.Calc.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
+        float playVolume = (range - (Math.clamp(Tools.Calc.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
         playVolume = playVolume * volume * this.volume;
         float pan = 0;
         if (camera_x > position_x) {
-            pan = Tools.Calc.inBounds(-((camera_x - position_x) / (float) range), -1, 0);
+            pan = Math.clamp(-((camera_x - position_x) / (float) range), -1, 0);
         } else if (camera_x < position_x) {
-            pan = Tools.Calc.inBounds((position_x - camera_x) / (float) range, 0, 1);
+            pan = Math.clamp((position_x - camera_x) / (float) range, 0, 1);
         }
         long id;
         if(loop) {

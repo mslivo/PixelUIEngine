@@ -21,10 +21,10 @@ public class FadeTransition implements Transition {
     @Override
     public boolean update() {
         if(this.fadeOut < 1f){
-            this.fadeOut = Tools.Calc.upperBounds(fadeOut+0.06f,1f);
+            this.fadeOut = Math.clamp(fadeOut+0.06f,Float.MIN_VALUE,1f);
             return false;
         }else if(this.fadeIn < 1f){
-            this.fadeIn = Tools.Calc.upperBounds(fadeIn+0.06f,1f);
+            this.fadeIn = Math.clamp(fadeIn+0.06f, Float.MIN_VALUE,1f);
             return false;
         }else{
             return true;
@@ -34,7 +34,7 @@ public class FadeTransition implements Transition {
     @Override
     public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
         if(this.fadeOut < 1f){
-            float color = Tools.Calc.inBounds(1f-fadeOut,0f,1f);
+            float color = Math.clamp(1f-fadeOut,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_from, 0, 0);
         }else {
@@ -45,7 +45,7 @@ public class FadeTransition implements Transition {
     @Override
     public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
         if(this.fadeOut >= 1 && this.fadeIn <= 1f){
-            float color = Tools.Calc.inBounds(fadeIn,0f,1f);
+            float color = Math.clamp(fadeIn,0f,1f);
             batch.setColor(color,color,color,1f);
             batch.draw(texture_to, 0, 0);
         }else{

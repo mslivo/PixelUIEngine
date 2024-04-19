@@ -19,7 +19,7 @@ abstract class ParticleSystem<T>{
     ParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider){
         this.particles = new ArrayList<>();
         this.deleteQueue = new ArrayDeque<>();
-        this.particleLimit = Tools.Calc.lowerBounds(particleLimit, 0);
+        this.particleLimit = Math.clamp(particleLimit, 0, Integer.MAX_VALUE);
         this.particleDataProvider = particleDataProvider;
         this.particlePool = new ArrayDeque<>(particleLimit);
     }

@@ -38,7 +38,7 @@ public class Tools {
         private static float updateDelta;
 
         public static void setTargetUpdates(int updatesPerSecond) {
-            App.maxUpdatesPerSecond = Tools.Calc.lowerBounds(updatesPerSecond, 1);
+            App.maxUpdatesPerSecond = Math.clamp(updatesPerSecond, 1, Integer.MAX_VALUE);
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
             timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
@@ -46,7 +46,7 @@ public class Tools {
 
         public static boolean isRunUpdate() {
             // Accumulate 2 frames max
-            skipFrameAccumulator = Tools.Calc.upperBounds(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), timeStepX2);
+            skipFrameAccumulator = Math.clamp(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), Float.MIN_VALUE, timeStepX2);
             if (skipFrameAccumulator < timeStep) {
                 return false;
             } else {
@@ -471,7 +471,7 @@ public class Tools {
         }
 
         public static float percentAboveThreshold(long value, long max, int threshold) {
-            value = Tools.Calc.upperBounds(value, max);
+            value = Math.clamp(value, Long.MIN_VALUE, max);
             if (value > threshold) {
                 long above = value - threshold;
                 float divisor = (max - threshold);
@@ -482,7 +482,7 @@ public class Tools {
         }
 
         public static float percentBelowThreshold(long value, long min, int threshold) {
-            value = Tools.Calc.lowerBounds(value, min);
+            value = Math.clamp(value, min, Long.MAX_VALUE);
             if (value < threshold) {
                 long below = threshold - value;
                 float divisor = (threshold - min);
@@ -493,7 +493,7 @@ public class Tools {
         }
 
         public static float percentAboveThreshold(float value, float max, float threshold) {
-            value = Tools.Calc.upperBounds(value, max);
+            value = Math.clamp(value, Float.MIN_VALUE, max);
             if (value > threshold) {
                 float above = value - threshold;
                 float divisor = (max - threshold);
@@ -504,7 +504,7 @@ public class Tools {
         }
 
         public static float percentBelowThreshold(float value, float min, float threshold) {
-            value = Tools.Calc.lowerBounds(value, min);
+            value = Math.clamp(value, min, Float.MAX_VALUE);
             if (value < threshold) {
                 float below = threshold - value;
                 float divisor = (threshold - min);
@@ -516,19 +516,19 @@ public class Tools {
 
         public static int applyRandomness(int value, float randomness) {
             if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            randomness = Math.clamp(randomness, 0f, 1f);
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
         public static long applyRandomness(long value, float randomness) {
             if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            randomness = Math.clamp(randomness, 0f, 1f);
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
         public static float applyRandomness(float value, float randomness) {
             if (randomness == 0) return value;
-            randomness = Tools.Calc.inBounds(randomness, 0f, 1f);
+            randomness = Math.clamp(randomness, 0f, 1f);
             return value * MathUtils.random((1 - randomness), (1 + randomness));
         }
 
@@ -548,58 +548,6 @@ public class Tools {
             if (percent == 0) return value;
             value += (value * percent);
             return value;
-        }
-
-        public static float inBounds(float value, float lower, float upper) {
-            return value < lower ? lower : (value > upper ? upper : value);
-        }
-
-        public static double inBounds(double value, double lower, double upper) {
-            return value < lower ? lower : (value > upper ? upper : value);
-        }
-
-        public static long inBounds(long value, long lower, long upper) {
-            return value < lower ? lower : (value > upper ? upper : value);
-        }
-
-        public static int inBounds(int value, int lower, int upper) {
-            return value < lower ? lower : (value > upper ? upper : value);
-        }
-
-        public static float inBounds01(float value) {
-            return Tools.Calc.inBounds(value, 0f, 1f);
-        }
-
-        public static double upperBounds(double value, double upper) {
-            return value > upper ? upper : value;
-        }
-
-        public static long upperBounds(long value, long upper) {
-            return value > upper ? upper : value;
-        }
-
-        public static float upperBounds(float value, float upper) {
-            return value > upper ? upper : value;
-        }
-
-        public static int upperBounds(int value, int upper) {
-            return value > upper ? upper : value;
-        }
-
-        public static double lowerBounds(double value, double lower) {
-            return value < lower ? lower : value;
-        }
-
-        public static int lowerBounds(int value, int lower) {
-            return value < lower ? lower : value;
-        }
-
-        public static float lowerBounds(float value, float lower) {
-            return value < lower ? lower : value;
-        }
-
-        public static long lowerBounds(long value, long lower) {
-            return value < lower ? lower : value;
         }
 
         public static Object selectRandom(List list) {

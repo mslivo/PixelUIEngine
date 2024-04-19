@@ -63,7 +63,7 @@ public class TransitionManager {
         int resolutionHeight = from.getResolutionHeight();
         VIEWPORT_MODE VIEWPORTMODE = from.getViewportMode();
         this.transition = transition == null ? new FadeTransition() : transition;
-        this.transitionSpeed = Tools.Calc.inBounds(transitionSpeed, 1, 10);
+        this.transitionSpeed = Math.clamp(transitionSpeed, 1, 10);
         boolean createNew = this.resolutionWidth != resolutionWidth || this.resolutionHeight != resolutionHeight || this.VIEWPORTMODE != VIEWPORTMODE;
         if (createNew) {
             this.resolutionWidth = resolutionWidth;

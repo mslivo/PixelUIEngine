@@ -23,7 +23,7 @@ import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGenerator;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = true;
+    private static final boolean IM_PERFORMANCE_TEST = false;
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
@@ -125,8 +125,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Draw app based on data
-
-
         batch.setLightness(0.5f);
         batch.setSaturation(0.5f);
         batch.setTint(1f);

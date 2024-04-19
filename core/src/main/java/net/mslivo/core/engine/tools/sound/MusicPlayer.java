@@ -216,7 +216,7 @@ public class MusicPlayer {
     }
 
     public void setVolume(float volume) {
-        this.volume = Tools.Calc.inBounds(volume, 0f, 1f);
+        this.volume = Math.clamp(volume, 0f, 1f);
     }
 
     public float volume() {

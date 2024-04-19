@@ -14,7 +14,7 @@ public class NumberValueValidator implements ValueValidator {
 
     public NumberValueValidator(int rangeFrom, int rangeTo) {
         this.rangeFrom = rangeFrom;
-        this.rangeTo = Tools.Calc.lowerBounds(rangeTo, rangeFrom);
+        this.rangeTo = Math.clamp(rangeTo, rangeFrom, Integer.MAX_VALUE);
     }
 
     @Override
