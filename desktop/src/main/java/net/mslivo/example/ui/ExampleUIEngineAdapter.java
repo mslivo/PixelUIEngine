@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -14,7 +13,6 @@ import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
-import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer2;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -31,7 +29,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private boolean resetPressed;
     private SpriteRenderer batch;
     private ImmediateRenderer immediateRenderer;
-
+    private static final boolean IM_PERFORMANCE_TEST = true;
 
     public ExampleUIEngineAdapter() {
     }
@@ -143,20 +141,33 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
         batch.end();
 
+        if(IM_PERFORMANCE_TEST){
+            immediateRenderer.setProjectionMatrix(camera.combined);
+            long time = System.currentTimeMillis();
+            final int VERTEXES = 20000;
+            immediateRenderer.begin();
+            for(int i=0;i<VERTEXES;i++) {
+                for (int ix = 0; ix < 10; ix++) {
+                    for (int iy = 0; iy < 10; iy++) {
+                        immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                        immediateRenderer.vertex(100 + ix, 100 + iy);
+                    }
+                }
+            }
+            System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
+            immediateRenderer.end();
+        }
+
 
         immediateRenderer.setProjectionMatrix(camera.combined);
         immediateRenderer.begin();
-
-            for (int ix = 0; ix < 10; ix++) {
-                for (int iy = 0; iy < 10; iy++) {
-                    immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                    immediateRenderer.vertex(100 + ix, 100 + iy);
-                }
+        for (int ix = 0; ix < 10; ix++) {
+            for (int iy = 0; iy < 10; iy++) {
+                immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                immediateRenderer.vertex(100 + ix, 100 + iy);
             }
-
+        }
         immediateRenderer.end();
-
-
 
 
         immediateRenderer.begin(GL20.GL_LINES);
@@ -172,10 +183,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         immediateRenderer.begin(GL20.GL_TRIANGLES);
         immediateRenderer.vertex(0, 0);
         immediateRenderer.vertex(100, 100);
-        immediateRenderer.vertex( 200, 0);
+        immediateRenderer.vertex(200, 0);
         immediateRenderer.end();
-
-
 
 
     }
