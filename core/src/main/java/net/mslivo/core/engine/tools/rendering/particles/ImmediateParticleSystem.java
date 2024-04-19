@@ -28,7 +28,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            immediateRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
+            immediateRenderer.setVertexColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDAITE_POINT -> {
                     immediateRenderer.vertex(particle.x, particle.y);
