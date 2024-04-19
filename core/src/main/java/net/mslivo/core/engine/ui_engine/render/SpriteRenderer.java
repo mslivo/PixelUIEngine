@@ -295,8 +295,8 @@ public class SpriteRenderer implements Batch {
         tweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
-    public void setHSLT(final float tweakPacked) {
-        this.tweak = tweakPacked;
+    public void setPackedHSLT(final float tweak) {
+        this.tweak = tweak;
     }
 
     public void setHSLTReset() {
