@@ -23,23 +23,23 @@ import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGenerator;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
+    private static final boolean IM_PERFORMANCE_TEST = true;
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
     private SpriteRenderer batch;
     private ImmediateRenderer immediateRenderer;
-    private static final boolean IM_PERFORMANCE_TEST = true;
 
     public ExampleUIEngineAdapter() {
     }
 
-    public void setResetPressed(boolean resetPressed) {
-        this.resetPressed = resetPressed;
-    }
-
     public boolean isResetPressed() {
         return resetPressed;
+    }
+
+    public void setResetPressed(boolean resetPressed) {
+        this.resetPressed = resetPressed;
     }
 
     @Override
@@ -141,12 +141,13 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
         batch.end();
 
-        if(IM_PERFORMANCE_TEST){
+        immediateRenderer.setColor(Color.WHITE);
+        if (IM_PERFORMANCE_TEST) {
             immediateRenderer.setProjectionMatrix(camera.combined);
             long time = System.currentTimeMillis();
-            final int VERTEXES = 20000;
+            final int VERTEXES = 10000;
             immediateRenderer.begin();
-            for(int i=0;i<VERTEXES;i++) {
+            for (int i = 0; i < VERTEXES; i++) {
                 for (int ix = 0; ix < 10; ix++) {
                     for (int iy = 0; iy < 10; iy++) {
                         immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
@@ -154,8 +155,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                     }
                 }
             }
-            System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
             immediateRenderer.end();
+            System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
+
         }
 
 

@@ -211,25 +211,17 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void setColor(Color color) {
-        this.color = color.toFloatBits();
+        setColor(color.r,color.g,color.b,color.a);
     }
 
     @Override
-    public void setColor(float red, float green, float blue, float alpha) {
-        color = rgbPacked(red, green, blue, alpha);
-    }
-
-    public void setColor(final float color) {
-        setPackedColor(color);
+    public void setColor(float r, float g, float b, float a) {
+        color = rgbPacked(r, g, b, a);
     }
 
     @Override
     public void setPackedColor(final float color) {
         this.color = color;
-    }
-
-    public void setPackedColor(final int color) {
-        setPackedColor(NumberUtils.intBitsToFloat(Integer.reverseBytes(color & -2)));
     }
 
     @Override
@@ -303,8 +295,8 @@ public class SpriteRenderer implements Batch {
         tweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
-    public void setPackedHSLT(final float tweak) {
-        this.tweak = tweak;
+    public void setHSLT(final float tweakPacked) {
+        this.tweak = tweakPacked;
     }
 
     public void setHSLTReset() {

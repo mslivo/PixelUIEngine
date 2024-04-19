@@ -109,8 +109,8 @@ public class ImmediateRenderer {
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.primitiveType = GL20.GL_POINTS;
         this.blendingDisabled = false;
-        this.color = Color.toFloatBits(1f, 1f, 1f, 1f);
-        this.vertexColor = Color.toFloatBits(1f, 1f, 1f, 1f);
+        this.color = rgbPacked(1f, 1f, 1f, 1f);
+        this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
         this.tweak = TWEAK_RESET;
         this.blendSrcFunc = GL20.GL_SRC_ALPHA;
         this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
@@ -218,7 +218,7 @@ public class ImmediateRenderer {
     }
 
     private float rgbPacked(float red, float green, float blue, float alpha) {
-        return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
+        return Float.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
@@ -253,7 +253,7 @@ public class ImmediateRenderer {
     }
 
     public void setVertexColor(float r, float g, float b, float a) {
-        this.vertexColor = Color.toFloatBits(r, g, b, a);
+        this.vertexColor = rgbPacked(r, g, b, a);
     }
 
     public void setColor(Color color) {
@@ -265,7 +265,7 @@ public class ImmediateRenderer {
     }
 
     public void setColor(float r, float g, float b, float a) {
-        this.color = Color.toFloatBits(r, g, b, a);
+        this.color = rgbPacked(r, g, b, a);
     }
 
     public float getHue() {
@@ -328,8 +328,8 @@ public class ImmediateRenderer {
         tweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
-    public void setPackedHSLT(final float tweak) {
-        this.tweak = tweak;
+    public void setPackedHSLT(final float tweakPacked) {
+        this.tweak = tweakPacked;
     }
 
     public float getPackedHSLT() {
