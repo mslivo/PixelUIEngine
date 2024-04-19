@@ -20,10 +20,10 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
 
     public void render(ImmediateRenderer immediateRenderer) {
         if (particles.size() == 0) return;
-        backup.r = immediateRenderer.getColor().r;
-        backup.g = immediateRenderer.getColor().g;
-        backup.b = immediateRenderer.getColor().b;
-        backup.a = immediateRenderer.getColor().a;
+        backup.r = immediateRenderer.getVertexColor().r;
+        backup.g = immediateRenderer.getVertexColor().g;
+        backup.b = immediateRenderer.getVertexColor().b;
+        backup.a = immediateRenderer.getVertexColor().a;
 
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
@@ -38,7 +38,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
                 }
             }
         }
-        immediateRenderer.setColor(backup);
+        immediateRenderer.setVertexColor(backup);
     }
 
 

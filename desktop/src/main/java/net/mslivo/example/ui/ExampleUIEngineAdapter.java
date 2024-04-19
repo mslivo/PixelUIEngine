@@ -14,6 +14,7 @@ import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer2;
 import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -30,6 +31,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private boolean resetPressed;
     private SpriteRenderer batch;
     private ImmediateRenderer immediateRenderer;
+    private ImmediateRenderer2 immediateRenderer2 = new ImmediateRenderer2();
     private float rotation = 0f;
 
     public ExampleUIEngineAdapter() {
@@ -129,7 +131,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         batch.setLightness(0.5f);
-        batch.setSaturation(1f);
+        batch.setSaturation(0.5f);
         batch.setTint(1f);
         batch.setProjectionMatrix(camera.combined);
 
@@ -142,15 +144,43 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
         batch.end();
 
+
+
+        final int TEST = 10000;
+
+
+        long time = System.currentTimeMillis();
         immediateRenderer.setProjectionMatrix(camera.combined);
         immediateRenderer.begin();
-        for (int ix = 0; ix < 10; ix++) {
-            for (int iy = 0; iy < 10; iy++) {
-                immediateRenderer.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                immediateRenderer.vertex(100 + ix, 100 + iy);
+
+        for(int i=0;i<TEST;i++) {
+            for (int ix = 0; ix < 10; ix++) {
+                for (int iy = 0; iy < 10; iy++) {
+                    immediateRenderer.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                    immediateRenderer.vertex(100 + ix, 100 + iy);
+                }
             }
         }
+
         immediateRenderer.end();
+        System.out.println("new: "+(System.currentTimeMillis()-time)+"ms");
+
+
+        time = System.currentTimeMillis();
+        immediateRenderer2.setProjectionMatrix(camera.combined);
+        immediateRenderer2.begin();
+
+        for(int i=0;i<TEST;i++) {
+            for (int ix = 0; ix < 10; ix++) {
+                for (int iy = 0; iy < 10; iy++) {
+                    immediateRenderer2.setColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                    immediateRenderer2.vertex(100 + ix, 100 + iy);
+                }
+            }
+        }
+
+        immediateRenderer2.end();
+        System.out.println("old: "+(System.currentTimeMillis()-time)+"ms");
 
         immediateRenderer.begin(GL20.GL_LINES);
         for (int ix = 0; ix < 10; ix++) {

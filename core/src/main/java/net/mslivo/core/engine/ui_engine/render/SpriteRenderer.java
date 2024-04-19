@@ -38,8 +38,10 @@ public class SpriteRenderer implements Batch {
             {
                v_color = a_color;
                v_color.a = v_color.a * (255.0/254.0);
+               
                v_tweak = a_tweak;
                v_tweak.a = v_tweak.a * (255.0/254.0);
+               
                v_texCoords = a_texCoord0;
                gl_Position =  u_projTrans * a_position;
             }
@@ -96,11 +98,11 @@ public class SpriteRenderer implements Batch {
                      """;
     public static final int SPRITE_SIZE = 24;
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
-    private static final float HSLT_TWEAK_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
+    private static final float TWEAK_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     private final Color TEMP_COLOR = new Color(1f, 1f, 1f, 1f);
     private final Mesh mesh;
     private final float[] vertices;
-    private float hslsTweak = HSLT_TWEAK_RESET;
+    private float tweak = TWEAK_RESET;
     private int idx = 0;
     private Texture lastTexture = null;
     private float invTexWidth = 0, invTexHeight = 0;
@@ -235,7 +237,7 @@ public class SpriteRenderer implements Batch {
     }
 
     public float getHue() {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
@@ -244,66 +246,66 @@ public class SpriteRenderer implements Batch {
     }
 
     public float getSaturation() {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
     public float getLightness() {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
     public float getTint() {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         return ((c & 0xff000000) >>> 24) / 255f;
     }
 
     public void setHue(float hue) {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        hslsTweak = rgbPacked(hue, g, b, a);
+        tweak = rgbPacked(hue, g, b, a);
     }
 
     public void setSaturation(float saturation) {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        hslsTweak = rgbPacked(r, saturation, b, a);
+        tweak = rgbPacked(r, saturation, b, a);
     }
 
     public void setLightness(float lightness) {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        hslsTweak = rgbPacked(r, g, lightness, a);
+        tweak = rgbPacked(r, g, lightness, a);
     }
 
     public void setTint(float tint) {
-        int c = NumberUtils.floatToIntColor(hslsTweak);
+        int c = NumberUtils.floatToIntColor(tweak);
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        hslsTweak = rgbPacked(r, g, b, tint);
+        tweak = rgbPacked(r, g, b, tint);
     }
 
     public void setHSLS(float hue, float saturation, float lightness, float tint) {
-        hslsTweak = rgbPacked(hue, saturation, lightness, tint);
+        tweak = rgbPacked(hue, saturation, lightness, tint);
     }
 
     public void setPackedHSLS(final float tweak) {
-        this.hslsTweak = tweak;
+        this.tweak = tweak;
     }
 
     public void setHSLSReset() {
-        this.hslsTweak = HSLT_TWEAK_RESET;
+        this.tweak = TWEAK_RESET;
     }
 
     public float getPackedHSLS() {
-        return hslsTweak;
+        return tweak;
     }
 
     private float rgbPacked(float red, float green, float blue, float alpha) {
@@ -431,7 +433,7 @@ public class SpriteRenderer implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -495,7 +497,7 @@ public class SpriteRenderer implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -546,7 +548,7 @@ public class SpriteRenderer implements Batch {
         final float fy2 = y + srcHeight;
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -593,7 +595,7 @@ public class SpriteRenderer implements Batch {
         final float fy2 = y + height;
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -649,7 +651,7 @@ public class SpriteRenderer implements Batch {
         final float v2 = 0;
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -708,7 +710,7 @@ public class SpriteRenderer implements Batch {
             }
         }
         int copyCount = Math.min(remainingVertices, count);
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
 
         ////old way, breaks when libGDX code expects SPRITE_SIZE to be 20
         //System.arraycopy(spriteVertices, offset, vertices, idx, copyCount);
@@ -807,7 +809,7 @@ public class SpriteRenderer implements Batch {
         final float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x;
         vertices[idx + 1] = y;
@@ -932,7 +934,7 @@ public class SpriteRenderer implements Batch {
         final float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1073,7 +1075,7 @@ public class SpriteRenderer implements Batch {
         }
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1134,7 +1136,7 @@ public class SpriteRenderer implements Batch {
         float v2 = region.getV();
 
         final float color = this.color;
-        final float tweak = this.hslsTweak;
+        final float tweak = this.tweak;
         final int idx = this.idx;
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
