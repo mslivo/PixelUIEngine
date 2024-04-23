@@ -90,7 +90,7 @@ public class ImmediateRenderer {
     private final Matrix4 projectionMatrix;
     private float vertexColor;
     private float color;
-    private boolean blendingDisabled;
+    private boolean blendingEnabled;
     private ShaderProgram shader;
     private Mesh mesh;
     private float vertices[];
@@ -108,7 +108,7 @@ public class ImmediateRenderer {
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.primitiveType = GL20.GL_POINTS;
-        this.blendingDisabled = false;
+        this.blendingEnabled = false;
         this.color = rgbPacked(1f, 1f, 1f, 1f);
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
         this.tweak = TWEAK_RESET;
@@ -141,16 +141,23 @@ public class ImmediateRenderer {
         if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         this.primitiveType = primitiveType;
         this.renderCalls = 0;
+        blendingEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
+        if(!blendingEnabled){
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+        }
         shader.bind();
         shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
+
         this.drawing = true;
     }
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         if (idx > 0) flush();
         this.drawing = false;
-        if (isBlendingEnabled()) Gdx.gl.glDisable(GL20.GL_BLEND);
+        if(!this.blendingEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private void flush(){
@@ -158,14 +165,6 @@ public class ImmediateRenderer {
 
         renderCalls++;
         totalRenderCalls++;
-
-        if (blendingDisabled) {
-            Gdx.gl.glDisable(GL20.GL_BLEND);
-        }else{
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            if (blendSrcFunc != -1)
-                Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
-        }
 
         mesh.setVertices(vertices, 0, idx);
         mesh.render(shader, this.primitiveType);
@@ -346,22 +345,6 @@ public class ImmediateRenderer {
 
     public void setHSLTReset() {
         this.tweak = TWEAK_RESET;
-    }
-
-    public boolean isBlendingEnabled() {
-        return !blendingDisabled;
-    }
-
-    public void disableBlending() {
-        if (blendingDisabled) return;
-        flush();
-        blendingDisabled = true;
-    }
-
-    public void enableBlending() {
-        if (!blendingDisabled) return;
-        flush();
-        blendingDisabled = false;
     }
 
     public void setBlendFunction(int srcFunc, int dstFunc) {

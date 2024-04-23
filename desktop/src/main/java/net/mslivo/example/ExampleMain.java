@@ -1,14 +1,11 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.engine.AppEngine;
 import net.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
 import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
@@ -37,20 +34,20 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = new TransitionManager();
         // Load Assets
-        Tools.Log.inProgress("Loading Assets");
+        Tools.App.logInProgress("Loading Assets");
         this.mediaManager = new MediaManager();
         this.mediaManager.prepareUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
-        Tools.Log.done();
+        Tools.App.logDone();
 
         // Input/Render
-        Tools.Log.inProgress("Starting UI");
+        Tools.App.logInProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
                 new ExampleUIEngineAdapter(),
                 this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.viewportMode);
-        Tools.Log.done();
+        Tools.App.logDone();
 
         this.state = STATE.RUN;
     }
@@ -99,16 +96,16 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.Log.benchmark();
+            Tools.App.logBenchmark();
             timer_debug_info = System.currentTimeMillis();
         }
     }
 
     @Override
     public void dispose() {
-        Tools.Log.inProgress("Shutting down...");
+        Tools.App.logInProgress("Shutting down...");
         this.shutdownEngine();
-        Tools.Log.done();
+        Tools.App.logDone();
     }
 
     private void shutdownEngine() {

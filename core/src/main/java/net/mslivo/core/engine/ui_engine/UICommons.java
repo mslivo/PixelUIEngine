@@ -36,7 +36,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBar;
-import net.mslivo.core.engine.ui_engine.ui.components.progressbar.ProgressBarPercentText;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarHorizontal;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollBarVertical;
@@ -589,11 +588,11 @@ class UICommons {
     }
 
     static String progressBar_getProgressText(float progress) {
-        return ProgressBarPercentText.progressText[(int) (progress * 100)];
+        return Tools.Text.formatPercent(progress);
     }
 
     static String progressBar_getProgressText2Decimal(float progress) {
-        return ProgressBarPercentText.progressText2Decimal[(int) (progress * 10000)];
+        return Tools.Text.formatPercentDecimal(progress);
     }
 
 
@@ -1010,11 +1009,11 @@ class UICommons {
 
         if (draggedList != null && draggedList == list && draggedList.dragEnabled) return true; // Into itself
 
-        if ( list.dragInEnabled && !list.disabled && list.listAction != null) {
+        if (list.dragInEnabled && !list.disabled && list.listAction != null) {
             if (draggedGrid != null) {
                 return !inputState.draggedGrid.disabled && inputState.draggedGrid.dragOutEnabled &&
                         list.listAction.canDragFromGrid(inputState.draggedGrid);
-            }else if(draggedList != null){
+            } else if (draggedList != null) {
                 return !draggedList.disabled && draggedList.dragOutEnabled &&
                         list.listAction.canDragFromList(draggedList);
             }
@@ -1149,12 +1148,12 @@ class UICommons {
     }
 
     static void text_setLines(MediaManager mediaManager, Text text, String[] lines) {
-        text.lines = Tools.Text.validStringArrayCopy(lines);
+        text.lines = Tools.Text.validStringArray(lines);
         UICommons.text_updateSize(mediaManager, text);
     }
 
     static void tooltip_setLines(ToolTip toolTip, String[] lines) {
-        toolTip.lines = Tools.Text.validStringArrayCopy(lines);
+        toolTip.lines = Tools.Text.validStringArray(lines);
     }
 
     static void text_updateSize(MediaManager mediaManager, Text text) {

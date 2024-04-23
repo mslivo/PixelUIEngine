@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.*;
 
-import java.nio.Buffer;
-
 /**
  * A substitute for {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that adds an extra attribute to store another
  * color's worth of channels, called the "tweak" and used to modify the color with HSL changes, while the primary color
@@ -108,7 +106,7 @@ public class SpriteRenderer implements Batch {
     private final Matrix4 transformMatrix;
     private final Matrix4 projectionMatrix;
     private final Matrix4 combinedMatrix;
-    private boolean blendingDisabled = false;
+    private boolean blendingEnabled;
     private int blendSrcFunc;
     private int blendDstFunc;
     private int blendSrcFuncAlpha;
@@ -162,6 +160,7 @@ public class SpriteRenderer implements Batch {
         this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
         this.blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.blendingEnabled = false;
         this.vertices = new float[size * SPRITE_SIZE];
         this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
                 false, size * 4, size * 6,
@@ -194,6 +193,11 @@ public class SpriteRenderer implements Batch {
         shader.bind();
         setupMatrices();
 
+        blendingEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
+        if(!blendingEnabled){
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+        }
         drawing = true;
     }
 
@@ -206,8 +210,8 @@ public class SpriteRenderer implements Batch {
 
         GL20 gl = Gdx.gl;
         gl.glDepthMask(true);
-        if (isBlendingEnabled()) gl.glDisable(GL20.GL_BLEND);
-    }
+
+        if(!this.blendingEnabled) gl.glDisable(GL20.GL_BLEND);}
 
     @Override
     public void setColor(Color color) {
@@ -1168,14 +1172,6 @@ public class SpriteRenderer implements Batch {
         mesh.getIndicesBuffer(true).position(0);
         mesh.getIndicesBuffer(true).limit(count);
 
-        if (blendingDisabled) {
-            Gdx.gl.glDisable(GL20.GL_BLEND);
-        } else {
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            if (blendSrcFunc != -1)
-                Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
-        }
-
         mesh.render(shader, GL20.GL_TRIANGLES, 0, count);
 
         idx = 0;
@@ -1183,16 +1179,12 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void disableBlending() {
-        if (blendingDisabled) return;
-        flush();
-        blendingDisabled = true;
+        throw new RuntimeException("not supported");
     }
 
     @Override
     public void enableBlending() {
-        if (!blendingDisabled) return;
-        flush();
-        blendingDisabled = false;
+        throw new RuntimeException("not supported");
     }
 
     @Override
@@ -1292,7 +1284,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public boolean isBlendingEnabled() {
-        return !blendingDisabled;
+        throw new RuntimeException("not supported");
     }
 
     public boolean isDrawing() {

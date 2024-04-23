@@ -71,6 +71,8 @@ import java.util.Arrays;
  */
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIEngineAdapter> {
+    private static final int FONT_MAXWIDTH_NONE = -1;
+    private static final Color TEXTFIELD_INVALID = Color.valueOf("E5AEAE");
 
     // Basic Configuration
     private final T uiAdapter;
@@ -84,7 +86,7 @@ public class UIEngine<T extends UIEngineAdapter> {
     public static final int TILE_SIZE_2 = TILE_SIZE / 2;
     public static final float TILE_SIZE_F2 = TILE_SIZE / 2f;
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
-    private static final int FONT_MAXWIDTH_NONE = -1;
+
 
     public T getAdapter() {
         return uiAdapter;
@@ -1886,11 +1888,9 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         { // Draw GUI
             inputState.frameBuffer_ui.begin();
-
             Gdx.gl.glClearColor(0, 0, 0, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             this.uiAdapter.renderUIBefore(inputState.camera_ui);
-
             this.renderUI();
             this.uiAdapter.renderUIAfter(inputState.camera_ui);
             inputState.frameBuffer_ui.end();
@@ -2620,26 +2620,25 @@ public class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case TextField textField -> {
+                render_saveTempColorBatch();
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
-
-                    CMediaArray textFieldGraphic = inputState.focusedTextField == textField ? UIBaseMedia.UI_TEXTFIELD_FOCUSED : UIBaseMedia.UI_TEXTFIELD;
-                    inputState.spriteRenderer_ui.drawCMediaArray(textFieldGraphic, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
-
-                    if (!textField.contentValid) {
-                        render_saveTempColorBatch();
-                        render_batchSetColor(0.90588236f, 0.29803923f, 0.23529412f, (alpha * 0.2f));
+                    if (textField.contentValid) {
+                        CMediaArray textFieldGraphic = inputState.focusedTextField == textField ? UIBaseMedia.UI_TEXTFIELD_FOCUSED : UIBaseMedia.UI_TEXTFIELD;
+                        inputState.spriteRenderer_ui.drawCMediaArray(textFieldGraphic, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
+                    } else {
+                        render_batchSetColorWhite();
                         inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
-                        render_loadTempColorBatch();
                     }
+                }
+                render_loadTempColorBatch();
 
-                    if (textField.content != null) {
-                        render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
-                        if (UICommons.textField_isFocused(inputState, textField)) {
-                            int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
-                            if (xOffset < textField.width * TILE_SIZE) {
-                                inputState.spriteRenderer_ui.drawCMediaAnimation(UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
-                            }
+                if (textField.content != null) {
+                    render_drawFont(textField.font, textField.content.substring(textField.offset), alpha, UICommons.component_getAbsoluteX(textField), UICommons.component_getAbsoluteY(textField), 1, 2, (textField.width * TILE_SIZE) - 4);
+                    if (UICommons.textField_isFocused(inputState, textField)) {
+                        int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
+                        if (xOffset < textField.width * TILE_SIZE) {
+                            inputState.spriteRenderer_ui.drawCMediaAnimation(UIBaseMedia.UI_TEXTFIELD_CARET, UICommons.component_getAbsoluteX(textField) + xOffset, UICommons.component_getAbsoluteY(textField), inputState.animation_timer_ui);
                         }
                     }
                 }

@@ -1652,7 +1652,7 @@ public class API {
                 }
                 setComponentCommonInitValuesInternal(text, x, y, width, height);
                 text.textAction = textAction;
-                text.lines = Tools.Text.validStringArrayCopy(lines);
+                text.lines = Tools.Text.validStringArray(lines);
                 return text;
             }
 
@@ -2644,7 +2644,7 @@ public class API {
 
         public ToolTip create(String[] lines, ToolTipImage[] images, ToolTipAction toolTipAction, boolean displayFistLineAsTitle, int minWidth, int minHeight) {
             ToolTip tooltip = new ToolTip();
-            tooltip.lines = Tools.Text.validStringArrayCopy(lines);
+            tooltip.lines = Tools.Text.validStringArray(lines);
             tooltip.images = new ArrayList<>();
             if (images != null) {
                 for (int i = 0; i < images.length; i++) {

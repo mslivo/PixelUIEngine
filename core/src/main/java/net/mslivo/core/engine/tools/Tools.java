@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -22,20 +21,20 @@ import java.util.*;
  * Utility Class
  */
 public class Tools {
-    private static final DecimalFormat decimalFormat_2decimal = new DecimalFormat("#.##");
-    private static final DecimalFormat decimalFormat_3decimal = new DecimalFormat("#.###");
-    private static final DecimalFormat decimalFormat_4decimal = new DecimalFormat("#.####");
-    private static final DecimalFormat decimalFormat_5decimal = new DecimalFormat("#.#####");
-    private static final DecimalFormat decimalFormat_6decimal = new DecimalFormat("#.######");
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
+
+
+
 
     public static class App {
+        private static final StringBuilder logMessageBuilder = new StringBuilder();
         private static float skipFrameAccumulator = 0f;
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
         private static long lastUpdate;
         private static float updateDelta;
+        private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
+
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.clamp(updatesPerSecond, 1, Integer.MAX_VALUE);
@@ -51,12 +50,13 @@ public class Tools {
                 return false;
             } else {
                 skipFrameAccumulator -= timeStep;
-                updateDelta = (System.currentTimeMillis()-lastUpdate)/1000f;
+                updateDelta = (System.currentTimeMillis() - lastUpdate) / 1000f;
                 lastUpdate = System.currentTimeMillis();
                 return true;
             }
         }
-        public static float updateDeltaTime(){
+
+        public static float updateDeltaTime() {
             return updateDelta;
         }
 
@@ -79,37 +79,22 @@ public class Tools {
             config.setForegroundFPS(fps);
             config.useVsync(false);
             config.setWindowPosition(-1, -1);
-            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
+            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
             if (iconPath != null) config.setWindowIcon(iconPath);
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
-                Log.message(e);
-                Log.toFile(e, Path.of("error.log"));
+                App.log(e);
+                App.logToFile(e, Path.of(appTile + "_error.log"));
             }
         }
-    }
 
 
-    public static class Log {
-        private static final StringBuilder logMessageBuilder = new StringBuilder();
-        private static boolean stdOutLogEnabled = true;
-        private static boolean FileLogEnabled = true;
-
-        public static void setStdOutLogEnabled(boolean enabled) {
-            stdOutLogEnabled = enabled;
-        }
-
-        public static void setFileLogEnabled(boolean enabled) {
-            FileLogEnabled = enabled;
-        }
-
-        public static void benchmark(String... customValues) {
-            if (!stdOutLogEnabled) return;
+        public static void logBenchmark(String... customValues) {
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
                 custom.append(" | ").append(String.format("%1$10s", customValues[i]));
-            reset();
+            logReset();
             logMessageBuilder.append(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()));
             logMessageBuilder.append(" FPS | ");
             logMessageBuilder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
@@ -118,87 +103,74 @@ public class Tools {
             System.out.println(logMessageBuilder);
         }
 
-        public static void message(String msg) {
-            if (!stdOutLogEnabled) return;
-            reset();
+        public static void log(String msg) {
+            logReset();
             logMessageBuilder.append(msg);
             System.out.println(logMessageBuilder);
         }
 
-        public static void message(Exception e) {
-            if (!stdOutLogEnabled) return;
-            reset();
+        public static void log(Exception e) {
+            logReset();
             logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
             System.out.println(logMessageBuilder);
             e.printStackTrace(System.out);
         }
 
-        public static void inProgress(String what) {
-            if (!stdOutLogEnabled) return;
-            reset();
+        public static void logInProgress(String what) {
+            logReset();
             logMessageBuilder.append(what).append("...");
             System.out.println(logMessageBuilder);
         }
 
-        public static void done() {
-            if (!stdOutLogEnabled) return;
-            reset();
+        public static void logDone() {
+            logReset();
             logMessageBuilder.append("Done.");
             System.out.println(logMessageBuilder);
         }
 
-        public static void toFile(String error, Path file) {
-            if (!FileLogEnabled) return;
-            try {
-                reset();
-                FileWriter fileWriter = new FileWriter(file.toString(), true);
-                PrintWriter printWriter = new PrintWriter(fileWriter);
-                printWriter.write(logMessageBuilder + error);
-                printWriter.close();
+        public static void logToFile(String message, Path file) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
+                logReset();
+                pw.write(logMessageBuilder + message);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
-        public static void toFile(Exception e, Path file) {
-            if (!FileLogEnabled) return;
-            try {
-                reset();
+        public static void logToFile(Exception e, Path file) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
+                logReset();
                 logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-                FileWriter fileWriter = new FileWriter(file.toString(), true);
-                PrintWriter printWriter = new PrintWriter(fileWriter);
-                printWriter.write(logMessageBuilder.toString());
-                e.printStackTrace(printWriter);
-                printWriter.close();
+                pw.write(logMessageBuilder.toString());
+                e.printStackTrace(pw);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
-        private static void reset() {
+        private static void logReset() {
             logMessageBuilder.setLength(0);
-            logMessageBuilder.append(Text.ANSI_BLUE).append(sdf.format(new Date())).append(Text.ANSI_RESET);
+            logMessageBuilder.append(sdf.format(new Date()));
         }
     }
 
+
     public static class Text {
-        public static final String ANSI_RESET = "\u001B[0m";
-        public static final String ANSI_BLACK = "\u001B[30m";
-        public static final String ANSI_RED = "\u001B[31m";
-        public static final String ANSI_GREEN = "\u001B[32m";
-        public static final String ANSI_YELLOW = "\u001B[33m";
-        public static final String ANSI_BLUE = "\u001B[34m";
-        public static final String ANSI_PURPLE = "\u001B[35m";
-        public static final String ANSI_CYAN = "\u001B[36m";
-        public static final String ANSI_WHITE = "\u001B[37m";
-        public static final String ANSI_BACK_BLACK = "\u001B[40m";
-        public static final String ANSI_BACK_RED = "\u001B[41m";
-        public static final String ANSI_BACK_GREEN = "\u001B[42m";
-        public static final String ANSI_BACK_YELLOW = "\u001B[43m";
-        public static final String ANSI_BACK_BLUE = "\u001B[44m";
-        public static final String ANSI_BACK_PURPLE = "\u001B[45m";
-        public static final String ANSI_BACK_CYAN = "\u001B[46m";
-        public static final String ANSI_BACK_WHITE = "\u001B[47m";
+        private static final String[] percentText = new String[]{
+                "0%", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9%", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%",
+                "21%", "22%", "23%", "24%", "25%", "26%", "27%", "28%", "29%", "30%", "31%", "32%", "33%", "34%", "35%", "36%", "37%", "38%", "39%", "40%",
+                "41%", "42%", "43%", "44%", "45%", "46%", "47%", "48%", "49%", "50%", "51%", "52%", "53%", "54%", "55%", "56%", "57%", "58%", "59%", "60%",
+                "61%", "62%", "63%", "64%", "65%", "66%", "67%", "68%", "69%", "70%", "71%", "72%", "73%", "74%", "75%", "76%", "77%", "78%", "79%", "80%",
+                "81%", "82%", "83%", "84%", "85%", "86%", "87%", "88%", "89%", "90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"
+        };
+        private static final String[] percentDecimalText = new String[10001];
+        static {
+            int index = 0;
+            for (float i = 0; i <= 10_000; i += 1) {
+                percentDecimalText[index] = String.format("%.2f%%", i / 100f);
+                index += 1;
+            }
+        }
 
         public static String[] toArray(String text) {
             return toArray(text, true);
@@ -220,59 +192,19 @@ public class Tools {
             StringBuilder formattedNumber = new StringBuilder();
             String numberString = String.valueOf(number);
             int length = numberString.length();
-
             for (int i = 0; i < length; i++) {
-                if (i > 0 && (length - i) % 3 == 0) {
-                    formattedNumber.append(".");
-                }
+                if (i > 0 && (length - i) % 3 == 0) formattedNumber.append(".");
                 formattedNumber.append(numberString.charAt(i));
             }
-
             return formattedNumber.toString();
         }
 
-        public static String format2Decimal(float decimal) {
-            return decimalFormat_2decimal.format(decimal);
+        public static String formatPercent(float percent) {
+            return percentText[(int) (percent * 100)];
         }
 
-        public static String format3Decimal(float decimal) {
-            return decimalFormat_3decimal.format(decimal);
-        }
-
-        public static String format4Decimal(float decimal) {
-            return decimalFormat_4decimal.format(decimal);
-        }
-
-        public static String format5Decimal(float decimal) {
-            return decimalFormat_5decimal.format(decimal);
-        }
-
-        public static String format6Decimal(float decimal) {
-            return decimalFormat_6decimal.format(decimal);
-        }
-
-        public static String formatPercent2Decimal(float percentF) {
-            return format2Decimal(percentF * 100) + "%";
-        }
-
-        public static String formatPercent3Decimal(float percentF) {
-            return format3Decimal(percentF * 100) + "%";
-        }
-
-        public static String formatPercent4Decimal(float percentF) {
-            return format4Decimal(percentF * 100) + "%";
-        }
-
-        public static String formatPercent5Decimal(float percentF) {
-            return format5Decimal(percentF * 100) + "%";
-        }
-
-        public static String formatPercent6Decimal(float percentF) {
-            return format6Decimal(percentF * 100) + "%";
-        }
-
-        public static String formatPercent(float percentF) {
-            return MathUtils.round(percentF * 100) + "%";
+        public static String formatPercentDecimal(float percentDecimal) {
+            return percentDecimalText[(int) (percentDecimal * 10000)];
         }
 
         public static String customChar(int number) {
@@ -283,7 +215,7 @@ public class Tools {
             return string == null ? "" : string;
         }
 
-        public static String[] validStringArrayCopy(String[] string) {
+        public static String[] validStringArray(String[] string) {
             if (string == null) {
                 return new String[]{};
             } else {
@@ -299,12 +231,8 @@ public class Tools {
             }
         }
 
-        public static String truncateString(String input, int maxLength) {
-            if (input.length() <= maxLength) {
-                return input;
-            } else {
-                return input.substring(0, maxLength);
-            }
+        public static String truncate(String input, int maxLength) {
+            return input.length() <= maxLength ? input : input.substring(0, maxLength);
         }
 
     }
@@ -342,14 +270,13 @@ public class Tools {
             }
         }
 
-
         public static boolean makeSureDirectoryExists(Path file) {
             try {
                 if (Files.isRegularFile(file)) Files.delete(file);
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.Log.message(e);
+                Tools.App.log(e);
                 return false;
             }
         }
@@ -585,12 +512,12 @@ public class Tools {
         }
 
         public static boolean chance(int oneIn) {
-            if(oneIn <= 0) return false;
+            if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
         }
 
         public static boolean chance(long oneIn) {
-            if(oneIn <= 0) return false;
+            if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
         }
 

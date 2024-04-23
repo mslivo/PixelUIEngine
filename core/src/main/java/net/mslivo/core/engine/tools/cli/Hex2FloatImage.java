@@ -8,7 +8,7 @@ public class Hex2FloatImage {
 
     public static void main(String[] args) throws Exception {
 
-        hex2FloatImage("E:\\Code\\gradient.png");
+        hex2FloatImage("E:\\Code\\waves\\assets\\sprites\\gradient.png");
 
     }
 

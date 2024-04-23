@@ -139,6 +139,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
         batch.end();
 
+
         immediateRenderer.setColor(Color.WHITE);
         if (IM_PERFORMANCE_TEST) {
             immediateRenderer.setProjectionMatrix(camera.combined);
