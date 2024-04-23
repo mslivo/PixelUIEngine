@@ -90,7 +90,6 @@ public class ImmediateRenderer {
     private final Matrix4 projectionMatrix;
     private float vertexColor;
     private float color;
-    private boolean blendingEnabled;
     private ShaderProgram shader;
     private Mesh mesh;
     private float vertices[];
@@ -108,7 +107,6 @@ public class ImmediateRenderer {
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.primitiveType = GL20.GL_POINTS;
-        this.blendingEnabled = false;
         this.color = rgbPacked(1f, 1f, 1f, 1f);
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
         this.tweak = TWEAK_RESET;
@@ -141,11 +139,10 @@ public class ImmediateRenderer {
         if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         this.primitiveType = primitiveType;
         this.renderCalls = 0;
-        blendingEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
-        if(!blendingEnabled){
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
-        }
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+
         shader.bind();
         shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
 
@@ -157,7 +154,6 @@ public class ImmediateRenderer {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         if (idx > 0) flush();
         this.drawing = false;
-        if(!this.blendingEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private void flush(){
@@ -359,6 +355,7 @@ public class ImmediateRenderer {
         blendDstFunc = dstFuncColor;
         blendSrcFuncAlpha = srcFuncAlpha;
         blendDstFuncAlpha = dstFuncAlpha;
+        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
     }
 
     public int getBlendSrcFunc() {

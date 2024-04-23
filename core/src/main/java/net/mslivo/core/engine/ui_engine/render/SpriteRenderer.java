@@ -106,7 +106,6 @@ public class SpriteRenderer implements Batch {
     private final Matrix4 transformMatrix;
     private final Matrix4 projectionMatrix;
     private final Matrix4 combinedMatrix;
-    private boolean blendingEnabled;
     private int blendSrcFunc;
     private int blendDstFunc;
     private int blendSrcFuncAlpha;
@@ -160,7 +159,6 @@ public class SpriteRenderer implements Batch {
         this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
         this.blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.blendingEnabled = false;
         this.vertices = new float[size * SPRITE_SIZE];
         this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
                 false, size * 4, size * 6,
@@ -188,16 +186,13 @@ public class SpriteRenderer implements Batch {
     public void begin() {
         if (drawing) throw new IllegalStateException("SpriteRenderer.end must be called before begin.");
         renderCalls = 0;
-
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
         Gdx.gl.glDepthMask(false);
+
         shader.bind();
         setupMatrices();
 
-        blendingEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
-        if(!blendingEnabled){
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
-        }
         drawing = true;
     }
 
@@ -210,8 +205,7 @@ public class SpriteRenderer implements Batch {
 
         GL20 gl = Gdx.gl;
         gl.glDepthMask(true);
-
-        if(!this.blendingEnabled) gl.glDisable(GL20.GL_BLEND);}
+    }
 
     @Override
     public void setColor(Color color) {
@@ -1201,6 +1195,7 @@ public class SpriteRenderer implements Batch {
         blendDstFunc = dstFuncColor;
         blendSrcFuncAlpha = srcFuncAlpha;
         blendDstFuncAlpha = dstFuncAlpha;
+        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
     }
 
     @Override
