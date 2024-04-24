@@ -95,10 +95,10 @@ public class ImmediateRenderer {
     private float vertices[];
     private int idx;
     private float tweak;
-    private int blendSrcFunc;
-    private int blendDstFunc;
-    private int blendSrcFuncAlpha;
-    private int blendDstFuncAlpha;
+    private int srcRGB;
+    private int dstRGB;
+    private int srcAlpha;
+    private int dstAlpha;
     private int u_projTrans;
     private boolean drawing;
 
@@ -110,10 +110,10 @@ public class ImmediateRenderer {
         this.color = rgbPacked(1f, 1f, 1f, 1f);
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
         this.tweak = TWEAK_RESET;
-        this.blendSrcFunc = GL20.GL_SRC_ALPHA;
-        this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
-        this.blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.srcRGB = GL20.GL_SRC_ALPHA;
+        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.srcAlpha = GL20.GL_SRC_ALPHA;
+        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.tempColor = new Color(Color.WHITE);
         this.idx = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -140,9 +140,6 @@ public class ImmediateRenderer {
         this.primitiveType = primitiveType;
         this.renderCalls = 0;
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
-
         shader.bind();
         shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
 
@@ -151,7 +148,6 @@ public class ImmediateRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
         if (idx > 0) flush();
         this.drawing = false;
     }
@@ -161,6 +157,9 @@ public class ImmediateRenderer {
 
         renderCalls++;
         totalRenderCalls++;
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
         mesh.setVertices(vertices, 0, idx);
         mesh.render(shader, this.primitiveType);
@@ -348,30 +347,29 @@ public class ImmediateRenderer {
     }
 
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
-        if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha && blendDstFuncAlpha == dstFuncAlpha)
+        if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
             return;
         flush();
-        blendSrcFunc = srcFuncColor;
-        blendDstFunc = dstFuncColor;
-        blendSrcFuncAlpha = srcFuncAlpha;
-        blendDstFuncAlpha = dstFuncAlpha;
-        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+        this.srcRGB = srcFuncColor;
+        this.dstRGB = dstFuncColor;
+        this.srcAlpha = srcFuncAlpha;
+        this.dstAlpha = dstFuncAlpha;
     }
 
     public int getBlendSrcFunc() {
-        return blendSrcFunc;
+        return srcRGB;
     }
 
     public int getBlendDstFunc() {
-        return blendDstFunc;
+        return dstRGB;
     }
 
     public int getBlendSrcFuncAlpha() {
-        return blendSrcFuncAlpha;
+        return srcAlpha;
     }
 
     public int getBlendDstFuncAlpha() {
-        return blendDstFuncAlpha;
+        return dstAlpha;
     }
 
     public void setShader(ShaderProgram shader) {

@@ -10,9 +10,12 @@ import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.*;
+
+import java.nio.IntBuffer;
 
 /**
  * A substitute for {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that adds an extra attribute to store another
@@ -91,6 +94,8 @@ public class SpriteRenderer implements Batch {
               gl_FragColor = color;
             }       
             """;
+    private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
+    private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
     public static final int SPRITE_SIZE = 24;
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
 
@@ -106,10 +111,10 @@ public class SpriteRenderer implements Batch {
     private final Matrix4 transformMatrix;
     private final Matrix4 projectionMatrix;
     private final Matrix4 combinedMatrix;
-    private int blendSrcFunc;
-    private int blendDstFunc;
-    private int blendSrcFuncAlpha;
-    private int blendDstFuncAlpha;
+    private int srcRGB;
+    private int dstRGB;
+    private int srcAlpha;
+    private int dstAlpha;
     private ShaderProgram shader;
     private boolean defaultShader;
     protected float color;
@@ -119,6 +124,7 @@ public class SpriteRenderer implements Batch {
     public int renderCalls;
     public int totalRenderCalls;
     public int maxSpritesInBatch;
+
 
     public SpriteRenderer() {
         this(null, 1024, null);
@@ -155,10 +161,10 @@ public class SpriteRenderer implements Batch {
         this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
         this.invTexWidth = this.invTexHeight = 0;
         this.tweak = TWEAK_RESET;
-        this.blendSrcFunc = GL20.GL_SRC_ALPHA;
-        this.blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
-        this.blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.srcRGB = GL20.GL_SRC_ALPHA;
+        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.srcAlpha = GL20.GL_SRC_ALPHA;
+        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = new float[size * SPRITE_SIZE];
         this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
                 false, size * 4, size * 6,
@@ -184,10 +190,8 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void begin() {
-        if (drawing) throw new IllegalStateException("SpriteRenderer.end must be called before begin.");
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         renderCalls = 0;
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
         Gdx.gl.glDepthMask(false);
 
         shader.bind();
@@ -198,13 +202,12 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void end() {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before end.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (idx > 0) flush();
         lastTexture = null;
         drawing = false;
 
-        GL20 gl = Gdx.gl;
-        gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(true);
     }
 
     @Override
@@ -1156,20 +1159,25 @@ public class SpriteRenderer implements Batch {
 
         renderCalls++;
         totalRenderCalls++;
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(this.srcRGB, this.dstRGB, this.srcAlpha, this.dstAlpha);
+
         int spritesInBatch = idx / SPRITE_SIZE;
         if (spritesInBatch > maxSpritesInBatch) maxSpritesInBatch = spritesInBatch;
         int count = spritesInBatch * 6;
 
         lastTexture.bind();
+
         Mesh mesh = this.mesh;
         mesh.setVertices(vertices, 0, idx);
         mesh.getIndicesBuffer(true).position(0);
         mesh.getIndicesBuffer(true).limit(count);
-
         mesh.render(shader, GL20.GL_TRIANGLES, 0, count);
 
         idx = 0;
     }
+
 
     @Override
     public void disableBlending() {
@@ -1188,34 +1196,33 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
-        if (blendSrcFunc == srcFuncColor && blendDstFunc == dstFuncColor && blendSrcFuncAlpha == srcFuncAlpha && blendDstFuncAlpha == dstFuncAlpha)
+        if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
             return;
         flush();
-        blendSrcFunc = srcFuncColor;
-        blendDstFunc = dstFuncColor;
-        blendSrcFuncAlpha = srcFuncAlpha;
-        blendDstFuncAlpha = dstFuncAlpha;
-        Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+        this.srcRGB = srcFuncColor;
+        this.dstRGB = dstFuncColor;
+        this.srcAlpha = srcFuncAlpha;
+        this.dstAlpha = dstFuncAlpha;
     }
 
     @Override
     public int getBlendSrcFunc() {
-        return blendSrcFunc;
+        return srcRGB;
     }
 
     @Override
     public int getBlendDstFunc() {
-        return blendDstFunc;
+        return dstRGB;
     }
 
     @Override
     public int getBlendSrcFuncAlpha() {
-        return blendSrcFuncAlpha;
+        return srcAlpha;
     }
 
     @Override
     public int getBlendDstFuncAlpha() {
-        return blendDstFuncAlpha;
+        return dstAlpha;
     }
 
     @Override
