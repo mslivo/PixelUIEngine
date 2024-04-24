@@ -3089,20 +3089,20 @@ public class API {
                     return inputState.inputEvents.mouseScrolledAmount;
                 }
 
-                public boolean upHasNextButton() {
+                public boolean buttonUpHasNext() {
                     return inputState.inputEvents.mouseUpButtonIndex < inputState.inputEvents.mouseUpButtons.size;
                 }
 
-                public int upNextButton() {
-                    return upHasNextButton() ? inputState.inputEvents.mouseUpButtons.get(inputState.inputEvents.mouseUpButtonIndex++) : KeyCode.NONE;
+                public int buttonUpNext() {
+                    return buttonUpHasNext() ? inputState.inputEvents.mouseUpButtons.get(inputState.inputEvents.mouseUpButtonIndex++) : KeyCode.NONE;
                 }
 
-                public boolean downHasNextButton() {
+                public boolean buttonDownHasNext() {
                     return inputState.inputEvents.mouseDownButtonIndex < inputState.inputEvents.mouseDownButtons.size;
                 }
 
-                public int downNextButton() {
-                    return downHasNextButton() ? inputState.inputEvents.mouseDownButtons.get(inputState.inputEvents.mouseDownButtonIndex++) : KeyCode.NONE;
+                public int buttonDownNext() {
+                    return buttonDownHasNext() ? inputState.inputEvents.mouseDownButtons.get(inputState.inputEvents.mouseDownButtonIndex++) : KeyCode.NONE;
                 }
             }
 
