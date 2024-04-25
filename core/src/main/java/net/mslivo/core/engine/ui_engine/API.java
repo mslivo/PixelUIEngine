@@ -2856,9 +2856,9 @@ public class API {
             mouseTextInput.color_g = inputState.config.mouseTextInput_defaultColor.g;
             mouseTextInput.color_b = inputState.config.mouseTextInput_defaultColor.b;
             mouseTextInput.color_a = inputState.config.mouseTextInput_defaultColor.a;
-            mouseTextInput.color2_r = 0f;
-            mouseTextInput.color2_g = 0f;
-            mouseTextInput.color2_b = 0f;
+            mouseTextInput.color2_r = 0.5f;
+            mouseTextInput.color2_g = 0.5f;
+            mouseTextInput.color2_b = 0.5f;
             mouseTextInput.font = inputState.config.mouseTextInput_defaultFont;
             mouseTextInput.x = x - 6;
             mouseTextInput.y = y - 12;

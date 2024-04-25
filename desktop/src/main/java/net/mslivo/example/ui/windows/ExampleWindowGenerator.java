@@ -538,7 +538,7 @@ public class ExampleWindowGenerator implements WindowGenerator {
         ArrayList<ListItem> listItems2 = new ArrayList<>();
         addRandomItemsToList(listItems2, "L2 ");
 
-        List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, true, true, true, true);
+        List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, false, true, true, true);
         ListAction list2Action = new ListAction<ListItem>() {
             @Override
             public CMediaSprite icon(ListItem listItem) {

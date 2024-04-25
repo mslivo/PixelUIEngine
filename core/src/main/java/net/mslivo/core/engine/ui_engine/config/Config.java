@@ -98,7 +98,7 @@ public class Config implements Serializable, Cloneable {
         input_gamePadMouseButtonsScrollUp = null;
         input_gamePadMouseButtonsScrollDown = null;
         // ##### Window & Component Default Values #####
-        window_defaultEnforceScreenBounds = false;
+        window_defaultEnforceScreenBounds = true;
         window_defaultColor = Color.WHITE.cpy();
         window_defaultFont = UIBaseMedia.UI_FONT_BLACK;
         component_defaultColor = Color.WHITE.cpy();

@@ -526,6 +526,15 @@ class UICommons {
         return null;
     }
 
+    static void setMouseInteractedUIObject(InputState inputState, Object object){
+        inputState.mouseInteractedUIObjectFrame = object;
+    }
+
+    static void setKeyboardInteractedUIObject(InputState inputState, Object object){
+        inputState.keyboardInteractedUIObjectFrame = object;
+    }
+
+
     static Object getDraggedUIReference(InputState inputState) {
         if (inputState.draggedGrid != null) return inputState.draggedGrid;
         if (inputState.draggedList != null) return inputState.draggedList;
