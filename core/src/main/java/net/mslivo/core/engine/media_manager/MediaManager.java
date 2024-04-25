@@ -1,23 +1,18 @@
 package net.mslivo.core.engine.media_manager;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.media.*;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.UIBaseMedia;
-import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,7 +38,7 @@ public class MediaManager {
     private TextureRegion[] medias_cursors = null;
     private BitmapFont[] medias_fonts = null;
     private TextureRegion[][] medias_arrays = null;
-    private Animation[] medias_animations = null;
+    private Animation<TextureRegion>[] medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -166,13 +161,15 @@ public class MediaManager {
                 }
                 case CMediaArray cMediaArray -> {
                     cMediaArray.mediaManagerIndex = arraysIdx;
-                    medias_arrays[arraysIdx++] = splitFrames(cMediaArray.file, cMediaArray.tile_width, cMediaArray.tile_height,
-                            cMediaArray.frameOffset, cMediaArray.frameLength);
+                    medias_arrays[arraysIdx++] = splitFrames(cMediaArray.file, cMediaArray.regionWidth, cMediaArray.regionHeight,
+                            cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class);
                 }
                 case CMediaAnimation cMediaAnimation -> {
                     cMediaAnimation.mediaManagerIndex = animationsIdx;
+
                     medias_animations[animationsIdx++] = new Animation<>(cMediaAnimation.animation_speed,
-                            splitFrames(cMediaAnimation.file, cMediaAnimation.tile_width, cMediaAnimation.tile_height, cMediaAnimation.frameOffset, cMediaAnimation.frameLength)
+                            splitFrames(cMediaAnimation.file, cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                            cMediaAnimation.playMode
                     );
                 }
                 case CMediaFont cMediaFont -> {
@@ -211,30 +208,28 @@ public class MediaManager {
         return true;
     }
 
-    private TextureRegion[] splitFrames(String file, int tile_width, int tile_height, int frameOffset, int frameLength) {
+    private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset, int frameLength) {
         TextureRegion textureRegion = textureAtlas.findRegion(file);
         int width = (textureRegion.getRegionWidth() / tile_width);
         int height = (textureRegion.getRegionHeight() / tile_height);
         int maxFrames = Math.clamp(width * height, 0,frameLength);
 
         int frameCount = maxFrames - frameOffset;
-        if (frameCount == 0) return new TextureRegion[]{};
+        if (frameCount == 0) return new Array<>();
         if (frameCount < 0)
             throw new RuntimeException("Error loading: \"" + file + "\": Negative frameCount = " + frameCount);
 
 
         TextureRegion[][] tmp = textureRegion.split(tile_width, tile_height);
-        TextureRegion[] result = new TextureRegion[frameCount];
+        Array<TextureRegion> result = new Array<>();
         int allCounter = 0;
-        int indexCounter = 0;
         framesLoop:
 
         for (int ix = 0; ix < tmp.length; ix++) {
             for (int iy = 0; iy < tmp[0].length; iy++) {
                 allCounter++;
                 if (allCounter > frameOffset) {
-                    result[indexCounter] = tmp[ix][iy];
-                    indexCounter++;
+                    result.add( tmp[ix][iy]);
                 }
                 if (allCounter >= frameLength) break framesLoop;
             }
@@ -303,17 +298,22 @@ public class MediaManager {
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
-        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE);
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, Animation.PlayMode.LOOP);
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, Animation.PlayMode.LOOP);
+    }
+
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength, Animation.PlayMode playMode) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
-        cMediaAnimation.tile_width = Math.clamp(tileWidth, 1,Integer.MAX_VALUE);
-        cMediaAnimation.tile_height = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
+        cMediaAnimation.regionWidth = Math.clamp(tileWidth, 1,Integer.MAX_VALUE);
+        cMediaAnimation.regionHeight = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
         cMediaAnimation.animation_speed = animation_speed;
         cMediaAnimation.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
         cMediaAnimation.frameLength = frameLength;
+        cMediaAnimation.playMode = playMode;
         return cMediaAnimation;
     }
 
@@ -342,11 +342,21 @@ public class MediaManager {
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaArray cMediaArray = new CMediaArray(file);
-        cMediaArray.tile_width = Math.clamp(tileWidth, 1, Integer.MAX_VALUE);
-        cMediaArray.tile_height = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
+        cMediaArray.regionWidth = Math.clamp(tileWidth, 1, Integer.MAX_VALUE);
+        cMediaArray.regionHeight = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
         cMediaArray.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
         cMediaArray.frameLength = frameLength;
         return cMediaArray;
+    }
+
+    public Object getCMediaSprite(CMediaSprite cMediaSprite) {
+        return switch (cMediaSprite){
+            case CMediaImage cMediaImage -> medias_images[cMediaImage.mediaManagerIndex];
+            case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex];
+            case CMediaArray cMediaArray -> medias_arrays[cMediaArray.mediaManagerIndex];
+            case CMediaCursor cMediaCursor -> medias_cursors[cMediaCursor.mediaManagerIndex];
+            default -> throw new IllegalStateException("Unexpected value: " + cMediaSprite);
+        };
     }
 
     public TextureRegion getCMediaCursor(CMediaCursor cMedia) {
@@ -357,8 +367,8 @@ public class MediaManager {
         return medias_images[cMedia.mediaManagerIndex];
     }
 
-    public TextureRegion getCMediaAnimation(CMediaAnimation cMedia, float animationTimer) {
-        return (TextureRegion) medias_animations[cMedia.mediaManagerIndex].getKeyFrame(animationTimer, true);
+    public Animation<TextureRegion> getCMediaAnimation(CMediaAnimation cMedia) {
+        return medias_animations[cMedia.mediaManagerIndex];
     }
 
     public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
@@ -373,71 +383,40 @@ public class MediaManager {
         return medias_music[cMediaMusic.mediaManagerIndex];
     }
 
-
-    public boolean isCMediaAnimationFinished(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations[cMedia.mediaManagerIndex].isAnimationFinished(animationTimer);
+    public int getCMediaSpriteWidth(CMediaSprite cMedia) {
+        return switch (cMedia){
+            case CMediaImage __ -> medias_images[cMedia.mediaManagerIndex].getRegionWidth();
+            case CMediaCursor __ -> medias_cursors[cMedia.mediaManagerIndex].getRegionWidth();
+            case CMediaArray array -> array.regionWidth;
+            case CMediaAnimation animation -> animation.regionWidth;
+            default -> throw new IllegalStateException("Unexpected value: " + cMedia);
+        };
     }
 
-    public int getCMediaAnimationKeyFrameIndex(CMediaAnimation cMedia, float animationTimer) {
-        return medias_animations[cMedia.mediaManagerIndex].getKeyFrameIndex(animationTimer);
-    }
-
-    public int imageWidth(CMediaSprite cMedia) {
-        return imageWidth(cMedia, true);
-    }
-
-    public int imageWidth(CMediaSprite cMedia, boolean tileWidth) {
-        if (tileWidth) {
-            if (cMedia.getClass() == CMediaArray.class) {
-                return ((CMediaArray) cMedia).tile_width;
-            } else if (cMedia.getClass() == CMediaAnimation.class) {
-                return ((CMediaAnimation) cMedia).tile_width;
-            }
-        }
-        return textureAtlas.findRegion(cMedia.file).getRegionWidth();
-    }
-
-    public int imageHeight(CMediaSprite cMedia) {
-        return imageHeight(cMedia, true);
-    }
-
-    public int imageHeight(CMediaSprite cMedia, boolean tileHeight) {
-        if (tileHeight) {
-            if (cMedia.getClass() == CMediaArray.class) {
-                return ((CMediaArray) cMedia).tile_height;
-            } else if (cMedia.getClass() == CMediaAnimation.class) {
-                return ((CMediaAnimation) cMedia).tile_height;
-            }
-        }
-        return textureAtlas.findRegion(cMedia.file).getRegionHeight();
+    public int getCMediaSpriteHeight(CMediaSprite cMedia) {
+        return switch (cMedia){
+            case CMediaImage __ -> medias_images[cMedia.mediaManagerIndex].getRegionHeight();
+            case CMediaCursor __ -> medias_cursors[cMedia.mediaManagerIndex].getRegionHeight();
+            case CMediaArray array -> array.regionHeight;
+            case CMediaAnimation animation -> animation.regionHeight;
+            default -> throw new IllegalStateException("Unexpected value: " + cMedia);
+        };
     }
 
     public int getCMediaArraySize(CMediaArray cMedia) {
         return medias_arrays[cMedia.mediaManagerIndex].length;
     }
 
-    public void setCMediaFontColorWhite(CMediaFont font) {
-        setCMediaFontColor(font, 1, 1, 1, 1);
-    }
-
-    public void setCMediaFontColor(CMediaFont font, Color color) {
-        setCMediaFontColor(font, color.r, color.g, color.b, color.a);
-    }
-
-    public void setCMediaFontColor(CMediaFont font, float r, float g, float b, float a) {
-        getCMediaFont(font).setColor(r, g, b, a);
-    }
-
     public BitmapFont getCMediaFont(CMediaFont cMedia) {
         return medias_fonts[cMedia.mediaManagerIndex];
     }
 
-    public int textWidth(CMediaFont font, String text) {
+    public int getCMediaFontTextWidth(CMediaFont font, String text) {
         glyphLayout.setText(getCMediaFont(font), text);
         return (int) glyphLayout.width;
     }
 
-    public int textHeight(CMediaFont font, String text) {
+    public int getCMediaFontTextHeight(CMediaFont font, String text) {
         glyphLayout.setText(getCMediaFont(font), text);
         return (int) glyphLayout.height;
     }

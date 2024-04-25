@@ -2215,8 +2215,8 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
-            int imageWidthMin = toolTipImage.x + MathUtils.ceil(mediaManager.imageWidth(toolTipImage.image) / UIEngine.TILE_SIZE_F);
-            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.imageHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F);
+            int imageWidthMin = toolTipImage.x + MathUtils.ceil(mediaManager.getCMediaSpriteWidth(toolTipImage.image) / UIEngine.TILE_SIZE_F);
+            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.getCMediaSpriteHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F);
             if (imageWidthMin > tooltip_width) tooltip_width = imageWidthMin;
             if (imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
         }
@@ -2608,8 +2608,8 @@ public class UIEngine<T extends UIEngineAdapter> {
                     if (UICommons.canvas_isInsideCanvas(canvas, canvasImage.x, canvasImage.y)) {
                         render_saveTempColorBatch();
                         render_batchSetColor(canvasImage.color_r * alpha, canvasImage.color_g, canvasImage.color_b, (canvasImage.color_a * alpha));
-                        int imageWidthOffset = mediaManager.imageWidth(canvasImage.image) / 2;
-                        int imageHeightOffset = mediaManager.imageHeight(canvasImage.image) / 2;
+                        int imageWidthOffset = mediaManager.getCMediaSpriteWidth(canvasImage.image) / 2;
+                        int imageHeightOffset = mediaManager.getCMediaSpriteHeight(canvasImage.image) / 2;
                         render_drawCMediaSprite(canvasImage.image,
                                 UICommons.component_getAbsoluteX(canvas) + canvasImage.x - imageWidthOffset,
                                 UICommons.component_getAbsoluteY(canvas) + canvasImage.y - imageHeightOffset,
@@ -2884,7 +2884,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
     private int render_textWidth(CMediaFont font, String text) {
         if (font == null || text == null || text.length() == 0) return 0;
-        return mediaManager.textWidth(font, text);
+        return mediaManager.getCMediaFontTextWidth(font, text);
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex) {

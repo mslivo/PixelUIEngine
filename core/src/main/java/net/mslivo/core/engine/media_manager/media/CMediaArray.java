@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class CMediaArray extends CMediaSprite implements Serializable {
 
-    public int tile_width;
+    public int regionWidth;
 
-    public int tile_height;
+    public int regionHeight;
 
     public int frameOffset;
 

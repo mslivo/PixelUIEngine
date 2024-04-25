@@ -1114,7 +1114,7 @@ public class API {
                     tab.name = "";
                     tab.data = null;
                     if (width == 0) {
-                        tab.width = MathUtils.round((mediaManager.textWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
+                        tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
                     } else {
                         tab.width = width;
                     }
@@ -1644,7 +1644,7 @@ public class API {
                 int height = 1;
                 if (lines != null && text.font != null) {
                     for (int i = 0; i < lines.length; i++) {
-                        int widthT = mediaManager.textWidth(text.font, lines[i]);
+                        int widthT = mediaManager.getCMediaFontTextWidth(text.font, lines[i]);
                         if (widthT > width) width = widthT;
                     }
                     width = width / UIEngine.TILE_SIZE;
@@ -1694,8 +1694,8 @@ public class API {
 
             public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, float animation_offset) {
                 Image imageC = new Image();
-                int width = image != null ? mediaManager.imageWidth(image) / UIEngine.TILE_SIZE : 0;
-                int height = image != null ? mediaManager.imageHeight(image) / UIEngine.TILE_SIZE : 0;
+                int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / UIEngine.TILE_SIZE : 0;
+                int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / UIEngine.TILE_SIZE : 0;
                 setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
                 imageC.image = image;
                 imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
@@ -2515,7 +2515,7 @@ public class API {
             notification.font = inputState.config.notification_defaultFont;
             notification.notificationAction = notificationAction;
             notification.timer = 0;
-            int textWidth = mediaManager.textWidth(notification.font, notification.text);
+            int textWidth = mediaManager.getCMediaFontTextWidth(notification.font, notification.text);
             if (textWidth > inputState.resolutionWidth_ui) {
                 int tooMuch = (textWidth - inputState.resolutionWidth_ui);
                 notification.state = STATE_NOTIFICATION.INIT_SCROLL;
@@ -4079,7 +4079,7 @@ public class API {
                             StringBuilder currentLine = new StringBuilder();
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 String value = split[i2];
-                                if (mediaManager.textWidth(inputState.config.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
+                                if (mediaManager.getCMediaFontTextWidth(inputState.config.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
                                     textList.add(currentLine.toString());
                                     currentLine = new StringBuilder(value + " ");
                                 } else {
@@ -4423,7 +4423,7 @@ public class API {
         public Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.textWidth(inputState.config.component_defaultFont, lines[i]);
+                int len = mediaManager.getCMediaFontTextWidth(inputState.config.component_defaultFont, lines[i]);
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
@@ -4463,8 +4463,8 @@ public class API {
         public Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
-                    (mediaManager.textWidth(inputState.config.component_defaultFont, caption) + 8),
-                    mediaManager.textWidth(inputState.config.component_defaultFont, text)
+                    (mediaManager.getCMediaFontTextWidth(inputState.config.component_defaultFont, caption) + 8),
+                    mediaManager.getCMediaFontTextWidth(inputState.config.component_defaultFont, text)
             );
 
             int width = Math.clamp(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
@@ -4783,7 +4783,7 @@ public class API {
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Math.clamp(windowMinWidth, 11, Integer.MAX_VALUE);
             int wnd_width = Math.clamp(
-                    MathUtils.round(mediaManager.textWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
+                    MathUtils.round(mediaManager.getCMediaFontTextWidth(inputState.config.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
                     windowMinWidth, Integer.MAX_VALUE);
             int wnd_height = 5;
             if (showOKButton) wnd_height++;

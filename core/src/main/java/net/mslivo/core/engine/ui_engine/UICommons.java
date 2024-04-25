@@ -569,7 +569,7 @@ class UICommons {
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
-            int w = mediaManager.textWidth(contextMenuItem.font, contextMenuItem.text);
+            int w = mediaManager.getCMediaFontTextWidth(contextMenuItem.font, contextMenuItem.text);
             if (contextMenuItem.icon != null) w = w + UIEngine.TILE_SIZE;
             if (w > textwidth) textwidth = w;
         }
@@ -650,14 +650,14 @@ class UICommons {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
-            imageButton.contentOffset_x = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.imageWidth(imageButton.image)) / 2f);
-            imageButton.contentOffset_y = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.imageHeight(imageButton.image)) / 2f);
+            imageButton.contentOffset_x = MathUtils.round(((imageButton.width * UIEngine.TILE_SIZE) - mediaManager.getCMediaSpriteWidth(imageButton.image)) / 2f);
+            imageButton.contentOffset_y = MathUtils.round(((imageButton.height * UIEngine.TILE_SIZE) - mediaManager.getCMediaSpriteHeight(imageButton.image)) / 2f);
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.icon != null ? UIEngine.TILE_SIZE : 0;
-            int contentWidth = mediaManager.textWidth(textButton.font, textButton.text) + 1 + iconWidth;
-            int contentHeight = mediaManager.textHeight(textButton.font, textButton.text);
+            int contentWidth = mediaManager.getCMediaFontTextWidth(textButton.font, textButton.text) + 1 + iconWidth;
+            int contentHeight = mediaManager.getCMediaFontTextHeight(textButton.font, textButton.text);
             textButton.contentOffset_x = MathUtils.round(((textButton.width * UIEngine.TILE_SIZE) - contentWidth) / 2f);
             textButton.contentOffset_y = MathUtils.round((((textButton.height * UIEngine.TILE_SIZE) - contentHeight)) / 2f) - 2;
         }
@@ -697,8 +697,8 @@ class UICommons {
         } else {
             String subContent = textField.content.substring(textField.offset, textField.markerPosition);
             int width = (textField.width * UIEngine.TILE_SIZE) - 4;
-            if (mediaManager.textWidth(textField.font, subContent) > width) {
-                while (mediaManager.textWidth(textField.font, subContent) > width) {
+            if (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
+                while (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
                     textField.offset++;
                     subContent = textField.content.substring(textField.offset, textField.markerPosition);
                 }
@@ -1159,7 +1159,7 @@ class UICommons {
     static void text_updateSize(MediaManager mediaManager, Text text) {
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
-            int widthT = mediaManager.textWidth(text.font, text.lines[i]);
+            int widthT = mediaManager.getCMediaFontTextWidth(text.font, text.lines[i]);
             if (widthT > width) width = widthT;
         }
         text.width = width / UIEngine.TILE_SIZE;
@@ -1172,8 +1172,8 @@ class UICommons {
     }
 
     static void image_updateSize(MediaManager mediaManager, Image imageC) {
-        imageC.width = imageC.image != null ? mediaManager.imageWidth(imageC.image) / UIEngine.TILE_SIZE : 0;
-        imageC.height = imageC.image != null ? mediaManager.imageHeight(imageC.image) / UIEngine.TILE_SIZE : 0;
+        imageC.width = imageC.image != null ? mediaManager.getCMediaSpriteWidth(imageC.image) / UIEngine.TILE_SIZE : 0;
+        imageC.height = imageC.image != null ? mediaManager.getCMediaSpriteHeight(imageC.image) / UIEngine.TILE_SIZE : 0;
     }
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
