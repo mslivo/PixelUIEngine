@@ -554,13 +554,13 @@ public class API {
                 appViewPort.updateTime = Math.clamp(updateTime, 0, Integer.MAX_VALUE);
             }
 
-            public void setPosition(AppViewPort appViewPort,float x, float y) {
+            public void setCamPosition(AppViewPort appViewPort,float x, float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera, x, y);
             }
 
 
-            public void move(AppViewPort appViewPort,float x, float y) {
+            public void moveCam(AppViewPort appViewPort,float x, float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
@@ -568,7 +568,7 @@ public class API {
                 );
             }
 
-            public void setX(AppViewPort appViewPort,float x) {
+            public void setCamX(AppViewPort appViewPort,float x) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         x,
@@ -576,7 +576,7 @@ public class API {
                 );
             }
 
-            public void moveX(AppViewPort appViewPort,float x) {
+            public void moveCamX(AppViewPort appViewPort,float x) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
@@ -584,7 +584,7 @@ public class API {
                 );
             }
 
-            public void setY(AppViewPort appViewPort,float y) {
+            public void setCamY(AppViewPort appViewPort,float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
@@ -592,7 +592,7 @@ public class API {
                 );
             }
 
-            public void moveY(AppViewPort appViewPort,float y) {
+            public void moveCamY(AppViewPort appViewPort,float y) {
                 if(appViewPort == null)return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
@@ -600,7 +600,7 @@ public class API {
                 );
             }
 
-            public void setZoom(AppViewPort appViewPort,float zoom) {
+            public void setCamZoom(AppViewPort appViewPort,float zoom) {
                 if(appViewPort == null)return;
                 UICommons.camera_setZoom(appViewPort.camera, zoom);
             }
