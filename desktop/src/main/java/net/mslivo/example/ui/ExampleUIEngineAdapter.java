@@ -58,7 +58,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(api), "Example Window", mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(), "Example Window", mediaManager));
             }
         }, null, 0, ButtonMode.DEFAULT);
 

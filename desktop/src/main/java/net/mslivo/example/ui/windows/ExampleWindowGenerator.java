@@ -50,16 +50,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-public class ExampleWindowGenerator extends WindowGenerator {
-
-    public ExampleWindowGenerator(API api) {
-        super(api);
-    }
+public class ExampleWindowGenerator implements WindowGenerator {
 
     private MediaManager mediaManager;
 
     @Override
-    public Window create(Object[] p) {
+    public Window create(API api, Object[] p) {
         String title = (String) p[0];
         this.mediaManager = (MediaManager) p[1];
         /* Window */
@@ -70,13 +66,13 @@ public class ExampleWindowGenerator extends WindowGenerator {
         api.window.center(window);
 
         /* List / Inventory */
-        ArrayList<Component> components_tab1 = createTab1(window);
+        ArrayList<Component> components_tab1 = createTab1(api,window);
         /* Button, Text, Image */
-        ArrayList<Component> components_tab2 = createTab2(window);
+        ArrayList<Component> components_tab2 = createTab2(api,window);
         /* Slider */
-        ArrayList<Component> components_tab3 = createTab3(window);
+        ArrayList<Component> components_tab3 = createTab3(api,window);
         /* Font */
-        ArrayList<Component> components_tab4 = createTab4(window);
+        ArrayList<Component> components_tab4 = createTab4(api,window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
         tabs.add(api.component.tabBar.tab.create("Tab I", ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE, 0, components_tab1.toArray(new Component[]{})));
@@ -94,7 +90,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
     }
 
 
-    private ArrayList<Component> createTab4(Window window) {
+    private ArrayList<Component> createTab4(API api,Window window) {
         Text text1 = api.component.text.create(2, 6, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
         Text text2 = api.component.text.create(2, 5, new String[]{"abcdefghijklmnopqrstuvwxyz"});
         Text text3 = api.component.text.create(2, 4, new String[]{"0123456789"});
@@ -106,7 +102,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
         return components;
     }
 
-    private ArrayList<Component> createTab3(Window window) {
+    private ArrayList<Component> createTab3(API api,Window window) {
 
         ScrollBarVertical scrollBarVertical = api.component.scrollBar.verticalScrollbar.create(2, 2, 12, new ScrollBarAction() {
             @Override
@@ -309,7 +305,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
     }
 
 
-    private ArrayList<Component> createTab2(Window window) {
+    private ArrayList<Component> createTab2(API api,Window window) {
         ArrayList<Component> components = new ArrayList<>();
 
         // Text Buttons Tab
@@ -486,7 +482,7 @@ public class ExampleWindowGenerator extends WindowGenerator {
     }
 
 
-    private ArrayList<Component> createTab1(Window window) {
+    private ArrayList<Component> createTab1(API api,Window window) {
 
         ArrayList<Component> components = new ArrayList<>();
 

@@ -298,10 +298,9 @@ public class API {
             if (includeWindow) setColor(window, color);
         }
 
-
         public Window createFromGenerator(WindowGenerator windowGenerator, Object... params) {
             if (windowGenerator == null) return null;
-            return windowGenerator.create(params);
+            return windowGenerator.create(API.this, params);
         }
 
         public void addComponent(Window window, Component component) {
