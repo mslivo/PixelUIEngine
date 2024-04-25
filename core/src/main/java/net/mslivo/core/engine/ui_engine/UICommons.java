@@ -265,13 +265,19 @@ class UICommons {
 
     static void window_removeFromScreen(InputState inputState, Window window) {
         if (!window.addedToScreen) return;
+
+        // Remove References
         if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
         if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow == window) inputState.modalWindow = null;
+        for(int i=0;i<window.components.size();i++) if(window.components.get(i) instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
+        resetActivelyUsedUIReferences(inputState);
+
+        // Remove
         window.addedToScreen = false;
         inputState.windows.remove(window);
-        resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onRemove();
-        // Add Next Modal if in queue
+
+        // Add Next Modal from Queue queue
         if (inputState.modalWindowQueue.size() > 0)
             window_addToScreenAsModal(inputState, inputState.modalWindowQueue.poll());
     }
@@ -797,23 +803,31 @@ class UICommons {
     static void component_removeFromScreen(Component component, InputState inputState) {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
+
+        // Remove References
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
+        resetActivelyUsedUIReferences(inputState);
+
+        // Remove
         component.addedToScreen = true;
         inputState.screenComponents.remove(component);
-        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_removeFromWindow(Component component, Window window, InputState inputState) {
         if (component.addedToWindow != window) return;
         if (component.addedToScreen) return;
+
+        // Remove References
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
+        resetActivelyUsedUIReferences(inputState);
+
+        // Remove
         component.addedToWindow = null;
         component.addedToWindow.components.remove(component);
-        resetActivelyUsedUIReferences(inputState);
     }
 
     static void tab_removeComponent(Tab tab, Component component) {
