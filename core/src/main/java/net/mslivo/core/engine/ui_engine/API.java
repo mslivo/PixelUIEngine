@@ -503,9 +503,9 @@ public class API {
         public final _ComboBox comboBox = new _ComboBox();
         public final _ProgressBar progressBar = new _ProgressBar();
         public final _CheckBox checkBox = new _CheckBox();
-        public final _GameViewPort gameViewPort = new _GameViewPort();
+        public final _AppViewPort appViewPort = new _AppViewPort();
 
-        public class _GameViewPort {
+        public class _AppViewPort {
 
             public AppViewPort create(int x, int y, int width, int height) {
                 return create(x, y, width, height, null, 0, 0, 1f, inputState.config.component_appViewportDefaultUpdateTime);
@@ -3777,8 +3777,8 @@ public class API {
                 return inputState.config.component_appViewportDefaultUpdateTime;
             }
 
-            public void setAppViewportDefaultUpdateTime(int gameViewport_defaultUpdateTime) {
-                inputState.config.component_appViewportDefaultUpdateTime = gameViewport_defaultUpdateTime;
+            public void setAppViewportDefaultUpdateTime(int appViewport_defaultUpdateTime) {
+                inputState.config.component_appViewportDefaultUpdateTime = appViewport_defaultUpdateTime;
             }
 
             public float getListDragAlpha() {

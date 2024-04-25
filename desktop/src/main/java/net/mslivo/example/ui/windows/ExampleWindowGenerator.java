@@ -269,7 +269,7 @@ public class ExampleWindowGenerator implements WindowGenerator {
 
         CheckBox checkBox2 = api.component.checkBox.create(18, 2, "Radio", CheckBoxStyle.RADIO);
 
-        AppViewPort appViewPort = api.component.gameViewPort.create(29, 9, 4, 4, null, 100, 100, 1);
+        AppViewPort appViewPort = api.component.appViewPort.create(29, 9, 4, 4, null, 100, 100, 1);
 
         TextField osKeyBoardTextInput = api.component.textField.create(18, 13, 10, "", null, 128);
         api.component.textField.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
