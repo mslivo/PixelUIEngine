@@ -248,6 +248,7 @@ class UICommons {
         inputState.windows.add(window);
         resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onAdd();
+        window_enforceScreenBounds(inputState, window);
     }
 
     static boolean window_close(InputState inputState, Window window) {
