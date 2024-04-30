@@ -15,8 +15,8 @@ import com.badlogic.gdx.utils.LongArray;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.enums.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
@@ -24,7 +24,6 @@ import net.mslivo.core.engine.ui_engine.input.InputMethod;
 import net.mslivo.core.engine.ui_engine.input.KeyCode;
 import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
@@ -54,6 +53,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.generator.*;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.notification.STATE_NOTIFICATION;
@@ -298,9 +298,29 @@ public class API {
             if (includeWindow) setColor(window, color);
         }
 
-        public Window createFromGenerator(WindowGenerator windowGenerator, Object... params) {
+        public <P1> Window createFromGenerator(WindowGeneratorP1<P1> windowGenerator, P1 p1) {
             if (windowGenerator == null) return null;
-            return windowGenerator.create(API.this, params);
+            return windowGenerator.createWindow(API.this, p1);
+        }
+
+        public <P1, P2> Window createFromGenerator(WindowGeneratorP2<P1, P2> windowGenerator, P1 p1, P2 p2) {
+            if (windowGenerator == null) return null;
+            return windowGenerator.createWindow(API.this, p1, p2);
+        }
+
+        public <P1, P2, P3> Window createFromGenerator(WindowGeneratorP3<P1, P2, P3> windowGenerator, P1 p1, P2 p2, P3 p3) {
+            if (windowGenerator == null) return null;
+            return windowGenerator.createWindow(API.this, p1, p2, p3);
+        }
+
+        public <P1, P2, P3, P4> Window createFromGenerator(WindowGeneratorP4<P1, P2, P3, P4> windowGenerator, P1 p1, P2 p2, P3 p3, P4 p4) {
+            if (windowGenerator == null) return null;
+            return windowGenerator.createWindow(API.this, p1, p2, p3, p4);
+        }
+
+        public <P1, P2, P3, P4, P5> Window createFromGenerator(WindowGeneratorP5<P1, P2, P3, P4, P5> windowGenerator, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+            if (windowGenerator == null) return null;
+            return windowGenerator.createWindow(API.this, p1, p2, p3, p4, p5);
         }
 
         public void addComponent(Window window, Component component) {
@@ -554,54 +574,54 @@ public class API {
                 appViewPort.updateTime = Math.clamp(updateTime, 0, Integer.MAX_VALUE);
             }
 
-            public void setCamPosition(AppViewPort appViewPort,float x, float y) {
-                if(appViewPort == null)return;
+            public void setCamPosition(AppViewPort appViewPort, float x, float y) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera, x, y);
             }
 
 
-            public void moveCam(AppViewPort appViewPort,float x, float y) {
-                if(appViewPort == null)return;
+            public void moveCam(AppViewPort appViewPort, float x, float y) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
                         (appViewPort.camera.position.y + y)
                 );
             }
 
-            public void setCamX(AppViewPort appViewPort,float x) {
-                if(appViewPort == null)return;
+            public void setCamX(AppViewPort appViewPort, float x) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         x,
                         appViewPort.camera.position.y
                 );
             }
 
-            public void moveCamX(AppViewPort appViewPort,float x) {
-                if(appViewPort == null)return;
+            public void moveCamX(AppViewPort appViewPort, float x) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         (appViewPort.camera.position.x + x),
                         appViewPort.camera.position.y
                 );
             }
 
-            public void setCamY(AppViewPort appViewPort,float y) {
-                if(appViewPort == null)return;
+            public void setCamY(AppViewPort appViewPort, float y) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
                         y
                 );
             }
 
-            public void moveCamY(AppViewPort appViewPort,float y) {
-                if(appViewPort == null)return;
+            public void moveCamY(AppViewPort appViewPort, float y) {
+                if (appViewPort == null) return;
                 UICommons.camera_setPosition(appViewPort.camera,
                         appViewPort.camera.position.x,
                         (appViewPort.camera.position.y + y)
                 );
             }
 
-            public void setCamZoom(AppViewPort appViewPort,float zoom) {
-                if(appViewPort == null)return;
+            public void setCamZoom(AppViewPort appViewPort, float zoom) {
+                if (appViewPort == null) return;
                 UICommons.camera_setZoom(appViewPort.camera, zoom);
             }
 
@@ -1564,7 +1584,7 @@ public class API {
 
                 public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
                     if (canvasImage == null) return;
-                    canvasImage.arrayIndex = Math.clamp(arrayIndex, 0,Integer.MAX_VALUE);
+                    canvasImage.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 }
 
                 public void setName(CanvasImage canvasImage, String name) {
@@ -2191,10 +2211,10 @@ public class API {
 
         public void setColor(Component component, float r, float g, float b, float a) {
             if (component == null) return;
-            component.color_r = Math.clamp(r,0f,1f);
-            component.color_g = Math.clamp(g,0f,1f);
-            component.color_b = Math.clamp(b,0f,1f);
-            component.color_a = Math.clamp(a,0f,1f);
+            component.color_r = Math.clamp(r, 0f, 1f);
+            component.color_g = Math.clamp(g, 0f, 1f);
+            component.color_b = Math.clamp(b, 0f, 1f);
+            component.color_a = Math.clamp(a, 0f, 1f);
         }
 
         public void setColor2(Component[] components, Color color2) {
@@ -2209,9 +2229,9 @@ public class API {
 
         public void setColor2(Component component, float r, float g, float b) {
             if (component == null) return;
-            component.color2_r = Math.clamp(r,0f,1f);
-            component.color2_g = Math.clamp(g,0f,1f);
-            component.color2_b = Math.clamp(b,0f,1f);
+            component.color2_r = Math.clamp(r, 0f, 1f);
+            component.color2_g = Math.clamp(g, 0f, 1f);
+            component.color2_b = Math.clamp(b, 0f, 1f);
         }
 
         public void setColor1And2(Component component, Color color) {
@@ -2230,7 +2250,7 @@ public class API {
 
         public void setAlpha(Component component, float alpha) {
             if (component == null) return;
-            component.color_a = Math.clamp(alpha,0f,1f);
+            component.color_a = Math.clamp(alpha, 0f, 1f);
         }
 
         public void setAlpha(Component[] components, float alpha) {

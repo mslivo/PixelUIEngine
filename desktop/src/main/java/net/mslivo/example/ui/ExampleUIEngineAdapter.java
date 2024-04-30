@@ -20,7 +20,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
-import net.mslivo.example.ui.windows.ExampleWindowGenerator;
+import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private static final boolean IM_PERFORMANCE_TEST = false;
@@ -58,7 +58,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.window.createFromGenerator(new ExampleWindowGenerator(), "Example Window", mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window", mediaManager));
             }
         }, null, 0, ButtonMode.DEFAULT);
 

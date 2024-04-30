@@ -13,7 +13,6 @@ import net.mslivo.core.engine.ui_engine.UIBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.WindowGenerator;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
@@ -41,6 +40,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.TextField;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
@@ -50,14 +50,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-public class ExampleWindowGenerator implements WindowGenerator {
+public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaManager> {
 
     private MediaManager mediaManager;
 
     @Override
-    public Window create(API api, Object[] p) {
-        String title = (String) p[0];
-        this.mediaManager = (MediaManager) p[1];
+    public Window createWindow(API api, String title, MediaManager mediaManager) {
+        this.mediaManager = mediaManager;
+
         /* Window */
         Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.ICON_EXAMPLE_WINDOW, 0);
         api.window.setEnforceScreenBounds(window, true);
@@ -805,6 +805,8 @@ public class ExampleWindowGenerator implements WindowGenerator {
                 default -> throw new IllegalStateException("Unexpected value: " + MathUtils.random(1, 3));
             }));
     }
+
+
 
 
     class ListItem {
