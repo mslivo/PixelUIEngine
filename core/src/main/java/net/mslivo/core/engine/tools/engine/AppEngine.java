@@ -7,45 +7,52 @@ import java.util.ArrayDeque;
  * Sends input to adapter & gathers outputs using object pooling.
  */
 public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
-    static class EngineIO {
-        private int type;
-        private Object[] params;
+    public static final int PARAMETERS_MAX = 5;
+    private static final Object[] RESET_OBJECT = new Object[PARAMETERS_MAX];
+    private static final int[] RESET_INT = new int[PARAMETERS_MAX];
+    private static final float[] RESET_FLOAT = new float[PARAMETERS_MAX];
+    static {
+        for(int i=0;i<PARAMETERS_MAX;i++){
+            RESET_OBJECT[i] = null;
+            RESET_INT[i] = 0;
+            RESET_FLOAT[i] = 0;
+        }
     }
+
+    private long lastUpdateTime;
+    private long ticks;
+    private AppEngineIO lastOutput;
 
     private final A adapter;
     private final D data;
-    private final ArrayDeque<EngineIO> inputs;
-    private final ArrayDeque<EngineIO> inputPool;
-    private final ArrayDeque<EngineIO> outputs;
-    private final ArrayDeque<EngineIO> outputPool;
-    private int outputType;
-    private Object[] outputParams;
-    private long lastUpdateTime;
-    private long ticks;
+    private final ArrayDeque<AppEngineIO> inputs;
+    private final ArrayDeque<AppEngineIO> outputs;
+    private final ArrayDeque<AppEngineIO> engineIOPool;
+    private final AppEngineOutputQueue appEngineOutputQueue = new AppEngineOutputQueue() {
+        @Override
+        public AppEngineIO addOutput(int type) {
+            AppEngineIO appEngineIO = getAndResetEngineIOFromPool(type);
+            outputs.add(appEngineIO);
+            return appEngineIO;
+        }
+    };
 
     public AppEngine(A adapter, D data) {
         final String errorMessageNull = "Cannot initialize AppEngine: %s is null";
         if(data == null) throw new RuntimeException(String.format(errorMessageNull, "data"));
         if(adapter == null) throw new RuntimeException(String.format(errorMessageNull, "adapter"));
 
+        this.lastUpdateTime = 0;
+        this.lastOutput = null;
+        this.ticks = 0;
+
         this.data = data;
         this.inputs = new ArrayDeque<>();
-        this.inputPool = new ArrayDeque<>();
         this.outputs = new ArrayDeque<>();
-        this.outputPool = new ArrayDeque<>();
-        this.lastUpdateTime = 0;
-        this.outputType = -1;
-        this.outputParams = null;
-        // Start
+        this.engineIOPool = new ArrayDeque<>();
         this.adapter = adapter;
 
-        Output output = (type, params) -> {
-            EngineIO engineIO = outputPool.isEmpty() ? new EngineIO() : outputPool.poll() ;
-            engineIO.type = type;
-            engineIO.params = params;
-            outputs.add(engineIO);
-        };
-        this.adapter.init(this.data, output);
+        this.adapter.init(this.data, this.appEngineOutputQueue);
     }
 
     public long getTicks() {
@@ -56,54 +63,37 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         return lastUpdateTime;
     }
 
-    public void input(int type, Object... params) {
-        EngineIO engineIO = inputPool.isEmpty() ?  new EngineIO() : inputPool.poll();
+    private AppEngineIO getAndResetEngineIOFromPool(int type){
+        AppEngineIO engineIO = engineIOPool.isEmpty() ?  new AppEngineIO() : engineIOPool.poll();
         engineIO.type = type;
-        engineIO.params = params;
-        inputs.add(engineIO);
+        engineIO.readIndex = 0;
+        engineIO.writeIndex = 0;
+        System.arraycopy(RESET_OBJECT,0,engineIO.objectParams,0,PARAMETERS_MAX);
+        System.arraycopy(RESET_INT,0,engineIO.intParams,0,PARAMETERS_MAX);
+        System.arraycopy(RESET_FLOAT,0,engineIO.floatParams,0,PARAMETERS_MAX);
+        return engineIO;
     }
 
     public boolean outputAvailable() {
         return !this.outputs.isEmpty();
     }
 
-    public boolean nextOutput(){
+    public AppEngineIO processOutput(){
+        if(lastOutput != null) engineIOPool.add(lastOutput);
         if(outputAvailable()){
-            EngineIO engineIO = outputs.poll();
-            outputType = engineIO.type;
-            outputParams = engineIO.params;
-            outputPool.add(engineIO);
-            return true;
+            lastOutput = outputs.poll();
+            return lastOutput;
         }else{
-            this.outputType = -1;
-            this.outputParams = null;
-            return false;
+            lastOutput = null;
+            return null;
         }
     }
 
     public void clearOutputs() {
-        outputPool.addAll(this.outputs);
-        this.outputs.clear();
-        this.outputType = -1;
-        this.outputParams = null;
+        engineIOPool.addAll(outputs);
+        outputs.clear();
+        lastOutput = null;
     }
-
-    public int getOutputType() {
-        return outputType;
-    }
-
-    public Object[] getOutputParams() {
-        return outputParams;
-    }
-
-    public int getOutputParamsSize() {
-        return outputParams != null ? outputParams.length : 0;
-    }
-
-    public Object getOutputParam(int index) {
-        return (outputParams != null && index < outputParams.length) ? outputParams[index] : null;
-    }
-
 
     public A getAdapter() {
         return adapter;
@@ -116,10 +106,10 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     public void update() {
         adapter.beforeInputs();
         // Process Inputs
-        EngineIO engineIO;
+        AppEngineIO engineIO;
         while ((engineIO = this.inputs.pollFirst()) != null) {
-            adapter.processInput(engineIO.type, engineIO.params);
-            inputPool.add(engineIO);
+            adapter.processInput(engineIO);
+            engineIOPool.add(engineIO);
         }
         // Update Engine
         adapter.update();
@@ -131,6 +121,12 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         inputs.clear();
         outputs.clear();
         adapter.shutdown();
+    }
+
+    public AppEngineIO addInput(int type){
+        AppEngineIO appEngineIO = getAndResetEngineIOFromPool(type);
+        inputs.add(appEngineIO);
+        return appEngineIO;
     }
 
 }
