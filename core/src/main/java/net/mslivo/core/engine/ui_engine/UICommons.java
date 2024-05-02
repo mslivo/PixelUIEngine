@@ -926,6 +926,7 @@ class UICommons {
     static void comboBox_close(InputState inputState, ComboBox comboBox) {
         if (comboBox_isOpen(inputState, comboBox)) {
             inputState.openComboBox = null;
+            inputState.pressedComboBoxItem = null;
             if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
         }
     }
