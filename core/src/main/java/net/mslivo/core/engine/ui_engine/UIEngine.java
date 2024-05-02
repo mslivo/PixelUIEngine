@@ -203,14 +203,14 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.draggedWindow = null;
         newInputState.draggedWindow_offset = new GridPoint2();
         newInputState.pressedButton = null;
-        newInputState.turnedKnob = null;
+        newInputState.pressedKnob = null;
         newInputState.tooltip = null;
         newInputState.tooltip_fadeIn_pct = 0f;
         newInputState.tooltip_wait_delay = false;
         newInputState.tooltip_delay_timer = 0;
         newInputState.tooltip_fadeIn_timer = 0;
-        newInputState.scrolledScrollBarVertical = null;
-        newInputState.scrolledScrollBarHorizontal = null;
+        newInputState.pressedScrollBarVertical = null;
+        newInputState.pressedScrollBarHorizontal = null;
         newInputState.draggedGridItem = null;
         newInputState.draggedGrid = null;
         newInputState.draggedGridOffset = new GridPoint2();
@@ -1154,13 +1154,13 @@ public class UIEngine<T extends UIEngineAdapter> {
                             UICommons.scrollBar_pressButton(scrollBarVertical);
                             UICommons.scrollBar_scroll(scrollBarVertical,
                                     UICommons.scrollBar_calculateScrolled(scrollBarVertical, inputState.mouse_ui.x, inputState.mouse_ui.y));
-                            inputState.scrolledScrollBarVertical = scrollBarVertical;
+                            inputState.pressedScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollBarHorizontal scrollBarHorizontal -> {
                             UICommons.scrollBar_pressButton(scrollBarHorizontal);
                             UICommons.scrollBar_scroll(scrollBarHorizontal,
                                     UICommons.scrollBar_calculateScrolled(scrollBarHorizontal, inputState.mouse_ui.x, inputState.mouse_ui.y));
-                            inputState.scrolledScrollBarHorizontal = scrollBarHorizontal;
+                            inputState.pressedScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case ComboBox comboBox -> {
                             if (UICommons.comboBox_isOpen(inputState, comboBox)) {
@@ -1190,7 +1190,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                             }
                         }
                         case Knob knob -> {
-                            inputState.turnedKnob = knob;
+                            inputState.pressedKnob = knob;
                             if (knob.knobAction != null) knob.knobAction.onPress();
                         }
                         case Canvas canvas -> {
@@ -1268,7 +1268,6 @@ public class UIEngine<T extends UIEngineAdapter> {
                         UICommons.window_bringToFront(inputState, inputState.draggedWindow);
                     }
 
-
                     // Unfocus focused textfields
                     if (inputState.focusedTextField != null && lastUIMouseHover != inputState.focusedTextField) {
                         UICommons.textField_unFocus(inputState, inputState.focusedTextField);
@@ -1280,7 +1279,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     UICommons.comboBox_close(inputState, inputState.openComboBox);
                 }
 
-                // Hide displayed ContextMenus
+                // Close opened ContextMenus
                 if (inputState.openContextMenu != null) {
                     if (!(lastUIMouseHover instanceof ContextMenuItem contextMenuItem) || contextMenuItem.addedToContextMenu != inputState.openContextMenu) {
                         UICommons.contextMenu_close(inputState, inputState.openContextMenu);
@@ -1307,24 +1306,19 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
         // ------ MOUSE UP ------
         if (inputState.inputEvents.mouseUp) {
-            // Used interaction
-            boolean processMouseUpUsed = true;
-            boolean processMouseUpDragged = true;
             Object lastUIMouseHover = inputState.lastUIMouseHover;
-            Object usedUIObject = UICommons.getUsedUIReference(inputState);
-            if (usedUIObject == null) processMouseUpUsed = false;
+            boolean processMouseUpPressed = true;
+            boolean processMouseUpDragged = true;
+            // Press interaction
+            Object pressedUIObject = UICommons.getPressedUIReference(inputState);
+            if (pressedUIObject == null) processMouseUpPressed = false;
             // Drag interaction
             Object draggedUIObject = UICommons.getDraggedUIReference(inputState);
             if (draggedUIObject == null) processMouseUpDragged = false;
 
 
-            if (processMouseUpUsed) {
-                switch (usedUIObject) {
-                    case Window __ -> {
-                        inputState.draggedWindow_offset.x = 0;
-                        inputState.draggedWindow_offset.y = 0;
-                        inputState.draggedWindow = null;
-                    }
+            if (processMouseUpPressed) {
+                switch (pressedUIObject) {
                     case Canvas canvas -> {
                         if (canvas.canvasAction != null) canvas.canvasAction.onRelease();
                         inputState.pressedCanvas = null;
@@ -1333,11 +1327,6 @@ public class UIEngine<T extends UIEngineAdapter> {
                         UICommons.contextMenu_selectItem(inputState, contextMenuItem);
                         inputState.pressedContextMenuItem = null;
                     }
-                    case CheckBox checkBox -> {
-                        checkBox.checked = !checkBox.checked;
-                        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
-                        inputState.pressedCheckBox = null;
-                    }
                     case ComboBoxItem comboBoxItem -> {
                         UICommons.comboBox_selectItem(inputState, comboBoxItem);
                         if (inputState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
@@ -1345,6 +1334,11 @@ public class UIEngine<T extends UIEngineAdapter> {
                             inputState.mouse_emulated.y = UICommons.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TILE_SIZE_2;
                         }
                         inputState.pressedComboBoxItem = null;
+                    }
+                    case CheckBox checkBox -> {
+                        checkBox.checked = !checkBox.checked;
+                        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                        inputState.pressedCheckBox = null;
                     }
                     case TextField textField -> {
                         // Set Marker to mouse position
@@ -1370,6 +1364,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         // Set Focus
                         UICommons.textField_focus(inputState, textField);
                         inputState.pressedTextField = null;
+                        inputState.pressedTextFieldMouseX = 0;
                     }
                     case AppViewPort appViewPort -> {
                         if (appViewPort.appViewPortAction != null)
@@ -1382,18 +1377,18 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                     case ScrollBarVertical scrollBarVertical -> {
                         UICommons.scrollBar_releaseButton(scrollBarVertical);
-                        inputState.scrolledScrollBarVertical = null;
+                        inputState.pressedScrollBarVertical = null;
                     }
                     case ScrollBarHorizontal scrollBarHorizontal -> {
                         UICommons.scrollBar_releaseButton(scrollBarHorizontal);
-                        inputState.scrolledScrollBarHorizontal = null;
+                        inputState.pressedScrollBarHorizontal = null;
                     }
                     case Knob knob -> {
                         if (knob.knobAction != null) knob.knobAction.onRelease();
-                        inputState.turnedKnob = null;
+                        inputState.pressedKnob = null;
                     }
                     case Grid __ -> {
-                        boolean isHoverObject = lastUIMouseHover == usedUIObject;
+                        boolean isHoverObject = lastUIMouseHover == pressedUIObject;
                         if (isHoverObject) {
                             if (inputState.pressedGridItem != null) {
                                 inputState.pressedGrid.gridAction.onItemSelected(inputState.pressedGridItem);
@@ -1405,7 +1400,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         inputState.pressedGridItem = null;
                     }
                     case List list -> {
-                        boolean isHoverObject = lastUIMouseHover == usedUIObject;
+                        boolean isHoverObject = lastUIMouseHover == pressedUIObject;
                         if (isHoverObject) {
                             if (inputState.pressedListItem != null) {
                                 if (list.multiSelect) {
@@ -1436,10 +1431,14 @@ public class UIEngine<T extends UIEngineAdapter> {
                     case null, default -> {
                     }
                 }
-                UICommons.setMouseInteractedUIObject(inputState, usedUIObject);
+                UICommons.setMouseInteractedUIObject(inputState, pressedUIObject);
             }
             if (processMouseUpDragged) {
                 switch (draggedUIObject) {
+                    case Window __ -> {
+                        inputState.draggedWindow_offset.set(0,0);
+                        inputState.draggedWindow = null;
+                    }
                     case List list -> {
                         int dragFromIndex = inputState.draggedListFromIndex;
                         Object dragItem = inputState.draggedListItem;
@@ -1471,10 +1470,11 @@ public class UIEngine<T extends UIEngineAdapter> {
                                     inputState.mouse_ui.y
                             );
                         }
-                        inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
-                        inputState.draggedListFromIndex = 0;
-                        inputState.draggedListItem = null;
+                        // reset
                         inputState.draggedList = null;
+                        inputState.draggedListFromIndex = 0;
+                        inputState.draggedListOffsetX.set(0, 0);
+                        inputState.draggedListItem = null;
                     }
                     case Grid grid -> {
                         int dragFromX = inputState.draggedGridFrom.x;
@@ -1510,11 +1510,11 @@ public class UIEngine<T extends UIEngineAdapter> {
                                         inputState.mouse_ui.y
                                 );
                         }
-                        inputState.draggedGridOffset.x = inputState.draggedGridOffset.y = 0;
-                        inputState.draggedGridFrom.x = inputState.draggedGridFrom.y = 0;
-                        inputState.draggedGridItem = null;
+                        // reset
                         inputState.draggedGrid = null;
-
+                        inputState.draggedGridFrom.set(0, 0);
+                        inputState.draggedGridOffset.set(0, 0);
+                        inputState.draggedGridItem = null;
                     }
                     case null, default -> {
                     }
@@ -1524,7 +1524,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             }
 
             // MouseTool Interaction
-            if(!processMouseUpUsed && !processMouseUpDragged) {
+            if(!processMouseUpPressed && !processMouseUpDragged) {
                 if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                     MouseTool pressedMouseTool = inputState.mouseTool;
                     if (pressedMouseTool.mouseToolAction != null) {
@@ -1540,21 +1540,18 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
         // ------ MOUSE DRAGGED ------
         if (inputState.inputEvents.mouseDragged) {
-            // Active UI Element Interaction
-            boolean processMouseDraggedUsed = true;
-            Object usedUIObject = UICommons.getUsedUIReference(inputState);
-            if(usedUIObject == null) processMouseDraggedUsed = false;
+            Object lastUIMouseHover = inputState.lastUIMouseHover;
+            boolean processMouseDraggedPressed = true;
+            boolean processMouseDraggedDragged = true;
+            // Press interaction
+            Object pressedUIObject = UICommons.getPressedUIReference(inputState);
+            if (pressedUIObject == null) processMouseDraggedPressed = false;
+            // Drag interaction
+            Object draggedUIObject = UICommons.getDraggedUIReference(inputState);
+            if (draggedUIObject == null) processMouseDraggedDragged = false;
 
-            if (processMouseDraggedUsed) {
-                switch (usedUIObject) {
-                    case Window draggedWindow -> {
-                        UICommons.window_setPosition(inputState, draggedWindow,
-                                inputState.mouse_ui.x - inputState.draggedWindow_offset.x,
-                                inputState.mouse_ui.y - inputState.draggedWindow_offset.y);
-
-                        if (draggedWindow.windowAction != null)
-                            draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
-                    }
+            if (processMouseDraggedPressed) {
+                switch (pressedUIObject) {
                     case ScrollBarVertical scrolledScrollBarVertical -> {
                         UICommons.scrollBar_scroll(scrolledScrollBarVertical, UICommons.scrollBar_calculateScrolled(scrolledScrollBarVertical, inputState.mouse_ui.x, inputState.mouse_ui.y));
                     }
@@ -1573,8 +1570,25 @@ public class UIEngine<T extends UIEngineAdapter> {
                     case null, default -> {
                     }
                 }
-                UICommons.setMouseInteractedUIObject(inputState, usedUIObject);
-            }else{
+                UICommons.setMouseInteractedUIObject(inputState, pressedUIObject);
+            }
+            if (processMouseDraggedDragged) {
+                switch (draggedUIObject) {
+                    case Window draggedWindow -> {
+                        UICommons.window_setPosition(inputState, draggedWindow,
+                                inputState.mouse_ui.x - inputState.draggedWindow_offset.x,
+                                inputState.mouse_ui.y - inputState.draggedWindow_offset.y);
+
+                        if (draggedWindow.windowAction != null)
+                            draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
+                    }
+                    case null, default -> {
+                    }
+                }
+                UICommons.setMouseInteractedUIObject(inputState, draggedUIObject);
+            }
+
+            if(!processMouseDraggedPressed && !processMouseDraggedDragged){
                 // Mouse Tool Interaction
                 if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                     MouseTool draggedMouseTool = inputState.mouseTool;

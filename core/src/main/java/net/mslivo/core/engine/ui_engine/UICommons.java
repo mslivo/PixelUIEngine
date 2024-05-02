@@ -246,7 +246,6 @@ class UICommons {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         inputState.windows.add(window);
-        resetActivelyUsedUIReferences(inputState);
         if (window.windowAction != null) window.windowAction.onAdd();
         window_enforceScreenBounds(inputState, window);
     }
@@ -270,8 +269,10 @@ class UICommons {
         // Remove References
         if (inputState.lastUIMouseHover == window) inputState.lastUIMouseHover = null;
         if (UICommons.window_isModalOpen(inputState) && inputState.modalWindow == window) inputState.modalWindow = null;
-        for(int i=0;i<window.components.size();i++) if(window.components.get(i) instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
-        resetActivelyUsedUIReferences(inputState);
+        for (int i = 0; i < window.components.size(); i++)
+            if (window.components.get(i) instanceof AppViewPort appViewPort)
+                inputState.appViewPorts.remove(appViewPort);
+        window_resetReferences(inputState, window);
 
         // Remove
         window.addedToScreen = false;
@@ -433,95 +434,66 @@ class UICommons {
         if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(false);
     }
 
-    static void resetActivelyUsedUIReferences(InputState inputState) {
-        // Window
-        inputState.draggedWindow = null;
-        inputState.draggedWindow_offset.x = inputState.draggedWindow_offset.y = 0;
-
-        // Buton
-        inputState.pressedButton = null;
-
-        // Scrollbar
-        inputState.scrolledScrollBarVertical = null;
-        inputState.scrolledScrollBarHorizontal = null;
-
-        // ToolTip
-        inputState.tooltip = null;
-        inputState.tooltip_fadeIn_pct = 0f;
-        inputState.tooltip_wait_delay = false;
-        inputState.tooltip_delay_timer = 0;
-        inputState.tooltip_fadeIn_timer = 0;
-        inputState.tooltip_lastHoverObject = null;
-        inputState.appToolTip = null;
-
-        // Knob
-        inputState.turnedKnob = null;
-
-        // Map
-        inputState.pressedCanvas = null;
-
-        // AppViewport
-        inputState.pressedAppViewPort = null;
-
-        // TextField
-        inputState.pressedTextField = null;
-        inputState.pressedTextFieldMouseX = 0;
-
-        // Grid
-        inputState.draggedGrid = null;
-        inputState.draggedGridFrom.x = inputState.draggedGridFrom.y = 0;
-        inputState.draggedGridOffset.x = inputState.draggedGridOffset.y = 0;
-        inputState.draggedGridItem = null;
-        inputState.pressedGrid = null;
-        inputState.pressedGridItem = null;
-
-        // List
-        inputState.draggedList = null;
-        inputState.draggedListFromIndex = 0;
-        inputState.draggedListOffsetX.x = inputState.draggedListOffsetX.y = 0;
-        inputState.draggedListItem = null;
-        inputState.pressedList = null;
-        inputState.pressedListItem = null;
-
-        // Textfield
-        inputState.focusedTextField = null;
-        inputState.focusedTextField_repeatedKey = KeyCode.NONE;
-        inputState.focusedTextField_repeatedKeyTimer = 0;
-
-        // ComboBox
-        inputState.openComboBox = null;
-        inputState.pressedComboBoxItem = null;
-
-        // ContextMenu
-        inputState.openContextMenu = null;
-        inputState.displayedContextMenuWidth = 0;
-        inputState.pressedContextMenuItem = null;
-
-        // Checkbox
-        inputState.pressedCheckBox = null;
-
-        // mouseTextInput Keyboard
-        inputState.openMouseTextInput = null;
-        inputState.mTextInputMouse1Pressed = false;
-        inputState.mTextInputMouse2Pressed = false;
-        inputState.mTextInputMouse3Pressed = false;
-        inputState.mTextInputGamePadLeft = false;
-        inputState.mTextInputGamePadRight = false;
-        inputState.mTextInputScrollTimer = 0;
-        inputState.mTextInputScrollTime = 0;
-        inputState.mTextInputScrollSpeed = 0;
-        inputState.mTextInputTranslatedMouse1Down = false;
-        inputState.mTextInputTranslatedMouse2Down = false;
-        inputState.mTextInputTranslatedMouse3Down = false;
-        inputState.mTextInputUnlock = false;
+    static void window_resetReferences(InputState inputState, Window window) {
+        if(inputState.draggedWindow == window){
+            inputState.draggedWindow = null;
+            inputState.draggedWindow_offset.set(0,0);
+        }
     }
 
-    static Object getUsedUIReference(InputState inputState) {
+    static void component_resetReferences(InputState inputState, Component component) {
+        if (inputState.pressedButton == component) inputState.pressedButton = null;
+        if (inputState.pressedScrollBarVertical == component) inputState.pressedScrollBarVertical = null;
+        if (inputState.pressedScrollBarHorizontal == component) inputState.pressedScrollBarHorizontal = null;
+        if (inputState.pressedKnob == component) inputState.pressedKnob = null;
+        if (inputState.pressedCanvas == component) inputState.pressedCanvas = null;
+        if (inputState.pressedAppViewPort == component) inputState.pressedAppViewPort = null;
+        if (inputState.pressedTextField == component) {
+            inputState.pressedTextField = null;
+            inputState.pressedTextFieldMouseX = 0;
+        }
+        if (inputState.focusedTextField == component) {
+            inputState.focusedTextField = null;
+            inputState.focusedTextField_repeatedKey = KeyCode.NONE;
+            inputState.focusedTextField_repeatedKeyTimer = 0;
+        }
+        if (inputState.draggedGrid == component) {
+            inputState.draggedGrid = null;
+            inputState.draggedGridFrom.set(0, 0);
+            inputState.draggedGridOffset.set(0, 0);
+            inputState.draggedGridItem = null;
+            inputState.pressedGrid = null;
+            inputState.pressedGridItem = null;
+        }
+        if (inputState.draggedList == component) {
+            inputState.draggedList = null;
+            inputState.draggedListFromIndex = 0;
+            inputState.draggedListOffsetX.set(0, 0);
+            inputState.draggedListItem = null;
+            inputState.pressedList = null;
+            inputState.pressedListItem = null;
+        }
+        if (inputState.openComboBox == component) {
+            inputState.openComboBox = null;
+            inputState.pressedComboBoxItem = null;
+        }
+        if (inputState.pressedCheckBox == component) {
+            inputState.pressedCheckBox = null;
+        }
+    }
+
+    static Object getDraggedUIReference(InputState inputState) {
         if (inputState.draggedWindow != null) return inputState.draggedWindow;
+        if (inputState.draggedGrid != null) return inputState.draggedGrid;
+        if (inputState.draggedList != null) return inputState.draggedList;
+        return null;
+    }
+
+    static Object getPressedUIReference(InputState inputState) {
         if (inputState.pressedButton != null) return inputState.pressedButton;
-        if (inputState.scrolledScrollBarHorizontal != null) return inputState.scrolledScrollBarHorizontal;
-        if (inputState.scrolledScrollBarVertical != null) return inputState.scrolledScrollBarVertical;
-        if (inputState.turnedKnob != null) return inputState.turnedKnob;
+        if (inputState.pressedScrollBarHorizontal != null) return inputState.pressedScrollBarHorizontal;
+        if (inputState.pressedScrollBarVertical != null) return inputState.pressedScrollBarVertical;
+        if (inputState.pressedKnob != null) return inputState.pressedKnob;
         if (inputState.pressedCanvas != null) return inputState.pressedCanvas;
         if (inputState.pressedTextField != null) return inputState.pressedTextField;
         if (inputState.pressedAppViewPort != null) return inputState.pressedAppViewPort;
@@ -533,19 +505,12 @@ class UICommons {
         return null;
     }
 
-    static void setMouseInteractedUIObject(InputState inputState, Object object){
+    static void setMouseInteractedUIObject(InputState inputState, Object object) {
         inputState.mouseInteractedUIObjectFrame = object;
     }
 
-    static void setKeyboardInteractedUIObject(InputState inputState, Object object){
+    static void setKeyboardInteractedUIObject(InputState inputState, Object object) {
         inputState.keyboardInteractedUIObjectFrame = object;
-    }
-
-
-    static Object getDraggedUIReference(InputState inputState) {
-        if (inputState.draggedGrid != null) return inputState.draggedGrid;
-        if (inputState.draggedList != null) return inputState.draggedList;
-        return null;
     }
 
     static void notification_addToScreen(InputState inputState, Notification notification, int notificationsMax) {
@@ -599,6 +564,7 @@ class UICommons {
         if (contextMenu_isOpen(inputState, contextMenu)) {
             inputState.openContextMenu = null;
             inputState.displayedContextMenuWidth = 0;
+            inputState.pressedContextMenuItem = null;
             if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
         }
     }
@@ -679,7 +645,6 @@ class UICommons {
         }
     }
 
-
     static boolean grid_positionValid(Grid grid, int x, int y) {
         if (grid.items != null) {
             return x >= 0 && x < grid.items.length && y >= 0 && y < grid.items[0].length;
@@ -702,7 +667,6 @@ class UICommons {
             grid.height = 1;
         }
     }
-
 
     static void textField_setMarkerPosition(MediaManager mediaManager, TextField textField, int position) {
         textField.markerPosition = Math.clamp(position, 0, textField.content.length());
@@ -782,14 +746,12 @@ class UICommons {
         }
     }
 
-
     static void component_addToWindow(Component component, InputState inputState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.add(appViewPort);
         component.addedToWindow = window;
         window.components.add(component);
-        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_addToScreen(Component component, InputState inputState) {
@@ -798,7 +760,6 @@ class UICommons {
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.add(appViewPort);
         component.addedToScreen = true;
         inputState.screenComponents.add(component);
-        resetActivelyUsedUIReferences(inputState);
     }
 
     static void component_removeFromScreen(Component component, InputState inputState) {
@@ -809,7 +770,7 @@ class UICommons {
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
-        resetActivelyUsedUIReferences(inputState);
+        component_resetReferences(inputState, component);
 
         // Remove
         component.addedToScreen = true;
@@ -824,7 +785,7 @@ class UICommons {
         if (inputState.lastUIMouseHover == component) inputState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewPort appViewPort) inputState.appViewPorts.remove(appViewPort);
-        resetActivelyUsedUIReferences(inputState);
+        component_resetReferences(inputState, component);
 
         // Remove
         component.addedToWindow = null;
@@ -842,7 +803,6 @@ class UICommons {
         component.addedToTab = tab;
         tab.components.add(component);
     }
-
 
     static void tabBar_addTab(TabBar tabBar, Tab tab) {
         if (tab.addedToTabBar != null) return;
@@ -944,7 +904,6 @@ class UICommons {
         toolTipImage.addedToToolTip = null;
         toolTip.images.remove(toolTipImage);
     }
-
 
     static boolean comboBox_isOpen(InputState inputState, ComboBox comboBox) {
         return inputState.openComboBox != null && inputState.openComboBox == comboBox;

@@ -88,15 +88,15 @@ public class InputState {
     public Window draggedWindow;
     public GridPoint2 draggedWindow_offset;
     public Button pressedButton;
-    public ScrollBarVertical scrolledScrollBarVertical;
-    public ScrollBarHorizontal scrolledScrollBarHorizontal;
+    public ScrollBarVertical pressedScrollBarVertical;
+    public ScrollBarHorizontal pressedScrollBarHorizontal;
     public ToolTip tooltip;
     public float tooltip_fadeIn_pct;
     public boolean tooltip_wait_delay;
     public long tooltip_delay_timer, tooltip_fadeIn_timer;
     public ToolTip appToolTip;
     public Object tooltip_lastHoverObject;
-    public Knob turnedKnob;
+    public Knob pressedKnob;
     public Canvas pressedCanvas;
     public AppViewPort pressedAppViewPort;
     public TextField pressedTextField;
