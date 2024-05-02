@@ -1153,6 +1153,25 @@ class UICommons {
         }
     }
 
+
+    static void mouseTextInput_close(InputState inputState) {
+        // mouseTextInput Keyboard
+        inputState.openMouseTextInput = null;
+        inputState.mTextInputMouse1Pressed = false;
+        inputState.mTextInputMouse2Pressed = false;
+        inputState.mTextInputMouse3Pressed = false;
+        inputState.mTextInputGamePadLeft = false;
+        inputState.mTextInputGamePadRight = false;
+        inputState.mTextInputScrollTimer = 0;
+        inputState.mTextInputScrollTime = 0;
+        inputState.mTextInputScrollSpeed = 0;
+        inputState.mTextInputTranslatedMouse1Down = false;
+        inputState.mTextInputTranslatedMouse2Down = false;
+        inputState.mTextInputTranslatedMouse3Down = false;
+        inputState.mTextInputUnlock = false;
+    }
+
+
     static void mouseTextInput_setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
         if (charactersLC == null || charactersUC == null) return;
         int maxCharacters = Math.min(charactersLC.length, charactersUC.length);

@@ -2905,7 +2905,7 @@ public class API {
         }
 
         public void close() {
-            inputState.openMouseTextInput = null;
+            UICommons.mouseTextInput_close(inputState);
         }
 
         public boolean isUpperCase() {

@@ -536,7 +536,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Control Confirm
                 case '\n' -> {
                     boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
-                    inputState.openMouseTextInput = close ? null : inputState.openMouseTextInput;
+                    if(close) UICommons.mouseTextInput_close(inputState);
                 }
                 // Default Text Character
                 default -> {
