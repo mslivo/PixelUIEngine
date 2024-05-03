@@ -7,7 +7,7 @@ package net.mslivo.core.engine.tools.cli;
 public class Hex2Float {
 
     public static void main(String[] args){
-        final String arg = args.length >= 1 ? args[0] : "#000000";
+        final String arg = args.length >= 1 ? args[0] : "#333454";
         System.out.println(hex2Float(arg));
     }
 

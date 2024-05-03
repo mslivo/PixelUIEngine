@@ -315,6 +315,10 @@ public class SpriteRenderer implements Batch {
         this.hslt = HSLT_RESET;
     }
 
+    public void setColorReset() {
+        this.color = COLOR_RESET;
+    }
+
     public float getPackedHSLT() {
         return hslt;
     }

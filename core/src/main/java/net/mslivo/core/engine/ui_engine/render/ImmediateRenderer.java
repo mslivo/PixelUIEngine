@@ -347,6 +347,10 @@ public class ImmediateRenderer {
         this.hslt = HSLT_RESET;
     }
 
+    public void setColorReset() {
+        this.color = COLOR_RESET;
+    }
+
     public void setBlendFunction(int srcFunc, int dstFunc) {
         setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
     }
