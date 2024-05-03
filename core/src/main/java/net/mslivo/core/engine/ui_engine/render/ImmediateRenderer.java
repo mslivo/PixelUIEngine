@@ -13,7 +13,7 @@ public class ImmediateRenderer {
                 attribute vec4 a_position;
                 attribute vec4 a_vertexColor;
                 attribute vec4 a_color;
-                attribute vec4 a_tweak;
+                attribute vec4 a_hslt;
                 uniform mat4 u_projTrans;
                 varying vec4 v_color;
                 const float eps = 1.0e-10;
@@ -43,20 +43,20 @@ public class ImmediateRenderer {
                    vec4 vcolor = a_color;
                    vcolor.a *= 255.0 / 254.0;
                    
-                   vec4 tweak = a_tweak;
-                   tweak.a *= 255.0 / 254.0;
+                   vec4 hslt = a_hslt;
+                   hslt.a *= 255.0 / 254.0;
                    
                    gl_PointSize = 1.0;
                    gl_Position = u_projTrans * a_position;
                    
                    vec4 tgt = rgb2hsl(vertexColor); // convert to HSL
                    
-                   tgt.x = fract(tgt.x+tweak.x); // tweak Hue
-                   tgt.y *= (tweak.y*2.0); // tweak Saturation
-                   tgt.z += (tweak.z-0.5) * 2.0; // tweak Lightness
+                   tgt.x = fract(tgt.x+hslt.x); // hslt Hue
+                   tgt.y *= (hslt.y*2.0); // hslt Saturation
+                   tgt.z += (hslt.z-0.5) * 2.0; // hslt Lightness
                    vec4 color = hsl2rgb(tgt); // convert back to RGB 
-                   v_color = mix(color, (color*vcolor), tweak.w); // mixed with tinted color based on tweak Tint
-                   v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, (tweak.y*2.0));  // remove colors based on tweak.saturation
+                   v_color = mix(color, (color*vcolor), hslt.w); // mixed with tinted color based on hslt Tint
+                   v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, (hslt.y*2.0));  // remove colors based on hslt.saturation
                 }
             """;
     private static final String FRAGMENT = """
@@ -75,13 +75,14 @@ public class ImmediateRenderer {
 
     private static final String ERROR_END_BEGIN = "ImmediateRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "ImmediateRenderer.begin must be called before end.";
-    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String HSLT_ATTRIBUTE = "a_hslt";
     public static final String COLOR_ATTRIBUTE = "a_color";
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     private static final int VERTEX_SIZE = 6;
     private static final int MESH_SIZE_VERTICES = 5000 * VERTEX_SIZE;
     private static final int MESH_SIZE_INDICES = 0;
-    private static final float TWEAK_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
+    private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
+    private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
 
     public int renderCalls;
     public int totalRenderCalls;
@@ -94,22 +95,24 @@ public class ImmediateRenderer {
     private Mesh mesh;
     private float vertices[];
     private int idx;
-    private float tweak;
+    private float hslt;
     private int srcRGB;
     private int dstRGB;
     private int srcAlpha;
     private int dstAlpha;
     private int u_projTrans;
     private boolean drawing;
+    public float backup_hslt;
+    public float backup_color;
 
     public ImmediateRenderer() {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.primitiveType = GL20.GL_POINTS;
-        this.color = rgbPacked(1f, 1f, 1f, 1f);
+        this.color = COLOR_RESET;
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
-        this.tweak = TWEAK_RESET;
+        this.hslt = HSLT_RESET;
         this.srcRGB = GL20.GL_SRC_ALPHA;
         this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.srcAlpha = GL20.GL_SRC_ALPHA;
@@ -117,6 +120,8 @@ public class ImmediateRenderer {
         this.tempColor = new Color(Color.WHITE);
         this.idx = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.backup_hslt = 0;
+        this.backup_color = 0f;
         this.drawing = false;
 
         this.vertices = new float[MESH_SIZE_VERTICES];
@@ -178,7 +183,7 @@ public class ImmediateRenderer {
         vertices[idx + 2] = z;
         vertices[idx + 3] = vertexColor;
         vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 5] = hslt;
         idx += VERTEX_SIZE;
     }
 
@@ -207,7 +212,7 @@ public class ImmediateRenderer {
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE)
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE)
         );
     }
 
@@ -271,7 +276,7 @@ public class ImmediateRenderer {
     }
 
     public float getHue() {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
@@ -280,66 +285,66 @@ public class ImmediateRenderer {
     }
 
     public float getSaturation() {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
     public float getLightness() {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
     public float getTint() {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         return ((c & 0xff000000) >>> 24) / 255f;
     }
 
     public void setHue(float hue) {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = rgbPacked(hue, g, b, a);
+        hslt = rgbPacked(hue, g, b, a);
     }
 
     public void setSaturation(float saturation) {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        tweak = rgbPacked(r, saturation, b, a);
+        hslt = rgbPacked(r, saturation, b, a);
     }
 
     public void setLightness(float lightness) {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         float a = ((c & 0xff000000) >>> 24) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        tweak = rgbPacked(r, g, lightness, a);
+        hslt = rgbPacked(r, g, lightness, a);
     }
 
     public void setTint(float tint) {
-        int c = NumberUtils.floatToIntColor(tweak);
+        int c = NumberUtils.floatToIntColor(hslt);
         float b = ((c & 0x00ff0000) >>> 16) / 255f;
         float g = ((c & 0x0000ff00) >>> 8) / 255f;
         float r = ((c & 0x000000ff)) / 255f;
-        tweak = rgbPacked(r, g, b, tint);
+        hslt = rgbPacked(r, g, b, tint);
     }
 
     public void setHSLT(float hue, float saturation, float lightness, float tint) {
-        tweak = rgbPacked(hue, saturation, lightness, tint);
+        hslt = rgbPacked(hue, saturation, lightness, tint);
     }
 
-    public void setPackedHSLT(final float tweakPacked) {
-        this.tweak = tweakPacked;
+    public void setPackedHSLT(final float hsltPacked) {
+        this.hslt = hsltPacked;
     }
 
     public float getPackedHSLT() {
-        return tweak;
+        return hslt;
     }
 
     public void setHSLTReset() {
-        this.tweak = TWEAK_RESET;
+        this.hslt = HSLT_RESET;
     }
 
     public void setBlendFunction(int srcFunc, int dstFunc) {
@@ -383,5 +388,15 @@ public class ImmediateRenderer {
 
     public ShaderProgram getShader() {
         return this.shader;
+    }
+
+    public void saveBackup(){
+        this.backup_color = this.color;
+        this.backup_hslt = this.hslt;
+    }
+
+    public void loadBackup(){
+        this.color = backup_color;
+        this.hslt = backup_hslt;
     }
 }
