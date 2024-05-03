@@ -98,6 +98,7 @@ public class SpriteRenderer implements Batch {
 
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
+
     private final Color tempColor;
     private final Mesh mesh;
     private final float[] vertices;
@@ -115,6 +116,13 @@ public class SpriteRenderer implements Batch {
     private int dstAlpha;
     private ShaderProgram shader;
     private boolean defaultShader;
+    private float backup_hslt;
+    private float backup_color;
+    private int backup_srcRGB;
+    private int backup_dstRGB;
+    private int backup_srcAlpha;
+    private int backup_dstAlpha;
+
     protected float color;
     private MediaManager mediaManager;
     private int u_projTrans;
@@ -123,8 +131,7 @@ public class SpriteRenderer implements Batch {
     public int totalRenderCalls;
     public int maxSpritesInBatch;
 
-    public float backup_hslt;
-    public float backup_color;
+
 
     public SpriteRenderer() {
         this(null, 1024, null);
@@ -166,8 +173,12 @@ public class SpriteRenderer implements Batch {
         this.srcAlpha = GL20.GL_SRC_ALPHA;
         this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = new float[size * SPRITE_SIZE];
-        this.backup_color = 0f;
-        this.backup_hslt = 0f;
+        this.backup_color = COLOR_RESET;
+        this.backup_hslt = HSLT_RESET;
+        this.backup_srcRGB = GL20.GL_SRC_ALPHA;
+        this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
+        this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
                 false, size * 4, size * 6,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
@@ -192,11 +203,16 @@ public class SpriteRenderer implements Batch {
     public void saveBackup(){
         this.backup_color = this.color;
         this.backup_hslt = this.hslt;
+        this.backup_srcRGB = this.srcRGB;
+        this.backup_dstRGB = this.dstRGB;
+        this.backup_srcAlpha = this.srcAlpha;
+        this.backup_dstAlpha = this.dstAlpha;
     }
 
     public void loadBackup(){
-        this.color = backup_color;
-        this.hslt = backup_hslt;
+        setPackedColor(this.backup_color);
+        setPackedHSLT(this.backup_hslt);
+        setBlendFunctionSeparate(backup_srcRGB,backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 
     @Override

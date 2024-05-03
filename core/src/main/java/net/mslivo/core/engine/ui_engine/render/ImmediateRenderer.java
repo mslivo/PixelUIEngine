@@ -102,13 +102,18 @@ public class ImmediateRenderer {
     private int dstAlpha;
     private int u_projTrans;
     private boolean drawing;
-    public float backup_hslt;
-    public float backup_color;
+    private float backup_hslt;
+    private float backup_color;
+    private int backup_srcRGB;
+    private int backup_dstRGB;
+    private int backup_srcAlpha;
+    private int backup_dstAlpha;
 
     public ImmediateRenderer() {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
+        this.drawing = false;
         this.primitiveType = GL20.GL_POINTS;
         this.color = COLOR_RESET;
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
@@ -122,8 +127,10 @@ public class ImmediateRenderer {
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.backup_hslt = 0;
         this.backup_color = 0f;
-        this.drawing = false;
-
+        this.backup_srcRGB = GL20.GL_SRC_ALPHA;
+        this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
+        this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = new float[MESH_SIZE_VERTICES];
         this.mesh = createMesh(MESH_SIZE_VERTICES);
     }
@@ -397,10 +404,15 @@ public class ImmediateRenderer {
     public void saveBackup(){
         this.backup_color = this.color;
         this.backup_hslt = this.hslt;
+        this.backup_srcRGB = this.srcRGB;
+        this.backup_dstRGB = this.dstRGB;
+        this.backup_srcAlpha = this.srcAlpha;
+        this.backup_dstAlpha = this.dstAlpha;
     }
 
     public void loadBackup(){
-        this.color = backup_color;
-        this.hslt = backup_hslt;
+        setPackedColor(this.backup_color);
+        setPackedHSLT(this.backup_hslt);
+        setBlendFunctionSeparate(backup_srcRGB,backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 }
