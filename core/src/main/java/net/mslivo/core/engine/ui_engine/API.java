@@ -101,7 +101,7 @@ public class API {
     public final _Input input = new _Input();
     public final _Camera camera = new _Camera();
     public final _Config config = new _Config();
-    public final _Preset preConfigured = new _Preset();
+    public final _Preconfigured preConfigured = new _Preconfigured();
 
     public API(InputState inputState, MediaManager mediaManager) {
         this.inputState = inputState;
@@ -1458,6 +1458,11 @@ public class API {
                 if (canvas == null) return null;
                 Color color = UICommons.canvas_getPoint(canvas, x, y);
                 return color != null ? new Color(color) : null;
+            }
+
+            public boolean pointValid(Canvas canvas, int x, int y){
+                if (canvas == null) return false;
+                return UICommons.canvas_pointValid(canvas, x,y);
             }
 
             public void point(Canvas canvas, int x, int y, Color color) {
@@ -3963,7 +3968,7 @@ public class API {
         }
     }
 
-    public class _Preset {
+    public class _Preconfigured {
 
         public class GraphInfo {
             public final long lowestValue;
@@ -4381,18 +4386,20 @@ public class API {
                     if (drag[0]) {
                         int x = input.mouse.state.xUI() - component.absoluteX(colorCanvas);
                         int yInv = (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
-                        int y = colorTexture.getRegionHeight() - yInv;
+                        int y =  yInv;
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
                             currentColor = component.canvas.point(colorCanvas, x, y - 1);
-                            component.setColor(ok, currentColor);
-                            float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
-                            component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
-                            component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, yInv - 1);
-                            xLast = x;
-                            yLast = y;
+                            if(currentColor != null) {
+                                component.setColor(ok, currentColor);
+                                float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
+                                component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
+                                component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, yInv - 1);
+                                xLast = x;
+                                yLast = y;
+                            }
                         }
                     }
                 }

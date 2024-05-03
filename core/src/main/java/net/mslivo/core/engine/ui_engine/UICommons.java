@@ -1250,8 +1250,12 @@ class UICommons {
                 a);
     }
 
+    static boolean canvas_pointValid(Canvas canvas, int x, int y) {
+        return x >= 0 && x <= canvas.map.length && y >= 0 && y <= canvas.map.length - 1;
+    }
+
     static Color canvas_getPoint(Canvas canvas, int x, int y) {
-        if (x < 0 || x > (canvas.map.length - 1) || y < 0 || y > (canvas.map.length - 1)) return null;
+        if (!canvas_pointValid(canvas,x,y)) return null;
         return canvas.map[x][y];
     }
 
