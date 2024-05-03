@@ -354,6 +354,11 @@ public class ImmediateRenderer {
         this.hslt = HSLT_RESET;
     }
 
+    public void setHSLTAndColorReset() {
+        this.hslt = HSLT_RESET;
+        this.color = COLOR_RESET;
+    }
+
     public void setColorReset() {
         this.color = COLOR_RESET;
     }
