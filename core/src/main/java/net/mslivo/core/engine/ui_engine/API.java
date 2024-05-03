@@ -4359,7 +4359,7 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     component.canvas.point(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        component.canvas.canvasImage.setPosition(cursorOverlay, x - 3, colorTexture.getRegionHeight() - y + 1);
+                        component.canvas.canvasImage.setPosition(cursorOverlay, x ,  y );
                     }
                 }
             }
@@ -4385,8 +4385,7 @@ public class API {
                 public void onUpdate() {
                     if (drag[0]) {
                         int x = input.mouse.state.xUI() - component.absoluteX(colorCanvas);
-                        int yInv = (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
-                        int y =  yInv;
+                        int y =  (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
@@ -4396,7 +4395,7 @@ public class API {
                                 component.setColor(ok, currentColor);
                                 float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
                                 component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);
-                                component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, yInv - 1);
+                                component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, y - 1);
                                 xLast = x;
                                 yLast = y;
                             }
