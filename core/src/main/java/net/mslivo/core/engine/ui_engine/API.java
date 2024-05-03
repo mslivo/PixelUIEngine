@@ -4359,7 +4359,7 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     component.canvas.point(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        component.canvas.canvasImage.setPosition(cursorOverlay, x ,  y );
+                        component.canvas.canvasImage.setPosition(cursorOverlay, x-1 ,  y-1 );
                     }
                 }
             }
