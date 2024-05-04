@@ -351,14 +351,15 @@ public class ImmediateRenderer {
     }
 
     public void setHSLTReset() {
-        this.hslt = HSLT_RESET;
+        setPackedHSLT(HSLT_RESET);
+    }
+
+    public void setColorReset() {
+        setPackedColor(COLOR_RESET);
     }
 
     public void setBlendFunctionReset(){
-        this.srcRGB = GL20.GL_SRC_ALPHA;
-        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.srcAlpha = GL20.GL_SRC_ALPHA;
-        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setHSLTAndColorReset() {
@@ -369,10 +370,6 @@ public class ImmediateRenderer {
     public void setAllReset() {
         setHSLTAndColorReset();
         setBlendFunctionReset();
-    }
-
-    public void setColorReset() {
-        this.color = COLOR_RESET;
     }
 
     public void setBlendFunction(int srcFunc, int dstFunc) {
