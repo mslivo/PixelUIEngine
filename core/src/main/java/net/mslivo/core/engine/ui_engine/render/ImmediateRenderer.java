@@ -354,9 +354,21 @@ public class ImmediateRenderer {
         this.hslt = HSLT_RESET;
     }
 
+    public void setBlendFunctionReset(){
+        this.srcRGB = GL20.GL_SRC_ALPHA;
+        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
+        this.srcAlpha = GL20.GL_SRC_ALPHA;
+        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+    }
+
     public void setHSLTAndColorReset() {
-        this.hslt = HSLT_RESET;
-        this.color = COLOR_RESET;
+        setHSLTReset();
+        setColorReset();
+    }
+
+    public void setAllReset() {
+        setHSLTAndColorReset();
+        setBlendFunctionReset();
     }
 
     public void setColorReset() {
