@@ -21,7 +21,23 @@ public class NestedFrameBuffer extends FrameBuffer {
             .allocateDirect(16 * Integer.BYTES).order(ByteOrder.nativeOrder())
             .asIntBuffer();
 
-    private final boolean hasDepth;
+
+    public NestedFrameBuffer(Pixmap.Format format, int width, int height) {
+        this(format, width, height, false, false);
+    }
+
+    public NestedFrameBuffer(Pixmap.Format format, int width, int height, boolean hasDepth) {
+        this(format, width, height, hasDepth, false);
+    }
+
+    public NestedFrameBuffer(Pixmap.Format format, int width, int height, boolean hasDepth, boolean hasStencil) {
+        super(format, width, height, hasDepth, hasStencil);
+    }
+
+    protected NestedFrameBuffer(NestableFrameBufferBuilder bufferBuilder) {
+        super(bufferBuilder);
+    }
+
 
     private int getBoundFboHandle() {
         IntBuffer intBuf = INT_BUFF;
@@ -32,26 +48,11 @@ public class NestedFrameBuffer extends FrameBuffer {
     private int[] getViewport() {
         IntBuffer intBuf = INT_BUFF;
         Gdx.gl.glGetIntegerv(GL20.GL_VIEWPORT, intBuf);
-
         return new int[]{intBuf.get(0), intBuf.get(1), intBuf.get(2),
                 intBuf.get(3)};
     }
 
-    public NestedFrameBuffer(Pixmap.Format format, int width, int height,
-                             boolean hasDepth, boolean hasStencil) {
-        super(format, width, height, hasDepth, hasStencil);
-        this.hasDepth = hasDepth;
-    }
 
-    public NestedFrameBuffer(Pixmap.Format format, int width, int height,
-                             boolean hasDepth) {
-        this(format, width, height, hasDepth, false);
-    }
-
-    protected NestedFrameBuffer(NestableFrameBufferBuilder bufferBuilder) {
-        super(bufferBuilder);
-        this.hasDepth = bufferBuilder.hasDepthRenderBuffer();
-    }
 
     @Override
     public void begin() {
@@ -97,10 +98,6 @@ public class NestedFrameBuffer extends FrameBuffer {
         int previousFBOHandle = getBoundFboHandle();
         super.build();
         Gdx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
-    }
-
-    public boolean hasDepth() {
-        return hasDepth;
     }
 
     public boolean isBound() {
