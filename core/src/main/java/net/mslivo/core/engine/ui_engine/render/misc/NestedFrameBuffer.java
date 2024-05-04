@@ -3,6 +3,7 @@ package net.mslivo.core.engine.ui_engine.render.misc;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 
 import java.nio.ByteBuffer;
@@ -17,6 +18,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     private int previousFBOHandle = -1;
     private int[] previousViewport = new int[4];
     private boolean isBound = false;
+    private TextureRegion textureRegion_flipped = null;
     private static final IntBuffer INT_BUFF = ByteBuffer
             .allocateDirect(16 * Integer.BYTES).order(ByteOrder.nativeOrder())
             .asIntBuffer();
@@ -117,6 +119,14 @@ public class NestedFrameBuffer extends FrameBuffer {
         boolean hasDepthRenderBuffer() {
             return hasDepthRenderBuffer;
         }
+    }
+
+    public TextureRegion getFlippedTextureRegion(){
+        if(this.textureRegion_flipped == null){
+            this.textureRegion_flipped = new TextureRegion(this.getColorBufferTexture());
+            this.textureRegion_flipped.flip(false,true);
+        }
+        return this.textureRegion_flipped;
     }
 
 }

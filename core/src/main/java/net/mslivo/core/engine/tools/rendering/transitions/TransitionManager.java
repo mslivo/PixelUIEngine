@@ -101,7 +101,7 @@ public class TransitionManager {
             frameBuffer_from.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);
             batch_screen.begin();
-            batch_screen.draw(from.getTextureScreen(), 0, 0, resolutionWidth, resolutionHeight);
+            batch_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
             batch_screen.end();
             frameBuffer_from.end();
         }
@@ -111,7 +111,7 @@ public class TransitionManager {
             frameBuffer_to.begin();
             batch_screen.setProjectionMatrix(camera_screen.combined);
             batch_screen.begin();
-            batch_screen.draw(to.getTextureScreen(), 0, 0, resolutionWidth, resolutionHeight);
+            batch_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
             batch_screen.end();
             frameBuffer_to.end();
         }

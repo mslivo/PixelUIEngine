@@ -55,19 +55,17 @@ public class InputState {
     public Config config;
 
     /* #################### Graphics: App #################### */
-    public TextureRegion texture_app;
+
     public OrthographicCamera camera_app;
     public NestedFrameBuffer frameBuffer_app;
 
     /* #################### Graphics: GUI #################### */
     public SpriteRenderer spriteRenderer_ui;
-    public TextureRegion texture_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;
 
     /* #################### Graphics: Screen #################### */
     public int upscaleFactor_screen;
-    public TextureRegion texture_screen;
     public Texture.TextureFilter textureFilter_screen;
     public NestedFrameBuffer frameBuffer_screen;
     public Viewport viewport_screen;

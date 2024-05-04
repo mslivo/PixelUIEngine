@@ -144,8 +144,6 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.camera_app.update();
         newInputState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newInputState.resolutionWidth, newInputState.resolutionHeight, true);
         newInputState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newInputState.texture_app = new TextureRegion(newInputState.frameBuffer_app.getColorBufferTexture());
-        newInputState.texture_app.flip(false, true);
 
         // -----  GUI
         newInputState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, 8192);
@@ -155,15 +153,11 @@ public class UIEngine<T extends UIEngineAdapter> {
         newInputState.camera_ui.update();
         newInputState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.resolutionWidth_ui, newInputState.resolutionHeight_ui, false);
         newInputState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newInputState.texture_ui = new TextureRegion(newInputState.frameBuffer_ui.getColorBufferTexture());
-        newInputState.texture_ui.flip(false, true);
         // ----- UpScaler
         newInputState.upscaleFactor_screen = UICommons.viewport_determineUpscaleFactor(newInputState.viewportMode, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.textureFilter_screen = UICommons.viewport_determineUpscaleTextureFilter(newInputState.viewportMode);
         newInputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newInputState.resolutionWidth * newInputState.upscaleFactor_screen, newInputState.resolutionHeight * newInputState.upscaleFactor_screen, false);
         newInputState.frameBuffer_screen.getColorBufferTexture().setFilter(newInputState.textureFilter_screen, newInputState.textureFilter_screen);
-        newInputState.texture_screen = new TextureRegion(newInputState.frameBuffer_screen.getColorBufferTexture());
-        newInputState.texture_screen.flip(false, true);
         // ----- Screen
         newInputState.viewport_screen = UICommons.viewport_createViewport(newInputState.viewportMode, newInputState.camera_ui, newInputState.resolutionWidth, newInputState.resolutionHeight);
         newInputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
@@ -1942,7 +1936,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             inputState.frameBuffer_screen.begin();
             this.uiAdapter.renderComposite(inputState.camera_ui,
                     inputState.spriteRenderer_ui,
-                    inputState.texture_app, inputState.texture_ui,
+                    inputState.frameBuffer_app.getFlippedTextureRegion(), inputState.frameBuffer_ui.getFlippedTextureRegion(),
                     inputState.resolutionWidth, inputState.resolutionHeight,
                     UICommons.window_isModalOpen(inputState)
             );
@@ -1957,7 +1951,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 inputState.spriteRenderer_ui.begin();
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                inputState.spriteRenderer_ui.draw(inputState.texture_screen, 0, 0, inputState.resolutionWidth, inputState.resolutionHeight);
+                inputState.spriteRenderer_ui.draw(inputState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, inputState.resolutionWidth, inputState.resolutionHeight);
                 inputState.spriteRenderer_ui.end();
             }
         }
@@ -3025,9 +3019,9 @@ public class UIEngine<T extends UIEngineAdapter> {
 
 
         // Textures
-        inputState.texture_app.getTexture().dispose();
-        inputState.texture_ui.getTexture().dispose();
-        inputState.texture_screen.getTexture().dispose();
+        inputState.frameBuffer_app.dispose();
+        inputState.frameBuffer_ui.dispose();
+        inputState.frameBuffer_screen.dispose();
 
 
         inputState = null;
@@ -3065,15 +3059,15 @@ public class UIEngine<T extends UIEngineAdapter> {
         return inputState.gamePadSupport;
     }
 
-    public TextureRegion getTextureScreen() {
-        return inputState.texture_screen;
+    public NestedFrameBuffer getFrameBufferScreen() {
+        return inputState.frameBuffer_screen;
     }
 
-    public TextureRegion getTextureApp() {
-        return inputState.texture_app;
+    public NestedFrameBuffer getFrameBufferApp() {
+        return inputState.frameBuffer_app;
     }
 
-    public TextureRegion getTextureUI() {
-        return inputState.texture_ui;
+    public NestedFrameBuffer getFrameBufferUI() {
+        return inputState.frameBuffer_ui;
     }
 }

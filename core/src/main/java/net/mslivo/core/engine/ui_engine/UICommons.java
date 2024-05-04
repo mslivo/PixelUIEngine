@@ -1312,10 +1312,6 @@ class UICommons {
         inputState.frameBuffer_screen.dispose();
         inputState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, inputState.resolutionWidth * inputState.upscaleFactor_screen, inputState.resolutionHeight * inputState.upscaleFactor_screen, false);
         inputState.frameBuffer_screen.getColorBufferTexture().setFilter(inputState.textureFilter_screen, inputState.textureFilter_screen);
-        // texture_upScale
-        inputState.texture_screen.getTexture().dispose();
-        inputState.texture_screen = new TextureRegion(inputState.frameBuffer_screen.getColorBufferTexture());
-        inputState.texture_screen.flip(false, true);
         // viewport_screen
         inputState.viewport_screen = UICommons.viewport_createViewport(viewPortMode, inputState.camera_ui, inputState.resolutionWidth, inputState.resolutionHeight);
         inputState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
