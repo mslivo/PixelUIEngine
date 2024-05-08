@@ -3406,106 +3406,148 @@ public class API {
 
     public class _Camera {
 
-        public boolean isPointVisible(float x, float y) {
-            if (inputState.camera_app.frustum.pointInFrustum(x, y, 0f)) return true;
-            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
-                AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                if (appViewPort.camera.frustum.pointInFrustum(x, y, 0f)) return true;
+        public final _App app = new _App();
+
+        public final _AppViewports appViewports = new _AppViewports();
+
+        public class _App {
+            public boolean pointVisible(float x, float y) {
+                if (inputState.camera_app.frustum.pointInFrustum(x, y, 0f)) return true;
+                return false;
             }
-            return false;
-        }
 
-        public boolean isRectVisible(float x, float y, float width, float height) {
-            if (inputState.camera_app.frustum.boundsInFrustum(x, y, 0f, width, height, 0f)) return true;
-            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
-                AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                if (appViewPort.camera.frustum.boundsInFrustum(x, y, 0f, width, height, 0f))
-                    return true;
+            public boolean rectVisible(float x, float y, float width, float height) {
+                if (inputState.camera_app.frustum.boundsInFrustum(x, y, 0f, width, height, 0f)) return true;
+                return false;
             }
-            return false;
-        }
 
-        public boolean isSphereVisible(float x, float y, float radius) {
-            if (inputState.camera_app.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
-            for (int i = 0; i < inputState.appViewPorts.size(); i++) {
-                AppViewPort appViewPort = inputState.appViewPorts.get(i);
-                if (appViewPort.camera.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
+            public boolean sphereVisible(float x, float y, float radius) {
+                if (inputState.camera_app.frustum.sphereInFrustum(x, y, 0f, radius)) return true;
+                return false;
             }
-            return false;
+
+            public void setPosition(float x, float y) {
+                UICommons.camera_setPosition(inputState.camera_app, x, y);
+            }
+
+
+            public void move(float x, float y) {
+                UICommons.camera_setPosition(inputState.camera_app,
+                        (inputState.camera_app.position.x + x),
+                        (inputState.camera_app.position.y + y)
+                );
+            }
+
+            public void setX(float x) {
+                UICommons.camera_setPosition(inputState.camera_app,
+                        x,
+                        inputState.camera_app.position.y
+                );
+            }
+
+            public void moveX(float x) {
+                UICommons.camera_setPosition(inputState.camera_app,
+                        (inputState.camera_app.position.x + x),
+                        inputState.camera_app.position.y
+                );
+            }
+
+            public void setY(float y) {
+                UICommons.camera_setPosition(inputState.camera_app,
+                        inputState.camera_app.position.x,
+                        y
+                );
+            }
+
+            public void moveY(float y) {
+                UICommons.camera_setPosition(inputState.camera_app,
+                        inputState.camera_app.position.x,
+                        (inputState.camera_app.position.y + y)
+                );
+            }
+
+            public void setZoom(float zoom) {
+                UICommons.camera_setZoom(inputState.camera_app, zoom);
+            }
+
+            public float x() {
+                return inputState.camera_app.position.x;
+            }
+
+            public float y() {
+                return inputState.camera_app.position.y;
+            }
+
+            public float z() {
+                return inputState.camera_app.position.z;
+            }
+
+            public float zoom() {
+                return inputState.camera_app.zoom;
+            }
+
+            public Matrix4 projection() {
+                return inputState.camera_app.combined;
+            }
+
+            public float viewPortStretchFactorWidth() {
+                return inputState.viewport_screen.getWorldWidth() / (float) inputState.viewport_screen.getScreenWidth();
+            }
+
+            public float viewPortStretchFactorHeight() {
+                return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
+            }
+
         }
 
-        public void setPosition(float x, float y) {
-            UICommons.camera_setPosition(inputState.camera_app, x, y);
+        public class _AppViewports {
+
+            public int activeSize(){
+                return inputState.appViewPorts.size();
+            }
+
+            public AppViewPort get(int index){
+                return inputState.appViewPorts.get(index);
+            }
+
+            private ArrayList<AppViewPort> getAll(){
+                return new ArrayList<>(inputState.appViewPorts);
+            }
+
+            public boolean pointVisible(AppViewPort appViewPort, float x, float y) {
+                return appViewPort.camera.frustum.pointInFrustum(x, y, 0f);
+            }
+
+            public boolean pointVisibleAny(float x, float y) {
+                for(int i=0;i<inputState.appViewPorts.size();i++){
+                    if(pointVisible(inputState.appViewPorts.get(i),x,y)) return true;
+                }
+                return false;
+            }
+
+            public boolean rectVisible(AppViewPort appViewPort, float x, float y,float width, float height) {
+                return appViewPort.camera.frustum.boundsInFrustum(x, y, 0f, width, height,0f);
+            }
+
+            public boolean rectVisibleAny(float x, float y,float width, float height) {
+                for(int i=0;i<inputState.appViewPorts.size();i++){
+                    if(rectVisible(inputState.appViewPorts.get(i),x,y, width, height)) return true;
+                }
+                return false;
+            }
+
+            public boolean sphereVisible(AppViewPort appViewPort, float x, float y,float radius) {
+                return appViewPort.camera.frustum.sphereInFrustum(x, y, 0f, radius);
+            }
+
+            public boolean sphereVisibleAny(float x, float y,float width, float radius) {
+                for(int i=0;i<inputState.appViewPorts.size();i++){
+                    if(sphereVisible(inputState.appViewPorts.get(i),x,y, radius)) return true;
+                }
+                return false;
+            }
+
         }
-
-
-        public void move(float x, float y) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    (inputState.camera_app.position.x + x),
-                    (inputState.camera_app.position.y + y)
-            );
-        }
-
-        public void setX(float x) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    x,
-                    inputState.camera_app.position.y
-            );
-        }
-
-        public void moveX(float x) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    (inputState.camera_app.position.x + x),
-                    inputState.camera_app.position.y
-            );
-        }
-
-        public void setY(float y) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    inputState.camera_app.position.x,
-                    y
-            );
-        }
-
-        public void moveY(float y) {
-            UICommons.camera_setPosition(inputState.camera_app,
-                    inputState.camera_app.position.x,
-                    (inputState.camera_app.position.y + y)
-            );
-        }
-
-        public void setZoom(float zoom) {
-            UICommons.camera_setZoom(inputState.camera_app, zoom);
-        }
-
-        public float x() {
-            return inputState.camera_app.position.x;
-        }
-
-        public float y() {
-            return inputState.camera_app.position.y;
-        }
-
-        public float z() {
-            return inputState.camera_app.position.z;
-        }
-
-        public float zoom() {
-            return inputState.camera_app.zoom;
-        }
-
-        public Matrix4 projection() {
-            return inputState.camera_app.combined;
-        }
-
-        public float viewPortStretchFactorWidth() {
-            return inputState.viewport_screen.getWorldWidth() / (float) inputState.viewport_screen.getScreenWidth();
-        }
-
-        public float viewPortStretchFactorHeight() {
-            return inputState.viewport_screen.getWorldHeight() / (float) inputState.viewport_screen.getScreenHeight();
-        }
-
 
     }
 

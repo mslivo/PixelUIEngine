@@ -85,7 +85,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 api.closeAllWindows();
             }
         }));
-        api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
+        api.camera.app.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
         api.setMouseTool(api.mouseTool.create("Pointer", null, UIBaseMedia.UI_CURSOR_ARROW));
 
 
