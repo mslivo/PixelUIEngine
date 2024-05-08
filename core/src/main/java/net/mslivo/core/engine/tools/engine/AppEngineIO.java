@@ -20,9 +20,51 @@ public class AppEngineIO {
         return this;
     }
 
+    public AppEngineIO write(Object parameter1, Object parameter2){
+        write(parameter1);
+        write(parameter2);
+        return this;
+    }
+
+    public AppEngineIO write(Object parameter1, Object parameter2, Object parameter3){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        return this;
+    }
+
+    public AppEngineIO write(Object parameter1, Object parameter2, Object parameter3, Object parameter4){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        write(parameter4);
+        return this;
+    }
+
     public AppEngineIO write(int parameter){
         if(writeIndex >= AppEngine.PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS);
         intParams[writeIndex++] = parameter;
+        return this;
+    }
+
+    public AppEngineIO write(int parameter1, int parameter2){
+        write(parameter1);
+        write(parameter2);
+        return this;
+    }
+
+    public AppEngineIO write(int parameter1, int parameter2, int parameter3){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        return this;
+    }
+
+    public AppEngineIO write(int parameter1, int parameter2, int parameter3, int parameter4){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        write(parameter4);
         return this;
     }
 
@@ -31,6 +73,28 @@ public class AppEngineIO {
         floatParams[writeIndex++] = parameter;
         return this;
     }
+
+    public AppEngineIO write(float parameter1, float parameter2){
+        write(parameter1);
+        write(parameter2);
+        return this;
+    }
+
+    public AppEngineIO write(float parameter1, float parameter2, float parameter3){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        return this;
+    }
+
+    public AppEngineIO write(float parameter1, float parameter2, float parameter3, float parameter4){
+        write(parameter1);
+        write(parameter2);
+        write(parameter3);
+        write(parameter4);
+        return this;
+    }
+
 
     public Object read(){
         if(readIndex >= AppEngine.PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS);
