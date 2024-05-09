@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongArray;
 import net.mslivo.core.engine.media_manager.media.CMedia;
 
 import java.io.*;
@@ -21,8 +22,6 @@ import java.util.*;
  * Utility Class
  */
 public class Tools {
-
-
 
 
     public static class App {
@@ -164,6 +163,7 @@ public class Tools {
                 "81%", "82%", "83%", "84%", "85%", "86%", "87%", "88%", "89%", "90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"
         };
         private static final String[] percentDecimalText = new String[10001];
+
         static {
             int index = 0;
             for (float i = 0; i <= 10_000; i += 1) {
@@ -386,16 +386,6 @@ public class Tools {
             return sum;
         }
 
-        public static long packIntToLong(int int1, int int2) {
-            return (((long) int1) << 32) | (int2 & 0xffffffffL);
-        }
-
-        public static int[] unpackIntToLong(long longValue) {
-            int[] ret = new int[2];
-            ret[0] = ((int) (longValue >> 32));
-            ret[1] = (int) longValue;
-            return ret;
-        }
 
         public static float percentAboveThreshold(long value, long max, int threshold) {
             value = Math.clamp(value, Long.MIN_VALUE, max);
@@ -531,7 +521,7 @@ public class Tools {
             return list.get(MathUtils.random(0, list.size() - 1));
         }
 
-        private static final IntMap<ArrayList<Long>> doInRadiusCache = new IntMap<>();
+        private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
         public interface DoInRadiusFunction {
             boolean apply(int x, int y);
@@ -550,10 +540,10 @@ public class Tools {
         }
 
         public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
-            ArrayList<Long> cached = doInRadiusCache.get(radius);
+            LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
-                cached = new ArrayList<>();
-                ArrayList<Long> finalCached = cached;
+                cached = new LongArray();
+                LongArray finalCached = cached;
                 doInRadiusInternal(0, 0, radius, (x1, y1) -> {
                     finalCached.add(
                             (((long) x1) << 32) | (y1 & 0xffffffffL));
@@ -562,11 +552,11 @@ public class Tools {
                 doInRadiusCache.put(radius, cached);
             }
 
-            for (int i = 0; i < cached.size(); i++) {
-                Long positions = cached.get(i);
+            for (int i = 0; i < cached.size; i++) {
+                long positions = cached.get(i);
                 if (!radiusFunction.apply(
                         x + ((int) (positions >> 32)),
-                        y + positions.intValue())
+                        y + ((int) positions))
                 ) {
                     return;
                 }
@@ -590,7 +580,6 @@ public class Tools {
                         }
                     }
                 }
-
             }
             return false;
         }
@@ -607,10 +596,6 @@ public class Tools {
             return 1.0f / x;
         }
 
-        public static float distanceFast(int x1, int y1, int x2, int y2) {
-            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
-        }
-
         public static int distance(int x1, int y1, int x2, int y2) {
             return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
         }
@@ -619,19 +604,23 @@ public class Tools {
             return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         }
 
-        public static boolean isInDistance(int x1, int y1, int x2, int y2, int radius) {
-            return distance(x1, y1, x2, y2) <= radius;
+        public static float distanceFast(int x1, int y1, int x2, int y2) {
+            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
         }
 
-        public static boolean isInDistance(float x1, float y1, float x2, float y2, float radius) {
-            return distance(x1, y1, x2, y2) <= radius;
+        public static boolean isWithinDistance(int x1, int y1, int x2, int y2, int distance) {
+            return distance(x1, y1, x2, y2) <= distance;
         }
 
-        public static boolean isInDistanceFast(float x1, float y1, float x2, float y2, float radius) {
-            return distanceFast(x1, y1, x2, y2) <= radius;
+        public static boolean isWithinDistance(float x1, float y1, float x2, float y2, float distance) {
+            return distance(x1, y1, x2, y2) <= distance;
         }
 
-        public static boolean isInDistanceFast(int x1, int y1, int x2, int y2, int radius) {
+        public static boolean isWithinDistanceFast(float x1, float y1, float x2, float y2, float distance) {
+            return distanceFast(x1, y1, x2, y2) <= distance;
+        }
+
+        public static boolean isWithinDistanceFast(int x1, int y1, int x2, int y2, int radius) {
             return distanceFast(x1, y1, x2, y2) <= radius;
         }
 
@@ -661,37 +650,22 @@ public class Tools {
             return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
         }
 
-        public static float toIsoX(float cart_X, float cart_Y) {
-            return cart_X - cart_Y;
+        public static boolean circlesCollide(float x1, float y1, float r1, float x2, float y2, float r2) {
+            return distance(x1, y1, x2, y2) <= (r1 + r2);
         }
 
-        public static float toIsoY(float cart_X, float cart_Y) {
-            return (cart_X + cart_Y) / 2;
+        public static boolean circleCollideFast(float x1, float y1, float r1, float x2, float y2, float r2) {
+            return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
         }
 
-        public static int toIsoX(int cart_X, int cart_Y) {
-            return cart_X - cart_Y;
+        public static boolean circlesCollide(int x1, int y1, int r1, int x2, int y2, int r2) {
+            return distance(x1, y1, x2, y2) <= (r1 + r2);
         }
 
-        public static int toIsoY(int cart_X, int cart_Y) {
-            return (cart_X + cart_Y) / 2;
+        public static boolean circleCollideFast(int x1, int y1, int r1, int x2, int y2, int r2) {
+            return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
         }
 
-        public static int toCartX(int iso_X, int iso_Y) {
-            return (2 * iso_Y + iso_X) / 2;
-        }
-
-        public static float toCartX(float iso_X, float iso_Y) {
-            return (2 * iso_Y + iso_X) / 2;
-        }
-
-        public static float toCartY(float iso_X, float iso_Y) {
-            return (2 * iso_Y - iso_X) / 2;
-        }
-
-        public static int toCartY(int iso_X, int iso_Y) {
-            return (2 * iso_Y - iso_X) / 2;
-        }
     }
 
     public static class Reflection {
