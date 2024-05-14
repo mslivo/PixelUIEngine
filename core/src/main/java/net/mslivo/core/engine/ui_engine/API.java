@@ -149,8 +149,8 @@ public class API {
 
         public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
             Window window = new Window();
-            window.x = x;
-            window.y = y;
+            window.x = x*UIEngine.TILE_SIZE;
+            window.y = y*UIEngine.TILE_SIZE;
             window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
             window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
             window.title = Tools.Text.validString(title);
@@ -203,7 +203,6 @@ public class API {
             removeMessageReceiverActions(window, window.messageReceiverActions.toArray(new MessageReceiverAction[]{}));
         }
 
-
         public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
             if (window == null) return;
             window.enforceScreenBounds = enforceScreenBounds;
@@ -238,7 +237,6 @@ public class API {
             if (window == null) return false;
             return window.addedToScreen;
         }
-
 
         public void setColorEverything(Window window, Color color) {
             setColorInternal(window, color, 2, null,
