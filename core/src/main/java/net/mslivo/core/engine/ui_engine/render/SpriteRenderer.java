@@ -1214,7 +1214,6 @@ public class SpriteRenderer implements Batch {
 
         lastTexture.bind();
 
-        Mesh mesh = this.mesh;
         mesh.setVertices(vertices, 0, idx);
         mesh.getIndicesBuffer(true).position(0);
         mesh.getIndicesBuffer(true).limit(count);
