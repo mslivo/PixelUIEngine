@@ -722,13 +722,13 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onDragIntoScreen(ListItem listItem, int x, int y, int screenX, int screenY) {
+            public void onDragIntoApp(ListItem listItem, int x, int y, int screenX, int screenY) {
                 invItems3[x][y] = null;
                 api.addNotification(api.notification.create(listItem.text + " " + screenX + "," + screenY));
             }
 
             @Override
-            public boolean canDragIntoScreen() {
+            public boolean canDragIntoApp() {
                 return true;
             }
         };

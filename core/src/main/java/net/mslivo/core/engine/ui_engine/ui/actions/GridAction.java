@@ -1,10 +1,10 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 
 public abstract class GridAction<T> extends CommonActions {
 
@@ -38,15 +38,15 @@ public abstract class GridAction<T> extends CommonActions {
         return false;
     }
 
-    public boolean canDragIntoScreen() {return false;}
-
     public Color cellColor(T listItem, int x, int y) {
         return null;
     }
 
-    public void onDragIntoScreen(T listItem, int x, int y, int screenX, int screenY) {
+    public void onDragIntoApp(T listItem, int x, int y, int screenX, int screenY) {
     }
 
-
+    public boolean canDragIntoApp() {
+        return false;
+    }
 
 }

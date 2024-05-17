@@ -980,11 +980,11 @@ class UICommons {
     }
 
     static boolean list_canDragIntoScreen(List list) {
-        return list.dragEnabled && list.dragOutEnabled && list.listAction != null && list.listAction.canDragIntoScreen();
+        return list.dragEnabled && list.dragOutEnabled && list.listAction != null && list.listAction.canDragIntoApp();
     }
 
     static boolean grid_canDragIntoScreen(Grid grid) {
-        return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction != null && grid.gridAction.canDragIntoScreen();
+        return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction != null && grid.gridAction.canDragIntoApp();
     }
 
     static boolean list_canDragIntoList(InputState inputState, List list) {

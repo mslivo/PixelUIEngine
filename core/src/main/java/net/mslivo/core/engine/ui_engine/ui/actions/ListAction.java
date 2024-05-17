@@ -1,12 +1,10 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-
-import java.util.HashSet;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 
 public abstract class ListAction<T> extends CommonActions {
 
@@ -53,9 +51,11 @@ public abstract class ListAction<T> extends CommonActions {
         return null;
     }
 
-    public void onDragIntoScreen(T listItem, int index, int mouseX, int mouseY) {
+    public void onDragIntoApp(T listItem, int index, int mouseX, int mouseY) {
     }
 
-    public boolean canDragIntoScreen() {return false;}
+    public boolean canDragIntoApp() {
+        return false;
+    }
 
 }
