@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.media_manager.media.CMediaArray;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
@@ -50,8 +51,7 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImage;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -533,8 +533,8 @@ class UICommonUtils {
         boolean success = contextMenu_open(uiEngineState, mediaManager, contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
-            uiEngineState.mouse_emulated.x += UIEngine.TILE_SIZE_2;
-            uiEngineState.mouse_emulated.y -= UIEngine.TILE_SIZE_2;
+            uiEngineState.mouse_emulated.x += UIEngine.TILE_SIZE_HALF;
+            uiEngineState.mouse_emulated.y -= UIEngine.TILE_SIZE_HALF;
         }
         return success;
     }
@@ -893,17 +893,38 @@ class UICommonUtils {
         canvas.canvasImages.remove(canvasImage);
     }
 
-
-    static void toolTip_addToolTipImage(Tooltip toolTip, TooltipImage toolTipImage) {
-        if (toolTipImage.addedToToolTip != null) return;
-        toolTipImage.addedToToolTip = toolTip;
-        toolTip.images.add(toolTipImage);
+    static void toolTip_setImageSegmentImage(MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
+        tooltipImageSegment.image = image;
+        if(tooltipImageSegment.image != null){
+            tooltipImageSegment.width = MathUtils.ceil(mediaManager.getCMediaSpriteWidth(image) / UIEngine.TILE_SIZE_F);
+            tooltipImageSegment.height = MathUtils.ceil(mediaManager.getCMediaSpriteHeight(image) / UIEngine.TILE_SIZE_F);
+        }else{
+            tooltipImageSegment.width = 0;
+            tooltipImageSegment.height = 0;
+        }
     }
 
-    static void toolTip_removeToolTipImage(Tooltip toolTip, TooltipImage toolTipImage) {
-        if (toolTipImage.addedToToolTip != toolTip) return;
-        toolTipImage.addedToToolTip = null;
-        toolTip.images.remove(toolTipImage);
+    static void toolTip_setTextSegmentText(MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
+        tooltipTextSegment.text = text;
+        if(tooltipTextSegment.text != null){
+            tooltipTextSegment.width = MathUtils.ceil(mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) / UIEngine.TILE_SIZE_F);
+            tooltipTextSegment.height = 1;
+        }else{
+            tooltipTextSegment.width = 0;
+            tooltipTextSegment.height = 0;
+        }
+    }
+
+    static void toolTip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+        if (segment.addedToTooltip != null) return;
+        segment.addedToTooltip = toolTip;
+        toolTip.segments.add(segment);
+    }
+
+    static void toolTip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+        if (segment.addedToTooltip != toolTip) return;
+        segment.addedToTooltip = null;
+        toolTip.segments.remove(segment);
     }
 
     static boolean comboBox_isOpen(UIEngineState uiEngineState, Combobox comboBox) {
@@ -1154,10 +1175,6 @@ class UICommonUtils {
     static void text_setLines(MediaManager mediaManager, Text text, String[] lines) {
         text.lines = Tools.Text.validStringArray(lines);
         UICommonUtils.text_updateSize(mediaManager, text);
-    }
-
-    static void tooltip_setLines(Tooltip toolTip, String[] lines) {
-        toolTip.lines = Tools.Text.validStringArray(lines);
     }
 
     static void text_updateSize(MediaManager mediaManager, Text text) {

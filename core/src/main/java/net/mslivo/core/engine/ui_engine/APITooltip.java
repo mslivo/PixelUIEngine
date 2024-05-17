@@ -6,11 +6,10 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.constants.TOOLTIP_SEGMENT_ALIGNMENT;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImage;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
 
@@ -18,17 +17,13 @@ public final class APITooltip {
     private API api;
     private UIEngineState uiEngineState;
     private MediaManager mediaManager;
-    public final APITooltipImage toolTipImage;
-    public final APITooltipTextSegment textSegment;
-    public final APITooltipImageSegment imageSegment;
+    public final APITooltipSegment segment;
 
     APITooltip(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.toolTipImage = new APITooltipImage();
-        this.textSegment = new APITooltipTextSegment();
-        this.imageSegment = new APITooltipImageSegment();
+        this.segment = new APITooltipSegment();
     }
 
     private ToolTipAction defaultToolTipAction() {
@@ -36,67 +31,50 @@ public final class APITooltip {
         };
     }
 
-    public Tooltip create(String[] lines) {
-        return create(lines, null, defaultToolTipAction(), true, 1, 1);
+    public Tooltip create(TooltipSegment[] segments) {
+        return create( segments, defaultToolTipAction(), null, 1, 1);
     }
 
-    public Tooltip create(String[] lines, TooltipImage[] images) {
-        return create(lines, images, defaultToolTipAction(), true, 1, 1);
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
+        return create( segments, toolTipAction, null, 1, 1);
     }
 
-    public Tooltip create(String[] lines, TooltipImage[] images, ToolTipAction toolTipAction) {
-        return create(lines, images, toolTipAction, true, 1, 1);
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, String title) {
+        return create( segments, toolTipAction, title, 1, 1);
     }
 
-    public Tooltip create(String[] lines, TooltipImage[] images, ToolTipAction toolTipAction, boolean displayFistLineAsTitle) {
-        return create(lines, images, toolTipAction, displayFistLineAsTitle, 1, 1);
-    }
-
-    public Tooltip create(String[] lines, TooltipImage[] images, ToolTipAction toolTipAction, boolean displayFistLineAsTitle, int minWidth, int minHeight) {
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, String title, int minWidth, int minHeight) {
         Tooltip tooltip = new Tooltip();
-        tooltip.lines = Tools.Text.validStringArray(lines);
-        tooltip.images = new ArrayList<>();
-        if (images != null) {
-            for (int i = 0; i < images.length; i++) {
-                tooltip.images.add(images[0]);
-                images[i].addedToToolTip = tooltip;
+        tooltip.title = title;
+        tooltip.segments = new ArrayList<>();
+        if (segments != null) {
+            for (int i = 0; i < segments.length; i++) {
+                if(segments[i].addedToTooltip == null) {
+                    tooltip.segments.add(segments[i]);
+                    segments[i].addedToTooltip = tooltip;
+                }
             }
         }
         tooltip.toolTipAction = toolTipAction;
-        tooltip.displayFistLineAsTitle = displayFistLineAsTitle;
         tooltip.minWidth = Math.clamp(minWidth, 1, Integer.MAX_VALUE);
         tooltip.minHeight = Math.clamp(minHeight, 1, Integer.MAX_VALUE);
-        tooltip.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
-        tooltip.color_r = uiEngineState.uiEngineConfig.component_defaultColor.r;
-        tooltip.color_g = uiEngineState.uiEngineConfig.component_defaultColor.g;
-        tooltip.color_b = uiEngineState.uiEngineConfig.component_defaultColor.b;
-        tooltip.color_a = uiEngineState.uiEngineConfig.component_defaultColor.a;
         return tooltip;
     }
 
-    public void addToolTipImage(Tooltip toolTip, TooltipImage toolTipImage) {
-        if (toolTip == null || toolTipImage == null) return;
-        UICommonUtils.toolTip_addToolTipImage(toolTip, toolTipImage);
+
+    public void addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+        if (toolTip == null || segment == null) return;
+        UICommonUtils.toolTip_addTooltipSegment(toolTip, segment);
     }
 
-    public void addToolTipImages(Tooltip toolTip, TooltipImage[] toolTipImages) {
-        if (toolTip == null || toolTipImages == null) return;
-        for (int i = 0; i < toolTipImages.length; i++) addToolTipImage(toolTip, toolTipImages[i]);
+    public void removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+        if (toolTip == null || segment == null) return;
+        UICommonUtils.toolTip_removeTooltipSegment(toolTip, segment);
     }
 
-    public void removeToolTipImage(Tooltip toolTip, TooltipImage toolTipImage) {
-        if (toolTip == null || toolTipImage == null) return;
-        UICommonUtils.toolTip_removeToolTipImage(toolTip, toolTipImage);
-    }
-
-    public void removeToolTipImages(Tooltip toolTip, TooltipImage[] toolTipImages) {
-        if (toolTip == null || toolTipImages == null) return;
-        for (int i = 0; i < toolTipImages.length; i++) removeToolTipImage(toolTip, toolTipImages[i]);
-    }
-
-    public void removeAllToolTipImages(Tooltip toolTip) {
-        if (toolTip == null) return;
-        removeToolTipImages(toolTip, toolTip.images.toArray(new TooltipImage[]{}));
+    public void removeAllTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+        if (toolTip == null || segment == null) return;
+        for(int i=0;i<toolTip.segments.size();i++) UICommonUtils.toolTip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
     }
 
     public void setToolTipAction(Tooltip toolTip, ToolTipAction toolTipAction) {
@@ -104,14 +82,9 @@ public final class APITooltip {
         toolTip.toolTipAction = toolTipAction;
     }
 
-    public void setDisplayFistLineAsTitle(Tooltip tooltip, boolean firstLineIsTitle) {
+    public void setTitle(Tooltip tooltip, String title) {
         if (tooltip == null) return;
-        tooltip.displayFistLineAsTitle = firstLineIsTitle;
-    }
-
-    public void setLines(Tooltip tooltip, String[] lines) {
-        if (tooltip == null) return;
-        UICommonUtils.tooltip_setLines(tooltip, lines);
+        tooltip.title = title;
     }
 
     public void setSizeMin(Tooltip tooltip, int minWidth, int minHeight) {
@@ -120,98 +93,116 @@ public final class APITooltip {
         tooltip.minHeight = Math.clamp(minHeight, 1, Integer.MAX_VALUE);
     }
 
-    public void setColor(Tooltip tooltip, float r, float g, float b, float a) {
-        if (tooltip == null) return;
-        tooltip.color_r = r;
-        tooltip.color_g = g;
-        tooltip.color_b = b;
-        tooltip.color_a = a;
-    }
 
-    public void setColor(Tooltip tooltip, Color color) {
-        if (tooltip == null || color == null) return;
-        setColor(tooltip, color.r, color.g, color.b, color.a);
-    }
+    public final class APITooltipSegment {
+        public final APITooltipTextSegment text;
+        public final APITooltipImageSegment image;
 
-    public void setFont(Tooltip tooltip, CMediaFont font) {
-        if (tooltip == null) return;
-        tooltip.font = font;
-    }
-
-    public final class APITooltipTextSegment {
-        APITooltipTextSegment() {
+        APITooltipSegment(){
+            text = new APITooltipTextSegment();
+            image = new APITooltipImageSegment();
         }
 
-    }
-
-    public final class APITooltipImageSegment {
-
-        APITooltipImageSegment(){
+        public void setColor(TooltipSegment tooltipSegment, Color color) {
+            if (tooltipSegment == null || color == null) return;
+            setColor(tooltipSegment, color.r, color.g, color.b, color.a);
         }
 
-        public TooltipImageSegment create(CMediaSprite sprite) {
-            return create(sprite, Color.WHITE);
+        public void setColor(TooltipSegment tooltipSegment, float r, float g, float b, float a) {
+            if (tooltipSegment == null) return;
+            tooltipSegment.color_r = r;
+            tooltipSegment.color_g = g;
+            tooltipSegment.color_b = b;
+            tooltipSegment.color_a = a;
         }
 
-        public TooltipImageSegment create(CMediaSprite sprite, Color color) {
-            TooltipImageSegment toolTipImageSegment = new TooltipImageSegment();
-            toolTipImageSegment.sprite = sprite;
-            toolTipImageSegment.color = new Color(color);
-            if (sprite != null) {
-                toolTipImageSegment.width = MathUtils.ceil(mediaManager.getCMediaSpriteWidth(sprite));
+        public void setFont(TooltipSegment tooltipSegment, CMediaFont font){
+            if (tooltipSegment == null) return;
+            tooltipSegment.font = font;
+        }
 
+        public void setAlignment(TooltipSegment tooltipSegment, TOOLTIP_SEGMENT_ALIGNMENT alignment){
+            if(tooltipSegment == null) return;
+            tooltipSegment.alignment = alignment;
+        }
+
+        public final class APITooltipImageSegment {
+
+            APITooltipImageSegment() {
             }
-            return toolTipImageSegment;
+
+            public TooltipImageSegment create(CMediaSprite sprite) {
+                return create(sprite,TOOLTIP_SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+            }
+
+            public TooltipImageSegment create(CMediaSprite sprite, TOOLTIP_SEGMENT_ALIGNMENT alignment) {
+                return create(sprite,alignment, Color.WHITE);
+            }
+
+            public TooltipImageSegment create(CMediaSprite sprite, TOOLTIP_SEGMENT_ALIGNMENT alignment, Color color) {
+                TooltipImageSegment tooltipImageSegment = new TooltipImageSegment();
+                tooltipImageSegment.color_r = color.r;
+                tooltipImageSegment.color_g = color.g;
+                tooltipImageSegment.color_b = color.b;
+                tooltipImageSegment.color_a = color.a;
+                tooltipImageSegment.alignment = alignment;
+                tooltipImageSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
+                tooltipImageSegment.image = sprite;
+                if (sprite != null) {
+                    tooltipImageSegment.width = MathUtils.ceil(mediaManager.getCMediaSpriteWidth(sprite) / UIEngine.TILE_SIZE_F);
+                    tooltipImageSegment.height = MathUtils.ceil(mediaManager.getCMediaSpriteHeight(sprite) / UIEngine.TILE_SIZE_F);
+                }else{
+                    tooltipImageSegment.width = tooltipImageSegment.height = 0;
+                }
+                return tooltipImageSegment;
+            }
+
+            public void setImage(TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
+                if (tooltipImageSegment == null) return;
+                UICommonUtils.toolTip_setImageSegmentImage(mediaManager,tooltipImageSegment, image);
+            }
+        }
+
+        public final class APITooltipTextSegment {
+            APITooltipTextSegment() {
+            }
+
+            public TooltipTextSegment create(String text) {
+                return create(text, TOOLTIP_SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+            }
+
+            public TooltipTextSegment create(String text, TOOLTIP_SEGMENT_ALIGNMENT alignment) {
+                return create(text, alignment, Color.WHITE);
+            }
+
+            public TooltipTextSegment create(String text, TOOLTIP_SEGMENT_ALIGNMENT alignment, Color color) {
+                TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
+                tooltipTextSegment.text = Tools.Text.validString(text);
+                tooltipTextSegment.color_r = color.r;
+                tooltipTextSegment.color_g = color.g;
+                tooltipTextSegment.color_b = color.b;
+                tooltipTextSegment.color_a = color.a;
+                tooltipTextSegment.alignment = alignment;
+                tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
+                if (!tooltipTextSegment.text.isEmpty()) {
+                    tooltipTextSegment.width = MathUtils.ceil(mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) / UIEngine.TILE_SIZE_F);
+                    tooltipTextSegment.height = 1;
+                }else{
+                    tooltipTextSegment.width = tooltipTextSegment.height = 0;
+                }
+                return tooltipTextSegment;
+            }
+
+            public void setText(TooltipTextSegment tooltipTextSegment, String text) {
+                if (tooltipTextSegment == null) return;
+                UICommonUtils.toolTip_setTextSegmentText(mediaManager, tooltipTextSegment, text);
+            }
+
         }
 
     }
 
-    public final class APITooltipImage {
 
-        APITooltipImage(){
-        }
-
-        public TooltipImage create(CMediaSprite image) {
-            return create(image, 0, 0);
-        }
-
-        public TooltipImage create(CMediaSprite image, int x, int y) {
-            TooltipImage toolTipImage = new TooltipImage();
-            toolTipImage.image = image;
-            toolTipImage.x = x;
-            toolTipImage.y = y;
-            toolTipImage.color_r = Color.WHITE.r;
-            toolTipImage.color_g = Color.WHITE.g;
-            toolTipImage.color_b = Color.WHITE.b;
-            toolTipImage.color_a = Color.WHITE.a;
-            return toolTipImage;
-        }
-
-        public void setImage(TooltipImage toolTipImage, CMediaSprite image) {
-            if (toolTipImage == null) return;
-            toolTipImage.image = image;
-        }
-
-        public void setPosition(TooltipImage toolTipImage, int x, int y) {
-            if (toolTipImage == null) return;
-            toolTipImage.x = x;
-            toolTipImage.y = y;
-        }
-
-        public void setColor(TooltipImage toolTipImage, float r, float g, float b, float a) {
-            if (toolTipImage == null) return;
-            toolTipImage.color_r = r;
-            toolTipImage.color_g = g;
-            toolTipImage.color_b = b;
-            toolTipImage.color_a = a;
-        }
-
-        public void setColor(TooltipImage toolTipImage, Color color) {
-            if (toolTipImage == null) return;
-            setColor(toolTipImage, color.r, color.g, color.b, color.a);
-        }
-
-    }
 
 
 }

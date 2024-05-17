@@ -44,6 +44,7 @@ import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
@@ -435,16 +436,14 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.setColor(imageButton5, Color.YELLOW);
         api.component.setColor(imageButton6, Color.ORANGE);
 
-        Tooltip imageToolTip = api.toolTip.create(Tools.Text.toArray("ToolTip With Images"), null, null, true, 3, 4);
 
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_1, 0, 0));
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_2, 1, 1));
-        api.toolTip.addToolTipImage(imageToolTip, api.toolTip.toolTipImage.create(ExampleBaseMedia.ICON_EXAMPLE_3, 3, 2));
+        api.component.setToolTip(imageButton4, api.toolTip.create(
+                new TooltipSegment[]{
+                        api.toolTip.segment.text.create("TextSegment")
+                },
+                null,"title"
+        ));
 
-        api.component.setToolTip(imageButton3, imageToolTip);
-        api.component.setToolTip(imageButton4, api.toolTip.create(Tools.Text.toArray("Button 2", "ppPPP", "yyGG", "WWAXY")));
-        api.component.setToolTip(imageButton5, api.toolTip.create(Tools.Text.toArray("Button 3", "Four")));
-        api.component.setToolTip(imageButton6, api.toolTip.create(Tools.Text.toArray("Button 3", "Buttons")));
 
 
         ArrayList<Component> border = api.composite.image_createBorder(10, 4, 4, 4);
@@ -531,7 +530,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text));
+                return api.toolTip.create(new TooltipSegment[]{
+                        api.toolTip.segment.text.create(listItem.text)
+                });
             }
         };
         api.component.list.setListAction(list1, list1Action);
@@ -580,7 +581,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text));
+                return api.toolTip.create(new TooltipSegment[]{
+                        api.toolTip.segment.text.create(listItem.text)
+                });
             }
         };
         api.component.list.setListAction(list2, list2Action);
@@ -617,7 +620,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
+                return api.toolTip.create(new TooltipSegment[]{
+                        api.toolTip.segment.text.create(listItem.text)
+                });
             }
 
             @Override
@@ -663,7 +668,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
+                return api.toolTip.create(new TooltipSegment[]{
+                        api.toolTip.segment.text.create(listItem.text)
+                });
             }
 
             @Override
@@ -708,7 +715,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                return api.toolTip.create(Tools.Text.toArray(listItem.text, "An item"));
+                return api.toolTip.create(new TooltipSegment[]{
+                        api.toolTip.segment.text.create(listItem.text)
+                });
             }
 
             @Override

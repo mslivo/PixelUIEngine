@@ -6,12 +6,9 @@ import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 import java.util.ArrayList;
 
 public class Tooltip {
-    public String[] lines;
-    public boolean displayFistLineAsTitle;
-    public CMediaFont font;
-    public float color_r, color_g, color_b, color_a;
+    public String title;
     public ToolTipAction toolTipAction;
     public int minWidth, minHeight;
-    public ArrayList<TooltipImage> images;
+    public ArrayList<TooltipSegment> segments;
 
 }

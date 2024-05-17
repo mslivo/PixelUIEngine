@@ -57,6 +57,9 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImage;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,8 +84,8 @@ public class UIEngine<T extends UIEngineAdapter> {
     // Constants
     public static final int TILE_SIZE = 8;
     public static final float TILE_SIZE_F = TILE_SIZE;
-    public static final int TILE_SIZE_2 = TILE_SIZE / 2;
-    public static final float TILE_SIZE_F2 = TILE_SIZE / 2f;
+    public static final int TILE_SIZE_HALF = TILE_SIZE / 2;
+    public static final float TILE_SIZE_F_HALF = TILE_SIZE / 2f;
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
 
 
@@ -1323,7 +1326,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.comboBox_selectItem(uiEngineState, comboBoxItem);
                         if (uiEngineState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
                             // emulated: move mouse back to combobox on item select
-                            uiEngineState.mouse_emulated.y = UICommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TILE_SIZE_2;
+                            uiEngineState.mouse_emulated.y = UICommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TILE_SIZE_HALF;
                         }
                         uiEngineState.pressedComboBoxItem = null;
                     }
@@ -2241,9 +2244,35 @@ public class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawTooltip() {
         if (uiEngineState.tooltip == null || uiEngineState.tooltip_wait_delay) return;
-        if (uiEngineState.tooltip.lines == null || uiEngineState.tooltip.lines.length == 0) return;
+        if (uiEngineState.tooltip.segments.isEmpty()) return;
         Tooltip tooltip = uiEngineState.tooltip;
+        ArrayList<TooltipSegment> segments = uiEngineState.tooltip.segments;
 
+        // Determine Dimensions
+        int tooltip_width = tooltip.minWidth;
+        int tooltip_height = tooltip.minHeight;
+        int heightSum = 0;
+        for(int i=0;i<segments.size();i++){
+            TooltipSegment segment = segments.get(i);
+            tooltip_width = Math.max(tooltip_width, segment.width);
+            heightSum += segment.height;
+        }
+        tooltip_height = Math.max(tooltip_height, heightSum);
+
+        // Determine Position
+        boolean drawRight = (uiEngineState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= uiEngineState.resolutionWidth_ui);
+        int tooltip_x;
+        if (drawRight) {
+            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x + (2 * TILE_SIZE), 0, uiEngineState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
+        } else {
+            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE), 0, uiEngineState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
+        }
+        int tooltip_y = Math.clamp(uiEngineState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2), 0, uiEngineState.resolutionHeight_ui - (tooltip_height * TILE_SIZE));
+
+
+        // Draw tooltip
+
+        /*
         int text_width_max = 0;
         for (int i = 0; i < tooltip.lines.length; i++) {
             String line = tooltip.lines[i];
@@ -2322,6 +2351,8 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
 
 
+
+         */
 
         render_batchSetColorWhite();
     }

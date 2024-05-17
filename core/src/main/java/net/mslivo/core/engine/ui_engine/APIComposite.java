@@ -32,6 +32,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.awt.*;
 import java.net.URI;
@@ -866,8 +867,8 @@ public final class APIComposite {
                 Tooltip tooltip = list.listAction.toolTip(item);
                 if (tooltip != null) {
                     linesLoop:
-                    for (int i2 = 0; i2 < tooltip.lines.length; i2++) {
-                        if (tooltip.lines[i] != null && tooltip.lines[i].trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                    for (int i2 = 0; i2 < tooltip.segments.size(); i2++) {
+                        if (tooltip.segments.get(i2) instanceof TooltipTextSegment textSegment && textSegment.text.trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                             resultList.add(item);
                             break linesLoop;
                         }
@@ -909,12 +910,12 @@ public final class APIComposite {
         ArrayList<Component> componentsList = new ArrayList<>();
 
         Text textC = api.component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
-        api.component.move(textC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+        api.component.move(textC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
         componentsList.add(textC);
 
         Textfield inputTextField = api.component.textfield.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
         componentsList.add(inputTextField);
-        api.component.move(inputTextField, UIEngine.TILE_SIZE_2, 0);
+        api.component.move(inputTextField, UIEngine.TILE_SIZE_HALF, 0);
 
         net.mslivo.core.engine.ui_engine.ui.components.button.Button okBtn = null;
         if (showOKButton) {
@@ -947,7 +948,7 @@ public final class APIComposite {
                             api.component.textfield.setMarkerPosition(inputTextField, inputTextField.content.length());
                         }
                     });
-                    api.component.move(charButtonLC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+                    api.component.move(charButtonLC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
                     componentsList.add(charButtonLC);
                     lowerCaseButtonsList.add(charButtonLC);
                     TextButton charButtonUC = api.component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
@@ -957,7 +958,7 @@ public final class APIComposite {
                             api.component.textfield.setMarkerPosition(inputTextField, inputTextField.content.length());
                         }
                     });
-                    api.component.move(charButtonUC, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+                    api.component.move(charButtonUC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
                     componentsList.add(charButtonUC);
                     api.component.setVisible(charButtonUC, false);
                     upperCaseButtonsList.add(charButtonUC);
@@ -980,7 +981,7 @@ public final class APIComposite {
                                 api.component.setVisible(upperCaseButtonsList.get(i2), value);
                         }
                     }, BUTTON_MODE.TOGGLE);
-            api.component.move(caseButton, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+            api.component.move(caseButton, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
             componentsList.add(caseButton);
             ix += 2;
             if (ix >= (wnd_width - 2)) {
@@ -998,7 +999,7 @@ public final class APIComposite {
                             }
                         }
                     }, BUTTON_MODE.DEFAULT);
-            api.component.move(delButton, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+            api.component.move(delButton, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
             componentsList.add(delButton);
 
 
@@ -1032,7 +1033,7 @@ public final class APIComposite {
                 api.component.textfield.focus(inputTextField);
             }
         });
-        api.component.move(okBtn, UIEngine.TILE_SIZE_2, UIEngine.TILE_SIZE_2);
+        api.component.move(okBtn, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
 
 
         //
