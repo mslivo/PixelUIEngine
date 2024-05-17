@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.*;
-import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 /*
  * Particle System must be extended and implemented

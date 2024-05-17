@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.tools.rendering.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
 
 /*
  * Particle System must be extended and implemented

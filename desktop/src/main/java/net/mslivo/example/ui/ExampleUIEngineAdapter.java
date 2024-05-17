@@ -8,17 +8,15 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.UIBaseMedia;
-import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
-import net.mslivo.core.engine.ui_engine.input.KeyCode;
-import net.mslivo.core.engine.ui_engine.render.ImmediateRenderer;
-import net.mslivo.core.engine.ui_engine.render.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.*;
+import net.mslivo.core.engine.ui_engine.constants.KeyCode;
+import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
-import net.mslivo.core.engine.ui_engine.ui.components.button.ButtonMode;
+import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewPort;
+import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
@@ -61,7 +59,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             public void onRelease() {
                 api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window", mediaManager));
             }
-        }, null, 0, ButtonMode.DEFAULT);
+        }, null, 0, BUTTON_MODE.DEFAULT);
 
         api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
@@ -87,7 +85,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         }));
         api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
-        api.setMouseTool(api.mouseTool.create("Pointer", null, UIBaseMedia.UI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia.UI_CURSOR_ARROW));
 
 
         api.config.input.setHardwareMouseEnabled(true);
@@ -108,7 +106,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
     @Override
     public void update() {
-        API._Input._KeyBoard keyBoard = api.input.keyboard;
+        APIInput.APIKeyboard keyBoard = api.input.keyboard;
         while (keyBoard.event.keyDownHasNext()) {
             int key = keyBoard.event.keyDownNext();
             switch (key) {
@@ -121,7 +119,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
     @Override
-    public void render(OrthographicCamera camera, AppViewPort appViewPort) {
+    public void render(OrthographicCamera camera, AppViewport appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

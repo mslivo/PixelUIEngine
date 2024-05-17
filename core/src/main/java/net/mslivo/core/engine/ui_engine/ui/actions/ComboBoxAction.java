@@ -1,10 +1,10 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboBoxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 
 public abstract class ComboBoxAction extends CommonActions {
 
-    public void onItemSelected(ComboBoxItem selectedItem) {
+    public void onItemSelected(ComboboxItem selectedItem) {
     }
 
     public void onOpen() {

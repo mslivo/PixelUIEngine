@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 public abstract class ListAction<T> extends CommonActions {
 
@@ -12,7 +12,7 @@ public abstract class ListAction<T> extends CommonActions {
         return null;
     }
 
-    public ToolTip toolTip(T listItem) {
+    public Tooltip toolTip(T listItem) {
         return null;
     }
 

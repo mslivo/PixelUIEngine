@@ -8,11 +8,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
-import net.mslivo.core.engine.ui_engine.enums.VIEWPORT_MODE;
-import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.render.misc.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.render.misc.PixelPerfectViewport;
+import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 
 public class TransitionManager {
     private NestedFrameBuffer frameBuffer_from;

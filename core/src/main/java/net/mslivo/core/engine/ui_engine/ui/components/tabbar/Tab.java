@@ -11,7 +11,7 @@ public class Tab {
     public String title;
     public int width;
     public TabAction tabAction;
-    public TabBar addedToTabBar;
+    public Tabbar addedToTabBar;
     public CMediaFont font;
     public CMediaSprite icon;
     public ArrayList<Component> components;
