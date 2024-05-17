@@ -50,6 +50,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.batch = new SpriteRenderer(mediaManager);
         this.immediateRenderer = new ImmediateRenderer();
 
+        api.config.window.setDefaultEnforceScreenBounds(false);
         Environment environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
         environment.add(new DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f));

@@ -60,7 +60,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         /* Window */
         Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.ICON_EXAMPLE_WINDOW, 0);
-        api.window.setEnforceScreenBounds(window, true);
+
         api.window.addComponent(window, api.preConfigured.button_CreateWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
         api.window.center(window);

@@ -2244,7 +2244,6 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (inputState.tooltip == null) return;
         if (inputState.tooltip_wait_delay) return;
         if (inputState.tooltip.lines == null || inputState.tooltip.lines.length == 0) return;
-
         ToolTip tooltip = inputState.tooltip;
 
         int text_width_max = 0;
@@ -2265,84 +2264,29 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
         }
 
-        int tooltip_x = 0;
-        int tooltip_y = 0;
-        // Direction
-        int direction = 1;
+        boolean drawRight = (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.resolutionWidth_ui);
 
-
-        /* Left or right ? */
-        /* Up or down */
-        boolean collidesLeft = true;
-        boolean collidesRight = true;
-        boolean collidesUp = true;
-        boolean collidesDown = true;
-
-
-        if (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.resolutionWidth_ui) {
-            collidesRight = false;
-            //direction = 1;
+        int tooltip_x;
+        int tooltip_y;
+        if(drawRight){
+            tooltip_x = Math.clamp(inputState.mouse_ui.x + (2 * TILE_SIZE),0,inputState.resolutionWidth_ui-(tooltip_width*TILE_SIZE));
+            tooltip_y = Math.clamp(inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2),0,inputState.resolutionHeight_ui-(tooltip_height*TILE_SIZE));
+        }else{
+            tooltip_x = Math.clamp(inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE), 0, inputState.resolutionWidth_ui-(tooltip_width*TILE_SIZE));
+            tooltip_y = Math.clamp(inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2),0,inputState.resolutionHeight_ui-(tooltip_height*TILE_SIZE));
         }
-        if (inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE) >= 0) {
-            collidesLeft = false;
-            //direction = 2;
-        }
-        if (inputState.mouse_ui.y - ((tooltip_height + 2) * TILE_SIZE) >= 0) {
-            collidesDown = false;
-            //direction = 3;
-        }
-        if (inputState.mouse_ui.y + ((tooltip_height + 2) * TILE_SIZE) <= inputState.resolutionHeight_ui) { // Push down
-            collidesUp = false;
-            //direction = 4;
-        }
-
-        if (collidesUp) direction = 4;
-        if (collidesDown) direction = 3;
-        if (collidesLeft) direction = 1;
-        if (collidesRight) direction = 2;
-
-        switch (direction) {
-            case 1 -> {
-                tooltip_x = inputState.mouse_ui.x + (2 * TILE_SIZE);
-                tooltip_y = inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2);
-            }
-            case 2 -> {
-                tooltip_x = inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE);
-                tooltip_y = inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2);
-            }
-            case 3 -> {
-                tooltip_x = inputState.mouse_ui.x - ((tooltip_width * TILE_SIZE) / 2);
-                tooltip_y = inputState.mouse_ui.y + ((2) * TILE_SIZE);
-            }
-            case 4 -> {
-                tooltip_x = inputState.mouse_ui.x - ((tooltip_width * TILE_SIZE) / 2);
-                tooltip_y = inputState.mouse_ui.y - ((tooltip_height + 2) * TILE_SIZE);
-            }
-        }
-
 
         // Draw
         float alpha = tooltip.color_a * inputState.tooltip_fadeIn_pct;
         render_batchSetColor(tooltip.color_r, tooltip.color_g, tooltip.color_b, alpha);
 
         // Lines
-        switch (direction) {
-            case 1 -> {
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x, inputState.mouse_ui.y);
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
-            }
-            case 2 -> {
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_X, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
-            }
-            case 3 -> {
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y);
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y + TILE_SIZE);
-            }
-            case 4 -> {
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - TILE_SIZE);
-                inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE_Y, inputState.mouse_ui.x, inputState.mouse_ui.y - (TILE_SIZE * 2));
-            }
+        if(drawRight){
+            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x, inputState.mouse_ui.y);
+            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
+        }else{
+            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
+            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
         }
 
         // Box
