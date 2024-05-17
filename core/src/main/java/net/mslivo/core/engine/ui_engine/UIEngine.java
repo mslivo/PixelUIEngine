@@ -1381,42 +1381,51 @@ public class UIEngine<T extends UIEngineAdapter> {
                         if (knob.knobAction != null) knob.knobAction.onRelease();
                         inputState.pressedKnob = null;
                     }
-                    case Grid __ -> {
-                        boolean isHoverObject = lastUIMouseHover == pressedUIObject;
-                        if (isHoverObject) {
-                            if (inputState.pressedGridItem != null) {
-                                inputState.pressedGrid.gridAction.onItemSelected(inputState.pressedGridItem);
-                            } else {
-                                inputState.pressedGrid.gridAction.onItemSelected(null);
+                    case Grid grid -> {
+                        boolean select = grid.gridAction != null ? grid.gridAction.onItemSelected(inputState.pressedGridItem) : true;
+                        if(inputState.pressedGridItem != null){
+                            if(select){
+                                if(grid.multiSelect){
+                                    if(!grid.selectedItems.contains(inputState.pressedGridItem)){
+                                        grid.selectedItems.add(inputState.pressedGridItem);
+                                    }else{
+                                        grid.selectedItems.remove(inputState.pressedGridItem);
+                                    }
+                                    grid.selectedItem = null;
+                                }else{
+                                    grid.selectedItems.clear();
+                                    grid.selectedItem = inputState.pressedGridItem;
+                                }
+                            }
+                        }else{
+                            if(select){
+                                grid.selectedItems.clear();
+                                grid.selectedItem = null;
                             }
                         }
                         inputState.pressedGrid = null;
                         inputState.pressedGridItem = null;
                     }
                     case List list -> {
-                        boolean isHoverObject = lastUIMouseHover == pressedUIObject;
-                        if (isHoverObject) {
-                            if (inputState.pressedListItem != null) {
-                                if (list.multiSelect) {
-                                    if (list.selectedItems.contains(inputState.pressedListItem)) {
-                                        list.selectedItems.remove(inputState.pressedListItem);
-                                    } else {
+                        boolean select = list.listAction != null ? list.listAction.onItemSelected(inputState.pressedListItem) : true;
+                        if(inputState.pressedListItem != null){
+                            if(select){
+                                if(list.multiSelect){
+                                    if(!list.selectedItems.contains(inputState.pressedListItem)){
                                         list.selectedItems.add(inputState.pressedListItem);
+                                    }else{
+                                        list.selectedItems.remove(inputState.pressedListItem);
                                     }
-                                    if (list.listAction != null)
-                                        list.listAction.onItemsSelected(list.selectedItems);
-                                } else {
-                                    list.selectedItem = inputState.pressedListItem;
-                                    if (list.listAction != null)
-                                        list.listAction.onItemSelected(list.selectedItem);
-                                }
-                            } else {
-                                if (list.multiSelect) {
-                                    list.selectedItems.clear();
-                                } else {
                                     list.selectedItem = null;
+                                }else{
+                                    list.selectedItems.clear();
+                                    list.selectedItem = inputState.pressedListItem;
                                 }
-                                if (list.listAction != null) list.listAction.onItemSelected(null);
+                            }
+                        }else{
+                            if(select){
+                                list.selectedItems.clear();
+                                list.selectedItem = null;
                             }
                         }
                         inputState.pressedListItem = null;

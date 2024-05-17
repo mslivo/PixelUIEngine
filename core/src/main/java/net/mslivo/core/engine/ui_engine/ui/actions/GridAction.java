@@ -20,7 +20,8 @@ public abstract class GridAction<T> extends CommonActions {
         return 0;
     }
 
-    public void onItemSelected(T listItem) {
+    public boolean onItemSelected(T listItem) {
+        return true;
     }
 
     public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {

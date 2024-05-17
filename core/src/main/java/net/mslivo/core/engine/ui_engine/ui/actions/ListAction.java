@@ -26,10 +26,8 @@ public abstract class ListAction<T> extends CommonActions {
         return listItem.toString();
     }
 
-    public void onItemSelected(T listItem) {
-    }
-
-    public void onItemsSelected(HashSet<T> listItems) {
+    public boolean onItemSelected(T listItem) {
+        return true;
     }
 
     public void onScrolled(float scrolled) {

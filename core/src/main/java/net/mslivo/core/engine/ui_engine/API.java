@@ -149,8 +149,8 @@ public class API {
 
         public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
             Window window = new Window();
-            window.x = x*UIEngine.TILE_SIZE;
-            window.y = y*UIEngine.TILE_SIZE;
+            window.x = x * UIEngine.TILE_SIZE;
+            window.y = y * UIEngine.TILE_SIZE;
             window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
             window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
             window.title = Tools.Text.validString(title);
@@ -1229,26 +1229,30 @@ public class API {
             }
 
             public Grid create(int x, int y, Object[][] items) {
-                return create(x, y, items, defaultGridAction(), false, false, false, false);
+                return create(x, y, items, defaultGridAction(), false, false, false, false, false);
             }
 
             public Grid create(int x, int y, Object[][] items, GridAction gridAction) {
-                return create(x, y, items, gridAction, false, false, false, false);
+                return create(x, y, items, gridAction, false, false, false, false, false);
             }
 
-            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled) {
-                return create(x, y, items, gridAction, dragEnabled, false, false, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect) {
+                return create(x, y, items, gridAction, multiSelect, false, false, false, false);
             }
 
-            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled) {
-                return create(x, y, items, gridAction, dragEnabled, dragOutEnabled, false, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled) {
+                return create(x, y, items, gridAction, multiSelect, dragEnabled, false, false, false);
             }
 
-            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-                return create(x, y, items, gridAction, dragEnabled, dragOutEnabled, dragInEnabled, false);
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
+                return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, false, false);
             }
 
-            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
+                return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
+            }
+
+            public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
                 Grid grid = new Grid();
                 int width = 1;
                 int height = 1;
@@ -1257,12 +1261,15 @@ public class API {
                     height = items[0].length * (doubleSized ? 2 : 1);
                 }
                 setComponentCommonInitValuesInternal(grid, x, y, width, height);
+                grid.selectedItem = null;
+                grid.selectedItems = new HashSet();
                 grid.items = items;
                 grid.gridAction = gridAction;
                 grid.dragEnabled = dragEnabled;
                 grid.dragInEnabled = dragInEnabled;
                 grid.dragOutEnabled = dragOutEnabled;
                 grid.doubleSized = doubleSized;
+                grid.multiSelect = multiSelect;
                 return grid;
             }
 
@@ -1458,9 +1465,9 @@ public class API {
                 return color != null ? new Color(color) : null;
             }
 
-            public boolean pointValid(Canvas canvas, int x, int y){
+            public boolean pointValid(Canvas canvas, int x, int y) {
                 if (canvas == null) return false;
-                return UICommons.canvas_pointValid(canvas, x,y);
+                return UICommons.canvas_pointValid(canvas, x, y);
             }
 
             public void point(Canvas canvas, int x, int y, Color color) {
@@ -3495,15 +3502,15 @@ public class API {
 
         public class _AppViewports {
 
-            public int activeSize(){
+            public int activeSize() {
                 return inputState.appViewPorts.size();
             }
 
-            public AppViewPort get(int index){
+            public AppViewPort get(int index) {
                 return inputState.appViewPorts.get(index);
             }
 
-            private ArrayList<AppViewPort> getAll(){
+            private ArrayList<AppViewPort> getAll() {
                 return new ArrayList<>(inputState.appViewPorts);
             }
 
@@ -3512,30 +3519,30 @@ public class API {
             }
 
             public boolean pointVisibleAny(float x, float y) {
-                for(int i=0;i<inputState.appViewPorts.size();i++){
-                    if(pointVisible(inputState.appViewPorts.get(i),x,y)) return true;
+                for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                    if (pointVisible(inputState.appViewPorts.get(i), x, y)) return true;
                 }
                 return false;
             }
 
-            public boolean rectVisible(AppViewPort appViewPort, float x, float y,float width, float height) {
-                return appViewPort.camera.frustum.boundsInFrustum(x, y, 0f, width, height,0f);
+            public boolean rectVisible(AppViewPort appViewPort, float x, float y, float width, float height) {
+                return appViewPort.camera.frustum.boundsInFrustum(x, y, 0f, width, height, 0f);
             }
 
-            public boolean rectVisibleAny(float x, float y,float width, float height) {
-                for(int i=0;i<inputState.appViewPorts.size();i++){
-                    if(rectVisible(inputState.appViewPorts.get(i),x,y, width, height)) return true;
+            public boolean rectVisibleAny(float x, float y, float width, float height) {
+                for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                    if (rectVisible(inputState.appViewPorts.get(i), x, y, width, height)) return true;
                 }
                 return false;
             }
 
-            public boolean sphereVisible(AppViewPort appViewPort, float x, float y,float radius) {
+            public boolean sphereVisible(AppViewPort appViewPort, float x, float y, float radius) {
                 return appViewPort.camera.frustum.sphereInFrustum(x, y, 0f, radius);
             }
 
-            public boolean sphereVisibleAny(float x, float y,float width, float radius) {
-                for(int i=0;i<inputState.appViewPorts.size();i++){
-                    if(sphereVisible(inputState.appViewPorts.get(i),x,y, radius)) return true;
+            public boolean sphereVisibleAny(float x, float y, float width, float radius) {
+                for (int i = 0; i < inputState.appViewPorts.size(); i++) {
+                    if (sphereVisible(inputState.appViewPorts.get(i), x, y, radius)) return true;
                 }
                 return false;
             }
@@ -4394,7 +4401,7 @@ public class API {
                     pixelColor.set(pixmap.getPixel(colorTexture.getRegionX() + x, colorTexture.getRegionY() + y));
                     component.canvas.point(colorCanvas, x, y, pixelColor.r, pixelColor.g, pixelColor.b, 1f);
                     if (initColor != null && pixelColor.r == initColor.r && pixelColor.g == initColor.g && pixelColor.b == initColor.b) {
-                        component.canvas.canvasImage.setPosition(cursorOverlay, x-1 ,  y-1 );
+                        component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, y - 1);
                     }
                 }
             }
@@ -4420,13 +4427,13 @@ public class API {
                 public void onUpdate() {
                     if (drag[0]) {
                         int x = input.mouse.state.xUI() - component.absoluteX(colorCanvas);
-                        int y =  (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
+                        int y = (input.mouse.state.yUI() - component.absoluteY(colorCanvas));
                         if (x < 0 || y < 0 || x >= colorTexture.getRegionWidth() || y >= colorTexture.getRegionHeight()) {
                             return;
                         }
                         if (x != xLast || y != yLast) {
                             currentColor = component.canvas.point(colorCanvas, x, y - 1);
-                            if(currentColor != null) {
+                            if (currentColor != null) {
                                 component.setColor(ok, currentColor);
                                 float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
                                 component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIBaseMedia.UI_FONT_WHITE : UIBaseMedia.UI_FONT_BLACK);

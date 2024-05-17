@@ -524,8 +524,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ListItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
+                return true;
             }
 
             @Override
@@ -572,8 +573,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ListItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
+                return true;
             }
 
             @Override
@@ -629,8 +631,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ListItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
+                return true;
             }
         };
         api.component.grid.setGridAction(grid1, gridAction1);
@@ -674,8 +677,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ListItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
+                return true;
             }
         };
         api.component.grid.setGridAction(grid2, gridAction2);
@@ -684,7 +688,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Grid grid3 = api.component.grid.create(32, 2, invItems3, null, true, false, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,false, true, false, false, true);
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override
