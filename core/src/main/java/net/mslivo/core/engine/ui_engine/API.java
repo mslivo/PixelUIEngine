@@ -62,6 +62,7 @@ import net.mslivo.core.engine.ui_engine.ui.ostextinput.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImage;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.ToolTipImageSegment;
 
 import java.awt.*;
 import java.net.URI;
@@ -2605,13 +2606,46 @@ public class API {
     public class _ToolTip {
 
         public final _ToolTipImage toolTipImage = new _ToolTipImage();
+        public final _ToolTipTextSegment textSegment = new _ToolTipTextSegment();
+        public final _ToolTipImageSegment imageSegment = new _ToolTipImageSegment();
+
+
+
+        public final class _ToolTipTextSegment {
+
+
+
+
+        }
+
+        public final class _ToolTipImageSegment {
+
+            public ToolTipImageSegment create(CMediaSprite sprite){
+                return create(sprite, Color.WHITE);
+            }
+
+            public ToolTipImageSegment create(CMediaSprite sprite, Color color){
+                ToolTipImageSegment toolTipImageSegment = new ToolTipImageSegment();
+                toolTipImageSegment.sprite = sprite;
+                toolTipImageSegment.color = new Color(color);
+                if(sprite != null) {
+                    toolTipImageSegment.width = MathUtils.ceil(mediaManager.getCMediaSpriteWidth(sprite));
+
+                }
+                return toolTipImageSegment;
+            }
+
+        }
 
         private ToolTipAction defaultToolTipAction() {
             return new ToolTipAction() {
             };
         }
 
-        public class _ToolTipImage {
+
+
+
+        public final class _ToolTipImage {
 
             public ToolTipImage create(CMediaSprite image) {
                 return create(image, 0, 0);
