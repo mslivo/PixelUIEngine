@@ -529,7 +529,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Control Confirm
                 case '\n' -> {
                     boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
-                    if(close) UICommons.mouseTextInput_close(inputState);
+                    if (close) UICommons.mouseTextInput_close(inputState);
                 }
                 // Default Text Character
                 default -> {
@@ -957,16 +957,16 @@ public class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void updateUI_keyInteractions() {
-        UICommons.setKeyboardInteractedUIObject(inputState,null);
+        UICommons.setKeyboardInteractedUIObject(inputState, null);
         if (inputState.config.ui_keyInteractionsDisabled) return;
 
         if (inputState.inputEvents.keyTyped) {
             boolean processKeyTyped = true;
             TextField focusedTextField = inputState.focusedTextField;
-            if(focusedTextField == null) processKeyTyped = false;
+            if (focusedTextField == null) processKeyTyped = false;
 
             if (processKeyTyped) {
-                 // Into Temp variable because focuseTextField can change after executing actions
+                // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < inputState.inputEvents.keyTypedCharacters.size; ic++) {
                     char keyTypedCharacter = (char) inputState.inputEvents.keyTypedCharacters.get(ic);
                     UICommons.textField_typeCharacter(mediaManager, focusedTextField, keyTypedCharacter);
@@ -983,7 +983,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (inputState.inputEvents.keyDown) {
             boolean processKeyDown = true;
             TextField focusedTextField = inputState.focusedTextField;
-            if(focusedTextField == null) processKeyDown = false;
+            if (focusedTextField == null) processKeyDown = false;
 
             if (focusedTextField != null) {
                 // TextField Control Keys
@@ -997,7 +997,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         }
                         UICommons.textField_executeControlKey(inputState, mediaManager, focusedTextField, keyDownKeyCode);
                     }
-                    UICommons.setKeyboardInteractedUIObject(inputState,focusedTextField);
+                    UICommons.setKeyboardInteractedUIObject(inputState, focusedTextField);
                 }
             } else {
                 // Hotkeys
@@ -1046,7 +1046,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
 
     private void updateUI_mouseInteractions() {
-        UICommons.setMouseInteractedUIObject(inputState,null);
+        UICommons.setMouseInteractedUIObject(inputState, null);
         if (inputState.config.ui_mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (inputState.inputEvents.mouseDoubleClick) {
@@ -1382,22 +1382,22 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                     case Grid grid -> {
                         boolean select = grid.gridAction != null ? grid.gridAction.onItemSelected(inputState.pressedGridItem) : true;
-                        if(inputState.pressedGridItem != null){
-                            if(select){
-                                if(grid.multiSelect){
-                                    if(!grid.selectedItems.contains(inputState.pressedGridItem)){
+                        if (inputState.pressedGridItem != null) {
+                            if (select) {
+                                if (grid.multiSelect) {
+                                    if (!grid.selectedItems.contains(inputState.pressedGridItem)) {
                                         grid.selectedItems.add(inputState.pressedGridItem);
-                                    }else{
+                                    } else {
                                         grid.selectedItems.remove(inputState.pressedGridItem);
                                     }
                                     grid.selectedItem = null;
-                                }else{
+                                } else {
                                     grid.selectedItems.clear();
                                     grid.selectedItem = inputState.pressedGridItem;
                                 }
                             }
-                        }else{
-                            if(select){
+                        } else {
+                            if (select) {
                                 grid.selectedItems.clear();
                                 grid.selectedItem = null;
                             }
@@ -1407,22 +1407,22 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                     case List list -> {
                         boolean select = list.listAction != null ? list.listAction.onItemSelected(inputState.pressedListItem) : true;
-                        if(inputState.pressedListItem != null){
-                            if(select){
-                                if(list.multiSelect){
-                                    if(!list.selectedItems.contains(inputState.pressedListItem)){
+                        if (inputState.pressedListItem != null) {
+                            if (select) {
+                                if (list.multiSelect) {
+                                    if (!list.selectedItems.contains(inputState.pressedListItem)) {
                                         list.selectedItems.add(inputState.pressedListItem);
-                                    }else{
+                                    } else {
                                         list.selectedItems.remove(inputState.pressedListItem);
                                     }
                                     list.selectedItem = null;
-                                }else{
+                                } else {
                                     list.selectedItems.clear();
                                     list.selectedItem = inputState.pressedListItem;
                                 }
                             }
-                        }else{
-                            if(select){
+                        } else {
+                            if (select) {
                                 list.selectedItems.clear();
                                 list.selectedItem = null;
                             }
@@ -1438,7 +1438,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (processMouseUpDragged) {
                 switch (draggedUIObject) {
                     case Window __ -> {
-                        inputState.draggedWindow_offset.set(0,0);
+                        inputState.draggedWindow_offset.set(0, 0);
                         inputState.draggedWindow = null;
                     }
                     case List list -> {
@@ -1526,7 +1526,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             }
 
             // MouseTool Interaction
-            if(!processMouseUpPressed && !processMouseUpDragged) {
+            if (!processMouseUpPressed && !processMouseUpDragged) {
                 if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                     MouseTool pressedMouseTool = inputState.mouseTool;
                     if (pressedMouseTool.mouseToolAction != null) {
@@ -1590,7 +1590,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 UICommons.setMouseInteractedUIObject(inputState, draggedUIObject);
             }
 
-            if(!processMouseDraggedPressed && !processMouseDraggedDragged){
+            if (!processMouseDraggedPressed && !processMouseDraggedDragged) {
                 // Mouse Tool Interaction
                 if (inputState.mouseToolPressed && inputState.mouseTool != null) {
                     MouseTool draggedMouseTool = inputState.mouseTool;
@@ -1612,7 +1612,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (inputState.inputEvents.mouseScrolled) {
             boolean processMouseScrolled = true;
             Object lastUIMouseHover = inputState.lastUIMouseHover;
-            if(lastUIMouseHover == null) processMouseScrolled = false;
+            if (lastUIMouseHover == null) processMouseScrolled = false;
 
             if (processMouseScrolled) {
                 switch (lastUIMouseHover) {
@@ -2241,8 +2241,7 @@ public class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawTooltip() {
-        if (inputState.tooltip == null) return;
-        if (inputState.tooltip_wait_delay) return;
+        if (inputState.tooltip == null || inputState.tooltip_wait_delay) return;
         if (inputState.tooltip.lines == null || inputState.tooltip.lines.length == 0) return;
         ToolTip tooltip = inputState.tooltip;
 
@@ -2255,39 +2254,33 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         int tooltip_width = Math.clamp(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float) TILE_SIZE), tooltip.minWidth, Integer.MAX_VALUE);
         int tooltip_height = Math.clamp(tooltip.lines.length, tooltip.minHeight, Integer.MAX_VALUE);
-
+        int firstLinePlus = tooltip.displayFistLineAsTitle ? 1 : 0;
         for (int i = 0; i < tooltip.images.size(); i++) {
             ToolTipImage toolTipImage = tooltip.images.get(i);
             int imageWidthMin = toolTipImage.x + MathUtils.ceil(mediaManager.getCMediaSpriteWidth(toolTipImage.image) / UIEngine.TILE_SIZE_F);
-            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.getCMediaSpriteHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F);
-            if (imageWidthMin > tooltip_width) tooltip_width = imageWidthMin;
-            if (imageHeightMin > tooltip_height) tooltip_height = imageHeightMin;
+            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.getCMediaSpriteHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F) + firstLinePlus;
+            tooltip_width = Math.max(tooltip_width, imageWidthMin);
+            tooltip_height = Math.max(tooltip_height, imageHeightMin);
         }
 
         boolean drawRight = (inputState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= inputState.resolutionWidth_ui);
 
         int tooltip_x;
-        int tooltip_y;
-        if(drawRight){
-            tooltip_x = Math.clamp(inputState.mouse_ui.x + (2 * TILE_SIZE),0,inputState.resolutionWidth_ui-(tooltip_width*TILE_SIZE));
-            tooltip_y = Math.clamp(inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2),0,inputState.resolutionHeight_ui-(tooltip_height*TILE_SIZE));
-        }else{
-            tooltip_x = Math.clamp(inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE), 0, inputState.resolutionWidth_ui-(tooltip_width*TILE_SIZE));
-            tooltip_y = Math.clamp(inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2),0,inputState.resolutionHeight_ui-(tooltip_height*TILE_SIZE));
+        if (drawRight) {
+            tooltip_x = Math.clamp(inputState.mouse_ui.x + (2 * TILE_SIZE), 0, inputState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
+        } else {
+            tooltip_x = Math.clamp(inputState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE), 0, inputState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
         }
+        int tooltip_y = Math.clamp(inputState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2), 0, inputState.resolutionHeight_ui - (tooltip_height * TILE_SIZE));
+
 
         // Draw
         float alpha = tooltip.color_a * inputState.tooltip_fadeIn_pct;
         render_batchSetColor(tooltip.color_r, tooltip.color_g, tooltip.color_b, alpha);
 
         // Lines
-        if(drawRight){
-            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x, inputState.mouse_ui.y);
-            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x + TILE_SIZE, inputState.mouse_ui.y);
-        }else{
-            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x - TILE_SIZE, inputState.mouse_ui.y);
-            inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x - (TILE_SIZE * 2), inputState.mouse_ui.y);
-        }
+        int xOffset = drawRight ? 0 : -TILE_SIZE*2;
+        inputState.spriteRenderer_ui.drawCMediaImage(UIBaseMedia.UI_TOOLTIP_LINE, inputState.mouse_ui.x + xOffset, inputState.mouse_ui.y);
 
         // Box
         for (int tx = 0; tx < tooltip_width; tx++) {
@@ -2299,6 +2292,17 @@ public class UIEngine<T extends UIEngineAdapter> {
                     inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
                 }
             }
+        }
+
+        // Images
+        for (int i = 0; i < tooltip.images.size(); i++) {
+            ToolTipImage toolTipImage = tooltip.images.get(i);
+            render_saveTempColorBatch();
+            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
+            int toolTipImageX = tooltip_x + (toolTipImage.x * UIEngine.TILE_SIZE);
+            int toolTipImageY = tooltip_y + (toolTipImage.y * UIEngine.TILE_SIZE);
+            render_drawCMediaSprite(toolTipImage.image, toolTipImageX, toolTipImageY);
+            render_loadTempColorBatch();
         }
 
 
@@ -2318,16 +2322,6 @@ public class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
-        // Images
-        for (int i = 0; i < tooltip.images.size(); i++) {
-            ToolTipImage toolTipImage = tooltip.images.get(i);
-            render_saveTempColorBatch();
-            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
-            int toolTipImageX = tooltip_x + (toolTipImage.x * UIEngine.TILE_SIZE);
-            int toolTipImageY = tooltip_y + (toolTipImage.y * UIEngine.TILE_SIZE);
-            render_drawCMediaSprite(toolTipImage.image, toolTipImageX, toolTipImageY);
-            render_loadTempColorBatch();
-        }
 
 
         render_batchSetColorWhite();
@@ -2616,7 +2610,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     inputState.spriteRenderer_ui.drawCMediaArray(textFieldGraphic, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
 
                     if (!textField.contentValid) {
-                        render_batchSetColorWhite(alpha*0.5f);
+                        render_batchSetColorWhite(alpha * 0.5f);
                         inputState.spriteRenderer_ui.drawCMediaArray(UIBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommons.component_getAbsoluteX(textField) + (ix * TILE_SIZE), UICommons.component_getAbsoluteY(textField), index);
                     }
                 }
