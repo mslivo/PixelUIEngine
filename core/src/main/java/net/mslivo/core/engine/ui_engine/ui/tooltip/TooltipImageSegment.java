@@ -5,4 +5,5 @@ import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 public class TooltipImageSegment extends TooltipSegment {
 
     public CMediaSprite image;
+    public int arrayIndex;
 }

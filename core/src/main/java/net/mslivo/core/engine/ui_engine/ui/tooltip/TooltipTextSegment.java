@@ -1,7 +1,9 @@
 package net.mslivo.core.engine.ui_engine.ui.tooltip;
 
-public class TooltipTextSegment extends TooltipSegment {
+import net.mslivo.core.engine.media_manager.media.CMediaFont;
 
+public class TooltipTextSegment extends TooltipSegment {
     public String text;
+    public CMediaFont font;
 
 }

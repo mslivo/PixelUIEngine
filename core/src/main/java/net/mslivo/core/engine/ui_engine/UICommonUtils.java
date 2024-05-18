@@ -896,8 +896,8 @@ class UICommonUtils {
     static void toolTip_setImageSegmentImage(MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
         tooltipImageSegment.image = image;
         if(tooltipImageSegment.image != null){
-            tooltipImageSegment.width = MathUtils.ceil(mediaManager.getCMediaSpriteWidth(image) / UIEngine.TILE_SIZE_F);
-            tooltipImageSegment.height = MathUtils.ceil(mediaManager.getCMediaSpriteHeight(image) / UIEngine.TILE_SIZE_F);
+            tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(image)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
+            tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(image)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
         }else{
             tooltipImageSegment.width = 0;
             tooltipImageSegment.height = 0;
@@ -907,7 +907,7 @@ class UICommonUtils {
     static void toolTip_setTextSegmentText(MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = text;
         if(tooltipTextSegment.text != null){
-            tooltipTextSegment.width = MathUtils.ceil(mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) / UIEngine.TILE_SIZE_F);
+            tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
             tooltipTextSegment.height = 1;
         }else{
             tooltipTextSegment.width = 0;

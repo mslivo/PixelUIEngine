@@ -36,8 +36,8 @@ public class UIEngineBaseMedia {
     public static final CMediaArray UI_SEPARATOR_HORIZONTAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "separator_horizontal.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_SEPARATOR_VERTICAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "separator_vertical.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_TOOLTIP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray UI_TOOLTIP_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip_border.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaImage UI_TOOLTIP_LINE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "tooltip_line.png");
-    public static final CMediaArray UI_TOOLTIP_TITLE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip_title.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "context_menu.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_CONTEXT_MENU_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "context_menu_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_TEXTFIELD = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "textfield.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
@@ -120,8 +120,8 @@ public class UIEngineBaseMedia {
             UI_SEPARATOR_HORIZONTAL,
             UI_SEPARATOR_VERTICAL,
             UI_TOOLTIP,
+            UI_TOOLTIP_BORDER,
             UI_TOOLTIP_LINE,
-            UI_TOOLTIP_TITLE,
             UI_CONTEXT_MENU,
             UI_CONTEXT_MENU_SELECTED,
             UI_TEXTFIELD,

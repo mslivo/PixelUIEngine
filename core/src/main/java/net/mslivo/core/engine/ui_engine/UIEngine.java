@@ -55,10 +55,7 @@ import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImage;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -2249,11 +2246,11 @@ public class UIEngine<T extends UIEngineAdapter> {
         ArrayList<TooltipSegment> segments = uiEngineState.tooltip.segments;
 
         // Determine Dimensions
-        int tooltip_width = tooltip.minWidth;
-        int tooltip_height = tooltip.minHeight;
+        int tooltip_width = 0;
+        int tooltip_height = 0;
         int heightSum = 0;
-        for(int i=0;i<segments.size();i++){
-            TooltipSegment segment = segments.get(i);
+        for(int is=0;is<segments.size();is++){
+            TooltipSegment segment = segments.get(is);
             tooltip_width = Math.max(tooltip_width, segment.width);
             heightSum += segment.height;
         }
@@ -2271,88 +2268,59 @@ public class UIEngine<T extends UIEngineAdapter> {
 
 
         // Draw tooltip
+        int iy = tooltip_height;
+        for(int is =0;is<tooltip.segments.size();is++){
+            TooltipSegment segment = segments.get(is);
+            iy -= segment.height;
 
-        /*
-        int text_width_max = 0;
-        for (int i = 0; i < tooltip.lines.length; i++) {
-            String line = tooltip.lines[i];
-            int line_width = render_textWidth(tooltip.font, line);
-            if (line_width > text_width_max) text_width_max = line_width;
+            // Background
+            int width_reference = tooltip_width;
+            int height_reference = segment.border ? segment.height : tooltip_height;
+            for (int ty = 0; ty < segment.height; ty++) {
+                int y_combined = iy+ty;
+                int y_reference = segment.border ? ty : y_combined;
+                for (int tx = 0; tx < tooltip_width; tx++) {
+                    render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                }
+            }
+
+            switch (segment){
+                case TooltipTextSegment  textSegment -> {
+                    // Text
+                    int text_width = render_textWidth(textSegment.font, textSegment.text);
+                    int text_y = tooltip_y + (iy * TILE_SIZE);
+                    int text_x = tooltip_x + switch (textSegment.alignment){
+                        case LEFT -> 1;
+                        case CENTER -> MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
+                        case RIGHT -> (tooltip_width*UIEngine.TILE_SIZE)-text_width-3;
+                    };
+                    render_drawFont(textSegment.font, textSegment.text, textSegment.color_a * uiEngineState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
+                }
+                case TooltipImageSegment imageSegment ->{
+                    // Image
+                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
+                    int image_width = mediaManager.getCMediaSpriteWidth(imageSegment.image);
+                    int image_height = mediaManager.getCMediaSpriteHeight(imageSegment.image);
+                    int image_y = tooltip_y + (iy * TILE_SIZE) + MathUtils.round((segment.height*UIEngine.TILE_SIZE-image_height)/2f);
+                    int image_x = tooltip_x + switch (imageSegment.alignment){
+                        case LEFT -> 2;
+                        case CENTER -> MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(image_width / 2f);
+                        case RIGHT -> (tooltip_width*UIEngine.TILE_SIZE)-image_width-2;
+                    };
+                    render_drawCMediaSprite(imageSegment.image,image_x, image_y, imageSegment.arrayIndex);
+                }
+                case null, default -> {}
+            }
         }
 
-        int tooltip_width = Math.clamp(MathUtils.ceil((text_width_max + (TILE_SIZE)) / (float) TILE_SIZE), tooltip.minWidth, Integer.MAX_VALUE);
-        int tooltip_height = Math.clamp(tooltip.lines.length, tooltip.minHeight, Integer.MAX_VALUE);
-        int firstLinePlus = tooltip.displayFistLineAsTitle ? 1 : 0;
-        for (int i = 0; i < tooltip.images.size(); i++) {
-            TooltipImage toolTipImage = tooltip.images.get(i);
-            int imageWidthMin = toolTipImage.x + MathUtils.ceil(mediaManager.getCMediaSpriteWidth(toolTipImage.image) / UIEngine.TILE_SIZE_F);
-            int imageHeightMin = toolTipImage.y + MathUtils.ceil(mediaManager.getCMediaSpriteHeight(toolTipImage.image) / UIEngine.TILE_SIZE_F) + firstLinePlus;
-            tooltip_width = Math.max(tooltip_width, imageWidthMin);
-            tooltip_height = Math.max(tooltip_height, imageHeightMin);
-        }
-
-        boolean drawRight = (uiEngineState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= uiEngineState.resolutionWidth_ui);
-
-        int tooltip_x;
-        if (drawRight) {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x + (2 * TILE_SIZE), 0, uiEngineState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
-        } else {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x - ((tooltip_width + 2) * TILE_SIZE), 0, uiEngineState.resolutionWidth_ui - (tooltip_width * TILE_SIZE));
-        }
-        int tooltip_y = Math.clamp(uiEngineState.mouse_ui.y - ((tooltip_height * TILE_SIZE) / 2), 0, uiEngineState.resolutionHeight_ui - (tooltip_height * TILE_SIZE));
-
-
-        // Draw
-        float alpha = tooltip.color_a * uiEngineState.tooltip_fadeIn_pct;
-        render_batchSetColor(tooltip.color_r, tooltip.color_g, tooltip.color_b, alpha);
-
+        // Line
         // Lines
         int xOffset = drawRight ? 0 : -TILE_SIZE*2;
         uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
 
-        // Box
-        for (int tx = 0; tx < tooltip_width; tx++) {
-            for (int ty = 0; ty < tooltip_height; ty++) {
-                if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
-                    int titleIndex = (tx == 0 ? 0 : ((tx == tooltip_width - 1) ? 2 : 1));
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_TITLE, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), titleIndex);
-                } else {
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (ty * TILE_SIZE), render_get16TilesCMediaIndex(tx, ty, tooltip_width, tooltip_height));
-                }
-            }
-        }
-
-        // Images
-        for (int i = 0; i < tooltip.images.size(); i++) {
-            TooltipImage toolTipImage = tooltip.images.get(i);
-            render_saveTempColorBatch();
-            render_batchSetColor(toolTipImage.color_r, toolTipImage.color_g, toolTipImage.color_b, alpha);
-            int toolTipImageX = tooltip_x + (toolTipImage.x * UIEngine.TILE_SIZE);
-            int toolTipImageY = tooltip_y + (toolTipImage.y * UIEngine.TILE_SIZE);
-            render_drawCMediaSprite(toolTipImage.image, toolTipImageX, toolTipImageY);
-            render_loadTempColorBatch();
-        }
-
-
-        //Text
-        for (int ty = 0; ty < tooltip_height; ty++) {
-            int lineIndex = tooltip_height - ty - 1;
-            if (lineIndex < tooltip.lines.length) {
-                String lineTxt = tooltip.lines[lineIndex];
-                if (tooltip.displayFistLineAsTitle && ty == (tooltip_height - 1)) {
-                    int text_width = render_textWidth(tooltip.font, lineTxt);
-                    int text_x = tooltip_x + MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
-                    int text_y = tooltip_y + (ty * TILE_SIZE);
-                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * uiEngineState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
-                } else {
-                    render_drawFont(tooltip.font, lineTxt, tooltip.color_a * uiEngineState.tooltip_fadeIn_pct, tooltip_x, tooltip_y + (ty * TILE_SIZE), 2, 1);
-                }
-            }
-        }
-
-
-
-         */
 
         render_batchSetColorWhite();
     }

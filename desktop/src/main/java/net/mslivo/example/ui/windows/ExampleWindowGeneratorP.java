@@ -11,16 +11,14 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
+import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
-import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
-import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
@@ -33,7 +31,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.Scrollbar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarHorizontal;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarVertical;
 import net.mslivo.core.engine.ui_engine.ui.components.shape.Shape;
-import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
 import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
 import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
@@ -439,9 +436,13 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("TextSegment")
-                },
-                null,"title"
+                        api.toolTip.segment.text.create("Title",true, SEGMENT_ALIGNMENT.CENTER),
+                        api.toolTip.segment.text.create("Text1"),
+                        api.toolTip.segment.text.create("1111",false, SEGMENT_ALIGNMENT.LEFT, Color.RED),
+                        api.toolTip.segment.text.create("2222222222222222222",false, SEGMENT_ALIGNMENT.RIGHT, Color.BLUE),
+                        api.toolTip.segment.text.create("Text2 aaaaaergergjregorejogerjgorejogej"),
+                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2,0,true,SEGMENT_ALIGNMENT.CENTER,Color.MAGENTA),
+                }
         ));
 
 
