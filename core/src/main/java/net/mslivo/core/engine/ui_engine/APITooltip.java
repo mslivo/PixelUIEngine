@@ -105,7 +105,7 @@ public final class APITooltip {
 
         public void setBorder(TooltipSegment tooltipSegment, boolean border) {
             if (tooltipSegment == null) return;
-            tooltipSegment.border = true;
+            tooltipSegment.border = border;
         }
 
         public final class APITooltipImageSegment {

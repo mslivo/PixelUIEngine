@@ -2248,13 +2248,12 @@ public class UIEngine<T extends UIEngineAdapter> {
         // Determine Dimensions
         int tooltip_width = 0;
         int tooltip_height = 0;
-        int heightSum = 0;
         for(int is=0;is<segments.size();is++){
             TooltipSegment segment = segments.get(is);
             tooltip_width = Math.max(tooltip_width, segment.width);
-            heightSum += segment.height;
+            tooltip_height += segment.height;
         }
-        tooltip_height = Math.max(tooltip_height, heightSum);
+        if(tooltip_width == 0 || tooltip_height == 0) return;
 
         // Determine Position
         boolean drawRight = (uiEngineState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= uiEngineState.resolutionWidth_ui);
@@ -2316,8 +2315,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
-        // Line
-        // Lines
+        // Draw line
         int xOffset = drawRight ? 0 : -TILE_SIZE*2;
         uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
 
