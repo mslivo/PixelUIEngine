@@ -202,12 +202,8 @@ public final class APITooltip {
                 tooltipTextSegment.alignment = alignment;
                 tooltipTextSegment.merge = merge;
                 tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
-                if (!tooltipTextSegment.text.isEmpty()) {
-                    tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
-                    tooltipTextSegment.height = 1;
-                } else {
-                    tooltipTextSegment.width = tooltipTextSegment.height = 0;
-                }
+                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
+                tooltipTextSegment.height = 1;
                 return tooltipTextSegment;
             }
 

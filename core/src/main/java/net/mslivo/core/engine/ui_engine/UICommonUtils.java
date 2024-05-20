@@ -899,20 +899,15 @@ class UICommonUtils {
             tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(image)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
             tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(image)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
         }else{
-            tooltipImageSegment.width = 0;
-            tooltipImageSegment.height = 0;
+            tooltipImageSegment.width = 1;
+            tooltipImageSegment.height = 1;
         }
     }
 
     static void toolTip_setTextSegmentText(MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
-        tooltipTextSegment.text = text;
-        if(tooltipTextSegment.text != null){
-            tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
-            tooltipTextSegment.height = 1;
-        }else{
-            tooltipTextSegment.width = 0;
-            tooltipTextSegment.height = 0;
-        }
+        tooltipTextSegment.text = Tools.Text.validString(text);
+        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text)+UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
+        tooltipTextSegment.height = 1;
     }
 
     static void toolTip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
