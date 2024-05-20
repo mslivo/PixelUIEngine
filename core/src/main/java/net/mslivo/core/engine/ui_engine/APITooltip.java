@@ -35,12 +35,17 @@ public final class APITooltip {
     }
 
     public Tooltip create(TooltipSegment[] segments) {
-        return create(segments, defaultToolTipAction());
+        return create(segments, defaultToolTipAction(), 0);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
+        return create(segments, toolTipAction, 0);
+    }
+
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth) {
         Tooltip tooltip = new Tooltip();
         tooltip.segments = new ArrayList<>();
+        tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
         if (segments != null) {
             for (int i = 0; i < segments.length; i++) {
                 if (segments[i].addedToTooltip == null) {
@@ -73,6 +78,10 @@ public final class APITooltip {
     public void setToolTipAction(Tooltip toolTip, ToolTipAction toolTipAction) {
         if (toolTip == null) return;
         toolTip.toolTipAction = toolTipAction;
+    }
+
+    public void setMinWidth(Tooltip tooltip, int minWidth) {
+        tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
     }
 
 
@@ -113,23 +122,23 @@ public final class APITooltip {
             APITooltipImageSegment() {
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite) {
-                return create(sprite, 0, false, SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
-            }
-
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex) {
-                return create(sprite, arrayIndex, false, SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+                return create(sprite, arrayIndex, SEGMENT_ALIGNMENT.LEFT, false, false, Color.WHITE);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, boolean border) {
-                return create(sprite, arrayIndex, border, SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment) {
+                return create(sprite, arrayIndex, alignment, false, false, Color.WHITE);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, boolean border, SEGMENT_ALIGNMENT alignment) {
-                return create(sprite, arrayIndex, border, alignment, Color.WHITE);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge) {
+                return create(sprite, arrayIndex, alignment, merge, false, Color.WHITE);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, boolean border, SEGMENT_ALIGNMENT alignment, Color color) {
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
+                return create(sprite, arrayIndex, alignment, merge, border, Color.WHITE);
+            }
+
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, Color color) {
                 TooltipImageSegment tooltipImageSegment = new TooltipImageSegment();
                 tooltipImageSegment.color_r = color.r;
                 tooltipImageSegment.color_g = color.g;
@@ -137,6 +146,7 @@ public final class APITooltip {
                 tooltipImageSegment.color_a = color.a;
                 tooltipImageSegment.alignment = alignment;
                 tooltipImageSegment.image = sprite;
+                tooltipImageSegment.merge = merge;
                 tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 tooltipImageSegment.border = border;
                 if (sprite != null) {
@@ -166,18 +176,22 @@ public final class APITooltip {
             }
 
             public TooltipTextSegment create(String text) {
-                return create(text, false, SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+                return create(text, SEGMENT_ALIGNMENT.LEFT, false, false, Color.WHITE);
             }
 
-            public TooltipTextSegment create(String text, boolean border) {
-                return create(text, border, SEGMENT_ALIGNMENT.LEFT, Color.WHITE);
+            public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment) {
+                return create(text, alignment, false, false, Color.WHITE);
             }
 
-            public TooltipTextSegment create(String text, boolean border, SEGMENT_ALIGNMENT alignment) {
-                return create(text, border, alignment, Color.WHITE);
+            public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge) {
+                return create(text, alignment, merge, false, Color.WHITE);
             }
 
-            public TooltipTextSegment create(String text, boolean border, SEGMENT_ALIGNMENT alignment, Color color) {
+            public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
+                return create(text, alignment, merge, border, Color.WHITE);
+            }
+
+            public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, Color color) {
                 TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
                 tooltipTextSegment.text = Tools.Text.validString(text);
                 tooltipTextSegment.color_r = color.r;
@@ -186,6 +200,7 @@ public final class APITooltip {
                 tooltipTextSegment.color_a = color.a;
                 tooltipTextSegment.border = border;
                 tooltipTextSegment.alignment = alignment;
+                tooltipTextSegment.merge = merge;
                 tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
                 if (!tooltipTextSegment.text.isEmpty()) {
                     tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);

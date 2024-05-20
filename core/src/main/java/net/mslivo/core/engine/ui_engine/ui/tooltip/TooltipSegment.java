@@ -8,5 +8,6 @@ public abstract class TooltipSegment {
     public int height;
     public SEGMENT_ALIGNMENT alignment;
     public boolean border;
+    public boolean merge;
     public Tooltip addedToTooltip;
 }

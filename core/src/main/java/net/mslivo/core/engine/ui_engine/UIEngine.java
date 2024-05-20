@@ -2246,15 +2246,14 @@ public class UIEngine<T extends UIEngineAdapter> {
         ArrayList<TooltipSegment> segments = uiEngineState.tooltip.segments;
 
         // Determine Dimensions
-        int tooltip_width = 0;
+        int tooltip_width = tooltip.minWidth;
         int tooltip_height = 0;
         for(int is=0;is<segments.size();is++){
             TooltipSegment segment = segments.get(is);
             tooltip_width = Math.max(tooltip_width, segment.width);
-            tooltip_height += segment.height;
+            if(!segment.merge) tooltip_height += segment.height;
         }
         if(tooltip_width == 0 || tooltip_height == 0) return;
-
         // Determine Position
         boolean drawRight = (uiEngineState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= uiEngineState.resolutionWidth_ui);
         int tooltip_x;
@@ -2270,19 +2269,21 @@ public class UIEngine<T extends UIEngineAdapter> {
         int iy = tooltip_height;
         for(int is =0;is<tooltip.segments.size();is++){
             TooltipSegment segment = segments.get(is);
-            iy -= segment.height;
 
             // Background
-            int width_reference = tooltip_width;
-            int height_reference = segment.border ? segment.height : tooltip_height;
-            for (int ty = 0; ty < segment.height; ty++) {
-                int y_combined = iy+ty;
-                int y_reference = segment.border ? ty : y_combined;
-                for (int tx = 0; tx < tooltip_width; tx++) {
-                    render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
-                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+            if(!segment.merge) {
+                iy -= segment.height;
+                int width_reference = tooltip_width;
+                int height_reference = segment.border ? segment.height : tooltip_height;
+                for (int ty = 0; ty < segment.height; ty++) {
+                    int y_combined = iy + ty;
+                    int y_reference = segment.border ? ty : y_combined;
+                    for (int tx = 0; tx < tooltip_width; tx++) {
+                        render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                        render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                    }
                 }
             }
 
