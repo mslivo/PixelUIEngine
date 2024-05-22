@@ -2380,7 +2380,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (!window.folded) {
                 render_drawComponent(component);
             } else {
-                if (component.y == window.height - 1) {
+                if ((component.y/TILE_SIZE) == (window.height - 1)) {
                     // draw title bar components only if folded
                     render_drawComponent(component);
                 }
