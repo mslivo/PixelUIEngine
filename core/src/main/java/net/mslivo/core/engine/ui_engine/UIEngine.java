@@ -14,14 +14,12 @@ import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
-import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
+import net.mslivo.core.engine.ui_engine.constants.*;
+import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.UIInputEvents;
-import net.mslivo.core.engine.ui_engine.constants.KeyCode;
-import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -32,7 +30,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
-import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
@@ -51,11 +48,13 @@ import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
-import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -2248,12 +2247,12 @@ public class UIEngine<T extends UIEngineAdapter> {
         // Determine Dimensions
         int tooltip_width = tooltip.minWidth;
         int tooltip_height = 0;
-        for(int is=0;is<segments.size();is++){
+        for (int is = 0; is < segments.size(); is++) {
             TooltipSegment segment = segments.get(is);
             tooltip_width = Math.max(tooltip_width, segment.width);
-            if(!segment.merge) tooltip_height += segment.height;
+            if (!segment.merge) tooltip_height += segment.height;
         }
-        if(tooltip_width == 0 || tooltip_height == 0) return;
+        if (tooltip_width == 0 || tooltip_height == 0) return;
         // Determine Position
         boolean drawRight = (uiEngineState.mouse_ui.x + ((tooltip_width + 2) * TILE_SIZE) <= uiEngineState.resolutionWidth_ui);
         int tooltip_x;
@@ -2267,57 +2266,78 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         // Draw tooltip
         int iy = tooltip_height;
-        for(int is =0;is<tooltip.segments.size();is++){
+        for (int is = 0; is < tooltip.segments.size(); is++) {
             TooltipSegment segment = segments.get(is);
 
             // Background
-            if(!segment.merge) {
+            if (!segment.merge) {
                 iy -= segment.height;
                 int width_reference = tooltip_width;
-                int height_reference = segment.border ? segment.height : tooltip_height;
+                int height_reference = tooltip_height;
+                final int BORDER_NONE = -1;
                 for (int ty = 0; ty < segment.height; ty++) {
                     int y_combined = iy + ty;
-                    int y_reference = segment.border ? ty : y_combined;
+                    int borderIndex = BORDER_NONE;
+                    if (segment.border) {
+                        borderIndex = segment.height == 1 ? 2 : ty == 0 ? 0 : ty == (segment.height - 1) ? 1 : BORDER_NONE;
+                        if(borderIndex != BORDER_NONE) {
+                            if (y_combined == (tooltip_height - 1)) { // top of tooltip
+                                if (borderIndex == 2) borderIndex = 0;
+                                if (borderIndex == 1) borderIndex = BORDER_NONE;
+                            }
+                            if (y_combined == 0) { // bottom of tooltip
+                                if (borderIndex == 2) borderIndex = 1;
+                                if (borderIndex == 0) borderIndex = BORDER_NONE;
+                            }
+                        }
+                    }
+
                     for (int tx = 0; tx < tooltip_width; tx++) {
                         render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
                         render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_reference, width_reference, height_reference));
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
+                        if (borderIndex != BORDER_NONE) {
+                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), borderIndex);
+                        }
                     }
                 }
             }
 
-            switch (segment){
-                case TooltipTextSegment  textSegment -> {
+            switch (segment) {
+                case TooltipTextSegment textSegment -> {
                     // Text
                     int text_width = render_textWidth(textSegment.font, textSegment.text);
                     int text_y = tooltip_y + (iy * TILE_SIZE);
-                    int text_x = tooltip_x + switch (textSegment.alignment){
+                    int text_x = tooltip_x + switch (textSegment.alignment) {
                         case LEFT -> 1;
-                        case CENTER -> MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
-                        case RIGHT -> (tooltip_width*UIEngine.TILE_SIZE)-text_width-3;
+                        case CENTER ->
+                                MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(text_width / 2f);
+                        case RIGHT -> (tooltip_width * UIEngine.TILE_SIZE) - text_width - 3;
                     };
                     render_drawFont(textSegment.font, textSegment.text, textSegment.color_a * uiEngineState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
                 }
-                case TooltipImageSegment imageSegment ->{
+                case TooltipImageSegment imageSegment -> {
                     // Image
                     render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
                     int image_width = mediaManager.getCMediaSpriteWidth(imageSegment.image);
                     int image_height = mediaManager.getCMediaSpriteHeight(imageSegment.image);
-                    int image_y = tooltip_y + (iy * TILE_SIZE) + MathUtils.round((segment.height*UIEngine.TILE_SIZE-image_height)/2f);
-                    int image_x = tooltip_x + switch (imageSegment.alignment){
+                    int image_y = tooltip_y + (iy * TILE_SIZE) + MathUtils.round((segment.height * UIEngine.TILE_SIZE - image_height) / 2f);
+                    int image_x = tooltip_x + switch (imageSegment.alignment) {
                         case LEFT -> 2;
-                        case CENTER -> MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(image_width / 2f);
-                        case RIGHT -> (tooltip_width*UIEngine.TILE_SIZE)-image_width-2;
+                        case CENTER ->
+                                MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(image_width / 2f);
+                        case RIGHT -> (tooltip_width * UIEngine.TILE_SIZE) - image_width - 2;
                     };
-                    render_drawCMediaSprite(imageSegment.image,image_x, image_y, imageSegment.arrayIndex);
+                    render_drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex);
                 }
-                case null, default -> {}
+                case null, default -> {
+                }
             }
         }
 
         // Draw line
-        int xOffset = drawRight ? 0 : -TILE_SIZE*2;
+        int xOffset = drawRight ? 0 : -TILE_SIZE * 2;
         uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
 
 
@@ -2380,7 +2400,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (!window.folded) {
                 render_drawComponent(component);
             } else {
-                if ((component.y/TILE_SIZE) == (window.height - 1)) {
+                if ((component.y / TILE_SIZE) == (window.height - 1)) {
                     // draw title bar components only if folded
                     render_drawComponent(component);
                 }

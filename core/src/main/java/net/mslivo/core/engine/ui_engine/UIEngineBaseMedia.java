@@ -37,6 +37,7 @@ public class UIEngineBaseMedia {
     public static final CMediaArray UI_SEPARATOR_VERTICAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "separator_vertical.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_TOOLTIP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_TOOLTIP_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip_border.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
+    public static final CMediaArray UI_TOOLTIP_SEGMENT_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "tooltip_segment_border.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaImage UI_TOOLTIP_LINE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "tooltip_line.png");
     public static final CMediaArray UI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "context_menu.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
     public static final CMediaArray UI_CONTEXT_MENU_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "context_menu_selected.png", UIEngine.TILE_SIZE, UIEngine.TILE_SIZE);
@@ -120,6 +121,7 @@ public class UIEngineBaseMedia {
             UI_SEPARATOR_HORIZONTAL,
             UI_SEPARATOR_VERTICAL,
             UI_TOOLTIP,
+            UI_TOOLTIP_SEGMENT_BORDER,
             UI_TOOLTIP_BORDER,
             UI_TOOLTIP_LINE,
             UI_CONTEXT_MENU,
