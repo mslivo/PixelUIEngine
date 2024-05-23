@@ -3,6 +3,7 @@ package net.mslivo.core.engine.ui_engine;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.ui_engine.constants.*;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -36,6 +37,7 @@ public final class API {
     // ##### PRIVATE Fields #####
     private final UIEngineState uiEngineState;
     private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
     // ##### API Components #####
     public final APIWindow window;
@@ -56,6 +58,7 @@ public final class API {
     public API(UIEngineState uiEngineState, MediaManager mediaManager) {
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.uiEngineConfig;
         this.window = new APIWindow(this, uiEngineState, mediaManager);
         this.component = new APIComponent(this, uiEngineState, mediaManager);
         this.input = new APIInput(this, uiEngineState, mediaManager);
@@ -78,7 +81,7 @@ public final class API {
 
     public void addNotification(Notification notification) {
         if (notification == null) return;
-        UICommonUtils.notification_addToScreen(uiEngineState, notification, uiEngineState.uiEngineConfig.notification_max);
+        UICommonUtils.notification_addToScreen(uiEngineState, notification, uiConfig.notification_max);
     }
 
     public void addNotifications(Notification[] notifications) {

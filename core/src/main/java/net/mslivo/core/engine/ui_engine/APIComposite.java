@@ -12,6 +12,7 @@ import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -42,14 +43,16 @@ import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 
 public final class APIComposite {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
     APIComposite(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.uiEngineConfig;
     }
 
     public class GraphInfo {
@@ -184,7 +187,7 @@ public final class APIComposite {
                         StringBuilder currentLine = new StringBuilder();
                         for (int i2 = 0; i2 < split.length; i2++) {
                             String value = split[i2];
-                            if (mediaManager.getCMediaFontTextWidth(uiEngineState.uiEngineConfig.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
+                            if (mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
                                 textList.add(currentLine.toString());
                                 currentLine = new StringBuilder(value + " ");
                             } else {
@@ -345,7 +348,7 @@ public final class APIComposite {
         for (int i = 0; i < size; i++) {
             int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
             net.mslivo.core.engine.ui_engine.ui.components.image.Image image = api.component.image.create(x + i, y, UIEngineBaseMedia.UI_SEPARATOR_HORIZONTAL, index);
-            api.component.setColor(image, uiEngineState.uiEngineConfig.component_defaultColor);
+            api.component.setColor(image, uiConfig.component_defaultColor);
             returnComponents.add(image);
         }
         return returnComponents;
@@ -356,7 +359,7 @@ public final class APIComposite {
         for (int i = 0; i < size; i++) {
             int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
             Image image = api.component.image.create(x, y + i, UIEngineBaseMedia.UI_SEPARATOR_VERTICAL, index);
-            api.component.setColor(image, uiEngineState.uiEngineConfig.component_defaultColor);
+            api.component.setColor(image, uiConfig.component_defaultColor);
             returnComponents.add(image);
         }
         return returnComponents;
@@ -511,11 +514,11 @@ public final class APIComposite {
     }
 
     public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-        return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, uiEngineState.uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters, uiEngineState.uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
+        return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, uiConfig.mouseTextInput_defaultLowerCaseCharacters, uiConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
     }
 
     public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-        return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, uiEngineState.uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters, uiEngineState.uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
+        return modal_CreateTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, uiConfig.mouseTextInput_defaultLowerCaseCharacters, uiConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
     }
 
     public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
@@ -529,7 +532,7 @@ public final class APIComposite {
     public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateMessageModal(String caption, String[] lines, Runnable closeFunction) {
         int longest = 0;
         for (int i = 0; i < lines.length; i++) {
-            int len = mediaManager.getCMediaFontTextWidth(uiEngineState.uiEngineConfig.component_defaultFont, lines[i]);
+            int len = mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, lines[i]);
             if (len > longest) longest = len;
         }
         ArrayList<Component> componentsList = new ArrayList<>();
@@ -569,8 +572,8 @@ public final class APIComposite {
     public net.mslivo.core.engine.ui_engine.ui.Window modal_CreateYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
         int textWidthMin = Math.max(
-                (mediaManager.getCMediaFontTextWidth(uiEngineState.uiEngineConfig.component_defaultFont, caption) + 8),
-                mediaManager.getCMediaFontTextWidth(uiEngineState.uiEngineConfig.component_defaultFont, text)
+                (mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, caption) + 8),
+                mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text)
         );
 
         int width = Math.clamp(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
@@ -889,7 +892,7 @@ public final class APIComposite {
         originalText = Tools.Text.validString(originalText);
         windowMinWidth = Math.clamp(windowMinWidth, 11, Integer.MAX_VALUE);
         int wnd_width = Math.clamp(
-                MathUtils.round(mediaManager.getCMediaFontTextWidth(uiEngineState.uiEngineConfig.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
+                MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
                 windowMinWidth, Integer.MAX_VALUE);
         int wnd_height = 5;
         if (showOKButton) wnd_height++;

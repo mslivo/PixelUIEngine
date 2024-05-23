@@ -11,16 +11,16 @@ import net.mslivo.core.engine.ui_engine.ui.actions.NotificationAction;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 
 public final class APINotification {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
-    private UIConfig uiConfig;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
     APINotification(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = this.uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.uiEngineConfig;
     }
 
 

@@ -15,18 +15,18 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 import java.util.ArrayList;
 
 public final class APITooltip {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
     public final APITooltipSegment segment;
-    private UIConfig uiConfig;
 
     APITooltip(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.segment = new APITooltipSegment();
         this.uiConfig = uiEngineState.uiEngineConfig;
+        this.segment = new APITooltipSegment();
     }
 
     private ToolTipAction defaultToolTipAction() {

@@ -2,20 +2,23 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.math.Matrix4;
 import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 
 import java.util.ArrayList;
 
 public final class APICamera {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final UIConfig uiConfig;
+    private final MediaManager mediaManager;
     public final APIAppViewports appViewport;
 
     APICamera(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiConfig = uiEngineState.uiEngineConfig;
         this.mediaManager = mediaManager;
         this.appViewport = new APIAppViewports();
     }

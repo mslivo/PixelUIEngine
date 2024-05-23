@@ -5,6 +5,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextmenuAction;
@@ -14,14 +15,16 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import java.util.ArrayList;
 
 public final class APIContextMenu {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
     public final APIContextMenuItem item;
 
     APIContextMenu(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiConfig = uiEngineState.uiEngineConfig;
         this.mediaManager = mediaManager;
         this.item = new APIContextMenuItem();
     }
@@ -127,10 +130,10 @@ public final class APIContextMenu {
         public ContextmenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaSprite icon, int iconIndex) {
             ContextmenuItem contextMenuItem = new ContextmenuItem();
             contextMenuItem.text = Tools.Text.validString(text);
-            contextMenuItem.font = uiEngineState.uiEngineConfig.component_defaultFont;
-            contextMenuItem.color_r = uiEngineState.uiEngineConfig.component_defaultColor.r;
-            contextMenuItem.color_g = uiEngineState.uiEngineConfig.component_defaultColor.g;
-            contextMenuItem.color_b = uiEngineState.uiEngineConfig.component_defaultColor.b;
+            contextMenuItem.font = uiConfig.component_defaultFont;
+            contextMenuItem.color_r = uiConfig.component_defaultColor.r;
+            contextMenuItem.color_g = uiConfig.component_defaultColor.g;
+            contextMenuItem.color_b = uiConfig.component_defaultColor.b;
             contextMenuItem.icon = icon;
             contextMenuItem.iconIndex = iconIndex;
             contextMenuItem.name = "";

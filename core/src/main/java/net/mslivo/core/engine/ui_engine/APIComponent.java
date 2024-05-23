@@ -14,6 +14,7 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -42,9 +43,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public final class APIComponent {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
+
     public final APIShape shape;
     public final APIButton button;
     public final APITabbar tabbar;
@@ -65,6 +68,7 @@ public final class APIComponent {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig= uiEngineState.uiEngineConfig;
         this.shape = new APIShape();
         this.button = new APIButton();
         this.tabbar = new APITabbar();
@@ -90,19 +94,19 @@ public final class APIComponent {
         }
 
         public AppViewport create(int x, int y, int width, int height) {
-            return create(x, y, width, height, null, 0, 0, 1f, uiEngineState.uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, null, 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction) {
-            return create(x, y, width, height, appViewPortAction, 0, 0, 1f, uiEngineState.uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY) {
-            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, 1f, uiEngineState.uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, 1f, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom) {
-            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, camZoom, uiEngineState.uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, camZoom, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
@@ -209,11 +213,11 @@ public final class APIComponent {
 
         public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
             Progressbar progressBar = new Progressbar();
-            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiEngineState.uiEngineConfig.component_defaultColor);
+            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor);
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
-            progressBar.font = uiEngineState.uiEngineConfig.component_defaultFont;
+            progressBar.font = uiConfig.component_defaultFont;
             return progressBar;
         }
 
@@ -246,7 +250,7 @@ public final class APIComponent {
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType) {
             Shape shape = new Shape();
-            setComponentCommonInitValuesInternal(shape, x, y, width, height, uiEngineState.uiEngineConfig.component_defaultColor);
+            setComponentCommonInitValuesInternal(shape, x, y, width, height, uiConfig.component_defaultColor);
             shape.shapeType = shapeType;
             return shape;
         }
@@ -299,7 +303,7 @@ public final class APIComponent {
                 setComponentCommonInitValuesInternal(textButton, x, y, width, height);
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
-                textButton.font = uiEngineState.uiEngineConfig.component_defaultFont;
+                textButton.font = uiConfig.component_defaultFont;
                 textButton.icon = icon;
                 textButton.iconIndex = iconIndex;
                 UICommonUtils.button_centerContent(mediaManager, textButton);
@@ -352,7 +356,7 @@ public final class APIComponent {
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
                 ImageButton imageButton = new ImageButton();
-                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiEngineState.uiEngineConfig.component_defaultColor, Color.WHITE);
+                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiConfig.component_defaultColor, Color.WHITE);
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
@@ -480,7 +484,7 @@ public final class APIComponent {
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction;
-            checkBox.font = uiEngineState.uiEngineConfig.component_defaultFont;
+            checkBox.font = uiConfig.component_defaultFont;
             checkBox.checked = checked;
             return checkBox;
         }
@@ -717,7 +721,7 @@ public final class APIComponent {
                 tab.tabAction = tabAction;
                 tab.icon = icon;
                 tab.iconIndex = iconIndex;
-                tab.font = uiEngineState.uiEngineConfig.component_defaultFont;
+                tab.font = uiConfig.component_defaultFont;
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
@@ -916,30 +920,30 @@ public final class APIComponent {
 
         public Textfield create(int x, int y, int width) {
             return create(x, y, width, "", defaultTextFieldAction(), 32,
-                    uiEngineState.uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+                    uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content) {
             return create(x, y, width, content, defaultTextFieldAction(), 32,
-                    uiEngineState.uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+                    uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
             return create(x, y, width, content, textFieldAction, 32,
-                    uiEngineState.uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+                    uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
             return create(x, y, width, content, textFieldAction, contentMaxLength,
-                    uiEngineState.uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+                    uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
             setComponentCommonInitValuesInternal(textField, x, y, width, 1, Color.WHITE);
-            textField.font = uiEngineState.uiEngineConfig.component_defaultFont;
+            textField.font = uiConfig.component_defaultFont;
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
                 textField.allowedCharacters.add(allowedCharacters[i]);
@@ -1129,15 +1133,15 @@ public final class APIComponent {
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y) {
-                return create(image, x, y, 0, false, uiEngineState.uiEngineConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, 0, false, uiConfig.component_mapOverlayDefaultFadeoutTime);
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex) {
-                return create(image, x, y, arrayIndex, false, uiEngineState.uiEngineConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, arrayIndex, false, uiConfig.component_mapOverlayDefaultFadeoutTime);
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut) {
-                return create(image, x, y, arrayIndex, fadeOut, uiEngineState.uiEngineConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, arrayIndex, fadeOut, uiConfig.component_mapOverlayDefaultFadeoutTime);
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut, int fadeOutTime) {
@@ -1239,7 +1243,7 @@ public final class APIComponent {
 
         public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
             Knob knob = new Knob();
-            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiEngineState.uiEngineConfig.component_defaultColor, Color.BLACK);
+            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, Color.BLACK);
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
             knob.knobAction = knobAction;
@@ -1279,7 +1283,7 @@ public final class APIComponent {
 
         public Text create(int x, int y, String[] lines, TextAction textAction) {
             Text text = new Text();
-            text.font = uiEngineState.uiEngineConfig.component_defaultFont;
+            text.font = uiConfig.component_defaultFont;
             int width = 1;
             int height = 1;
             if (lines != null && text.font != null) {
@@ -1511,10 +1515,10 @@ public final class APIComponent {
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaSprite icon, int iconIndex) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
-                comboBoxItem.font = uiEngineState.uiEngineConfig.component_defaultFont;
-                comboBoxItem.color_r = uiEngineState.uiEngineConfig.component_defaultColor.r;
-                comboBoxItem.color_g = uiEngineState.uiEngineConfig.component_defaultColor.g;
-                comboBoxItem.color_b = uiEngineState.uiEngineConfig.component_defaultColor.b;
+                comboBoxItem.font = uiConfig.component_defaultFont;
+                comboBoxItem.color_r = uiConfig.component_defaultColor.r;
+                comboBoxItem.color_g = uiConfig.component_defaultColor.g;
+                comboBoxItem.color_b = uiConfig.component_defaultColor.b;
                 comboBoxItem.icon = icon;
                 comboBoxItem.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
@@ -1689,7 +1693,7 @@ public final class APIComponent {
             list.dragEnabled = dragEnabled;
             list.dragInEnabled = dragInEnabled;
             list.dragOutEnabled = dragOutEnabled;
-            list.font = uiEngineState.uiEngineConfig.component_defaultFont;
+            list.font = uiConfig.component_defaultFont;
             return list;
         }
 
@@ -1950,7 +1954,7 @@ public final class APIComponent {
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
-        setComponentCommonInitValuesInternal(component, x, y, width, height, uiEngineState.uiEngineConfig.component_defaultColor, uiEngineState.uiEngineConfig.component_defaultColor);
+        setComponentCommonInitValuesInternal(component, x, y, width, height, uiConfig.component_defaultColor, uiConfig.component_defaultColor);
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color) {

@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -9,13 +10,15 @@ import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import java.util.Arrays;
 
 public final class APIHotkey {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final UIConfig uiConfig;
+    private final MediaManager mediaManager;
 
     APIHotkey(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiConfig = uiEngineState.uiEngineConfig;
         this.mediaManager = mediaManager;
     }
 

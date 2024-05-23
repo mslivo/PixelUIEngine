@@ -4,19 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 
 public final class APIMouseTextInput {
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
     APIMouseTextInput(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.uiEngineConfig;
     }
 
     private MouseTextInputAction defaultMouseTextInputConfirmAction() {
@@ -27,36 +30,36 @@ public final class APIMouseTextInput {
     public void open(int x, int y) {
         open(x, y, defaultMouseTextInputConfirmAction(),
                 null,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiConfig.mouseTextInput_defaultLowerCaseCharacters,
+                uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
     public void open(int x, int y, MouseTextInputAction onConfirm) {
         open(x, y, onConfirm,
                 null,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiConfig.mouseTextInput_defaultLowerCaseCharacters,
+                uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
     public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
         open(x, y, onConfirm,
                 selectedCharacter,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineState.uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiConfig.mouseTextInput_defaultLowerCaseCharacters,
+                uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
     public void open(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
         if (charactersLC == null || charactersUC == null) return;
         if (uiEngineState.openMouseTextInput != null) return;
         MouseTextInput mouseTextInput = new MouseTextInput();
-        mouseTextInput.color_r = uiEngineState.uiEngineConfig.mouseTextInput_defaultColor.r;
-        mouseTextInput.color_g = uiEngineState.uiEngineConfig.mouseTextInput_defaultColor.g;
-        mouseTextInput.color_b = uiEngineState.uiEngineConfig.mouseTextInput_defaultColor.b;
-        mouseTextInput.color_a = uiEngineState.uiEngineConfig.mouseTextInput_defaultColor.a;
+        mouseTextInput.color_r = uiConfig.mouseTextInput_defaultColor.r;
+        mouseTextInput.color_g = uiConfig.mouseTextInput_defaultColor.g;
+        mouseTextInput.color_b = uiConfig.mouseTextInput_defaultColor.b;
+        mouseTextInput.color_a = uiConfig.mouseTextInput_defaultColor.a;
         mouseTextInput.color2_r = 0.5f;
         mouseTextInput.color2_g = 0.5f;
         mouseTextInput.color2_b = 0.5f;
-        mouseTextInput.font = uiEngineState.uiEngineConfig.mouseTextInput_defaultFont;
+        mouseTextInput.font = uiConfig.mouseTextInput_defaultFont;
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
         mouseTextInput.mouseTextInputAction = mouseTextInputAction;

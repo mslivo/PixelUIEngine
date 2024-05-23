@@ -5,6 +5,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
@@ -18,14 +19,16 @@ import java.util.ArrayList;
 
 public final class APIWindow {
 
-    private API api;
-    private UIEngineState uiEngineState;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final UIConfig uiConfig;
+    private final MediaManager mediaManager;
 
     APIWindow(API api, UIEngineState uiEngineState, MediaManager mediaManager){
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.uiEngineConfig;
     }
 
     private WindowAction defaultWindowAction() {
@@ -70,11 +73,11 @@ public final class APIWindow {
         window.title = Tools.Text.validString(title);
         window.alwaysOnTop = alwaysOnTop;
         window.moveAble = moveAble;
-        window.color_r = uiEngineState.uiEngineConfig.window_defaultColor.r;
-        window.color_g = uiEngineState.uiEngineConfig.window_defaultColor.g;
-        window.color_b = uiEngineState.uiEngineConfig.window_defaultColor.b;
-        window.color_a = uiEngineState.uiEngineConfig.window_defaultColor.a;
-        window.font = uiEngineState.uiEngineConfig.window_defaultFont;
+        window.color_r = uiConfig.window_defaultColor.r;
+        window.color_g = uiConfig.window_defaultColor.g;
+        window.color_b = uiConfig.window_defaultColor.b;
+        window.color_a = uiConfig.window_defaultColor.a;
+        window.font = uiConfig.window_defaultFont;
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
         window.windowAction = windowAction;
@@ -82,7 +85,7 @@ public final class APIWindow {
         window.iconIndex = iconIndex;
         window.name = "";
         window.data = null;
-        window.enforceScreenBounds = uiEngineState.uiEngineConfig.window_defaultEnforceScreenBounds;
+        window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;
         window.messageReceiverActions = new ArrayList<>();
         window.updateActions = new ArrayList<>();
         window.addedToScreen = false;
