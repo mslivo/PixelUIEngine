@@ -2280,7 +2280,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     int borderIndex = BORDER_NONE;
                     if (segment.border) {
                         borderIndex = segment.height == 1 ? 2 : ty == 0 ? 0 : ty == (segment.height - 1) ? 1 : BORDER_NONE;
-                        if(borderIndex != BORDER_NONE) {
+                        if (borderIndex != BORDER_NONE) {
                             if (y_combined == (tooltip_height - 1)) { // top of tooltip
                                 if (borderIndex == 2) borderIndex = 0;
                                 if (borderIndex == 1) borderIndex = BORDER_NONE;
@@ -2295,7 +2295,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     for (int tx = 0; tx < tooltip_width; tx++) {
                         render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
-                        render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
+                        render_batchSetColor(tooltip.color_border_r, tooltip.color_border_g, tooltip.color_border_b, tooltip.color_border_a * uiEngineState.tooltip_fadeIn_pct);
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
                         if (borderIndex != BORDER_NONE) {
                             uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + (tx * TILE_SIZE), tooltip_y + (y_combined * TILE_SIZE), borderIndex);
@@ -2318,8 +2318,6 @@ public class UIEngine<T extends UIEngineAdapter> {
                     render_drawFont(textSegment.font, textSegment.text, textSegment.color_a * uiEngineState.tooltip_fadeIn_pct, text_x, text_y, 1, 1);
                 }
                 case TooltipImageSegment imageSegment -> {
-                    // Image
-                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
                     int image_width = mediaManager.getCMediaSpriteWidth(imageSegment.image);
                     int image_height = mediaManager.getCMediaSpriteHeight(imageSegment.image);
                     int image_y = tooltip_y + (iy * TILE_SIZE) + MathUtils.round((segment.height * UIEngine.TILE_SIZE - image_height) / 2f);
@@ -2329,6 +2327,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                                 MathUtils.round((tooltip_width * TILE_SIZE) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> (tooltip_width * UIEngine.TILE_SIZE) - image_width - 2;
                     };
+                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
                     render_drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex);
                 }
                 case null, default -> {

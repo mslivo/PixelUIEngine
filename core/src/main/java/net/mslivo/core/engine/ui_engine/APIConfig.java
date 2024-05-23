@@ -471,6 +471,13 @@ public final class APIConfig {
             uiEngineState.uiEngineConfig.tooltip_FadeInDelayTime = tooltip_FadeInDelayTime;
         }
 
+        public Color getTooltip_defaultBorderColor() {
+            return uiEngineState.uiEngineConfig.tooltip_defaultBorderColor;
+        }
+
+        public void setTooltip_defaultBorderColor(Color tooltip_defaultBorderColor) {
+            uiEngineState.uiEngineConfig.tooltip_defaultBorderColor = tooltip_defaultBorderColor;
+        }
     }
 
     public final class APIMouseTextInputConfig {

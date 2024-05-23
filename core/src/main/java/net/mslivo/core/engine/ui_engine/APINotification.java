@@ -5,6 +5,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.NotificationAction;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -13,11 +14,13 @@ public final class APINotification {
     private API api;
     private UIEngineState uiEngineState;
     private MediaManager mediaManager;
+    private UIConfig uiConfig;
 
     APINotification(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
+        this.uiConfig = this.uiEngineState.uiEngineConfig;
     }
 
 
@@ -27,22 +30,22 @@ public final class APINotification {
     }
 
     public Notification create(String text) {
-        return create(text, defaultNotificationAction(), uiEngineState.uiEngineConfig.notification_defaultDisplayTime);
+        return create(text, defaultNotificationAction(), uiConfig.notification_defaultDisplayTime);
     }
 
     public Notification create(String text, NotificationAction notificationAction) {
-        return create(text, notificationAction, uiEngineState.uiEngineConfig.notification_defaultDisplayTime);
+        return create(text, notificationAction, uiConfig.notification_defaultDisplayTime);
     }
 
     public Notification create(String text, NotificationAction notificationAction, int displayTime) {
         Notification notification = new Notification();
         notification.text = Tools.Text.validString(text);
         notification.displayTime = displayTime;
-        notification.color_r = uiEngineState.uiEngineConfig.notification_defaultColor.r;
-        notification.color_g = uiEngineState.uiEngineConfig.notification_defaultColor.g;
-        notification.color_b = uiEngineState.uiEngineConfig.notification_defaultColor.b;
-        notification.color_a = uiEngineState.uiEngineConfig.notification_defaultColor.a;
-        notification.font = uiEngineState.uiEngineConfig.notification_defaultFont;
+        notification.color_r = uiConfig.notification_defaultColor.r;
+        notification.color_g = uiConfig.notification_defaultColor.g;
+        notification.color_b = uiConfig.notification_defaultColor.b;
+        notification.color_a = uiConfig.notification_defaultColor.a;
+        notification.font = uiConfig.notification_defaultFont;
         notification.notificationAction = notificationAction;
         notification.timer = 0;
         int textWidth = mediaManager.getCMediaFontTextWidth(notification.font, notification.text);

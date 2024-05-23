@@ -7,6 +7,7 @@ import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
+import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
@@ -18,12 +19,14 @@ public final class APITooltip {
     private UIEngineState uiEngineState;
     private MediaManager mediaManager;
     public final APITooltipSegment segment;
+    private UIConfig uiConfig;
 
     APITooltip(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
         this.segment = new APITooltipSegment();
+        this.uiConfig = uiEngineState.uiEngineConfig;
     }
 
     private ToolTipAction defaultToolTipAction() {
@@ -32,16 +35,31 @@ public final class APITooltip {
     }
 
     public Tooltip create(TooltipSegment[] segments) {
-        return create(segments, defaultToolTipAction(), 0);
+        return create(segments, defaultToolTipAction(), 0,
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
-        return create(segments, toolTipAction, 0);
+        return create(segments, toolTipAction, 0,
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth) {
+        return create(segments, toolTipAction, minWidth,
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
+    }
+
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, Color color) {
+        return create(segments, toolTipAction, minWidth, color.r, color.g, color.b, color.a);
+    }
+
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, float borderColor_r, float borderColor_g, float borderColor_b, float borderColor_a) {
         Tooltip tooltip = new Tooltip();
         tooltip.segments = new ArrayList<>();
+        tooltip.color_border_r = borderColor_r;
+        tooltip.color_border_g = borderColor_g;
+        tooltip.color_border_b = borderColor_b;
+        tooltip.color_border_a = borderColor_a;
         tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
         if (segments != null) {
             for (int i = 0; i < segments.length; i++) {
@@ -80,7 +98,6 @@ public final class APITooltip {
     public void setMinWidth(Tooltip tooltip, int minWidth) {
         tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
     }
-
 
     public final class APITooltipSegment {
         public final APITooltipTextSegment text;
@@ -122,19 +139,19 @@ public final class APITooltip {
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex) {
-                return create(sprite, arrayIndex, SEGMENT_ALIGNMENT.LEFT, false, false, 1f,1f,1f,1f);
+                return create(sprite, arrayIndex, SEGMENT_ALIGNMENT.LEFT, false, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment) {
-                return create(sprite, arrayIndex, alignment, false, false, 1f,1f,1f,1f);
+                return create(sprite, arrayIndex, alignment, false, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge) {
-                return create(sprite, arrayIndex, alignment, merge, false, 1f,1f,1f,1f);
+                return create(sprite, arrayIndex, alignment, merge, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
-                return create(sprite, arrayIndex, alignment, merge, border, 1f,1f,1f,1f);
+                return create(sprite, arrayIndex, alignment, merge, border, 1f, 1f, 1f, 1f);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, Color color) {
@@ -179,19 +196,19 @@ public final class APITooltip {
             }
 
             public TooltipTextSegment create(String text) {
-                return create(text, SEGMENT_ALIGNMENT.LEFT, false, false, 1f,1f,1f,1f);
+                return create(text, SEGMENT_ALIGNMENT.LEFT, false, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment) {
-                return create(text, alignment, false, false, 1f,1f,1f,1f);
+                return create(text, alignment, false, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge) {
-                return create(text, alignment, merge, false, 1f,1f,1f,1f);
+                return create(text, alignment, merge, false, 1f, 1f, 1f, 1f);
             }
 
             public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
-                return create(text, alignment, merge, border, 1f,1f,1f,1f);
+                return create(text, alignment, merge, border, 1f, 1f, 1f, 1f);
             }
 
             public TooltipTextSegment create(String text, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, Color color) {
@@ -241,7 +258,7 @@ public final class APITooltip {
             }
 
             public TooltipEmptySegment create(boolean merge, boolean border, Color color) {
-                return create(merge, border, color.r,color.g,color.b,color.a);
+                return create(merge, border, color.r, color.g, color.b, color.a);
             }
 
             public TooltipEmptySegment create(boolean merge, boolean border, float r, float g, float b, float a) {

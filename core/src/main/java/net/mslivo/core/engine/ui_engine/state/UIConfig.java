@@ -55,6 +55,7 @@ public class UIConfig implements Serializable, Cloneable {
     public int notification_fadeoutTime;
     public float notification_scrollSpeed;
     public Color tooltip_defaultColor;
+    public Color tooltip_defaultBorderColor;
     public CMediaFont tooltip_defaultFont;
     public int tooltip_FadeInTime;
     public int tooltip_FadeInDelayTime;
@@ -63,6 +64,7 @@ public class UIConfig implements Serializable, Cloneable {
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
     public Color mouseTextInput_defaultColor;
+
     public UIConfig() {
         // ##### UI Default Values #####
         ui_cursor = UIEngineBaseMedia.UI_CURSOR_ARROW;
@@ -128,6 +130,7 @@ public class UIConfig implements Serializable, Cloneable {
         notification_fadeoutTime = 200;
         notification_scrollSpeed = 1;
         tooltip_defaultColor = Color.WHITE.cpy();
+        tooltip_defaultBorderColor = Color.valueOf("7F7F7F").cpy();
         tooltip_defaultFont = UIEngineBaseMedia.UI_FONT_BLACK;
         tooltip_FadeInTime = 50;
         tooltip_FadeInDelayTime = 25;
