@@ -132,7 +132,6 @@ public class SpriteRenderer implements Batch {
     public int maxSpritesInBatch;
 
 
-
     public SpriteRenderer() {
         this(null, 1024, null);
     }
@@ -200,7 +199,7 @@ public class SpriteRenderer implements Batch {
         this.mediaManager = mediaManager;
     }
 
-    public void saveBackup(){
+    public void saveBackup() {
         this.backup_color = this.color;
         this.backup_hslt = this.hslt;
         this.backup_srcRGB = this.srcRGB;
@@ -209,10 +208,10 @@ public class SpriteRenderer implements Batch {
         this.backup_dstAlpha = this.dstAlpha;
     }
 
-    public void loadBackup(){
+    public void loadBackup() {
         setPackedColor(this.backup_color);
         setPackedHSLT(this.backup_hslt);
-        setBlendFunctionSeparate(backup_srcRGB,backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
+        setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 
     @Override
@@ -239,7 +238,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void setColor(Color color) {
-        setColor(color.r,color.g,color.b,color.a);
+        setColor(color.r, color.g, color.b, color.a);
     }
 
     @Override
@@ -335,8 +334,8 @@ public class SpriteRenderer implements Batch {
         setPackedColor(COLOR_RESET);
     }
 
-    public void setBlendFunctionReset(){
-        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    public void setBlendFunctionReset() {
+        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setHSLTAndColorReset() {
@@ -1509,8 +1508,7 @@ public class SpriteRenderer implements Batch {
         if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(cMediaImage, x, y, origin_x, origin_y);
-            case CMediaAnimation cMediaAnimation ->
-                    drawCMediaAnimation(cMediaAnimation, x, y, animationTimer, origin_x, origin_y);
+            case CMediaAnimation cMediaAnimation -> drawCMediaAnimation(cMediaAnimation, x, y, animationTimer, origin_x, origin_y);
             case CMediaArray cMediaArray -> drawCMediaArray(cMediaArray, x, y, arrayIndex, origin_x, origin_y);
             case CMediaCursor cMediaCursor -> drawCMediaCursor(cMediaCursor, x, y);
             default -> {
