@@ -17,7 +17,6 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.TextureArraySpriteBatch;
 import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.UIInputEvents;
