@@ -61,9 +61,6 @@ public class ExampleMain extends ApplicationAdapter {
                 }
 
                 this.uiEngine.render();
-
-
-
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(

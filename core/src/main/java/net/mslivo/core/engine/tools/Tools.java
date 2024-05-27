@@ -60,16 +60,21 @@ public class Tools {
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null);
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null, false);
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null);
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, false);
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath) {
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath, boolean useAngle) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
+            if(useAngle) {
+                config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
+            }else{
+                config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
+            }
             config.setWindowedMode(resolutionWidth, resolutionHeight);
             config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
             config.setTitle(appTile);
