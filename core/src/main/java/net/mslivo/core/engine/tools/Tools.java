@@ -6,8 +6,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import net.mslivo.core.engine.media_manager.media.CMedia;
 
 import java.io.*;
@@ -70,7 +72,8 @@ public class Tools {
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath, boolean useAngle) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
-            if(useAngle) {
+            boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
+            if(useAngle && !linux32Bit) {
                 config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
             }else{
                 config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
