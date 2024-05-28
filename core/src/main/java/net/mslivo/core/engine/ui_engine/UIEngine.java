@@ -79,12 +79,12 @@ public class UIEngine<T extends UIEngineAdapter> {
 
     // Constants Tile Size
     public static final int TL = 8;
-    public static final int TL_HALF = TL/4;
+    public static final int TL_HALF = TL/2;
     public static final int TL2 = TL*2;
     public static final int TL3 = TL*3;
     public static final int TL4 = TL*4;
     public static final float TLF = 8f;
-    public static final float TLF_HALF = TL/4f;
+    public static final float TLF_HALF = TL/2;
     public static final float TLF2 = TL*2f;
     public static final float TLF3 = TL*3f;
     public static final float TLF4 = TL*4f;
