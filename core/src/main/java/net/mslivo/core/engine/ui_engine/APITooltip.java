@@ -170,8 +170,8 @@ public final class APITooltip {
                 tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 tooltipImageSegment.border = border;
                 if (sprite != null) {
-                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
-                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
+                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + UIEngine.TL) / UIEngine.TLF);
+                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + UIEngine.TL) / UIEngine.TLF);
                 } else {
                     tooltipImageSegment.width = tooltipImageSegment.height = 0;
                 }
@@ -226,7 +226,7 @@ public final class APITooltip {
                 tooltipTextSegment.alignment = alignment;
                 tooltipTextSegment.merge = merge;
                 tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
-                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TILE_SIZE) / UIEngine.TILE_SIZE_F);
+                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TL) / UIEngine.TLF);
                 tooltipTextSegment.height = 1;
                 return tooltipTextSegment;
             }

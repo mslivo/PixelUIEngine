@@ -128,7 +128,7 @@ public final class APIComposite {
                 api.component.list.setScrolled(list, 1f - scrolled);
             }
         });
-        api.component.setPosition(scrollBarVertical, list.x + (list.width * UIEngine.TILE_SIZE), list.y);
+        api.component.setPosition(scrollBarVertical, list.x + (list.width * UIEngine.TL), list.y);
 
         api.component.addUpdateAction(scrollBarVertical, new UpdateAction() {
             float scrolledLast = -1;
@@ -177,7 +177,7 @@ public final class APIComposite {
         // Cut Text to Fit
         if (text != null) {
             ArrayList<String> textList = new ArrayList<>();
-            int pixelWidth = ((width - 1) * UIEngine.TILE_SIZE);
+            int pixelWidth = ((width - 1) * UIEngine.TL);
             for (int i = 0; i < text.length; i++) {
                 String textLine = text[i];
                 textLine = Tools.Text.validString(textLine);
@@ -286,8 +286,8 @@ public final class APIComposite {
                         api.input.mouse.state.yUI(),
                         api.component.absoluteX(hlText),
                         api.component.absoluteY(hlText),
-                        hlText.width * UIEngine.TILE_SIZE,
-                        hlText.height * UIEngine.TILE_SIZE
+                        hlText.width * UIEngine.TL,
+                        hlText.height * UIEngine.TL
                 )) {
                     api.component.text.setFont(hlText, fontHover);
                     api.component.text.setLines(hlText, textHover);
@@ -429,7 +429,7 @@ public final class APIComposite {
         net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas colorCanvas = api.component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-        CanvasImage cursorOverlay = api.component.canvas.canvasImage.create(UIEngineBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TILE_SIZE * 8, UIEngine.TILE_SIZE * 4);
+        CanvasImage cursorOverlay = api.component.canvas.canvasImage.create(UIEngineBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TL * 8, UIEngine.TL * 4);
         api.component.canvas.addCanvasImage(colorCanvas, cursorOverlay);
 
 
@@ -490,8 +490,8 @@ public final class APIComposite {
 
 
         Component[] componentl = new Component[]{colorCanvas, ok};
-        api.component.move(ok, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
-        api.component.move(colorCanvas, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+        api.component.move(ok, UIEngine.TL_HALF, UIEngine.TL_HALF);
+        api.component.move(colorCanvas, UIEngine.TL_HALF, UIEngine.TL_HALF);
         api.window.addComponents(modal, componentl);
 
         return modal;
@@ -536,7 +536,7 @@ public final class APIComposite {
             if (len > longest) longest = len;
         }
         ArrayList<Component> componentsList = new ArrayList<>();
-        final int WIDTH = Math.clamp(MathUtils.round(longest / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
+        final int WIDTH = Math.clamp(MathUtils.round(longest / (float) UIEngine.TL) + 2, 12, Integer.MAX_VALUE);
         final int HEIGHT = 4 + lines.length;
         net.mslivo.core.engine.ui_engine.ui.Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption, UIEngineBaseMedia.UI_ICON_INFORMATION, 0);
 
@@ -560,7 +560,7 @@ public final class APIComposite {
 
 
         Component[] componentsArr = componentsList.toArray(new Component[]{});
-        api.component.move(componentsArr, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+        api.component.move(componentsArr, UIEngine.TL_HALF, UIEngine.TL_HALF);
         api.window.addComponents(modal, componentsArr);
         return modal;
     }
@@ -576,7 +576,7 @@ public final class APIComposite {
                 mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text)
         );
 
-        int width = Math.clamp(MathUtils.round(textWidthMin / (float) UIEngine.TILE_SIZE) + 2, 12, Integer.MAX_VALUE);
+        int width = Math.clamp(MathUtils.round(textWidthMin / (float) UIEngine.TL) + 2, 12, Integer.MAX_VALUE);
         if (width % 2 == 0) width++;
         net.mslivo.core.engine.ui_engine.ui.Window modal = api.window.create(0, 0, width, 5, caption, UIEngineBaseMedia.UI_ICON_QUESTION, 0);
 
@@ -604,7 +604,7 @@ public final class APIComposite {
         api.component.button.centerContent(noC);
 
         Component[] componentsl = new Component[]{textC, yesC, noC};
-        api.component.move(componentsl, UIEngine.TILE_SIZE / 2, UIEngine.TILE_SIZE / 2);
+        api.component.move(componentsl, UIEngine.TL_HALF, UIEngine.TL_HALF);
         api.window.addComponents(modal, componentsl);
         return modal;
     }
@@ -612,8 +612,8 @@ public final class APIComposite {
     /* #################### Preset - Canvas #################### */
 
     public GraphInfo canvas_drawGraph(Canvas canvas, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
-        int mapWidth = canvas.width * UIEngine.TILE_SIZE;
-        int mapHeight = canvas.height * UIEngine.TILE_SIZE;
+        int mapWidth = canvas.width * UIEngine.TL;
+        int mapHeight = canvas.height * UIEngine.TL;
         int[] indexAtPosition = new int[mapWidth];
         long[] valueAtPosition = new long[mapWidth];
         boolean[] dataAvailableAtPosition = new boolean[mapWidth];
@@ -733,7 +733,7 @@ public final class APIComposite {
 
     public ImageButton button_CreateWindowCloseButton(net.mslivo.core.engine.ui_engine.ui.Window window, Consumer<net.mslivo.core.engine.ui_engine.ui.Window> closeFunction) {
         ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia.UI_ICON_CLOSE);
-        api.component.setName(closeButton, UIEngine.WND_CLOSE_BUTTON);
+        api.component.setName(closeButton, UICommonUtils.WND_CLOSE_BUTTON);
         api.component.button.setButtonAction(closeButton, new ButtonAction() {
 
             @Override
@@ -892,7 +892,7 @@ public final class APIComposite {
         originalText = Tools.Text.validString(originalText);
         windowMinWidth = Math.clamp(windowMinWidth, 11, Integer.MAX_VALUE);
         int wnd_width = Math.clamp(
-                MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text) / (float) UIEngine.TILE_SIZE) + 2,
+                MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text) / (float) UIEngine.TL) + 2,
                 windowMinWidth, Integer.MAX_VALUE);
         int wnd_height = 5;
         if (showOKButton) wnd_height++;
@@ -913,12 +913,12 @@ public final class APIComposite {
         ArrayList<Component> componentsList = new ArrayList<>();
 
         Text textC = api.component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
-        api.component.move(textC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+        api.component.move(textC, UIEngine.TL_HALF, UIEngine.TL_HALF);
         componentsList.add(textC);
 
         Textfield inputTextField = api.component.textfield.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
         componentsList.add(inputTextField);
-        api.component.move(inputTextField, UIEngine.TILE_SIZE_HALF, 0);
+        api.component.move(inputTextField, UIEngine.TL_HALF, 0);
 
         net.mslivo.core.engine.ui_engine.ui.components.button.Button okBtn = null;
         if (showOKButton) {
@@ -951,7 +951,7 @@ public final class APIComposite {
                             api.component.textfield.setMarkerPosition(inputTextField, inputTextField.content.length());
                         }
                     });
-                    api.component.move(charButtonLC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+                    api.component.move(charButtonLC, UIEngine.TL_HALF, UIEngine.TL_HALF);
                     componentsList.add(charButtonLC);
                     lowerCaseButtonsList.add(charButtonLC);
                     TextButton charButtonUC = api.component.button.textButton.create(ix, iy, 2, 2, String.valueOf(cu), new ButtonAction() {
@@ -961,7 +961,7 @@ public final class APIComposite {
                             api.component.textfield.setMarkerPosition(inputTextField, inputTextField.content.length());
                         }
                     });
-                    api.component.move(charButtonUC, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+                    api.component.move(charButtonUC, UIEngine.TL_HALF, UIEngine.TL_HALF);
                     componentsList.add(charButtonUC);
                     api.component.setVisible(charButtonUC, false);
                     upperCaseButtonsList.add(charButtonUC);
@@ -984,7 +984,7 @@ public final class APIComposite {
                                 api.component.setVisible(upperCaseButtonsList.get(i2), value);
                         }
                     }, BUTTON_MODE.TOGGLE);
-            api.component.move(caseButton, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+            api.component.move(caseButton, UIEngine.TL_HALF, UIEngine.TL_HALF);
             componentsList.add(caseButton);
             ix += 2;
             if (ix >= (wnd_width - 2)) {
@@ -1002,7 +1002,7 @@ public final class APIComposite {
                             }
                         }
                     }, BUTTON_MODE.DEFAULT);
-            api.component.move(delButton, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+            api.component.move(delButton, UIEngine.TL_HALF, UIEngine.TL_HALF);
             componentsList.add(delButton);
 
 
@@ -1036,7 +1036,7 @@ public final class APIComposite {
                 api.component.textfield.focus(inputTextField);
             }
         });
-        api.component.move(okBtn, UIEngine.TILE_SIZE_HALF, UIEngine.TILE_SIZE_HALF);
+        api.component.move(okBtn, UIEngine.TL_HALF, UIEngine.TL_HALF);
 
 
         //

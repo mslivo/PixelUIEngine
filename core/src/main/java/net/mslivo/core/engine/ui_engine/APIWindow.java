@@ -367,7 +367,7 @@ public final class APIWindow {
 
     public void setPositionGrid(Window window, int x, int y) {
         if (window == null) return;
-        setPosition(window, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
+        setPosition(window, x * UIEngine.TL, y * UIEngine.TL);
     }
 
     public void move(Window window, int x, int y) {

@@ -113,8 +113,8 @@ public final class APIComponent {
             AppViewport appViewPort = new AppViewport();
             appViewPort.updateTimer = 0;
             setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.WHITE);
-            int viewportWidth = appViewPort.width * UIEngine.TILE_SIZE;
-            int viewportHeight = appViewPort.height * UIEngine.TILE_SIZE;
+            int viewportWidth = appViewPort.width * UIEngine.TL;
+            int viewportHeight = appViewPort.height * UIEngine.TL;
             appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
             Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
             texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -725,7 +725,7 @@ public final class APIComponent {
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TILE_SIZE : 0) + UIEngine.TILE_SIZE) / (float) UIEngine.TILE_SIZE);
+                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? UIEngine.TL : 0) + UIEngine.TL) / UIEngine.TLF);
                 } else {
                     tab.width = width;
                 }
@@ -1036,7 +1036,7 @@ public final class APIComponent {
         public net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas = new net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas();
             setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
-            canvas.map = new Color[width * UIEngine.TILE_SIZE][height * UIEngine.TILE_SIZE];
+            canvas.map = new Color[width * UIEngine.TL][height * UIEngine.TL];
             for (int ix = 0; ix < canvas.map.length; ix++)
                 for (int iy = 0; iy < canvas.map[0].length; iy++)
                     canvas.map[ix][iy] = new Color(1f, 1f, 1f, 1f);
@@ -1291,7 +1291,7 @@ public final class APIComponent {
                     int widthT = mediaManager.getCMediaFontTextWidth(text.font, lines[i]);
                     if (widthT > width) width = widthT;
                 }
-                width = width / UIEngine.TILE_SIZE;
+                width = width / UIEngine.TL;
                 height = lines.length;
             }
             setComponentCommonInitValuesInternal(text, x, y, width, height);
@@ -1341,8 +1341,8 @@ public final class APIComponent {
 
         public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, float animation_offset) {
             net.mslivo.core.engine.ui_engine.ui.components.image.Image imageC = new net.mslivo.core.engine.ui_engine.ui.components.image.Image();
-            int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / UIEngine.TILE_SIZE : 0;
-            int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / UIEngine.TILE_SIZE : 0;
+            int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / UIEngine.TL : 0;
+            int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / UIEngine.TL : 0;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
             imageC.image = image;
             imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
@@ -1766,7 +1766,7 @@ public final class APIComponent {
 
     public void setPositionGrid(Component component, int x, int y) {
         if (component == null) return;
-        setPosition(component, x * UIEngine.TILE_SIZE, y * UIEngine.TILE_SIZE);
+        setPosition(component, x * UIEngine.TL, y * UIEngine.TL);
     }
 
     public void moveX(Component[] components, int x) {
@@ -1963,8 +1963,8 @@ public final class APIComponent {
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
         // Align to grid per default
-        component.x = (x * UIEngine.TILE_SIZE);
-        component.y = (y * UIEngine.TILE_SIZE);
+        component.x = (x * UIEngine.TL);
+        component.y = (y * UIEngine.TL);
         component.width = width;
         component.height = height;
         component.color_a = 1f;
