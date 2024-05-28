@@ -66,8 +66,8 @@ public final class APIWindow {
 
     public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
         Window window = new Window();
-        window.x = x * UIEngine.TILE_SIZE;
-        window.y = y * UIEngine.TILE_SIZE;
+        window.x = x;
+        window.y = y;
         window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
         window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
         window.title = Tools.Text.validString(title);
