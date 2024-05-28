@@ -1928,14 +1928,14 @@ public final class APIComponent {
         return UICommonUtils.component_getAbsoluteY(component);
     }
 
-    public int absoluteWidth(Component component) {
+    public int realWidth(Component component) {
         if (component == null) return 0;
-        return UICommonUtils.component_getAbsoluteWidth(component);
+        return UIEngine.TL(component.width);
     }
 
-    public int absoluteHeight(Component component) {
+    public int realHeight(Component component) {
         if (component == null) return 0;
-        return UICommonUtils.component_getAbsoluteHeight(component);
+        return UIEngine.TL(component.height);
     }
 
     public boolean isAddedToWindow(Component component, Window window) {

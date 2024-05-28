@@ -187,11 +187,11 @@ public final class APIWindow {
     }
 
     public int realWidth(Window window) {
-        return UICommonUtils.window_getAbsoluteWidth(window);
+        return UIEngine.TL(window.width);
     }
 
     public int realHeight(Window window) {
-        return UICommonUtils.window_getAbsoluteHeight(window);
+        return UIEngine.TL(window.height);
     }
 
     public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
