@@ -189,15 +189,18 @@ public final class API {
         closeWindows(uiEngineState.windows.toArray(new Window[]{}));
     }
 
-    public void sendMessageToWindow(Window window, String message_type, Object... content) {
-        if (window == null || message_type == null) return;
-        UICommonUtils.window_receiveMessage(window, message_type, content);
+    public void sendMessageToWindow(Window window, int type, Object... parameters) {
+        if (window == null) return;
+        UICommonUtils.window_receiveMessage(window, type, parameters);
     }
 
-    public void sendMessageToWindows(String message_type, Object... content) {
-        if (message_type == null) return;
-        for (int i = 0; i < uiEngineState.windows.size(); i++)
-            sendMessageToWindow(uiEngineState.windows.get(i), message_type, content);
+    public void sendMessageToWindows(Window[] windows, int type, Object... parameters) {
+        if (windows == null) return;
+        for(int i=0;i<windows.length;i++) UICommonUtils.window_receiveMessage(windows[i], type, parameters);
+    }
+
+    public void sendMessageToAllWindows(int type, Object... parameters) {
+        for(int i=0;i< uiEngineState.windows.size();i++) UICommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
     }
 
     public void windowsEnforceScreenBounds() {

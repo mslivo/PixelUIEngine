@@ -8,7 +8,6 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.state.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -24,7 +23,7 @@ public final class APIWindow {
     private final UIConfig uiConfig;
     private final MediaManager mediaManager;
 
-    APIWindow(API api, UIEngineState uiEngineState, MediaManager mediaManager){
+    APIWindow(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
@@ -86,38 +85,10 @@ public final class APIWindow {
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;
-        window.messageReceiverActions = new ArrayList<>();
         window.updateActions = new ArrayList<>();
         window.addedToScreen = false;
         window.components = new ArrayList<>();
         return window;
-    }
-
-    public void addMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
-        if (window == null || messageReceiverAction == null) return;
-        window.messageReceiverActions.add(messageReceiverAction);
-    }
-
-    public void addMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
-        if (window == null || messageReceiverActions == null) return;
-        for (int i = 0; i < messageReceiverActions.length; i++)
-            addMessageReceiverAction(window, messageReceiverActions[i]);
-    }
-
-    public void removeMessageReceiverAction(Window window, MessageReceiverAction messageReceiverAction) {
-        if (window == null || messageReceiverAction == null) return;
-        window.messageReceiverActions.remove(messageReceiverAction);
-    }
-
-    public void removeMessageReceiverActions(Window window, MessageReceiverAction[] messageReceiverActions) {
-        if (window == null || messageReceiverActions == null) return;
-        for (int i = 0; i < messageReceiverActions.length; i++)
-            removeMessageReceiverAction(window, messageReceiverActions[i]);
-    }
-
-    public void removeAllMessageReceiverActions(Window window) {
-        if (window == null) return;
-        removeMessageReceiverActions(window, window.messageReceiverActions.toArray(new MessageReceiverAction[]{}));
     }
 
     public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {

@@ -20,4 +20,7 @@ public abstract class WindowAction extends CommonActions {
     public void onAdd() {
     }
 
+    public void onMessageReceived(int type, Object... parameters) {
+    }
+
 }

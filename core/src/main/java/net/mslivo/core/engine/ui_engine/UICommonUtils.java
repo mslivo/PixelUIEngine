@@ -22,7 +22,6 @@ import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.MessageReceiverAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
@@ -88,9 +87,7 @@ class UICommonUtils {
 
     private static boolean emulatedMouse_isInteractAbleComponent(Component component) {
         if (!(component instanceof Image || component instanceof Text)) {
-            if (component.visible && !component.disabled && !component_isHiddenByTab(component)) {
-                return true;
-            }
+            if (component.visible && !component.disabled && !component_isHiddenByTab(component)) return true;
         }
         return false;
     }
@@ -170,13 +167,10 @@ class UICommonUtils {
         if (window.windowAction != null) window.windowAction.onUnfold();
     }
 
-    static void window_receiveMessage(Window window, String message_type, Object... content) {
-        if (message_type == null) return;
-        for (int i2 = 0; i2 < window.messageReceiverActions.size(); i2++) {
-            MessageReceiverAction messageReceiverAction = window.messageReceiverActions.get(i2);
-            if (messageReceiverAction.messageType.equals(message_type)) {
-                messageReceiverAction.onMessageReceived(content);
-            }
+    static void window_receiveMessage(Window window, int type, Object... parameters) {
+        if (window == null) return;
+        if (window.windowAction != null) {
+            window.windowAction.onMessageReceived(type, parameters);
         }
     }
 
@@ -1267,7 +1261,7 @@ class UICommonUtils {
         if (appViewPort.textureRegion != null) appViewPort.textureRegion.getTexture().dispose();
         if (appViewPort.frameBuffer != null) appViewPort.frameBuffer.dispose();
 
-        int viewportWidth = UIEngine.TL(appViewPort.width) ;
+        int viewportWidth = UIEngine.TL(appViewPort.width);
         int viewportHeight = UIEngine.TL(appViewPort.height);
         // FrameBuffer
         appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);

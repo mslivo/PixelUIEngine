@@ -7,12 +7,12 @@ import java.util.ArrayDeque;
  * Sends input to adapter & gathers outputs using object pooling.
  */
 public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
-    public static final int PARAMETERS_MAX = 5;
-    private static final Object[] RESET_OBJECT = new Object[PARAMETERS_MAX];
-    private static final int[] RESET_INT = new int[PARAMETERS_MAX];
-    private static final float[] RESET_FLOAT = new float[PARAMETERS_MAX];
+
+    private static final Object[] RESET_OBJECT = new Object[AppEngineIO.PARAMETERS_MAX];
+    private static final int[] RESET_INT = new int[AppEngineIO.PARAMETERS_MAX];
+    private static final float[] RESET_FLOAT = new float[AppEngineIO.PARAMETERS_MAX];
     static {
-        for(int i=0;i<PARAMETERS_MAX;i++){
+        for(int i=0;i<AppEngineIO.PARAMETERS_MAX;i++){
             RESET_OBJECT[i] = null;
             RESET_INT[i] = 0;
             RESET_FLOAT[i] = 0;
@@ -68,9 +68,9 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         engineIO.type = type;
         engineIO.readIndex = 0;
         engineIO.writeIndex = 0;
-        System.arraycopy(RESET_OBJECT,0,engineIO.objectParams,0,PARAMETERS_MAX);
-        System.arraycopy(RESET_INT,0,engineIO.intParams,0,PARAMETERS_MAX);
-        System.arraycopy(RESET_FLOAT,0,engineIO.floatParams,0,PARAMETERS_MAX);
+        System.arraycopy(RESET_OBJECT,0,engineIO.objectStack,0,AppEngineIO.PARAMETERS_MAX);
+        System.arraycopy(RESET_INT,0,engineIO.intStack,0,AppEngineIO.PARAMETERS_MAX);
+        System.arraycopy(RESET_FLOAT,0,engineIO.floatStack,0,AppEngineIO.PARAMETERS_MAX);
         return engineIO;
     }
 
