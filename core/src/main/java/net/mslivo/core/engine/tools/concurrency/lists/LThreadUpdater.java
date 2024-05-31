@@ -1,5 +1,7 @@
 package net.mslivo.core.engine.tools.concurrency.lists;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -7,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Threadpool that can be used to iterate over subsets of lists
+ * Threadpool that can be used to iterate over multiple parts of a list at once
  */
 public class LThreadUpdater<T> {
     private final ExecutorService threadPool;
@@ -32,15 +34,14 @@ public class LThreadUpdater<T> {
         this.objectsSizeLast = -1;
     }
 
-    private Worker getNextWorker(List<T> objects, int fromIndex, int toIndex) {
+    private Worker getNextWorker(int fromIndex, int toIndex) {
         if (freeWorkerPool.size() > 0) {
             Worker worker = freeWorkerPool.pop();
-            worker.objects = objects;
             worker.fromIndex = fromIndex;
             worker.toIndex = toIndex;
             return worker;
         } else {
-            return new Worker(objects, fromIndex, toIndex);
+            return new Worker(fromIndex, toIndex);
         }
     }
 
@@ -48,20 +49,22 @@ public class LThreadUpdater<T> {
         if (updateObjects.size() == 0) return;
 
         if (updateObjects.size() != objectsSizeLast) {
+            // Resize Tasks
             int objectsPerWorker = updateObjects.size()/cpuCount;
             int rest = updateObjects.size()%cpuCount;
+            int sizeMinus1 = updateObjects.size()-1;
             if (tasks.size() > 0) {
                 freeWorkerPool.addAll(tasks);
                 tasks.clear();
             }
             if (updateObjects.size() > (objectsPerWorker+rest)) {
-                for (int i = 0; i < updateObjects.size(); i = i + objectsPerWorker) {
+                for (int i = 0; i < updateObjects.size(); i += objectsPerWorker) {
                     int fromIndex = i;
-                    int toIndex = i+(objectsPerWorker - 1) + (i == (updateObjects.size()-1) ? rest : 0);
-                    tasks.add(getNextWorker(updateObjects, fromIndex, toIndex));
+                    int toIndex = i+(objectsPerWorker - 1) + (i == sizeMinus1 ? rest : 0);
+                    tasks.add(getNextWorker(fromIndex, toIndex));
                 }
             }else{
-                tasks.add(getNextWorker(this.updateObjects, 0, (this.updateObjects.size() - 1)));
+                tasks.add(getNextWorker(0, (sizeMinus1)));
             }
             objectsSizeLast = updateObjects.size();
         }
@@ -82,18 +85,15 @@ public class LThreadUpdater<T> {
 
         private int fromIndex, toIndex;
 
-        private List<T> objects;
-
-        public Worker(List<T> objects, int fromIndex, int toIndex) {
-            this.objects = objects;
+        public Worker(int fromIndex, int toIndex) {
             this.fromIndex = fromIndex;
-            this.toIndex = Math.min(toIndex, (objects.size() - 1));
+            this.toIndex = Math.min(toIndex, (LThreadUpdater.this.updateObjects.size() - 1));
         }
 
         @Override
         public Object call() {
             for (int i = fromIndex; i <= toIndex; i++) {
-                lThreadPoolUpdater.updateFromThread(objects.get(i), i);
+                lThreadPoolUpdater.updateFromThread(LThreadUpdater.this.updateObjects.get(i), i);
             }
             return null;
         }
