@@ -30,8 +30,8 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     private final ArrayDeque<AppEngineIO> engineIOPool;
     private final AppEngineOutputQueue appEngineOutputQueue = new AppEngineOutputQueue() {
         @Override
-        public AppEngineIO addOutput(int type) {
-            AppEngineIO appEngineIO = getAndResetEngineIOFromPool(type);
+        public synchronized AppEngineIO addOutput(int type) {
+            AppEngineIO appEngineIO = getNextEngineIOFromPool(type);
             outputs.add(appEngineIO);
             return appEngineIO;
         }
@@ -63,7 +63,7 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         return lastUpdateTime;
     }
 
-    private AppEngineIO getAndResetEngineIOFromPool(int type){
+    private AppEngineIO getNextEngineIOFromPool(int type){
         AppEngineIO engineIO = engineIOPool.isEmpty() ?  new AppEngineIO() : engineIOPool.poll();
         engineIO.type = type;
         engineIO.readIndex = 0;
@@ -123,8 +123,8 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         adapter.shutdown();
     }
 
-    public AppEngineIO addInput(int type){
-        AppEngineIO appEngineIO = getAndResetEngineIOFromPool(type);
+    public synchronized AppEngineIO addInput(int type){
+        AppEngineIO appEngineIO = getNextEngineIOFromPool(type);
         inputs.add(appEngineIO);
         return appEngineIO;
     }
