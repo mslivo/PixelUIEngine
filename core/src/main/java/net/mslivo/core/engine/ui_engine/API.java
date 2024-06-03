@@ -52,7 +52,7 @@ public final class API {
 
     public final APICamera camera;
     public final APIConfig config;
-    public final APIComposite composite;
+    public final APIComposites composites;
 
 
     public API(UIEngineState uiEngineState, MediaManager mediaManager) {
@@ -70,7 +70,7 @@ public final class API {
         this.mouseTextInput = new APIMouseTextInput(this, uiEngineState, mediaManager);
         this.camera = new APICamera(this, uiEngineState, mediaManager);
         this.config = new APIConfig(this, uiEngineState, mediaManager);
-        this.composite = new APIComposite(this, uiEngineState, mediaManager);
+        this.composites = new APIComposites(this, uiEngineState, mediaManager);
     }
 
     /* #################### Notifications #################### */

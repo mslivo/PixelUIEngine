@@ -59,7 +59,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         /* Window */
         Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.ICON_EXAMPLE_WINDOW, 0);
 
-        api.window.addComponent(window, api.composite.button_CreateWindowCloseButton(window));
+        api.window.addComponent(window, api.composites.button.createWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
         api.window.center(window);
 
@@ -79,7 +79,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         tabs.add(api.component.tabbar.tab.create("Font", ExampleBaseMedia.ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab4.toArray(new Component[]{})));
 
 
-        ArrayList<Component> tabBarComponents = api.composite.tabBar_createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
+        ArrayList<Component> tabBarComponents = api.composites.tabBar.createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
                 0, null, true, window.height - 4, false);
 
         api.window.addComponents(window, tabBarComponents.toArray(new Component[]{}));
@@ -197,7 +197,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         });
 
-        Textfield number = api.composite.textField_createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
+        Textfield number = api.composites.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
 
         ArrayList<ComboboxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
         Combobox comboBox = api.component.comboBox.create(25, 7, 6, new ComboboxItem[]{
@@ -211,9 +211,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Button modal1 = api.component.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composite.modal_CreateYesNoRequester("Caption ", "Modal 1 Example Text", null));
-                api.addWindowAsModal(api.composite.modal_CreateYesNoRequester("FollowUp 1 ", "Modal 1 Example Text", null));
-                api.addWindowAsModal(api.composite.modal_CreateYesNoRequester("FollowUp 2 ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.composites.modal.createYesNoRequester("Caption ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.composites.modal.createYesNoRequester("FollowUp 1 ", "Modal 1 Example Text", null));
+                api.addWindowAsModal(api.composites.modal.createYesNoRequester("FollowUp 2 ", "Modal 1 Example Text", null));
             }
         });
 
@@ -221,7 +221,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Button modal2 = api.component.button.textButton.create(28, 4, 5, 1, "Modal 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composite.modal_CreateTextInputModal("Caption", "Enter Text", "", new Consumer<String>() {
+                api.addWindowAsModal(api.composites.modal.createTextInputModal("Caption", "Enter Text", "", new Consumer<String>() {
                     @Override
                     public void accept(String s) {
 
@@ -235,7 +235,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Button modal3 = api.component.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composite.modal_CreateColorModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
+                api.addWindowAsModal(api.composites.modal.createColorModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
             }
         });
 
@@ -243,7 +243,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Button modal4 = api.component.button.textButton.create(28, 2, 5, 1, "Modal 4", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composite.modal_CreateTouchTextInputModal("Caption", "Input Please", "", new Consumer<String>() {
+                api.addWindowAsModal(api.composites.modal.createTouchTextInputModal("Caption", "Input Please", "", new Consumer<String>() {
                             @Override
                             public void accept(String s) {
 
@@ -325,7 +325,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         TextButton textBtn3 = api.component.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composite.modal_CreateTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notification.create(s))));
+                api.addWindowAsModal(api.composites.modal.createTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notification.create(s))));
             }
         });
 
@@ -445,7 +445,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 }
         ));
 
-        ArrayList<Component> border = api.composite.image_createBorder(10, 4, 4, 4);
+        ArrayList<Component> border = api.composites.image.createBorder(10, 4, 4, 4);
         api.window.addComponents(window, border.toArray(new Component[]{}));
         api.component.tabbar.tab.addTabComponents(tabImageButton, border.toArray(new Component[]{}));
 
@@ -588,11 +588,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.list.setListAction(list2, list2Action);
 
         api.window.addComponent(window, list1);
-        Scrollbar list1ScrollBar = api.composite.list_CreateScrollBar(list1);
+        Scrollbar list1ScrollBar = api.composites.list.createScrollBar(list1);
         api.window.addComponent(window, list1ScrollBar);
 
         api.window.addComponent(window, list2);
-        Scrollbar list2ScrollBar = api.composite.list_CreateScrollBar(list2);
+        Scrollbar list2ScrollBar = api.composites.list.createScrollBar(list2);
         api.window.addComponent(window, list2ScrollBar);
 
 

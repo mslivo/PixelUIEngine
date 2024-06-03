@@ -245,6 +245,9 @@ public final class APITooltip {
 
         public final class APITooltipEmptySegment {
 
+            APITooltipEmptySegment() {
+            }
+
             public TooltipEmptySegment create() {
                 return create(false, false, Color.WHITE);
             }
