@@ -46,6 +46,7 @@ import net.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaManager> {
@@ -432,6 +433,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.setColor(imageButton4, Color.BLUE);
         api.component.setColor(imageButton5, Color.YELLOW);
         api.component.setColor(imageButton6, Color.ORANGE);
+
+        api.composites.button.makeExclusiveToggleButtons(new Button[]{
+                imageButton3, imageButton4, imageButton5, imageButton6
+        }, new BiConsumer<Button, Boolean>() {
+            @Override
+            public void accept(Button button, Boolean aBoolean) {
+
+            }
+        });
 
 
         api.component.setToolTip(imageButton4, api.toolTip.create(

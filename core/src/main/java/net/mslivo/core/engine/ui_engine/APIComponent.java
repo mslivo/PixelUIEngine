@@ -474,11 +474,11 @@ public final class APIComponent {
             return create(x, y, text, checkBoxStyle, null, false);
         }
 
-        public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckBoxAction checkBoxAction) {
+        public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction) {
             return create(x, y, text, checkBoxStyle, checkBoxAction, false);
         }
 
-        public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckBoxAction checkBoxAction, boolean checked) {
+        public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
             setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, Color.WHITE);
             checkBox.text = Tools.Text.validString(text);
@@ -523,7 +523,7 @@ public final class APIComponent {
             checkBox.checkBoxStyle = checkBoxStyle;
         }
 
-        public void setCheckBoxAction(Checkbox checkBox, CheckBoxAction checkBoxAction) {
+        public void setCheckBoxAction(Checkbox checkBox, CheckboxAction checkBoxAction) {
             if (checkBox == null) return;
             checkBox.checkBoxAction = checkBoxAction;
         }

@@ -38,6 +38,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
@@ -53,13 +54,13 @@ public final class APIComposites {
     public final APICompositeList list;
     public final APICompositeImage image;
     public final APICompositeText text;
-    public final APICompositeHotKey hotkey;
-    public final APICompositeCheckBox checkBox;
+    public final APICompositeHotkey hotkey;
+    public final APICompositeCheckbox checkBox;
     public final APICompositeModal modal;
     public final APICompositeCanvas canvas;
     public final APICompositeButton button;
     public final APICompositeTextfield textfield;
-    public final APICompositeTabBar tabBar;
+    public final APICompositeTabbar tabBar;
 
     APIComposites(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
@@ -69,13 +70,13 @@ public final class APIComposites {
         this.list = new APICompositeList();
         this.image = new APICompositeImage();
         this.text = new APICompositeText();
-        this.hotkey = new APICompositeHotKey();
-        this.checkBox = new APICompositeCheckBox();
+        this.hotkey = new APICompositeHotkey();
+        this.checkBox = new APICompositeCheckbox();
         this.modal = new APICompositeModal();
         this.canvas = new APICompositeCanvas();
         this.button = new APICompositeButton();
         this.textfield = new APICompositeTextfield();
-        this.tabBar = new APICompositeTabBar();
+        this.tabBar = new APICompositeTabbar();
     }
 
     public final class APICompositeList {
@@ -186,7 +187,7 @@ public final class APIComposites {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                net.mslivo.core.engine.ui_engine.ui.components.image.Image image = api.component.image.create(x + i, y, UIEngineBaseMedia.UI_SEPARATOR_HORIZONTAL, index);
+                Image image = api.component.image.create(x + i, y, UIEngineBaseMedia.UI_SEPARATOR_HORIZONTAL, index);
                 api.component.setColor(image, uiConfig.component_defaultColor);
                 returnComponents.add(image);
             }
@@ -383,11 +384,11 @@ public final class APIComposites {
         }
     }
 
-    public final class APICompositeHotKey {
-        APICompositeHotKey() {
+    public final class APICompositeHotkey {
+        APICompositeHotkey() {
         }
 
-        public HotKeyAction createForButton(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
+        public HotKeyAction createForButton(Button button) {
             return new HotKeyAction() {
                 @Override
                 public void onPress() {
@@ -402,15 +403,15 @@ public final class APIComposites {
         }
     }
 
-    public final class APICompositeCheckBox {
-        APICompositeCheckBox() {
+    public final class APICompositeCheckbox {
+        APICompositeCheckbox() {
         }
 
         public void makeExclusiveRadioButtons(Checkbox[] checkboxes, Consumer<Checkbox> checkedFunction) {
             if (checkboxes == null || checkedFunction == null) return;
             for (int i = 0; i < checkboxes.length; i++) {
                 int iF = i;
-                api.component.checkbox.setCheckBoxAction(checkboxes[i], new CheckBoxAction() {
+                api.component.checkbox.setCheckBoxAction(checkboxes[i], new CheckboxAction() {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
@@ -466,7 +467,7 @@ public final class APIComposites {
             api.component.setColor(ok, initColor);
 
 
-            net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas colorCanvas = api.component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
+            Canvas colorCanvas = api.component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
             CanvasImage cursorOverlay = api.component.canvas.canvasImage.create(UIEngineBaseMedia.UI_COLOR_SELECTOR_OVERLAY, UIEngine.TL * 8, UIEngine.TL * 4);
@@ -586,7 +587,7 @@ public final class APIComposites {
                 componentsList.add(texts[i]);
             }
 
-            net.mslivo.core.engine.ui_engine.ui.components.button.Button okBtn = api.component.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
+            Button okBtn = api.component.button.textButton.create(0, 0, WIDTH - 1, 1, "OK", new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (closeFunction != null) {
@@ -625,7 +626,7 @@ public final class APIComposites {
 
             Text textC = api.component.text.create(0, 2, new String[]{text});
             int xOffset = 0;
-            net.mslivo.core.engine.ui_engine.ui.components.button.Button yesC = api.component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
+            Button yesC = api.component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (choiceFunction != null) choiceFunction.accept(Boolean.TRUE);
@@ -634,7 +635,7 @@ public final class APIComposites {
             });
             api.component.button.centerContent(yesC);
             xOffset += width1;
-            net.mslivo.core.engine.ui_engine.ui.components.button.Button noC = api.component.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
+            Button noC = api.component.button.textButton.create(xOffset, 0, width2, 1, no, new ButtonAction() {
                 @Override
                 public void onRelease() {
                     if (choiceFunction != null) choiceFunction.accept(Boolean.FALSE);
@@ -688,7 +689,7 @@ public final class APIComposites {
             componentsList.add(inputTextField);
             api.component.move(inputTextField, UIEngine.TL_HALF, 0);
 
-            net.mslivo.core.engine.ui_engine.ui.components.button.Button okBtn = null;
+            Button okBtn = null;
             if (showOKButton) {
                 okBtn = api.component.button.textButton.create(0, 0, wnd_width - 1, 1, "OK", new ButtonAction() {
                     @Override
@@ -703,8 +704,8 @@ public final class APIComposites {
             }
 
 
-            ArrayList<net.mslivo.core.engine.ui_engine.ui.components.button.Button> lowerCaseButtonsList = new ArrayList<>();
-            ArrayList<net.mslivo.core.engine.ui_engine.ui.components.button.Button> upperCaseButtonsList = new ArrayList<>();
+            ArrayList<Button> lowerCaseButtonsList = new ArrayList<>();
+            ArrayList<Button> upperCaseButtonsList = new ArrayList<>();
             if (showTouchInputs) {
                 int ix = 0;
                 int iy = wnd_height - 4;
@@ -983,6 +984,31 @@ public final class APIComposites {
             return closeButton;
         }
 
+        public void makeExclusiveToggleButtons(Button[] buttons, BiConsumer<Button, Boolean> toggleFunction) {
+            if (buttons == null || toggleFunction == null) return;
+            for (int i = 0; i < buttons.length; i++) {
+                Button button = buttons[i];
+                api.component.button.setButtonMode(button, BUTTON_MODE.TOGGLE);
+                api.component.button.setButtonAction(button, new ButtonAction() {
+                    @Override
+                    public void onToggle(boolean value) {
+                        if (value) {
+                            api.component.button.setToggleDisabled(button, true);
+                            for (int i = 0; i < buttons.length; i++) {
+                                if (buttons[i] != button) {
+                                    Button otherButton = buttons[i];
+                                    api.component.button.setToggleDisabled(otherButton, false);
+                                    api.component.button.toggle(otherButton, false);
+                                    toggleFunction.accept(otherButton, false);
+                                }
+                            }
+                            toggleFunction.accept(button, true);
+                        }
+                    }
+                });
+            }
+        }
+
     }
 
     public final class APICompositeTextfield {
@@ -1049,8 +1075,8 @@ public final class APIComposites {
 
     }
 
-    public final class APICompositeTabBar {
-        APICompositeTabBar() {
+    public final class APICompositeTabbar {
+        APICompositeTabbar() {
         }
 
         public ArrayList<Component> createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
