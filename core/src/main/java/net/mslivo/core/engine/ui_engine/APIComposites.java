@@ -407,26 +407,31 @@ public final class APIComposites {
         APICompositeCheckbox() {
         }
 
-        public void makeExclusiveRadioButtons(Checkbox[] checkboxes, Consumer<Checkbox> checkedFunction) {
+        public void makeExclusiveRadioButtons(Checkbox[] checkboxes, BiConsumer<Checkbox, Boolean> checkedFunction) {
             if (checkboxes == null || checkedFunction == null) return;
             for (int i = 0; i < checkboxes.length; i++) {
-                int iF = i;
-                api.component.checkbox.setCheckBoxAction(checkboxes[i], new CheckboxAction() {
+                Checkbox checkbox = checkboxes[i];
+                api.component.checkbox.setCheckBoxAction(checkbox, new CheckboxAction() {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
                             //noinspection ForLoopReplaceableByForEach
-                            for (int i = 0; i < checkboxes.length; i++)
-                                if (checkboxes[i] != checkboxes[iF])
-                                    api.component.checkbox.setChecked(checkboxes[i], false);
-                            checkedFunction.accept(checkboxes[iF]);
+                            for (int i2 = 0; i2 < checkboxes.length; i2++) {
+                                if (checkboxes[i2] != checkbox) {
+                                    Checkbox otherCheckbox = checkboxes[i2];
+                                    api.component.checkbox.setChecked(otherCheckbox, false);
+                                    checkedFunction.accept(otherCheckbox, false);
+                                }
+                            }
+                            checkedFunction.accept(checkbox, true);
                         } else {
-                            api.component.checkbox.setChecked(checkboxes[iF], true);
+                            api.component.checkbox.setChecked(checkbox, true);
                         }
                     }
                 });
             }
         }
+
 
     }
 
