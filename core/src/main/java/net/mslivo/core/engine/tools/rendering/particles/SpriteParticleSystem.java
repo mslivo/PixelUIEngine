@@ -63,9 +63,6 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
                 case SPRITE_ANIMATION -> {
                     batch.drawCMediaAnimationScale((CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer + particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
                 }
-                case SPRITE_CURSOR -> {
-                    //batch.drawCMediaCursor((CMediaCursor) particle.appearance, particle.x, particle.y);
-                }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
