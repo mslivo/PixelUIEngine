@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine.state;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia;
+import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia_8x8;
 
 import java.io.Serializable;
 
@@ -67,7 +67,7 @@ public class UIConfig implements Serializable, Cloneable {
 
     public UIConfig() {
         // ##### UI Default Values #####
-        ui_cursor = UIEngineBaseMedia.UI_CURSOR_ARROW;
+        ui_cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
@@ -100,9 +100,9 @@ public class UIConfig implements Serializable, Cloneable {
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = true;
         window_defaultColor = Color.WHITE.cpy();
-        window_defaultFont = UIEngineBaseMedia.UI_FONT_BLACK;
+        window_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         component_defaultColor = Color.WHITE.cpy();
-        component_defaultFont = UIEngineBaseMedia.UI_FONT_BLACK;
+        component_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         component_appViewportDefaultUpdateTime = 0;
         component_listDragAlpha = 0.8f;
         component_gridDragAlpha = 0.8f;
@@ -125,13 +125,13 @@ public class UIConfig implements Serializable, Cloneable {
         };
         notification_max = 20;
         notification_defaultDisplayTime = 3000;
-        notification_defaultFont = UIEngineBaseMedia.UI_FONT_WHITE;
+        notification_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_WHITE;
         notification_defaultColor = Color.DARK_GRAY.cpy();
         notification_fadeoutTime = 200;
         notification_scrollSpeed = 1;
         tooltip_defaultColor = Color.WHITE.cpy();
         tooltip_defaultBorderColor = Color.valueOf("7F7F7F").cpy();
-        tooltip_defaultFont = UIEngineBaseMedia.UI_FONT_BLACK;
+        tooltip_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         tooltip_FadeInTime = 50;
         tooltip_FadeInDelayTime = 25;
         // ##### MouseTextInput Default Values #####
@@ -151,7 +151,7 @@ public class UIConfig implements Serializable, Cloneable {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
-        mouseTextInput_defaultFont = UIEngineBaseMedia.UI_FONT_BLACK;
+        mouseTextInput_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         mouseTextInput_defaultColor = Color.WHITE.cpy();
     }
 
