@@ -46,7 +46,7 @@ public class ExampleMain extends ApplicationAdapter {
         this.uiEngine = new UIEngine<>(
                 new ExampleUIEngineAdapter(),
                 this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                ExampleMainConstants.viewportMode);
+                ExampleMainConstants.viewportMode, true);
         Tools.App.logDone();
 
         this.state = STATE.RUN;

@@ -49,8 +49,8 @@ public final class APINotification {
         notification.notificationAction = notificationAction;
         notification.timer = 0;
         int textWidth = mediaManager.getCMediaFontTextWidth(notification.font, notification.text);
-        if (textWidth > uiEngineState.resolutionWidth_ui) {
-            int tooMuch = (textWidth - uiEngineState.resolutionWidth_ui);
+        if (textWidth > uiEngineState.resolutionWidth) {
+            int tooMuch = (textWidth - uiEngineState.resolutionWidth);
             notification.state = STATE_NOTIFICATION.INIT_SCROLL;
             notification.scroll = -(tooMuch / 2) - 4;
             notification.scrollMax = (tooMuch / 2) + 4;

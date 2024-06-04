@@ -54,7 +54,6 @@ public final class API {
     public final APIConfig config;
     public final APIComposites composites;
 
-
     public API(UIEngineState uiEngineState, MediaManager mediaManager) {
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
@@ -394,12 +393,41 @@ public final class API {
         return uiEngineState.resolutionHeight;
     }
 
-    public int resolutionWidthUI() {
-        return uiEngineState.resolutionWidth_ui;
+    public int TL(){
+        return uiEngineState.sizeSize.TL;
     }
-
-    public int resolutionHeightUI() {
-        return uiEngineState.resolutionHeight_ui;
+    public int TL(int size){
+        return uiEngineState.sizeSize.TL(size);
     }
+    public int TL_HALF(){
+        return uiEngineState.sizeSize.TL_HALF;
+    };
+    public int TL2(){
+        return uiEngineState.sizeSize.TL2;
+    };
+    public int TL3(){
+        return uiEngineState.sizeSize.TL3;
+    };
+    public int TL4(){
+        return uiEngineState.sizeSize.TL4;
+    };
+    public float TLF(){
+        return uiEngineState.sizeSize.TLF;
+    };
+    public float TLF(float size){
+        return uiEngineState.sizeSize.TLF(size);
+    };
+    public float TLF_HALF(){
+        return uiEngineState.sizeSize.TLF_HALF;
+    };
+    public float TLF2(){
+        return uiEngineState.sizeSize.TLF2;
+    };
+    public float TLF3(){
+        return uiEngineState.sizeSize.TLF3;
+    };
+    public float TLF4(){
+        return uiEngineState.sizeSize.TLF4;
+    };
 
 }

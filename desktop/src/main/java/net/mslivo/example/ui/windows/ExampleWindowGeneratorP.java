@@ -9,8 +9,7 @@ import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.media_manager.media.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia;
-import net.mslivo.core.engine.ui_engine.UIEngine;
+import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -189,7 +188,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Progressbar progressBar = api.component.progressbar.create(18, 3, 8, 0, true, true);
         api.component.setColor(progressBar, Color.BLUE);
         api.component.setColor2(progressBar, Color.RED);
-        api.component.progressbar.setFont(progressBar, UIEngineBaseMedia.UI_FONT_WHITE);
+        api.component.progressbar.setFont(progressBar, UIEngineBaseMedia_8x8.UI_FONT_WHITE);
 
         ScrollbarHorizontal pgScrollbar = api.component.scrollbar.scrollbarHorizontal.create(18, 5, 8, new ScrollBarAction() {
             @Override
@@ -387,8 +386,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public void onUpdate() {
                 for (int i = 0; i < 20; i++)
                     api.component.canvas.point(canvas,
-                            MathUtils.random(0, canvas.width * UIEngine.TL),
-                            MathUtils.random(0, canvas.height * UIEngine.TL),
+                            MathUtils.random(0, canvas.width * api.TL()),
+                            MathUtils.random(0, canvas.height * api.TL()),
                             MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
                     );
 
@@ -471,7 +470,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
         Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
-        api.component.text.setFont(text2, UIEngineBaseMedia.UI_FONT_WHITE);
+        api.component.text.setFont(text2, UIEngineBaseMedia_8x8.UI_FONT_WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabbar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 

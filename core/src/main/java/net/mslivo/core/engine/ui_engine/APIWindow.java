@@ -158,11 +158,11 @@ public final class APIWindow {
     }
 
     public int realWidth(Window window) {
-        return UIEngine.TL(window.width);
+        return api.TL(window.width);
     }
 
     public int realHeight(Window window) {
-        return UIEngine.TL(window.height);
+        return api.TL(window.height);
     }
 
     public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
@@ -338,7 +338,7 @@ public final class APIWindow {
 
     public void setPositionGrid(Window window, int x, int y) {
         if (window == null) return;
-        setPosition(window, x * UIEngine.TL, y * UIEngine.TL);
+        setPosition(window, x * api.TL(), y * api.TL());
     }
 
     public void move(Window window, int x, int y) {

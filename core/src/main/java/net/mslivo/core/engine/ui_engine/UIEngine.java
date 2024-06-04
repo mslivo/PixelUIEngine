@@ -69,7 +69,6 @@ import java.util.Arrays;
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public class UIEngine<T extends UIEngineAdapter> {
     private static final int FONT_MAXWIDTH_NONE = -1;
-    private static final Color TEXTFIELD_INVALID = Color.valueOf("E5AEAE");
 
     // Basic Configuration
     private final T uiAdapter;
@@ -77,51 +76,28 @@ public class UIEngine<T extends UIEngineAdapter> {
     private final API api;
     private final MediaManager mediaManager;
 
-    // Constants Tile Size
-    public static final int TL = 8;
-    public static final int TL_HALF = TL / 2;
-    public static final int TL2 = TL * 2;
-    public static final int TL3 = TL * 3;
-    public static final int TL4 = TL * 4;
-    public static final float TLF = 8f;
-    public static final float TLF_HALF = TL / 2f;
-    public static final float TLF2 = TL * 2f;
-    public static final float TLF3 = TL * 3f;
-    public static final float TLF4 = TL * 4f;
-
-    public static int TL(int size) {
-        return size * TL;
-    }
-
-    public static float TL(float size) {
-        return size * TLF;
-    }
-
     public T getAdapter() {
         return uiAdapter;
     }
 
     public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight) {
-        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, VIEWPORT_MODE.PIXEL_PERFECT, true, 1);
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, VIEWPORT_MODE.PIXEL_PERFECT, true);
     }
 
     public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode) {
-        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, true, 1);
+        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, true);
     }
 
     public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport) {
-        this(uiAdapter, mediaManager, resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, 1);
-    }
-
-    public UIEngine(T uiAdapter, MediaManager mediaManager, int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, int uiScale) {
         if (uiAdapter == null || mediaManager == null) {
             throw new RuntimeException("Cannot initialize UIEngine: missing parameters");
         }
         this.uiAdapter = uiAdapter;
         this.mediaManager = mediaManager;
         /* Setup */
-        this.uiEngineState = initializeInputState(resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, uiScale);
+        this.uiEngineState = initializeInputState(resolutionWidth, resolutionHeight, viewportMode, gamePadSupport, TILE_SIZE.MODE_8x8);
         this.api = new API(this.uiEngineState, mediaManager);
+
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -130,18 +106,15 @@ public class UIEngine<T extends UIEngineAdapter> {
     }
 
 
-    private UIEngineState initializeInputState(int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, int uiScale) {
+    private UIEngineState initializeInputState(int resolutionWidth, int resolutionHeight, VIEWPORT_MODE viewportMode, boolean gamePadSupport, TILE_SIZE tileSize) {
         UIEngineState newUIEngineState = new UIEngineState();
 
         //  ----- Paramters
         newUIEngineState.resolutionWidth = Math.clamp(resolutionWidth, 16, Integer.MAX_VALUE);
-        newUIEngineState.resolutionWidth_ui = newUIEngineState.resolutionWidth / uiScale;
         newUIEngineState.resolutionHeight = Math.clamp(resolutionHeight, 16, Integer.MAX_VALUE);
-        newUIEngineState.resolutionHeight_ui = newUIEngineState.resolutionHeight / uiScale;
         newUIEngineState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newUIEngineState.gamePadSupport = gamePadSupport;
-        newUIEngineState.uiScale = Math.clamp(uiScale, 1, Integer.MAX_VALUE);
-
+        newUIEngineState.sizeSize = tileSize;
 
         // ----- Config
         newUIEngineState.uiEngineConfig = new UIConfig();
@@ -157,10 +130,10 @@ public class UIEngine<T extends UIEngineAdapter> {
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, 8192);
         newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth_ui, newUIEngineState.resolutionHeight_ui);
-        newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth_ui, newUIEngineState.resolutionHeight_ui);
+        newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
+        newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.update();
-        newUIEngineState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth_ui, newUIEngineState.resolutionHeight_ui, false);
+        newUIEngineState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
         newUIEngineState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         // ----- UpScaler
         newUIEngineState.upscaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.viewportMode, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -233,7 +206,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedCheckBox = null;
         // ----- Controls
         newUIEngineState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
-        newUIEngineState.mouse_ui = new GridPoint2(newUIEngineState.resolutionWidth_ui / 2, newUIEngineState.resolutionHeight_ui / 2);
+        newUIEngineState.mouse_ui = new GridPoint2(newUIEngineState.resolutionWidth/ 2, newUIEngineState.resolutionHeight / 2);
         newUIEngineState.mouse_app = new GridPoint2(0, 0);
         newUIEngineState.mouse_delta = new Vector2(0, 0);
         newUIEngineState.lastUIMouseHover = null;
@@ -242,7 +215,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.mouseToolPressed = false;
         newUIEngineState.vector_fboCursor = new Vector3(0, 0, 0);
         newUIEngineState.vector2_unproject = new Vector2(0, 0);
-        newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidth_ui / 2, newUIEngineState.resolutionHeight_ui / 2);
+        newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidth / 2, newUIEngineState.resolutionHeight / 2);
         newUIEngineState.emulatedMouseLastMouseClick = 0;
         newUIEngineState.keyBoardMouseSpeedUp = new Vector2(0, 0);
         newUIEngineState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
@@ -739,8 +712,8 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Set to final
-        uiEngineState.mouse_emulated.x = Math.clamp(uiEngineState.mouse_emulated.x + deltaX, 0, uiEngineState.resolutionWidth_ui);
-        uiEngineState.mouse_emulated.y = Math.clamp(uiEngineState.mouse_emulated.y - deltaY, 0, uiEngineState.resolutionHeight_ui);
+        uiEngineState.mouse_emulated.x = Math.clamp(uiEngineState.mouse_emulated.x + deltaX, 0, uiEngineState.resolutionWidth);
+        uiEngineState.mouse_emulated.y = Math.clamp(uiEngineState.mouse_emulated.y - deltaY, 0, uiEngineState.resolutionHeight);
         uiEngineState.mouse_delta.x = deltaX;
         uiEngineState.mouse_delta.y = -deltaY;
         uiEngineState.mouse_ui.x = MathUtils.round(uiEngineState.mouse_emulated.x);
@@ -896,12 +869,8 @@ public class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void mouseControl_enforceUIMouseBounds() {
-        if (uiEngineState.mouse_ui.x < 0) uiEngineState.mouse_ui.x = 0;
-        if (uiEngineState.mouse_ui.x > uiEngineState.resolutionWidth_ui)
-            uiEngineState.mouse_ui.x = uiEngineState.resolutionWidth_ui;
-        if (uiEngineState.mouse_ui.y < 0) uiEngineState.mouse_ui.y = 0;
-        if (uiEngineState.mouse_ui.y > uiEngineState.resolutionHeight_ui)
-            uiEngineState.mouse_ui.y = uiEngineState.resolutionHeight_ui;
+        uiEngineState.mouse_ui.x = Math.clamp(uiEngineState.mouse_ui.x, 0 ,uiEngineState.resolutionWidth);
+        uiEngineState.mouse_ui.y = Math.clamp(uiEngineState.mouse_ui.y, 0 ,uiEngineState.resolutionHeight);
     }
 
     private void mouseControl_updateGameMouseXY() {
@@ -909,7 +878,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.vector_fboCursor.x = uiEngineState.mouse_ui.x;
         uiEngineState.vector_fboCursor.y = Gdx.graphics.getHeight() - uiEngineState.mouse_ui.y;
         uiEngineState.vector_fboCursor.z = 1;
-        uiEngineState.camera_app.unproject(uiEngineState.vector_fboCursor, 0, 0, uiEngineState.resolutionWidth_ui, uiEngineState.resolutionHeight_ui);
+        uiEngineState.camera_app.unproject(uiEngineState.vector_fboCursor, 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
         this.uiEngineState.mouse_app.x = (int) uiEngineState.vector_fboCursor.x;
         this.uiEngineState.mouse_app.y = (int) uiEngineState.vector_fboCursor.y;
     }
@@ -925,13 +894,13 @@ public class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.vector_fboCursor.x = uiEngineState.vector2_unproject.x;
         uiEngineState.vector_fboCursor.y = Gdx.graphics.getHeight() - uiEngineState.vector2_unproject.y;
         uiEngineState.vector_fboCursor.z = 1;
-        uiEngineState.camera_ui.unproject(uiEngineState.vector_fboCursor, 0, 0, uiEngineState.resolutionWidth_ui, uiEngineState.resolutionHeight_ui);
+        uiEngineState.camera_ui.unproject(uiEngineState.vector_fboCursor, 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
 
         // Set to final
         uiEngineState.mouse_delta.x = MathUtils.round(uiEngineState.vector_fboCursor.x - uiEngineState.mouse_ui.x);
         uiEngineState.mouse_delta.y = MathUtils.round(uiEngineState.vector_fboCursor.y - uiEngineState.mouse_ui.y);
-        uiEngineState.mouse_ui.x = Math.clamp(MathUtils.round(uiEngineState.vector_fboCursor.x), 0, uiEngineState.resolutionWidth_ui);
-        uiEngineState.mouse_ui.y = Math.clamp(MathUtils.round(uiEngineState.vector_fboCursor.y), 0, uiEngineState.resolutionHeight_ui);
+        uiEngineState.mouse_ui.x = Math.clamp(MathUtils.round(uiEngineState.vector_fboCursor.x), 0, uiEngineState.resolutionWidth);
+        uiEngineState.mouse_ui.y = Math.clamp(MathUtils.round(uiEngineState.vector_fboCursor.y), 0, uiEngineState.resolutionHeight);
     }
 
     private void mouseControl_updateLastUIMouseHover() {
@@ -979,7 +948,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < uiEngineState.inputEvents.keyTypedCharacters.size; ic++) {
                     char keyTypedCharacter = (char) uiEngineState.inputEvents.keyTypedCharacters.get(ic);
-                    UICommonUtils.textField_typeCharacter(mediaManager, focusedTextField, keyTypedCharacter);
+                    UICommonUtils.textField_typeCharacter(uiEngineState,mediaManager, focusedTextField, keyTypedCharacter);
                 }
                 // MouseTextInput open = focus on last typed character
                 if (uiEngineState.openMouseTextInput != null) {
@@ -1075,7 +1044,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     for (int ib = 0; ib < uiEngineState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = uiEngineState.inputEvents.mouseDownButtons.get(ib);
                         if (uiEngineState.uiEngineConfig.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
-                            if (window.hasTitleBar && Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, window.x, window.y + TL(window.height - 1), UIEngine.TL(window.width), TL)) {
+                            if (window.hasTitleBar && Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, window.x, window.y + TL(window.height - 1), TL(window.width), TL())) {
                                 if (window.folded) {
                                     UICommonUtils.window_unFold(window);
                                 } else {
@@ -1156,20 +1125,20 @@ public class UIEngine<T extends UIEngineAdapter> {
                         case ScrollbarVertical scrollBarVertical -> {
                             UICommonUtils.scrollBar_pressButton(scrollBarVertical);
                             UICommonUtils.scrollBar_scroll(scrollBarVertical,
-                                    UICommonUtils.scrollBar_calculateScrolled(scrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
+                                    UICommonUtils.scrollBar_calculateScrolled(uiEngineState,scrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                             uiEngineState.pressedScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollbarHorizontal scrollBarHorizontal -> {
                             UICommonUtils.scrollBar_pressButton(scrollBarHorizontal);
                             UICommonUtils.scrollBar_scroll(scrollBarHorizontal,
-                                    UICommonUtils.scrollBar_calculateScrolled(scrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
+                                    UICommonUtils.scrollBar_calculateScrolled(uiEngineState,scrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                             uiEngineState.pressedScrollBarHorizontal = scrollBarHorizontal;
                         }
                         case Combobox comboBox -> {
                             if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
                                 if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
                                         UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox),
-                                        TL(comboBox.width), TL)) {
+                                        TL(comboBox.width), TL())) {
                                     // Clicked on Combobox itself -> close
                                     UICommonUtils.comboBox_close(uiEngineState, comboBox);
                                 } else {
@@ -1177,9 +1146,9 @@ public class UIEngine<T extends UIEngineAdapter> {
                                     for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
                                         if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
                                                 UICommonUtils.component_getAbsoluteX(comboBox),
-                                                UICommonUtils.component_getAbsoluteY(comboBox) - TL(i) - TL,
+                                                UICommonUtils.component_getAbsoluteY(comboBox) - TL(i) - TL(),
                                                 TL(comboBox.width),
-                                                TL
+                                                TL()
                                         )) {
                                             uiEngineState.pressedComboBoxItem = comboBox.comboBoxItems.get(i);
                                         }
@@ -1213,7 +1182,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                             uiEngineState.pressedTextField = textField;
                         }
                         case Grid grid -> {
-                            int tileSize = grid.doubleSized ? TL2 : TL;
+                            int tileSize = grid.doubleSized ? TL2() : TL();
                             int x_grid = UICommonUtils.component_getAbsoluteX(grid);
                             int y_grid = UICommonUtils.component_getAbsoluteY(grid);
                             int inv_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
@@ -1334,7 +1303,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.comboBox_selectItem(uiEngineState, comboBoxItem);
                         if (uiEngineState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
                             // emulated: move mouse back to combobox on item select
-                            uiEngineState.mouse_emulated.y = UICommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TL_HALF;
+                            uiEngineState.mouse_emulated.y = UICommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TL_HALF();
                         }
                         uiEngineState.pressedComboBoxItem = null;
                     }
@@ -1353,7 +1322,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
                             if (render_textWidth(textField.font, testString) > mouseX) {
-                                UICommonUtils.textField_setMarkerPosition(mediaManager, textField,
+                                UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField,
                                         textField.offset + i);
                                 found = true;
                                 break;
@@ -1361,7 +1330,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         }
                         if (!found) {
                             // Set to end
-                            UICommonUtils.textField_setMarkerPosition(mediaManager, textField,
+                            UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField,
                                     textField.offset + fieldContent.length);
                         }
                         // Set Focus
@@ -1565,10 +1534,10 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (processMouseDraggedPressed) {
                 switch (pressedUIObject) {
                     case ScrollbarVertical scrolledScrollBarVertical -> {
-                        UICommonUtils.scrollBar_scroll(scrolledScrollBarVertical, UICommonUtils.scrollBar_calculateScrolled(scrolledScrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
+                        UICommonUtils.scrollBar_scroll(scrolledScrollBarVertical, UICommonUtils.scrollBar_calculateScrolled(uiEngineState,scrolledScrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                     }
                     case ScrollbarHorizontal scrolledScrollBarHorizontal -> {
-                        UICommonUtils.scrollBar_scroll(scrolledScrollBarHorizontal, UICommonUtils.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
+                        UICommonUtils.scrollBar_scroll(scrolledScrollBarHorizontal, UICommonUtils.scrollBar_calculateScrolled(uiEngineState,scrolledScrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                     }
                     case Knob turnedKnob -> {
                         float amount = (uiEngineState.mouse_delta.y / 100f) * uiEngineState.uiEngineConfig.component_knobSensitivity;
@@ -1746,7 +1715,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     }
                 }
             } else if (hoverComponent instanceof Grid grid) {
-                int tileSize = grid.doubleSized ? TL2 : TL;
+                int tileSize = grid.doubleSized ? TL2() : TL();
                 if (grid.gridAction != null) {
                     int x_grid = UICommonUtils.component_getAbsoluteX(grid);
                     int y_grid = UICommonUtils.component_getAbsoluteY(grid);
@@ -2068,22 +2037,22 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         // Selection
         render_batchSetColor(r2, g2, b2, alpha);
-        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
+        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
     }
 
     private void render_mouseTextInputCharacter(CMediaFont font, char c, int x, int y, float r, float g, float b, float alpha, boolean upperCase, boolean pressed) {
         render_batchSetColor(r, g, b, alpha);
         int pressedIndex = pressed ? 1 : 0;
-        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
+        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_CHARACTER, x, y, pressedIndex);
         if (c == '\n') {
-            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
+            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_CONFIRM, x, y, pressedIndex);
         }
         if (c == '\t') {
-            CMediaArray caseGraphic = upperCase ? UIEngineBaseMedia.UI_OSTEXTINPUT_UPPERCASE : UIEngineBaseMedia.UI_OSTEXTINPUT_LOWERCASE;
+            CMediaArray caseGraphic = upperCase ? UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_LOWERCASE;
             uiEngineState.spriteRenderer_ui.drawCMediaArray(caseGraphic, x, y, pressedIndex);
         }
         if (c == '\b') {
-            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
+            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_OSTEXTINPUT_DELETE, x, y, pressedIndex);
         } else {
             int offset = pressed ? 1 : 0;
             render_drawFont(font, String.valueOf(c), 1.0f, x + 2 + offset, y + 2 - offset);
@@ -2186,14 +2155,14 @@ public class UIEngine<T extends UIEngineAdapter> {
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                             CMediaArray comboMenuGraphic;
-                            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TL - TL(iy), TL(comboBox.width), TL)) {
-                                comboMenuGraphic = UIEngineBaseMedia.UI_COMBOBOX_LIST_SELECTED;
+                            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TL() - TL(iy), TL(comboBox.width), TL())) {
+                                comboMenuGraphic = UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_SELECTED;
                             } else {
-                                comboMenuGraphic = UIEngineBaseMedia.UI_COMBOBOX_LIST;
+                                comboMenuGraphic = UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST;
                             }
                             render_saveTempColorBatch();
                             render_batchSetColor(comboBoxItem.color_r, comboBoxItem.color_g, comboBoxItem.color_b, alpha);
-                            uiEngineState.spriteRenderer_ui.drawCMediaArray(comboMenuGraphic, UICommonUtils.component_getAbsoluteX(comboBox) + TL(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TL(iy) - TL, index);
+                            uiEngineState.spriteRenderer_ui.drawCMediaArray(comboMenuGraphic, UICommonUtils.component_getAbsoluteX(comboBox) + TL(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TL(iy) - TL(), index);
                             render_loadTempColorBatch();
                         }
                     }
@@ -2201,7 +2170,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     /* Text */
                     for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
                         ComboboxItem comboBoxItem = comboBox.comboBoxItems.get(i);
-                        render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TL(i) - TL, 2, 1, TL(comboBox.width), comboBoxItem.icon, comboBoxItem.iconIndex);
+                        render_drawFont(comboBoxItem.font, comboBoxItem.text, alpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TL(i) - TL(), 2, 1, TL(comboBox.width), comboBoxItem.icon, comboBoxItem.iconIndex);
                     }
                 }
             }
@@ -2226,14 +2195,14 @@ public class UIEngine<T extends UIEngineAdapter> {
                 for (int ix = 0; ix < width; ix++) {
                     int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
                     CMediaArray contextMenuGraphic;
-                    if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, contextMenu.x, contextMenu.y - TL - TL(iy), TL(uiEngineState.displayedContextMenuWidth), TL)) {
-                        contextMenuGraphic = UIEngineBaseMedia.UI_CONTEXT_MENU_SELECTED;
+                    if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, contextMenu.x, contextMenu.y - TL() - TL(iy), TL(uiEngineState.displayedContextMenuWidth), TL())) {
+                        contextMenuGraphic = UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_SELECTED;
                     } else {
-                        contextMenuGraphic = UIEngineBaseMedia.UI_CONTEXT_MENU;
+                        contextMenuGraphic = UIEngineBaseMedia_8x8.UI_CONTEXT_MENU;
                     }
                     render_saveTempColorBatch();
                     render_batchSetColor(contextMenuItem.color_r, contextMenuItem.color_g, contextMenuItem.color_b, alpha);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(contextMenuGraphic, contextMenu.x + TL(ix), contextMenu.y - TL(iy) - TL, index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(contextMenuGraphic, contextMenu.x + TL(ix), contextMenu.y - TL(iy) - TL(), index);
                     render_loadTempColorBatch();
                 }
             }
@@ -2241,7 +2210,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             /* Text */
             for (int iy = 0; iy < contextMenu.items.size(); iy++) {
                 ContextmenuItem item = contextMenu.items.get(iy);
-                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - TL(iy) - TL, 2, 1, TL(width), item.icon, item.iconIndex);
+                render_drawFont(item.font, item.text, alpha, contextMenu.x, contextMenu.y - TL(iy) - TL(), 2, 1, TL(width), item.icon, item.iconIndex);
             }
 
         }
@@ -2266,14 +2235,14 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
         if (tooltip_width == 0 || tooltip_height == 0) return;
         // Determine Position
-        boolean drawRight = (uiEngineState.mouse_ui.x + (TL(tooltip_width + 2)) <= uiEngineState.resolutionWidth_ui);
+        boolean drawRight = (uiEngineState.mouse_ui.x + (TL(tooltip_width + 2)) <= uiEngineState.resolutionWidth);
         int tooltip_x;
         if (drawRight) {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x + TL2, 0, uiEngineState.resolutionWidth_ui - TL(tooltip_width ));
+            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x + TL2(), 0, uiEngineState.resolutionWidth - TL(tooltip_width ));
         } else {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x - TL(tooltip_width + 2), 0, uiEngineState.resolutionWidth_ui - TL(tooltip_width));
+            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x - TL(tooltip_width + 2), 0, uiEngineState.resolutionWidth - TL(tooltip_width));
         }
-        int tooltip_y = Math.clamp(uiEngineState.mouse_ui.y - (TL(tooltip_height) / 2), 0, uiEngineState.resolutionHeight_ui - TL(tooltip_height));
+        int tooltip_y = Math.clamp(uiEngineState.mouse_ui.y - (TL(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TL(tooltip_height));
 
 
         // Draw tooltip
@@ -2306,11 +2275,11 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                     for (int tx = 0; tx < tooltip_width; tx++) {
                         render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP, tooltip_x + TL(tx), tooltip_y + TL(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, tooltip_x + TL(tx), tooltip_y + TL(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
                         render_batchSetColor(tooltip.color_border_r, tooltip.color_border_g, tooltip.color_border_b, tooltip.color_border_a * uiEngineState.tooltip_fadeIn_pct);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_BORDER, tooltip_x + TL(tx), tooltip_y + TL(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_BORDER, tooltip_x + TL(tx), tooltip_y + TL(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
                         if (borderIndex != BORDER_NONE) {
-                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TL(tx), tooltip_y + TL(y_combined), borderIndex);
+                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TL(tx), tooltip_y + TL(y_combined), borderIndex);
                         }
                     }
                 }
@@ -2346,8 +2315,8 @@ public class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Draw line
-        int xOffset = drawRight ? 0 : -TL2;
-        uiEngineState.spriteRenderer_ui.drawCMediaSprite(UIEngineBaseMedia.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y, 0, uiEngineState.animation_timer_ui);
+        int xOffset = drawRight ? 0 : -TL2();
+        uiEngineState.spriteRenderer_ui.drawCMediaSprite(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y, 0, uiEngineState.animation_timer_ui);
 
         render_batchSetColorWhite();
     }
@@ -2356,7 +2325,7 @@ public class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.notifications.size() == 0) return;
         boolean grayscalePreNotification = render_isGrayscaleEnabled();
         if (UICommonUtils.window_isModalOpen(uiEngineState)) render_setGrayscaleEnabled(true);
-        int width = (uiEngineState.resolutionWidth_ui % TL == 0) ? (uiEngineState.resolutionWidth_ui / TL) : ((uiEngineState.resolutionWidth_ui / TL) + 1);
+        int width = (uiEngineState.resolutionWidth % TL() == 0) ? (uiEngineState.resolutionWidth / TL()) : ((uiEngineState.resolutionWidth / TL()) + 1);
 
         int y = 0;
         int yOffsetSlideFade = 0;
@@ -2364,15 +2333,15 @@ public class UIEngine<T extends UIEngineAdapter> {
             Notification notification = uiEngineState.notifications.get(i);
             if (notification.state == STATE_NOTIFICATION.FADEOUT) {
                 float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) uiEngineState.uiEngineConfig.notification_fadeoutTime);
-                yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TL * fadeoutProgress);
+                yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TL() * fadeoutProgress);
             }
             render_saveTempColorBatch();
             render_batchSetColor(notification.color_r, notification.color_g, notification.color_b, notification.color_a);
             for (int ix = 0; ix < width; ix++) {
-                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_NOTIFICATION_BAR, TL(ix), uiEngineState.resolutionHeight_ui - TL - TL(y) + yOffsetSlideFade);
+                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_NOTIFICATION_BAR, TL(ix), uiEngineState.resolutionHeight - TL() - TL(y) + yOffsetSlideFade);
             }
             int xOffset = (TL(width) / 2) - (render_textWidth(notification.font, notification.text) / 2) - notification.scroll;
-            render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (uiEngineState.resolutionHeight_ui - TL - TL(y)) + 1 + yOffsetSlideFade);
+            render_drawFont(notification.font, notification.text, notification.color_a, xOffset, (uiEngineState.resolutionHeight - TL() - TL(y)) + 1 + yOffsetSlideFade);
             y = y + 1;
             render_loadTempColorBatch();
         }
@@ -2392,15 +2361,15 @@ public class UIEngine<T extends UIEngineAdapter> {
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
                 for (int iy = 0; iy < window.height; iy++) {
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_WINDOW, window.x + TL(ix), window.y + TL(iy), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_WINDOW, window.x + TL(ix), window.y + TL(iy), render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar));
                 }
             } else {
-                uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_WINDOW, window.x + TL(ix), window.y + ( TL(window.height - 1)), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
+                uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_WINDOW, window.x + TL(ix), window.y + ( TL(window.height - 1)), render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar));
             }
         }
 
         if (window.hasTitleBar) {
-            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + TL(window.height) - TL, 1, 1, TL(window.width - 1), window.icon, window.iconIndex);
+            render_drawFont(window.font, window.title, window.color_a, window.x, window.y + TL(window.height) - TL(), 1, 1, TL(window.width - 1), window.icon, window.iconIndex);
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2408,7 +2377,7 @@ public class UIEngine<T extends UIEngineAdapter> {
             if (!window.folded) {
                 render_drawComponent(component);
             } else {
-                if ((component.y / TL) == (window.height - 1)) {
+                if ((component.y / TL()) == (window.height - 1)) {
                     // draw title bar components only if folded
                     render_drawComponent(component);
                 }
@@ -2436,7 +2405,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
         switch (component) {
             case Button button -> {
-                CMediaArray buttonGraphic = (button.pressed ? UIEngineBaseMedia.UI_BUTTON_PRESSED : UIEngineBaseMedia.UI_BUTTON);
+                CMediaArray buttonGraphic = (button.pressed ? UIEngineBaseMedia_8x8.UI_BUTTON_PRESSED : UIEngineBaseMedia_8x8.UI_BUTTON);
                 int pressed_offset = button.pressed ? 1 : 0;
 
                 for (int ix = 0; ix < button.width; ix++) {
@@ -2471,22 +2440,22 @@ public class UIEngine<T extends UIEngineAdapter> {
             case ScrollbarVertical scrollBarVertical -> {
                 for (int i = 0; i < scrollBarVertical.height; i++) {
                     int index = (i == 0 ? 2 : (i == (scrollBarVertical.height - 1) ? 0 : 1));
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_SCROLLBAR_VERTICAL, UICommonUtils.component_getAbsoluteX(scrollBarVertical), UICommonUtils.component_getAbsoluteY(scrollBarVertical) + TL(i), index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_VERTICAL, UICommonUtils.component_getAbsoluteX(scrollBarVertical), UICommonUtils.component_getAbsoluteY(scrollBarVertical) + TL(i), index);
                     int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * TL(scrollBarVertical.height - 1));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarVertical.color2_r, scrollBarVertical.color2_g, scrollBarVertical.color2_b, alpha);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_SCROLLBAR_BUTTON_VERTICAL, UICommonUtils.component_getAbsoluteX(scrollBarVertical), UICommonUtils.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_BUTTON_VERTICAL, UICommonUtils.component_getAbsoluteX(scrollBarVertical), UICommonUtils.component_getAbsoluteY(scrollBarVertical) + buttonYOffset, (scrollBarVertical.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
             case ScrollbarHorizontal scrollBarHorizontal -> {
                 for (int i = 0; i < scrollBarHorizontal.width; i++) {
                     int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_SCROLLBAR_HORIZONTAL, UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + TL(i), UICommonUtils.component_getAbsoluteY(scrollBarHorizontal), index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_HORIZONTAL, UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + TL(i), UICommonUtils.component_getAbsoluteY(scrollBarHorizontal), index);
                     int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * TL(scrollBarHorizontal.width - 1));
                     render_saveTempColorBatch();
                     render_batchSetColor(scrollBarHorizontal.color2_r, scrollBarHorizontal.color2_g, scrollBarHorizontal.color2_b, alpha);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommonUtils.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_BUTTON_HORIZONAL, UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommonUtils.component_getAbsoluteY(scrollBarHorizontal), (scrollBarHorizontal.buttonPressed ? 1 : 0));
                     render_loadTempColorBatch();
                 }
             }
@@ -2506,7 +2475,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     if (dragValid) {
                         drag_x = UICommonUtils.component_getAbsoluteX(list);
                         int y_list = UICommonUtils.component_getAbsoluteY(list);
-                        drag_y = y_list + TL((uiEngineState.mouse_ui.y - y_list) / TL);
+                        drag_y = y_list + TL((uiEngineState.mouse_ui.y - y_list) / TL());
                     }
                 }
 
@@ -2535,7 +2504,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                         }
                     }
                     for (int ix = 0; ix < list.width; ix++) {
-                        CMediaImage listSelectedGraphic = selected ? UIEngineBaseMedia.UI_LIST_SELECTED : UIEngineBaseMedia.UI_LIST;
+                        CMediaImage listSelectedGraphic = selected ? UIEngineBaseMedia_8x8.UI_LIST_SELECTED : UIEngineBaseMedia_8x8.UI_LIST;
                         uiEngineState.spriteRenderer_ui.drawCMediaImage(listSelectedGraphic, UICommonUtils.component_getAbsoluteX(list) + TL(ix), UICommonUtils.component_getAbsoluteY(list) + TL(itemOffsetY));
                     }
                     if (cellColor != null) render_loadTempColorBatch();
@@ -2549,7 +2518,7 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                 if (dragEnabled && dragValid) {
                     for (int ix = 0; ix < list.width; ix++) {
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_LIST_DRAG, drag_x + TL(ix), drag_y, render_getListDragCMediaIndex(ix, list.width));
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_LIST_DRAG, drag_x + TL(ix), drag_y, render_getListDragCMediaIndex(ix, list.width));
                     }
                 }
                 render_setGrayscaleEnabled(preListGrayScaleState);
@@ -2558,7 +2527,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Box
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
-                    CMediaArray comboMedia = UICommonUtils.comboBox_isOpen(uiEngineState, comboBox) ? UIEngineBaseMedia.UI_COMBOBOX_OPEN : UIEngineBaseMedia.UI_COMBOBOX;
+                    CMediaArray comboMedia = UICommonUtils.comboBox_isOpen(uiEngineState, comboBox) ? UIEngineBaseMedia_8x8.UI_COMBOBOX_OPEN : UIEngineBaseMedia_8x8.UI_COMBOBOX;
 
                     // Item color or default color
                     float color_r = comboBox.selectedItem != null ? comboBox.selectedItem.color_r : comboBox.color_r;
@@ -2577,15 +2546,15 @@ public class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Knob knob -> {
-                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_KNOB_BACKGROUND, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
+                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_KNOB_BACKGROUND, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
                 render_saveTempColorBatch();
                 render_batchSetColor(knob.color2_r, knob.color2_g, knob.color2_b, alpha);
                 if (knob.endless) {
                     int index = MathUtils.round(knob.turned * 31);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_KNOB_ENDLESS, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob), index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB_ENDLESS, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob), index);
                 } else {
                     int index = MathUtils.round(knob.turned * 25);
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_KNOB, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob), index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob), index);
                 }
                 render_loadTempColorBatch();
             }
@@ -2596,7 +2565,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 for (int ix = 0; ix < width; ix++) {
                     for (int iy = 0; iy < height; iy++) {
                         render_batchSetColor(canvas.map[ix][iy].r, canvas.map[ix][iy].g, canvas.map[ix][iy].b, (canvas.map[ix][iy].a * alpha));
-                        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia.UI_PIXEL, UICommonUtils.component_getAbsoluteX(canvas) + ix, UICommonUtils.component_getAbsoluteY(canvas) + iy);
+                        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, UICommonUtils.component_getAbsoluteX(canvas) + ix, UICommonUtils.component_getAbsoluteY(canvas) + iy);
                     }
                 }
                 render_loadTempColorBatch();
@@ -2631,12 +2600,12 @@ public class UIEngine<T extends UIEngineAdapter> {
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
                     render_batchSetColorWhite(alpha);
-                    CMediaArray textFieldGraphic = uiEngineState.focusedTextField == textField ? UIEngineBaseMedia.UI_TEXTFIELD_FOCUSED : UIEngineBaseMedia.UI_TEXTFIELD;
+                    CMediaArray textFieldGraphic = uiEngineState.focusedTextField == textField ? UIEngineBaseMedia_8x8.UI_TEXTFIELD_FOCUSED : UIEngineBaseMedia_8x8.UI_TEXTFIELD;
                     uiEngineState.spriteRenderer_ui.drawCMediaArray(textFieldGraphic, UICommonUtils.component_getAbsoluteX(textField) + TL(ix), UICommonUtils.component_getAbsoluteY(textField), index);
 
                     if (!textField.contentValid) {
                         render_batchSetColorWhite(alpha * 0.5f);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommonUtils.component_getAbsoluteX(textField) + TL(ix), UICommonUtils.component_getAbsoluteY(textField), index);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommonUtils.component_getAbsoluteX(textField) + TL(ix), UICommonUtils.component_getAbsoluteY(textField), index);
                     }
                 }
                 render_loadTempColorBatch();
@@ -2646,13 +2615,13 @@ public class UIEngine<T extends UIEngineAdapter> {
                     if (UICommonUtils.textField_isFocused(uiEngineState, textField)) {
                         int xOffset = render_textWidth(textField.font, textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                         if (xOffset <  TL(textField.width)) {
-                            uiEngineState.spriteRenderer_ui.drawCMediaAnimation(UIEngineBaseMedia.UI_TEXTFIELD_CARET, UICommonUtils.component_getAbsoluteX(textField) + xOffset, UICommonUtils.component_getAbsoluteY(textField), uiEngineState.animation_timer_ui);
+                            uiEngineState.spriteRenderer_ui.drawCMediaAnimation(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CARET, UICommonUtils.component_getAbsoluteX(textField) + xOffset, UICommonUtils.component_getAbsoluteY(textField), uiEngineState.animation_timer_ui);
                         }
                     }
                 }
             }
             case Grid grid -> {
-                int tileSize = grid.doubleSized ? TL2 : TL;
+                int tileSize = grid.doubleSized ? TL2() : TL();
                 int gridWidth = grid.items.length;
                 int gridHeight = grid.items[0].length;
 
@@ -2687,12 +2656,12 @@ public class UIEngine<T extends UIEngineAdapter> {
                             CMediaArray cellGraphic;
                             boolean selected = grid.items[ix][iy] != null && grid.items[ix][iy] == grid.selectedItem;
                             if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
-                                cellGraphic = grid.doubleSized ? UIEngineBaseMedia.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia.UI_GRID_DRAGGED;
+                                cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia_8x8.UI_GRID_DRAGGED;
                             } else {
                                 if (selected) {
-                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia.UI_GRID_SELECTED_X2 : UIEngineBaseMedia.UI_GRID_SELECTED;
+                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_SELECTED_X2 : UIEngineBaseMedia_8x8.UI_GRID_SELECTED;
                                 } else {
-                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia.UI_GRID_X2 : UIEngineBaseMedia.UI_GRID;
+                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_X2 : UIEngineBaseMedia_8x8.UI_GRID;
                                 }
                             }
 
@@ -2732,7 +2701,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                     boolean selected = i == tabBar.selectedTab;
 
                     if (tabBar.bigIconMode) {
-                        CMediaImage tabGraphic = selected ? UIEngineBaseMedia.UI_TAB_BIGICON_SELECTED : UIEngineBaseMedia.UI_TAB_BIGICON;
+                        CMediaImage tabGraphic = selected ? UIEngineBaseMedia_8x8.UI_TAB_BIGICON_SELECTED : UIEngineBaseMedia_8x8.UI_TAB_BIGICON;
                         uiEngineState.spriteRenderer_ui.drawCMediaImage(tabGraphic, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar));
                         // Icon
                         if (tab.icon != null) {
@@ -2740,7 +2709,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                             uiEngineState.spriteRenderer_ui.drawCMediaSprite(tab.icon, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabXOffset) + selected_offset, UICommonUtils.component_getAbsoluteY(tabBar) - selected_offset, tab.iconIndex, uiEngineState.animation_timer_ui);
                         }
                     } else {
-                        CMediaArray tabGraphic = selected ? UIEngineBaseMedia.UI_TAB_SELECTED : UIEngineBaseMedia.UI_TAB;
+                        CMediaArray tabGraphic = selected ? UIEngineBaseMedia_8x8.UI_TAB_SELECTED : UIEngineBaseMedia_8x8.UI_TAB;
                         for (int ix = 0; ix < tabWidth; ix++) {
                             uiEngineState.spriteRenderer_ui.drawCMediaArray(tabGraphic, UICommonUtils.component_getAbsoluteX(tabBar) + TL(ix) + TL(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar), render_getTabCMediaIndex(ix, tab.width));
                         }
@@ -2756,32 +2725,32 @@ public class UIEngine<T extends UIEngineAdapter> {
 
                 // Top Border Top
                 for (int ix = 0; ix < topBorder; ix++) {
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabXOffset + ix), UICommonUtils.component_getAbsoluteY(tabBar), 2);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabXOffset + ix), UICommonUtils.component_getAbsoluteY(tabBar), 2);
                 }
 
                 if (tabBar.border) {
                     // Bottom
                     for (int ix = 0; ix < tabBar.width; ix++) {
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(ix), UICommonUtils.component_getAbsoluteY(tabBar) - TL(tabBar.borderHeight), 2);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(ix), UICommonUtils.component_getAbsoluteY(tabBar) - TL(tabBar.borderHeight), 2);
                     }
                     // Left/Right
                     for (int iy = 0; iy < tabBar.borderHeight; iy++) {
                         int yOffset = TL(iy + 1);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset, 0);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabBar.width - 1), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset, 1);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset, 0);
+                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, UICommonUtils.component_getAbsoluteX(tabBar) + TL(tabBar.width - 1), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset, 1);
                     }
                 }
             }
             case Shape shape -> {
                 if (shape.shapeType != null) {
                     CMediaImage shapeImage = switch (shape.shapeType) {
-                        case OVAL -> UIEngineBaseMedia.UI_SHAPE_OVAL;
-                        case RECT -> UIEngineBaseMedia.UI_SHAPE_RECT;
-                        case DIAMOND -> UIEngineBaseMedia.UI_SHAPE_DIAMOND;
-                        case TRIANGLE_LEFT_DOWN -> UIEngineBaseMedia.UI_SHAPE_TRIANGLE_LEFT_DOWN;
-                        case TRIANGLE_RIGHT_DOWN -> UIEngineBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_DOWN;
-                        case TRIANGLE_LEFT_UP -> UIEngineBaseMedia.UI_SHAPE_TRIANGLE_LEFT_UP;
-                        case TRIANGLE_RIGHT_UP -> UIEngineBaseMedia.UI_SHAPE_TRIANGLE_RIGHT_UP;
+                        case OVAL -> UIEngineBaseMedia_8x8.UI_SHAPE_OVAL;
+                        case RECT -> UIEngineBaseMedia_8x8.UI_SHAPE_RECT;
+                        case DIAMOND -> UIEngineBaseMedia_8x8.UI_SHAPE_DIAMOND;
+                        case TRIANGLE_LEFT_DOWN -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_LEFT_DOWN;
+                        case TRIANGLE_RIGHT_DOWN -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_RIGHT_DOWN;
+                        case TRIANGLE_LEFT_UP -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_LEFT_UP;
+                        case TRIANGLE_RIGHT_UP -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_RIGHT_UP;
                     };
 
                     uiEngineState.spriteRenderer_ui.drawCMediaImage(shapeImage, UICommonUtils.component_getAbsoluteX(shape), UICommonUtils.component_getAbsoluteY(shape),
@@ -2792,7 +2761,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // Background
                 for (int ix = 0; ix < progressBar.width; ix++) {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
-                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_PROGRESSBAR, UICommonUtils.component_getAbsoluteX(progressBar) + TL(ix), UICommonUtils.component_getAbsoluteY(progressBar), index);
+                    uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR, UICommonUtils.component_getAbsoluteX(progressBar) + TL(ix), UICommonUtils.component_getAbsoluteY(progressBar), index);
                 }
 
                 // Bar
@@ -2803,10 +2772,10 @@ public class UIEngine<T extends UIEngineAdapter> {
                     int xOffset = TL(ix);
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
                     if (xOffset < pixels) {
-                        if (pixels - xOffset < TL) {
-                            uiEngineState.spriteRenderer_ui.drawCMediaArrayCut(UIEngineBaseMedia.UI_PROGRESSBAR_BAR, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), index, pixels - xOffset, TL);
+                        if (pixels - xOffset < TL()) {
+                            uiEngineState.spriteRenderer_ui.drawCMediaArrayCut(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), index, pixels - xOffset, TL());
                         } else {
-                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia.UI_PROGRESSBAR_BAR, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), index);
+                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), index);
                         }
                     }
                 }
@@ -2819,9 +2788,9 @@ public class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Checkbox checkBox -> {
-                CMediaArray checkBoxGraphic = checkBox.checkBoxStyle == CHECKBOX_STYLE.CHECKBOX ? UIEngineBaseMedia.UI_CHECKBOX_CHECKBOX : UIEngineBaseMedia.UI_CHECKBOX_RADIO;
+                CMediaArray checkBoxGraphic = checkBox.checkBoxStyle == CHECKBOX_STYLE.CHECKBOX ? UIEngineBaseMedia_8x8.UI_CHECKBOX_CHECKBOX : UIEngineBaseMedia_8x8.UI_CHECKBOX_RADIO;
                 uiEngineState.spriteRenderer_ui.drawCMediaArray(checkBoxGraphic, UICommonUtils.component_getAbsoluteX(checkBox), UICommonUtils.component_getAbsoluteY(checkBox), checkBox.checked ? 1 : 0);
-                render_drawFont(checkBox.font, checkBox.text, alpha, UICommonUtils.component_getAbsoluteX(checkBox) + TL, UICommonUtils.component_getAbsoluteY(checkBox), 1, 1, FONT_MAXWIDTH_NONE, null, 0);
+                render_drawFont(checkBox.font, checkBox.text, alpha, UICommonUtils.component_getAbsoluteX(checkBox) + TL(), UICommonUtils.component_getAbsoluteY(checkBox), 1, 1, FONT_MAXWIDTH_NONE, null, 0);
             }
             case AppViewport appViewPort -> {
                 uiEngineState.spriteRenderer_ui.draw(appViewPort.textureRegion, UICommonUtils.component_getAbsoluteX(appViewPort), UICommonUtils.component_getAbsoluteY(appViewPort));
@@ -2855,7 +2824,7 @@ public class UIEngine<T extends UIEngineAdapter> {
                 // List
                 render_batchSetColor(dragList.color_r, dragList.color_g, dragList.color_b, Math.min(dragList.color_a, uiEngineState.uiEngineConfig.component_listDragAlpha));
                 for (int ix = 0; ix < dragList.width; ix++) {
-                    uiEngineState.spriteRenderer_ui.drawCMediaSprite(UIEngineBaseMedia.UI_LIST_SELECTED, uiEngineState.mouse_ui.x - dragOffsetX + TL(ix), uiEngineState.mouse_ui.y - dragOffsetY, 0, uiEngineState.animation_timer_ui);
+                    uiEngineState.spriteRenderer_ui.drawCMediaSprite(UIEngineBaseMedia_8x8.UI_LIST_SELECTED, uiEngineState.mouse_ui.x - dragOffsetX + TL(ix), uiEngineState.mouse_ui.y - dragOffsetY, 0, uiEngineState.animation_timer_ui);
                 }
                 // Text
                 String text = dragList.listAction.text(dragItem);
@@ -2899,10 +2868,10 @@ public class UIEngine<T extends UIEngineAdapter> {
         render_saveTempColorFont(font);
         render_fontSetAlpha(font, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TL : 0) + textXOffset, y + textYOffset, text);
+            uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TL() : 0) + textXOffset, y + textYOffset, text);
         } else {
-            if (withIcon) maxWidth -= TL;
-            uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TL : 0) + textXOffset, y + textYOffset, text,
+            if (withIcon) maxWidth -= TL();
+            uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TL() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
         render_loadTempColorFont(font);
@@ -3015,5 +2984,21 @@ public class UIEngine<T extends UIEngineAdapter> {
 
     public NestedFrameBuffer getFrameBufferUI() {
         return uiEngineState.frameBuffer_ui;
+    }
+
+    private int TL(int size) {
+        return uiEngineState.sizeSize.TL(size);
+    }
+
+    private int TL() {
+        return uiEngineState.sizeSize.TL;
+    }
+
+    private int TL_HALF() {
+        return uiEngineState.sizeSize.TL_HALF;
+    }
+
+    private int TL2() {
+        return uiEngineState.sizeSize.TL2;
     }
 }

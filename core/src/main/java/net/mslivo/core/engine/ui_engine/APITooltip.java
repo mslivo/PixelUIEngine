@@ -170,8 +170,8 @@ public final class APITooltip {
                 tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 tooltipImageSegment.border = border;
                 if (sprite != null) {
-                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + UIEngine.TL) / UIEngine.TLF);
-                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + UIEngine.TL) / UIEngine.TLF);
+                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + api.TL()) / api.TLF());
+                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + api.TL()) / api.TLF());
                 } else {
                     tooltipImageSegment.width = tooltipImageSegment.height = 0;
                 }
@@ -180,7 +180,7 @@ public final class APITooltip {
 
             public void setImage(TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
                 if (tooltipImageSegment == null) return;
-                UICommonUtils.toolTip_setImageSegmentImage(mediaManager, tooltipImageSegment, image);
+                UICommonUtils.toolTip_setImageSegmentImage(uiEngineState,mediaManager, tooltipImageSegment, image);
             }
 
             public void setArrayIndex(TooltipImageSegment tooltipImageSegment, int arrayIndex) {
@@ -226,14 +226,14 @@ public final class APITooltip {
                 tooltipTextSegment.alignment = alignment;
                 tooltipTextSegment.merge = merge;
                 tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
-                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + UIEngine.TL) / UIEngine.TLF);
+                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + api.TL()) / api.TLF());
                 tooltipTextSegment.height = 1;
                 return tooltipTextSegment;
             }
 
             public void setText(TooltipTextSegment tooltipTextSegment, String text) {
                 if (tooltipTextSegment == null) return;
-                UICommonUtils.toolTip_setTextSegmentText(mediaManager, tooltipTextSegment, text);
+                UICommonUtils.toolTip_setTextSegmentText(uiEngineState,mediaManager, tooltipTextSegment, text);
             }
 
             public void setFont(TooltipTextSegment tooltipTextSegment, CMediaFont font) {
