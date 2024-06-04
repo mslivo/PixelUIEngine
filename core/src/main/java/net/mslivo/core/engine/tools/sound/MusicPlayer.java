@@ -169,7 +169,7 @@ public class MusicPlayer {
                         playCurrent = mediaManager.getCMediaMusic(nextTrack);
                         playCurrent.play();
                         if(playCurrent != null) {
-                            playCurrentFileName = nextTrack.file;
+                            playCurrentFileName = nextTrack.file();
                             playCurrent.setVolume(volume);
                             playCurrent.setOnCompletionListener(music -> {
                                 playCurrent.stop();

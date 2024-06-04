@@ -1,12 +1,12 @@
 package net.mslivo.core.engine.ui_engine;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaCursor;
-import net.mslivo.core.engine.ui_engine.constants.*;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.*;
+import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -63,7 +63,7 @@ public final class API {
         this.input = new APIInput(this, uiEngineState, mediaManager);
         this.contextMenu = new APIContextMenu(this, uiEngineState, mediaManager);
         this.notification = new APINotification(this, uiEngineState, mediaManager);
-        this.toolTip = new APITooltip(this, uiEngineState,mediaManager);
+        this.toolTip = new APITooltip(this, uiEngineState, mediaManager);
         this.hotkey = new APIHotkey(this, uiEngineState, mediaManager);
         this.mouseTool = new APIMouseTool(this, uiEngineState, mediaManager);
         this.mouseTextInput = new APIMouseTextInput(this, uiEngineState, mediaManager);
@@ -195,11 +195,12 @@ public final class API {
 
     public void sendMessageToWindows(Window[] windows, int type, Object... parameters) {
         if (windows == null) return;
-        for(int i=0;i<windows.length;i++) UICommonUtils.window_receiveMessage(windows[i], type, parameters);
+        for (int i = 0; i < windows.length; i++) UICommonUtils.window_receiveMessage(windows[i], type, parameters);
     }
 
     public void sendMessageToAllWindows(int type, Object... parameters) {
-        for(int i=0;i< uiEngineState.windows.size();i++) UICommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
+        for (int i = 0; i < uiEngineState.windows.size(); i++)
+            UICommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
     }
 
     public void windowsEnforceScreenBounds() {
@@ -362,11 +363,18 @@ public final class API {
         this.uiEngineState.singleUpdateActions.add(updateAction);
     }
 
-    public void overrideCursor(CMediaCursor temporaryCursor) {
+    public void overrideCursor(CMediaSprite overrideCursor) {
+        if (overrideCursor == null) return;
+        overrideCursor(overrideCursor, 0);
+    }
+
+    public void overrideCursor(CMediaSprite temporaryCursor, int arrayIndex) {
         if (temporaryCursor == null) return;
         uiEngineState.overrideCursor = temporaryCursor;
         uiEngineState.displayOverrideCursor = true;
+        uiEngineState.overrideCursorArrayIndex = Math.max(0, arrayIndex);
     }
+
 
     public void setAppToolTip(Tooltip toolTip) {
         uiEngineState.appToolTip = toolTip;
@@ -393,41 +401,52 @@ public final class API {
         return uiEngineState.resolutionHeight;
     }
 
-    public int TS(){
+    public int TS() {
         return uiEngineState.sizeSize.TS;
     }
-    public int TS(int size){
+
+    public int TS(int size) {
         return uiEngineState.sizeSize.TL(size);
     }
-    public int TS_HALF(){
+
+    public int TS_HALF() {
         return uiEngineState.sizeSize.TS_HALF;
-    };
-    public int TS2(){
+    }
+
+    public int TS2() {
         return uiEngineState.sizeSize.TS2;
-    };
-    public int TS3(){
+    }
+
+    public int TS3() {
         return uiEngineState.sizeSize.TS3;
-    };
-    public int TS4(){
+    }
+
+    public int TS4() {
         return uiEngineState.sizeSize.TS4;
-    };
-    public float TSF(){
+    }
+
+    public float TSF() {
         return uiEngineState.sizeSize.TSF;
-    };
-    public float TSF(float size){
+    }
+
+    public float TSF(float size) {
         return uiEngineState.sizeSize.TLF(size);
-    };
-    public float TSF_HALF(){
+    }
+
+    public float TSF_HALF() {
         return uiEngineState.sizeSize.TLF_HALF;
-    };
-    public float TSF2(){
+    }
+
+    public float TSF2() {
         return uiEngineState.sizeSize.TSF2;
-    };
-    public float TSF3(){
+    }
+
+    public float TSF3() {
         return uiEngineState.sizeSize.TSF3;
-    };
-    public float TSF4(){
+    }
+
+    public float TSF4() {
         return uiEngineState.sizeSize.TSF4;
-    };
+    }
 
 }

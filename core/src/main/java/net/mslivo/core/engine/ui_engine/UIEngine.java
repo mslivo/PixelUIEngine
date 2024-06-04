@@ -214,8 +214,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.mouse_delta = new Vector2(0, 0);
         newUIEngineState.lastUIMouseHover = null;
         newUIEngineState.cursor = null;
+        newUIEngineState.cursorArrayIndex = 0;
         newUIEngineState.mouseTool = null;
         newUIEngineState.mouseToolPressed = false;
+        newUIEngineState.overrideCursor = null;
+        newUIEngineState.overrideCursorArrayIndex = 0;
+        newUIEngineState.displayOverrideCursor = false;
         newUIEngineState.vector_fboCursor = new Vector3(0, 0, 0);
         newUIEngineState.vector2_unproject = new Vector2(0, 0);
         newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidth / 2, newUIEngineState.resolutionHeight / 2);
@@ -914,10 +918,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.lastUIMouseHover != null) {
             // 1. GUI Cursor
             uiEngineState.cursor = uiEngineState.config.ui_cursor;
+            uiEngineState.cursorArrayIndex = 0;
         } else {
             // 2. Manually overidden Cursor
             if (uiEngineState.displayOverrideCursor) {
                 uiEngineState.cursor = uiEngineState.overrideCursor;
+                uiEngineState.cursorArrayIndex = uiEngineState.overrideCursorArrayIndex;
                 uiEngineState.displayOverrideCursor = false;
             } else {
                 if (uiEngineState.mouseTool != null) {
@@ -927,6 +933,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     } else {
                         uiEngineState.cursor = uiEngineState.mouseTool.cursor;
                     }
+                    uiEngineState.cursorArrayIndex = uiEngineState.mouseTool.cursorArrayIndex;
                 } else {
                     // no mouse tool set - display no cursor
                     uiEngineState.cursor = null;
@@ -2062,7 +2069,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawCursor() {
         if (uiEngineState.cursor != null) {
-            uiEngineState.spriteRenderer_ui.drawCMediaCursor(uiEngineState.cursor, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
+            int center_x = mediaManager.getCMediaSpriteWidth(uiEngineState.cursor)/2;
+            int center_y = mediaManager.getCMediaSpriteHeight(uiEngineState.cursor)/2;
+            uiEngineState.spriteRenderer_ui.drawCMediaSprite(uiEngineState.cursor,
+                    (uiEngineState.mouse_ui.x-center_x), (uiEngineState.mouse_ui.y-center_y),0,uiEngineState.animationTimer_ui);
             render_batchSetColorWhite();
         }
     }

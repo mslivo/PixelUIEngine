@@ -1,10 +1,10 @@
 package net.mslivo.core.engine.ui_engine;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaCursor;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseToolAction;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 
@@ -21,26 +21,26 @@ public final class APIMouseTool {
         this.mediaManager = mediaManager;
     }
 
-
-    public MouseTool create(String name, Object data, CMediaCursor cursor) {
+    public MouseTool create(String name, Object data, CMediaSprite cursor) {
         return create(name, data, cursor, cursor, null);
     }
 
-    public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown) {
+    public MouseTool create(String name, Object data, CMediaSprite cursor, CMediaSprite cursorDown) {
         return create(name, data, cursor, cursorDown, null);
     }
 
-    public MouseTool create(String name, Object data, CMediaCursor cursor, MouseToolAction mouseToolAction) {
+    public MouseTool create(String name, Object data, CMediaSprite cursor, MouseToolAction mouseToolAction) {
         return create(name, data, cursor, cursor, mouseToolAction);
     }
 
-    public MouseTool create(String name, Object data, CMediaCursor cursor, CMediaCursor cursorDown, MouseToolAction mouseToolAction) {
+    public MouseTool create(String name, Object data, CMediaSprite cursor, CMediaSprite cursorDown, MouseToolAction mouseToolAction) {
         MouseTool mouseTool = new MouseTool();
         mouseTool.name = name;
         mouseTool.data = data;
         mouseTool.cursor = cursor;
         mouseTool.cursorDown = cursorDown;
         mouseTool.mouseToolAction = mouseToolAction;
+        mouseTool.cursorArrayIndex = 0;
         return mouseTool;
     }
 
@@ -54,12 +54,12 @@ public final class APIMouseTool {
         mouseTool.data = data;
     }
 
-    public void setCursor(MouseTool mouseTool, CMediaCursor cursor) {
+    public void setCursor(MouseTool mouseTool, CMediaSprite cursor) {
         if (mouseTool == null) return;
         mouseTool.cursor = cursor;
     }
 
-    public void setCursorDown(MouseTool mouseTool, CMediaCursor cursorDown) {
+    public void setCursorDown(MouseTool mouseTool, CMediaSprite cursorDown) {
         if (mouseTool == null) return;
         mouseTool.cursorDown = cursorDown;
     }
@@ -68,6 +68,12 @@ public final class APIMouseTool {
         if (mouseTool == null) return;
         mouseTool.mouseToolAction = mouseToolAction;
     }
+
+    public void setCursorArrayIndex(MouseTool mouseTool, int cursorArrayIndex) {
+        if (mouseTool == null) return;
+        mouseTool.cursorArrayIndex = Math.max(0,cursorArrayIndex);
+    }
+
 
 }
 

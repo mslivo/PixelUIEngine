@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.ui_engine.state.config;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
@@ -13,7 +12,7 @@ public final class UIConfig implements Serializable, Cloneable {
 
     private final UIEngineState uiEngineState;
 
-    public CMediaCursor ui_cursor;
+    public CMediaSprite ui_cursor;
     public boolean ui_keyInteractionsDisabled;
     public boolean ui_mouseInteractionsDisabled;
     public boolean ui_foldWindowsOnDoubleClick;

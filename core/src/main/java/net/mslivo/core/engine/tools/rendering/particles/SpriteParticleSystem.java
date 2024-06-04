@@ -64,7 +64,7 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
                     batch.drawCMediaAnimationScale((CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer + particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
                 }
                 case SPRITE_CURSOR -> {
-                    batch.drawCMediaCursor((CMediaCursor) particle.appearance, particle.x, particle.y);
+                    //batch.drawCMediaCursor((CMediaCursor) particle.appearance, particle.x, particle.y);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
@@ -74,25 +74,6 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
         batch.setColor(backup);
     }
 
-
-    /* ------- Cursor ------- */
-    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y) {
-        Particle<T> particle = particleNew(ParticleType.SPRITE_CURSOR, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaCursor, null, null, 0f, true);
-        addParticleToSystem(particle);
-        return particle;
-    }
-
-    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a) {
-        Particle<T> particle = particleNew(ParticleType.SPRITE_CURSOR, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaCursor, null, null, 0f, true);
-        addParticleToSystem(particle);
-        return particle;
-    }
-
-    protected Particle<T> addParticle(CMediaCursor cMediaCursor, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
-        Particle<T> particle = particleNew(ParticleType.SPRITE_CURSOR, x, y, r, g, b, a, 0f, 1f, 1f, 0, origin_x, origin_y, cMediaCursor, null, null, 0f, true);
-        addParticleToSystem(particle);
-        return particle;
-    }
 
     /* ------- Font ------- */
 

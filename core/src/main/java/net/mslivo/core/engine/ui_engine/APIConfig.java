@@ -2,8 +2,8 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
@@ -46,11 +46,11 @@ public final class APIConfig {
         APIUIConfig(){
         }
 
-        public CMediaCursor getCursor() {
+        public CMediaSprite getCursor() {
             return uiConfig.ui_cursor;
         }
 
-        public void setCursor(CMediaCursor ui_cursor) {
+        public void setCursor(CMediaSprite ui_cursor) {
             uiConfig.ui_cursor = ui_cursor;
         }
 

@@ -1,17 +1,31 @@
 package net.mslivo.core.engine.media_manager.media;
 
+import net.mslivo.core.engine.media_manager.MediaManager;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public abstract class CMedia implements Serializable {
-    public static final int MEDIAMANGER_INDEX_NONE = -1;
     public final String file;
-    private final int hash;
-    public int mediaManagerIndex;
+    private int hash;
+    private int mediaManagerIndex;
+
     protected CMedia(String file) {
         this.file = file;
+        this.mediaManagerIndex = MediaManager.MEDIAMANGER_INDEX_NONE;
         this.hash = Objects.hash(file);
-        this.mediaManagerIndex = MEDIAMANGER_INDEX_NONE;
+    }
+
+    public void setMediaManagerIndex(int mediaManagerIndex) {
+        this.mediaManagerIndex = mediaManagerIndex;
+    }
+
+    public int mediaManagerIndex() {
+        return mediaManagerIndex;
+    }
+
+    public String file() {
+        return file;
     }
 
     @Override
@@ -26,4 +40,5 @@ public abstract class CMedia implements Serializable {
     public int hashCode() {
         return hash;
     }
+
 }
