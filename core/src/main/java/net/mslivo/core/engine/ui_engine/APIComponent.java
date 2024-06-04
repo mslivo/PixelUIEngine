@@ -113,8 +113,8 @@ public final class APIComponent {
             AppViewport appViewPort = new AppViewport();
             appViewPort.updateTimer = 0;
             setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.WHITE);
-            int viewportWidth = appViewPort.width * api.TL();
-            int viewportHeight = appViewPort.height * api.TL();
+            int viewportWidth = appViewPort.width * api.TS();
+            int viewportHeight = appViewPort.height * api.TS();
             appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
             Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
             texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -725,7 +725,7 @@ public final class APIComponent {
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? api.TL() : 0) + api.TL()) / api.TLF());
+                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
                     tab.width = width;
                 }
@@ -1036,7 +1036,7 @@ public final class APIComponent {
         public net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas = new net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas();
             setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
-            canvas.map = new Color[width * api.TL()][height * api.TL()];
+            canvas.map = new Color[width * api.TS()][height * api.TS()];
             for (int ix = 0; ix < canvas.map.length; ix++)
                 for (int iy = 0; iy < canvas.map[0].length; iy++)
                     canvas.map[ix][iy] = new Color(1f, 1f, 1f, 1f);
@@ -1291,7 +1291,7 @@ public final class APIComponent {
                     int widthT = mediaManager.getCMediaFontTextWidth(text.font, lines[i]);
                     if (widthT > width) width = widthT;
                 }
-                width = width / api.TL();
+                width = width / api.TS();
                 height = lines.length;
             }
             setComponentCommonInitValuesInternal(text, x, y, width, height);
@@ -1341,8 +1341,8 @@ public final class APIComponent {
 
         public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, float animation_offset) {
             net.mslivo.core.engine.ui_engine.ui.components.image.Image imageC = new net.mslivo.core.engine.ui_engine.ui.components.image.Image();
-            int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TL() : 0;
-            int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TL() : 0;
+            int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TS() : 0;
+            int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
             imageC.image = image;
             imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
@@ -1766,7 +1766,7 @@ public final class APIComponent {
 
     public void setPositionGrid(Component component, int x, int y) {
         if (component == null) return;
-        setPosition(component, x * api.TL(), y * api.TL());
+        setPosition(component, x * api.TS(), y * api.TS());
     }
 
     public void moveX(Component[] components, int x) {
@@ -1930,12 +1930,12 @@ public final class APIComponent {
 
     public int realWidth(Component component) {
         if (component == null) return 0;
-        return api.TL(component.width);
+        return api.TS(component.width);
     }
 
     public int realHeight(Component component) {
         if (component == null) return 0;
-        return api.TL(component.height);
+        return api.TS(component.height);
     }
 
     public boolean isAddedToWindow(Component component, Window window) {
@@ -1963,8 +1963,8 @@ public final class APIComponent {
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
         // Align to grid per default
-        component.x = (x * api.TL());
-        component.y = (y * api.TL());
+        component.x = (x * api.TS());
+        component.y = (y * api.TS());
         component.width = width;
         component.height = height;
         component.color_a = 1f;

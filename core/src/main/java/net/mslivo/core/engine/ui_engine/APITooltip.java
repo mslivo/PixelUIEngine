@@ -170,8 +170,8 @@ public final class APITooltip {
                 tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
                 tooltipImageSegment.border = border;
                 if (sprite != null) {
-                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + api.TL()) / api.TLF());
-                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + api.TL()) / api.TLF());
+                    tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + api.TS()) / api.TSF());
+                    tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + api.TS()) / api.TSF());
                 } else {
                     tooltipImageSegment.width = tooltipImageSegment.height = 0;
                 }
@@ -226,7 +226,7 @@ public final class APITooltip {
                 tooltipTextSegment.alignment = alignment;
                 tooltipTextSegment.merge = merge;
                 tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
-                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + api.TL()) / api.TLF());
+                tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + api.TS()) / api.TSF());
                 tooltipTextSegment.height = 1;
                 return tooltipTextSegment;
             }

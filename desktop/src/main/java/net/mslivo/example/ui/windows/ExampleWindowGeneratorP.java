@@ -386,8 +386,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public void onUpdate() {
                 for (int i = 0; i < 20; i++)
                     api.component.canvas.point(canvas,
-                            MathUtils.random(0, canvas.width * api.TL()),
-                            MathUtils.random(0, canvas.height * api.TL()),
+                            MathUtils.random(0, canvas.width * api.TS()),
+                            MathUtils.random(0, canvas.height * api.TS()),
                             MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
                     );
 
