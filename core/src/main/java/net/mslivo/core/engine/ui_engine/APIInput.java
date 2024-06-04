@@ -4,8 +4,9 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.constants.INPUT_METHOD;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
@@ -15,6 +16,7 @@ public final class APIInput {
     private final API api;
     private final UIEngineState uiEngineState;
     private final UIConfig uiConfig;
+    private final UIInputEvents inputEvents;
     private final MediaManager mediaManager;
     public final APIMouse mouse;
     public final APIKeyboard keyboard;
@@ -23,7 +25,8 @@ public final class APIInput {
     APIInput(API api, UIEngineState uiEngineState, MediaManager mediaManager){
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
+        this.inputEvents = uiEngineState.inputEvents;
         this.mediaManager = mediaManager;
         this.mouse = new APIMouse();
         this.keyboard = new APIKeyboard();
@@ -31,7 +34,7 @@ public final class APIInput {
     }
 
     public INPUT_METHOD lastUsedInputMethod() {
-        return uiEngineState.inputEvents.lastUsedInputMethod;
+        return inputEvents.lastUsedInputMethod;
     }
 
     public final class APIMouse {
@@ -107,47 +110,47 @@ public final class APIInput {
         public final class APIEvent {
             /* ---- MOUSE EVENTS --- */
             public boolean buttonDown() {
-                return uiEngineState.inputEvents.mouseDown;
+                return inputEvents.mouseDown;
             }
 
             public boolean doubleClick() {
-                return uiEngineState.inputEvents.mouseDoubleClick;
+                return inputEvents.mouseDoubleClick;
             }
 
             public boolean buttonUp() {
-                return uiEngineState.inputEvents.mouseUp;
+                return inputEvents.mouseUp;
             }
 
             public boolean dragged() {
-                return uiEngineState.inputEvents.mouseDragged;
+                return inputEvents.mouseDragged;
             }
 
             public boolean moved() {
-                return uiEngineState.inputEvents.mouseMoved;
+                return inputEvents.mouseMoved;
             }
 
             public boolean scrolled() {
-                return uiEngineState.inputEvents.mouseScrolled;
+                return inputEvents.mouseScrolled;
             }
 
             public float scrolledAmount() {
-                return uiEngineState.inputEvents.mouseScrolledAmount;
+                return inputEvents.mouseScrolledAmount;
             }
 
             public boolean buttonUpHasNext() {
-                return uiEngineState.inputEvents.mouseUpButtonIndex < uiEngineState.inputEvents.mouseUpButtons.size;
+                return inputEvents.mouseUpButtonIndex < inputEvents.mouseUpButtons.size;
             }
 
             public int buttonUpNext() {
-                return buttonUpHasNext() ? uiEngineState.inputEvents.mouseUpButtons.get(uiEngineState.inputEvents.mouseUpButtonIndex++) : KeyCode.NONE;
+                return buttonUpHasNext() ? inputEvents.mouseUpButtons.get(inputEvents.mouseUpButtonIndex++) : KeyCode.NONE;
             }
 
             public boolean buttonDownHasNext() {
-                return uiEngineState.inputEvents.mouseDownButtonIndex < uiEngineState.inputEvents.mouseDownButtons.size;
+                return inputEvents.mouseDownButtonIndex < inputEvents.mouseDownButtons.size;
             }
 
             public int buttonDownNext() {
-                return buttonDownHasNext() ? uiEngineState.inputEvents.mouseDownButtons.get(uiEngineState.inputEvents.mouseDownButtonIndex++) : KeyCode.NONE;
+                return buttonDownHasNext() ? inputEvents.mouseDownButtons.get(inputEvents.mouseDownButtonIndex++) : KeyCode.NONE;
             }
         }
 
@@ -177,7 +180,7 @@ public final class APIInput {
             }
 
             public boolean isButtonUp(int keyCode) {
-                return !uiEngineState.inputEvents.mouseButtonsDown[keyCode];
+                return !inputEvents.mouseButtonsDown[keyCode];
             }
 
             public boolean isAnyButtonUp(int[] keyCodes) {
@@ -188,7 +191,7 @@ public final class APIInput {
             }
 
             public boolean isButtonDown(int button) {
-                return uiEngineState.inputEvents.mouseButtonsDown[button];
+                return inputEvents.mouseButtonsDown[button];
             }
 
             public boolean isAnyButtonDown(int[] keyCodes) {
@@ -236,51 +239,51 @@ public final class APIInput {
 
         public final class APIEvent {
             public boolean keyDown() {
-                return uiEngineState.inputEvents.keyDown;
+                return inputEvents.keyDown;
             }
 
             public boolean keyUp() {
-                return uiEngineState.inputEvents.keyUp;
+                return inputEvents.keyUp;
             }
 
             public boolean keyTyped() {
-                return uiEngineState.inputEvents.keyTyped;
+                return inputEvents.keyTyped;
             }
 
             public boolean keyTypedCharacter(Character character) {
-                for (int i = 0; i < uiEngineState.inputEvents.keyTypedCharacters.size; i++)
-                    if (character == uiEngineState.inputEvents.keyTypedCharacters.get(i)) return true;
+                for (int i = 0; i < inputEvents.keyTypedCharacters.size; i++)
+                    if (character == inputEvents.keyTypedCharacters.get(i)) return true;
                 return false;
             }
 
             public boolean keyUpHasNext() {
-                return uiEngineState.inputEvents.keyUpKeyCodeIndex < uiEngineState.inputEvents.keyUpKeyCodes.size;
+                return inputEvents.keyUpKeyCodeIndex < inputEvents.keyUpKeyCodes.size;
             }
 
             public int keyUpNext() {
-                return keyUpHasNext() ? uiEngineState.inputEvents.keyUpKeyCodes.get(uiEngineState.inputEvents.keyUpKeyCodeIndex++) : KeyCode.NONE;
+                return keyUpHasNext() ? inputEvents.keyUpKeyCodes.get(inputEvents.keyUpKeyCodeIndex++) : KeyCode.NONE;
             }
 
             public boolean keyDownHasNext() {
-                return uiEngineState.inputEvents.keyDownKeyCodeIndex < uiEngineState.inputEvents.keyDownKeyCodes.size;
+                return inputEvents.keyDownKeyCodeIndex < inputEvents.keyDownKeyCodes.size;
             }
 
             public int keyDownNext() {
-                return keyDownHasNext() ? uiEngineState.inputEvents.keyDownKeyCodes.get(uiEngineState.inputEvents.keyDownKeyCodeIndex++) : KeyCode.NONE;
+                return keyDownHasNext() ? inputEvents.keyDownKeyCodes.get(inputEvents.keyDownKeyCodeIndex++) : KeyCode.NONE;
             }
 
             public boolean keyTypedHasNext() {
-                return uiEngineState.inputEvents.keyTypedCharacterIndex < uiEngineState.inputEvents.keyTypedCharacters.size;
+                return inputEvents.keyTypedCharacterIndex < inputEvents.keyTypedCharacters.size;
             }
 
             public char keyTypedNext() {
-                return (char) (keyTypedHasNext() ? uiEngineState.inputEvents.keyTypedCharacters.get(uiEngineState.inputEvents.keyTypedCharacterIndex++) : -1);
+                return (char) (keyTypedHasNext() ? inputEvents.keyTypedCharacters.get(inputEvents.keyTypedCharacterIndex++) : -1);
             }
         }
 
         public final class APIState {
             public boolean isKeyDown(int keyCode) {
-                return uiEngineState.inputEvents.keysDown[keyCode];
+                return inputEvents.keysDown[keyCode];
             }
 
             public boolean isAnyKeyDown(int[] keyCodes) {
@@ -291,7 +294,7 @@ public final class APIInput {
             }
 
             public boolean isKeyUp(int keyCode) {
-                return !uiEngineState.inputEvents.keysDown[keyCode];
+                return !inputEvents.keysDown[keyCode];
             }
 
             public boolean isAnyKeyUp(int[] keyCodes) {
@@ -316,27 +319,27 @@ public final class APIInput {
 
         public final class APIEvent {
             public boolean buttonDown() {
-                return uiEngineState.inputEvents.gamePadButtonDown;
+                return inputEvents.gamePadButtonDown;
             }
 
             public boolean buttonUp() {
-                return uiEngineState.inputEvents.gamePadButtonUp;
+                return inputEvents.gamePadButtonUp;
             }
 
             public boolean connected() {
-                return uiEngineState.inputEvents.gamePadConnected;
+                return inputEvents.gamePadConnected;
             }
 
             public boolean disconnected() {
-                return uiEngineState.inputEvents.gamePadDisconnected;
+                return inputEvents.gamePadDisconnected;
             }
 
             public boolean leftXMoved() {
-                return uiEngineState.inputEvents.gamePadLeftXMoved;
+                return inputEvents.gamePadLeftXMoved;
             }
 
             public boolean leftYMoved() {
-                return uiEngineState.inputEvents.gamePadLeftYMoved;
+                return inputEvents.gamePadLeftYMoved;
             }
 
             public boolean leftMoved() {
@@ -344,11 +347,11 @@ public final class APIInput {
             }
 
             public boolean rightXMoved() {
-                return uiEngineState.inputEvents.gamePadRightXMoved;
+                return inputEvents.gamePadRightXMoved;
             }
 
             public boolean rightYMoved() {
-                return uiEngineState.inputEvents.gamePadRightYMoved;
+                return inputEvents.gamePadRightYMoved;
             }
 
             public boolean rightMoved() {
@@ -356,33 +359,33 @@ public final class APIInput {
             }
 
             public boolean leftTriggerMoved() {
-                return uiEngineState.inputEvents.gamePadLeftTriggerMoved;
+                return inputEvents.gamePadLeftTriggerMoved;
             }
 
             public boolean rightTriggerMoved() {
-                return uiEngineState.inputEvents.gamePadRightTriggerMoved;
+                return inputEvents.gamePadRightTriggerMoved;
             }
 
             public boolean buttonDownHasNext() {
-                return uiEngineState.inputEvents.gamePadButtonDownIndex < uiEngineState.inputEvents.gamePadButtonDownKeyCodes.size;
+                return inputEvents.gamePadButtonDownIndex < inputEvents.gamePadButtonDownKeyCodes.size;
             }
 
             public int buttonDownNext() {
-                return buttonDownHasNext() ? uiEngineState.inputEvents.gamePadButtonDownKeyCodes.get(uiEngineState.inputEvents.gamePadButtonDownIndex++) : KeyCode.NONE;
+                return buttonDownHasNext() ? inputEvents.gamePadButtonDownKeyCodes.get(inputEvents.gamePadButtonDownIndex++) : KeyCode.NONE;
             }
 
             public boolean buttonUpHasNext() {
-                return uiEngineState.inputEvents.gamePadButtonUpIndex < uiEngineState.inputEvents.gamePadButtonUpKeyCodes.size;
+                return inputEvents.gamePadButtonUpIndex < inputEvents.gamePadButtonUpKeyCodes.size;
             }
 
             public int buttonUpNext() {
-                return buttonUpHasNext() ? uiEngineState.inputEvents.gamePadButtonUpKeyCodes.get(uiEngineState.inputEvents.gamePadButtonUpIndex++) : KeyCode.NONE;
+                return buttonUpHasNext() ? inputEvents.gamePadButtonUpKeyCodes.get(inputEvents.gamePadButtonUpIndex++) : KeyCode.NONE;
             }
         }
 
         public final class APIState {
             public boolean isButtonDown(int keyCode) {
-                return uiEngineState.inputEvents.gamePadButtonsDown[keyCode];
+                return inputEvents.gamePadButtonsDown[keyCode];
             }
 
             public boolean isAnyButtonDown(int[] keyCodes) {
@@ -393,7 +396,7 @@ public final class APIInput {
             }
 
             public boolean isButtonUp(int keyCode) {
-                return !uiEngineState.inputEvents.gamePadButtonsDown[keyCode];
+                return !inputEvents.gamePadButtonsDown[keyCode];
             }
 
             public boolean isAnyButtonUp(int[] keyCodes) {
@@ -404,27 +407,27 @@ public final class APIInput {
             }
 
             public float leftTrigger() {
-                return uiEngineState.inputEvents.gamePadLeftTrigger;
+                return inputEvents.gamePadLeftTrigger;
             }
 
             public float rightTrigger() {
-                return uiEngineState.inputEvents.gamePadRightTrigger;
+                return inputEvents.gamePadRightTrigger;
             }
 
             public float leftX() {
-                return uiEngineState.inputEvents.gamePadLeftX;
+                return inputEvents.gamePadLeftX;
             }
 
             public float leftY() {
-                return uiEngineState.inputEvents.gamePadLeftY;
+                return inputEvents.gamePadLeftY;
             }
 
             public float rightX() {
-                return uiEngineState.inputEvents.gamePadRightX;
+                return inputEvents.gamePadRightX;
             }
 
             public float rightY() {
-                return uiEngineState.inputEvents.gamePadRightY;
+                return inputEvents.gamePadRightY;
             }
         }
 

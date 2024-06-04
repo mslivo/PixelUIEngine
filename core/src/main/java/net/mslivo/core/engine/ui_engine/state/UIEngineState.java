@@ -13,6 +13,8 @@ import net.mslivo.core.engine.ui_engine.constants.TILE_SIZE;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -36,12 +38,12 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.UIEngineInputProcessor;
+import net.mslivo.core.engine.ui_engine.state.input.UIInputProcessor;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class UIEngineState {
+public final class UIEngineState {
 
     /* ################ Constructor Parameters ################# */
     public int resolutionWidth, resolutionHeight;
@@ -50,7 +52,7 @@ public class UIEngineState {
     public TILE_SIZE sizeSize;
 
     /* ##################### Config ########################## */
-    public UIConfig uiEngineConfig;
+    public UIConfig config;
 
     /* #################### Graphics: App #################### */
 
@@ -160,10 +162,10 @@ public class UIEngineState {
 
     /* #################### Misc. ####################  */
 
-    public float animation_timer_ui;
+    public float animationTimer_ui;
     public Color tempSaveColor;
     public UIInputEvents inputEvents;
-    public UIEngineInputProcessor inputProcessor;
+    public UIInputProcessor inputProcessor;
     public int itemInfo_listIndex;
     public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;

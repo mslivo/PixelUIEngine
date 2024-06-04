@@ -14,7 +14,7 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -26,6 +26,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
+import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.Progressbar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarHorizontal;
@@ -68,7 +69,7 @@ public final class APIComponent {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig= uiEngineState.uiEngineConfig;
+        this.uiConfig= uiEngineState.config;
         this.shape = new APIShape();
         this.button = new APIButton();
         this.tabbar = new APITabbar();
@@ -1327,46 +1328,37 @@ public final class APIComponent {
             };
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0, defaultImageAction(), 0f);
+        public Image create(int x, int y, CMediaSprite image) {
+            return create(x, y, image, 0, defaultImageAction());
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex, defaultImageAction(), 0f);
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
+            return create(x, y, image, arrayIndex, defaultImageAction());
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image, int arrayIndex, float animation_offset) {
-            return create(x, y, image, arrayIndex, defaultImageAction(), animation_offset);
-        }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.image.Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, float animation_offset) {
-            net.mslivo.core.engine.ui_engine.ui.components.image.Image imageC = new net.mslivo.core.engine.ui_engine.ui.components.image.Image();
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction) {
+            Image imageC = new Image();
             int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TS() : 0;
             int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
             imageC.image = image;
             imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
-            imageC.animationOffset = animation_offset;
             imageC.imageAction = imageAction;
             return imageC;
         }
 
-        public void setAnimationOffset(net.mslivo.core.engine.ui_engine.ui.components.image.Image image, float animationOffset) {
-            if (image == null) return;
-            image.animationOffset = animationOffset;
-        }
-
-        public void setImageAction(net.mslivo.core.engine.ui_engine.ui.components.image.Image image, ImageAction imageAction) {
+        public void setImageAction(Image image, ImageAction imageAction) {
             if (image == null) return;
             image.imageAction = imageAction;
         }
 
-        public void setArrayIndex(net.mslivo.core.engine.ui_engine.ui.components.image.Image image, int arrayIndex) {
+        public void setArrayIndex(Image image, int arrayIndex) {
             if (image == null) return;
             image.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
         }
 
-        public void setImage(net.mslivo.core.engine.ui_engine.ui.components.image.Image imageC, CMediaSprite image) {
+        public void setImage(Image imageC, CMediaSprite image) {
             if (imageC == null) return;
             UICommonUtils.image_setImage(uiEngineState,mediaManager, imageC, image);
         }

@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseToolAction;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
@@ -17,7 +17,7 @@ public final class APIMouseTool {
     APIMouseTool(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
         this.mediaManager = mediaManager;
     }
 

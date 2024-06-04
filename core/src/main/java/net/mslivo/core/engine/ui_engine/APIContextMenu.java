@@ -5,7 +5,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextmenuAction;
@@ -24,7 +24,7 @@ public final class APIContextMenu {
     APIContextMenu(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
         this.mediaManager = mediaManager;
         this.item = new APIContextMenuItem();
     }

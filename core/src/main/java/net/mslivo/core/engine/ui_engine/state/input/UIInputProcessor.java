@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.ui_engine;
+package net.mslivo.core.engine.ui_engine.state.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -9,16 +9,15 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.studiohartman.jamepad.ControllerAxis;
 import net.mslivo.core.engine.ui_engine.constants.INPUT_METHOD;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
-import net.mslivo.core.engine.ui_engine.state.UIInputEvents;
 
-public class UIEngineInputProcessor implements InputProcessor, ControllerListener {
+public final class UIInputProcessor implements InputProcessor, ControllerListener {
     public static final int DOUBLE_CLICK_TIME = 180;
     private final UIInputEvents inputEvents;
-    private long lastClickTime;
     private final boolean gamePadSupport;
+    private long lastClickTime;
 
-    public UIEngineInputProcessor(UIInputEvents inputEvents, boolean gamePadSupport) {
-        this.inputEvents = inputEvents;
+    public UIInputProcessor(UIInputEvents uiInputEvents, boolean gamePadSupport) {
+        this.inputEvents = uiInputEvents;
         this.lastClickTime = System.currentTimeMillis();
         this.gamePadSupport = gamePadSupport;
         Gdx.input.setInputProcessor(this);

@@ -5,7 +5,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.NotificationAction;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -20,7 +20,7 @@ public final class APINotification {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
     }
 
 

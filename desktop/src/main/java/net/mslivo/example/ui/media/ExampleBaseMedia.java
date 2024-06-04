@@ -16,7 +16,7 @@ public class ExampleBaseMedia {
     public static final CMediaImage ICON_EXAMPLE_BULLET_BLUE = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_bullet_blue.png");
     public static final CMediaImage ICON_EXAMPLE_BULLET_ORANGE = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_bullet_orange.png");
     public static final CMediaImage ICON_EXAMPLE_WINDOW = MediaManager.create_CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_icon_window.png");
-    public static final CMediaAnimation EXAMPLE_ANIMATION_2 = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png",  8,  8, 0.1f);
+    public static final CMediaAnimation EXAMPLE_ANIMATION_2 = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png",  8*8,  8*8, 0.1f);
     public static final CMediaAnimation EXAMPLE_ANIMATION = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation.png", 16, 8, 0.1f);
     public static final CMediaAnimation BACKGROUND = MediaManager.create_CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 16, 16, 0.2f);
     public static final CMedia[] ALL = new CMedia[]{

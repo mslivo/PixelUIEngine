@@ -58,7 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-class UICommonUtils {
+final class UICommonUtils {
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();

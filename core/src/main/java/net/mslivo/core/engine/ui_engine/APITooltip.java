@@ -7,7 +7,7 @@ import net.mslivo.core.engine.media_manager.media.CMediaFont;
 import net.mslivo.core.engine.media_manager.media.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
@@ -25,7 +25,7 @@ public final class APITooltip {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
         this.segment = new APITooltipSegment();
     }
 
@@ -225,7 +225,7 @@ public final class APITooltip {
                 tooltipTextSegment.border = border;
                 tooltipTextSegment.alignment = alignment;
                 tooltipTextSegment.merge = merge;
-                tooltipTextSegment.font = uiEngineState.uiEngineConfig.tooltip_defaultFont;
+                tooltipTextSegment.font = uiEngineState.config.tooltip_defaultFont;
                 tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + api.TS()) / api.TSF());
                 tooltipTextSegment.height = 1;
                 return tooltipTextSegment;

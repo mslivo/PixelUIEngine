@@ -1,17 +1,23 @@
-package net.mslivo.core.engine.ui_engine.state;
+package net.mslivo.core.engine.ui_engine.state.config;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
 import java.io.Serializable;
 
-public class UIConfig implements Serializable, Cloneable {
+public final class UIConfig implements Serializable, Cloneable {
+
+    private final UIEngineState uiEngineState;
+
     public CMediaCursor ui_cursor;
     public boolean ui_keyInteractionsDisabled;
     public boolean ui_mouseInteractionsDisabled;
     public boolean ui_foldWindowsOnDoubleClick;
+    public AnimationTimerFunction ui_animationTimerFunction;
     public float input_emulatedMouseCursorSpeed;
     public boolean input_hardwareMouseEnabled;
     public boolean input_keyboardMouseEnabled;
@@ -65,12 +71,21 @@ public class UIConfig implements Serializable, Cloneable {
     public char[] mouseTextInput_defaultUpperCaseCharacters;
     public Color mouseTextInput_defaultColor;
 
-    public UIConfig() {
+    public UIConfig(UIEngineState uiEngineState) {
+        this.uiEngineState = uiEngineState;
+
+        // Initialize Default Values
         // ##### UI Default Values #####
         ui_cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
+        ui_animationTimerFunction = new AnimationTimerFunction() {
+            @Override
+            public float getTime(CMediaSprite sprite, float uiAnimationTimer) {
+                return uiEngineState.animationTimer_ui;
+            }
+        };
         // ##### Input Default Values #####
         input_emulatedMouseCursorSpeed = 4.0f;
         input_hardwareMouseEnabled = true;
@@ -155,5 +170,8 @@ public class UIConfig implements Serializable, Cloneable {
         mouseTextInput_defaultColor = Color.WHITE.cpy();
     }
 
+    public interface AnimationTimerFunction {
+        float getTime(CMediaSprite sprite, float uiAnimationTimer);
+    }
 
 }

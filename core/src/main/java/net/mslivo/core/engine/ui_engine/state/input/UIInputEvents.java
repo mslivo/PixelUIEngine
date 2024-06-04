@@ -1,9 +1,10 @@
-package net.mslivo.core.engine.ui_engine.state;
+package net.mslivo.core.engine.ui_engine.state.input;
 
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.constants.INPUT_METHOD;
 
-public class UIInputEvents {
+public final class UIInputEvents {
+
     public INPUT_METHOD lastUsedInputMethod;
 
     /* --- Hardware Mouse --- */

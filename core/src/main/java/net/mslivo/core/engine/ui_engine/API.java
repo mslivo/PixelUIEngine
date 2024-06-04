@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.ui_engine.constants.*;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -57,7 +57,7 @@ public final class API {
     public API(UIEngineState uiEngineState, MediaManager mediaManager) {
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
         this.window = new APIWindow(this, uiEngineState, mediaManager);
         this.component = new APIComponent(this, uiEngineState, mediaManager);
         this.input = new APIInput(this, uiEngineState, mediaManager);

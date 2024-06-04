@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.media.*;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

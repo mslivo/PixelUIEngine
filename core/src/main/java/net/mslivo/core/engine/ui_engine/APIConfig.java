@@ -2,10 +2,9 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMedia;
 import net.mslivo.core.engine.media_manager.media.CMediaCursor;
 import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.ui_engine.state.UIConfig;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
 public final class APIConfig {
@@ -26,7 +25,7 @@ public final class APIConfig {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = uiEngineState.uiEngineConfig;
+        this.uiConfig = uiEngineState.config;
         this.ui = new APIUIConfig();
         this.input = new APIInputConfig();
         this.window = new APIWindowConfig();
@@ -77,6 +76,14 @@ public final class APIConfig {
 
         public void setFoldWindowsOnDoubleClick(boolean ui_foldWindowsOnDoubleClick) {
             uiConfig.ui_foldWindowsOnDoubleClick = ui_foldWindowsOnDoubleClick;
+        }
+
+        public UIConfig.AnimationTimerFunction getAnimationTimerFunction() {
+            return uiConfig.ui_animationTimerFunction;
+        }
+
+        public void setUi_animationTimerFunction(UIConfig.AnimationTimerFunction ui_animationTimerFunction) {
+            uiConfig.ui_animationTimerFunction = ui_animationTimerFunction;
         }
 
     }

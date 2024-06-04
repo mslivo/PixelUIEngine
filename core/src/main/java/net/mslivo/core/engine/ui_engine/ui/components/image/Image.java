@@ -7,6 +7,5 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 public class Image extends Component {
     public CMediaSprite image;
     public int arrayIndex;
-    public float animationOffset;
     public ImageAction imageAction;
 }

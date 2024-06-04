@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.ui_engine;
+package net.mslivo.core.engine.ui_engine.media;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.media.*;
