@@ -216,7 +216,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.cursor = null;
         newUIEngineState.cursorArrayIndex = 0;
         newUIEngineState.mouseTool = null;
-        newUIEngineState.mouseToolPressed = false;
         newUIEngineState.overrideCursor = null;
         newUIEngineState.overrideCursorArrayIndex = 0;
         newUIEngineState.displayOverrideCursor = false;
@@ -1070,14 +1069,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
 
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, lastUIMouseHover);
-            } else {
-                // Tool
-                if (uiEngineState.mouseTool != null && uiEngineState.mouseTool.mouseToolAction != null) {
-                    for (int ib = 0; ib < uiEngineState.inputEvents.mouseDownButtons.size; ib++) {
-                        int mouseDownButton = uiEngineState.inputEvents.mouseDownButtons.get(ib);
-                        uiEngineState.mouseTool.mouseToolAction.onDoubleClick(mouseDownButton, uiEngineState.mouse_app.x, uiEngineState.mouse_app.y);
-                    }
-                }
             }
         }
         // ------ MOUSE DOWN ------
@@ -1273,15 +1264,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
 
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, lastUIMouseHover);
-            } else {
-                // Tool
-                if (uiEngineState.mouseTool != null && uiEngineState.mouseTool.mouseToolAction != null) {
-                    for (int ib = 0; ib < uiEngineState.inputEvents.mouseDownButtons.size; ib++) {
-                        int mouseDownButton = uiEngineState.inputEvents.mouseDownButtons.get(ib);
-                        uiEngineState.mouseTool.mouseToolAction.onPress(mouseDownButton, uiEngineState.mouse_app.x, uiEngineState.mouse_app.y);
-                        uiEngineState.mouseToolPressed = true;
-                    }
-                }
             }
         }
         // ------ MOUSE UP ------
@@ -1512,20 +1494,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, draggedUIObject);
             }
 
-            // MouseTool Interaction
-            if (!processMouseUpPressed && !processMouseUpDragged) {
-                if (uiEngineState.mouseToolPressed && uiEngineState.mouseTool != null) {
-                    MouseTool pressedMouseTool = uiEngineState.mouseTool;
-                    if (pressedMouseTool.mouseToolAction != null) {
-                        for (int ib = 0; ib < uiEngineState.inputEvents.mouseUpButtons.size; ib++) {
-                            int mouseUpButton = uiEngineState.inputEvents.mouseUpButtons.get(ib);
-                            pressedMouseTool.mouseToolAction.onRelease(mouseUpButton, uiEngineState.mouse_app.x, uiEngineState.mouse_app.y);
-                        }
-                    }
-                    uiEngineState.mouseToolPressed = false;
-                }
-            }
-
         }
         // ------ MOUSE DRAGGED ------
         if (uiEngineState.inputEvents.mouseDragged) {
@@ -1577,23 +1545,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, draggedUIObject);
             }
 
-            if (!processMouseDraggedPressed && !processMouseDraggedDragged) {
-                // Mouse Tool Interaction
-                if (uiEngineState.mouseToolPressed && uiEngineState.mouseTool != null) {
-                    MouseTool draggedMouseTool = uiEngineState.mouseTool;
-                    if (draggedMouseTool.mouseToolAction != null)
-                        draggedMouseTool.mouseToolAction.onDrag(uiEngineState.mouse_app.x, uiEngineState.mouse_app.y);
-                }
-            }
         }
         // ------ MOUSE MOVED ------
         if (uiEngineState.inputEvents.mouseMoved) {
-            // Mouse Tool Interaction
-            if (uiEngineState.mouseTool != null) {
-                MouseTool movedMouseTool = uiEngineState.mouseTool;
-                if (movedMouseTool.mouseToolAction != null)
-                    movedMouseTool.mouseToolAction.onMove(uiEngineState.mouse_app.x, uiEngineState.mouse_app.y);
-            }
+
         }
         // ------ MOUSE SCROLLED ------
         if (uiEngineState.inputEvents.mouseScrolled) {

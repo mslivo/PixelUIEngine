@@ -280,12 +280,12 @@ public final class API {
 
     /* #################### MouseTool #################### */
 
-    public MouseTool mouseTool() {
-        return uiEngineState.mouseTool;
-    }
-
     public void setMouseTool(MouseTool mouseTool) {
         uiEngineState.mouseTool = mouseTool;
+    }
+
+    public MouseTool mouseTool() {
+        return uiEngineState.mouseTool;
     }
 
     public boolean isMouseTool(MouseTool mouseTool) {

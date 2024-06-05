@@ -37,6 +37,10 @@ public final class APIInput {
         return inputEvents.lastUsedInputMethod;
     }
 
+    public boolean isAnyInputUsingUI(){
+        return mouse.useUIObject() != null || keyboard.useUIObject() != null;
+    }
+
     public final class APIMouse {
         public final APIEvent event;
         public final APIState state;
@@ -46,6 +50,38 @@ public final class APIInput {
             event = new APIEvent();
             state = new APIState();
             emulated = new APIEmulated();
+        }
+
+        public Object hoverUIObject() {
+            return uiEngineState.lastUIMouseHover;
+        }
+
+        public boolean isHoverUIObject(Object object) {
+            if(object == null) return false;
+            return uiEngineState.lastUIMouseHover == object;
+        }
+
+        public boolean isHoverUIObjectName(String name) {
+            if(name == null) return false;
+            return uiEngineState.lastUIMouseHover != null && name.equals(mouseUIObjectName(uiEngineState.lastUIMouseHover));
+        }
+
+        public Object useUIObject() {
+            return uiEngineState.mouseInteractedUIObjectFrame != null ? uiEngineState.mouseInteractedUIObjectFrame : null;
+        }
+
+        public boolean isUseUIObject(Object object) {
+            if(object == null) return false;
+            return uiEngineState.mouseInteractedUIObjectFrame == object;
+        }
+
+        public boolean isUseUIObjectName(String name) {
+            if(name == null) return false;
+            return uiEngineState.mouseInteractedUIObjectFrame != null && name.equals(mouseUIObjectName(uiEngineState.mouseInteractedUIObjectFrame));
+        }
+
+        public MOUSE_CONTROL_MODE currentControlMode() {
+            return uiEngineState.currentControlMode;
         }
 
         public final class APIEmulated {
@@ -66,45 +102,6 @@ public final class APIInput {
                 UICommonUtils.emulatedMouse_setPositionNextComponent(uiEngineState, true);
             }
 
-        }
-
-        private String mouseUIObjectName(Object mouseObject) {
-            if (mouseObject != null) {
-                if (mouseObject instanceof Component component) {
-                    return component.name;
-                } else if (mouseObject instanceof Window window) {
-                    return window.name;
-                }
-            }
-            return "";
-        }
-
-        public MOUSE_CONTROL_MODE currentControlMode() {
-            return uiEngineState.currentControlMode;
-        }
-
-        public Object hoverUIObject() {
-            return uiEngineState.lastUIMouseHover;
-        }
-
-        public boolean isHoveringOverUIObject() {
-            return hoverUIObject() != null;
-        }
-
-        public String hoverUIObjectName() {
-            return mouseUIObjectName(hoverUIObject());
-        }
-
-        public Object useUIObject() {
-            return uiEngineState.mouseInteractedUIObjectFrame != null ? uiEngineState.mouseInteractedUIObjectFrame : null;
-        }
-
-        public boolean isUsingUIObject() {
-            return useUIObject() != null;
-        }
-
-        public String useUIObjectName() {
-            return mouseUIObjectName(useUIObject());
         }
 
         public final class APIEvent {
@@ -202,6 +199,17 @@ public final class APIInput {
             }
         }
 
+        private String mouseUIObjectName(Object mouseObject) {
+            if (mouseObject != null) {
+                if (mouseObject instanceof Component component) {
+                    return component.name;
+                } else if (mouseObject instanceof Window window) {
+                    return window.name;
+                }
+            }
+            return "";
+        }
+
     }
 
     public final class APIKeyboard {
@@ -214,27 +222,18 @@ public final class APIInput {
             this.state = new APIState();
         }
 
-        private String keyBoardGUIObjectName(Object keyBoardobject) {
-            if (keyBoardobject != null) {
-                if (keyBoardobject instanceof Component component) {
-                    return component.name;
-                } else if (keyBoardobject instanceof HotKey hotKey) {
-                    return hotKey.name;
-                }
-            }
-            return "";
-        }
-
         public Object useUIObject() {
             return uiEngineState.keyboardInteractedUIObjectFrame != null ? uiEngineState.keyboardInteractedUIObjectFrame : null;
         }
 
-        public boolean isUsingUIObject() {
-            return useUIObject() != null;
+        public boolean isUseUIObject(Object object) {
+            if(object == null) return false;
+            return uiEngineState.keyboardInteractedUIObjectFrame == object;
         }
 
-        public String keyBoardUsingUIObjectName() {
-            return keyBoardGUIObjectName(useUIObject());
+        public boolean isUseUIObjectName(String name) {
+            if(name == null) return false;
+            return uiEngineState.keyboardInteractedUIObjectFrame != null && name.equals(keyboardUIObjectName(uiEngineState.keyboardInteractedUIObjectFrame));
         }
 
         public final class APIEvent {
@@ -303,6 +302,17 @@ public final class APIInput {
                 }
                 return false;
             }
+        }
+
+        private String keyboardUIObjectName(Object keyBoardobject) {
+            if (keyBoardobject != null) {
+                if (keyBoardobject instanceof Component component) {
+                    return component.name;
+                } else if (keyBoardobject instanceof HotKey hotKey) {
+                    return hotKey.name;
+                }
+            }
+            return "";
         }
 
     }

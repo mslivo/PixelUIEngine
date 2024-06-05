@@ -148,7 +148,6 @@ public final class UIEngineState {
     public CMediaSprite cursor;
     public int cursorArrayIndex;
     public MouseTool mouseTool;
-    public boolean mouseToolPressed;
     public CMediaSprite overrideCursor;
     public int overrideCursorArrayIndex;
     public boolean displayOverrideCursor;
