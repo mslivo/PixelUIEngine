@@ -124,7 +124,7 @@ public final class APIComponent {
             appViewPort.camera = new OrthographicCamera(viewportWidth, viewportHeight);
             appViewPort.camera.setToOrtho(false, viewportWidth, viewportHeight);
             appViewPort.camera.position.set(camPositionX, camPositionY, 0f);
-            appViewPort.camera.zoom = Math.clamp(camZoom, 0f, Float.MAX_VALUE);
+            appViewPort.camera.zoom = Math.max(camZoom, 0f);
             appViewPort.camera.update();
             appViewPort.updateTime = updateTime;
             appViewPort.appViewPortAction = appViewPortAction;
@@ -138,7 +138,7 @@ public final class APIComponent {
 
         public void setUpdateTime(AppViewport appViewPort, int updateTime) {
             if (appViewPort == null) return;
-            appViewPort.updateTime = Math.clamp(updateTime, 0, Integer.MAX_VALUE);
+            appViewPort.updateTime = Math.max(updateTime, 0);
         }
 
         public void setCamPosition(AppViewport appViewPort, float x, float y) {
@@ -318,7 +318,7 @@ public final class APIComponent {
 
             public void setIconIndex(TextButton textButton, int iconIndex) {
                 if (textButton == null) return;
-                textButton.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
+                textButton.iconIndex = Math.max(iconIndex, 0);
             }
 
             public void setText(TextButton textButton, String text) {
@@ -372,7 +372,7 @@ public final class APIComponent {
 
             public void setArrayIndex(ImageButton imageButton, int arrayIndex) {
                 if (imageButton == null) return;
-                imageButton.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+                imageButton.arrayIndex = Math.max(arrayIndex, 0);
             }
 
         }
@@ -564,8 +564,8 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(tabBar, x, y, width, (bigIconMode ? 2 : 1));
             tabBar.tabBarAction = tabBarAction;
             tabBar.border = border;
-            tabBar.borderHeight = Math.clamp(borderHeight, 0, Integer.MAX_VALUE);
-            tabBar.tabOffset = Math.clamp(tabOffset, 0, Integer.MAX_VALUE);
+            tabBar.borderHeight = Math.max(borderHeight, 0);
+            tabBar.tabOffset = Math.max(tabOffset, 0);
             tabBar.bigIconMode = bigIconMode;
             tabBar.tabs = new ArrayList<>();
             if (tabs != null) {
@@ -582,7 +582,7 @@ public final class APIComponent {
 
         public void setTabOffset(Tabbar tabBar, int tabOffset) {
             if (tabBar == null) return;
-            tabBar.tabOffset = Math.clamp(tabOffset, 0, Integer.MAX_VALUE);
+            tabBar.tabOffset = Math.max(tabOffset, 0);
         }
 
         public void setBigIconMode(Tabbar tabBar, boolean bigIconMode) {
@@ -595,7 +595,7 @@ public final class APIComponent {
         }
 
         public void setBorderHeight(Tabbar tabBar, int borderHeight) {
-            tabBar.borderHeight = Math.clamp(borderHeight, 0, Integer.MAX_VALUE);
+            tabBar.borderHeight = Math.max(borderHeight, 0);
         }
 
         public void setTabBarAction(Tabbar tabBar, TabBarAction tabBarAction) {
@@ -754,7 +754,7 @@ public final class APIComponent {
 
             public void setIconIndex(Tab tab, int iconIndex) {
                 if (tab == null) return;
-                tab.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
+                tab.iconIndex = Math.max(iconIndex, 0);
             }
 
             public void addTabComponent(Tab tab, Component component) {
@@ -810,7 +810,7 @@ public final class APIComponent {
 
             public void setWidth(Tab tab, int width) {
                 if (tab == null) return;
-                tab.width = Math.clamp(width, 1, Integer.MAX_VALUE);
+                tab.width = Math.max(width, 1);
             }
 
         }
@@ -952,7 +952,7 @@ public final class APIComponent {
             textField.content = Tools.Text.validString(content);
             textField.textFieldAction = textFieldAction;
             textField.markerPosition = textField.content.length();
-            textField.contentMaxLength = Math.clamp(contentMaxLength, 0, Integer.MAX_VALUE);
+            textField.contentMaxLength = Math.max(contentMaxLength, 0);
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
             return textField;
         }
@@ -980,7 +980,7 @@ public final class APIComponent {
 
         public void setContentMaxLength(Textfield textField, int contentMaxLength) {
             if (textField == null) return;
-            textField.contentMaxLength = Math.clamp(contentMaxLength, 0, Integer.MAX_VALUE);
+            textField.contentMaxLength = Math.max(contentMaxLength, 0);
         }
 
         public void setAllowedCharacters(Textfield textField, char[] allowedCharacters) {
@@ -1151,12 +1151,12 @@ public final class APIComponent {
                 canvasImage.x = x;
                 canvasImage.y = y;
                 canvasImage.fadeOut = fadeOut;
-                canvasImage.fadeOutTime = Math.clamp(fadeOutTime, 0, Integer.MAX_VALUE);
+                canvasImage.fadeOutTime = Math.max(fadeOutTime, 0);
                 canvasImage.color_r = Color.WHITE.r;
                 canvasImage.color_g = Color.WHITE.g;
                 canvasImage.color_b = Color.WHITE.b;
                 canvasImage.color_a = Color.WHITE.a;
-                canvasImage.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+                canvasImage.arrayIndex = Math.max(arrayIndex, 0);
                 canvasImage.name = Tools.Text.validString("");
                 canvasImage.data = null;
                 canvasImage.timer = fadeOut ? System.currentTimeMillis() : 0;
@@ -1204,7 +1204,7 @@ public final class APIComponent {
 
             public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
                 if (canvasImage == null) return;
-                canvasImage.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+                canvasImage.arrayIndex = Math.max(arrayIndex, 0);
             }
 
             public void setName(CanvasImage canvasImage, String name) {
@@ -1343,7 +1343,7 @@ public final class APIComponent {
             int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
             imageC.image = image;
-            imageC.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+            imageC.arrayIndex = Math.max(arrayIndex, 0);
             imageC.imageAction = imageAction;
             return imageC;
         }
@@ -1355,7 +1355,7 @@ public final class APIComponent {
 
         public void setArrayIndex(Image image, int arrayIndex) {
             if (image == null) return;
-            image.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+            image.arrayIndex = Math.max(arrayIndex, 0);
         }
 
         public void setImage(Image imageC, CMediaSprite image) {
@@ -1512,7 +1512,7 @@ public final class APIComponent {
                 comboBoxItem.color_g = uiConfig.component_defaultColor.g;
                 comboBoxItem.color_b = uiConfig.component_defaultColor.b;
                 comboBoxItem.icon = icon;
-                comboBoxItem.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
+                comboBoxItem.iconIndex = Math.max(iconIndex, 0);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
                 comboBoxItem.name = "";
                 comboBoxItem.data = null;
@@ -1558,7 +1558,7 @@ public final class APIComponent {
 
             public void setIconIndex(ComboboxItem comboBoxItem, int index) {
                 if (comboBoxItem == null) return;
-                comboBoxItem.iconIndex = Math.clamp(index, 0, Integer.MAX_VALUE);
+                comboBoxItem.iconIndex = Math.max(index, 0);
             }
 
         }

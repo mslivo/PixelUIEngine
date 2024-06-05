@@ -67,8 +67,8 @@ public final class APIWindow {
         Window window = new Window();
         window.x = x;
         window.y = y;
-        window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
-        window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
+        window.width = Math.max(width, 2);
+        window.height = Math.max(height, 2);
         window.title = Tools.Text.validString(title);
         window.alwaysOnTop = alwaysOnTop;
         window.moveAble = moveAble;
@@ -103,7 +103,7 @@ public final class APIWindow {
 
     public void setIconIndex(Window window, int iconIndex) {
         if (window == null) return;
-        window.iconIndex = Math.clamp(iconIndex, 0, Integer.MAX_VALUE);
+        window.iconIndex = Math.max(iconIndex, 0);
     }
 
     public void setVisible(Window window, boolean visible) {
@@ -358,8 +358,8 @@ public final class APIWindow {
 
     public void setSize(Window window, int width, int height) {
         if (window == null) return;
-        window.width = Math.clamp(width, 2, Integer.MAX_VALUE);
-        window.height = Math.clamp(height, 2, Integer.MAX_VALUE);
+        window.width = Math.max(width, 2);
+        window.height = Math.max(height, 2);
     }
 
     public void setTitle(Window window, String title) {

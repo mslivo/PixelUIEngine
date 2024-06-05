@@ -36,7 +36,7 @@ public class SoundPlayer {
     }
 
     private void setRange2D(int range2D) {
-        this.range = Math.clamp(range2D, 1, Integer.MAX_VALUE);
+        this.range = Math.max(range2D, 1);
     }
 
     public long playSound(CMediaSound cMediaSound) {

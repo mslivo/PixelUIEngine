@@ -21,10 +21,10 @@ public class FadeTransition implements Transition {
     @Override
     public boolean update() {
         if(this.fadeOut < 1f){
-            this.fadeOut = Math.clamp(fadeOut+0.06f,Float.MIN_VALUE,1f);
+            this.fadeOut = Math.min(fadeOut+0.06f,1f);
             return false;
         }else if(this.fadeIn < 1f){
-            this.fadeIn = Math.clamp(fadeIn+0.06f, Float.MIN_VALUE,1f);
+            this.fadeIn = Math.min(fadeIn+0.06f,1f);
             return false;
         }else{
             return true;

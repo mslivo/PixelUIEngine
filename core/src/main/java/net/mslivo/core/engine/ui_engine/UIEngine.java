@@ -112,8 +112,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         UIEngineState newUIEngineState = new UIEngineState();
 
         //  ----- Paramters
-        newUIEngineState.resolutionWidth = Math.clamp(resolutionWidth, 16, Integer.MAX_VALUE);
-        newUIEngineState.resolutionHeight = Math.clamp(resolutionHeight, 16, Integer.MAX_VALUE);
+        newUIEngineState.resolutionWidth = Math.max(resolutionWidth, 16);
+        newUIEngineState.resolutionHeight = Math.max(resolutionHeight, 16);
         newUIEngineState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newUIEngineState.gamePadSupport = gamePadSupport;
         newUIEngineState.sizeSize = tileSize;
@@ -1605,7 +1605,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 switch (lastUIMouseHover) {
                     case List list -> {
                         int size = list.items != null ? list.items.size() : 0;
-                        float amount = (1 / (float) Math.clamp(size, 1, Integer.MAX_VALUE)) * uiEngineState.inputEvents.mouseScrolledAmount;
+                        float amount = (1 / (float) Math.max(size, 1)) * uiEngineState.inputEvents.mouseScrolledAmount;
                         UICommonUtils.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
@@ -2475,7 +2475,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int itemFrom = 0;
                 if (itemsValid) {
                     itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-                    itemFrom = Math.clamp(itemFrom, 0, Integer.MAX_VALUE);
+                    itemFrom = Math.max(itemFrom, 0);
                 }
                 boolean dragEnabled = false;
                 boolean dragValid = false;

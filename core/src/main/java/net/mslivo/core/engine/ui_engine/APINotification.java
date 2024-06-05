@@ -78,7 +78,7 @@ public final class APINotification {
 
     public void setDisplayTime(Notification notification, int displayTime) {
         if (notification == null) return;
-        notification.displayTime = Math.clamp(displayTime, 0, Integer.MAX_VALUE);
+        notification.displayTime = Math.max(displayTime, 0);
     }
 
     public void setColor(Notification notification, float r, float g, float b, float a) {

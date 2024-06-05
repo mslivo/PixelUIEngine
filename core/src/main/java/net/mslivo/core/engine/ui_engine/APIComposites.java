@@ -212,8 +212,8 @@ public final class APIComposites {
 
         public ArrayList<Component> createBorder(int x, int y, int width, int height, int gap) {
             ArrayList<Component> borders = new ArrayList<>();
-            width = Math.clamp(width, 1, Integer.MAX_VALUE);
-            height = Math.clamp(height, 1, Integer.MAX_VALUE);
+            width = Math.max(width, 1);
+            height = Math.max(height, 1);
 
             for (int ix = 0; ix < width; ix++) {
 
@@ -295,7 +295,7 @@ public final class APIComposites {
             api.component.text.setTextAction(textField, new TextAction() {
                 @Override
                 public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Math.clamp(textConverted.length, 1, Integer.MAX_VALUE)) * api.input.mouse.event.scrolledAmount();
+                    float scrollAmount = (-1 / (float) Math.max(textConverted.length, 1)) * api.input.mouse.event.scrolledAmount();
                     UICommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
                 }
             });
@@ -583,7 +583,7 @@ public final class APIComposites {
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
-            final int WIDTH = Math.clamp(MathUtils.round(longest / (float) api.TS()) + 2, 12, Integer.MAX_VALUE);
+            final int WIDTH = Math.max(MathUtils.round(longest / (float) api.TS()) + 2, 12);
             final int HEIGHT = 4 + lines.length;
             Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption, UIEngineBaseMedia_8x8.UI_ICON_INFORMATION, 0);
 
@@ -623,7 +623,7 @@ public final class APIComposites {
                     mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text)
             );
 
-            int width = Math.clamp(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12, Integer.MAX_VALUE);
+            int width = Math.max(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12);
             if (width % 2 == 0) width++;
             Window modal = api.window.create(0, 0, width, 5, caption, UIEngineBaseMedia_8x8.UI_ICON_QUESTION, 0);
 
@@ -665,7 +665,7 @@ public final class APIComposites {
 
             showOKButton = showTouchInputs ? true : showOKButton;
             originalText = Tools.Text.validString(originalText);
-            windowMinWidth = Math.clamp(windowMinWidth, 11, Integer.MAX_VALUE);
+            windowMinWidth = Math.max(windowMinWidth, 11);
             int wnd_width = Math.clamp(
                     MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text) / (float) api.TS()) + 2,
                     windowMinWidth, Integer.MAX_VALUE);
@@ -917,7 +917,7 @@ public final class APIComposites {
 
 
                 float heightPct = (value - loReference) / (float) (hiReference - loReference);
-                int heightPixels = Math.clamp(MathUtils.round(mapHeight * heightPct), 2, Integer.MAX_VALUE);
+                int heightPixels = Math.max(MathUtils.round(mapHeight * heightPct), 2);
                 for (int iy = 0; iy < heightPixels; iy++) {
                     int y = mapHeight - iy;
                     if (iy == heightPixels - 1) {
@@ -1088,7 +1088,7 @@ public final class APIComposites {
         public ArrayList<Component> createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
             ArrayList<Component> ret = new ArrayList<>();
 
-            width = Math.clamp(width, 1, Integer.MAX_VALUE);
+            width = Math.max(width, 1);
             Tabbar tabBar = api.component.tabbar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
             ImageButton extendButton = api.component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIEngineBaseMedia_8x8.UI_ICON_EXTEND);
 

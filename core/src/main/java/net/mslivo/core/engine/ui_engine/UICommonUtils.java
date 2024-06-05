@@ -277,8 +277,8 @@ final class UICommonUtils {
     }
 
     static void component_setSize(UIEngineState uiEngineState, Component component, int width, int height) {
-        component.width = Math.clamp(width, 1, Integer.MAX_VALUE);
-        component.height = Math.clamp(height, 1, Integer.MAX_VALUE);
+        component.width = Math.max(width, 1);
+        component.height = Math.max(height, 1);
 
         if (component instanceof AppViewport appViewPort) {
             appViewPort_resizeCameraTextureAndFrameBuffer(uiEngineState, appViewPort);
@@ -1035,7 +1035,7 @@ final class UICommonUtils {
     static void list_updateItemInfoAtMousePosition(UIEngineState uiEngineState, List list) {
         if (list.items != null && list.listAction != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
-            itemFrom = Math.clamp(itemFrom, 0, Integer.MAX_VALUE);
+            itemFrom = Math.max(itemFrom, 0);
             int x_list = UICommonUtils.component_getAbsoluteX(list);
             int y_list = UICommonUtils.component_getAbsoluteY(list);
             // insert between other items
@@ -1339,7 +1339,7 @@ final class UICommonUtils {
     }
 
     static void camera_setZoom(OrthographicCamera camera, float zoom) {
-        camera.zoom = Math.clamp(zoom, 0f, Float.MAX_VALUE);
+        camera.zoom = Math.max(zoom, 0f);
         camera.update();
     }
 

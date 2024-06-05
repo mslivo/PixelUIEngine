@@ -31,9 +31,11 @@ public abstract class CMedia implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CMedia cMedia = (CMedia) o;
-        return cMedia.hash == this.hash;
+        if (o instanceof CMedia cMedia) {
+            return cMedia.hash == this.hash;
+        } else {
+            return false;
+        }
     }
 
     @Override

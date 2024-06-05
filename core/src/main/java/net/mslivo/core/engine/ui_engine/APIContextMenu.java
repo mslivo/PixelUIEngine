@@ -188,7 +188,7 @@ public final class APIContextMenu {
 
         public void setIconIndex(ContextmenuItem contextMenuItem, int index) {
             if (contextMenuItem == null) return;
-            contextMenuItem.iconIndex = Math.clamp(index, 0, Integer.MAX_VALUE);
+            contextMenuItem.iconIndex = Math.max(index, 0);
         }
 
         public void selectItem(ContextmenuItem contextMenuItem) {

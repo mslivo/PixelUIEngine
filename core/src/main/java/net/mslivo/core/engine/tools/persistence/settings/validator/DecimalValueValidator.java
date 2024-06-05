@@ -14,7 +14,7 @@ public class DecimalValueValidator implements ValueValidator {
 
     public DecimalValueValidator(float rangeFrom, float rangeTo) {
         this.rangeFrom = rangeFrom;
-        this.rangeTo = Math.clamp(rangeTo, rangeFrom, Float.MAX_VALUE);
+        this.rangeTo = Math.max(rangeTo, rangeFrom);
     }
 
     @Override

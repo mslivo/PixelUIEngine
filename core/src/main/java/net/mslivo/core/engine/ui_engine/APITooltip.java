@@ -60,7 +60,7 @@ public final class APITooltip {
         tooltip.color_border_g = borderColor_g;
         tooltip.color_border_b = borderColor_b;
         tooltip.color_border_a = borderColor_a;
-        tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
+        tooltip.minWidth = Math.max(minWidth, 0);
         if (segments != null) {
             for (int i = 0; i < segments.length; i++) {
                 if (segments[i].addedToTooltip == null) {
@@ -96,7 +96,7 @@ public final class APITooltip {
     }
 
     public void setMinWidth(Tooltip tooltip, int minWidth) {
-        tooltip.minWidth = Math.clamp(minWidth, 0, Integer.MAX_VALUE);
+        tooltip.minWidth = Math.max(minWidth, 0);
     }
 
     public final class APITooltipSegment {
@@ -167,7 +167,7 @@ public final class APITooltip {
                 tooltipImageSegment.alignment = alignment;
                 tooltipImageSegment.image = sprite;
                 tooltipImageSegment.merge = merge;
-                tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+                tooltipImageSegment.arrayIndex = Math.max(arrayIndex, 0);
                 tooltipImageSegment.border = border;
                 if (sprite != null) {
                     tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(sprite) + api.TS()) / api.TSF());
@@ -185,7 +185,7 @@ public final class APITooltip {
 
             public void setArrayIndex(TooltipImageSegment tooltipImageSegment, int arrayIndex) {
                 if (tooltipImageSegment == null) return;
-                tooltipImageSegment.arrayIndex = Math.clamp(arrayIndex, 0, Integer.MAX_VALUE);
+                tooltipImageSegment.arrayIndex = Math.max(arrayIndex, 0);
             }
 
 

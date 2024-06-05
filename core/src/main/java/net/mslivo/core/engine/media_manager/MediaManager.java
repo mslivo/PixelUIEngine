@@ -291,21 +291,24 @@ public class MediaManager {
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength, Animation.PlayMode playMode) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
-        CMediaAnimation cMediaAnimation = new CMediaAnimation(file);
-        cMediaAnimation.regionWidth = Math.clamp(tileWidth, 1, Integer.MAX_VALUE);
-        cMediaAnimation.regionHeight = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
-        cMediaAnimation.animation_speed = animation_speed;
-        cMediaAnimation.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
-        cMediaAnimation.frameLength = frameLength;
-        cMediaAnimation.playMode = playMode;
+        CMediaAnimation cMediaAnimation = new CMediaAnimation(
+                file,
+                Math.max(tileWidth, 1),
+                Math.max(tileHeight, 1),
+                animation_speed,
+                Math.max(frameOffset, 0),
+                frameLength,
+                playMode
+        );
         return cMediaAnimation;
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
-        CMediaFont cMediaFont = new CMediaFont(file);
-        cMediaFont.offset_x = offset_x;
-        cMediaFont.offset_y = offset_y;
+        CMediaFont cMediaFont = new CMediaFont(
+                file,
+                offset_x,
+                offset_y);
         return cMediaFont;
     }
 
@@ -325,11 +328,13 @@ public class MediaManager {
 
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
-        CMediaArray cMediaArray = new CMediaArray(file);
-        cMediaArray.regionWidth = Math.clamp(tileWidth, 1, Integer.MAX_VALUE);
-        cMediaArray.regionHeight = Math.clamp(tileHeight, 1, Integer.MAX_VALUE);
-        cMediaArray.frameOffset = Math.clamp(frameOffset, 0, Integer.MAX_VALUE);
-        cMediaArray.frameLength = frameLength;
+        CMediaArray cMediaArray = new CMediaArray(
+                file,
+                Math.max(tileWidth, 1),
+                Math.max(tileHeight, 1),
+                Math.max(frameOffset, 0),
+                Math.max(frameLength,0)
+                );
         return cMediaArray;
     }
 

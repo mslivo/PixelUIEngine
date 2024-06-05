@@ -38,7 +38,7 @@ public class Tools {
 
 
         public static void setTargetUpdates(int updatesPerSecond) {
-            App.maxUpdatesPerSecond = Math.clamp(updatesPerSecond, 1, Integer.MAX_VALUE);
+            App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
             timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
@@ -46,7 +46,7 @@ public class Tools {
 
         public static boolean isRunUpdate() {
             // Accumulate 2 frames max
-            skipFrameAccumulator = Math.clamp(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), Float.MIN_VALUE, timeStepX2);
+            skipFrameAccumulator = Math.min(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), timeStepX2);
             if (skipFrameAccumulator < timeStep) {
                 return false;
             } else {
@@ -396,7 +396,7 @@ public class Tools {
 
 
         public static float percentAboveThreshold(long value, long max, int threshold) {
-            value = Math.clamp(value, Long.MIN_VALUE, max);
+            value = Math.min(value, max);
             if (value > threshold) {
                 long above = value - threshold;
                 float divisor = (max - threshold);
@@ -407,7 +407,7 @@ public class Tools {
         }
 
         public static float percentBelowThreshold(long value, long min, int threshold) {
-            value = Math.clamp(value, min, Long.MAX_VALUE);
+            value = Math.max(value, min);
             if (value < threshold) {
                 long below = threshold - value;
                 float divisor = (threshold - min);
@@ -418,7 +418,7 @@ public class Tools {
         }
 
         public static float percentAboveThreshold(float value, float max, float threshold) {
-            value = Math.clamp(value, Float.MIN_VALUE, max);
+            value = Math.min(value, max);
             if (value > threshold) {
                 float above = value - threshold;
                 float divisor = (max - threshold);
@@ -429,7 +429,7 @@ public class Tools {
         }
 
         public static float percentBelowThreshold(float value, float min, float threshold) {
-            value = Math.clamp(value, min, Float.MAX_VALUE);
+            value = Math.max(value, min);
             if (value < threshold) {
                 float below = threshold - value;
                 float divisor = (threshold - min);
