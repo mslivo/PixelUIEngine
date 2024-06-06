@@ -2033,7 +2033,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             int center_x = mediaManager.getCMediaSpriteWidth(uiEngineState.cursor) / 2;
             int center_y = mediaManager.getCMediaSpriteHeight(uiEngineState.cursor) / 2;
             uiEngineState.spriteRenderer_ui.drawCMediaSprite(uiEngineState.cursor,
-                    (uiEngineState.mouse_ui.x - center_x), (uiEngineState.mouse_ui.y - center_y), 0, uiEngineState.animationTimer_ui);
+                    (uiEngineState.mouse_ui.x - center_x), (uiEngineState.mouse_ui.y - center_y), 0, UICommonUtils.ui_getAnimationTimer(uiEngineState));
             render_batchSetColorWhite();
         }
     }
