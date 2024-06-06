@@ -32,16 +32,15 @@ public class Tools {
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
-        private static long lastUpdate;
-        private static float updateDelta;
+        private static float animationReference;
         private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
-
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
             timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
+            animationReference = 1000f/(updatesPerSecond*1000f);
         }
 
         public static boolean runUpdate() {
@@ -51,14 +50,13 @@ public class Tools {
                 return false;
             } else {
                 skipFrameAccumulator -= timeStep;
-                updateDelta = (System.currentTimeMillis() - lastUpdate) / 1000f;
-                lastUpdate = System.currentTimeMillis();
+                targetUpdateAnimationReference();
                 return true;
             }
         }
 
-        public static float updateDeltaTime() {
-            return updateDelta;
+        public static float targetUpdateAnimationReference() {
+            return animationReference;
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
