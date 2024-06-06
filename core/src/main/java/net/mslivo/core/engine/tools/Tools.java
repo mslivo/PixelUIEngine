@@ -32,7 +32,7 @@ public class Tools {
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
-        private static float animationReference;
+        private static float timeBetweenUpdates;
         private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
 
         public static void setTargetUpdates(int updatesPerSecond) {
@@ -40,7 +40,7 @@ public class Tools {
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
             timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
-            animationReference = 1000f/(updatesPerSecond*1000f);
+            timeBetweenUpdates = 1000f/(updatesPerSecond*1000f);
         }
 
         public static boolean runUpdate() {
@@ -50,13 +50,12 @@ public class Tools {
                 return false;
             } else {
                 skipFrameAccumulator -= timeStep;
-                targetUpdateAnimationReference();
                 return true;
             }
         }
 
-        public static float targetUpdateAnimationReference() {
-            return animationReference;
+        public static float timeBetweenUpdates() {
+            return timeBetweenUpdates;
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
