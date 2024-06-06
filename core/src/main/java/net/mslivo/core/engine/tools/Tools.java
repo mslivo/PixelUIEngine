@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
-import net.mslivo.core.engine.media_manager.media.CMedia;
+import net.mslivo.core.engine.media_manager.CMedia;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -44,7 +44,7 @@ public class Tools {
             skipFrameAccumulator = 0;
         }
 
-        public static boolean isRunUpdate() {
+        public static boolean runUpdate() {
             // Accumulate 2 frames max
             skipFrameAccumulator = Math.min(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), timeStepX2);
             if (skipFrameAccumulator < timeStep) {
@@ -102,10 +102,12 @@ public class Tools {
             for (int i = 0; i < customValues.length; i++)
                 custom.append(" | ").append(String.format("%1$10s", customValues[i]));
             logReset();
-            logMessageBuilder.append(String.format("%1$3s", Gdx.graphics.getFramesPerSecond()));
+            logMessageBuilder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
             logMessageBuilder.append(" FPS | ");
             logMessageBuilder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
-            logMessageBuilder.append("MB RAM");
+            logMessageBuilder.append("MB RAM | ");
+            logMessageBuilder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
+            logMessageBuilder.append(" Threads");
             logMessageBuilder.append(custom);
             System.out.println(logMessageBuilder);
         }

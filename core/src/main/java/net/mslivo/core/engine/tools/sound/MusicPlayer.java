@@ -4,8 +4,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaMusic;
-import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.media_manager.CMediaMusic;
 
 import java.util.ArrayList;
 import java.util.Collections;

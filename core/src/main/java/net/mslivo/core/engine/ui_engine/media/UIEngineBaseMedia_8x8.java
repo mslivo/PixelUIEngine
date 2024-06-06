@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.ui_engine.media;
 
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.*;
+import net.mslivo.core.engine.media_manager.*;
 
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what

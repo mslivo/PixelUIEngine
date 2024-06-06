@@ -2,7 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaFont;
+import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;

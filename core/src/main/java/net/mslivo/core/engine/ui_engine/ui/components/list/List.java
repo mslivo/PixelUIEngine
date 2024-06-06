@@ -1,6 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.components.list;
 
-import net.mslivo.core.engine.media_manager.media.CMediaFont;
+import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.ui_engine.ui.actions.ListAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 

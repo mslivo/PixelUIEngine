@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
@@ -1341,6 +1341,11 @@ final class UICommonUtils {
     static void camera_setZoom(OrthographicCamera camera, float zoom) {
         camera.zoom = Math.max(zoom, 0f);
         camera.update();
+    }
+
+    static float ui_getAnimationTimer(UIEngineState state){
+        if(state.config.ui_animationTimerFunction == null) return 0f;
+        return state.config.ui_animationTimerFunction.getAnimationTimer();
     }
 
 }

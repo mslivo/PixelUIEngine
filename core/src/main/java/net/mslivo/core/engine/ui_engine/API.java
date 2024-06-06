@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -375,7 +375,6 @@ public final class API {
         uiEngineState.overrideCursorArrayIndex = Math.max(0, arrayIndex);
     }
 
-
     public void setAppToolTip(Tooltip toolTip) {
         uiEngineState.appToolTip = toolTip;
     }
@@ -399,6 +398,10 @@ public final class API {
 
     public int resolutionHeight() {
         return uiEngineState.resolutionHeight;
+    }
+
+    public float animationTimer(){
+        return UICommonUtils.ui_getAnimationTimer(uiEngineState);
     }
 
     public int TS() {

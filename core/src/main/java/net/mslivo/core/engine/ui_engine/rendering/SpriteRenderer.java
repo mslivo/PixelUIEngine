@@ -11,8 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.*;
+import net.mslivo.core.engine.media_manager.*;
 
 /**
  * A substitute for {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that adds an extra attribute to store another
@@ -1392,7 +1391,8 @@ public class SpriteRenderer implements Batch {
 
     public void drawCMediaAnimation(CMediaAnimation cMedia, float x, float y, float animationTimer) {
         if(cMedia == null) return;
-        TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
+        ExtendedAnimation animation = mediaManager.getCMediaAnimation(cMedia);
+        TextureRegion textureRegion = animation.getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 

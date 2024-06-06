@@ -10,9 +10,9 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.core.engine.media_manager.media.*;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 /**
  * Created by Admin on 07.02.2019.
  */
-public class MediaManager {
+public final class MediaManager {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int MEDIAMANGER_INDEX_NONE = -1;
     private static final String ERROR_FILE_MISSING = "file missing";
@@ -37,7 +37,7 @@ public class MediaManager {
     private TextureRegion[] medias_images = null;
     private BitmapFont[] medias_fonts = null;
     private TextureRegion[][] medias_arrays = null;
-    private Animation<TextureRegion>[] medias_animations = null;
+    private ExtendedAnimation[] medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -123,7 +123,7 @@ public class MediaManager {
         }
         medias_images = new TextureRegion[imagesMax];
         medias_arrays = new TextureRegion[arraysMax][];
-        medias_animations = new Animation[animationsMax];
+        medias_animations = new ExtendedAnimation[animationsMax];
         medias_fonts = new BitmapFont[fontsMax];
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
@@ -160,7 +160,7 @@ public class MediaManager {
                 }
                 case CMediaAnimation cMediaAnimation -> {
                     cMediaAnimation.setMediaManagerIndex(animationsIdx);
-                    medias_animations[animationsIdx++] = new Animation<>(cMediaAnimation.animation_speed,
+                    medias_animations[animationsIdx++] = new ExtendedAnimation(cMediaAnimation.animation_speed,
                             splitFrames(cMediaAnimation.file(), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                             cMediaAnimation.playMode
                     );
@@ -282,14 +282,14 @@ public class MediaManager {
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
-        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, Animation.PlayMode.LOOP);
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP);
     }
 
     public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
-        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, Animation.PlayMode.LOOP);
+        return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP);
     }
 
-    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength, Animation.PlayMode playMode) {
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
         if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         CMediaAnimation cMediaAnimation = new CMediaAnimation(
                 file,
@@ -352,7 +352,7 @@ public class MediaManager {
         return medias_images[cMedia.mediaManagerIndex()];
     }
 
-    public Animation<TextureRegion> getCMediaAnimation(CMediaAnimation cMedia) {
+    public ExtendedAnimation getCMediaAnimation(CMediaAnimation cMedia) {
         return medias_animations[cMedia.mediaManagerIndex()];
     }
 

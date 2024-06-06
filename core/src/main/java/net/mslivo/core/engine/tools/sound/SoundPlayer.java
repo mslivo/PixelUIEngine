@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.tools.sound;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.CMediaSound;
+import net.mslivo.core.engine.media_manager.CMediaSound;
 import net.mslivo.core.engine.tools.Tools;
 
 import java.util.HashSet;

@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine.ui.components.tabbar;
 
-import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.media_manager.CMediaFont;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.actions.TabAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 

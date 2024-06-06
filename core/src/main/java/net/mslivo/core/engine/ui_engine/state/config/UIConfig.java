@@ -1,8 +1,8 @@
 package net.mslivo.core.engine.ui_engine.state.config;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.media.CMediaFont;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.media_manager.CMediaFont;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
@@ -80,9 +80,20 @@ public final class UIConfig implements Serializable, Cloneable {
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
         ui_animationTimerFunction = new AnimationTimerFunction() {
+            float delta = 0;
+            float animationTimer = 0;
+            long lastUpdate = -1;
             @Override
-            public float getTime(CMediaSprite sprite, float uiAnimationTimer) {
-                return uiEngineState.animationTimer_ui;
+            public void updateAnimationTimer() {
+                delta = lastUpdate != -1 ? (System.currentTimeMillis()-lastUpdate)/1000f : 0;
+                lastUpdate = System.currentTimeMillis();
+                animationTimer += delta;
+                return;
+            }
+
+            @Override
+            public float getAnimationTimer() {
+                return animationTimer;
             }
         };
         // ##### Input Default Values #####
@@ -170,7 +181,8 @@ public final class UIConfig implements Serializable, Cloneable {
     }
 
     public interface AnimationTimerFunction {
-        float getTime(CMediaSprite sprite, float uiAnimationTimer);
+        void updateAnimationTimer();
+        float getAnimationTimer();
     }
 
 }

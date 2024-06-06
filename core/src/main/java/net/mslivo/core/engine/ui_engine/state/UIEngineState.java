@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import net.mslivo.core.engine.media_manager.media.CMediaSprite;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.constants.TILE_SIZE;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
@@ -171,5 +171,7 @@ public final class UIEngineState {
     public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;
     public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_gridValid;
+
+    public long lastUpdate;
 
 }

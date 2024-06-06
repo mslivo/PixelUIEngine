@@ -1,8 +1,6 @@
 package net.mslivo.example.ui.media;
 
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.media.*;
-import net.mslivo.core.engine.ui_engine.UIEngine;
+import net.mslivo.core.engine.media_manager.*;
 
 public class ExampleBaseMedia {
     private static final String DIR_EXAMPLE_GRAPHICS = MediaManager.DIR_GRAPHICS + "example/";

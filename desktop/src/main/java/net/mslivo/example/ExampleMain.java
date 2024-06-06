@@ -3,8 +3,8 @@ package net.mslivo.example;
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.rendering.transitions.TransitionManager;
-import net.mslivo.core.engine.tools.rendering.transitions.transitions.FadeTransition;
+import net.mslivo.core.engine.tools.transitions.TransitionManager;
+import net.mslivo.core.engine.tools.transitions.transitions.FadeTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
@@ -56,7 +56,7 @@ public class ExampleMain extends ApplicationAdapter {
     public void render() {
         switch (state) {
             case RUN -> {
-                if (Tools.App.isRunUpdate()) {
+                if (Tools.App.runUpdate()) {
                     this.uiEngine.update();
                 }
 
@@ -76,7 +76,7 @@ public class ExampleMain extends ApplicationAdapter {
 
             }
             case TRANSITION -> {
-                if (Tools.App.isRunUpdate()) {
+                if (Tools.App.runUpdate()) {
                     boolean finished = this.transitionManager.update();
                     if (finished) {
                         // Replace with new UIEngine after Reset
