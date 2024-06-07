@@ -78,6 +78,7 @@ public class ThreadedListUpdater<T> {
             try {
                 for(int i=0;i<lThreadPoolUpdaters.length;i++) {
                     this.currentUpdater = lThreadPoolUpdaters[i];
+                    this.currentUpdater.beforeUpdate();
                     threadPool.invokeAll(tasks);
                 }
             } catch (InterruptedException e) {
@@ -85,6 +86,7 @@ public class ThreadedListUpdater<T> {
         } else {
             for(int i=0;i<lThreadPoolUpdaters.length;i++) {
                 this.currentUpdater = lThreadPoolUpdaters[i];
+                this.currentUpdater.beforeUpdate();
                 tasks.getFirst().call();
             }
         }
@@ -120,6 +122,8 @@ public class ThreadedListUpdater<T> {
 
 
     public interface ItemUpdater<T> {
+
+        default void beforeUpdate(){}
 
         void updateFromThread(T object, int index);
     }
