@@ -102,7 +102,7 @@ public class ThreadedListUpdater<T> {
 
         public Worker(int fromIndex, int toIndex) {
             this.fromIndex = fromIndex;
-            this.toIndex = Math.min(toIndex, (ThreadedListUpdater.this.updateObjects.size() - 1));
+            this.toIndex = toIndex;
         }
 
         @Override
