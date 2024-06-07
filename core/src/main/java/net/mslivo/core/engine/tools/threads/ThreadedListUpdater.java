@@ -11,19 +11,26 @@ import java.util.concurrent.Executors;
  */
 public class ThreadedListUpdater<T> {
     private final ExecutorService threadPool;
-    private final ItemUpdater<T> lThreadPoolUpdater;
+    private final ItemUpdater<T>[] lThreadPoolUpdaters;
     private final int cpuCount;
     private final ArrayDeque<Worker> tasks;
-    private int objectsSizeLast;
     private final List<T> updateObjects;
     private final ArrayDeque<Worker> freeWorkerPool;
 
-    public ThreadedListUpdater(List<T> updateObjects, ItemUpdater ItemUpdater) {
-        this(updateObjects, ItemUpdater, Executors.newVirtualThreadPerTaskExecutor());
+    private int objectsSizeLast;
+    private ItemUpdater<T> currentUpdater;
+
+    public ThreadedListUpdater(List<T> updateObjects, ItemUpdater itemUpdater) {
+        this(updateObjects, new ItemUpdater[]{itemUpdater}, Executors.newVirtualThreadPerTaskExecutor());
     }
 
-    public ThreadedListUpdater(List<T> updateObjects, ItemUpdater ItemUpdater, ExecutorService executorService) {
-        this.lThreadPoolUpdater = ItemUpdater;
+    public ThreadedListUpdater(List<T> updateObjects, ItemUpdater itemUpdater, ExecutorService executorService) {
+        this(updateObjects, new ItemUpdater[]{itemUpdater}, executorService);
+    }
+
+    public ThreadedListUpdater(List<T> updateObjects, ItemUpdater[] itemUpdaters, ExecutorService executorService) {
+        this.lThreadPoolUpdaters = itemUpdaters != null ? itemUpdaters : new ItemUpdater[]{};
+        this.currentUpdater = null;
         this.updateObjects = updateObjects;
         this.cpuCount = Runtime.getRuntime().availableProcessors();
         this.threadPool = executorService;
@@ -69,11 +76,17 @@ public class ThreadedListUpdater<T> {
 
         if (tasks.size() > 1) {
             try {
-                threadPool.invokeAll(tasks);
+                for(int i=0;i<lThreadPoolUpdaters.length;i++) {
+                    this.currentUpdater = lThreadPoolUpdaters[i];
+                    threadPool.invokeAll(tasks);
+                }
             } catch (InterruptedException e) {
             }
         } else {
-            tasks.getFirst().call();
+            for(int i=0;i<lThreadPoolUpdaters.length;i++) {
+                this.currentUpdater = lThreadPoolUpdaters[i];
+                tasks.getFirst().call();
+            }
         }
 
     }
@@ -91,7 +104,7 @@ public class ThreadedListUpdater<T> {
         @Override
         public Object call() {
             for (int i = fromIndex; i <= toIndex; i++) {
-                lThreadPoolUpdater.updateFromThread(ThreadedListUpdater.this.updateObjects.get(i), i);
+                ThreadedListUpdater.this.currentUpdater.updateFromThread(ThreadedListUpdater.this.updateObjects.get(i), i);
             }
             return null;
         }
