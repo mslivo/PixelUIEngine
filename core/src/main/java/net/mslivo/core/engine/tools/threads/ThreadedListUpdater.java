@@ -80,6 +80,7 @@ public class ThreadedListUpdater<T> {
                     this.currentUpdater = lThreadPoolUpdaters[i];
                     this.currentUpdater.beforeUpdate();
                     threadPool.invokeAll(tasks);
+                    this.currentUpdater.afterUpdate();
                 }
             } catch (InterruptedException e) {
             }
@@ -88,6 +89,7 @@ public class ThreadedListUpdater<T> {
                 this.currentUpdater = lThreadPoolUpdaters[i];
                 this.currentUpdater.beforeUpdate();
                 tasks.getFirst().call();
+                this.currentUpdater.afterUpdate();
             }
         }
 
@@ -124,6 +126,7 @@ public class ThreadedListUpdater<T> {
     public interface ItemUpdater<T> {
 
         default void beforeUpdate(){}
+        default void afterUpdate(){}
 
         void updateFromThread(T object, int index);
     }
