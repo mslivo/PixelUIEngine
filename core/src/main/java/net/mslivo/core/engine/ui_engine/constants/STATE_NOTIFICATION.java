@@ -5,7 +5,8 @@ public enum STATE_NOTIFICATION {
     INIT_DISPLAY("Init Display"),
     SCROLL("Scroll"),
     DISPLAY("Display"),
-    FADEOUT("Fadeout");
+    FADEOUT("Fadeout"),
+    FINISHED("Finished");
 
     public final String text;
 

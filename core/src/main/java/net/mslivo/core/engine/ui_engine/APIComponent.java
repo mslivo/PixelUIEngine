@@ -1134,24 +1134,24 @@ public final class APIComponent {
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y) {
-                return create(image, x, y, 0, false, uiConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, 0, false, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex) {
-                return create(image, x, y, arrayIndex, false, uiConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, arrayIndex, false, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
             }
 
             public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut) {
-                return create(image, x, y, arrayIndex, fadeOut, uiConfig.component_mapOverlayDefaultFadeoutTime);
+                return create(image, x, y, arrayIndex, fadeOut, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
             }
 
-            public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut, int fadeOutTime) {
+            public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut, float fadeOutSpeed) {
                 CanvasImage canvasImage = new CanvasImage();
                 canvasImage.image = image;
                 canvasImage.x = x;
                 canvasImage.y = y;
                 canvasImage.fadeOut = fadeOut;
-                canvasImage.fadeOutTime = Math.max(fadeOutTime, 0);
+                canvasImage.fadeOutSpeed = Math.max(fadeOutSpeed, 0);
                 canvasImage.color_r = Color.WHITE.r;
                 canvasImage.color_g = Color.WHITE.g;
                 canvasImage.color_b = Color.WHITE.b;
@@ -1159,7 +1159,6 @@ public final class APIComponent {
                 canvasImage.arrayIndex = Math.max(arrayIndex, 0);
                 canvasImage.name = Tools.Text.validString("");
                 canvasImage.data = null;
-                canvasImage.timer = fadeOut ? System.currentTimeMillis() : 0;
                 canvasImage.addedToCanvas = null;
                 return canvasImage;
             }
@@ -1169,9 +1168,9 @@ public final class APIComponent {
                 canvasImage.fadeOut = fadeOut;
             }
 
-            public void setFadeOutTime(CanvasImage canvasImage, int fadeoutTime) {
+            public void setFadeOutTime(CanvasImage canvasImage, float fadeoutSpeed) {
                 if (canvasImage == null) return;
-                canvasImage.fadeOutTime = Math.clamp(fadeoutTime, 0, Integer.MAX_VALUE);
+                canvasImage.fadeOutSpeed = Math.max(fadeoutSpeed, 0);
             }
 
             public void setPosition(CanvasImage canvasImage, int x, int y) {

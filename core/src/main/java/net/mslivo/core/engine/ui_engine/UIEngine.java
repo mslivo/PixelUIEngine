@@ -8,11 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.CMediaArray;
-import net.mslivo.core.engine.media_manager.CMediaFont;
-import net.mslivo.core.engine.media_manager.CMediaImage;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
@@ -183,10 +179,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedButton = null;
         newUIEngineState.pressedKnob = null;
         newUIEngineState.tooltip = null;
-        newUIEngineState.tooltip_fadeIn_pct = 0f;
+        newUIEngineState.tooltip_fadePct = 0f;
         newUIEngineState.tooltip_wait_delay = false;
         newUIEngineState.tooltip_delay_timer = 0;
-        newUIEngineState.tooltip_fadeIn_timer = 0;
         newUIEngineState.pressedScrollBarVertical = null;
         newUIEngineState.pressedScrollBarHorizontal = null;
         newUIEngineState.draggedGridItem = null;
@@ -1615,8 +1610,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     }
 
-    private void updateUI_animationTimer(){
-        if(uiEngineState.config.ui_animationTimerFunction != null){
+    private void updateUI_animationTimer() {
+        if (uiEngineState.config.ui_animationTimerFunction != null) {
             uiEngineState.config.ui_animationTimerFunction.updateAnimationTimer();
         }
     }
@@ -1673,7 +1668,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (showComponentToolTip) {
             showComponentToolTip = uiEngineState.modalWindow == null || ((Component) uiEngineState.lastUIMouseHover).addedToWindow == uiEngineState.modalWindow;
         }
-
         if (showComponentToolTip) {
             Component hoverComponent = (Component) uiEngineState.lastUIMouseHover;
             Object toolTipSubItem = null;
@@ -1713,8 +1707,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             if (updateComponentToolTip) {
                 uiEngineState.tooltip_wait_delay = true;
-                uiEngineState.tooltip_delay_timer = System.currentTimeMillis();
-                if (hoverComponent instanceof List list && toolTipSubItem != null) {
+                uiEngineState.tooltip_delay_timer = 0;
+                if (hoverComponent instanceof List list) {
                     // check for list item tooltips
                     uiEngineState.tooltip = list.listAction.toolTip(toolTipSubItem);
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
@@ -1732,9 +1726,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             // Set App Tooltip
             if (uiEngineState.lastUIMouseHover == null && uiEngineState.appToolTip != null) {
                 if (uiEngineState.tooltip != uiEngineState.appToolTip) {
-                    uiEngineState.tooltip = uiEngineState.appToolTip;
                     uiEngineState.tooltip_wait_delay = true;
-                    uiEngineState.tooltip_delay_timer = System.currentTimeMillis();
+                    uiEngineState.tooltip_delay_timer = 0;
+                    uiEngineState.tooltip = uiEngineState.appToolTip;
                 }
             } else {
                 uiEngineState.tooltip = null;
@@ -1742,22 +1736,34 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
-        // Fade In/Out
+
+
+        // Fade In
         if (uiEngineState.tooltip != null) {
             if (uiEngineState.tooltip_wait_delay) {
-                if ((System.currentTimeMillis() - uiEngineState.tooltip_delay_timer) > uiEngineState.config.tooltip_FadeInDelayTime) {
+                uiEngineState.tooltip_delay_timer += uiEngineState.config.tooltip_FadeInDelay;
+                if (uiEngineState.tooltip_delay_timer >= uiEngineState.config.tooltip_FadeInDelay) {
                     uiEngineState.tooltip_wait_delay = false;
-                    uiEngineState.tooltip_fadeIn_pct = 0f;
-                    uiEngineState.tooltip_fadeIn_timer = System.currentTimeMillis();
-                    if (uiEngineState.tooltip.toolTipAction != null) {
+                    uiEngineState.tooltip_delay_timer = 0;
+                    uiEngineState.tooltip_fadePct = 0f;
+                    if (uiEngineState.tooltip.toolTipAction != null)
                         uiEngineState.tooltip.toolTipAction.onDisplay();
-                    }
                 }
-            } else if (uiEngineState.tooltip_fadeIn_pct < 1f) {
-                uiEngineState.tooltip_fadeIn_pct = Math.clamp(((System.currentTimeMillis() - uiEngineState.tooltip_fadeIn_timer) / (float) uiEngineState.config.tooltip_FadeInTime), 0f, 1f);
+            } else if (uiEngineState.tooltip_fadePct < 1f) {
+                uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct + uiEngineState.config.tooltip_FadeInSpeed, 0f, 1f);
             } else {
                 if (uiEngineState.tooltip.toolTipAction != null) {
                     uiEngineState.tooltip.toolTipAction.onUpdate();
+                }
+            }
+
+            uiEngineState.fadeOutTooltip = uiEngineState.tooltip;
+        } else {
+            if (uiEngineState.fadeOutTooltip != null) {
+                if (uiEngineState.tooltip_fadePct > 0f) {
+                    uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip_FadeOutSpeed, 0f, 1f);
+                } else {
+                    uiEngineState.fadeOutTooltip = null;
                 }
             }
         }
@@ -1769,33 +1775,40 @@ public final class UIEngine<T extends UIEngineAdapter> {
             Notification notification = uiEngineState.notifications.getFirst();
             switch (notification.state) {
                 case INIT_SCROLL -> {
-                    notification.timer = System.currentTimeMillis();
+                    notification.timer = 0;
                     notification.state = STATE_NOTIFICATION.SCROLL;
                 }
                 case INIT_DISPLAY -> {
-                    notification.timer = System.currentTimeMillis();
+                    notification.timer = 0;
                     notification.state = STATE_NOTIFICATION.DISPLAY;
                 }
                 case SCROLL -> {
-                    if (System.currentTimeMillis() - notification.timer > 500) {
+                    notification.timer ++;
+                    if(notification.timer > 30){
                         notification.scroll += MathUtils.round(uiEngineState.config.notification_scrollSpeed);
                         if (notification.scroll >= notification.scrollMax) {
+                            notification.timer = 0;
                             notification.state = STATE_NOTIFICATION.DISPLAY;
-                            notification.timer = System.currentTimeMillis();
                         }
+                        notification.timer = 30;
                     }
                 }
                 case DISPLAY -> {
-                    if (System.currentTimeMillis() - notification.timer > notification.displayTime) {
+                    notification.timer++;
+                    if(notification.timer > notification.displayTime){
+                        notification.timer = 0;
                         notification.state = STATE_NOTIFICATION.FADEOUT;
-                        notification.timer = System.currentTimeMillis();
                     }
                 }
                 case FADEOUT -> {
-                    if ((System.currentTimeMillis() - notification.timer > uiEngineState.config.notification_fadeoutTime)) {
+                    notification.timer++;
+                    if(notification.timer > uiEngineState.config.notification_fadeoutTime){
+                        notification.timer = 0;
+                        notification.state = STATE_NOTIFICATION.FINISHED;
                         UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
                     }
                 }
+                case FINISHED -> {}
             }
         }
     }
@@ -2192,10 +2205,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawTooltip() {
-        if (uiEngineState.tooltip == null || uiEngineState.tooltip_wait_delay) return;
-        if (uiEngineState.tooltip.segments.isEmpty()) return;
-        Tooltip tooltip = uiEngineState.tooltip;
-        ArrayList<TooltipSegment> segments = uiEngineState.tooltip.segments;
+        Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
+        if(tooltip == null) return;
+        if (tooltip.segments.isEmpty()) return;
+        ArrayList<TooltipSegment> segments = tooltip.segments;
 
         // Determine Dimensions
         int tooltip_width = tooltip.minWidth;
@@ -2246,9 +2259,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
 
                     for (int tx = 0; tx < tooltip_width; tx++) {
-                        render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadeIn_pct);
+                        render_batchSetColor(segment.color_r, segment.color_g, segment.color_b, segment.color_a * uiEngineState.tooltip_fadePct);
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
-                        render_batchSetColor(tooltip.color_border_r, tooltip.color_border_g, tooltip.color_border_b, tooltip.color_border_a * uiEngineState.tooltip_fadeIn_pct);
+                        render_batchSetColor(tooltip.color_border_r, tooltip.color_border_g, tooltip.color_border_b, tooltip.color_border_a * uiEngineState.tooltip_fadePct);
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
                         if (borderIndex != BORDER_NONE) {
                             uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), borderIndex);
@@ -2267,7 +2280,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
                         case RIGHT -> TS(tooltip_width) - text_width - 3;
                     };
-                    render_drawFont(textSegment.font, textSegment.text, textSegment.color_a * uiEngineState.tooltip_fadeIn_pct, text_x, text_y, 1, 1, FONT_MAXWIDTH_NONE, null, 0);
+                    render_drawFont(textSegment.font, textSegment.text, textSegment.color_a * uiEngineState.tooltip_fadePct, text_x, text_y, 1, 1, FONT_MAXWIDTH_NONE, null, 0);
                 }
                 case TooltipImageSegment imageSegment -> {
                     int image_width = mediaManager.getCMediaSpriteWidth(imageSegment.image);
@@ -2278,7 +2291,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> TS(tooltip_width) - image_width - 2;
                     };
-                    render_batchSetColorWhite(uiEngineState.tooltip_fadeIn_pct);
+                    render_batchSetColorWhite(uiEngineState.tooltip_fadePct);
                     uiEngineState.spriteRenderer_ui.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }
                 case null, default -> {
@@ -2304,7 +2317,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         for (int i = 0; i < uiEngineState.notifications.size(); i++) {
             Notification notification = uiEngineState.notifications.get(i);
             if (notification.state == STATE_NOTIFICATION.FADEOUT) {
-                float fadeoutProgress = ((System.currentTimeMillis() - notification.timer) / (float) uiEngineState.config.notification_fadeoutTime);
+                float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification_fadeoutTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             render_saveTempColorBatch();
@@ -2546,7 +2559,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 for (int i = (canvas.canvasImages.size() - 1); i >= 0; i--) {
                     CanvasImage canvasImage = canvas.canvasImages.get(i);
                     if (canvasImage.fadeOut) {
-                        canvasImage.color_a = 1 - ((System.currentTimeMillis() - canvasImage.timer) / (float) canvasImage.fadeOutTime);
+                        canvasImage.color_a = Math.clamp(canvasImage.color_a - canvasImage.fadeOutSpeed, 0f,1f);
                         if (canvasImage.color_a <= 0) {
                             canvas.canvasImages.remove(i);
                             continue;
@@ -2970,7 +2983,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private int TS2() {
         return uiEngineState.sizeSize.TS2;
     }
-
 
 
 }

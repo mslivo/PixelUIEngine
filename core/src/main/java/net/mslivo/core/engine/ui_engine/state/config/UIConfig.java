@@ -52,7 +52,7 @@ public final class UIConfig implements Serializable, Cloneable {
     public float component_gridDragAlpha;
     public float component_knobSensitivity;
     public float component_scrollbarSensitivity;
-    public int component_mapOverlayDefaultFadeoutTime;
+    public float component_mapOverlayDefaultFadeoutSpeed;
     public int notification_max;
     public int notification_defaultDisplayTime;
     public CMediaFont notification_defaultFont;
@@ -62,8 +62,9 @@ public final class UIConfig implements Serializable, Cloneable {
     public Color tooltip_defaultColor;
     public Color tooltip_defaultBorderColor;
     public CMediaFont tooltip_defaultFont;
-    public int tooltip_FadeInTime;
-    public int tooltip_FadeInDelayTime;
+    public float tooltip_FadeInSpeed;
+    public int tooltip_FadeInDelay;
+    public float tooltip_FadeOutSpeed;
     public char[] component_textFieldDefaultAllowedCharacters;
     public CMediaFont mouseTextInput_defaultFont;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
@@ -133,7 +134,7 @@ public final class UIConfig implements Serializable, Cloneable {
         component_gridDragAlpha = 0.8f;
         component_knobSensitivity = 1f;
         component_scrollbarSensitivity = 1f;
-        component_mapOverlayDefaultFadeoutTime = 200;
+        component_mapOverlayDefaultFadeoutSpeed = 0.05f;
         component_textFieldDefaultAllowedCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
@@ -149,16 +150,17 @@ public final class UIConfig implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
         notification_max = 20;
-        notification_defaultDisplayTime = 3000;
+        notification_defaultDisplayTime = 180;
         notification_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_WHITE;
         notification_defaultColor = Color.DARK_GRAY.cpy();
-        notification_fadeoutTime = 200;
+        notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
         tooltip_defaultColor = Color.WHITE.cpy();
         tooltip_defaultBorderColor = Color.valueOf("7F7F7F").cpy();
         tooltip_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        tooltip_FadeInTime = 50;
-        tooltip_FadeInDelayTime = 25;
+        tooltip_FadeInSpeed = 0.2f;
+        tooltip_FadeOutSpeed = 0.2f;
+        tooltip_FadeInDelay = 20;
         // ##### MouseTextInput Default Values #####
         mouseTextInput_defaultLowerCaseCharacters = new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',

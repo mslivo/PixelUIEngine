@@ -11,7 +11,6 @@ public class CanvasImage {
     public float color_r, color_g, color_b, color_a;
     public int arrayIndex;
     public boolean fadeOut;
-    public int fadeOutTime;
-    public long timer;
+    public float fadeOutSpeed;
     public Canvas addedToCanvas;
 }

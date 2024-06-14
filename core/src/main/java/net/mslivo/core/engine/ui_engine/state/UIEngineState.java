@@ -89,9 +89,10 @@ public final class UIEngineState {
     public ScrollbarVertical pressedScrollBarVertical;
     public ScrollbarHorizontal pressedScrollBarHorizontal;
     public Tooltip tooltip;
-    public float tooltip_fadeIn_pct;
+    public Tooltip fadeOutTooltip;
+    public float tooltip_fadePct;
     public boolean tooltip_wait_delay;
-    public long tooltip_delay_timer, tooltip_fadeIn_timer;
+    public float tooltip_delay_timer;
     public Tooltip appToolTip;
     public Object tooltip_lastHoverObject;
     public Knob pressedKnob;

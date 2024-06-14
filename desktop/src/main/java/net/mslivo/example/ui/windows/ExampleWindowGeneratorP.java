@@ -538,6 +538,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
+                if(listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -589,6 +590,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
+                if(listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });

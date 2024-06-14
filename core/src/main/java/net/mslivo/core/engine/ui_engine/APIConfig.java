@@ -381,12 +381,12 @@ public final class APIConfig {
             uiConfig.component_scrollbarSensitivity = scrollbar_sensitivity;
         }
 
-        public int getMapOverlayDefaultFadeoutTime() {
-            return uiConfig.component_mapOverlayDefaultFadeoutTime;
+        public float getMapOverlayDefaultFadeoutSpeed() {
+            return uiConfig.component_mapOverlayDefaultFadeoutSpeed;
         }
 
-        public void setMapOverlayDefaultFadeoutTime(int mapOverlay_defaultFadeoutTime) {
-            uiConfig.component_mapOverlayDefaultFadeoutTime = mapOverlay_defaultFadeoutTime;
+        public void setMapOverlayDefaultFadeoutSpeed(float mapOverlayDefaultFadeoutSpeed) {
+            uiConfig.component_mapOverlayDefaultFadeoutSpeed = mapOverlayDefaultFadeoutSpeed;
         }
 
         public char[] getTextfieldDefaultAllowedCharacters() {
@@ -411,7 +411,7 @@ public final class APIConfig {
             uiConfig.notification_max = notifications_max;
         }
 
-        public int getNotifications_defaultDisplayTime() {
+        public int getDefaultDisplayTime() {
             return uiConfig.notification_defaultDisplayTime;
         }
 
@@ -419,7 +419,7 @@ public final class APIConfig {
             uiConfig.notification_defaultDisplayTime = notifications_defaultDisplayTime;
         }
 
-        public CMediaFont getNotifications_defaultFont() {
+        public CMediaFont getDefaultFont() {
             return uiConfig.notification_defaultFont;
         }
 
@@ -427,7 +427,7 @@ public final class APIConfig {
             uiConfig.notification_defaultFont = notifications_defaultFont;
         }
 
-        public Color getNotifications_defaultColor() {
+        public Color getDefaultColor() {
             return uiConfig.notification_defaultColor;
         }
 
@@ -435,15 +435,15 @@ public final class APIConfig {
             uiConfig.notification_defaultColor = notifications_defaultColor;
         }
 
-        public int getNotifications_fadeoutTime() {
+        public int getFadeoutTime() {
             return uiConfig.notification_fadeoutTime;
         }
 
         public void setFadeoutTime(int notifications_fadeoutTime) {
-            uiConfig.notification_fadeoutTime = notifications_fadeoutTime;
+            uiConfig.notification_fadeoutTime = Math.max(notifications_fadeoutTime,0);
         }
 
-        public float getNotifications_scrollSpeed() {
+        public float getScrollSpeed() {
             return uiConfig.notification_scrollSpeed;
         }
 
@@ -473,28 +473,36 @@ public final class APIConfig {
             uiConfig.tooltip_defaultFont = tooltip_defaultFont;
         }
 
-        public int getFadeInTime() {
-            return uiConfig.tooltip_FadeInTime;
+        public float getFadeInTime() {
+            return uiConfig.tooltip_FadeInSpeed;
         }
 
-        public void setFadeInTime(int tooltip_FadeInTime) {
-            uiConfig.tooltip_FadeInTime = tooltip_FadeInTime;
+        public void setFadeInSpeed(float fadeInSpeed) {
+            uiConfig.tooltip_FadeInSpeed = fadeInSpeed;
         }
 
-        public int getFadeInDelayTime() {
-            return uiConfig.tooltip_FadeInDelayTime;
+        public int getFadeInDelay() {
+            return uiConfig.tooltip_FadeInDelay;
         }
 
-        public void setFadeInDelayTime(int tooltip_FadeInDelayTime) {
-            uiConfig.tooltip_FadeInDelayTime = tooltip_FadeInDelayTime;
+        public void setFadeInDelay(int fadeInDelay) {
+            uiConfig.tooltip_FadeInDelay = fadeInDelay;
         }
 
-        public Color getTooltip_defaultBorderColor() {
+        public Color getDefaultBorderColor() {
             return uiConfig.tooltip_defaultBorderColor;
         }
 
-        public void setTooltip_defaultBorderColor(Color tooltip_defaultBorderColor) {
+        public void setDefaultBorderColor(Color tooltip_defaultBorderColor) {
             uiConfig.tooltip_defaultBorderColor = tooltip_defaultBorderColor;
+        }
+
+        public float getFadeOutSpeed() {
+            return uiConfig.tooltip_FadeOutSpeed;
+        }
+
+        public void setFadeOutSpeed(float fadeOutSpeed) {
+            uiConfig.tooltip_FadeOutSpeed = fadeOutSpeed;
         }
     }
 
