@@ -70,14 +70,12 @@ public class Tools {
 
         public static void logDone() {
             if(!LOG_SYSOUT_ENABLED) return;
-            logMessageBuilder.append("Done.");
-            Gdx.app.log(dateTag(), logMessageBuilder.toString());
+            Gdx.app.log(dateTag(), "Done.");
         }
 
 
         public static void debug(String message) {
             if(!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
-            logMessageBuilder.append("Done.");
             if(Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
             Gdx.app.debug(dateTag(), message);
         }
