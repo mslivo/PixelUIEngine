@@ -27,15 +27,13 @@ public class Tools {
 
     public static class Log {
         private static final StringBuilder logMessageBuilder = new StringBuilder();
-        public static boolean LOG_SYSOUT = true;
-        public static boolean LOG_SYSOUT_DEBUG = true;
-        public static boolean LOG_FILE = true;
-
+        private static boolean LOG_SYSOUT_ENABLED = true;
+        private static boolean LOG_SYSOUT_DEBUG_ENABLED = true;
+        private static boolean LOG_FILE_ENABLED = true;
         private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy][HH:mm:ss");
 
-
         public static void logBenchmark(String... customValues) {
-            if(!LOG_SYSOUT) return;
+            if(!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
@@ -51,39 +49,39 @@ public class Tools {
         }
 
         public static void log(String msg) {
-            if(!LOG_SYSOUT) return;
+            if(!LOG_SYSOUT_ENABLED) return;
             Gdx.app.log(dateTag(),msg);
         }
 
         public static void log(Exception e) {
-            if(!LOG_SYSOUT) return;
+            if(!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
             Gdx.app.error(dateTag(),logMessageBuilder.toString(),e);
         }
 
         public static void logInProgress(String what) {
-            if(!LOG_SYSOUT) return;
+            if(!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append(what).append("...");
             Gdx.app.log(dateTag(), logMessageBuilder.toString());
         }
 
         public static void logDone() {
-            if(!LOG_SYSOUT) return;
+            if(!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.append("Done.");
             Gdx.app.log(dateTag(), logMessageBuilder.toString());
         }
 
 
         public static void debug(String message) {
-            if(!LOG_SYSOUT || !LOG_SYSOUT_DEBUG) return;
+            if(!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
             logMessageBuilder.append("Done.");
             Gdx.app.debug(dateTag(), message);
         }
 
         public static void toFile(String message, Path file) {
-            if(!LOG_FILE) return;
+            if(!LOG_FILE_ENABLED) return;
             try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
                 pw.write(message);
             } catch (IOException ex) {
@@ -103,6 +101,18 @@ public class Tools {
 
         private static String dateTag(){
             return sdf.format(new Date());
+        }
+
+        public static void setFileLogEnabled(boolean fileLogEnabled) {
+            LOG_FILE_ENABLED = fileLogEnabled;
+        }
+
+        public static void setDebugLogEnabled(boolean sysOutLogEnabled) {
+            LOG_SYSOUT_DEBUG_ENABLED = sysOutLogEnabled;
+        }
+
+        public static void setSysOutLogEnabled(boolean logSysout) {
+            LOG_SYSOUT_ENABLED = logSysout;
         }
 
     }
