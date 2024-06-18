@@ -34,20 +34,20 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = new TransitionManager();
         // Load Assets
-        Tools.App.logInProgress("Loading Assets");
+        Tools.Log.logInProgress("Loading Assets");
         this.mediaManager = new MediaManager();
         this.mediaManager.prepareUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
-        Tools.App.logDone();
+        Tools.Log.logDone();
 
         // Input/Render
-        Tools.App.logInProgress("Starting UI");
+        Tools.Log.logInProgress("Starting UI");
         this.uiEngine = new UIEngine<>(
                 new ExampleUIEngineAdapter(),
                 this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.viewportMode, true);
-        Tools.App.logDone();
+        Tools.Log.logDone();
 
         this.state = STATE.RUN;
     }
@@ -93,16 +93,16 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.App.logBenchmark();
+            Tools.Log.logBenchmark();
             timer_debug_info = System.currentTimeMillis();
         }
     }
 
     @Override
     public void dispose() {
-        Tools.App.logInProgress("Shutting down...");
+        Tools.Log.logInProgress("Shutting down...");
         this.shutdownEngine();
-        Tools.App.logDone();
+        Tools.Log.logDone();
     }
 
     private void shutdownEngine() {

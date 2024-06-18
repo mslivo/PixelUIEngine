@@ -25,15 +25,96 @@ import java.util.*;
  */
 public class Tools {
 
+    public static class Log {
+        private static final StringBuilder logMessageBuilder = new StringBuilder();
+        public static boolean LOG_SYSOUT = true;
+        public static boolean LOG_SYSOUT_DEBUG = true;
+        public static boolean LOG_FILE = true;
+
+        private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy][HH:mm:ss");
+
+
+        public static void logBenchmark(String... customValues) {
+            if(!LOG_SYSOUT) return;
+            logMessageBuilder.setLength(0);
+            StringBuilder custom = new StringBuilder();
+            for (int i = 0; i < customValues.length; i++)
+                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
+            logMessageBuilder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
+            logMessageBuilder.append(" FPS | ");
+            logMessageBuilder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
+            logMessageBuilder.append("MB RAM | ");
+            logMessageBuilder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
+            logMessageBuilder.append(" Threads");
+            logMessageBuilder.append(custom);
+            Gdx.app.log(dateTag(),logMessageBuilder.toString());
+        }
+
+        public static void log(String msg) {
+            if(!LOG_SYSOUT) return;
+            Gdx.app.log(dateTag(),msg);
+        }
+
+        public static void log(Exception e) {
+            if(!LOG_SYSOUT) return;
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
+            Gdx.app.error(dateTag(),logMessageBuilder.toString(),e);
+        }
+
+        public static void logInProgress(String what) {
+            if(!LOG_SYSOUT) return;
+            logMessageBuilder.setLength(0);
+            logMessageBuilder.append(what).append("...");
+            Gdx.app.log(dateTag(), logMessageBuilder.toString());
+        }
+
+        public static void logDone() {
+            if(!LOG_SYSOUT) return;
+            logMessageBuilder.append("Done.");
+            Gdx.app.log(dateTag(), logMessageBuilder.toString());
+        }
+
+
+        public static void debug(String message) {
+            if(!LOG_SYSOUT || !LOG_SYSOUT_DEBUG) return;
+            logMessageBuilder.append("Done.");
+            Gdx.app.debug(dateTag(), message);
+        }
+
+        public static void toFile(String message, Path file) {
+            if(!LOG_FILE) return;
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
+                pw.write(message);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public static void toFile(Exception e, Path file) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
+                logMessageBuilder.setLength(0);
+                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
+                pw.write(logMessageBuilder.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        private static String dateTag(){
+            return sdf.format(new Date());
+        }
+
+    }
+
 
     public static class App {
-        private static final StringBuilder logMessageBuilder = new StringBuilder();
         private static float skipFrameAccumulator = 0f;
         private static int maxUpdatesPerSecond = 60;
         private static float timeStep;
         private static float timeStepX2;
         private static float timeBetweenUpdates;
-        private static final SimpleDateFormat sdf = new SimpleDateFormat("[dd.MM.yy][HH:mm:ss] ");
+
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
@@ -88,76 +169,13 @@ public class Tools {
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
-                App.log(e);
-                App.logToFile(e, Path.of(appTile + "_error.log"));
+                Log.log(e);
+                Log.toFile(e, Path.of(appTile + "_error.log"));
             }
         }
 
 
-        public static void logBenchmark(String... customValues) {
-            StringBuilder custom = new StringBuilder();
-            for (int i = 0; i < customValues.length; i++)
-                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
-            logReset();
-            logMessageBuilder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
-            logMessageBuilder.append(" FPS | ");
-            logMessageBuilder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
-            logMessageBuilder.append("MB RAM | ");
-            logMessageBuilder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
-            logMessageBuilder.append(" Threads");
-            logMessageBuilder.append(custom);
-            System.out.println(logMessageBuilder);
-        }
 
-        public static void log(String msg) {
-            logReset();
-            logMessageBuilder.append(msg);
-            System.out.println(logMessageBuilder);
-        }
-
-        public static void log(Exception e) {
-            logReset();
-            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-            System.out.println(logMessageBuilder);
-            e.printStackTrace(System.out);
-        }
-
-        public static void logInProgress(String what) {
-            logReset();
-            logMessageBuilder.append(what).append("...");
-            System.out.println(logMessageBuilder);
-        }
-
-        public static void logDone() {
-            logReset();
-            logMessageBuilder.append("Done.");
-            System.out.println(logMessageBuilder);
-        }
-
-        public static void logToFile(String message, Path file) {
-            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
-                logReset();
-                pw.write(logMessageBuilder + message);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        public static void logToFile(Exception e, Path file) {
-            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
-                logReset();
-                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-                pw.write(logMessageBuilder.toString());
-                e.printStackTrace(pw);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        private static void logReset() {
-            logMessageBuilder.setLength(0);
-            logMessageBuilder.append(sdf.format(new Date()));
-        }
     }
 
 
@@ -283,7 +301,7 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.App.log(e);
+                Tools.Log.log(e);
                 return false;
             }
         }
