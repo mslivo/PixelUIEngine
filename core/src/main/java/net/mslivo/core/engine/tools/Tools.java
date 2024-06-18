@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.tools;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -77,6 +78,7 @@ public class Tools {
         public static void debug(String message) {
             if(!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
             logMessageBuilder.append("Done.");
+            if(Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
             Gdx.app.debug(dateTag(), message);
         }
 
