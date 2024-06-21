@@ -81,13 +81,10 @@ public final class UIConfig implements Serializable, Cloneable {
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
         ui_animationTimerFunction = new AnimationTimerFunction() {
-            float delta = 0;
+            float delta = 0.016f;
             float animationTimer = 0;
-            long lastUpdate = -1;
             @Override
             public void updateAnimationTimer() {
-                delta = lastUpdate != -1 ? (System.currentTimeMillis()-lastUpdate)/1000f : 0;
-                lastUpdate = System.currentTimeMillis();
                 animationTimer += delta;
                 return;
             }
