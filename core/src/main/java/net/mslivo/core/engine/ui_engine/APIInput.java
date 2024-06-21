@@ -37,8 +37,10 @@ public final class APIInput {
         return inputEvents.lastUsedInputMethod;
     }
 
-    public boolean isAnyInputUsingUI(){
-        return mouse.useUIObject() != null || keyboard.useUIObject() != null;
+    public boolean isAnyInputHoveringOrUsingUI(){
+        if(mouse.useUIObject() != null || mouse.hoverUIObject() != null) return true;
+        if(keyboard.useUIObject() != null) return true;
+        return false;
     }
 
     public final class APIMouse {
