@@ -587,12 +587,15 @@ public class Tools {
             LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new LongArray();
-                for (int iy = -radius; iy <= radius; iy++) {
-                    for (int ix = -radius; ix <= radius; ix++) {
-                        if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                            int xr = ix;
-                            int yr = iy;
-                            cached.add((((long) xr) << 32) | (yr & 0xffffffffL));
+                // map from inside out
+                for (int r = 0; r <= radius; r++) {
+                    for (int iy = -r; iy <= r; iy++) {
+                        for (int ix = -r; ix <= r; ix++) {
+                            if ((ix * ix) + (iy * iy) <= (r * r)) {
+                                int xr = ix;
+                                int yr = iy;
+                                cached.add((((long) xr) << 32) | (yr & 0xffffffffL));
+                            }
                         }
                     }
                 }
