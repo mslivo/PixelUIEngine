@@ -34,7 +34,7 @@ public class Tools {
         private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy][HH:mm:ss");
 
         public static void logBenchmark(String... customValues) {
-            if(!LOG_SYSOUT_ENABLED) return;
+            if (!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             StringBuilder custom = new StringBuilder();
             for (int i = 0; i < customValues.length; i++)
@@ -46,42 +46,42 @@ public class Tools {
             logMessageBuilder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
             logMessageBuilder.append(" Threads");
             logMessageBuilder.append(custom);
-            Gdx.app.log(dateTag(),logMessageBuilder.toString());
+            Gdx.app.log(dateTag(), logMessageBuilder.toString());
         }
 
         public static void log(String msg) {
-            if(!LOG_SYSOUT_ENABLED) return;
-            Gdx.app.log(dateTag(),msg);
+            if (!LOG_SYSOUT_ENABLED) return;
+            Gdx.app.log(dateTag(), msg);
         }
 
         public static void log(Exception e) {
-            if(!LOG_SYSOUT_ENABLED) return;
+            if (!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-            Gdx.app.error(dateTag(),logMessageBuilder.toString(),e);
+            Gdx.app.error(dateTag(), logMessageBuilder.toString(), e);
         }
 
         public static void logInProgress(String what) {
-            if(!LOG_SYSOUT_ENABLED) return;
+            if (!LOG_SYSOUT_ENABLED) return;
             logMessageBuilder.setLength(0);
             logMessageBuilder.append(what).append("...");
             Gdx.app.log(dateTag(), logMessageBuilder.toString());
         }
 
         public static void logDone() {
-            if(!LOG_SYSOUT_ENABLED) return;
+            if (!LOG_SYSOUT_ENABLED) return;
             Gdx.app.log(dateTag(), "Done.");
         }
 
 
         public static void debug(String message) {
-            if(!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
-            if(Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
+            if (!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
+            if (Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
             Gdx.app.debug(dateTag(), message);
         }
 
         public static void toFile(String message, Path file) {
-            if(!LOG_FILE_ENABLED) return;
+            if (!LOG_FILE_ENABLED) return;
             try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
                 pw.write(message);
             } catch (IOException ex) {
@@ -99,7 +99,7 @@ public class Tools {
             }
         }
 
-        private static String dateTag(){
+        private static String dateTag() {
             return sdf.format(new Date());
         }
 
@@ -131,7 +131,7 @@ public class Tools {
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
             timeStepX2 = timeStep * 2f;
             skipFrameAccumulator = 0;
-            timeBetweenUpdates = 1000f/(updatesPerSecond*1000f);
+            timeBetweenUpdates = 1000f / (updatesPerSecond * 1000f);
         }
 
         public static boolean runUpdate() {
@@ -161,9 +161,9 @@ public class Tools {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
             boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
-            if(useAngle && !linux32Bit) {
+            if (useAngle && !linux32Bit) {
                 config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
-            }else{
+            } else {
                 config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
             }
             config.setWindowedMode(resolutionWidth, resolutionHeight);
@@ -183,7 +183,6 @@ public class Tools {
                 Log.toFile(e, Path.of(appTile + "_error.log"));
             }
         }
-
 
 
     }
@@ -558,15 +557,21 @@ public class Tools {
 
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
-        public interface DoInRadiusFunction {
-            boolean apply(int x, int y);
+        public interface DoInRadiusFunction<T> {
+            default boolean doInRadiusContinue(int x, int y, T data){
+                return false;
+            };
+
+            default boolean doInRadiusContinue(int x, int y){
+                return false;
+            };
         }
 
         private static void doInRadiusInternal(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
             for (int iy = -radius; iy <= radius; iy++) {
                 for (int ix = -radius; ix <= radius; ix++) {
                     if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!radiusFunction.apply(x + ix, y + iy)) {
+                        if (!radiusFunction.doInRadiusContinue(x + ix, y + iy)) {
                             return;
                         }
                     }
@@ -575,27 +580,39 @@ public class Tools {
         }
 
         public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
+            doInRadius(x,y,radius,radiusFunction, null);
+        }
+
+        public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction, Object data) {
             LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new LongArray();
-                LongArray finalCached = cached;
-                doInRadiusInternal(0, 0, radius, (x1, y1) -> {
-                    finalCached.add(
-                            (((long) x1) << 32) | (y1 & 0xffffffffL));
-                    return true;
-                });
+                for (int iy = -radius; iy <= radius; iy++) {
+                    for (int ix = -radius; ix <= radius; ix++) {
+                        if ((ix * ix) + (iy * iy) <= (radius * radius)) {
+                            int xr = ix;
+                            int yr = iy;
+                            cached.add((((long) xr) << 32) | (yr & 0xffffffffL));
+                        }
+                    }
+                }
                 doInRadiusCache.put(radius, cached);
             }
 
-            for (int i = 0; i < cached.size; i++) {
-                long positions = cached.get(i);
-                if (!radiusFunction.apply(
-                        x + ((int) (positions >> 32)),
-                        y + ((int) positions))
-                ) {
-                    return;
+            if(data != null){
+                for (int i = 0; i < cached.size; i++) {
+                    long positions = cached.get(i);
+                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)),y + ((int) positions),data))
+                        return;
+                }
+            }else{
+                for (int i = 0; i < cached.size; i++) {
+                    long positions = cached.get(i);
+                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)),y + ((int) positions)))
+                        return;
                 }
             }
+
         }
 
         public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
