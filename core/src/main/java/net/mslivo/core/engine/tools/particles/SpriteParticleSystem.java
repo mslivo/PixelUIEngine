@@ -9,6 +9,7 @@ import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
  * Particle System must be extended and implemented
  */
 public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
+
     private final MediaManager mediaManager;
     private Color backup;
     private Color backup_font;
@@ -22,6 +23,10 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
         this.mediaManager = mediaManager;
         backup = new Color();
         backup_font = new Color();
+    }
+
+    public MediaManager getMediaManager() {
+        return mediaManager;
     }
 
     public void render(SpriteRenderer batch) {
