@@ -15,9 +15,9 @@ abstract class ParticleSystem<T>{
     final ArrayDeque<Particle<T>> particlePool;
     final ParticleDataProvider<T> particleDataProvider;
 
-    public interface ParticleConsumer<T> {
-        void accept(Particle<T> particle);
-        void accept(Particle<T> particle, Object data);
+    public interface ParticleConsumer<T,O> {
+        default void accept(Particle<T> particle){};
+        default void accept(Particle<T> particle, O data){};
     }
 
     ParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider){
@@ -88,11 +88,11 @@ abstract class ParticleSystem<T>{
         deleteQueuedParticles();
     }
 
-    public void forEveryParticle(ParticleConsumer<Particle> consumer) {
+    public void forEveryParticle(ParticleConsumer<T,?> consumer) {
         forEveryParticle(consumer, null);
     }
 
-    public void forEveryParticle(ParticleConsumer<Particle> consumer, Object data) {
+    public <O> void forEveryParticle(ParticleConsumer<T,O> consumer, O data) {
         if(data != null) {
             for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
         }else{

@@ -557,8 +557,8 @@ public class Tools {
 
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
-        public interface DoInRadiusFunction<T> {
-            default boolean doInRadiusContinue(int x, int y, T data){
+        public interface DoInRadiusFunction<O> {
+            default boolean doInRadiusContinue(int x, int y, O data){
                 return false;
             };
 
@@ -583,7 +583,7 @@ public class Tools {
             doInRadius(x,y,radius,radiusFunction, null);
         }
 
-        public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction, Object data) {
+        public static <O> void doInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
             LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new LongArray();
