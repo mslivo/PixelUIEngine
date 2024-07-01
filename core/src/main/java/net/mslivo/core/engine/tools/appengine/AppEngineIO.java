@@ -8,6 +8,8 @@ public class AppEngineIO {
 
     public static final int PARAMETERS_MAX = 16;
     private static final String ERROR_PARAMETERS_MAX = String.format("Push exceeds maximum parameter limit of %s", PARAMETERS_MAX);
+    private static final String ERROR_INT_AUTOBOXING = "Integer autoboxed, use pushInt() instead of push()";
+    private static final String ERROR_FLOAT_AUTOBOXING = "Float autoboxed, use pushFloat() instead of push()";
     private static final String ERROR_PARAMETERS_COUNT = "Poll exceeds the parameter count of %s";
     int type;
     int readIndex, writeIndex;
@@ -25,10 +27,16 @@ public class AppEngineIO {
 
     public AppEngineIO push(Object parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
-        objectStack[writeIndex] = parameter;
-        parameterTypes[writeIndex] = PARAMETER_TYPE.OBJECT;
-        writeIndex++;
-        return this;
+        switch (parameter){
+            case Integer _ -> throw new RuntimeException(ERROR_FLOAT_AUTOBOXING);
+            case Float _ -> throw new RuntimeException(ERROR_INT_AUTOBOXING);
+            default -> {
+                objectStack[writeIndex] = parameter;
+                parameterTypes[writeIndex] = PARAMETER_TYPE.OBJECT;
+                writeIndex++;
+                return this;
+            }
+        }
     }
 
     public AppEngineIO push(Object parameter1, Object parameter2) {
@@ -55,23 +63,23 @@ public class AppEngineIO {
     }
 
     public AppEngineIO pushInt(int parameter1, int parameter2) {
-        push(parameter1);
-        push(parameter2);
+        pushInt(parameter1);
+        pushInt(parameter2);
         return this;
     }
 
     public AppEngineIO pushInt(int parameter1, int parameter2, int parameter3) {
-        push(parameter1);
-        push(parameter2);
-        push(parameter3);
+        pushInt(parameter1);
+        pushInt(parameter2);
+        pushInt(parameter3);
         return this;
     }
 
     public AppEngineIO pushInt(int parameter1, int parameter2, int parameter3, int parameter4) {
-        push(parameter1);
-        push(parameter2);
-        push(parameter3);
-        push(parameter4);
+        pushInt(parameter1);
+        pushInt(parameter2);
+        pushInt(parameter3);
+        pushInt(parameter4);
         return this;
     }
 
@@ -84,23 +92,23 @@ public class AppEngineIO {
     }
 
     public AppEngineIO pushFloat(float parameter1, float parameter2) {
-        push(parameter1);
-        push(parameter2);
+        pushFloat(parameter1);
+        pushFloat(parameter2);
         return this;
     }
 
     public AppEngineIO pushFloat(float parameter1, float parameter2, float parameter3) {
-        push(parameter1);
-        push(parameter2);
-        push(parameter3);
+        pushFloat(parameter1);
+        pushFloat(parameter2);
+        pushFloat(parameter3);
         return this;
     }
 
     public AppEngineIO pushFloat(float parameter1, float parameter2, float parameter3, float parameter4) {
-        push(parameter1);
-        push(parameter2);
-        push(parameter3);
-        push(parameter4);
+        pushFloat(parameter1);
+        pushFloat(parameter2);
+        pushFloat(parameter3);
+        pushFloat(parameter4);
         return this;
     }
 
