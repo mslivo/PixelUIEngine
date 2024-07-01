@@ -46,7 +46,7 @@ public class AppEngineIO {
         return this;
     }
 
-    public AppEngineIO push(int parameter) {
+    public AppEngineIO pushInt(int parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
         intStack[writeIndex] = parameter;
         parameterTypes[writeIndex] = PARAMETER_TYPE.INTEGER;
@@ -54,20 +54,20 @@ public class AppEngineIO {
         return this;
     }
 
-    public AppEngineIO push(int parameter1, int parameter2) {
+    public AppEngineIO pushInt(int parameter1, int parameter2) {
         push(parameter1);
         push(parameter2);
         return this;
     }
 
-    public AppEngineIO push(int parameter1, int parameter2, int parameter3) {
+    public AppEngineIO pushInt(int parameter1, int parameter2, int parameter3) {
         push(parameter1);
         push(parameter2);
         push(parameter3);
         return this;
     }
 
-    public AppEngineIO push(int parameter1, int parameter2, int parameter3, int parameter4) {
+    public AppEngineIO pushInt(int parameter1, int parameter2, int parameter3, int parameter4) {
         push(parameter1);
         push(parameter2);
         push(parameter3);
@@ -75,7 +75,7 @@ public class AppEngineIO {
         return this;
     }
 
-    public AppEngineIO push(float parameter) {
+    public AppEngineIO pushFloat(float parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
         floatStack[writeIndex] = parameter;
         parameterTypes[writeIndex] = PARAMETER_TYPE.FLOAT;
@@ -83,20 +83,20 @@ public class AppEngineIO {
         return this;
     }
 
-    public AppEngineIO push(float parameter1, float parameter2) {
+    public AppEngineIO pushFloat(float parameter1, float parameter2) {
         push(parameter1);
         push(parameter2);
         return this;
     }
 
-    public AppEngineIO push(float parameter1, float parameter2, float parameter3) {
+    public AppEngineIO pushFloat(float parameter1, float parameter2, float parameter3) {
         push(parameter1);
         push(parameter2);
         push(parameter3);
         return this;
     }
 
-    public AppEngineIO push(float parameter1, float parameter2, float parameter3, float parameter4) {
+    public AppEngineIO pushFloat(float parameter1, float parameter2, float parameter3, float parameter4) {
         push(parameter1);
         push(parameter2);
         push(parameter3);
