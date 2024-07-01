@@ -30,7 +30,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
             if (!particle.visible) continue;
             immediateRenderer.setVertexColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
-                case IMMEDAITE_POINT -> {
+                case IMMEDIATE_POINT -> {
                     immediateRenderer.vertex(particle.x, particle.y);
                 }
                 default -> {
@@ -44,13 +44,13 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
 
     /* ------- Point ------- */
     protected Particle<T> addParticle(float x, float y, float r, float g, float b) {
-        Particle<T> particle = particleNew(ParticleType.IMMEDAITE_POINT, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.IMMEDIATE_POINT, x, y, r, g, b, 1f, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected Particle<T> addParticle(float x, float y, float r, float g, float b, float a) {
-        Particle<T> particle = particleNew(ParticleType.IMMEDAITE_POINT, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
+        Particle<T> particle = particleNew(ParticleType.IMMEDIATE_POINT, x, y, r, g, b, a, 0, 0, 0, 0, 0, 0, null, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
