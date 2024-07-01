@@ -124,9 +124,9 @@ abstract class ParticleSystem<T>{
         deleteQueuedParticles();
     }
 
-    protected abstract void onParticleCreate(Particle<T> particle);
+    protected void onParticleCreate(Particle<T> particle){};
 
-    protected abstract void onParticleDestroy(Particle<T> particle);
+    protected void onParticleDestroy(Particle<T> particle){};
 
     protected abstract boolean updateParticle(Particle<T> particle, int index);
 
