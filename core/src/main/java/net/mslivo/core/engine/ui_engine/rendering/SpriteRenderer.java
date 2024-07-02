@@ -21,6 +21,66 @@ import net.mslivo.core.engine.media_manager.*;
  * https://github.com/tommyettinger/colorful-gdx/blob/master/colorful/src/test/java/com/github/tommyettinger/colorful/rgb/UISpriteBatch.java
  */
 public class SpriteRenderer implements Batch {
+    private static final String VERTEX_OUTlINE_SHADER = """
+            attribute vec4 a_position;
+            attribute vec4 a_color;
+            attribute vec2 a_texCoord0;
+            attribute vec4 a_hslt;
+            uniform mat4 u_projTrans;
+            varying vec4 v_hslt;
+            varying vec2 v_texCoords;
+                            
+            void main()
+            {
+               v_texCoords = a_texCoord0;
+               gl_Position =  u_projTrans * a_position;
+            }
+    """;
+
+    private static final String FRAGMENT_OUTLINE_SHADER = """
+            #ifdef GL_ES
+            #define LOWP lowp
+            precision mediump float;
+            #else
+            #define LOWP
+            #endif
+
+            varying vec2 v_texCoords;
+            uniform sampler2D u_texture;
+            uniform vec2 u_texSize;
+
+            void main() {
+                vec2 pixelCoord = gl_FragCoord.xy;
+                vec2 onePixel = 1.0 / u_texSize;
+                
+                // Check if the current pixel is inside the sprite
+                float centerAlpha = texture2D(u_texture, v_texCoords).a;
+                if(centerAlpha > 0.0){
+                    gl_FragColor = texture2D(u_texture, v_texCoords);
+                }else{
+                    vec2 pixelCoord = gl_FragCoord.xy;
+                    vec2 texCoord = pixelCoord / u_texSize;
+                    // Check neighboring pixels
+                    float leftAlpha = texture2D(u_texture, vec2(gl_FragCoord.xy.x-onePixel.x,gl_FragCoord.xy.y)).a;
+                    
+                    /*float rightAlpha = texture2D(u_texture, (uv + onePixel.x)).a;
+                    float topAlpha = texture2D(u_texture, (uv + vec2(0.0, onePixel.y))).a;
+                    float bottomAlpha = texture2D(u_texture, (uv - vec2(0.0, onePixel.y))).a;*/
+                    
+                    float rightAlpha = 0.0;
+                    float topAlpha = 0.0;
+                    float bottomAlpha = 0.0;
+                    
+                    if ((leftAlpha > 0.0)) {
+                        gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+                    } else {
+                        discard; // No outline needed
+                    }
+                }
+            }
+    """;
+
+
     private static final String VERTEX_SHADER = """
             attribute vec4 a_position;
             attribute vec4 a_color;
@@ -56,7 +116,7 @@ public class SpriteRenderer implements Batch {
             varying LOWP vec4 v_hslt;
             uniform sampler2D u_texture;
             const float eps = 1.0e-10;
-                                
+            
             vec4 rgb2hsl(vec4 c)
             {
                 const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -66,7 +126,7 @@ public class SpriteRenderer implements Batch {
                 float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
                 return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
             }
-                        
+            
             vec4 hsl2rgb(vec4 c)
             {
                 const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -90,6 +150,7 @@ public class SpriteRenderer implements Batch {
               gl_FragColor = color;
             }       
             """;
+
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
     public static final int SPRITE_SIZE = 24;
@@ -114,7 +175,7 @@ public class SpriteRenderer implements Batch {
     private int srcAlpha;
     private int dstAlpha;
     private ShaderProgram shader;
-    private boolean defaultShader;
+    private ShaderProgram outLineShader;
     private float backup_hslt;
     private float backup_color;
     private int backup_srcRGB;
@@ -122,7 +183,7 @@ public class SpriteRenderer implements Batch {
     private int backup_srcAlpha;
     private int backup_dstAlpha;
 
-    protected float color;
+    private float color;
     private MediaManager mediaManager;
     private int u_projTrans;
     private int u_texture;
@@ -130,29 +191,26 @@ public class SpriteRenderer implements Batch {
     public int totalRenderCalls;
     public int maxSpritesInBatch;
 
+    private Color outLineColor = Color.WHITE.cpy();
+    private int outLineWidth = 0;
+
 
     public SpriteRenderer() {
-        this(null, 1024, null);
+        this(null, 1024);
     }
 
     public SpriteRenderer(MediaManager mediaManager) {
-        this(mediaManager, 1024, null);
+        this(mediaManager, 1024);
     }
 
     public SpriteRenderer(MediaManager mediaManager, int size) {
-        this(mediaManager, size, null);
-    }
-
-    public SpriteRenderer(MediaManager mediaManager, int size, ShaderProgram shader) {
         if (size > 16383) throw new IllegalArgumentException("Can't have more than 16383 sprites per batch: " + size);
-        if (shader == null) {
-            this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-            if (!this.shader.isCompiled())
-                throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
-            defaultShader = true;
-        } else {
-            this.shader = shader;
-        }
+        this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+        if (!this.shader.isCompiled())
+            throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
+        this.outLineShader = new ShaderProgram(VERTEX_OUTlINE_SHADER, FRAGMENT_OUTLINE_SHADER);
+        if (!this.outLineShader.isCompiled())
+            throw new IllegalArgumentException("Error compiling shader: " + this.outLineShader.getLog());
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
         this.drawing = false;
@@ -359,7 +417,9 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
                      float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
+        if(true)return;
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+
 
         float[] vertices = this.vertices;
 
@@ -495,6 +555,8 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(Texture texture, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
                      int srcHeight, boolean flipX, boolean flipY) {
+        if(true)return;
+
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -558,6 +620,8 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
+        if(true)return;
+
         if (!drawing) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -609,6 +673,8 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y, float width, float height, float u, float v, float u2, float v2) {
+        if(true)return;
+
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -656,6 +722,7 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(Texture texture, float x, float y) {
+        if(true)return;
         draw(texture, x, y, texture.getWidth(), texture.getHeight());
     }
 
@@ -723,7 +790,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(Texture texture, float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
-
+        if(true)return;
         count = (count / 5) * 6;
         int verticesLength = vertices.length;
         int remainingVertices = verticesLength;
@@ -813,13 +880,58 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void draw(TextureRegion region, float x, float y) {
-        draw(region, x, y, region.getRegionWidth(), region.getRegionHeight());
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        float[] vertices = this.vertices;
+
+        Texture texture = region.getTexture();
+        if (texture != lastTexture) {
+            switchTexture(texture);
+        } else if (idx == vertices.length) {
+            flush();
+        }
+        final float fx2 = x;
+        final float fy2 = y;
+        final float u = region.getU();
+        final float v = region.getV2();
+        final float u2 = region.getU2();
+        final float v2 = region.getV();
+
+        final float color = this.color;
+        final float hslt = this.hslt;
+        final int idx = this.idx;
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = hslt;
+
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = hslt;
+
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = hslt;
+
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = hslt;
+        this.idx = idx + 24;
     }
 
     @Override
     public void draw(TextureRegion region, float x, float y, float width, float height) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
-
         float[] vertices = this.vertices;
 
         Texture texture = region.getTexture();
@@ -868,11 +980,33 @@ public class SpriteRenderer implements Batch {
         this.idx = idx + 24;
     }
 
+    public int getOutLineWidth() {
+        return outLineWidth;
+    }
+
+    public void setOutLineWidth(int outLineWidth) {
+        this.outLineWidth = outLineWidth;
+    }
+
     @Override
     public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                      float scaleX, float scaleY, float rotation) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if(outLineWidth > 0){
+            ShaderProgram shaderProgram = this.getShader();
+            setShader(outLineShader);
+            shader.setUniformMatrix(u_projTrans, combinedMatrix);
+            shader.setUniformi(u_texture, 0);
+            shader.setUniform2fv(shader.getUniformLocation("u_texSize"),new float[]{region.getRegionWidth(),region.getRegionHeight()},0,2);
+            drawInternal( region,  x,  y,  originX,  originY,  width,  height, scaleX,  scaleY,  rotation);
+            setShader(shaderProgram);
+        }
+        //drawInternal( region,  x,  y,  originX,  originY,  width,  height, scaleX,  scaleY,  rotation);
 
+    }
+
+    private void drawInternal(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
+                     float scaleX, float scaleY, float rotation) {
+        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
         float[] vertices = this.vertices;
 
         Texture texture = region.getTexture();
@@ -993,10 +1127,13 @@ public class SpriteRenderer implements Batch {
         this.idx = idx + 24;
     }
 
+
+
     @Override
     public void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
                      float scaleX, float scaleY, float rotation, boolean clockwise) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if(true) return;
 
         float[] vertices = this.vertices;
 
@@ -1137,6 +1274,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void draw(TextureRegion region, float width, float height, Affine2 transform) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if(true) return;
 
         float[] vertices = this.vertices;
 
@@ -1270,7 +1408,7 @@ public class SpriteRenderer implements Batch {
     @Override
     public void dispose() {
         mesh.dispose();
-        if (defaultShader && shader != null) shader.dispose();
+        if (shader != null) shader.dispose();
     }
 
     @Override
