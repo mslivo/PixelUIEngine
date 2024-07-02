@@ -5,26 +5,27 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
-abstract class ParticleSystem<T>{
+sealed abstract class ParticleSystem<T> permits ImmediateParticleSystem, SpriteParticleSystem{
 
     final ArrayList<Particle> particles;
     final ArrayDeque<Particle> deleteQueue;
     final int particleLimit;
     final ArrayDeque<Particle<T>> particlePool;
     final ParticleDataProvider<T> particleDataProvider;
+    final ParticleRenderHook<T> particleRenderHook;
 
     public interface ParticleConsumer<T,O> {
         default void accept(Particle<T> particle){};
         default void accept(Particle<T> particle, O data){};
     }
 
-    ParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider){
+    ParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider, ParticleRenderHook<T> particleRenderHook){
         this.particles = new ArrayList<>();
         this.deleteQueue = new ArrayDeque<>();
         this.particleLimit = Math.max(particleLimit, 0);
-        this.particleDataProvider = particleDataProvider;
+        this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {};
+        this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new ParticleRenderHook<T>() {};
         this.particlePool = new ArrayDeque<>(particleLimit);
     }
 
@@ -49,11 +50,7 @@ abstract class ParticleSystem<T>{
         particle.text = text;
         particle.animation_offset = animation_offset;
         particle.visible = visible;
-        if (this.particleDataProvider != null) {
-            if (particle.data == null) particle.data = particleDataProvider.provideNewInstance();
-        } else {
-            particle.data = null;
-        }
+        particle.data = particleDataProvider.provideNewInstance();
         return particle;
     }
 

@@ -8,18 +8,22 @@ import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 /*
  * Particle System must be extended and implemented
  */
-public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
+public abstract non-sealed class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
     private final MediaManager mediaManager;
     private Color backup;
     private Color backup_font;
 
     public SpriteParticleSystem(MediaManager mediaManager, int particleLimit) {
-        this(mediaManager, particleLimit, null);
+        this(mediaManager, particleLimit, null, null);
     }
 
     public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider) {
-        super(particleLimit, particleDataProvider);
+        this(mediaManager, particleLimit, particleDataProvider, null);
+    }
+
+    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider, ParticleRenderHook<T> particleRenderHook) {
+        super(particleLimit, particleDataProvider, particleRenderHook);
         this.mediaManager = mediaManager;
         backup = new Color();
         backup_font = new Color();
@@ -44,6 +48,7 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
             batch.setColor(particle.r, particle.g, particle.b, particle.a);
+            super.particleRenderHook.beforeRenderParticle(batch, particle);
             switch (particle.type) {
                 case SPRITE_FONT -> {
                     if (particle.text != null && particle.font != null) {
@@ -71,6 +76,7 @@ public abstract class SpriteParticleSystem<T> extends ParticleSystem<T> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
+            super.particleRenderHook.afterRenderParticle(batch, particle);
         }
         batch.setColor(backup);
     }

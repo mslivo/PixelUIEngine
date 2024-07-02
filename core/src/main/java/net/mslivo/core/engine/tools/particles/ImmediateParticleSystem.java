@@ -6,15 +6,19 @@ import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
 /*
  * Particle System must be extended and implemented
  */
-public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
+public abstract non-sealed class ImmediateParticleSystem<T> extends ParticleSystem<T> {
     private Color backup;
 
     public ImmediateParticleSystem(int particleLimit) {
-        this(particleLimit, null);
+        this(particleLimit, null, null);
     }
 
     public ImmediateParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider) {
-        super(particleLimit, particleDataProvider);
+        this(particleLimit, particleDataProvider, null);
+    }
+
+    public ImmediateParticleSystem(int particleLimit, ParticleDataProvider<T> particleDataProvider, ParticleRenderHook<T> particleRenderHook) {
+        super(particleLimit, particleDataProvider, particleRenderHook);
         backup = new Color();
     }
 
@@ -28,6 +32,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
+            particleRenderHook.beforeRenderParticle(immediateRenderer, particle);
             immediateRenderer.setVertexColor(particle.r, particle.g, particle.b, particle.a);
             switch (particle.type) {
                 case IMMEDIATE_POINT -> {
@@ -37,6 +42,7 @@ public abstract class ImmediateParticleSystem<T> extends ParticleSystem<T> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
                 }
             }
+            particleRenderHook.afterRenderParticle(immediateRenderer, particle);
         }
         immediateRenderer.setVertexColor(backup);
     }
