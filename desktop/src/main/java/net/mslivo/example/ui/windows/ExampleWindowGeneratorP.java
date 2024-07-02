@@ -93,7 +93,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Text text2 = api.component.text.create(2, 5, new String[]{"abcdefghijklmnopqrstuvwxyz"});
         Text text3 = api.component.text.create(2, 4, new String[]{"0123456789"});
         Text text4 = api.component.text.create(2, 3, new String[]{"¡!\"#$%&'()*+,-./:;<=>¿?@[\\]^_`{|}~¢£¤¥¦§¨©´·×÷€"});
-        Text text5 = api.component.text.create(2, 2, new String[]{"pPqQwyg"});
+        Text text5 = api.component.text.create(2, 2, new String[]{"pPqQwyga"
+                +Tools.Text.customChar(0)+Tools.Text.customChar(1)});
 
         ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
         api.window.addComponents(window, components.toArray(new Component[]{}));
