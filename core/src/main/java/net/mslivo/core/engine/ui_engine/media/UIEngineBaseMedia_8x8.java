@@ -87,6 +87,7 @@ public class UIEngineBaseMedia_8x8 {
     // Fonts
     public static final CMediaFont UI_FONT_BLACK = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_black.fnt", 0, 5);
     public static final CMediaFont UI_FONT_WHITE = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_white.fnt", 0, 5);
+    public static final CMediaFont UI_FONT_TINY = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_tiny.fnt", 0, 5);
 
     // Misc
     public static final CMediaImage UI_PIXEL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
@@ -168,6 +169,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_OSTEXTINPUT_SELECTED,
             UI_FONT_BLACK,
             UI_FONT_WHITE,
+            UI_FONT_TINY,
             UI_PIXEL
     };
 }
