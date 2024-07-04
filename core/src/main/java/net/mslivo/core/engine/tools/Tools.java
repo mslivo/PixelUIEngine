@@ -198,6 +198,8 @@ public class Tools {
         };
         private static final String[] percentDecimalText = new String[10001];
 
+        private static final StringBuilder numberBuilder = new StringBuilder();
+
         static {
             int index = 0;
             for (float i = 0; i <= 10_000; i += 1) {
@@ -223,14 +225,14 @@ public class Tools {
         }
 
         public static String formatNumber(long number) {
-            StringBuilder formattedNumber = new StringBuilder();
+            numberBuilder.setLength(0);
             String numberString = String.valueOf(number);
             int length = numberString.length();
             for (int i = 0; i < length; i++) {
-                if (i > 0 && (length - i) % 3 == 0) formattedNumber.append(".");
-                formattedNumber.append(numberString.charAt(i));
+                if (i > 0 && (length - i) % 3 == 0) numberBuilder.append(".");
+                numberBuilder.append(numberString.charAt(i));
             }
-            return formattedNumber.toString();
+            return numberBuilder.toString();
         }
 
         public static String formatPercent(float percent) {
