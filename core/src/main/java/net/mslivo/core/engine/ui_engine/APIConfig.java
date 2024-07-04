@@ -489,14 +489,6 @@ public final class APIConfig {
             uiConfig.tooltip_FadeInDelay = fadeInDelay;
         }
 
-        public Color getDefaultBorderColor() {
-            return uiConfig.tooltip_defaultBorderColor;
-        }
-
-        public void setDefaultBorderColor(Color tooltip_defaultBorderColor) {
-            uiConfig.tooltip_defaultBorderColor = tooltip_defaultBorderColor;
-        }
-
         public float getFadeOutSpeed() {
             return uiConfig.tooltip_FadeOutSpeed;
         }

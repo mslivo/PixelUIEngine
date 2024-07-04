@@ -2261,6 +2261,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height_reference = tooltip_height;
                 final int BORDER_NONE = -1;
                 for (int ty = 0; ty < segment.height; ty++) {
+                    if(segment.clear) continue;
                     int y_combined = iy + ty;
                     int borderIndex = BORDER_NONE;
                     if (segment.border) {
@@ -2319,7 +2320,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Draw line
-
+        render_batchSetColor(tooltip.color_line);
         switch (direction) {
             case LEFT, RIGHT -> {
                 int xOffset = direction == DIRECTION.RIGHT ? 0 : -TS2();

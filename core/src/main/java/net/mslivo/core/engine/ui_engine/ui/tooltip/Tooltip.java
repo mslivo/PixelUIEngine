@@ -11,5 +11,6 @@ public class Tooltip {
     public ArrayList<TooltipSegment> segments;
     public int minWidth;
     public Color color_border;
+    public Color color_line;
     public DIRECTION direction;
 }
