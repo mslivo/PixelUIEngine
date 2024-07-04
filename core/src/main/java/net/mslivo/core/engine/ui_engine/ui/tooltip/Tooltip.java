@@ -3,7 +3,6 @@ package net.mslivo.core.engine.ui_engine.ui.tooltip;
 import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class Tooltip {
