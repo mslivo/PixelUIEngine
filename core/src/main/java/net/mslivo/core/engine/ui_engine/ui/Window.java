@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
@@ -19,7 +20,7 @@ public class Window {
     public ArrayList<UpdateAction> updateActions;
     public String name;
     public Object data;
-    public float color_r, color_g, color_b, color_a;
+    public Color color;
     public boolean alwaysOnTop;
     public boolean folded;
     public boolean moveAble;

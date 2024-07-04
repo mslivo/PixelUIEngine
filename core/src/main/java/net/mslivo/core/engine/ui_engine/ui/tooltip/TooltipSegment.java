@@ -1,9 +1,10 @@
 package net.mslivo.core.engine.ui_engine.ui.tooltip;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
 
 public abstract class TooltipSegment {
-    public float color_r, color_g, color_b, color_a;
+    public Color color;
     public int width;
     public int height;
     public SEGMENT_ALIGNMENT alignment;

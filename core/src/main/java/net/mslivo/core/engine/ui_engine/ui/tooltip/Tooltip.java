@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.tooltip;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 
@@ -9,6 +10,6 @@ public class Tooltip {
     public ToolTipAction toolTipAction;
     public ArrayList<TooltipSegment> segments;
     public int minWidth;
-    public float color_border_r, color_border_g, color_border_b, color_border_a;
+    public Color color_border;
     public DIRECTION direction;
 }

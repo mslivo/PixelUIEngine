@@ -466,7 +466,7 @@ public final class APIComposites {
             api.component.button.setButtonAction(ok, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    selectColorFunction.accept(new Color(ok.color_r, ok.color_g, ok.color_b, 1f));
+                    selectColorFunction.accept(ok.color);
                     api.removeCurrentModalWindow();
                 }
             });

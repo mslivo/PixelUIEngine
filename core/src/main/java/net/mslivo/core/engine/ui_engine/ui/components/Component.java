@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.components;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
@@ -11,8 +12,8 @@ public abstract class Component {
     public int x, y, width, height;
     public Tooltip toolTip;
     public boolean updateToolTip;
-    public float color_r, color_g, color_b,color_a;
-    public float color2_r, color2_g, color2_b;
+    public Color color;
+    public Color color2;
     public boolean disabled;
     public boolean visible;
     public Tab addedToTab;

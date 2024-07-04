@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.notification;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.ui.actions.NotificationAction;
@@ -8,7 +9,7 @@ public class Notification {
     public STATE_NOTIFICATION state;
     public long timer;
     public String text;
-    public float color_r, color_g, color_b, color_a;
+    public Color color;
     public CMediaFont font;
     public int displayTime;
     public int scroll;

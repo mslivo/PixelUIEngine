@@ -41,10 +41,7 @@ public final class APINotification {
         Notification notification = new Notification();
         notification.text = Tools.Text.validString(text);
         notification.displayTime = displayTime;
-        notification.color_r = uiConfig.notification_defaultColor.r;
-        notification.color_g = uiConfig.notification_defaultColor.g;
-        notification.color_b = uiConfig.notification_defaultColor.b;
-        notification.color_a = uiConfig.notification_defaultColor.a;
+        notification.color = new Color(uiConfig.notification_defaultColor);
         notification.font = uiConfig.notification_defaultFont;
         notification.notificationAction = notificationAction;
         notification.timer = 0;
@@ -81,17 +78,9 @@ public final class APINotification {
         notification.displayTime = Math.max(displayTime, 0);
     }
 
-    public void setColor(Notification notification, float r, float g, float b, float a) {
-        if (notification == null) return;
-        notification.color_r = r;
-        notification.color_g = g;
-        notification.color_b = b;
-        notification.color_a = a;
-    }
-
     public void setColor(Notification notification, Color color) {
         if (notification == null || color == null) return;
-        setColor(notification, color.r, color.g, color.b, color.a);
+        notification.color.set(color);
     }
 
     public void setFont(Notification notification, CMediaFont font) {

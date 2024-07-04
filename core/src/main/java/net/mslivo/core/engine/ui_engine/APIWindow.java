@@ -72,10 +72,7 @@ public final class APIWindow {
         window.title = Tools.Text.validString(title);
         window.alwaysOnTop = alwaysOnTop;
         window.moveAble = moveAble;
-        window.color_r = uiConfig.window_defaultColor.r;
-        window.color_g = uiConfig.window_defaultColor.g;
-        window.color_b = uiConfig.window_defaultColor.b;
-        window.color_a = uiConfig.window_defaultColor.a;
+        window.color = new Color(uiConfig.window_defaultColor);
         window.font = uiConfig.window_defaultFont;
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
@@ -300,20 +297,12 @@ public final class APIWindow {
 
     public void setColor(Window window, Color color) {
         if (window == null || color == null) return;
-        setColor(window, color.r, color.g, color.b, color.a);
+        window.color.set(color);
     }
 
-    public void setColor(Window window, float r, float g, float b, float a) {
+    public void setAlpha(Window window, float alpha) {
         if (window == null) return;
-        window.color_r = r;
-        window.color_g = g;
-        window.color_b = b;
-        window.color_a = a;
-    }
-
-    public void setAlpha(Window window, float transparency) {
-        if (window == null) return;
-        window.color_a = transparency;
+        window.color.set(window.color.r,window.color.g,window.color.b, alpha);
     }
 
     public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {

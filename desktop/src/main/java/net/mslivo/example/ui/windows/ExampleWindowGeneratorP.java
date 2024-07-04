@@ -107,12 +107,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ScrollbarVertical scrollBarVertical = api.component.scrollbar.scrollbarVertical.create(2, 2, 12, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                window.color_a = scrolled;
+                window.color.a = scrolled;
             }
-        }, window.color_a);
+        }, window.color.a);
 
         Knob knob = api.component.knob.create(4, 2, null, false);
-        api.component.knob.setTurned(knob, knob.color_a);
+        api.component.knob.setTurned(knob, knob.color.a);
         KnobAction knobAction = new KnobAction() {
             @Override
             public void onTurned(float turned, float amount) {
@@ -138,23 +138,23 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ScrollbarHorizontal scrollBarHorizontalR = api.component.scrollbar.scrollbarHorizontal.create(4, 8, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color_r = scrolled;
+                oval.color.r = scrolled;
             }
-        }, oval.color_r);
+        }, oval.color.r);
         api.component.setColor1And2(scrollBarHorizontalR, Color.RED);
         ScrollbarHorizontal scrollBarHorizontalG = api.component.scrollbar.scrollbarHorizontal.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color_g = scrolled;
+                oval.color.g = scrolled;
             }
-        }, oval.color_g);
+        }, oval.color.g);
         api.component.setColor1And2(scrollBarHorizontalG, Color.GREEN);
         ScrollbarHorizontal scrollBarHorizontalB = api.component.scrollbar.scrollbarHorizontal.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color_b = scrolled;
+                oval.color.b = scrolled;
             }
-        }, oval.color_b);
+        }, oval.color.b);
         api.component.setColor1And2(scrollBarHorizontalB, Color.BLUE);
 
 
@@ -171,7 +171,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             @Override
             public void onRelease() {
                 Notification notification = api.notification.create(textField.content);
-                api.notification.setColor(notification, MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
+                api.notification.setColor(notification, new Color(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f));
 
                 api.notification.setNotificationAction(notification, new NotificationAction() {
                     @Override

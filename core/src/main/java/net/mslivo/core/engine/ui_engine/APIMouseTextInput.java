@@ -2,10 +2,10 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaFont;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 
@@ -52,13 +52,8 @@ public final class APIMouseTextInput {
         if (charactersLC == null || charactersUC == null) return;
         if (uiEngineState.openMouseTextInput != null) return;
         MouseTextInput mouseTextInput = new MouseTextInput();
-        mouseTextInput.color_r = uiConfig.mouseTextInput_defaultColor.r;
-        mouseTextInput.color_g = uiConfig.mouseTextInput_defaultColor.g;
-        mouseTextInput.color_b = uiConfig.mouseTextInput_defaultColor.b;
-        mouseTextInput.color_a = uiConfig.mouseTextInput_defaultColor.a;
-        mouseTextInput.color2_r = 0.5f;
-        mouseTextInput.color2_g = 0.5f;
-        mouseTextInput.color2_b = 0.5f;
+        mouseTextInput.color = new Color(uiConfig.mouseTextInput_defaultColor);
+        mouseTextInput.color2 = new Color(0.5f,0.5f,0.5f,1.0f);
         mouseTextInput.font = uiConfig.mouseTextInput_defaultFont;
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
@@ -141,34 +136,20 @@ public final class APIMouseTextInput {
         UICommonUtils.mouseTextInput_setCharacters(uiEngineState.openMouseTextInput, charactersLC, charactersUC);
     }
 
-    public void setAlpha(float a) {
+    public void setAlpha(float alpha) {
         if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.color_a = a;
+        Color color = uiEngineState.openMouseTextInput.color;
+        uiEngineState.openMouseTextInput.color.set(color.r, color.g, color.b, alpha);
     }
 
     public void setColor(Color color) {
         if (uiEngineState.openMouseTextInput == null) return;
-        setColor(color.r, color.g, color.b, color.a);
-    }
-
-    public void setColor(float r, float g, float b, float a) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.color_r = r;
-        uiEngineState.openMouseTextInput.color_g = g;
-        uiEngineState.openMouseTextInput.color_b = b;
-        uiEngineState.openMouseTextInput.color_a = a;
+        uiEngineState.openMouseTextInput.color.set(color);
     }
 
     public void setColor2(Color color2) {
         if (uiEngineState.openMouseTextInput == null) return;
-        setColor2(color2.r, color2.g, color2.b);
-    }
-
-    public void setColor2(float r, float g, float b) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.color2_r = r;
-        uiEngineState.openMouseTextInput.color2_g = g;
-        uiEngineState.openMouseTextInput.color2_b = b;
+        uiEngineState.openMouseTextInput.color2.set(color2);
     }
 
     public void setPosition(int x, int y) {

@@ -1153,10 +1153,7 @@ public final class APIComponent {
                 canvasImage.y = y;
                 canvasImage.fadeOut = fadeOut;
                 canvasImage.fadeOutSpeed = Math.max(fadeOutSpeed, 0);
-                canvasImage.color_r = Color.WHITE.r;
-                canvasImage.color_g = Color.WHITE.g;
-                canvasImage.color_b = Color.WHITE.b;
-                canvasImage.color_a = Color.WHITE.a;
+                canvasImage.color = new Color(Color.WHITE);
                 canvasImage.arrayIndex = Math.max(arrayIndex, 0);
                 canvasImage.name = Tools.Text.validString("");
                 canvasImage.data = null;
@@ -1190,16 +1187,9 @@ public final class APIComponent {
                 canvasImage.image = image;
             }
 
-            public void setColor(CanvasImage canvasImage, float r, float g, float b, float a) {
-                if (canvasImage == null) return;
-                canvasImage.color_r = r;
-                canvasImage.color_g = g;
-                canvasImage.color_b = b;
-                canvasImage.color_a = a;
-            }
-
             public void setColor(CanvasImage canvasImage, Color color) {
-                setColor(canvasImage, color.r, color.b, color.g, color.a);
+                if (canvasImage == null) return;
+                canvasImage.color.set(color);
             }
 
             public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
@@ -1508,9 +1498,7 @@ public final class APIComponent {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.font = uiConfig.component_defaultFont;
-                comboBoxItem.color_r = uiConfig.component_defaultColor.r;
-                comboBoxItem.color_g = uiConfig.component_defaultColor.g;
-                comboBoxItem.color_b = uiConfig.component_defaultColor.b;
+                comboBoxItem.color = new Color(uiConfig.component_defaultColor);
                 comboBoxItem.icon = icon;
                 comboBoxItem.iconIndex = Math.max(iconIndex, 0);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
@@ -1531,9 +1519,7 @@ public final class APIComponent {
 
             public void setColor(ComboboxItem comboBoxItem, Color color) {
                 if (comboBoxItem == null || color == null) return;
-                comboBoxItem.color_r = color.r;
-                comboBoxItem.color_g = color.g;
-                comboBoxItem.color_b = color.b;
+                comboBoxItem.color.set(color);
             }
 
             public void setFont(ComboboxItem comboBoxItem, CMediaFont font) {
@@ -1848,15 +1834,7 @@ public final class APIComponent {
 
     public void setColor(Component component, Color color) {
         if (component == null || color == null) return;
-        setColor(component, color.r, color.g, color.b, color.a);
-    }
-
-    public void setColor(Component component, float r, float g, float b, float a) {
-        if (component == null) return;
-        component.color_r = Math.clamp(r, 0f, 1f);
-        component.color_g = Math.clamp(g, 0f, 1f);
-        component.color_b = Math.clamp(b, 0f, 1f);
-        component.color_a = Math.clamp(a, 0f, 1f);
+        component.color.set(color);
     }
 
     public void setColor2(Component[] components, Color color2) {
@@ -1866,14 +1844,7 @@ public final class APIComponent {
 
     public void setColor2(Component component, Color color) {
         if (component == null || color == null) return;
-        setColor2(component, color.r, color.g, color.b);
-    }
-
-    public void setColor2(Component component, float r, float g, float b) {
-        if (component == null) return;
-        component.color2_r = Math.clamp(r, 0f, 1f);
-        component.color2_g = Math.clamp(g, 0f, 1f);
-        component.color2_b = Math.clamp(b, 0f, 1f);
+        component.color2.set(color);
     }
 
     public void setColor1And2(Component component, Color color) {
@@ -1892,7 +1863,7 @@ public final class APIComponent {
 
     public void setAlpha(Component component, float alpha) {
         if (component == null) return;
-        component.color_a = Math.clamp(alpha, 0f, 1f);
+        component.color.set(component.color.r,component.color.g,component.color.b,alpha);
     }
 
     public void setAlpha(Component[] components, float alpha) {
@@ -1959,13 +1930,8 @@ public final class APIComponent {
         component.y = (y * api.TS());
         component.width = width;
         component.height = height;
-        component.color_a = 1f;
-        component.color_r = color1.r;
-        component.color_g = color1.g;
-        component.color_b = color1.b;
-        component.color2_r = color2.r;
-        component.color2_g = color2.g;
-        component.color2_b = color2.b;
+        component.color = new Color(color1);
+        component.color2 = new Color(color2);
         component.disabled = false;
         component.updateActions = new ArrayList<>();
         component.data = null;
