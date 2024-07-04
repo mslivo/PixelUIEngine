@@ -453,7 +453,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         api.toolTip.segment.empty.create(),
                         api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.RIGHT,false,false),
                         api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2,0,Color.MAGENTA,SEGMENT_ALIGNMENT.CENTER,false,true),
-                },null,0,Color.RED,Color.BLUE
+                },null,0,Color.RED,Color.BLUE,5,DIRECTION.RIGHT
         ));
 
         ArrayList<Component> border = api.composites.image.createBorder(10, 4, 4, 4);

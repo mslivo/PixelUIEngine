@@ -2220,20 +2220,24 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (tooltip_width == 0 || tooltip_height == 0) return;
         // Determine Position
 
+        int lineLengthAbs = TS(tooltip.lineLength);
+
         DIRECTION direction = switch (tooltip.direction) {
             case RIGHT ->
-                    uiEngineState.mouse_ui.x + TS2() > uiEngineState.resolutionWidth - TS(tooltip_width) ? DIRECTION.LEFT : DIRECTION.RIGHT;
-            case LEFT -> uiEngineState.mouse_ui.x - TS(tooltip_width + 2) < 0 ? DIRECTION.RIGHT : DIRECTION.LEFT;
+                    uiEngineState.mouse_ui.x + lineLengthAbs > uiEngineState.resolutionWidth - TS(tooltip_width) ? DIRECTION.LEFT : DIRECTION.RIGHT;
+            case LEFT ->
+                    uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength) < 0 ? DIRECTION.RIGHT : DIRECTION.LEFT;
             case UP ->
-                    uiEngineState.mouse_ui.y + TS2() > uiEngineState.resolutionHeight - TS(tooltip_height) ? DIRECTION.DOWN : DIRECTION.UP;
-            case DOWN -> uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
+                    uiEngineState.mouse_ui.y + lineLengthAbs > uiEngineState.resolutionHeight - TS(tooltip_height) ? DIRECTION.DOWN : DIRECTION.UP;
+            case DOWN ->
+                    uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
         };
 
         int tooltip_x = switch (direction) {
             case RIGHT ->
-                    Math.clamp(uiEngineState.mouse_ui.x + TS2(), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+                    Math.clamp(uiEngineState.mouse_ui.x + lineLengthAbs, 0, uiEngineState.resolutionWidth - TS(tooltip_width));
             case LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
             case UP, DOWN ->
                     Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
         };
@@ -2242,9 +2246,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case RIGHT, LEFT ->
                     Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
             case UP ->
-                    Math.clamp(uiEngineState.mouse_ui.y + TS2(), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
             case DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
         };
 
 
@@ -2261,7 +2265,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height_reference = tooltip_height;
                 final int BORDER_NONE = -1;
                 for (int ty = 0; ty < segment.height; ty++) {
-                    if(segment.clear) continue;
                     int y_combined = iy + ty;
                     int borderIndex = BORDER_NONE;
                     if (segment.border) {
@@ -2278,10 +2281,17 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         }
                     }
 
+                    // Background
+                    if (!segment.clear) {
+                        for (int tx = 0; tx < tooltip_width; tx++) {
+                            render_batchSetColor(segment.color, segmentAlpha);
+                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
+                        }
+                    }
+
+                    // Border
                     for (int tx = 0; tx < tooltip_width; tx++) {
-                        render_batchSetColor(segment.color, segmentAlpha);
-                        uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
-                        render_batchSetColor(tooltip.color_border,borderAlpha);
+                        render_batchSetColor(tooltip.color_border, borderAlpha);
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
                         if (borderIndex != BORDER_NONE) {
                             uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), borderIndex);
@@ -2321,10 +2331,27 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Draw line
         render_batchSetColor(tooltip.color_line);
+        for(int i=0;i<tooltip.lineLength;i++) {
+            int xOffset = switch (direction) {
+                case LEFT -> -TS(i+1);
+                case RIGHT -> TS(i);
+                case UP,DOWN -> 0;
+            };
+            int yOffset = switch (direction){
+                case LEFT, RIGHT -> 0;
+                case UP -> TS(i);
+                case DOWN -> -TS(i+1);
+            };
+            CMediaImage sprite = switch (direction){
+                case LEFT,RIGHT -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL;
+                case UP,DOWN -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL;
+            };
+            uiEngineState.spriteRenderer_ui.drawCMediaImage(sprite, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y + yOffset);
+        }
         switch (direction) {
             case LEFT, RIGHT -> {
-                int xOffset = direction == DIRECTION.RIGHT ? 0 : -TS2();
-                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
+
+
             }
             case UP, DOWN -> {
                 int yOffset = direction == DIRECTION.UP ? 0 : -TS2();

@@ -12,5 +12,6 @@ public class Tooltip {
     public int minWidth;
     public Color color_border;
     public Color color_line;
+    public int lineLength;
     public DIRECTION direction;
 }
