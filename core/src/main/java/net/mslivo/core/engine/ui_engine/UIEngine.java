@@ -1737,7 +1737,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-
         // Fade In
         if (uiEngineState.tooltip != null) {
             if (uiEngineState.tooltip_wait_delay) {
@@ -1783,8 +1782,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     notification.state = STATE_NOTIFICATION.DISPLAY;
                 }
                 case SCROLL -> {
-                    notification.timer ++;
-                    if(notification.timer > 30){
+                    notification.timer++;
+                    if (notification.timer > 30) {
                         notification.scroll += MathUtils.round(uiEngineState.config.notification_scrollSpeed);
                         if (notification.scroll >= notification.scrollMax) {
                             notification.timer = 0;
@@ -1795,20 +1794,21 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
                 case DISPLAY -> {
                     notification.timer++;
-                    if(notification.timer > notification.displayTime){
+                    if (notification.timer > notification.displayTime) {
                         notification.timer = 0;
                         notification.state = STATE_NOTIFICATION.FADEOUT;
                     }
                 }
                 case FADEOUT -> {
                     notification.timer++;
-                    if(notification.timer > uiEngineState.config.notification_fadeoutTime){
+                    if (notification.timer > uiEngineState.config.notification_fadeoutTime) {
                         notification.timer = 0;
                         notification.state = STATE_NOTIFICATION.FINISHED;
                         UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
                     }
                 }
-                case FINISHED -> {}
+                case FINISHED -> {
+                }
             }
         }
     }
@@ -2206,7 +2206,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawTooltip() {
         Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
-        if(tooltip == null) return;
+        if (tooltip == null) return;
         if (tooltip.segments.isEmpty()) return;
         ArrayList<TooltipSegment> segments = tooltip.segments;
 
@@ -2220,14 +2220,34 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
         if (tooltip_width == 0 || tooltip_height == 0) return;
         // Determine Position
-        boolean drawRight = (uiEngineState.mouse_ui.x + (TS(tooltip_width + 2)) <= uiEngineState.resolutionWidth);
-        int tooltip_x;
-        if (drawRight) {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x + TS2(), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
-        } else {
-            tooltip_x = Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
-        }
-        int tooltip_y = Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+
+        DIRECTION direction = switch (tooltip.direction) {
+            case RIGHT ->
+                    uiEngineState.mouse_ui.x + TS2() > uiEngineState.resolutionWidth - TS(tooltip_width) ? DIRECTION.LEFT : DIRECTION.RIGHT;
+            case LEFT -> uiEngineState.mouse_ui.x - TS(tooltip_width + 2) < 0 ? DIRECTION.RIGHT : DIRECTION.LEFT;
+            case UP ->
+                    uiEngineState.mouse_ui.y + TS2() > uiEngineState.resolutionHeight - TS(tooltip_height) ? DIRECTION.DOWN : DIRECTION.UP;
+            case DOWN -> uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
+        };
+
+        int tooltip_x = switch (direction) {
+            case RIGHT ->
+                    Math.clamp(uiEngineState.mouse_ui.x + TS2(), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+            case LEFT ->
+                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+            case UP, DOWN ->
+                    Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+        };
+
+        int tooltip_y = switch (direction) {
+            case RIGHT,LEFT ->
+                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+            case UP ->
+                    Math.clamp(uiEngineState.mouse_ui.y + TS2(), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+            case DOWN ->
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height+2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+
+        };
 
 
         // Draw tooltip
@@ -2300,8 +2320,18 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Draw line
-        int xOffset = drawRight ? 0 : -TS2();
-        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
+
+        switch (direction) {
+            case LEFT, RIGHT -> {
+                int xOffset = direction == DIRECTION.RIGHT ? 0 : -TS2();
+                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y);
+            }
+            case UP, DOWN -> {
+                int yOffset = direction == DIRECTION.UP ? 0 : -TS2();
+                uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL, uiEngineState.mouse_ui.x , uiEngineState.mouse_ui.y+yOffset);
+
+            }
+        }
 
         render_batchSetColorWhite();
     }
@@ -2559,7 +2589,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 for (int i = (canvas.canvasImages.size() - 1); i >= 0; i--) {
                     CanvasImage canvasImage = canvas.canvasImages.get(i);
                     if (canvasImage.fadeOut) {
-                        canvasImage.color_a = Math.clamp(canvasImage.color_a - canvasImage.fadeOutSpeed, 0f,1f);
+                        canvasImage.color_a = Math.clamp(canvasImage.color_a - canvasImage.fadeOutSpeed, 0f, 1f);
                         if (canvasImage.color_a <= 0) {
                             canvas.canvasImages.remove(i);
                             continue;
@@ -2830,13 +2860,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.spriteRenderer_ui.setLightness(enabled ? 0.45f : 0.5f);
     }
 
-    private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
-        render_drawFont(font, text, alpha, x, y, 0, 0, FONT_MAXWIDTH_NONE, null, 0);
-    }
-
     private int render_textWidth(CMediaFont font, String text) {
         if (font == null || text == null || text.length() == 0) return 0;
         return mediaManager.getCMediaFontTextWidth(font, text);
+    }
+
+    private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y) {
+        render_drawFont(font, text, alpha, x, y, 0, 0, FONT_MAXWIDTH_NONE, null, 0);
     }
 
     private void render_drawFont(CMediaFont font, String text, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex) {

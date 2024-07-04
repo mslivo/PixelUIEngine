@@ -38,7 +38,8 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_TOOLTIP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip.png", TL, TL);
     public static final CMediaArray UI_TOOLTIP_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_border.png", TL, TL);
     public static final CMediaArray UI_TOOLTIP_SEGMENT_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_segment_border.png", TL, TL);
-    public static final CMediaImage UI_TOOLTIP_LINE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line.png");
+    public static final CMediaImage UI_TOOLTIP_LINE_HORIZONTAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_horizontal.png");
+    public static final CMediaImage UI_TOOLTIP_LINE_VERTICAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_vertical.png");
     public static final CMediaArray UI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu.png", TL, TL);
     public static final CMediaArray UI_CONTEXT_MENU_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_selected.png", TL, TL);
     public static final CMediaArray UI_TEXTFIELD = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield.png", TL, TL);
@@ -125,7 +126,8 @@ public class UIEngineBaseMedia_8x8 {
             UI_TOOLTIP,
             UI_TOOLTIP_SEGMENT_BORDER,
             UI_TOOLTIP_BORDER,
-            UI_TOOLTIP_LINE,
+            UI_TOOLTIP_LINE_HORIZONTAL,
+            UI_TOOLTIP_LINE_VERTICAL,
             UI_CONTEXT_MENU,
             UI_CONTEXT_MENU_SELECTED,
             UI_TEXTFIELD,

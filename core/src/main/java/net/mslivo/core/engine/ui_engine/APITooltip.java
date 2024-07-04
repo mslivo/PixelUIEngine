@@ -6,6 +6,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -36,24 +37,24 @@ public final class APITooltip {
 
     public Tooltip create(TooltipSegment[] segments) {
         return create(segments, defaultToolTipAction(), 0,
-                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a, DIRECTION.RIGHT);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
         return create(segments, toolTipAction, 0,
-                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a, DIRECTION.RIGHT);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth) {
         return create(segments, toolTipAction, minWidth,
-                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a);
+                uiConfig.tooltip_defaultBorderColor.r, uiConfig.tooltip_defaultBorderColor.g, uiConfig.tooltip_defaultBorderColor.b, uiConfig.tooltip_defaultBorderColor.a, DIRECTION.RIGHT);
     }
 
-    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, Color color) {
-        return create(segments, toolTipAction, minWidth, color.r, color.g, color.b, color.a);
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, Color borderColor) {
+        return create(segments, toolTipAction, minWidth, borderColor.r, borderColor.g, borderColor.b, borderColor.a, DIRECTION.RIGHT);
     }
 
-    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, float borderColor_r, float borderColor_g, float borderColor_b, float borderColor_a) {
+    public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, float borderColor_r, float borderColor_g, float borderColor_b, float borderColor_a, DIRECTION direction) {
         Tooltip tooltip = new Tooltip();
         tooltip.segments = new ArrayList<>();
         tooltip.color_border_r = borderColor_r;
@@ -70,6 +71,7 @@ public final class APITooltip {
             }
         }
         tooltip.toolTipAction = toolTipAction;
+        tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
     }
 
