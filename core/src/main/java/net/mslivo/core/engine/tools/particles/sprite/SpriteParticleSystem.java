@@ -205,6 +205,10 @@ public abstract class SpriteParticleSystem<T>{
         return this.particles.size() < particleLimit;
     }
 
+    public int particleCount() {
+        return this.particles.size();
+    }
+
     private void addParticleToSystem(SpriteParticle<T> particle) {
         if (particle == null) return;
         onParticleCreate(particle);

@@ -185,6 +185,10 @@ public abstract class PrimitiveParticleSystem<T> {
         deleteQueuedParticles();
     }
 
+    public int particleCount() {
+        return this.particles.size();
+    }
+
     public void forEveryParticle(ImmediateParticleConsumer<T,?> consumer) {
         forEveryParticle(consumer, null);
     }
