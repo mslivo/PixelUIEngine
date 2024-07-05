@@ -1,10 +1,10 @@
-package net.mslivo.core.engine.tools.particles;
+package net.mslivo.core.engine.tools.particles.sprite;
 
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 
-public class Particle<D> {
-    public ParticleType type;
+public class SpriteParticle<D> {
+    public SpriteParticleType type;
     public float x, y;
     public float r, g, b, a;
     public float rotation, scaleX, scaleY;
