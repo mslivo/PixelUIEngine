@@ -2,8 +2,8 @@ package net.mslivo.core.engine.tools.particles.immediate;
 
 import com.badlogic.gdx.utils.FloatArray;
 
-public class ImmediateParticle<D> {
-    public ImmediateParticleType type;
+public class PrimitiveParticle<D> {
+    public int primitiveType;
     public FloatArray x = new FloatArray();
     public FloatArray y = new FloatArray();
     public FloatArray color_r = new FloatArray();

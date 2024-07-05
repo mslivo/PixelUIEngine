@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.NumberUtils;
 
-public class ImmediateRenderer {
+public class PrimitiveRenderer {
 
     private static final String VERTEX = """
                 attribute vec4 a_position;
@@ -73,8 +73,9 @@ public class ImmediateRenderer {
                 }
             """;
 
-    private static final String ERROR_END_BEGIN = "ImmediateRenderer.end must be called before begin.";
-    private static final String ERROR_BEGIN_END = "ImmediateRenderer.begin must be called before end.";
+    private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
+    private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
+    private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     public static final String HSLT_ATTRIBUTE = "a_hslt";
     public static final String COLOR_ATTRIBUTE = "a_color";
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
@@ -109,7 +110,7 @@ public class ImmediateRenderer {
     private int backup_srcAlpha;
     private int backup_dstAlpha;
 
-    public ImmediateRenderer() {
+    public PrimitiveRenderer() {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
@@ -183,7 +184,7 @@ public class ImmediateRenderer {
     }
 
     public void vertex(float x, float y, float z) {
-        if (!drawing) throw new IllegalStateException("ImmediateRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
         checkMeshSize();
         vertices[idx] = x;
         vertices[idx + 1] = y;

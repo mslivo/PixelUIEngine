@@ -11,7 +11,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
-import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -28,7 +28,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private float animation_timer;
     private boolean resetPressed;
     private SpriteRenderer batch;
-    private ImmediateRenderer immediateRenderer;
+    private PrimitiveRenderer primitiveRenderer;
 
     public ExampleUIEngineAdapter() {
     }
@@ -47,7 +47,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
         this.batch = new SpriteRenderer(mediaManager);
-        this.immediateRenderer = new ImmediateRenderer();
+        this.primitiveRenderer = new PrimitiveRenderer();
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         Environment environment = new Environment();
@@ -140,52 +140,52 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         batch.end();
 
 
-        immediateRenderer.setColor(Color.WHITE);
+        primitiveRenderer.setColor(Color.WHITE);
         if (IM_PERFORMANCE_TEST) {
-            immediateRenderer.setProjectionMatrix(camera.combined);
+            primitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.currentTimeMillis();
             final int VERTEXES = 10000;
-            immediateRenderer.begin();
+            primitiveRenderer.begin();
             for (int i = 0; i < VERTEXES; i++) {
                 for (int ix = 0; ix < 10; ix++) {
                     for (int iy = 0; iy < 10; iy++) {
-                        immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                        immediateRenderer.vertex(100 + ix, 100 + iy);
+                        primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                        primitiveRenderer.vertex(100 + ix, 100 + iy);
                     }
                 }
             }
-            immediateRenderer.end();
+            primitiveRenderer.end();
             System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
 
         }
 
 
-        immediateRenderer.setProjectionMatrix(camera.combined);
-        immediateRenderer.begin();
+        primitiveRenderer.setProjectionMatrix(camera.combined);
+        primitiveRenderer.begin();
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {
-                immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                immediateRenderer.vertex(100 + ix, 100 + iy);
+                primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                primitiveRenderer.vertex(100 + ix, 100 + iy);
             }
         }
-        immediateRenderer.end();
+        primitiveRenderer.end();
 
 
-        immediateRenderer.begin(GL20.GL_LINES);
+        primitiveRenderer.begin(GL20.GL_LINES);
         for (int ix = 0; ix < 10; ix++) {
             for (int iy = 0; iy < 10; iy++) {
-                immediateRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                immediateRenderer.vertex(0, 0);
-                immediateRenderer.vertex(100 + ix, 100 + iy);
+                primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
+                primitiveRenderer.vertex(0, 0);
+                primitiveRenderer.vertex(100 + ix, 100 + iy);
             }
         }
-        immediateRenderer.end();
+        primitiveRenderer.end();
 
-        immediateRenderer.begin(GL20.GL_TRIANGLES);
-        immediateRenderer.vertex(0, 0);
-        immediateRenderer.vertex(100, 100);
-        immediateRenderer.vertex(200, 0);
-        immediateRenderer.end();
+        primitiveRenderer.begin(GL20.GL_TRIANGLES);
+        primitiveRenderer.vertex(0, 0);
+        primitiveRenderer.vertex(100, 100);
+        primitiveRenderer.vertex(200, 0);
+        primitiveRenderer.end();
 
 
     }

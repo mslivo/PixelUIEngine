@@ -1,6 +1,5 @@
 package net.mslivo.core.engine.tools.particles.sprite;
 
-import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public interface SpriteParticleRenderHook<T> {
