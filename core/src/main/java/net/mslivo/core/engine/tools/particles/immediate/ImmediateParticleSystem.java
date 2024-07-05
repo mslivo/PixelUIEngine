@@ -2,7 +2,6 @@ package net.mslivo.core.engine.tools.particles.immediate;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
-import net.mslivo.core.engine.tools.particles.sprite.SpriteParticle;
 import net.mslivo.core.engine.ui_engine.rendering.ImmediateRenderer;
 import org.lwjgl.opengl.GL20;
 
@@ -115,8 +114,8 @@ public abstract class ImmediateParticleSystem<T> {
             switch (particle.type) {
                 case IMMEDIATE_POINTS -> {
                     configureImmediateRenderer(immediateRenderer, GL20.GL_POINT);
-                    immediateRenderer.setVertexColor(particle.vxColorR.get(0), particle.vxColorG.get(0), particle.vxColorB.get(0), particle.vxColorA.get(0));
-                    immediateRenderer.vertex(particle.vxX.get(0), particle.vxY.get(0));
+                    immediateRenderer.setVertexColor(particle.color_r.get(0), particle.color_g.get(0), particle.color_b.get(0), particle.color_a.get(0));
+                    immediateRenderer.vertex(particle.x.get(0), particle.y.get(0));
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
@@ -195,12 +194,12 @@ public abstract class ImmediateParticleSystem<T> {
     }
 
     private void addVertex(ImmediateParticle<T> particle, float x, float y, float r, float g, float b, float a) {
-        particle.vxX.add(x);
-        particle.vxY.add(y);
-        particle.vxColorR.add(r);
-        particle.vxColorG.add(g);
-        particle.vxColorB.add(b);
-        particle.vxColorA.add(a);
+        particle.x.add(x);
+        particle.y.add(y);
+        particle.color_r.add(r);
+        particle.color_g.add(g);
+        particle.color_b.add(b);
+        particle.color_a.add(a);
     }
 
 
@@ -208,12 +207,12 @@ public abstract class ImmediateParticleSystem<T> {
         if (!canAddParticle()) return null;
         ImmediateParticle<T> particle = particlePool.size() > 0 ? particlePool.pop() : new ImmediateParticle<>();
         particle.type = type;
-        particle.vxX.clear();
-        particle.vxY.clear();
-        particle.vxColorR.clear();
-        particle.vxColorG.clear();
-        particle.vxColorB.clear();
-        particle.vxColorA.clear();
+        particle.x.clear();
+        particle.y.clear();
+        particle.color_r.clear();
+        particle.color_g.clear();
+        particle.color_b.clear();
+        particle.color_a.clear();
         particle.visible = visible;
         particle.data = particle.data == null ? particleDataProvider.provideNewInstance() : particle.data;
         if (particle.data != null) particleDataProvider.resetInstance(particle.data);

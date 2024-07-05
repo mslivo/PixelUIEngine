@@ -4,12 +4,12 @@ import com.badlogic.gdx.utils.FloatArray;
 
 public class ImmediateParticle<D> {
     public ImmediateParticleType type;
-    public FloatArray vxX = new FloatArray();
-    public FloatArray vxY = new FloatArray();
-    public FloatArray vxColorR= new FloatArray();
-    public FloatArray vxColorG= new FloatArray();
-    public FloatArray vxColorB= new FloatArray();
-    public FloatArray vxColorA= new FloatArray();
+    public FloatArray x = new FloatArray();
+    public FloatArray y = new FloatArray();
+    public FloatArray color_r = new FloatArray();
+    public FloatArray color_g = new FloatArray();
+    public FloatArray color_b = new FloatArray();
+    public FloatArray color_a = new FloatArray();
     public boolean visible;
     public D data;
 }
