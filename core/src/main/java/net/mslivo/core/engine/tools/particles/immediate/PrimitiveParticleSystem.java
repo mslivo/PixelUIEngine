@@ -22,9 +22,16 @@ public abstract class PrimitiveParticleSystem<T> {
     private final Color backupColor;
     private int backupPrimitiveType;
 
-    public interface ImmediateParticleConsumer<T,O> {
-        default void accept(PrimitiveParticle<T> particle){};
-        default void accept(PrimitiveParticle<T> particle, O data){};
+    public interface ImmediateParticleConsumer<T, O> {
+        default void accept(PrimitiveParticle<T> particle) {
+        }
+
+        ;
+
+        default void accept(PrimitiveParticle<T> particle, O data) {
+        }
+
+        ;
     }
 
     public PrimitiveParticleSystem(int particleLimit) {
@@ -57,6 +64,14 @@ public abstract class PrimitiveParticleSystem<T> {
         return particle;
     }
 
+    protected PrimitiveParticle<T> addPointParticle(float x1, float y1, Color color1) {
+        return addPointParticle(x1, y1, color1.r, color1.g, color1.b, color1.a);
+    }
+
+    protected PrimitiveParticle<T> addPointParticle(float x1, float y1, Color color1, float a1) {
+        return addPointParticle(x1, y1, color1.r, color1.g, color1.b, a1);
+    }
+
     /* ------- Line ------- */
 
     protected PrimitiveParticle<T> addLineParticle(
@@ -68,6 +83,24 @@ public abstract class PrimitiveParticleSystem<T> {
         addVertex(particle, x2, y2, r2, g2, b2, a2);
         addParticleToSystem(particle);
         return particle;
+    }
+
+    protected PrimitiveParticle<T> addLineParticle(
+            float x1, float y1, Color color1,
+            float x2, float y2, Color color2
+    ) {
+        return addLineParticle(
+                x1, y1, color1.r, color1.g, color1.b, color1.a,
+                x2, y2, color2.r, color2.g, color2.b, color2.a);
+    }
+
+    protected PrimitiveParticle<T> addLineParticle(
+            float x1, float y1, Color color1, float a1,
+            float x2, float y2, Color color2, float a2
+    ) {
+        return addLineParticle(
+                x1, y1, color1.r, color1.g, color1.b, a1,
+                x2, y2, color2.r, color2.g, color2.b, a2);
     }
 
     /* ------- Triangle ------- */
@@ -83,6 +116,30 @@ public abstract class PrimitiveParticleSystem<T> {
         addVertex(particle, x3, y3, r3, g3, b3, a3);
         addParticleToSystem(particle);
         return particle;
+    }
+
+    protected PrimitiveParticle<T> addTriangleParticle(
+            float x1, float y1, Color color1,
+            float x2, float y2, Color color2,
+            float x3, float y3, Color color3
+    ) {
+        return addTriangleParticle(
+                x1, y1, color1.r, color1.g, color1.b, color1.a,
+                x2, y2, color2.r, color2.g, color2.b, color2.a,
+                x3, y3, color3.r, color3.g, color3.b, color3.a
+        );
+    }
+
+    protected PrimitiveParticle<T> addTriangleParticle(
+            float x1, float y1, Color color1, float a1,
+            float x2, float y2, Color color2, float a2,
+            float x3, float y3, Color color3, float a3
+    ) {
+        return addTriangleParticle(
+                x1, y1, color1.r, color1.g, color1.b, a1,
+                x2, y2, color2.r, color2.g, color2.b, a2,
+                x3, y3, color3.r, color3.g, color3.b, a3
+        );
     }
 
     /* ------- Public Methods ------- */
@@ -127,7 +184,7 @@ public abstract class PrimitiveParticleSystem<T> {
                     primitiveRenderer.setVertexColor(particle.color_r.get(1), particle.color_g.get(1), particle.color_b.get(1), particle.color_a.get(1));
                     primitiveRenderer.vertex(particle.x.get(1), particle.y.get(1));
                 }
-                case GL20.GL_TRIANGLES ->{
+                case GL20.GL_TRIANGLES -> {
                     configureImmediateRenderer(primitiveRenderer, GL20.GL_TRIANGLES);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.color_r.get(0), particle.color_g.get(0), particle.color_b.get(0), particle.color_a.get(0));
@@ -140,7 +197,7 @@ public abstract class PrimitiveParticleSystem<T> {
                     primitiveRenderer.vertex(particle.x.get(2), particle.y.get(2));
                 }
                 default -> {
-                    throw new RuntimeException("Primitive Particle Type \""+particle.primitiveType+"\" not supported by " + this.getClass().getSimpleName());
+                    throw new RuntimeException("Primitive Particle Type \"" + particle.primitiveType + "\" not supported by " + this.getClass().getSimpleName());
                 }
             }
             particleRenderHook.afterRenderParticle(primitiveRenderer, particle);
@@ -189,14 +246,14 @@ public abstract class PrimitiveParticleSystem<T> {
         return this.particles.size();
     }
 
-    public void forEveryParticle(ImmediateParticleConsumer<T,?> consumer) {
+    public void forEveryParticle(ImmediateParticleConsumer<T, ?> consumer) {
         forEveryParticle(consumer, null);
     }
 
-    public <O> void forEveryParticle(ImmediateParticleConsumer<T,O> consumer, O data) {
-        if(data != null) {
+    public <O> void forEveryParticle(ImmediateParticleConsumer<T, O> consumer, O data) {
+        if (data != null) {
             for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
-        }else{
+        } else {
             for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
         }
     }
