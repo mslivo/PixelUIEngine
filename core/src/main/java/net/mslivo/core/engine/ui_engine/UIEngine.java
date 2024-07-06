@@ -109,6 +109,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         //  ----- Paramters
         newUIEngineState.resolutionWidth = Math.max(resolutionWidth, 16);
         newUIEngineState.resolutionHeight = Math.max(resolutionHeight, 16);
+        newUIEngineState.resolutionWidthHalf = MathUtils.round(resolutionWidth/2f);
+        newUIEngineState.resolutionHeightHalf = MathUtils.round(resolutionHeight/2f);
         newUIEngineState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newUIEngineState.gamePadSupport = gamePadSupport;
         newUIEngineState.sizeSize = tileSize;
@@ -119,7 +121,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // -----  App
         newUIEngineState.camera_app = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_app.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.camera_app.position.set((newUIEngineState.resolutionWidth / 2), (newUIEngineState.resolutionHeight / 2), 0);
+        newUIEngineState.camera_app.position.set(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeightHalf, 0);
         newUIEngineState.camera_app.zoom = 1f;
         newUIEngineState.camera_app.update();
         newUIEngineState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, true);
@@ -203,7 +205,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedCheckBox = null;
         // ----- Controls
         newUIEngineState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
-        newUIEngineState.mouse_ui = new GridPoint2(newUIEngineState.resolutionWidth / 2, newUIEngineState.resolutionHeight / 2);
+        newUIEngineState.mouse_ui = new GridPoint2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
         newUIEngineState.mouse_app = new GridPoint2(0, 0);
         newUIEngineState.mouse_delta = new Vector2(0, 0);
         newUIEngineState.lastUIMouseHover = null;
@@ -215,7 +217,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.displayOverrideCursor = false;
         newUIEngineState.vector_fboCursor = new Vector3(0, 0, 0);
         newUIEngineState.vector2_unproject = new Vector2(0, 0);
-        newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidth / 2, newUIEngineState.resolutionHeight / 2);
+        newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
         newUIEngineState.emulatedMouseLastMouseClick = 0;
         newUIEngineState.keyBoardMouseSpeedUp = new Vector2(0, 0);
         newUIEngineState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};

@@ -47,6 +47,7 @@ public final class UIEngineState {
 
     /* ################ Constructor Parameters ################# */
     public int resolutionWidth, resolutionHeight;
+    public int resolutionWidthHalf, resolutionHeightHalf;
     public VIEWPORT_MODE viewportMode;
     public boolean gamePadSupport;
     public TILE_SIZE sizeSize;

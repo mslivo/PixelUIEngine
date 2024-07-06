@@ -396,8 +396,16 @@ public final class API {
         return uiEngineState.resolutionWidth;
     }
 
+    public int resolutionWidthHalf() {
+        return uiEngineState.resolutionWidthHalf;
+    }
+
     public int resolutionHeight() {
         return uiEngineState.resolutionHeight;
+    }
+
+    public int resolutionHeightHalf() {
+        return uiEngineState.resolutionHeightHalf;
     }
 
     public float animationTimer(){

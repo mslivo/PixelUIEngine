@@ -228,8 +228,8 @@ final class UICommonUtils {
     }
 
     static void window_center(UIEngineState uiEngineState, Window window) {
-        int centerX = (uiEngineState.resolutionWidth / 2) - (uiEngineState.sizeSize.TL(window.width) / 2);
-        int centerY = (uiEngineState.resolutionHeight / 2) - ((window.folded ? uiEngineState.sizeSize.TS : uiEngineState.sizeSize.TL(window.height)) / 2);
+        int centerX = (uiEngineState.resolutionWidthHalf) - (uiEngineState.sizeSize.TL(window.width) / 2);
+        int centerY = (uiEngineState.resolutionHeightHalf) - ((window.folded ? uiEngineState.sizeSize.TS : uiEngineState.sizeSize.TL(window.height)) / 2);
         window_setPosition(uiEngineState, window, centerX, centerY);
     }
 
