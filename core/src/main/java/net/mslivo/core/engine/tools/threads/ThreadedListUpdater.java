@@ -42,7 +42,6 @@ public class ThreadedListUpdater<T> {
         if(updateObjects.size() != updateObjectsSizeLast){
             // Resize
             int itemsPerWorker = updateObjects.size() / threadCount;
-            int itemsMod = updateObjects.size() % threadCount;
             for (int it = 0; it < threadCount; it++) {
                 int fromIndex = it * itemsPerWorker;
                 int toIndex = (it == threadCount - 1) ? updateObjects.size() - 1 : fromIndex + itemsPerWorker - 1;
