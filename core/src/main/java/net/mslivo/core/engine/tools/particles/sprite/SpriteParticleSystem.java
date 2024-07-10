@@ -4,10 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.particles.*;
+import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticle;
+import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticleSystem;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /*
  * Particle System must be extended and implemented
@@ -23,10 +26,14 @@ public abstract class SpriteParticleSystem<T>{
     private final ArrayDeque<SpriteParticle<T>> particlePool;
     private final ParticleDataProvider<T> particleDataProvider;
     private final SpriteParticleRenderHook<T> particleRenderHook;
+    private final SpriteParticleConsumer<Object> parallelConsumer;
 
-    public interface SpriteParticleConsumer<T,O> {
-        default void accept(SpriteParticle<T> particle){};
-        default void accept(SpriteParticle<T> particle, O data){};
+    public interface SpriteParticleConsumer<O> extends Consumer<SpriteParticle> {
+        default void accept(SpriteParticle particle) {
+        }
+
+        default void accept(SpriteParticle particle, O data) {
+        }
     }
 
     public SpriteParticleSystem(MediaManager mediaManager, int particleLimit){
@@ -43,6 +50,16 @@ public abstract class SpriteParticleSystem<T>{
         this.particleLimit = Math.max(particleLimit, 0);
         this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {};
         this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new SpriteParticleRenderHook<T>() {};
+        this.parallelConsumer = new SpriteParticleConsumer<Object>() {
+            @Override
+            public void accept(SpriteParticle particle) {
+                if (!SpriteParticleSystem.this.updateParticle(particle)) {
+                    synchronized (deleteQueue) {
+                        deleteQueue.add(particle);
+                    }
+                }
+            }
+        };
         this.particlePool = new ArrayDeque<>(particleLimit);
         this.mediaManager = mediaManager;
         this.backupColor = new Color();
@@ -135,11 +152,17 @@ public abstract class SpriteParticleSystem<T>{
         return mediaManager;
     }
 
+    public void updateParallel() {
+        if (particles.size() == 0) return;
+        particles.parallelStream().forEach(this.parallelConsumer);
+        deleteQueuedParticles();
+    }
+
     public void update() {
         if (particles.size() == 0) return;
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = particles.get(i);
-            if (!updateParticle(particle, i)) {
+            if (!updateParticle(particle)) {
                 deleteQueue.add(particle);
             }
         }
@@ -227,18 +250,13 @@ public abstract class SpriteParticleSystem<T>{
     }
 
 
-    public void forEveryParticle(SpriteParticleConsumer<T,?> consumer) {
-        forEveryParticle(consumer, null);
+    public void forEachParticle(SpriteParticleConsumer consumer) {
+        for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
     }
 
-    public <O> void forEveryParticle(SpriteParticleConsumer<T,O> consumer, O data) {
-        if(data != null) {
-            for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
-        }else{
-            for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
-        }
+    public <O> void forEachParticle(SpriteParticleConsumer consumer, O data) {
+        for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
     }
-
 
     /* ------- Private Methods ------- */
 
@@ -259,7 +277,8 @@ public abstract class SpriteParticleSystem<T>{
 
     private SpriteParticle particleNew(SpriteParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaSprite appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
         if (!canAddParticle()) return null;
-        SpriteParticle<T> particle = particlePool.size() > 0 ? particlePool.pop() : new SpriteParticle<>();
+        SpriteParticle<T> particle = particlePool.poll();
+        if(particle == null) particle = new SpriteParticle<>();
         particle.type = type;
         particle.x = x;
         particle.y = y;
@@ -289,6 +308,6 @@ public abstract class SpriteParticleSystem<T>{
 
     protected void onParticleDestroy(SpriteParticle<T> particle){};
 
-    protected abstract boolean updateParticle(SpriteParticle<T> particle, int index);
+    protected abstract boolean updateParticle(SpriteParticle<T> particle);
 
 }

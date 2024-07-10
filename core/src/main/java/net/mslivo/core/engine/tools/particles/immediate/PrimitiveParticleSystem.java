@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL20;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /*
  * Particle System must be extended and implemented
@@ -21,17 +22,14 @@ public abstract class PrimitiveParticleSystem<T> {
     private final PrimitiveParticleRenderHook<T> particleRenderHook;
     private final Color backupColor;
     private int backupPrimitiveType;
+    private final PrimitiveParticleConsumer<Object> parallelConsumer;
 
-    public interface ImmediateParticleConsumer<T, O> {
-        default void accept(PrimitiveParticle<T> particle) {
+    public interface PrimitiveParticleConsumer<O> extends Consumer<PrimitiveParticle> {
+        default void accept(PrimitiveParticle particle) {
         }
 
-        ;
-
-        default void accept(PrimitiveParticle<T> particle, O data) {
+        default void accept(PrimitiveParticle particle, O data) {
         }
-
-        ;
     }
 
     public PrimitiveParticleSystem(int particleLimit) {
@@ -49,6 +47,16 @@ public abstract class PrimitiveParticleSystem<T> {
         this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {
         };
         this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new PrimitiveParticleRenderHook<T>() {
+        };
+        this.parallelConsumer = new PrimitiveParticleConsumer<>() {
+            @Override
+            public void accept(PrimitiveParticle particle) {
+                if (!PrimitiveParticleSystem.this.updateParticle(particle)) {
+                    synchronized (deleteQueue) {
+                        deleteQueue.add(particle);
+                    }
+                }
+            }
         };
         this.particlePool = new ArrayDeque<>(particleLimit);
         this.backupColor = new Color(Color.WHITE);
@@ -144,11 +152,17 @@ public abstract class PrimitiveParticleSystem<T> {
 
     /* ------- Public Methods ------- */
 
+    public void updateParallel() {
+        if (particles.size() == 0) return;
+        particles.parallelStream().forEach(this.parallelConsumer);
+        deleteQueuedParticles();
+    }
+
     public void update() {
         if (particles.size() == 0) return;
         for (int i = 0; i < particles.size(); i++) {
             PrimitiveParticle<T> particle = particles.get(i);
-            if (!updateParticle(particle, i)) {
+            if (!updateParticle(particle)) {
                 deleteQueue.add(particle);
             }
         }
@@ -246,18 +260,13 @@ public abstract class PrimitiveParticleSystem<T> {
         return this.particles.size();
     }
 
-    public void forEveryParticle(ImmediateParticleConsumer<T, ?> consumer) {
-        forEveryParticle(consumer, null);
+    public void forEachParticle(PrimitiveParticleConsumer consumer) {
+        for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
     }
 
-    public <O> void forEveryParticle(ImmediateParticleConsumer<T, O> consumer, O data) {
-        if (data != null) {
-            for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
-        } else {
-            for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i));
-        }
+    public <O> void forEachParticle(PrimitiveParticleConsumer<O> consumer, O data) {
+        for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
     }
-
 
     /* ------- Private Methods ------- */
 
@@ -288,7 +297,8 @@ public abstract class PrimitiveParticleSystem<T> {
 
     private PrimitiveParticle particleNew(int primitiveType, boolean visible) {
         if (!canAddParticle()) return null;
-        PrimitiveParticle<T> particle = particlePool.size() > 0 ? particlePool.pop() : new PrimitiveParticle<>();
+        PrimitiveParticle<T> particle = particlePool.poll();
+        if(particle == null) particle = new PrimitiveParticle<>();
         particle.primitiveType = primitiveType;
         particle.x.clear();
         particle.y.clear();
@@ -310,6 +320,6 @@ public abstract class PrimitiveParticleSystem<T> {
     protected void onParticleDestroy(PrimitiveParticle<T> particle) {
     }
 
-    protected abstract boolean updateParticle(PrimitiveParticle<T> particle, int index);
+    protected abstract boolean updateParticle(PrimitiveParticle<T> particle);
 
 }
