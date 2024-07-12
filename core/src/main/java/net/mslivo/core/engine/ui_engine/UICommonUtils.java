@@ -316,8 +316,9 @@ final class UICommonUtils {
         // Notification Collision
         for (int i = 0; i < uiEngineState.notifications.size(); i++) {
             Notification notification = uiEngineState.notifications.get(i);
-            if (notification.notificationAction != null && Tools.Calc.pointRectsCollide(x, y,
-                    0, uiEngineState.resolutionWidth - uiEngineState.sizeSize.TL(i + 1),
+            if(!notification.clickAble) continue;
+            if (Tools.Calc.pointRectsCollide(x, y,
+                    0, uiEngineState.resolutionHeight - uiEngineState.sizeSize.TL(i + 1),
                     uiEngineState.resolutionWidth, uiEngineState.sizeSize.TS)) {
                 return notification;
             }

@@ -10,6 +10,7 @@ public class Notification {
     public long timer;
     public String text;
     public Color color;
+    public boolean clickAble;
     public CMediaFont font;
     public int displayTime;
     public int scroll;

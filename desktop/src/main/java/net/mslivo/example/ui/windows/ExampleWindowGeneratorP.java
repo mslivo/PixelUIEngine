@@ -586,7 +586,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem));
+                api.addNotification(api.notification.create("Selected: " + listItem,null, true));
                 return true;
             }
 

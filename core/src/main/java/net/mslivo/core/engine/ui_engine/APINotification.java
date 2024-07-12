@@ -30,17 +30,22 @@ public final class APINotification {
     }
 
     public Notification create(String text) {
-        return create(text, defaultNotificationAction(), uiConfig.notification_defaultDisplayTime);
+        return create(text, defaultNotificationAction(), false, uiConfig.notification_defaultDisplayTime);
     }
 
     public Notification create(String text, NotificationAction notificationAction) {
-        return create(text, notificationAction, uiConfig.notification_defaultDisplayTime);
+        return create(text, notificationAction, false, uiConfig.notification_defaultDisplayTime);
     }
 
-    public Notification create(String text, NotificationAction notificationAction, int displayTime) {
+    public Notification create(String text, NotificationAction notificationAction, boolean clickAble) {
+        return create(text, notificationAction,clickAble, uiConfig.notification_defaultDisplayTime);
+    }
+
+    public Notification create(String text, NotificationAction notificationAction, boolean clickAble, int displayTime) {
         Notification notification = new Notification();
         notification.text = Tools.Text.validString(text);
-        notification.displayTime = displayTime;
+        notification.clickAble = clickAble;
+        notification.displayTime = Math.max(displayTime,0);
         notification.color = new Color(uiConfig.notification_defaultColor);
         notification.font = uiConfig.notification_defaultFont;
         notification.notificationAction = notificationAction;

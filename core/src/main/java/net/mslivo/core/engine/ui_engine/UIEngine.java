@@ -1098,7 +1098,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
             if (processMouseClick) {
-
                 Window moveWindow = null;
                 boolean isMouseLeftButton = uiEngineState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT];
                 if (isMouseLeftButton) {
@@ -1821,6 +1820,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
         if (commonActions != null) commonActions.onMouseClick(button);
         if (uiObject instanceof Component component) {
+            // Execute for parent window too
             actions_executeOnMouseClickCommonAction(component.addedToWindow, button);
         }
     }
