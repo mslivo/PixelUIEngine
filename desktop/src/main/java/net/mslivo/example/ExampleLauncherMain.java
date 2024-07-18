@@ -7,6 +7,7 @@ public class ExampleLauncherMain {
 
     public static void main(String[] args) {
 
+
         Tools.App.launch(
                 new ExampleMain(),
                 ExampleMainConstants.APP_TITLE,

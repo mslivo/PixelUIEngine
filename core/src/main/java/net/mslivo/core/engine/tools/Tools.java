@@ -189,24 +189,8 @@ public class Tools {
 
 
     public static class Text {
-        private static final String[] percentText = new String[]{
-                "0%", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9%", "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%", "20%",
-                "21%", "22%", "23%", "24%", "25%", "26%", "27%", "28%", "29%", "30%", "31%", "32%", "33%", "34%", "35%", "36%", "37%", "38%", "39%", "40%",
-                "41%", "42%", "43%", "44%", "45%", "46%", "47%", "48%", "49%", "50%", "51%", "52%", "53%", "54%", "55%", "56%", "57%", "58%", "59%", "60%",
-                "61%", "62%", "63%", "64%", "65%", "66%", "67%", "68%", "69%", "70%", "71%", "72%", "73%", "74%", "75%", "76%", "77%", "78%", "79%", "80%",
-                "81%", "82%", "83%", "84%", "85%", "86%", "87%", "88%", "89%", "90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%"
-        };
-        private static final String[] percentDecimalText = new String[10001];
 
         private static final StringBuilder numberBuilder = new StringBuilder();
-
-        static {
-            int index = 0;
-            for (float i = 0; i <= 10_000; i += 1) {
-                percentDecimalText[index] = String.format("%.2f%%", i / 100f);
-                index += 1;
-            }
-        }
 
         public static String[] toArray(String text) {
             return toArray(text, true);
@@ -235,12 +219,14 @@ public class Tools {
             return numberBuilder.toString();
         }
 
+
         public static String formatPercent(float percent) {
-            return percentText[(int) (percent * 100)];
+            return String.format("%.0f%%", percent * 100f);
+
         }
 
         public static String formatPercentDecimal(float percentDecimal) {
-            return percentDecimalText[(int) (percentDecimal * 10000)];
+            return String.format("%.2f%%", percentDecimal * 100f);
         }
 
         public static String customChar(int number) {
@@ -560,13 +546,17 @@ public class Tools {
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
         public interface DoInRadiusFunction<O> {
-            default boolean doInRadiusContinue(int x, int y, O data){
+            default boolean doInRadiusContinue(int x, int y, O data) {
                 return false;
-            };
+            }
 
-            default boolean doInRadiusContinue(int x, int y){
+            ;
+
+            default boolean doInRadiusContinue(int x, int y) {
                 return false;
-            };
+            }
+
+            ;
         }
 
         private static void doInRadiusInternal(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
@@ -582,7 +572,7 @@ public class Tools {
         }
 
         public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
-            doInRadius(x,y,radius,radiusFunction, null);
+            doInRadius(x, y, radius, radiusFunction, null);
         }
 
         public static <O> void doInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
@@ -604,16 +594,16 @@ public class Tools {
                 doInRadiusCache.put(radius, cached);
             }
 
-            if(data != null){
+            if (data != null) {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)),y + ((int) positions),data))
+                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)), y + ((int) positions), data))
                         return;
                 }
-            }else{
+            } else {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)),y + ((int) positions)))
+                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)), y + ((int) positions)))
                         return;
                 }
             }
