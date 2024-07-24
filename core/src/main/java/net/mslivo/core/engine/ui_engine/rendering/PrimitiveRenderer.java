@@ -255,6 +255,10 @@ public class PrimitiveRenderer {
         setVertexColor(vertexColor.r, vertexColor.g, vertexColor.b, vertexColor.a);
     }
 
+    public void setVertexColor(Color vertexColor, float a) {
+        setVertexColor(vertexColor.r, vertexColor.g, vertexColor.b, a);
+    }
+
     public void setVertexColor(float r, float g, float b) {
         setVertexColor(r, g, b, 1f);
     }
@@ -269,6 +273,10 @@ public class PrimitiveRenderer {
 
     public void setColor(Color color) {
         setColor(color.r, color.g, color.b, color.a);
+    }
+
+    public void setColor(Color color, float a) {
+        setColor(color.r, color.g, color.b, a);
     }
 
     public void setPackedColor(float color) {

@@ -546,24 +546,20 @@ public class Tools {
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
         public interface DoInRadiusFunction<O> {
-            default boolean doInRadiusContinue(int x, int y, O data) {
+            default boolean doInRadiusContinue(int x_center, int y_center, int x, int y, O data) {
                 return false;
             }
 
-            ;
-
-            default boolean doInRadiusContinue(int x, int y) {
+            default boolean doInRadiusContinue(int x_center, int y_center, int x, int y) {
                 return false;
             }
-
-            ;
         }
 
         private static void doInRadiusInternal(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
             for (int iy = -radius; iy <= radius; iy++) {
                 for (int ix = -radius; ix <= radius; ix++) {
                     if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!radiusFunction.doInRadiusContinue(x + ix, y + iy)) {
+                        if (!radiusFunction.doInRadiusContinue(x,y,x + ix, y + iy)) {
                             return;
                         }
                     }
@@ -597,13 +593,13 @@ public class Tools {
             if (data != null) {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)), y + ((int) positions), data))
+                    if (!radiusFunction.doInRadiusContinue(x,y,x + ((int) (positions >> 32)), y + ((int) positions), data))
                         return;
                 }
             } else {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x + ((int) (positions >> 32)), y + ((int) positions)))
+                    if (!radiusFunction.doInRadiusContinue(x,y, x + ((int) (positions >> 32)), y + ((int) positions)))
                         return;
                 }
             }

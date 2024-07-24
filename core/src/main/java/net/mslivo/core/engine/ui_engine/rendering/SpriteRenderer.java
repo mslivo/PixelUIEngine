@@ -240,6 +240,10 @@ public class SpriteRenderer implements Batch {
         setColor(color.r, color.g, color.b, color.a);
     }
 
+    public void setColor(Color color, float a) {
+        setColor(color.r, color.g, color.b, a);
+    }
+
     @Override
     public void setColor(float r, float g, float b, float a) {
         color = rgbPacked(r, g, b, a);
