@@ -28,8 +28,8 @@ public class AppEngineIO {
     public AppEngineIO push(Object parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
         switch (parameter){
-            case Integer _ -> throw new RuntimeException(ERROR_FLOAT_AUTOBOXING);
-            case Float _ -> throw new RuntimeException(ERROR_INT_AUTOBOXING);
+            case Integer _ -> throw new RuntimeException(ERROR_INT_AUTOBOXING);
+            case Float _ -> throw new RuntimeException(ERROR_FLOAT_AUTOBOXING);
             case null, default -> {
                 objectStack[writeIndex] = parameter;
                 parameterTypes[writeIndex] = PARAMETER_TYPE.OBJECT;
