@@ -121,7 +121,6 @@ public class SpriteRenderer implements Batch {
     private int backup_dstRGB;
     private int backup_srcAlpha;
     private int backup_dstAlpha;
-
     protected float color;
     private MediaManager mediaManager;
     private int u_projTrans;
@@ -129,6 +128,7 @@ public class SpriteRenderer implements Batch {
     public int renderCalls;
     public int totalRenderCalls;
     public int maxSpritesInBatch;
+    private boolean glBlendEnabled;
 
 
     public SpriteRenderer() {
@@ -222,6 +222,10 @@ public class SpriteRenderer implements Batch {
         shader.bind();
         setupMatrices();
 
+        this.glBlendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
+        if(!this.glBlendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+
         drawing = true;
     }
 
@@ -231,6 +235,8 @@ public class SpriteRenderer implements Batch {
         if (idx > 0) flush();
         lastTexture = null;
         drawing = false;
+
+        if(!this.glBlendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
 
         Gdx.gl.glDepthMask(true);
     }
@@ -1189,9 +1195,6 @@ public class SpriteRenderer implements Batch {
 
         renderCalls++;
         totalRenderCalls++;
-
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(this.srcRGB, this.dstRGB, this.srcAlpha, this.dstAlpha);
 
         int spritesInBatch = idx / SPRITE_SIZE;
         if (spritesInBatch > maxSpritesInBatch) maxSpritesInBatch = spritesInBatch;

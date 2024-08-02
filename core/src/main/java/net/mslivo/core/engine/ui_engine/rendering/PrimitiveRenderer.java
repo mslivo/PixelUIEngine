@@ -109,6 +109,7 @@ public class PrimitiveRenderer {
     private int backup_dstRGB;
     private int backup_srcAlpha;
     private int backup_dstAlpha;
+    private boolean glBlendEnabled;
 
     public PrimitiveRenderer() {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
@@ -134,6 +135,7 @@ public class PrimitiveRenderer {
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = new float[MESH_SIZE_VERTICES];
         this.mesh = createMesh(MESH_SIZE_VERTICES);
+        this.glBlendEnabled = false;
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -156,12 +158,21 @@ public class PrimitiveRenderer {
         shader.bind();
         shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
 
+
+        // Blending
+        this.glBlendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
+        if(!glBlendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+
         this.drawing = true;
     }
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (idx > 0) flush();
+
+        if(!glBlendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
+
         this.drawing = false;
     }
 
@@ -171,11 +182,9 @@ public class PrimitiveRenderer {
         renderCalls++;
         totalRenderCalls++;
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
-
         mesh.setVertices(vertices, 0, idx);
         mesh.render(shader, this.primitiveType);
+
         idx = 0;
     }
 
