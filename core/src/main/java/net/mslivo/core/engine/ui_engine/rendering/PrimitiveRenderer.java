@@ -185,7 +185,7 @@ public class PrimitiveRenderer {
 
     public void vertex(float x, float y, float z) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        checkMeshSize();
+        checkMeshSize(1);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = z;
@@ -195,15 +195,66 @@ public class PrimitiveRenderer {
     }
 
     public void vertex(float x, float y) {
-        vertex(x, y, 0f);
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
+        checkMeshSize(1);
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
     }
+
+    public void vertex(float x1, float y1,float x2, float y2) {
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
+        checkMeshSize(2);
+        vertices[idx++] = x1;
+        vertices[idx++] = y1;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
+
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
+    }
+
+    public void vertex(float x1, float y1,float x2, float y2,float x3, float y3) {
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
+        checkMeshSize(3);
+        vertices[idx++] = x1;
+        vertices[idx++] = y1;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
+
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
+
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = 0;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
+    }
+
 
     public boolean isDrawing() {
         return drawing;
     }
 
-    private void checkMeshSize() {
-        if ((idx + VERTEX_SIZE) > mesh.getMaxVertices()) {
+    private void checkMeshSize(int factor) {
+        if ((idx + (VERTEX_SIZE*factor)) > mesh.getMaxVertices()) {
             int newSize = mesh.getMaxVertices() + MESH_SIZE_VERTICES;
             float[] newVertices = new float[newSize];
             System.arraycopy(vertices, 0, newVertices, 0, vertices.length);
