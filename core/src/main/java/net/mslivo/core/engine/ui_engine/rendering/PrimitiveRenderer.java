@@ -266,12 +266,10 @@ public class PrimitiveRenderer {
     }
 
     private Mesh createMesh(int vertices) {
-        return new Mesh(false, vertices, MESH_SIZE_INDICES,
-                new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+        return new Mesh(Mesh.VertexDataType.VertexArray,true,vertices, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE)
-        );
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE));
     }
 
     private float rgbPacked(float red, float green, float blue, float alpha) {

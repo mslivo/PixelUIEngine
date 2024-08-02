@@ -178,7 +178,7 @@ public class SpriteRenderer implements Batch {
         this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
-                false, size * 4, size * 6,
+                true, size * 4, size * 6,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
