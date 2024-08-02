@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.particles.immediate;
+package net.mslivo.core.engine.tools.particles.primitive;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
@@ -51,7 +51,7 @@ public abstract class PrimitiveParticleSystem<T> {
         this.parallelConsumer = new PrimitiveParticleConsumer<>() {
             @Override
             public void accept(PrimitiveParticle particle) {
-                if (!PrimitiveParticleSystem.this.updateParticle(particle)) {
+                if (particle != null && !PrimitiveParticleSystem.this.updateParticle(particle)) {
                     synchronized (deleteQueue) {
                         deleteQueue.add(particle);
                     }
@@ -298,7 +298,7 @@ public abstract class PrimitiveParticleSystem<T> {
     private PrimitiveParticle particleNew(int primitiveType, boolean visible) {
         if (!canAddParticle()) return null;
         PrimitiveParticle<T> particle = particlePool.poll();
-        if(particle == null) particle = new PrimitiveParticle<>();
+        if (particle == null) particle = new PrimitiveParticle<>();
         particle.primitiveType = primitiveType;
         particle.x.clear();
         particle.y.clear();

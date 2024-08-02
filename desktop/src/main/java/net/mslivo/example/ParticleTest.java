@@ -2,15 +2,12 @@ package net.mslivo.example;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticle;
-import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticleSystem;
+import net.mslivo.core.engine.tools.particles.primitive.PrimitiveParticle;
+import net.mslivo.core.engine.tools.particles.primitive.PrimitiveParticleSystem;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 

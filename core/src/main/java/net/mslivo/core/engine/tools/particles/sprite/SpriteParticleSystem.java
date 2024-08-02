@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.particles.*;
-import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticle;
-import net.mslivo.core.engine.tools.particles.immediate.PrimitiveParticleSystem;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 import java.util.ArrayDeque;
@@ -50,10 +48,10 @@ public abstract class SpriteParticleSystem<T>{
         this.particleLimit = Math.max(particleLimit, 0);
         this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {};
         this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new SpriteParticleRenderHook<T>() {};
-        this.parallelConsumer = new SpriteParticleConsumer<Object>() {
+        this.parallelConsumer = new SpriteParticleConsumer<>() {
             @Override
             public void accept(SpriteParticle particle) {
-                if (!SpriteParticleSystem.this.updateParticle(particle)) {
+                if (particle!= null && !SpriteParticleSystem.this.updateParticle(particle)) {
                     synchronized (deleteQueue) {
                         deleteQueue.add(particle);
                     }

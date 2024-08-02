@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.particles.immediate;
+package net.mslivo.core.engine.tools.particles.primitive;
 
 import com.badlogic.gdx.utils.FloatArray;
 
