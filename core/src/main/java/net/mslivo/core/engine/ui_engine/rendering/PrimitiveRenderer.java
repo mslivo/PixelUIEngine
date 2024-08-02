@@ -186,13 +186,12 @@ public class PrimitiveRenderer {
     public void vertex(float x, float y, float z) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
         checkMeshSize();
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = z;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = hslt;
-        idx += VERTEX_SIZE;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = z;
+        vertices[idx++] = vertexColor;
+        vertices[idx++] = color;
+        vertices[idx++] = hslt;
     }
 
     public void vertex(float x, float y) {

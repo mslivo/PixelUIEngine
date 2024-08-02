@@ -465,35 +465,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x1;
+        vertices[idx++] = y1;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = x4;
+        vertices[idx++] = y4;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -529,35 +527,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = fx2;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -580,35 +576,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = fx2;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -627,35 +621,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = fx2;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -683,35 +675,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = fx2;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     /**
@@ -841,35 +831,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = fx2;
+        vertices[idx++] = fy2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -966,35 +954,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x1;
+        vertices[idx ++] = y1;
+        vertices[idx ++] = color;
+        vertices[idx ++] = u;
+        vertices[idx ++] = v;
+        vertices[idx ++] = hslt;
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx ++] = x2;
+        vertices[idx ++] = y2;
+        vertices[idx ++] = color;
+        vertices[idx ++] = u;
+        vertices[idx ++] = v2;
+        vertices[idx ++] = hslt;
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx ++] = x3;
+        vertices[idx ++] = y3;
+        vertices[idx ++] = color;
+        vertices[idx ++] = u2;
+        vertices[idx ++] = v2;
+        vertices[idx ++] = hslt;
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx ++] = x4;
+        vertices[idx ++] = y4;
+        vertices[idx ++] = color;
+        vertices[idx ++] = u2;
+        vertices[idx ++] = v;
+        vertices[idx ++] = hslt;
     }
 
     @Override
@@ -1107,35 +1093,33 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u1;
-        vertices[idx + 4] = v1;
-        vertices[idx + 5] = hslt;
+        vertices[idx++] = x1;
+        vertices[idx++] = y1;
+        vertices[idx++] = color;
+        vertices[idx++] = u1;
+        vertices[idx++] = v1;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u2;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u3;
-        vertices[idx + 16] = v3;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u3;
+        vertices[idx++] = v3;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u4;
-        vertices[idx + 22] = v4;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = x4;
+        vertices[idx++] = y4;
+        vertices[idx++] = color;
+        vertices[idx++] = u4;
+        vertices[idx++] = v4;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -1168,35 +1152,34 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
-        final int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = hslt;
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = hslt;
+        vertices[idx++] = x1;
+        vertices[idx++] = y1;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = hslt;
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = hslt;
-        this.idx = idx + 24;
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
+
+        vertices[idx++] = x4;
+        vertices[idx++] = y4;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @SuppressWarnings("RedundantCast") // These casts are absolutely not redundant! Java 9 changed Buffer ABI.
@@ -1344,49 +1327,49 @@ public class SpriteRenderer implements Batch {
     /* ----- CMediaImage ----- */
 
     public void drawCMediaImage(CMediaImage cMedia, float x, float y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, 0, 0, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaImage(CMediaImage cMedia, float x, float y, float origin_x, float origin_y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaImage(CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
     public void drawCMediaImage(CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
     public void drawCMediaImageCut(CMediaImage cMedia, float x, float y, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture.getTexture(), x, y, texture.getRegionX(), texture.getRegionY(), widthCut, heightCut);
     }
 
     public void drawCMediaImageCut(CMediaImage cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture.getTexture(), x, y, texture.getRegionX() + srcX, texture.getRegionY() + srcY, widthCut, heightCut);
     }
 
     public void drawCMediaImageScale(CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, 0);
     }
 
     public void drawCMediaImageScale(CMediaImage cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion texture = mediaManager.getCMediaImage(cMedia);
         this.draw(texture, x, y, origin_x, origin_y, texture.getRegionWidth(), texture.getRegionHeight(), scaleX, scaleY, rotation);
     }
@@ -1394,99 +1377,99 @@ public class SpriteRenderer implements Batch {
     /* --- CMediaAnimation  --- */
 
     public void drawCMediaAnimation(CMediaAnimation cMedia, float x, float y, float animationTimer) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         ExtendedAnimation animation = mediaManager.getCMediaAnimation(cMedia);
         TextureRegion textureRegion = animation.getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float width, float height, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
     public void drawCMediaAnimationCut(CMediaAnimation cMedia, float x, float y, float animationTimer, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX(), textureRegion.getRegionY(), widthCut, heightCut);
     }
 
     public void drawCMediaAnimationCut(CMediaAnimation cMedia, float x, float y, float animationTimer, int srcX, int srcY, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
     }
 
     public void drawCMediaAnimationScale(CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
     }
 
     public void drawCMediaAnimationScale(CMediaAnimation cMedia, float x, float y, float animationTimer, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaAnimation(cMedia).getKeyFrame(animationTimer);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
     }
     /* --- CMediaArray  --- */
 
     public void drawCMediaArray(CMediaArray cMedia, float x, float y, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, 0, 0, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaArray(CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), 1, 1, 0);
     }
 
     public void drawCMediaArray(CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, 0);
     }
 
     public void drawCMediaArray(CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float width, float height, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, origin_x, origin_y, width, height, 1, 1, rotation);
     }
 
     public void drawCMediaArrayCut(CMediaArray cMedia, float x, float y, int arrayIndex, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
-        this.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX(), textureRegion.getRegionY() , widthCut, heightCut);
+        this.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX(), textureRegion.getRegionY(), widthCut, heightCut);
     }
 
     public void drawCMediaArrayCut(CMediaArray cMedia, float x, float y, int arrayIndex, int srcX, int srcY, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion.getTexture(), x, y, textureRegion.getRegionX() + srcX, textureRegion.getRegionY() + srcY, widthCut, heightCut);
     }
 
     public void drawCMediaArrayScale(CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, 0);
     }
 
     public void drawCMediaArrayScale(CMediaArray cMedia, float x, float y, int arrayIndex, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         TextureRegion textureRegion = mediaManager.getCMediaArray(cMedia, arrayIndex);
         this.draw(textureRegion, x, y, origin_x, origin_y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight(), scaleX, scaleY, rotation);
     }
@@ -1494,13 +1477,13 @@ public class SpriteRenderer implements Batch {
     /* --- CMediaFont  --- */
 
     public void drawCMediaFont(CMediaFont cMedia, float x, float y, String text) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMedia);
         bitmapFont.draw(this, text, (x + cMedia.offset_x), (y + cMedia.offset_y));
     }
 
     public void drawCMediaFont(CMediaFont cMedia, float x, float y, String text, int maxWidth) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMedia);
         bitmapFont.draw(this, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, true, "");
     }
@@ -1508,12 +1491,12 @@ public class SpriteRenderer implements Batch {
     /* -----  CMediaSprite ----- */
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, 0, 0);
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, int arrayIndex, float animationTimer) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(cMediaImage, x, y);
             case CMediaAnimation cMediaAnimation -> drawCMediaAnimation(cMediaAnimation, x, y, animationTimer);
@@ -1524,12 +1507,12 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, 0, 0);
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, int arrayIndex, float animationTimer) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(cMediaImage, x, y, origin_x, origin_y);
             case CMediaAnimation cMediaAnimation ->
@@ -1541,12 +1524,12 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, width, height, 0, 0);
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, int arrayIndex, float animationTimer) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImage(cMediaImage, x, y, origin_x, origin_y, width, height);
             case CMediaAnimation cMediaAnimation ->
@@ -1559,12 +1542,12 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, width, height, rotation, 0, 0);
     }
 
     public void drawCMediaSprite(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float width, float height, float rotation, float animationTimer, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
                     drawCMediaImage(cMediaImage, x, y, origin_x, origin_y, width, height, rotation);
@@ -1578,12 +1561,12 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSpriteCut(CMediaSprite cMedia, float x, float y, int widthCut, int heightCut) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSpriteCut(cMedia, x, y, widthCut, heightCut, 0, 0);
     }
 
     public void drawCMediaSpriteCut(CMediaSprite cMedia, float x, float y, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSpriteCut(cMedia, x, y, 0, 0, widthCut, heightCut, animationTimer, arrayIndex);
     }
 
@@ -1592,7 +1575,7 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSpriteCut(CMediaSprite cMedia, float x, float y, int srcX, int srcY, int widthCut, int heightCut, float animationTimer, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage -> drawCMediaImageCut(cMediaImage, x, y, srcX, srcY, widthCut, heightCut);
             case CMediaAnimation cMediaAnimation ->
@@ -1605,22 +1588,22 @@ public class SpriteRenderer implements Batch {
     }
 
     public void drawCMediaSpriteScale(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, 0, 0);
     }
 
     public void drawCMediaSpriteScale(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float animationTimer, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, scaleX, scaleY, 0, animationTimer, arrayIndex);
     }
 
     public void drawCMediaSpriteScale(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         drawCMediaSprite(cMedia, x, y, origin_x, origin_y, scaleX, scaleY, rotation, 0, 0);
     }
 
     public void drawCMediaSpriteScale(CMediaSprite cMedia, float x, float y, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, float animationTimer, int arrayIndex) {
-        if(cMedia == null) return;
+        if (cMedia == null) return;
         switch (cMedia) {
             case CMediaImage cMediaImage ->
                     drawCMediaImageScale(cMediaImage, x, y, origin_x, origin_y, scaleX, scaleY, rotation);
