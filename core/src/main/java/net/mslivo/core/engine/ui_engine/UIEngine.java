@@ -109,8 +109,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         //  ----- Paramters
         newUIEngineState.resolutionWidth = Math.max(resolutionWidth, 16);
         newUIEngineState.resolutionHeight = Math.max(resolutionHeight, 16);
-        newUIEngineState.resolutionWidthHalf = MathUtils.round(resolutionWidth/2f);
-        newUIEngineState.resolutionHeightHalf = MathUtils.round(resolutionHeight/2f);
+        newUIEngineState.resolutionWidthHalf = MathUtils.round(resolutionWidth / 2f);
+        newUIEngineState.resolutionHeightHalf = MathUtils.round(resolutionHeight / 2f);
         newUIEngineState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newUIEngineState.gamePadSupport = gamePadSupport;
         newUIEngineState.sizeSize = tileSize;
@@ -2231,8 +2231,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength) < 0 ? DIRECTION.RIGHT : DIRECTION.LEFT;
             case UP ->
                     uiEngineState.mouse_ui.y + lineLengthAbs > uiEngineState.resolutionHeight - TS(tooltip_height) ? DIRECTION.DOWN : DIRECTION.UP;
-            case DOWN ->
-                    uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
+            case DOWN -> uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
         };
 
         int tooltip_x = switch (direction) {
@@ -2265,21 +2264,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 iy -= segment.height;
                 int width_reference = tooltip_width;
                 int height_reference = tooltip_height;
-                final int BORDER_NONE = -1;
                 for (int ty = 0; ty < segment.height; ty++) {
                     int y_combined = iy + ty;
-                    int borderIndex = BORDER_NONE;
-                    if (segment.border) {
-                        borderIndex = segment.height == 1 ? 2 : ty == 0 ? 0 : ty == (segment.height - 1) ? 1 : BORDER_NONE;
-                        if (borderIndex != BORDER_NONE) {
-                            if (y_combined == (tooltip_height - 1)) { // top of tooltip
-                                if (borderIndex == 2) borderIndex = 0;
-                                if (borderIndex == 1) borderIndex = BORDER_NONE;
-                            }
-                            if (y_combined == 0) { // bottom of tooltip
-                                if (borderIndex == 2) borderIndex = 1;
-                                if (borderIndex == 0) borderIndex = BORDER_NONE;
-                            }
+                    boolean drawTopBorder = false;
+
+                    if (ty == segment.height - 1) {
+                        if (segment.border) {
+                            drawTopBorder = y_combined != (tooltip_height - 1) && y_combined != 0;
+                        } else {
+                            drawTopBorder = is > 0 && tooltip.segments.get(is - 1).border && ty == segment.height - 1;
                         }
                     }
 
@@ -2294,9 +2287,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // Border
                     for (int tx = 0; tx < tooltip_width; tx++) {
                         render_batchSetColor(tooltip.color_border, borderAlpha);
+                        // tooltip border
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
-                        if (borderIndex != BORDER_NONE) {
-                            uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), borderIndex);
+                        // segmentborder
+                        if (drawTopBorder) {
+                            uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         }
                     }
                 }
@@ -2333,20 +2328,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Draw line
         render_batchSetColor(tooltip.color_line);
-        for(int i=0;i<tooltip.lineLength;i++) {
+        for (int i = 0; i < tooltip.lineLength; i++) {
             int xOffset = switch (direction) {
-                case LEFT -> -TS(i+1);
+                case LEFT -> -TS(i + 1);
                 case RIGHT -> TS(i);
-                case UP,DOWN -> 0;
+                case UP, DOWN -> 0;
             };
-            int yOffset = switch (direction){
+            int yOffset = switch (direction) {
                 case LEFT, RIGHT -> 0;
                 case UP -> TS(i);
-                case DOWN -> -TS(i+1);
+                case DOWN -> -TS(i + 1);
             };
-            CMediaImage sprite = switch (direction){
-                case LEFT,RIGHT -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL;
-                case UP,DOWN -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL;
+            CMediaImage sprite = switch (direction) {
+                case LEFT, RIGHT -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL;
+                case UP, DOWN -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL;
             };
             uiEngineState.spriteRenderer_ui.drawCMediaImage(sprite, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y + yOffset);
         }

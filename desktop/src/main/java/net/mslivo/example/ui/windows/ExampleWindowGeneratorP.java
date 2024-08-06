@@ -448,11 +448,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
                         api.toolTip.segment.text.create("Title",Color.WHITE, SEGMENT_ALIGNMENT.CENTER,false,true),
-                        api.toolTip.segment.text.create("xyzxyzxyzxyzxyzxyzxyz",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,true,true),
+                        api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,true,true),
+                        api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,true,true),
+                        api.toolTip.segment.text.create("",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,false),
+                        api.toolTip.segment.text.create("",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,false),
                         api.toolTip.segment.text.create("",Color.WHITE,SEGMENT_ALIGNMENT.CENTER,false,false),
                         api.toolTip.segment.empty.create(),
-                        api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.RIGHT,false,false),
+                        api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.RIGHT,false,true),
                         api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2,0,Color.MAGENTA,SEGMENT_ALIGNMENT.CENTER,false,true),
+                        api.toolTip.segment.text.create("555555",Color.WHITE,SEGMENT_ALIGNMENT.RIGHT,false,true),
                 },null,0,Color.RED,Color.BLUE,5,DIRECTION.RIGHT
         ));
 
