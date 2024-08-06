@@ -14,6 +14,8 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,9 +26,10 @@ import java.util.HashSet;
 public final class MediaManager {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int MEDIAMANGER_INDEX_NONE = -1;
-    private static final String ERROR_FILE_MISSING = "file missing";
+    private static final String ERROR_NOT_LOADED = "CMedia File \"%s\": is not loaded into MediaManager";
     private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in another MediaManager";
     private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
+    private static final String ERROR_FILE_NOT_FOUND = "CMedia File \"%s\": Does not exist";
     private static final String ERROR_UNKNOWN_FORMAT = "CMedia File \"%s\": class \"%s\" not supported";
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
@@ -97,10 +100,14 @@ public final class MediaManager {
         int imagesMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
         int imagesIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0;
         while ((loadMedia = loadMediaList.poll()) != null) {
-            if (duplicateCheck.contains(loadMedia))
+            if (!Tools.File.findResource(loadMedia.file).exists()) {
+                throw new RuntimeException(String.format(ERROR_FILE_NOT_FOUND, loadMedia.file()));
+            } else if (duplicateCheck.contains(loadMedia)) {
                 throw new RuntimeException(String.format(ERROR_DUPLICATE, loadMedia.file()));
-            if (loadMedia.mediaManagerIndex() != MEDIAMANGER_INDEX_NONE)
+            } else if (loadMedia.mediaManagerIndex() != MEDIAMANGER_INDEX_NONE) {
                 throw new RuntimeException(String.format(ERROR_ALREADY_LOADED_OTHER, loadMedia.file()));
+            }
+
             if (loadMedia instanceof CMediaSprite || loadMedia.getClass() == CMediaFont.class) {
                 imageCMediaLoadStack.add(loadMedia);
             } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
@@ -166,8 +173,10 @@ public final class MediaManager {
                     );
                 }
                 case CMediaFont cMediaFont -> {
+                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file()), textureAtlas.findRegion(cMediaFont.file()));
+                    bitmapFont.getData().markupEnabled = true;
                     cMediaFont.setMediaManagerIndex(fontsIdx);
-                    medias_fonts[fontsIdx++] = new BitmapFont(Tools.File.findResource(cMediaFont.file()), textureAtlas.findRegion(cMediaFont.file()));
+                    medias_fonts[fontsIdx++] = bitmapFont;
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + imageMedia);
             }
@@ -201,7 +210,8 @@ public final class MediaManager {
         return true;
     }
 
-    private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset, int frameLength) {
+    private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,
+                                             int frameLength) {
         TextureRegion textureRegion = textureAtlas.findRegion(file);
         int width = (textureRegion.getRegionWidth() / tile_width);
         int height = (textureRegion.getRegionHeight() / tile_height);
@@ -277,20 +287,21 @@ public final class MediaManager {
     }
 
     public static CMediaImage create_CMediaImage(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaImage(file);
     }
 
-    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight,
+                                                         float animation_speed) {
         return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP);
     }
 
-    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight,
+                                                         float animation_speed, int frameOffset, int frameLength) {
         return create_CMediaAnimation(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP);
     }
 
-    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
+    public static CMediaAnimation create_CMediaAnimation(String file, int tileWidth, int tileHeight,
+                                                         float animation_speed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
         CMediaAnimation cMediaAnimation = new CMediaAnimation(
                 file,
                 Math.max(tileWidth, 1),
@@ -304,21 +315,20 @@ public final class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
+        return create_CMediaFont(file, offset_x, offset_y, false);
+    }
+
+    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
         CMediaFont cMediaFont = new CMediaFont(
-                file,
-                offset_x,
-                offset_y);
+                file, offset_x, offset_y, markupEnabled);
         return cMediaFont;
     }
 
     public static CMediaMusic create_CMediaMusic(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaMusic(file);
     }
 
     public static CMediaSound create_CMediaSound(String file) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
         return new CMediaSound(file);
     }
 
@@ -326,15 +336,15 @@ public final class MediaManager {
         return create_CMediaArray(file, tileWidth, tileHeight, 0, Integer.MAX_VALUE);
     }
 
-    public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset, int frameLength) {
-        if (file == null || file.trim().length() == 0) throw new RuntimeException(ERROR_FILE_MISSING);
+    public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight, int frameOffset,
+                                                 int frameLength) {
         CMediaArray cMediaArray = new CMediaArray(
                 file,
                 Math.max(tileWidth, 1),
                 Math.max(tileHeight, 1),
                 Math.max(frameOffset, 0),
-                Math.max(frameLength,0)
-                );
+                Math.max(frameLength, 0)
+        );
         return cMediaArray;
     }
 

@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public abstract class CMedia implements Serializable {
     public final String file;
-    private int hash;
+    private final int hash;
     private int mediaManagerIndex;
 
     CMedia(String file) {
