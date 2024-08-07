@@ -12,6 +12,7 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
 ![](screenshot_2.png)
 
 ## Features
+- Windows
 - Components
   - Button
   - Checkbox / Radiobox
