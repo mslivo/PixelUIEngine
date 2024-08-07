@@ -18,10 +18,10 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
   - Combobox
   - Image
   - Text
-  - Grid
   - List
+  - Grid
   - Knob
-  - Map
+  - Canvas
   - Progressbar
   - Scrollbar
   - Shapes
@@ -34,15 +34,15 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
  - Modals
  - Hotkeys
  - Drag & Drop
- - Keyboard & Gamepad mouse emulation
- - Gamepad & Touchscreen text input
+ - Keyboard, Gamepad & Mouse Input handling
+ - Mouse emulation (Keyboard, Gamepad)
+ - Gamepad & Touchscreen text inputs
  - Viewport handling / Pixel-Art upscaling
  - Asset-Management
- - Input handling
  - High performance, low library size (~300kb)
  - Utility classes
   - Improved Sprite renderer
-  - Immediate-Mode renderer
+  - Primitive renderer (fast pixel rendering)
   - Particle system
   - Transition effects
   - Music & Sound players
