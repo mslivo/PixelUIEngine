@@ -14,6 +14,7 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
+import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
@@ -21,6 +22,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
+import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
@@ -1027,21 +1029,18 @@ public final class APIComponent {
             };
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas create(int x, int y, int width, int height) {
+        public Canvas create(int x, int y, int width, int height) {
             return create(x, y, width, height, defaultCanvasAction(), null);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
+        public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
             return create(x, y, width, height, canvasAction, null);
         }
 
-        public net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
-            net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas = new net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas();
+        public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
+            Canvas canvas = new Canvas();
             setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
-            canvas.map = new Color[width * api.TS()][height * api.TS()];
-            for (int ix = 0; ix < canvas.map.length; ix++)
-                for (int iy = 0; iy < canvas.map[0].length; iy++)
-                    canvas.map[ix][iy] = new Color(1f, 1f, 1f, 1f);
+            canvas.colorMap = new ColorMap(api.TS(width), api.TS(height));
             canvas.canvasAction = canvasAction;
             canvas.canvasImages = new ArrayList<>();
             if (canvasImages != null) {
@@ -1056,66 +1055,65 @@ public final class APIComponent {
             return canvas;
         }
 
-        public void setCanvasAction(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, CanvasAction canvasAction) {
+        public void setCanvasAction(Canvas canvas, CanvasAction canvasAction) {
             if (canvas == null) return;
             canvas.canvasAction = canvasAction;
         }
 
-        public void point(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, int x, int y, float r, float g, float b, float a) {
+        public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
             if (canvas == null) return;
-            UICommonUtils.canvas_setPoint(canvas, x, y, r, g, b, a);
+            UICommonUtils.colorMap_set(canvas.colorMap, x, y, r, g, b, a);
         }
 
-        public Color point(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, int x, int y) {
-            if (canvas == null) return null;
-            Color color = UICommonUtils.canvas_getPoint(canvas, x, y);
-            return color != null ? new Color(color) : null;
-        }
-
-        public boolean pointValid(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, int x, int y) {
-            if (canvas == null) return false;
-            return UICommonUtils.canvas_pointValid(canvas, x, y);
-        }
-
-        public void point(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, int x, int y, Color color) {
+        public void point(Canvas canvas, int x, int y, Color color) {
             point(canvas, x, y, color.r, color.g, color.b, color.a);
         }
 
-        public void setAllPoints(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, float r, float g, float b, float a) {
+        public void clear(Canvas canvas, float r, float g, float b, float a) {
             if (canvas == null) return;
-            UICommonUtils.canvas_setAllPoints(uiEngineState,canvas, r, g, b, a);
+            UICommonUtils.colorMap_clear(canvas.colorMap, r, g, b, a);
         }
 
-        public void setAllPoints(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, Color color) {
-            setAllPoints(canvas, color.r, color.g, color.b, color.a);
+        public void clear(Canvas canvas, Color color) {
+            clear(canvas, color.r, color.g, color.b, color.a);
         }
 
-        public void addCanvasImage(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, CanvasImage canvasImage) {
+        public Color getPoint(Canvas canvas, int x, int y) {
+            if (canvas == null) return null;
+            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
+        }
+
+        public boolean isPointInBounds(Canvas canvas, int x, int y) {
+            if (canvas == null) return false;
+            return UICommonUtils.colorMap_inBounds(canvas.colorMap, x,y);
+        }
+
+        public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
             if (canvas == null || canvasImage == null) return;
             UICommonUtils.canvas_addCanvasImage(canvas, canvasImage);
         }
 
-        public void addCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, CanvasImage[] canvasImages) {
+        public void addCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
             if (canvas == null || canvasImages == null) return;
             for (int i = 0; i < canvasImages.length; i++) addCanvasImage(canvas, canvasImages[i]);
         }
 
-        public void removeCanvasImage(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, CanvasImage canvasImage) {
+        public void removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
             if (canvas == null || canvasImage == null) return;
             UICommonUtils.canvas_removeCanvasImage(canvas, canvasImage);
         }
 
-        public void removeCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, CanvasImage[] canvasImages) {
+        public void removeCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
             if (canvas == null || canvasImages == null) return;
             for (int i = 0; i < canvasImages.length; i++) removeCanvasImage(canvas, canvasImages[i]);
         }
 
-        public void removeAllCanvasImages(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas) {
+        public void removeAllCanvasImages(Canvas canvas) {
             if (canvas == null) return;
             removeCanvasImages(canvas, canvas.canvasImages.toArray(new CanvasImage[]{}));
         }
 
-        public ArrayList<CanvasImage> findMapOverlaysByName(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, String name) {
+        public ArrayList<CanvasImage> findMapOverlaysByName(Canvas canvas, String name) {
             if (canvas == null || name == null) return new ArrayList<>();
             ArrayList<CanvasImage> result = new ArrayList<>();
             for (int i = 0; i < canvas.canvasImages.size(); i++)
@@ -1123,7 +1121,7 @@ public final class APIComponent {
             return result;
         }
 
-        public CanvasImage findMapOverlayByName(net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas canvas, String name) {
+        public CanvasImage findMapOverlayByName(Canvas canvas, String name) {
             if (canvas == null || name == null) return null;
             ArrayList<CanvasImage> result = findMapOverlaysByName(canvas, name);
             return result.size() > 0 ? result.getFirst() : null;

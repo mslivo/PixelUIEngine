@@ -521,7 +521,7 @@ public final class APIComposites {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = api.component.canvas.point(colorCanvas, x, y - 1);
+                            currentColor = api.component.canvas.getPoint(colorCanvas, x, y - 1);
                             if (currentColor != null) {
                                 api.component.setColor(ok, currentColor);
                                 float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);

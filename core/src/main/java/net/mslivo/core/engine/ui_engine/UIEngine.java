@@ -13,6 +13,7 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -127,6 +128,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, 8192);
         newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
+        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.update();
@@ -1944,6 +1949,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private void renderUI() {
 
         uiEngineState.spriteRenderer_ui.setProjectionMatrix(uiEngineState.camera_ui.combined);
+        uiEngineState.primitiveRenderer_ui.setProjectionMatrix(uiEngineState.camera_ui.combined);
         uiEngineState.spriteRenderer_ui.begin();
         render_batchSetColorWhite();
 
@@ -2269,7 +2275,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         if (segment.border) {
                             drawBottomborder = y_combined != 0;
                         } else {
-                            drawBottomborder = is+1 > 0 && tooltip.segments.get(is +1).border;
+                            int isPlus1 = is+1;
+                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(isPlus1).border;
                         }
                     }
 
@@ -2596,13 +2603,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int width = TS(canvas.width);
                 int height = TS(canvas.height);
                 render_saveTempColorBatch();
+                uiEngineState.spriteRenderer_ui.end();
+                uiEngineState.primitiveRenderer_ui.begin();
                 for (int ix = 0; ix < width; ix++) {
                     for (int iy = 0; iy < height; iy++) {
-                        Color mapPixelColor = canvas.map[ix][iy];
-                        render_batchSetColor(mapPixelColor, (canvas.map[ix][iy].a * componentAlpha));
-                        uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, UICommonUtils.component_getAbsoluteX(canvas) + ix, UICommonUtils.component_getAbsoluteY(canvas) + iy);
+                        float r = canvas.colorMap.r[ix][iy];
+                        float g = canvas.colorMap.g[ix][iy];
+                        float b = canvas.colorMap.b[ix][iy];
+                        float a = canvas.colorMap.a[ix][iy];
+                        uiEngineState.primitiveRenderer_ui.setColor(1f,1f,1f,a * componentAlpha);
+                        uiEngineState.primitiveRenderer_ui.setVertexColor(r,g,b,a);
+                        uiEngineState.primitiveRenderer_ui.vertex(UICommonUtils.component_getAbsoluteX(canvas) + ix+1, UICommonUtils.component_getAbsoluteY(canvas) + iy+1);
                     }
+
                 }
+                uiEngineState.primitiveRenderer_ui.end();
+                uiEngineState.spriteRenderer_ui.begin();
                 render_loadTempColorBatch();
 
 
@@ -2615,7 +2631,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             continue;
                         }
                     }
-                    if (UICommonUtils.canvas_isInsideCanvas(canvas, canvasImage.x, canvasImage.y)) {
+                    if (UICommonUtils.canvas_isImageInsideCanvas(uiEngineState, canvas, canvasImage.x, canvasImage.y)) {
                         render_saveTempColorBatch();
                         render_batchSetColor(canvasImage.color, (canvasImage.color.a * componentAlpha));
                         int imageWidthOffset = mediaManager.getCMediaSpriteWidth(canvasImage.image) / 2;

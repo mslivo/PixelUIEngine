@@ -12,12 +12,13 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
+import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -55,7 +56,6 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 
 final class UICommonUtils {
@@ -316,7 +316,7 @@ final class UICommonUtils {
         // Notification Collision
         for (int i = 0; i < uiEngineState.notifications.size(); i++) {
             Notification notification = uiEngineState.notifications.get(i);
-            if(!notification.clickAble) continue;
+            if (!notification.clickAble) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
                     0, uiEngineState.resolutionHeight - uiEngineState.sizeSize.TL(i + 1),
                     uiEngineState.resolutionWidth, uiEngineState.sizeSize.TS)) {
@@ -681,12 +681,14 @@ final class UICommonUtils {
 
     static void textField_executeControlKey(UIEngineState uiEngineState, MediaManager mediaManager, Textfield textField, int keyCode) {
         switch (keyCode) {
-            case Input.Keys.LEFT -> textField_setMarkerPosition(uiEngineState,mediaManager, textField, textField.markerPosition - 1);
-            case Input.Keys.RIGHT -> textField_setMarkerPosition(uiEngineState,mediaManager, textField, textField.markerPosition + 1);
+            case Input.Keys.LEFT ->
+                    textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition - 1);
+            case Input.Keys.RIGHT ->
+                    textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition + 1);
             case Input.Keys.BACKSPACE -> {
                 if (!textField.content.isEmpty() && textField.markerPosition > 0) {
                     String newContent = textField.content.substring(0, textField.markerPosition - 1) + textField.content.substring(textField.markerPosition);
-                    UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField, textField.markerPosition - 1);
+                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition - 1);
                     UICommonUtils.textField_setContent(textField, newContent);
                 }
             }
@@ -696,9 +698,10 @@ final class UICommonUtils {
                     UICommonUtils.textField_setContent(textField, newContent);
                 }
             }
-            case Input.Keys.HOME -> UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField, 0);
+            case Input.Keys.HOME ->
+                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, 0);
             case Input.Keys.END ->
-                    UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField, textField.content.length());
+                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.content.length());
             case Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
                 UICommonUtils.textField_unFocus(uiEngineState, textField); // Unfocus
                 if (textField.textFieldAction != null)
@@ -713,7 +716,7 @@ final class UICommonUtils {
         if (textField.allowedCharacters == null || textField.allowedCharacters.contains(character)) {
             String newContent = textField.content.substring(0, textField.markerPosition) + character + textField.content.substring(textField.markerPosition);
             UICommonUtils.textField_setContent(textField, newContent);
-            UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField, textField.markerPosition + 1);
+            UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition + 1);
             if (textField.textFieldAction != null)
                 textField.textFieldAction.onTyped(character);
         }
@@ -853,7 +856,6 @@ final class UICommonUtils {
         comboBox.comboBoxItems.remove(comboBoxItem);
     }
 
-
     static void canvas_addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
         if (canvasImage.addedToCanvas != null) return;
         canvasImage.addedToCanvas = canvas;
@@ -863,13 +865,67 @@ final class UICommonUtils {
     static void canvas_resizeMap(UIEngineState uiEngineState, Canvas canvas) {
         int newWidth = uiEngineState.sizeSize.TL(canvas.width);
         int newHeight = uiEngineState.sizeSize.TL(canvas.height);
-        Color[][] newMap;
-        newMap = Arrays.copyOf(canvas.map, newWidth);
-        for (int ix = 0; ix < newWidth; ix++) {
-            newMap[ix] = Arrays.copyOf(canvas.map[ix], newHeight);
-        }
-        canvas.map = newMap;
+        canvas.colorMap = new ColorMap(newWidth, newHeight);
     }
+
+    static boolean canvas_isImageInsideCanvas(UIEngineState uiEngineState, Canvas canvas, int x, int y) {
+        return x >= 0 && x <= uiEngineState.sizeSize.TL(canvas.width) && y >= 0 && y <= uiEngineState.sizeSize.TL(canvas.height);
+    }
+
+
+    static void colorMap_clear(ColorMap colorMap, float r, float g, float b, float a) {
+        for (int ix = 0; ix < colorMap.width; ix++) {
+            for (int iy = 0; iy < colorMap.height; iy++) {
+                colorMap.r[ix][iy] = r;
+                colorMap.g[ix][iy] = g;
+                colorMap.b[ix][iy] = b;
+                colorMap.a[ix][iy] = a;
+            }
+        }
+    }
+
+    static void colorMap_set(ColorMap colorMap, int x, int y, float r, float g, float b, float a) {
+        if(!colorMap_inBounds(colorMap,x,y)) return;
+        colorMap.r[x][y] = r;
+        colorMap.g[x][y] = g;
+        colorMap.b[x][y] = b;
+        colorMap.a[x][y] = a;
+    }
+
+    static float colorMap_r(ColorMap colorMap, int x, int y) {
+        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        return colorMap.r[x][y];
+    }
+
+    static float colorMap_g(ColorMap colorMap, int x, int y) {
+        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        return colorMap.g[x][y];
+    }
+
+    static float colorMap_b(ColorMap colorMap, int x, int y) {
+        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        return colorMap.b[x][y];
+    }
+
+    static float colorMap_a(ColorMap colorMap, int x, int y) {
+        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        return colorMap.a[x][y];
+    }
+
+    static Color colorMap_getPointAsColor(ColorMap colorMap, int x, int y) {
+        if(!colorMap_inBounds(colorMap, x,y)) return null;
+        return new Color(
+                colorMap.r[x][y],
+                colorMap.g[x][y],
+                colorMap.b[x][y],
+                colorMap.a[x][y]
+                );
+    }
+
+    static boolean colorMap_inBounds(ColorMap colorMap, int x, int y) {
+        return x < colorMap.width && y < colorMap.height;
+    }
+
 
     static void canvas_removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
         if (canvasImage.addedToCanvas != canvas) return;
@@ -1224,37 +1280,6 @@ final class UICommonUtils {
         if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
     }
 
-    static void canvas_setAllPoints(UIEngineState uiEngineState, Canvas canvas, float r, float g, float b, float a) {
-        int width = uiEngineState.sizeSize.TL(canvas.width);
-        int height = uiEngineState.sizeSize.TL(canvas.height);
-        for (int ix = 0; ix <= width; ix++) {
-            for (int iy = 0; iy <= height; iy++) {
-                canvas_setPoint(canvas, ix, iy, r, g, b, a);
-            }
-        }
-    }
-
-    static boolean canvas_isInsideCanvas(Canvas canvas, int x, int y) {
-        return x >= 0 && x < canvas.map.length && y >= 0 && y < canvas.map[0].length;
-    }
-
-    static void canvas_setPoint(Canvas canvas, int x, int y, float r, float g, float b, float a) {
-        if (!canvas_isInsideCanvas(canvas, x, y)) return;
-        canvas.map[x][y].set(
-                r,
-                g,
-                b,
-                a);
-    }
-
-    static boolean canvas_pointValid(Canvas canvas, int x, int y) {
-        return x >= 0 && x <= canvas.map.length && y >= 0 && y <= canvas.map.length - 1;
-    }
-
-    static Color canvas_getPoint(Canvas canvas, int x, int y) {
-        if (!canvas_pointValid(canvas, x, y)) return null;
-        return canvas.map[x][y];
-    }
 
     static void appViewPort_resizeCameraTextureAndFrameBuffer(UIEngineState uiEngineState, AppViewport appViewPort) {
         // Clean Up
@@ -1344,8 +1369,8 @@ final class UICommonUtils {
         camera.update();
     }
 
-    static float ui_getAnimationTimer(UIEngineState state){
-        if(state.config.ui_animationTimerFunction == null) return 0f;
+    static float ui_getAnimationTimer(UIEngineState state) {
+        if (state.config.ui_animationTimerFunction == null) return 0f;
         return state.config.ui_animationTimerFunction.getAnimationTimer();
     }
 

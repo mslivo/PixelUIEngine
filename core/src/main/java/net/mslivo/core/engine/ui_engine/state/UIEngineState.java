@@ -13,6 +13,7 @@ import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.constants.TILE_SIZE;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
@@ -62,6 +63,7 @@ public final class UIEngineState {
 
     /* #################### Graphics: GUI #################### */
     public SpriteRenderer spriteRenderer_ui;
+    public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBuffer_ui;
 

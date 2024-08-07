@@ -380,7 +380,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.canvas.setCanvasAction(canvas, new CanvasAction() {
             @Override
             public void onPress(int x, int y) {
-                api.component.canvas.setAllPoints(canvas, Color.WHITE);
+                api.component.canvas.clear(canvas, Color.WHITE);
             }
         });
         api.component.addUpdateAction(canvas, new UpdateAction() {
