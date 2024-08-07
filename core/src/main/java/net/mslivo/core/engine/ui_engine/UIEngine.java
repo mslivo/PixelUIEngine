@@ -48,10 +48,7 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -2266,13 +2263,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height_reference = tooltip_height;
                 for (int ty = 0; ty < segment.height; ty++) {
                     int y_combined = iy + ty;
-                    boolean drawTopBorder = false;
+                    boolean drawBottomborder = false;
 
-                    if (ty == segment.height - 1) {
+                    if (ty == 0) {
                         if (segment.border) {
-                            drawTopBorder = y_combined != (tooltip_height - 1) && y_combined != 0;
+                            drawBottomborder = y_combined != 0;
                         } else {
-                            drawTopBorder = is > 0 && tooltip.segments.get(is - 1).border && ty == segment.height - 1;
+                            drawBottomborder = is+1 > 0 && tooltip.segments.get(is +1).border;
                         }
                     }
 
@@ -2290,7 +2287,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         // tooltip border
                         uiEngineState.spriteRenderer_ui.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height));
                         // segmentborder
-                        if (drawTopBorder) {
+                        if (drawBottomborder) {
                             uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         }
                     }
@@ -2320,6 +2317,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     };
                     render_batchSetColorWhite(segmentAlpha);
                     uiEngineState.spriteRenderer_ui.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
+                }
+                case TooltipEmptySegment emptySegment -> {
+
                 }
                 case null, default -> {
                 }
@@ -2353,7 +2353,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case UP, DOWN -> {
                 int yOffset = direction == DIRECTION.UP ? 0 : -TS2();
                 uiEngineState.spriteRenderer_ui.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y + yOffset);
-
             }
         }
 

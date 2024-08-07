@@ -254,24 +254,32 @@ public final class APITooltip {
             }
 
             public TooltipEmptySegment create() {
-                return create(Color.WHITE, false, false, false);
+                return create(Color.WHITE,false,false,false,1);
+
             }
 
             public TooltipEmptySegment create(Color color) {
-                return create(color, false, false, false);
+                return create(color,false,false,false,1);
+
             }
 
             public TooltipEmptySegment create(Color color, boolean merge) {
-                return create(color, merge, false, false);
+                return create(color,merge,false,false,1);
+
             }
 
             public TooltipEmptySegment create(Color color, boolean merge, boolean border) {
-                return create(color, merge, border, false);
+                return create(color,merge,border,false,1);
+
             }
 
             public TooltipEmptySegment create(Color color, boolean merge, boolean border, boolean clear) {
+                return create(color,merge,border,clear,1);
+            }
+
+            public TooltipEmptySegment create(Color color, boolean merge, boolean border, boolean clear, int height) {
                 TooltipEmptySegment tooltipEmptySegment = new TooltipEmptySegment();
-                setSegmentValues(tooltipEmptySegment, color, SEGMENT_ALIGNMENT.LEFT, 0, 0, merge, border, clear);
+                setSegmentValues(tooltipEmptySegment, color, SEGMENT_ALIGNMENT.LEFT, 0, height, merge, border, clear);
                 return tooltipEmptySegment;
             }
 

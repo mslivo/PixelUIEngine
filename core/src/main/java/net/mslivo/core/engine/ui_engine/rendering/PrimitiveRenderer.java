@@ -109,7 +109,6 @@ public class PrimitiveRenderer {
     private int backup_dstRGB;
     private int backup_srcAlpha;
     private int backup_dstAlpha;
-    private boolean glBlendEnabled;
 
     public PrimitiveRenderer() {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
@@ -135,7 +134,6 @@ public class PrimitiveRenderer {
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = new float[MESH_SIZE_VERTICES];
         this.mesh = createMesh(MESH_SIZE_VERTICES);
-        this.glBlendEnabled = false;
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -154,14 +152,14 @@ public class PrimitiveRenderer {
         if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         this.primitiveType = primitiveType;
         this.renderCalls = 0;
+        Gdx.gl.glDepthMask(false);
 
         shader.bind();
         shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
 
 
         // Blending
-        this.glBlendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
-        if(!glBlendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
+        if(!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
         this.drawing = true;
@@ -170,9 +168,7 @@ public class PrimitiveRenderer {
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (idx > 0) flush();
-
-        if(!glBlendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
-
+        Gdx.gl.glDepthMask(true);
         this.drawing = false;
     }
 
@@ -434,7 +430,8 @@ public class PrimitiveRenderer {
     }
 
     public void setAllReset() {
-        setHSLTAndColorReset();
+        setHSLTReset();
+        setColorReset();
         setBlendFunctionReset();
     }
 
@@ -445,11 +442,14 @@ public class PrimitiveRenderer {
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
         if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
             return;
-        flush();
         this.srcRGB = srcFuncColor;
         this.dstRGB = dstFuncColor;
         this.srcAlpha = srcFuncAlpha;
         this.dstAlpha = dstFuncAlpha;
+        if(drawing) {
+            flush();
+            Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        }
     }
 
     public int getBlendSrcFunc() {

@@ -128,7 +128,6 @@ public class SpriteRenderer implements Batch {
     public int renderCalls;
     public int totalRenderCalls;
     public int maxSpritesInBatch;
-    private boolean glBlendEnabled;
 
 
     public SpriteRenderer() {
@@ -222,8 +221,7 @@ public class SpriteRenderer implements Batch {
         shader.bind();
         setupMatrices();
 
-        this.glBlendEnabled = Gdx.gl.glIsEnabled(GL20.GL_BLEND);
-        if(!this.glBlendEnabled) Gdx.gl.glEnable(GL20.GL_BLEND);
+        if(!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
         drawing = true;
@@ -234,11 +232,8 @@ public class SpriteRenderer implements Batch {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (idx > 0) flush();
         lastTexture = null;
-        drawing = false;
-
-        if(!this.glBlendEnabled) Gdx.gl.glDisable(GL20.GL_BLEND);
-
         Gdx.gl.glDepthMask(true);
+        drawing = false;
     }
 
     @Override
@@ -353,7 +348,8 @@ public class SpriteRenderer implements Batch {
     }
 
     public void setAllReset() {
-        setHSLTAndColorReset();
+        setHSLTReset();
+        setColorReset();
         setBlendFunctionReset();
     }
 
@@ -1230,11 +1226,14 @@ public class SpriteRenderer implements Batch {
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
         if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
             return;
-        flush();
         this.srcRGB = srcFuncColor;
         this.dstRGB = dstFuncColor;
         this.srcAlpha = srcFuncAlpha;
         this.dstAlpha = dstFuncAlpha;
+        if(drawing) {
+            flush();
+            Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        }
     }
 
     @Override
