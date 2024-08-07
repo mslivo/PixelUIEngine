@@ -8,6 +8,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
+import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
@@ -82,18 +83,18 @@ public final class APITooltip {
 
     public void addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
-        UICommonUtils.toolTip_addTooltipSegment(toolTip, segment);
+        UICommonUtils.tooltip_addTooltipSegment(toolTip, segment);
     }
 
     public void removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
-        UICommonUtils.toolTip_removeTooltipSegment(toolTip, segment);
+        UICommonUtils.tooltip_removeTooltipSegment(toolTip, segment);
     }
 
     public void removeAllTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
         for (int i = 0; i < toolTip.segments.size(); i++)
-            UICommonUtils.toolTip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
+            UICommonUtils.tooltip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
     }
 
     public void setToolTipAction(Tooltip toolTip, ToolTipAction toolTipAction) {
@@ -108,12 +109,12 @@ public final class APITooltip {
     public final class APITooltipSegment {
         public final APITooltipTextSegment text;
         public final APITooltipImageSegment image;
-        public final APITooltipEmptySegment empty;
+        public final APITooltipCanvasSegment canvas;
 
         APITooltipSegment() {
             text = new APITooltipTextSegment();
             image = new APITooltipImageSegment();
-            empty = new APITooltipEmptySegment();
+            canvas = new APITooltipCanvasSegment();
         }
 
         public void setColor(TooltipSegment tooltipSegment, Color color) {
@@ -129,6 +130,11 @@ public final class APITooltip {
         public void setBorder(TooltipSegment tooltipSegment, boolean border) {
             if (tooltipSegment == null) return;
             tooltipSegment.border = border;
+        }
+
+        public void resize(TooltipSegment tooltipSegment, int width, int height){
+            if(tooltipSegment == null) return;
+            UICommonUtils.tooltip_resizeSegment(uiEngineState,tooltipSegment, width, height);
         }
 
         private void setSegmentValues(TooltipSegment tooltipSegment, Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
@@ -189,7 +195,7 @@ public final class APITooltip {
 
             public void setImage(TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
                 if (tooltipImageSegment == null) return;
-                UICommonUtils.toolTip_setImageSegmentImage(uiEngineState, mediaManager, tooltipImageSegment, image);
+                UICommonUtils.tooltip_setImageSegmentImage(uiEngineState, mediaManager, tooltipImageSegment, image);
             }
 
             public void setArrayIndex(TooltipImageSegment tooltipImageSegment, int arrayIndex) {
@@ -238,7 +244,7 @@ public final class APITooltip {
 
             public void setText(TooltipTextSegment tooltipTextSegment, String text) {
                 if (tooltipTextSegment == null) return;
-                UICommonUtils.toolTip_setTextSegmentText(uiEngineState, mediaManager, tooltipTextSegment, text);
+                UICommonUtils.tooltip_setTextSegmentText(uiEngineState, mediaManager, tooltipTextSegment, text);
             }
 
             public void setFont(TooltipTextSegment tooltipTextSegment, CMediaFont font) {
@@ -248,39 +254,97 @@ public final class APITooltip {
 
         }
 
-        public final class APITooltipEmptySegment {
+        public final class APITooltipCanvasSegment {
 
-            APITooltipEmptySegment() {
+            APITooltipCanvasSegment() {
             }
 
-            public TooltipEmptySegment create() {
-                return create(Color.WHITE,false,false,false,1);
 
+            public TooltipCanvasSegment create() {
+                return create(Color.WHITE, SEGMENT_ALIGNMENT.LEFT,false,false,false,1,1);
             }
 
-            public TooltipEmptySegment create(Color color) {
-                return create(color,false,false,false,1);
-
-            }
-
-            public TooltipEmptySegment create(Color color, boolean merge) {
-                return create(color,merge,false,false,1);
+            public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
+                return create(Color.WHITE, alignment,false,false,false,1,1);
 
             }
 
-            public TooltipEmptySegment create(Color color, boolean merge, boolean border) {
-                return create(color,merge,border,false,1);
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment) {
+                return create(color, alignment,false,false,false,1,1);
 
             }
 
-            public TooltipEmptySegment create(Color color, boolean merge, boolean border, boolean clear) {
-                return create(color,merge,border,clear,1);
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge) {
+                return create(color,alignment,merge,false,false,1,1);
+
             }
 
-            public TooltipEmptySegment create(Color color, boolean merge, boolean border, boolean clear, int height) {
-                TooltipEmptySegment tooltipEmptySegment = new TooltipEmptySegment();
-                setSegmentValues(tooltipEmptySegment, color, SEGMENT_ALIGNMENT.LEFT, 0, height, merge, border, clear);
-                return tooltipEmptySegment;
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
+                return create(color,alignment,merge,border,false,1,1);
+
+            }
+
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
+                return create(color,alignment,merge,border,clear,1,1);
+            }
+
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear, int width, int height) {
+                TooltipCanvasSegment tooltipCanvasSegment = new TooltipCanvasSegment();
+                setSegmentValues(tooltipCanvasSegment, color, alignment, width, height, merge, border, clear);
+                tooltipCanvasSegment.colorMap = new ColorMap();
+                int widthPx =  api.TS(width);
+                int heightPx =  api.TS(height);
+                tooltipCanvasSegment.colorMap.width = widthPx;
+                tooltipCanvasSegment.colorMap.height = heightPx;
+                tooltipCanvasSegment.colorMap.r = new float[widthPx][heightPx];
+                tooltipCanvasSegment.colorMap.g = new float[widthPx][heightPx];
+                tooltipCanvasSegment.colorMap.b = new float[widthPx][heightPx];
+                tooltipCanvasSegment.colorMap.a = new float[widthPx][heightPx];
+                return tooltipCanvasSegment;
+            }
+
+            /* Draw Functions */
+
+            public void point(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, float r, float g, float b, float a) {
+                if (tooltipCanvasSegment == null) return;
+                UICommonUtils.colorMap_set(tooltipCanvasSegment.colorMap, x, y, r, g, b, a);
+            }
+
+            public void point(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, Color color) {
+                point(tooltipCanvasSegment, x, y, color.r, color.g, color.b, color.a);
+            }
+
+            public void clear(TooltipCanvasSegment tooltipCanvasSegment, float r, float g, float b, float a) {
+                if (tooltipCanvasSegment == null) return;
+                UICommonUtils.colorMap_clear(tooltipCanvasSegment.colorMap, r, g, b, a);
+            }
+
+            public void clear(TooltipCanvasSegment tooltipCanvasSegment, Color color) {
+                clear(tooltipCanvasSegment, color.r, color.g, color.b, color.a);
+            }
+
+            public Color getColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
+                if (tooltipCanvasSegment == null) return null;
+                return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x,y);
+            }
+
+            public float getR(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
+                if (tooltipCanvasSegment == null) return 0f;
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+            }
+
+            public float getG(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
+                if (tooltipCanvasSegment == null) return 0f;
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+            }
+
+            public float getB(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
+                if (tooltipCanvasSegment == null) return 0f;
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+            }
+            public float getA(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
+                if (tooltipCanvasSegment == null) return 0f;
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
             }
 
         }

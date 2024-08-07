@@ -50,10 +50,7 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,8 +77,8 @@ final class UICommonUtils {
     static void emulatedMouse_setPositionComponent(UIEngineState uiEngineState, Component component) {
         if (component == null) return;
         if (component.addedToWindow == null && !component.addedToScreen) return;
-        int x = component_getAbsoluteX(component) + (uiEngineState.sizeSize.TL(component.width) / 2);
-        int y = component_getAbsoluteY(component) + (uiEngineState.sizeSize.TL(component.height) / 2);
+        int x = component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2);
+        int y = component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2);
         emulatedMouse_setPosition(uiEngineState, x, y);
     }
 
@@ -96,8 +93,8 @@ final class UICommonUtils {
         Window activeWindow = window_findTopInteractableWindow(uiEngineState);
         if (activeWindow != null && activeWindow.folded) {
             emulatedMouse_setPosition(uiEngineState,
-                    activeWindow.x + (uiEngineState.sizeSize.TL(activeWindow.width) / 2),
-                    activeWindow.y + (uiEngineState.sizeSize.TL(activeWindow.height) - 4)
+                    activeWindow.x + (uiEngineState.tileSize.TL(activeWindow.width) / 2),
+                    activeWindow.y + (uiEngineState.tileSize.TL(activeWindow.height) - 4)
             );
             return;
         }
@@ -105,20 +102,20 @@ final class UICommonUtils {
         windowComponentsVisibleOrderSet.clear();
         int fromX = activeWindow != null ? activeWindow.x : 0;
         int fromY = activeWindow != null ? activeWindow.y : 0;
-        int toX = activeWindow != null ? fromX + uiEngineState.sizeSize.TL(activeWindow.width) : uiEngineState.resolutionWidth;
-        int toY = activeWindow != null ? fromY + uiEngineState.sizeSize.TL(activeWindow.height) : uiEngineState.resolutionHeight;
+        int toX = activeWindow != null ? fromX + uiEngineState.tileSize.TL(activeWindow.width) : uiEngineState.resolutionWidth;
+        int toY = activeWindow != null ? fromY + uiEngineState.tileSize.TL(activeWindow.height) : uiEngineState.resolutionHeight;
 
         int nearestIndex = -1;
         float nearestDistance = Float.MAX_VALUE;
 
-        for (int iy = toY; iy >= fromY; iy -= uiEngineState.sizeSize.TS) {
-            for (int ix = fromX; ix <= toX; ix += uiEngineState.sizeSize.TS) {
+        for (int iy = toY; iy >= fromY; iy -= uiEngineState.tileSize.TS) {
+            for (int ix = fromX; ix <= toX; ix += uiEngineState.tileSize.TS) {
                 Object object = UICommonUtils.component_getUIObjectAtPosition(uiEngineState, ix, iy);
                 if (!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)) {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
-                    float distance = Tools.Calc.distanceFast(component_getAbsoluteX(component) + (uiEngineState.sizeSize.TL(component.width) / 2),
-                            component_getAbsoluteY(component) + (uiEngineState.sizeSize.TL(component.height) / 2), uiEngineState.mouse_emulated.x, uiEngineState.mouse_emulated.y);
+                    float distance = Tools.Calc.distanceFast(component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2),
+                            component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated.x, uiEngineState.mouse_emulated.y);
                     if (distance < nearestDistance) {
                         nearestDistance = distance;
                         nearestIndex = windowComponentsVisibleOrder.size() - 1;
@@ -204,12 +201,12 @@ final class UICommonUtils {
 
 
     static void window_enforceScreenBounds(UIEngineState uiEngineState, Window window) {
-        int wndWidth = uiEngineState.sizeSize.TL(window.width);
+        int wndWidth = uiEngineState.tileSize.TL(window.width);
         window.x = Math.clamp(window.x, 0, uiEngineState.resolutionWidth - wndWidth);
         if (window.folded) {
-            window.y = Math.clamp(window.y, -(uiEngineState.sizeSize.TL(window.height - 1)), uiEngineState.resolutionHeight - uiEngineState.sizeSize.TL(window.height));
+            window.y = Math.clamp(window.y, -(uiEngineState.tileSize.TL(window.height - 1)), uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(window.height));
         } else {
-            window.y = Math.clamp(window.y, 0, uiEngineState.resolutionHeight - uiEngineState.sizeSize.TL(window.height));
+            window.y = Math.clamp(window.y, 0, uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(window.height));
         }
     }
 
@@ -228,8 +225,8 @@ final class UICommonUtils {
     }
 
     static void window_center(UIEngineState uiEngineState, Window window) {
-        int centerX = (uiEngineState.resolutionWidthHalf) - (uiEngineState.sizeSize.TL(window.width) / 2);
-        int centerY = (uiEngineState.resolutionHeightHalf) - ((window.folded ? uiEngineState.sizeSize.TS : uiEngineState.sizeSize.TL(window.height)) / 2);
+        int centerX = (uiEngineState.resolutionWidthHalf) - (uiEngineState.tileSize.TL(window.width) / 2);
+        int centerY = (uiEngineState.resolutionHeightHalf) - ((window.folded ? uiEngineState.tileSize.TS : uiEngineState.tileSize.TL(window.height)) / 2);
         window_setPosition(uiEngineState, window, centerX, centerY);
     }
 
@@ -284,7 +281,7 @@ final class UICommonUtils {
             appViewPort_resizeCameraTextureAndFrameBuffer(uiEngineState, appViewPort);
         }
         if (component instanceof Canvas canvas) {
-            canvas_resizeMap(uiEngineState, canvas);
+            colorMap_resize(canvas.colorMap, uiEngineState.tileSize.TL(width),uiEngineState.tileSize.TL(height));
         }
     }
 
@@ -318,8 +315,8 @@ final class UICommonUtils {
             Notification notification = uiEngineState.notifications.get(i);
             if (!notification.clickAble) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
-                    0, uiEngineState.resolutionHeight - uiEngineState.sizeSize.TL(i + 1),
-                    uiEngineState.resolutionWidth, uiEngineState.sizeSize.TS)) {
+                    0, uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(i + 1),
+                    uiEngineState.resolutionWidth, uiEngineState.tileSize.TS)) {
                 return notification;
             }
         }
@@ -327,7 +324,7 @@ final class UICommonUtils {
         // Context Menu Item collision
         if (uiEngineState.openContextMenu != null) {
             for (int i = 0; i < uiEngineState.openContextMenu.items.size(); i++) {
-                if (Tools.Calc.pointRectsCollide(x, y, uiEngineState.openContextMenu.x, uiEngineState.openContextMenu.y - (uiEngineState.sizeSize.TS) - uiEngineState.sizeSize.TL(i), uiEngineState.sizeSize.TL(uiEngineState.displayedContextMenuWidth), uiEngineState.sizeSize.TS)) {
+                if (Tools.Calc.pointRectsCollide(x, y, uiEngineState.openContextMenu.x, uiEngineState.openContextMenu.y - (uiEngineState.tileSize.TS) - uiEngineState.tileSize.TL(i), uiEngineState.tileSize.TL(uiEngineState.displayedContextMenuWidth), uiEngineState.tileSize.TS)) {
                     return uiEngineState.openContextMenu.items.get(i);
                 }
             }
@@ -335,7 +332,7 @@ final class UICommonUtils {
 
         // Combobox Open Menu collision
         if (uiEngineState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox), UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.sizeSize.TL(uiEngineState.openComboBox.comboBoxItems.size())), uiEngineState.sizeSize.TL(uiEngineState.openComboBox.width), uiEngineState.sizeSize.TL(uiEngineState.openComboBox.comboBoxItems.size()))) {
+            if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox), UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.comboBoxItems.size())), uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.comboBoxItems.size()))) {
                 return uiEngineState.openComboBox;
             }
         }
@@ -347,9 +344,9 @@ final class UICommonUtils {
             if (!window.visible) continue windowLoop;
 
             int wndX = window.x;
-            int wndY = window.y + (window.folded ? uiEngineState.sizeSize.TL(window.height - 1) : 0);
-            int wndWidth = uiEngineState.sizeSize.TL(window.width);
-            int wndHeight = window.folded ? uiEngineState.sizeSize.TS : uiEngineState.sizeSize.TL(window.height);
+            int wndY = window.y + (window.folded ? uiEngineState.tileSize.TL(window.height - 1) : 0);
+            int wndWidth = uiEngineState.tileSize.TL(window.width);
+            int wndHeight = window.folded ? uiEngineState.tileSize.TS : uiEngineState.tileSize.TL(window.height);
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
@@ -376,7 +373,7 @@ final class UICommonUtils {
         if (component.disabled) return false;
         if (UICommonUtils.component_isHiddenByTab(component)) return false;
 
-        if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(component), UICommonUtils.component_getAbsoluteY(component), uiEngineState.sizeSize.TL(component.width), uiEngineState.sizeSize.TL(component.height))) {
+        if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(component), UICommonUtils.component_getAbsoluteY(component), uiEngineState.tileSize.TL(component.width), uiEngineState.tileSize.TL(component.height))) {
             return true;
         }
         return false;
@@ -516,8 +513,8 @@ final class UICommonUtils {
         boolean success = contextMenu_open(uiEngineState, mediaManager, contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
-            uiEngineState.mouse_emulated.x += uiEngineState.sizeSize.TS_HALF;
-            uiEngineState.mouse_emulated.y -= uiEngineState.sizeSize.TS_HALF;
+            uiEngineState.mouse_emulated.x += uiEngineState.tileSize.TS_HALF;
+            uiEngineState.mouse_emulated.y -= uiEngineState.tileSize.TS_HALF;
         }
         return success;
     }
@@ -535,10 +532,10 @@ final class UICommonUtils {
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextmenuItem contextMenuItem = contextMenu.items.get(i);
             int w = mediaManager.getCMediaFontTextWidth(contextMenuItem.font, contextMenuItem.text);
-            if (contextMenuItem.icon != null) w = w + uiEngineState.sizeSize.TS;
+            if (contextMenuItem.icon != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
-        uiEngineState.displayedContextMenuWidth = (textwidth + uiEngineState.sizeSize.TS) / uiEngineState.sizeSize.TS;
+        uiEngineState.displayedContextMenuWidth = (textwidth + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TS;
         uiEngineState.openContextMenu = contextMenu;
         if (uiEngineState.openContextMenu.contextMenuAction != null)
             uiEngineState.openContextMenu.contextMenuAction.onOpen();
@@ -617,16 +614,16 @@ final class UICommonUtils {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
-            imageButton.contentOffset_x = MathUtils.round((uiEngineState.sizeSize.TL(imageButton.width) - mediaManager.getCMediaSpriteWidth(imageButton.image)) / 2f);
-            imageButton.contentOffset_y = MathUtils.round((uiEngineState.sizeSize.TL(imageButton.height) - mediaManager.getCMediaSpriteHeight(imageButton.image)) / 2f);
+            imageButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(imageButton.width) - mediaManager.getCMediaSpriteWidth(imageButton.image)) / 2f);
+            imageButton.contentOffset_y = MathUtils.round((uiEngineState.tileSize.TL(imageButton.height) - mediaManager.getCMediaSpriteHeight(imageButton.image)) / 2f);
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
-            int iconWidth = textButton.icon != null ? uiEngineState.sizeSize.TS : 0;
+            int iconWidth = textButton.icon != null ? uiEngineState.tileSize.TS : 0;
             int contentWidth = mediaManager.getCMediaFontTextWidth(textButton.font, textButton.text) + 1 + iconWidth;
             int contentHeight = mediaManager.getCMediaFontTextHeight(textButton.font, textButton.text);
-            textButton.contentOffset_x = MathUtils.round((uiEngineState.sizeSize.TL(textButton.width) - contentWidth) / 2f);
-            textButton.contentOffset_y = MathUtils.round(((uiEngineState.sizeSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
+            textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
+            textButton.contentOffset_y = MathUtils.round(((uiEngineState.tileSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
         }
     }
 
@@ -661,7 +658,7 @@ final class UICommonUtils {
             }
         } else {
             String subContent = textField.content.substring(textField.offset, textField.markerPosition);
-            int width = uiEngineState.sizeSize.TL(textField.width) - 4;
+            int width = uiEngineState.tileSize.TL(textField.width) - 4;
             if (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
                 while (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
                     textField.offset++;
@@ -862,14 +859,9 @@ final class UICommonUtils {
         canvas.canvasImages.add(canvasImage);
     }
 
-    static void canvas_resizeMap(UIEngineState uiEngineState, Canvas canvas) {
-        int newWidth = uiEngineState.sizeSize.TL(canvas.width);
-        int newHeight = uiEngineState.sizeSize.TL(canvas.height);
-        canvas.colorMap = new ColorMap(newWidth, newHeight);
-    }
 
     static boolean canvas_isImageInsideCanvas(UIEngineState uiEngineState, Canvas canvas, int x, int y) {
-        return x >= 0 && x <= uiEngineState.sizeSize.TL(canvas.width) && y >= 0 && y <= uiEngineState.sizeSize.TL(canvas.height);
+        return x >= 0 && x <= uiEngineState.tileSize.TL(canvas.width) && y >= 0 && y <= uiEngineState.tileSize.TL(canvas.height);
     }
 
 
@@ -884,8 +876,35 @@ final class UICommonUtils {
         }
     }
 
+    static void colorMap_resize(ColorMap colorMap, int width, int height) {
+        int copyWidth = Math.max(width, colorMap.width);
+        int copyHeight = Math.max(height, colorMap.height);
+        float[][] r = new float[width][height];
+        float[][] g = new float[width][height];
+        float[][] b = new float[width][height];
+        float[][] a = new float[width][height];
+
+        for (int ix = 0; ix < copyWidth; ix++) {
+            for (int iy = 0; iy < copyHeight; iy++) {
+                r[ix][iy] = colorMap.r[ix][iy];
+                g[ix][iy] = colorMap.g[ix][iy];
+                b[ix][iy] = colorMap.b[ix][iy];
+                a[ix][iy] = colorMap.a[ix][iy];
+            }
+        }
+
+        colorMap.width = width;
+        colorMap.height = height;
+        colorMap.r = r;
+        colorMap.g = g;
+        colorMap.b = b;
+        colorMap.a = a;
+
+        return;
+    }
+
     static void colorMap_set(ColorMap colorMap, int x, int y, float r, float g, float b, float a) {
-        if(!colorMap_inBounds(colorMap,x,y)) return;
+        if (!colorMap_inBounds(colorMap, x, y)) return;
         colorMap.r[x][y] = r;
         colorMap.g[x][y] = g;
         colorMap.b[x][y] = b;
@@ -893,33 +912,33 @@ final class UICommonUtils {
     }
 
     static float colorMap_r(ColorMap colorMap, int x, int y) {
-        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
         return colorMap.r[x][y];
     }
 
     static float colorMap_g(ColorMap colorMap, int x, int y) {
-        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
         return colorMap.g[x][y];
     }
 
     static float colorMap_b(ColorMap colorMap, int x, int y) {
-        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
         return colorMap.b[x][y];
     }
 
     static float colorMap_a(ColorMap colorMap, int x, int y) {
-        if(!colorMap_inBounds(colorMap,x,y)) return 0f;
+        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
         return colorMap.a[x][y];
     }
 
     static Color colorMap_getPointAsColor(ColorMap colorMap, int x, int y) {
-        if(!colorMap_inBounds(colorMap, x,y)) return null;
+        if (!colorMap_inBounds(colorMap, x, y)) return null;
         return new Color(
                 colorMap.r[x][y],
                 colorMap.g[x][y],
                 colorMap.b[x][y],
                 colorMap.a[x][y]
-                );
+        );
     }
 
     static boolean colorMap_inBounds(ColorMap colorMap, int x, int y) {
@@ -933,33 +952,41 @@ final class UICommonUtils {
         canvas.canvasImages.remove(canvasImage);
     }
 
-    static void toolTip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
+    static void tooltip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
         tooltipImageSegment.image = image;
         if (tooltipImageSegment.image != null) {
-            tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(image) + uiEngineState.sizeSize.TS) / uiEngineState.sizeSize.TSF);
-            tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(image) + uiEngineState.sizeSize.TS) / uiEngineState.sizeSize.TSF);
+            tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+            tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         } else {
             tooltipImageSegment.width = 1;
             tooltipImageSegment.height = 1;
         }
     }
 
-    static void toolTip_setTextSegmentText(UIEngineState uiEngineState, MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
+    static void tooltip_setTextSegmentText(UIEngineState uiEngineState, MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = Tools.Text.validString(text);
-        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + uiEngineState.sizeSize.TS) / uiEngineState.sizeSize.TSF);
+        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         tooltipTextSegment.height = 1;
     }
 
-    static void toolTip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+    static void tooltip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (segment.addedToTooltip != null) return;
         segment.addedToTooltip = toolTip;
         toolTip.segments.add(segment);
     }
 
-    static void toolTip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+    static void tooltip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (segment.addedToTooltip != toolTip) return;
         segment.addedToTooltip = null;
         toolTip.segments.remove(segment);
+    }
+
+    static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height){
+        tooltipSegment.width = Math.max(width,0);
+        tooltipSegment.height = Math.max(height,0);
+        if(tooltipSegment instanceof TooltipCanvasSegment tooltipCanvasSegment){
+            UICommonUtils.colorMap_resize(tooltipCanvasSegment.colorMap, uiEngineState.tileSize.TL(width), uiEngineState.tileSize.TL(height));
+        }
     }
 
     static boolean comboBox_isOpen(UIEngineState uiEngineState, Combobox comboBox) {
@@ -1074,8 +1101,8 @@ final class UICommonUtils {
                 break;
             }
 
-            int tabHeight = tabBar.bigIconMode ? uiEngineState.sizeSize.TS2 : uiEngineState.sizeSize.TS;
-            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_bar + (tabXOffset * uiEngineState.sizeSize.TS), y_bar, tabWidth * uiEngineState.sizeSize.TS, tabHeight)) {
+            int tabHeight = tabBar.bigIconMode ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
+            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_bar + (tabXOffset * uiEngineState.tileSize.TS), y_bar, tabWidth * uiEngineState.tileSize.TS, tabHeight)) {
                 uiEngineState.itemInfo_tabBarTabIndex = i;
                 uiEngineState.itemInfo_tabBarValid = true;
                 return;
@@ -1101,7 +1128,7 @@ final class UICommonUtils {
                 if (itemIndex < list.items.size()) {
                     int itemOffsetY = ((list.height - 1) - iy);
                     if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
-                            x_list, y_list + uiEngineState.sizeSize.TL(itemOffsetY), uiEngineState.sizeSize.TL(list.width), uiEngineState.sizeSize.TS)) {
+                            x_list, y_list + uiEngineState.tileSize.TL(itemOffsetY), uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TS)) {
                         uiEngineState.itemInfo_listIndex = itemIndex;
                         uiEngineState.itemInfo_listValid = true;
                         return;
@@ -1109,7 +1136,7 @@ final class UICommonUtils {
                 }
             }
             // Insert at end
-            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_list, y_list, uiEngineState.sizeSize.TL(list.width), uiEngineState.sizeSize.TL(list.height))) {
+            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_list, y_list, uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TL(list.height))) {
                 uiEngineState.itemInfo_listIndex = list.items.size();
                 uiEngineState.itemInfo_listValid = true;
                 return;
@@ -1123,7 +1150,7 @@ final class UICommonUtils {
     }
 
     static void grid_updateItemInfoAtMousePosition(UIEngineState uiEngineState, Grid grid) {
-        int tileSize = grid.doubleSized ? uiEngineState.sizeSize.TS2 : uiEngineState.sizeSize.TS;
+        int tileSize = grid.doubleSized ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
         int x_grid = UICommonUtils.component_getAbsoluteX(grid);
         int y_grid = UICommonUtils.component_getAbsoluteY(grid);
         int inv_to_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
@@ -1218,7 +1245,7 @@ final class UICommonUtils {
             int widthT = mediaManager.getCMediaFontTextWidth(text.font, text.lines[i]);
             if (widthT > width) width = widthT;
         }
-        text.width = width / uiEngineState.sizeSize.TS;
+        text.width = width / uiEngineState.tileSize.TS;
         text.height = text.lines.length;
     }
 
@@ -1228,8 +1255,8 @@ final class UICommonUtils {
     }
 
     static void image_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC) {
-        imageC.width = imageC.image != null ? mediaManager.getCMediaSpriteWidth(imageC.image) / uiEngineState.sizeSize.TS : 0;
-        imageC.height = imageC.image != null ? mediaManager.getCMediaSpriteHeight(imageC.image) / uiEngineState.sizeSize.TS : 0;
+        imageC.width = imageC.image != null ? mediaManager.getCMediaSpriteWidth(imageC.image) / uiEngineState.tileSize.TS : 0;
+        imageC.height = imageC.image != null ? mediaManager.getCMediaSpriteHeight(imageC.image) / uiEngineState.tileSize.TS : 0;
     }
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
@@ -1261,12 +1288,12 @@ final class UICommonUtils {
         switch (scrollBar) {
             case ScrollbarHorizontal scrollBarHorizontal -> {
                 relativePos = mouse_ui_x - UICommonUtils.component_getAbsoluteX(scrollBarHorizontal);
-                maxPos = uiEngineState.sizeSize.TL(scrollBarHorizontal.width) - uiEngineState.sizeSize.TS;
+                maxPos = uiEngineState.tileSize.TL(scrollBarHorizontal.width) - uiEngineState.tileSize.TS;
                 buttonOffset = (1 / (float) scrollBarHorizontal.width) / 2f;
             }
             case ScrollbarVertical scrollBarVertical -> {
                 relativePos = mouse_ui_y - UICommonUtils.component_getAbsoluteY(scrollBarVertical);
-                maxPos = uiEngineState.sizeSize.TL(scrollBarVertical.height) - uiEngineState.sizeSize.TS;
+                maxPos = uiEngineState.tileSize.TL(scrollBarVertical.height) - uiEngineState.tileSize.TS;
                 buttonOffset = (1 / (float) scrollBarVertical.height) / 2f;
             }
             default -> throw new IllegalStateException("Unexpected value: " + scrollBar);
@@ -1287,8 +1314,8 @@ final class UICommonUtils {
         if (appViewPort.textureRegion != null) appViewPort.textureRegion.getTexture().dispose();
         if (appViewPort.frameBuffer != null) appViewPort.frameBuffer.dispose();
 
-        int viewportWidth = uiEngineState.sizeSize.TL(appViewPort.width);
-        int viewportHeight = uiEngineState.sizeSize.TL(appViewPort.height);
+        int viewportWidth = uiEngineState.tileSize.TL(appViewPort.width);
+        int viewportHeight = uiEngineState.tileSize.TL(appViewPort.height);
         // FrameBuffer
         appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
         // Texture

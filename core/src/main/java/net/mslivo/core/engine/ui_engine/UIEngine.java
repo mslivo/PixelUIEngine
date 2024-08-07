@@ -111,7 +111,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.resolutionHeightHalf = MathUtils.round(resolutionHeight / 2f);
         newUIEngineState.viewportMode = viewportMode != null ? viewportMode : VIEWPORT_MODE.PIXEL_PERFECT;
         newUIEngineState.gamePadSupport = gamePadSupport;
-        newUIEngineState.sizeSize = tileSize;
+        newUIEngineState.tileSize = tileSize;
 
         // ----- Config
         newUIEngineState.config = new UIConfig(newUIEngineState);
@@ -2325,7 +2325,35 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     render_batchSetColorWhite(segmentAlpha);
                     uiEngineState.spriteRenderer_ui.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }
-                case TooltipEmptySegment emptySegment -> {
+                case TooltipCanvasSegment canvasSegment -> {
+                    int width = TS(canvasSegment.width);
+                    int height = TS(canvasSegment.height);
+
+                    uiEngineState.spriteRenderer_ui.end();
+                    uiEngineState.primitiveRenderer_ui.begin();
+
+                    int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
+                        case LEFT -> 0;
+                        case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(TS(canvasSegment.width) / 2f);
+                        case RIGHT -> TS(tooltip_width) - TS(canvasSegment.width);
+                    };
+
+                    for (int icx = 0; icx < width; icx++) {
+                        for (int icy = 0; icy < height; icy++) {
+                            float a = canvasSegment.colorMap.a[icx][icy];
+                            if(a == 0) continue;
+                            float r = canvasSegment.colorMap.r[icx][icy];
+                            float g = canvasSegment.colorMap.g[icx][icy];
+                            float b = canvasSegment.colorMap.b[icx][icy];
+                            int vx = canvas_x + icx+1;
+                            int vy = tooltip_y + TS(iy) +icy+1;
+                            uiEngineState.primitiveRenderer_ui.setColor(1f,1f,1f,a * segmentAlpha);
+                            uiEngineState.primitiveRenderer_ui.setVertexColor(r,g,b,a);
+                            uiEngineState.primitiveRenderer_ui.vertex(vx,vy );
+                        }
+                    }
+                    uiEngineState.primitiveRenderer_ui.end();
+                    uiEngineState.spriteRenderer_ui.begin();
 
                 }
                 case null, default -> {
@@ -2602,24 +2630,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Canvas canvas -> {
                 int width = TS(canvas.width);
                 int height = TS(canvas.height);
-                render_saveTempColorBatch();
+
                 uiEngineState.spriteRenderer_ui.end();
                 uiEngineState.primitiveRenderer_ui.begin();
-                for (int ix = 0; ix < width; ix++) {
-                    for (int iy = 0; iy < height; iy++) {
-                        float r = canvas.colorMap.r[ix][iy];
-                        float g = canvas.colorMap.g[ix][iy];
-                        float b = canvas.colorMap.b[ix][iy];
-                        float a = canvas.colorMap.a[ix][iy];
+                for (int icx = 0; icx < width; icx++) {
+                    for (int icy = 0; icy < height; icy++) {
+                        float a = canvas.colorMap.a[icx][icy];
+                        if(a == 0f) continue;
+                        float r = canvas.colorMap.r[icx][icy];
+                        float g = canvas.colorMap.g[icx][icy];
+                        float b = canvas.colorMap.b[icx][icy];
                         uiEngineState.primitiveRenderer_ui.setColor(1f,1f,1f,a * componentAlpha);
                         uiEngineState.primitiveRenderer_ui.setVertexColor(r,g,b,a);
-                        uiEngineState.primitiveRenderer_ui.vertex(UICommonUtils.component_getAbsoluteX(canvas) + ix+1, UICommonUtils.component_getAbsoluteY(canvas) + iy+1);
+                        uiEngineState.primitiveRenderer_ui.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx+1, UICommonUtils.component_getAbsoluteY(canvas) + icy+1);
                     }
-
                 }
                 uiEngineState.primitiveRenderer_ui.end();
                 uiEngineState.spriteRenderer_ui.begin();
-                render_loadTempColorBatch();
 
 
                 for (int i = (canvas.canvasImages.size() - 1); i >= 0; i--) {
@@ -3044,19 +3071,19 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private int TS(int size) {
-        return uiEngineState.sizeSize.TL(size);
+        return uiEngineState.tileSize.TL(size);
     }
 
     private int TS() {
-        return uiEngineState.sizeSize.TS;
+        return uiEngineState.tileSize.TS;
     }
 
     private int TS_HALF() {
-        return uiEngineState.sizeSize.TS_HALF;
+        return uiEngineState.tileSize.TS_HALF;
     }
 
     private int TS2() {
-        return uiEngineState.sizeSize.TS2;
+        return uiEngineState.tileSize.TS2;
     }
 
 

@@ -51,7 +51,7 @@ public final class UIEngineState {
     public int resolutionWidthHalf, resolutionHeightHalf;
     public VIEWPORT_MODE viewportMode;
     public boolean gamePadSupport;
-    public TILE_SIZE sizeSize;
+    public TILE_SIZE tileSize;
 
     /* ##################### Config ########################## */
     public UIConfig config;

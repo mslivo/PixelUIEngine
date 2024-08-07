@@ -413,51 +413,51 @@ public final class API {
     }
 
     public int TS() {
-        return uiEngineState.sizeSize.TS;
+        return uiEngineState.tileSize.TS;
     }
 
     public int TS(int size) {
-        return uiEngineState.sizeSize.TL(size);
+        return uiEngineState.tileSize.TL(size);
     }
 
     public int TS_HALF() {
-        return uiEngineState.sizeSize.TS_HALF;
+        return uiEngineState.tileSize.TS_HALF;
     }
 
     public int TS2() {
-        return uiEngineState.sizeSize.TS2;
+        return uiEngineState.tileSize.TS2;
     }
 
     public int TS3() {
-        return uiEngineState.sizeSize.TS3;
+        return uiEngineState.tileSize.TS3;
     }
 
     public int TS4() {
-        return uiEngineState.sizeSize.TS4;
+        return uiEngineState.tileSize.TS4;
     }
 
     public float TSF() {
-        return uiEngineState.sizeSize.TSF;
+        return uiEngineState.tileSize.TSF;
     }
 
     public float TSF(float size) {
-        return uiEngineState.sizeSize.TLF(size);
+        return uiEngineState.tileSize.TLF(size);
     }
 
     public float TSF_HALF() {
-        return uiEngineState.sizeSize.TLF_HALF;
+        return uiEngineState.tileSize.TLF_HALF;
     }
 
     public float TSF2() {
-        return uiEngineState.sizeSize.TSF2;
+        return uiEngineState.tileSize.TSF2;
     }
 
     public float TSF3() {
-        return uiEngineState.sizeSize.TSF3;
+        return uiEngineState.tileSize.TSF3;
     }
 
     public float TSF4() {
-        return uiEngineState.sizeSize.TSF4;
+        return uiEngineState.tileSize.TSF4;
     }
 
 }

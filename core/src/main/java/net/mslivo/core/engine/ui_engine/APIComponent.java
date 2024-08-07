@@ -42,6 +42,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipCanvasSegment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -1040,7 +1041,16 @@ public final class APIComponent {
         public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             Canvas canvas = new Canvas();
             setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
-            canvas.colorMap = new ColorMap(api.TS(width), api.TS(height));
+            canvas.colorMap = new ColorMap();
+            int widthPx =  api.TS(width);
+            int heightPx =  api.TS(height);
+            canvas.colorMap.width = widthPx;
+            canvas.colorMap.height = heightPx;
+            canvas.colorMap.r = new float[widthPx][heightPx];
+            canvas.colorMap.g = new float[widthPx][heightPx];
+            canvas.colorMap.b = new float[widthPx][heightPx];
+            canvas.colorMap.a = new float[widthPx][heightPx];
+
             canvas.canvasAction = canvasAction;
             canvas.canvasImages = new ArrayList<>();
             if (canvasImages != null) {
@@ -1058,29 +1068,6 @@ public final class APIComponent {
         public void setCanvasAction(Canvas canvas, CanvasAction canvasAction) {
             if (canvas == null) return;
             canvas.canvasAction = canvasAction;
-        }
-
-        public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
-            if (canvas == null) return;
-            UICommonUtils.colorMap_set(canvas.colorMap, x, y, r, g, b, a);
-        }
-
-        public void point(Canvas canvas, int x, int y, Color color) {
-            point(canvas, x, y, color.r, color.g, color.b, color.a);
-        }
-
-        public void clear(Canvas canvas, float r, float g, float b, float a) {
-            if (canvas == null) return;
-            UICommonUtils.colorMap_clear(canvas.colorMap, r, g, b, a);
-        }
-
-        public void clear(Canvas canvas, Color color) {
-            clear(canvas, color.r, color.g, color.b, color.a);
-        }
-
-        public Color getPoint(Canvas canvas, int x, int y) {
-            if (canvas == null) return null;
-            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
         }
 
         public boolean isPointInBounds(Canvas canvas, int x, int y) {
@@ -1125,6 +1112,55 @@ public final class APIComponent {
             if (canvas == null || name == null) return null;
             ArrayList<CanvasImage> result = findMapOverlaysByName(canvas, name);
             return result.size() > 0 ? result.getFirst() : null;
+        }
+
+        /* Draw Functions */
+
+        public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
+            if (canvas == null) return;
+            UICommonUtils.colorMap_set(canvas.colorMap, x, y, r, g, b, a);
+        }
+
+        public void point(Canvas canvas, int x, int y, Color color) {
+            point(canvas, x, y, color.r, color.g, color.b, color.a);
+        }
+
+        public void clear(Canvas canvas, float r, float g, float b, float a) {
+            if (canvas == null) return;
+            UICommonUtils.colorMap_clear(canvas.colorMap, r, g, b, a);
+        }
+
+        public void clear(Canvas canvas, Color color) {
+            clear(canvas, color.r, color.g, color.b, color.a);
+        }
+
+        public Color getPoint(Canvas canvas, int x, int y) {
+            if (canvas == null) return null;
+            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
+        }
+
+        public Color getColor(Canvas canvas, int x, int y) {
+            if (canvas == null) return null;
+            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
+        }
+
+        public float getR(Canvas canvas, int x, int y) {
+            if (canvas == null) return 0f;
+            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+        }
+
+        public float getG(Canvas canvas, int x, int y) {
+            if (canvas == null) return 0f;
+            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+        }
+
+        public float getB(Canvas canvas, int x, int y) {
+            if (canvas == null) return 0f;
+            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+        }
+        public float getA(Canvas canvas, int x, int y) {
+            if (canvas == null) return 0f;
+            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
         }
 
         public final class APICanvasImage {
