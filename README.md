@@ -53,14 +53,14 @@ This library was used in the game [Sandtrix](https://www.sandtrix.net).
 ## Overview
 ### desktop/ ... /example
 
-Basic example producing the UI in the screenshot above providing a typical setup for the engine.
+Basic example producing the UI in the screenshot above showcasing a typical setup for the engine.
 
 ### core/ ... /engine.media_manager
 
 This asset manager uses assets in the form of an internal CMedia descriptor format.
-These assets can then be loaded at once and used/drawn via the MediaManager.
+These assets can then be loaded at once and used/drawn via the SpriteRenderer.
 
-The assets for the UI are contained in GUIBaseMedia and need to be loaded alongside your own assets for the UI to work.
+The assets for the UI are contained in UIBaseMedia and need to be loaded alongside your own assets for the UI to work.
 
 ### core/ ... /engine.ui_engine
 
@@ -73,22 +73,18 @@ The UIEngine then passes a API Object into the Adapter on init() from which all 
 These are not needed for the UI to work.
 This package contains useful classes that integrate seamlessly with the Engine and use the internal formats and classes.
 
-#### core.engine.tools/ ... GameEngine
+#### core.engine.tools/ ... AppEngine
 
-Provides a basic framework for a game engine which works on data in update cycles. 
-Offers input/output handling and uses an adapter approach similar to the UIEngine.
+Provides a basic framework for an engine which works in update cycles, provides input/output handling.
+Uses the same Adapter approach as the UIEngine.
 
 #### core.engine.tools/ ... JsonInlcudeParser
 
 A json parser which supports include files via JSON comments.
 
-#### core.engine.tools/ ... ListThreadUpdater
-
-Used for iterating over large lists by splitting the workload over multiple threads.
-
 #### core.engine.tools/ ... ParticleSystem
 
-A particle system using the MediaManager and CMedia graphics formats. Uses object pooling for performance.
+High performance particle systems using the MediaManager CMedia graphics formats and primitves.
 
 #### core.engine.tools/ ... SettingsManager
 
