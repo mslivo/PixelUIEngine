@@ -261,34 +261,29 @@ public final class APITooltip {
 
 
             public TooltipCanvasSegment create() {
-                return create(Color.WHITE, SEGMENT_ALIGNMENT.LEFT,false,false,false,1,1);
+                return create(Color.WHITE, SEGMENT_ALIGNMENT.LEFT,1,1,false,false,false);
             }
 
             public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
-                return create(Color.WHITE, alignment,false,false,false,1,1);
+                return create(Color.WHITE, alignment,1,1, false,false,false);
 
             }
 
             public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment) {
-                return create(color, alignment,false,false,false,1,1);
+                return create(color, alignment,1,1,false,false,false);
 
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge) {
-                return create(color,alignment,merge,false,false,1,1);
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge) {
+                return create(color,alignment,width,height,merge, false,false);
 
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
-                return create(color,alignment,merge,border,false,1,1);
-
+            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge, boolean border) {
+                return create(color,alignment,width,height,merge,border,false);
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
-                return create(color,alignment,merge,border,clear,1,1);
-            }
-
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear, int width, int height) {
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge, boolean border, boolean clear) {
                 TooltipCanvasSegment tooltipCanvasSegment = new TooltipCanvasSegment();
                 setSegmentValues(tooltipCanvasSegment, color, alignment, width, height, merge, border, clear);
                 tooltipCanvasSegment.colorMap = new ColorMap();
