@@ -1134,6 +1134,11 @@ public final class APIComponent {
             clear(canvas, color.r, color.g, color.b, color.a);
         }
 
+        public void copy(Canvas canvas, ColorMap colorMap) {
+            if(canvas == null) return;
+            UICommonUtils.colorMap_copy(colorMap, canvas.colorMap);
+        }
+
         public Color getPoint(Canvas canvas, int x, int y) {
             if (canvas == null) return null;
             return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);

@@ -941,6 +941,19 @@ final class UICommonUtils {
         );
     }
 
+    static void colorMap_copy(ColorMap colorMapFrom, ColorMap colorMapTo) {
+        int width = Math.min(colorMapFrom.width, colorMapTo.width);
+        int height = Math.min(colorMapFrom.height, colorMapTo.height);
+        for(int ix=0;ix<width;ix++) {
+            for (int iy = 0; iy < height; iy++) {
+                colorMapTo.r[ix][iy] = colorMapFrom.r[ix][iy];
+                colorMapTo.g[ix][iy] = colorMapFrom.g[ix][iy];
+                colorMapTo.b[ix][iy] = colorMapFrom.b[ix][iy];
+                colorMapTo.a[ix][iy] = colorMapFrom.a[ix][iy];
+            }
+        }
+    }
+
     static boolean colorMap_inBounds(ColorMap colorMap, int x, int y) {
         return x < colorMap.width && y < colorMap.height;
     }

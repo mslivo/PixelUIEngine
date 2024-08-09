@@ -321,6 +321,11 @@ public final class APITooltip {
                 clear(tooltipCanvasSegment, color.r, color.g, color.b, color.a);
             }
 
+            public void copy(TooltipCanvasSegment tooltipCanvasSegment, ColorMap colorMap) {
+                if(tooltipCanvasSegment == null) return;
+                UICommonUtils.colorMap_copy(colorMap, tooltipCanvasSegment.colorMap);
+            }
+
             public Color getColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return null;
                 return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x, y);
