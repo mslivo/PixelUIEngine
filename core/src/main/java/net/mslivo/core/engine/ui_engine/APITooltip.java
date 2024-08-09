@@ -333,17 +333,17 @@ public final class APITooltip {
 
             public float getG(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
+                return UICommonUtils.colorMap_g(tooltipCanvasSegment.colorMap, x, y);
             }
 
             public float getB(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
+                return UICommonUtils.colorMap_b(tooltipCanvasSegment.colorMap, x, y);
             }
 
             public float getA(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
+                return UICommonUtils.colorMap_a(tooltipCanvasSegment.colorMap, x, y);
             }
 
         }
