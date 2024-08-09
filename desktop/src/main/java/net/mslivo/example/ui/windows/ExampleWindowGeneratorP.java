@@ -446,7 +446,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         });
 
 
-        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.WHITE, SEGMENT_ALIGNMENT.CENTER,false,false,false,8,3);
+        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.WHITE, SEGMENT_ALIGNMENT.CENTER,8,3);
 
         api.window.addUpdateAction(window, new UpdateAction(0) {
             @Override

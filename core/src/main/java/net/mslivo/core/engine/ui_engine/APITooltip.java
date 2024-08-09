@@ -65,7 +65,7 @@ public final class APITooltip {
         tooltip.segments = new ArrayList<>();
         tooltip.color_border = new Color(borderColor);
         tooltip.color_line = new Color(lineColor);
-        tooltip.lineLength = Math.max(lineLength,0);
+        tooltip.lineLength = Math.max(lineLength, 0);
         tooltip.minWidth = Math.max(minWidth, 0);
         if (segments != null) {
             for (int i = 0; i < segments.length; i++) {
@@ -132,9 +132,9 @@ public final class APITooltip {
             tooltipSegment.border = border;
         }
 
-        public void resize(TooltipSegment tooltipSegment, int width, int height){
-            if(tooltipSegment == null) return;
-            UICommonUtils.tooltip_resizeSegment(uiEngineState,tooltipSegment, width, height);
+        public void resize(TooltipSegment tooltipSegment, int width, int height) {
+            if (tooltipSegment == null) return;
+            UICommonUtils.tooltip_resizeSegment(uiEngineState, tooltipSegment, width, height);
         }
 
         private void setSegmentValues(TooltipSegment tooltipSegment, Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
@@ -261,34 +261,37 @@ public final class APITooltip {
 
 
             public TooltipCanvasSegment create() {
-                return create(Color.WHITE, SEGMENT_ALIGNMENT.LEFT,1,1,false,false,false);
+                return create(Color.WHITE, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
             public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
-                return create(Color.WHITE, alignment,1,1, false,false,false);
+                return create(Color.WHITE, alignment, 1, 1, false, false, false);
 
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment) {
-                return create(color, alignment,1,1,false,false,false);
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment) {
+                return create(color, alignment, 1, 1, false, false, false);
+            }
+
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height) {
+                return create(color, alignment, width, height, false, false, false);
+            }
+
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
+                return create(color, alignment, width, height, merge, false, false);
 
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge) {
-                return create(color,alignment,width,height,merge, false,false);
-
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
+                return create(color, alignment, width, height, merge, border, false);
             }
 
-            public TooltipCanvasSegment create(Color color,SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge, boolean border) {
-                return create(color,alignment,width,height,merge,border,false);
-            }
-
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment,int width, int height, boolean merge, boolean border, boolean clear) {
+            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
                 TooltipCanvasSegment tooltipCanvasSegment = new TooltipCanvasSegment();
                 setSegmentValues(tooltipCanvasSegment, color, alignment, width, height, merge, border, clear);
                 tooltipCanvasSegment.colorMap = new ColorMap();
-                int widthPx =  api.TS(width);
-                int heightPx =  api.TS(height);
+                int widthPx = api.TS(width);
+                int heightPx = api.TS(height);
                 tooltipCanvasSegment.colorMap.width = widthPx;
                 tooltipCanvasSegment.colorMap.height = heightPx;
                 tooltipCanvasSegment.colorMap.r = new float[widthPx][heightPx];
@@ -320,26 +323,27 @@ public final class APITooltip {
 
             public Color getColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return null;
-                return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x,y);
+                return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x, y);
             }
 
             public float getR(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
             }
 
             public float getG(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
             }
 
             public float getB(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
             }
+
             public float getA(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x,y);
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
             }
 
         }
