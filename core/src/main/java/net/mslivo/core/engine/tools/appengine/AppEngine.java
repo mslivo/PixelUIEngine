@@ -11,11 +11,13 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     private static final Object[] RESET_OBJECT = new Object[AppEngineIO.PARAMETERS_MAX];
     private static final int[] RESET_INT = new int[AppEngineIO.PARAMETERS_MAX];
     private static final float[] RESET_FLOAT = new float[AppEngineIO.PARAMETERS_MAX];
+    private static final boolean[] RESET_BOOLEAN = new boolean[AppEngineIO.PARAMETERS_MAX];
     static {
         for(int i=0;i<AppEngineIO.PARAMETERS_MAX;i++){
             RESET_OBJECT[i] = null;
             RESET_INT[i] = 0;
             RESET_FLOAT[i] = 0;
+            RESET_BOOLEAN[i] = false;
         }
     }
 

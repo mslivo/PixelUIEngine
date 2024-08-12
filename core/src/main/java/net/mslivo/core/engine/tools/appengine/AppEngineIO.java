@@ -3,25 +3,30 @@ package net.mslivo.core.engine.tools.appengine;
 public class AppEngineIO {
 
     public enum PARAMETER_TYPE {
-        OBJECT, INTEGER, FLOAT
+        OBJECT, INTEGER, FLOAT, BOOLEAN
     }
 
     public static final int PARAMETERS_MAX = 16;
     private static final String ERROR_PARAMETERS_MAX = String.format("Push exceeds maximum parameter limit of %s", PARAMETERS_MAX);
     private static final String ERROR_INT_AUTOBOXING = "Integer autoboxed, use pushInt() instead of push()";
     private static final String ERROR_FLOAT_AUTOBOXING = "Float autoboxed, use pushFloat() instead of push()";
+    private static final String ERROR_BOOLEAN_AUTOBOXING = "Boolean autoboxed, use pushBoolean() instead of push()";
     private static final String ERROR_PARAMETERS_COUNT = "Poll exceeds the parameter count of %s";
+
     int type;
     int readIndex, writeIndex;
-    Object[] objectStack;
-    int[] intStack;
-    float[] floatStack;
+    final Object[] objectStack;
+    final int[] intStack;
+    final float[] floatStack;
+    final boolean[] booleanStack;
+
     PARAMETER_TYPE[] parameterTypes;
 
     AppEngineIO() {
         this.objectStack = new Object[PARAMETERS_MAX];
         this.intStack = new int[PARAMETERS_MAX];
         this.floatStack = new float[PARAMETERS_MAX];
+        this.booleanStack = new boolean[PARAMETERS_MAX];
         this.parameterTypes = new PARAMETER_TYPE[PARAMETERS_MAX];
     }
 
@@ -30,6 +35,7 @@ public class AppEngineIO {
         switch (parameter){
             case Integer _ -> throw new RuntimeException(ERROR_INT_AUTOBOXING);
             case Float _ -> throw new RuntimeException(ERROR_FLOAT_AUTOBOXING);
+            case Boolean _ -> throw new RuntimeException(ERROR_BOOLEAN_AUTOBOXING);
             case null, default -> {
                 objectStack[writeIndex] = parameter;
                 parameterTypes[writeIndex] = PARAMETER_TYPE.OBJECT;
@@ -53,6 +59,36 @@ public class AppEngineIO {
         push(parameter1).push(parameter2).push(parameter3).push(parameter4);
         return this;
     }
+
+    public AppEngineIO pushBoolean(boolean parameter) {
+        if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
+        booleanStack[writeIndex] = parameter;
+        parameterTypes[writeIndex] = PARAMETER_TYPE.BOOLEAN;
+        writeIndex++;
+        return this;
+    }
+
+    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2) {
+        pushBoolean(parameter1);
+        pushBoolean(parameter2);
+        return this;
+    }
+
+    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2,boolean parameter3) {
+        pushBoolean(parameter1);
+        pushBoolean(parameter2);
+        pushBoolean(parameter3);
+        return this;
+    }
+
+    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2,boolean parameter3,boolean parameter4) {
+        pushBoolean(parameter1);
+        pushBoolean(parameter2);
+        pushBoolean(parameter3);
+        pushBoolean(parameter4);
+        return this;
+    }
+
 
     public AppEngineIO pushInt(int parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
@@ -118,7 +154,13 @@ public class AppEngineIO {
             case OBJECT -> objectStack[readIndex++];
             case INTEGER -> intStack[readIndex++];
             case FLOAT -> floatStack[readIndex++];
+            case BOOLEAN -> booleanStack[readIndex++];
         };
+    }
+
+    public boolean pollBoolean() {
+        checkPoll();
+        return booleanStack[readIndex++];
     }
 
     public int pollInt() {
