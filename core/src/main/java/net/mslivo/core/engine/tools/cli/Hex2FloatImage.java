@@ -17,7 +17,7 @@ public class Hex2FloatImage {
 
         boolean color = true;
         int skip = 0;
-        System.out.println("public enum COLOR {");
+        System.out.println("public enum WATER_COLOR {");
 
             int value = 1;
         for (int x = 0; x < image.getWidth(); x++) {
@@ -43,7 +43,7 @@ public class Hex2FloatImage {
         System.out.println("");
         System.out.println("public final float r,g,b,a;");
         System.out.println("");
-        System.out.println("COLOR(float r,float g, float b, float a){");
+        System.out.println("WATER_COLOR(float r,float g, float b, float a){");
         System.out.println("        this.r = r;");
         System.out.println("        this.g = g;");
         System.out.println("        this.b = b;");

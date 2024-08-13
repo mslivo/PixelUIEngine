@@ -221,7 +221,7 @@ public class SpriteRenderer implements Batch {
         shader.bind();
         setupMatrices();
 
-        if(!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
+        if (!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
         drawing = true;
@@ -957,32 +957,32 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
         vertices[idx++] = x1;
-        vertices[idx ++] = y1;
-        vertices[idx ++] = color;
-        vertices[idx ++] = u;
-        vertices[idx ++] = v;
-        vertices[idx ++] = hslt;
+        vertices[idx++] = y1;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
 
-        vertices[idx ++] = x2;
-        vertices[idx ++] = y2;
-        vertices[idx ++] = color;
-        vertices[idx ++] = u;
-        vertices[idx ++] = v2;
-        vertices[idx ++] = hslt;
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx ++] = x3;
-        vertices[idx ++] = y3;
-        vertices[idx ++] = color;
-        vertices[idx ++] = u2;
-        vertices[idx ++] = v2;
-        vertices[idx ++] = hslt;
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+        vertices[idx++] = hslt;
 
-        vertices[idx ++] = x4;
-        vertices[idx ++] = y4;
-        vertices[idx ++] = color;
-        vertices[idx ++] = u2;
-        vertices[idx ++] = v;
-        vertices[idx ++] = hslt;
+        vertices[idx++] = x4;
+        vertices[idx++] = y4;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+        vertices[idx++] = hslt;
     }
 
     @Override
@@ -1230,7 +1230,7 @@ public class SpriteRenderer implements Batch {
         this.dstRGB = dstFuncColor;
         this.srcAlpha = srcFuncAlpha;
         this.dstAlpha = dstFuncAlpha;
-        if(drawing) {
+        if (drawing) {
             flush();
             Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
         }
@@ -1478,16 +1478,28 @@ public class SpriteRenderer implements Batch {
 
     /* --- CMediaFont  --- */
 
-    public void drawCMediaFont(CMediaFont cMedia, float x, float y, String text) {
-        if (cMedia == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMedia);
-        bitmapFont.draw(this, text, (x + cMedia.offset_x), (y + cMedia.offset_y));
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
+        if (cMediaFont == null) return;
+        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
+        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y));
     }
 
-    public void drawCMediaFont(CMediaFont cMedia, float x, float y, String text, int maxWidth) {
-        if (cMedia == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMedia);
-        bitmapFont.draw(this, text, (x + cMedia.offset_x), (y + cMedia.offset_y), 0, text.length(), maxWidth, Align.left, true, "");
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
+        if (cMediaFont == null) return;
+        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
+        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, true, null);
+    }
+
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth, boolean centerX, boolean centerY) {
+        if (cMediaFont == null) return;
+        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
+        int xOffset = cMediaFont.offset_x;
+        int yOffset = cMediaFont.offset_y;
+        if (centerX)
+            xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
+        if (centerY)
+            yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
+        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, true, null);
     }
 
     /* -----  CMediaSprite ----- */
