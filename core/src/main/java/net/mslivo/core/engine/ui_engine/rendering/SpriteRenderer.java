@@ -1490,6 +1490,18 @@ public class SpriteRenderer implements Batch {
         bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, true, null);
     }
 
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY) {
+        if (cMediaFont == null) return;
+        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
+        int xOffset = cMediaFont.offset_x;
+        int yOffset = cMediaFont.offset_y;
+        if (centerX)
+            xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
+        if (centerY)
+            yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
+        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset));
+    }
+
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth, boolean centerX, boolean centerY) {
         if (cMediaFont == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);

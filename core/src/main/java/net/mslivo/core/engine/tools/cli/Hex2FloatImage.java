@@ -1,18 +1,22 @@
 package net.mslivo.core.engine.tools.cli;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class Hex2FloatImage {
+public class Hex2FloatImage implements ClipboardOwner {
 
     public static void main(String[] args) throws Exception {
 
-        hex2FloatImage("D:\\Code\\waves\\dev\\watercolor.png");
+        new Hex2FloatImage().hex2FloatImage("D:\\Code\\waves\\dev\\watercolor.png");
 
     }
 
-    public static void hex2FloatImage(String path) throws Exception {
+    public void hex2FloatImage(String path) throws Exception {
         BufferedImage image = ImageIO.read(new File(path));
 
         boolean color = true;
@@ -53,6 +57,11 @@ public class Hex2FloatImage {
         System.out.println("}");
 
 
+
     }
 
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+
+    }
 }
