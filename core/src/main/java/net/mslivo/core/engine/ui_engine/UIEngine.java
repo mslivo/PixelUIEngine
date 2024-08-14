@@ -2952,7 +2952,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
         } else {
-            if (withIcon) maxWidth -= TS();
+            if (withIcon) maxWidth += TS();
             uiEngineState.spriteRenderer_ui.drawCMediaFont(font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
