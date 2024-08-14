@@ -80,6 +80,8 @@ public class PrimitiveRenderer {
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
+    private static final int VERTEX_SIZE_X2 = VERTEX_SIZE*2;
+    private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
     private static final int ARRAY_RESIZE_STEP = 8192;
 
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
@@ -197,12 +199,14 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         try {
-            vertices[idx++] = x;
-            vertices[idx++] = y;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx] = x;
+            vertices[idx+1] = y;
+            vertices[idx+2] = 0;
+            vertices[idx+3] = vertexColor;
+            vertices[idx+4] = color;
+            vertices[idx+5] = hslt;
+
+            idx += VERTEX_SIZE;
         } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
@@ -212,19 +216,21 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         try {
-            vertices[idx++] = x1;
-            vertices[idx++] = y1;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx] = x1;
+            vertices[idx+1] = y1;
+            vertices[idx+2] = 0;
+            vertices[idx+3] = vertexColor;
+            vertices[idx+4] = color;
+            vertices[idx+5] = hslt;
 
-            vertices[idx++] = x2;
-            vertices[idx++] = y2;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx+6] = x2;
+            vertices[idx+7] = y2;
+            vertices[idx+8] = 0;
+            vertices[idx+9] = vertexColor;
+            vertices[idx+10] = color;
+            vertices[idx+11] = hslt;
+
+            idx += VERTEX_SIZE_X2;
         } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
@@ -234,26 +240,28 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         try {
-            vertices[idx++] = x1;
-            vertices[idx++] = y1;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx] = x1;
+            vertices[idx+1] = y1;
+            vertices[idx+2] = 0;
+            vertices[idx+3] = vertexColor;
+            vertices[idx+4] = color;
+            vertices[idx+5] = hslt;
 
-            vertices[idx++] = x2;
-            vertices[idx++] = y2;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx+6] = x2;
+            vertices[idx+7] = y2;
+            vertices[idx+8] = 0;
+            vertices[idx+9] = vertexColor;
+            vertices[idx+10] = color;
+            vertices[idx+11] = hslt;
 
-            vertices[idx++] = x3;
-            vertices[idx++] = y3;
-            vertices[idx++] = 0;
-            vertices[idx++] = vertexColor;
-            vertices[idx++] = color;
-            vertices[idx++] = hslt;
+            vertices[idx+12] = x3;
+            vertices[idx+13] = y3;
+            vertices[idx+14] = 0;
+            vertices[idx+15] = vertexColor;
+            vertices[idx+16] = color;
+            vertices[idx+17] = hslt;
+
+            idx += VERTEX_SIZE_X3;
         } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
