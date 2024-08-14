@@ -80,7 +80,7 @@ public class PrimitiveRenderer {
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
-    private static final int ARRAY_RESIZE_STEP = 10240;
+    private static final int ARRAY_RESIZE_STEP = 8192;
 
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
@@ -136,8 +136,8 @@ public class PrimitiveRenderer {
         this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP*VERTEX_SIZE, null);
-        this.mesh = createMesh(ARRAY_RESIZE_STEP*VERTEX_SIZE);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP * VERTEX_SIZE, null);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP * VERTEX_SIZE);
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -196,81 +196,86 @@ public class PrimitiveRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkArraySize(1);
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x;
+            vertices[idx++] = y;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
     }
 
     public void vertex(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkArraySize(2);
-        vertices[idx++] = x1;
-        vertices[idx++] = y1;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x1;
+            vertices[idx++] = y1;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x2;
-        vertices[idx++] = y2;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x2;
+            vertices[idx++] = y2;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
     }
 
     public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkArraySize(3);
-        vertices[idx++] = x1;
-        vertices[idx++] = y1;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x1;
+            vertices[idx++] = y1;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x2;
-        vertices[idx++] = y2;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x2;
+            vertices[idx++] = y2;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x3;
-        vertices[idx++] = y3;
-        vertices[idx++] = 0;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x3;
+            vertices[idx++] = y3;
+            vertices[idx++] = 0;
+            vertices[idx++] = vertexColor;
+            vertices[idx++] = color;
+            vertices[idx++] = hslt;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
     }
-
 
     public boolean isDrawing() {
         return drawing;
     }
 
+    private void resizeArray() {
+        int verticesSizeNew = this.vertices.length + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
+        this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
 
-    private void checkArraySize(int factor) {
-        if ((idx + (VERTEX_SIZE*factor)) > mesh.getMaxVertices()) {
-            int verticesSizeNew = this.vertices.length+(ARRAY_RESIZE_STEP*VERTEX_SIZE);
-            this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
-
-            int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
-            this.mesh.dispose();
-            this.mesh = createMesh(meshSizeNew);
-        }
+        this.mesh.dispose();
+        int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
+        this.mesh = createMesh(meshSizeNew);
     }
 
     private float[] createVerticesArray(int size, float[] copyFrom) {
         float[] newVertices = new float[size];
         // Copy from Old if exists
-        if(copyFrom != null) {
+        if (copyFrom != null) {
             System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
         }
         return newVertices;

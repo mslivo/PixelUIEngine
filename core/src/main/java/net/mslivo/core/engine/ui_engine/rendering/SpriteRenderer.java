@@ -93,7 +93,7 @@ public class SpriteRenderer implements Batch {
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
     private static final int VERTEX_SIZE = 6;
-    private static final int SPRITE_SIZE = VERTEX_SIZE*4;
+    private static final int SPRITE_SIZE = VERTEX_SIZE * 4;
     private static final int ARRAY_RESIZE_STEP = 1024;
     public static final String HSLT_ATTRIBUTE = "a_hslt";
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
@@ -165,8 +165,8 @@ public class SpriteRenderer implements Batch {
         this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.srcAlpha = GL20.GL_SRC_ALPHA;
         this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP*SPRITE_SIZE, null);
-        this.mesh = createMesh(ARRAY_RESIZE_STEP*VERTEX_SIZE);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP * SPRITE_SIZE, null);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP * VERTEX_SIZE);
         this.backup_color = COLOR_RESET;
         this.backup_hslt = HSLT_RESET;
         this.backup_srcRGB = GL20.GL_SRC_ALPHA;
@@ -176,7 +176,7 @@ public class SpriteRenderer implements Batch {
         this.mediaManager = mediaManager;
     }
 
-    private short[] createMeshIndices(int size){
+    private short[] createMeshIndices(int size) {
         short j = 0;
         short[] indices = new short[size];
         for (int i = 0; i < size; i += 6, j += 4) {
@@ -205,29 +205,27 @@ public class SpriteRenderer implements Batch {
         setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 
-    private void checkArraySize(int factor) {
-        if ((idx + (VERTEX_SIZE*factor)) > mesh.getMaxVertices()) {
-            int verticesSizeNew = this.vertices.length+(ARRAY_RESIZE_STEP*SPRITE_SIZE);
-            this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
+    private void resizeArray() {
+        int verticesSizeNew = this.vertices.length + (ARRAY_RESIZE_STEP * SPRITE_SIZE);
+        this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
 
-            int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
-            this.mesh.dispose();
-            this.mesh = createMesh(meshSizeNew);
-        }
+        this.mesh.dispose();
+        int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
+        this.mesh = createMesh(meshSizeNew);
     }
 
     private float[] createVerticesArray(int size, float[] copyFrom) {
         float[] newVertices = new float[size];
         // Copy from Old if exists
-        if(copyFrom != null) {
+        if (copyFrom != null) {
             System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
         }
         return newVertices;
     }
 
     private Mesh createMesh(int size) {
-        Mesh mesh =  new Mesh(Mesh.VertexDataType.VertexArray,
-                true, size * VERTEX_SIZE, size ,
+        Mesh mesh = new Mesh(Mesh.VertexDataType.VertexArray,
+                true, size * VERTEX_SIZE, size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
@@ -492,34 +490,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
-        vertices[idx++] = x1;
-        vertices[idx++] = y1;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x1;
+            vertices[idx++] = y1;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x2;
-        vertices[idx++] = y2;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x2;
+            vertices[idx++] = y2;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x3;
-        vertices[idx++] = y3;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x3;
+            vertices[idx++] = y3;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x4;
-        vertices[idx++] = y4;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x4;
+            vertices[idx++] = y4;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
     }
 
     @Override
@@ -556,34 +557,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x;
+            vertices[idx++] = y;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x;
-        vertices[idx++] = fy2;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x;
+            vertices[idx++] = fy2;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = fx2;
-        vertices[idx++] = fy2;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = fx2;
+            vertices[idx++] = fy2;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = fx2;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+            vertices[idx++] = fx2;
+            vertices[idx++] = y;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
     }
 
     @Override
@@ -607,7 +611,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -635,6 +639,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u2;
         vertices[idx++] = v;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @Override
@@ -654,7 +661,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -682,6 +689,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u2;
         vertices[idx++] = v;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @Override
@@ -710,7 +720,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -738,6 +748,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u2;
         vertices[idx++] = v;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     /**
@@ -868,34 +881,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+        try {
+            vertices[idx++] = x;
+            vertices[idx++] = y;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = x;
-        vertices[idx++] = fy2;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = x;
+            vertices[idx++] = fy2;
+            vertices[idx++] = color;
+            vertices[idx++] = u;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = fx2;
-        vertices[idx++] = fy2;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
-        vertices[idx++] = hslt;
+            vertices[idx++] = fx2;
+            vertices[idx++] = fy2;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v2;
+            vertices[idx++] = hslt;
 
-        vertices[idx++] = fx2;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-        vertices[idx++] = hslt;
+            vertices[idx++] = fx2;
+            vertices[idx++] = y;
+            vertices[idx++] = color;
+            vertices[idx++] = u2;
+            vertices[idx++] = v;
+            vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @Override
@@ -993,7 +1009,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -1021,6 +1037,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u2;
         vertices[idx++] = v;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @Override
@@ -1134,7 +1153,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -1162,6 +1181,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u4;
         vertices[idx++] = v4;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @Override
@@ -1195,7 +1217,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        checkArraySize(4);
+        try{
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -1223,6 +1245,9 @@ public class SpriteRenderer implements Batch {
         vertices[idx++] = u2;
         vertices[idx++] = v;
         vertices[idx++] = hslt;
+        }catch (ArrayIndexOutOfBoundsException _){
+            resizeArray();
+        }
     }
 
     @SuppressWarnings("RedundantCast") // These casts are absolutely not redundant! Java 9 changed Buffer ABI.
