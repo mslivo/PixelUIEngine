@@ -140,7 +140,7 @@ public class PrimitiveRenderer {
         this.projectionMatrix.set(projection);
     }
 
-    public Matrix4 getProjectionMatrix(Matrix4 projection) {
+    public Matrix4 getProjectionMatrix() {
         return this.projectionMatrix;
     }
 
@@ -188,16 +188,6 @@ public class PrimitiveRenderer {
         this.mesh.dispose();
     }
 
-    public void vertex(float x, float y, float z) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        checkMeshSize(1);
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = z;
-        vertices[idx++] = vertexColor;
-        vertices[idx++] = color;
-        vertices[idx++] = hslt;
-    }
 
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
