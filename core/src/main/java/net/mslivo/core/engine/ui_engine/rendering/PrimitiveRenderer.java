@@ -73,15 +73,15 @@ public class PrimitiveRenderer {
                 }
             """;
 
+    private static final String HSLT_ATTRIBUTE = "a_hslt";
+    private static final String COLOR_ATTRIBUTE = "a_color";
+    private static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
-    public static final String HSLT_ATTRIBUTE = "a_hslt";
-    public static final String COLOR_ATTRIBUTE = "a_color";
-    public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     private static final int VERTEX_SIZE = 6;
-    private static final int MESH_SIZE_VERTICES = 5000 * VERTEX_SIZE;
-    private static final int MESH_SIZE_INDICES = 0;
+    private static final int ARRAY_RESIZE_STEP = 10240;
+
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
 
@@ -111,6 +111,10 @@ public class PrimitiveRenderer {
     private int backup_dstAlpha;
 
     public PrimitiveRenderer() {
+        this(10240);
+    }
+
+    public PrimitiveRenderer(int size) {
         this.shader = new ShaderProgram(VERTEX, FRAGMENT);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
@@ -132,8 +136,8 @@ public class PrimitiveRenderer {
         this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.vertices = new float[MESH_SIZE_VERTICES];
-        this.mesh = createMesh(MESH_SIZE_VERTICES);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP*VERTEX_SIZE, null);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP*VERTEX_SIZE);
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -159,7 +163,7 @@ public class PrimitiveRenderer {
 
 
         // Blending
-        if(!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
+        if (!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
         this.drawing = true;
@@ -172,7 +176,7 @@ public class PrimitiveRenderer {
         this.drawing = false;
     }
 
-    private void flush(){
+    private void flush() {
         if (idx == 0) return;
 
         renderCalls++;
@@ -191,7 +195,8 @@ public class PrimitiveRenderer {
 
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        checkMeshSize(1);
+
+        checkArraySize(1);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = 0;
@@ -200,9 +205,10 @@ public class PrimitiveRenderer {
         vertices[idx++] = hslt;
     }
 
-    public void vertex(float x1, float y1,float x2, float y2) {
+    public void vertex(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        checkMeshSize(2);
+
+        checkArraySize(2);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = 0;
@@ -218,9 +224,10 @@ public class PrimitiveRenderer {
         vertices[idx++] = hslt;
     }
 
-    public void vertex(float x1, float y1,float x2, float y2,float x3, float y3) {
+    public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        checkMeshSize(3);
+
+        checkArraySize(3);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = 0;
@@ -248,20 +255,29 @@ public class PrimitiveRenderer {
         return drawing;
     }
 
-    private void checkMeshSize(int factor) {
+
+    private void checkArraySize(int factor) {
         if ((idx + (VERTEX_SIZE*factor)) > mesh.getMaxVertices()) {
-            int newSize = mesh.getMaxVertices() + MESH_SIZE_VERTICES;
-            float[] newVertices = new float[newSize];
-            System.arraycopy(vertices, 0, newVertices, 0, vertices.length);
-            this.vertices = newVertices;
-            Mesh newMesh = createMesh(newSize);
-            mesh.dispose();
-            mesh = newMesh;
+            int verticesSizeNew = this.vertices.length+(ARRAY_RESIZE_STEP*VERTEX_SIZE);
+            this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
+
+            int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
+            this.mesh.dispose();
+            this.mesh = createMesh(meshSizeNew);
         }
     }
 
-    private Mesh createMesh(int vertices) {
-        return new Mesh(Mesh.VertexDataType.VertexArray,true,vertices, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+    private float[] createVerticesArray(int size, float[] copyFrom) {
+        float[] newVertices = new float[size];
+        // Copy from Old if exists
+        if(copyFrom != null) {
+            System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
+        }
+        return newVertices;
+    }
+
+    private Mesh createMesh(int size) {
+        return new Mesh(Mesh.VertexDataType.VertexArray, true, size, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE));
@@ -410,8 +426,8 @@ public class PrimitiveRenderer {
         setPackedColor(COLOR_RESET);
     }
 
-    public void setBlendFunctionReset(){
-        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    public void setBlendFunctionReset() {
+        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setHSLTAndColorReset() {
@@ -436,7 +452,7 @@ public class PrimitiveRenderer {
         this.dstRGB = dstFuncColor;
         this.srcAlpha = srcFuncAlpha;
         this.dstAlpha = dstFuncAlpha;
-        if(drawing) {
+        if (drawing) {
             flush();
             Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
         }
@@ -471,7 +487,7 @@ public class PrimitiveRenderer {
         return this.shader;
     }
 
-    public void saveBackup(){
+    public void saveBackup() {
         this.backup_color = this.color;
         this.backup_hslt = this.hslt;
         this.backup_srcRGB = this.srcRGB;
@@ -480,9 +496,9 @@ public class PrimitiveRenderer {
         this.backup_dstAlpha = this.dstAlpha;
     }
 
-    public void loadBackup(){
+    public void loadBackup() {
         setPackedColor(this.backup_color);
         setPackedHSLT(this.backup_hslt);
-        setBlendFunctionSeparate(backup_srcRGB,backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
+        setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 }

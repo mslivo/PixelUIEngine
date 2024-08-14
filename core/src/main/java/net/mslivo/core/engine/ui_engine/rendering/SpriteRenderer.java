@@ -92,15 +92,16 @@ public class SpriteRenderer implements Batch {
             """;
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
-    public static final int SPRITE_SIZE = 24;
+    private static final int VERTEX_SIZE = 6;
+    private static final int SPRITE_SIZE = VERTEX_SIZE*4;
+    private static final int ARRAY_RESIZE_STEP = 1024;
     public static final String HSLT_ATTRIBUTE = "a_hslt";
-
     private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
     private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
 
     private final Color tempColor;
-    private final Mesh mesh;
-    private final float[] vertices;
+    private Mesh mesh;
+    private float[] vertices;
     private float hslt;
     private int idx;
     private Texture lastTexture;
@@ -131,19 +132,14 @@ public class SpriteRenderer implements Batch {
 
 
     public SpriteRenderer() {
-        this(null, 1024, null);
+        this(null, null);
     }
 
     public SpriteRenderer(MediaManager mediaManager) {
-        this(mediaManager, 1024, null);
+        this(mediaManager, null);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, int size) {
-        this(mediaManager, size, null);
-    }
-
-    public SpriteRenderer(MediaManager mediaManager, int size, ShaderProgram shader) {
-        if (size > 16383) throw new IllegalArgumentException("Can't have more than 16383 sprites per batch: " + size);
+    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -169,23 +165,21 @@ public class SpriteRenderer implements Batch {
         this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.srcAlpha = GL20.GL_SRC_ALPHA;
         this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.vertices = new float[size * SPRITE_SIZE];
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP*SPRITE_SIZE, null);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP*VERTEX_SIZE);
         this.backup_color = COLOR_RESET;
         this.backup_hslt = HSLT_RESET;
         this.backup_srcRGB = GL20.GL_SRC_ALPHA;
         this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
         this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.mesh = new Mesh((Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray,
-                true, size * 6, size * 6,
-                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE));
-        int len = size * 6;
-        short[] indices = new short[len];
+        this.mediaManager = mediaManager;
+    }
+
+    private short[] createMeshIndices(int size){
         short j = 0;
-        for (int i = 0; i < len; i += 6, j += 4) {
+        short[] indices = new short[size];
+        for (int i = 0; i < size; i += 6, j += 4) {
             indices[i] = j;
             indices[i + 1] = (short) (j + 1);
             indices[i + 2] = (short) (j + 2);
@@ -193,8 +187,7 @@ public class SpriteRenderer implements Batch {
             indices[i + 4] = (short) (j + 3);
             indices[i + 5] = j;
         }
-        this.mesh.setIndices(indices);
-        this.mediaManager = mediaManager;
+        return indices;
     }
 
     public void saveBackup() {
@@ -210,6 +203,37 @@ public class SpriteRenderer implements Batch {
         setPackedColor(this.backup_color);
         setPackedHSLT(this.backup_hslt);
         setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
+    }
+
+    private void checkArraySize(int factor) {
+        if ((idx + (VERTEX_SIZE*factor)) > mesh.getMaxVertices()) {
+            int verticesSizeNew = this.vertices.length+(ARRAY_RESIZE_STEP*SPRITE_SIZE);
+            this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
+
+            int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
+            this.mesh.dispose();
+            this.mesh = createMesh(meshSizeNew);
+        }
+    }
+
+    private float[] createVerticesArray(int size, float[] copyFrom) {
+        float[] newVertices = new float[size];
+        // Copy from Old if exists
+        if(copyFrom != null) {
+            System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
+        }
+        return newVertices;
+    }
+
+    private Mesh createMesh(int size) {
+        Mesh mesh =  new Mesh(Mesh.VertexDataType.VertexArray,
+                true, size * VERTEX_SIZE, size ,
+                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE));
+        mesh.setIndices(createMeshIndices(size));
+        return mesh;
     }
 
     @Override
@@ -467,6 +491,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -529,6 +555,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -578,6 +606,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -623,6 +653,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -677,6 +709,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -833,6 +867,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;
@@ -956,6 +992,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -1095,6 +1133,8 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float hslt = this.hslt;
+
+        checkArraySize(4);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
@@ -1155,6 +1195,7 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
+        checkArraySize(4);
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;

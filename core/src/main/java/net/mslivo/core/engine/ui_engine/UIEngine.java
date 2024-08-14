@@ -126,7 +126,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
-        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, 8192);
+        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager);
         newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
@@ -2633,18 +2633,18 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 uiEngineState.spriteRenderer_ui.end();
                 uiEngineState.primitiveRenderer_ui.begin();
-                for (int icx = 0; icx < width; icx++) {
-                    for (int icy = 0; icy < height; icy++) {
-                        float a = canvas.colorMap.a[icx][icy];
-                        if(a == 0f) continue;
-                        float r = canvas.colorMap.r[icx][icy];
-                        float g = canvas.colorMap.g[icx][icy];
-                        float b = canvas.colorMap.b[icx][icy];
-                        uiEngineState.primitiveRenderer_ui.setColor(1f,1f,1f,a * componentAlpha);
-                        uiEngineState.primitiveRenderer_ui.setVertexColor(r,g,b,a);
-                        uiEngineState.primitiveRenderer_ui.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx+1, UICommonUtils.component_getAbsoluteY(canvas) + icy+1);
+                    for (int icx = 0; icx < width; icx++) {
+                        for (int icy = 0; icy < height; icy++) {
+                            float a = canvas.colorMap.a[icx][icy];
+                            if (a == 0f) continue;
+                            float r = canvas.colorMap.r[icx][icy];
+                            float g = canvas.colorMap.g[icx][icy];
+                            float b = canvas.colorMap.b[icx][icy];
+                            uiEngineState.primitiveRenderer_ui.setColor(1f, 1f, 1f, a * componentAlpha);
+                            uiEngineState.primitiveRenderer_ui.setVertexColor(r, g, b, a);
+                            uiEngineState.primitiveRenderer_ui.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx + 1, UICommonUtils.component_getAbsoluteY(canvas) + icy + 1);
+                        }
                     }
-                }
                 uiEngineState.primitiveRenderer_ui.end();
                 uiEngineState.spriteRenderer_ui.begin();
 
