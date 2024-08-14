@@ -491,33 +491,33 @@ public class SpriteRenderer implements Batch {
         final float hslt = this.hslt;
 
         try {
-            vertices[idx]    = x1;
-            vertices[idx+1]  = y1;
-            vertices[idx+2]  = color;
-            vertices[idx+3]  = u;
-            vertices[idx+4]  = v;
-            vertices[idx+5]  = hslt;
+            vertices[idx] = x1;
+            vertices[idx + 1] = y1;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-            vertices[idx+6]  = x2;
-            vertices[idx+7]  = y2;
-            vertices[idx+8]  = color;
-            vertices[idx+9]  = u;
-            vertices[idx+10] = v2;
-            vertices[idx+11] = hslt;
+            vertices[idx + 6] = x2;
+            vertices[idx + 7] = y2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-            vertices[idx+12] = x3;
-            vertices[idx+13] = y3;
-            vertices[idx+14] = color;
-            vertices[idx+15] = u2;
-            vertices[idx+16] = v2;
-            vertices[idx+17] = hslt;
+            vertices[idx + 12] = x3;
+            vertices[idx + 13] = y3;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-            vertices[idx+18] = x4;
-            vertices[idx+19] = y4;
-            vertices[idx+20] = color;
-            vertices[idx+21] = u2;
-            vertices[idx+22] = v;
-            vertices[idx+23] = hslt;
+            vertices[idx + 18] = x4;
+            vertices[idx + 19] = y4;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
             idx += SPRITE_SIZE;
         } catch (ArrayIndexOutOfBoundsException _) {
@@ -560,33 +560,33 @@ public class SpriteRenderer implements Batch {
         final float hslt = this.hslt;
 
         try {
-            vertices[idx]    = x;
-            vertices[idx+1]  = y;
-            vertices[idx+2]  = color;
-            vertices[idx+3]  = u;
-            vertices[idx+4]  = v;
-            vertices[idx+5]  = hslt;
+            vertices[idx] = x;
+            vertices[idx + 1] = y;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-            vertices[idx+6]  = x;
-            vertices[idx+7]  = fy2;
-            vertices[idx+8]  = color;
-            vertices[idx+9]  = u;
-            vertices[idx+10] = v2;
-            vertices[idx+11] = hslt;
+            vertices[idx + 6] = x;
+            vertices[idx + 7] = fy2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-            vertices[idx+12] = fx2;
-            vertices[idx+13] = fy2;
-            vertices[idx+14] = color;
-            vertices[idx+15] = u2;
-            vertices[idx+16] = v2;
-            vertices[idx+17] = hslt;
+            vertices[idx + 12] = fx2;
+            vertices[idx + 13] = fy2;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-            vertices[idx+18] = fx2;
-            vertices[idx+19] = y;
-            vertices[idx+20] = color;
-            vertices[idx+21] = u2;
-            vertices[idx+22] = v;
-            vertices[idx+23] = hslt;
+            vertices[idx + 18] = fx2;
+            vertices[idx + 19] = y;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
             idx += SPRITE_SIZE;
         } catch (ArrayIndexOutOfBoundsException _) {
@@ -615,37 +615,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]   = x;
-        vertices[idx+1] = y;
-        vertices[idx+2] = color;
-        vertices[idx+3] = u;
-        vertices[idx+4] = v;
-        vertices[idx+5] = hslt;
+        try {
+            vertices[idx] = x;
+            vertices[idx + 1] = y;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6] = x;
-        vertices[idx+7] = fy2;
-        vertices[idx+8] = color;
-        vertices[idx+9] = u;
-        vertices[idx+10]= v2;
-        vertices[idx+11]= hslt;
+            vertices[idx + 6] = x;
+            vertices[idx + 7] = fy2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12]= fx2;
-        vertices[idx+13]= fy2;
-        vertices[idx+14]= color;
-        vertices[idx+15]= u2;
-        vertices[idx+16]= v2;
-        vertices[idx+17]= hslt;
+            vertices[idx + 12] = fx2;
+            vertices[idx + 13] = fy2;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18]= fx2;
-        vertices[idx+19]= y;
-        vertices[idx+20]= color;
-        vertices[idx+21]= u2;
-        vertices[idx+22]= v;
-        vertices[idx+23]= hslt;
+            vertices[idx + 18] = fx2;
+            vertices[idx + 19] = y;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -667,37 +667,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]    = x;
-        vertices[idx+1]  = y;
-        vertices[idx+2]  = color;
-        vertices[idx+3]  = u;
-        vertices[idx+4]  = v;
-        vertices[idx+5]  = hslt;
+        try {
+            vertices[idx] = x;
+            vertices[idx + 1] = y;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6]  = x;
-        vertices[idx+7]  = fy2;
-        vertices[idx+8]  = color;
-        vertices[idx+9]  = u;
-        vertices[idx+10] = v2;
-        vertices[idx+11] = hslt;
+            vertices[idx + 6] = x;
+            vertices[idx + 7] = fy2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12] = fx2;
-        vertices[idx+13] = fy2;
-        vertices[idx+14] = color;
-        vertices[idx+15] = u2;
-        vertices[idx+16] = v2;
-        vertices[idx+17] = hslt;
+            vertices[idx + 12] = fx2;
+            vertices[idx + 13] = fy2;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18] = fx2;
-        vertices[idx+19] = y;
-        vertices[idx+20] = color;
-        vertices[idx+21] = u2;
-        vertices[idx+22] = v;
-        vertices[idx+23] = hslt;
+            vertices[idx + 18] = fx2;
+            vertices[idx + 19] = y;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -728,37 +728,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]   = x;
-        vertices[idx+1] = y;
-        vertices[idx+2] = color;
-        vertices[idx+3] = u;
-        vertices[idx+4] = v;
-        vertices[idx+5] = hslt;
+        try {
+            vertices[idx] = x;
+            vertices[idx + 1] = y;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6] = x;
-        vertices[idx+7] = fy2;
-        vertices[idx+8] = color;
-        vertices[idx+9] = u;
-        vertices[idx+10] = v2;
-        vertices[idx+11] = hslt;
+            vertices[idx + 6] = x;
+            vertices[idx + 7] = fy2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12] = fx2;
-        vertices[idx+13] = fy2;
-        vertices[idx+14] = color;
-        vertices[idx+15] = u2;
-        vertices[idx+16] = v2;
-        vertices[idx+17] = hslt;
+            vertices[idx + 12] = fx2;
+            vertices[idx + 13] = fy2;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18] = fx2;
-        vertices[idx+19] = y;
-        vertices[idx+20] = color;
-        vertices[idx+21] = u2;
-        vertices[idx+22] = v;
-        vertices[idx+23] = hslt;
+            vertices[idx + 18] = fx2;
+            vertices[idx + 19] = y;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -892,36 +892,36 @@ public class SpriteRenderer implements Batch {
         final float hslt = this.hslt;
 
         try {
-            vertices[idx]    = x;
-            vertices[idx+1]  = y;
-            vertices[idx+2]  = color;
-            vertices[idx+3]  = u;
-            vertices[idx+4]  = v;
-            vertices[idx+5]  = hslt;
+            vertices[idx] = x;
+            vertices[idx + 1] = y;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-            vertices[idx+6]  = x;
-            vertices[idx+7]  = fy2;
-            vertices[idx+8]  = color;
-            vertices[idx+9]  = u;
-            vertices[idx+10] = v2;
-            vertices[idx+11] = hslt;
+            vertices[idx + 6] = x;
+            vertices[idx + 7] = fy2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-            vertices[idx+12] = fx2;
-            vertices[idx+13] = fy2;
-            vertices[idx+14] = color;
-            vertices[idx+15] = u2;
-            vertices[idx+16] = v2;
-            vertices[idx+17] = hslt;
+            vertices[idx + 12] = fx2;
+            vertices[idx + 13] = fy2;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-            vertices[idx+18] = fx2;
-            vertices[idx+19] = y;
-            vertices[idx+20] = color;
-            vertices[idx+21] = u2;
-            vertices[idx+22] = v;
-            vertices[idx+23] = hslt;
+            vertices[idx + 18] = fx2;
+            vertices[idx + 19] = y;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
             idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -1021,37 +1021,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]    = x1;
-        vertices[idx+1]  = y1;
-        vertices[idx+2]  = color;
-        vertices[idx+3]  = u;
-        vertices[idx+4]  = v;
-        vertices[idx+5]  = hslt;
+        try {
+            vertices[idx] = x1;
+            vertices[idx + 1] = y1;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6]  = x2;
-        vertices[idx+7]  = y2;
-        vertices[idx+8]  = color;
-        vertices[idx+9]  = u;
-        vertices[idx+10] = v2;
-        vertices[idx+11] = hslt;
+            vertices[idx + 6] = x2;
+            vertices[idx + 7] = y2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12] = x3;
-        vertices[idx+13] = y3;
-        vertices[idx+14] = color;
-        vertices[idx+15] = u2;
-        vertices[idx+16] = v2;
-        vertices[idx+17] = hslt;
+            vertices[idx + 12] = x3;
+            vertices[idx + 13] = y3;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18] = x4;
-        vertices[idx+19] = y4;
-        vertices[idx+20] = color;
-        vertices[idx+21] = u2;
-        vertices[idx+22] = v;
-        vertices[idx+23] = hslt;
+            vertices[idx + 18] = x4;
+            vertices[idx + 19] = y4;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -1167,37 +1167,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]    = x1;
-        vertices[idx+1]  = y1;
-        vertices[idx+2]  = color;
-        vertices[idx+3]  = u1;
-        vertices[idx+4]  = v1;
-        vertices[idx+5]  = hslt;
+        try {
+            vertices[idx] = x1;
+            vertices[idx + 1] = y1;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u1;
+            vertices[idx + 4] = v1;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6]  = x2;
-        vertices[idx+7]  = y2;
-        vertices[idx+8]  = color;
-        vertices[idx+9]  = u2;
-        vertices[idx+10] = v2;
-        vertices[idx+11] = hslt;
+            vertices[idx + 6] = x2;
+            vertices[idx + 7] = y2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u2;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12] = x3;
-        vertices[idx+13] = y3;
-        vertices[idx+14] = color;
-        vertices[idx+15] = u3;
-        vertices[idx+16] = v3;
-        vertices[idx+17] = hslt;
+            vertices[idx + 12] = x3;
+            vertices[idx + 13] = y3;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u3;
+            vertices[idx + 16] = v3;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18] = x4;
-        vertices[idx+19] = y4;
-        vertices[idx+20] = color;
-        vertices[idx+21] = u4;
-        vertices[idx+22] = v4;
-        vertices[idx+23] = hslt;
+            vertices[idx + 18] = x4;
+            vertices[idx + 19] = y4;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u4;
+            vertices[idx + 22] = v4;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }
@@ -1233,37 +1233,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float hslt = this.hslt;
 
-        try{
-        vertices[idx]   = x1;
-        vertices[idx+1] = y1;
-        vertices[idx+2] = color;
-        vertices[idx+3] = u;
-        vertices[idx+4] = v;
-        vertices[idx+5] = hslt;
+        try {
+            vertices[idx] = x1;
+            vertices[idx + 1] = y1;
+            vertices[idx + 2] = color;
+            vertices[idx + 3] = u;
+            vertices[idx + 4] = v;
+            vertices[idx + 5] = hslt;
 
-        vertices[idx+6] = x2;
-        vertices[idx+7] = y2;
-        vertices[idx+8] = color;
-        vertices[idx+9] = u;
-        vertices[idx+10]= v2;
-        vertices[idx+11]= hslt;
+            vertices[idx + 6] = x2;
+            vertices[idx + 7] = y2;
+            vertices[idx + 8] = color;
+            vertices[idx + 9] = u;
+            vertices[idx + 10] = v2;
+            vertices[idx + 11] = hslt;
 
-        vertices[idx+12]= x3;
-        vertices[idx+13]= y3;
-        vertices[idx+14]= color;
-        vertices[idx+15]= u2;
-        vertices[idx+16]= v2;
-        vertices[idx+17]= hslt;
+            vertices[idx + 12] = x3;
+            vertices[idx + 13] = y3;
+            vertices[idx + 14] = color;
+            vertices[idx + 15] = u2;
+            vertices[idx + 16] = v2;
+            vertices[idx + 17] = hslt;
 
-        vertices[idx+18]= x4;
-        vertices[idx+19]= y4;
-        vertices[idx+20]= color;
-        vertices[idx+21]= u2;
-        vertices[idx+22]= v;
-        vertices[idx+23]= hslt;
+            vertices[idx + 18] = x4;
+            vertices[idx + 19] = y4;
+            vertices[idx + 20] = color;
+            vertices[idx + 21] = u2;
+            vertices[idx + 22] = v;
+            vertices[idx + 23] = hslt;
 
-        idx += SPRITE_SIZE;
-        }catch (ArrayIndexOutOfBoundsException _){
+            idx += SPRITE_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
     }

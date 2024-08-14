@@ -2760,9 +2760,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             // Draw Icon
                             CMediaSprite cellIcon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
                             if (cellIcon != null) {
+                                render_saveTempColorBatch();
                                 render_batchSetColorWhite(componentAlpha);
                                 int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(grid.items[ix][iy]) : 0;
                                 uiEngineState.spriteRenderer_ui.drawCMediaSprite(cellIcon, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
+                                render_loadTempColorBatch();
                             }
                         }
                     }
