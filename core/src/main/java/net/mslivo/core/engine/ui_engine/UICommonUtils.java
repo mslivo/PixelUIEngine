@@ -302,7 +302,7 @@ final class UICommonUtils {
     }
 
     static int component_getRelativeMouseX(int mouse_ui_x, Component component) {
-        return mouse_ui_x - component_getAbsoluteY(component);
+        return mouse_ui_x - component_getAbsoluteX(component);
     }
 
     static int component_getRelativeMouseY(int mouse_ui_y, Component component) {
