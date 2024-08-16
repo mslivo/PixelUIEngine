@@ -1156,16 +1156,16 @@ public final class APIComponent {
 
         public float getG(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_g(canvas.colorMap, x,y);
         }
 
         public float getB(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_b(canvas.colorMap, x,y);
         }
         public float getA(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_a(canvas.colorMap, x,y);
         }
 
         public final class APICanvasImage {
