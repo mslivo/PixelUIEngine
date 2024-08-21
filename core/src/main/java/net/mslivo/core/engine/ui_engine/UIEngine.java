@@ -2707,7 +2707,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     if (!textField.contentValid) {
                         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha * 0.5f);
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_VALIDATION_OVERLAY, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField), index);
-                        spriteRenderer.setColorReset();
+                        spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
                     }
                 }
                 spriteRenderer.loadState();
