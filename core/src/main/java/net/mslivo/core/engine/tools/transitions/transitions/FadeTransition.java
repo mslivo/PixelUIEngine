@@ -37,7 +37,7 @@ public class FadeTransition implements Transition {
             batch.setColor(color,color,color,1f);
             batch.draw(texture_from, 0, 0);
         }else {
-            batch.setColor(Color.WHITE);
+            batch.setColor(Color.GRAY);
         }
     }
 
@@ -48,7 +48,7 @@ public class FadeTransition implements Transition {
             batch.setColor(color,color,color,1f);
             batch.draw(texture_to, 0, 0);
         }else{
-            batch.setColor(Color.WHITE);
+            batch.setColor(Color.GRAY);
         }
 
     }

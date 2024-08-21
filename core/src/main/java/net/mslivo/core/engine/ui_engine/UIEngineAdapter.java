@@ -19,12 +19,17 @@ public interface UIEngineAdapter {
         spriteRenderer.setProjectionMatrix(camera.combined);
         spriteRenderer.begin();
         // Draw App Framebuffer
-        if(appGrayScale) spriteRenderer.setSaturation(0f);
+        if(appGrayScale) {
+            spriteRenderer.setColor(0.4f,0.4f,0.4f,1);
+            spriteRenderer.setTweak(0.5f,0f,0f,0.5f);
+        }
         spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
-        if(appGrayScale) spriteRenderer.setSaturation(0.5f);
+        if(appGrayScale) spriteRenderer.setTweakAndColorReset();
+
         // Draw UI Framebuffer
         spriteRenderer.draw(texture_ui, 0, 0, resolutionWidth, resolutionHeight);
         spriteRenderer.end();
+
     }
     void shutdown();
 }

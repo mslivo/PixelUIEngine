@@ -121,9 +121,9 @@ public final class UIConfig implements Serializable, Cloneable {
         input_gamePadMouseButtonsScrollDown = null;
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = true;
-        window_defaultColor = Color.WHITE.cpy();
+        window_defaultColor = Color.GRAY.cpy();
         window_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        component_defaultColor = Color.WHITE.cpy();
+        component_defaultColor = Color.GRAY.cpy();
         component_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         component_appViewportDefaultUpdateTime = 0;
         component_listDragAlpha = 0.8f;
@@ -151,7 +151,7 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_defaultColor = Color.DARK_GRAY.cpy();
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
-        tooltip_defaultColor = Color.WHITE.cpy();
+        tooltip_defaultColor = Color.GRAY.cpy();
         tooltip_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         tooltip_FadeInSpeed = 0.2f;
         tooltip_FadeOutSpeed = 0.2f;
@@ -174,7 +174,7 @@ public final class UIConfig implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
         mouseTextInput_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        mouseTextInput_defaultColor = Color.WHITE.cpy();
+        mouseTextInput_defaultColor = Color.GRAY.cpy();
     }
 
     public interface AnimationTimerFunction {

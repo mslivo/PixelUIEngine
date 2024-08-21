@@ -47,13 +47,13 @@ public class FallInTransition implements Transition {
 
     @Override
     public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        batch.setColor(Color.WHITE);
+        batch.setColor(Color.GRAY);
         batch.draw(texture_from, 0, 0);
     }
 
     @Override
     public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
-        batch.setColor(Color.WHITE);
+        batch.setColor(Color.GRAY);
         batch.draw(texture_to, 0, MathUtils.round(yTo));
     }
 

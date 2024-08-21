@@ -11,6 +11,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.rendering.ColorfulBatch;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
@@ -50,9 +51,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.primitiveRenderer = new PrimitiveRenderer();
 
         api.config.window.setDefaultEnforceScreenBounds(false);
-        Environment environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
-        environment.add(new DirectionalLight().set(Color.WHITE, -1f, -0.8f, -0.2f));
 
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
@@ -125,12 +123,10 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Draw app based on data
-        batch.setLightness(0.5f);
-        batch.setSaturation(0.5f);
-        batch.setTint(1f);
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
+
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
                 batch.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,
@@ -140,7 +136,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         batch.end();
 
 
-        primitiveRenderer.setColor(Color.WHITE);
+        primitiveRenderer.setColorReset();
         if (IM_PERFORMANCE_TEST) {
             primitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.currentTimeMillis();
@@ -156,7 +152,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
             primitiveRenderer.end();
             System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
-
         }
 
 
@@ -182,10 +177,13 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
         primitiveRenderer.begin(GL20.GL_TRIANGLES);
+
         primitiveRenderer.vertex(0, 0);
         primitiveRenderer.vertex(100, 100);
         primitiveRenderer.vertex(200, 0);
         primitiveRenderer.end();
+
+
 
 
     }

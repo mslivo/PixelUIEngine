@@ -91,7 +91,7 @@ public class TransitionManager {
 
         // Capture Buffers
         batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
-        batch_screen.setColor(Color.WHITE);
+        batch_screen.setColor(Color.GRAY);
         viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         { // Capture From Framebuffer

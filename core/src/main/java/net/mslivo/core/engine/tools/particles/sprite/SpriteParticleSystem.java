@@ -67,7 +67,7 @@ public abstract class SpriteParticleSystem<T>{
     /* ------- Font ------- */
 
     protected SpriteParticle<T> addFontParticle(CMediaFont cMediaFont, String text, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_FONT, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_FONT, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -87,7 +87,7 @@ public abstract class SpriteParticleSystem<T>{
     /* ------- Image ------- */
 
     protected SpriteParticle<T> addImageParticle(CMediaImage cMediaImage, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_IMAGE, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaImage, null, null, 0f, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_IMAGE, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaImage, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -107,7 +107,7 @@ public abstract class SpriteParticleSystem<T>{
     /* ------- Animation ------- */
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -127,7 +127,7 @@ public abstract class SpriteParticleSystem<T>{
     /* ------- Array ------- */
 
     protected SpriteParticle<T> addArrayParticle(CMediaArray cMediaArray, int array_index, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 1f, 1f, 1f, 1f, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }

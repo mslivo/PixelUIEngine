@@ -9,73 +9,85 @@ import com.badlogic.gdx.utils.NumberUtils;
 
 public class PrimitiveRenderer {
 
-    private static final String VERTEX = """
-                attribute vec4 a_position;
-                attribute vec4 a_vertexColor;
-                attribute vec4 a_color;
-                attribute vec4 a_hslt;
-                uniform mat4 u_projTrans;
-                varying vec4 v_color;
-                const float eps = 1.0e-10;
+    private static final String TWEAK_ATTRIBUTE = "a_tweak";
+    private static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
 
-                vec4 rgb2hsl(vec4 c)
-                {
-                    const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                    vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                    float d = q.x - min(q.w, q.y);
-                    float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                    return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-                }
+    private static final String VERTEX_SHADER = """
+            attribute vec4 $POSITION_ATTRIBUTE;
+            attribute vec4 $COLOR_ATTRIBUTE;
+            attribute vec4 $VERTEXCOLOR_ATTRIBUTE;
+            attribute vec4 $TWEAK_ATTRIBUTE;
+            uniform mat4 u_projTrans;
+            varying vec4 v_color;
+            varying vec4 fragColor;
+            const vec3 forward = vec3(1.0 / 3.0);
+            
+            vec3 rgbToLab(vec3 start) {
+               vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
+                          pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
+                          * (start.rgb * start.rgb), forward);
+               lab.x = pow(lab.x, 1.5);
+               lab.yz = lab.yz * 0.5 + 0.5;
+               return lab;
+            }
+            
+            float toOklab(float L) {
+              return pow(L, 1.5);
+            }
+     
+            float fromOklab(float L) {
+              return pow(L, 0.666666);
+            }
+            
+            void main()
+            {
+              // Tint Color
+              vec4 v_color = $COLOR_ATTRIBUTE;
+              v_color.w = v_color.w * (255.0/254.0);
+              v_color.rgb = rgbToLab(v_color.rgb);
+              
+              // Tweak
+              vec4 v_tweak = $TWEAK_ATTRIBUTE;
+              
+              // Position
+              gl_PointSize = 1.0;
+              gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
+                            
+              // Draw
+              vec4 tgt = $VERTEXCOLOR_ATTRIBUTE;
+              vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) * pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
+                         * (tgt.rgb * tgt.rgb), forward);
+              lab.x = (toOklab(lab.x) - 0.5) * 2.0;
+              float contrast = (v_tweak.w * (1.5 * 255.0 / 254.0) - 0.75);
+              lab.xyz = lab.xyz / (contrast * abs(lab.xyz) + (1.0 - contrast));
+              lab.x = fromOklab(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0));
+              lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
+              lab = mat3(1.0, 1.0, 1.0, +0.3963377774, -0.1055613458, -0.0894841775, +0.2158037573, -0.0638541728, -1.2914855480) * lab;
+              fragColor = vec4(sqrt(clamp(mat3(+4.0767245293, -1.2681437731, -0.0041119885, -3.3072168827, +2.6093323231, -0.7034763098, +0.2307590544, -0.3411344290, +1.7068625689) *
+                             (lab * lab * lab),0.0, 1.0)), v_color.a * tgt.a);
+            }
+            """
+            .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
+            .replace("$COLOR_ATTRIBUTE", ShaderProgram.COLOR_ATTRIBUTE)
+            .replace("$VERTEXCOLOR_ATTRIBUTE", VERTEX_COLOR_ATTRIBUTE)
+            .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
 
-                vec4 hsl2rgb(vec4 c)
-                {
-                    const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                    vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                    float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                    return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
-                }
-
-                void main() {
-                   vec4 vertexColor = a_vertexColor;
-                   vertexColor.a *= 255.0 / 254.0;
-                   
-                   vec4 vcolor = a_color;
-                   vcolor.a *= 255.0 / 254.0;
-                   
-                   vec4 hslt = a_hslt;
-                   hslt.a *= 255.0 / 254.0;
-                   
-                   gl_PointSize = 1.0;
-                   gl_Position = u_projTrans * a_position;
-                   
-                   vec4 tgt = rgb2hsl(vertexColor); // convert to HSL
-                   
-                   tgt.x = fract(tgt.x+hslt.x); // hslt Hue
-                   tgt.y *= (hslt.y*2.0); // hslt Saturation
-                   tgt.z += (hslt.z-0.5) * 2.0; // hslt Lightness
-                   vec4 color = hsl2rgb(tgt); // convert back to RGB 
-                   v_color = mix(color, (color*vcolor), hslt.w); // mixed with tinted color based on hslt Tint
-                   v_color.rgb = mix(vec3(dot(v_color.rgb, vec3(0.3333))), v_color.rgb, (hslt.y*2.0));  // remove colors based on hslt.saturation
-                }
-            """;
-    private static final String FRAGMENT = """
+    private static final String FRAGMENT_SHADER = """
                 #ifdef GL_ES
                 #define LOWP lowp
                  precision mediump float;
                 #else
                  #define LOWP
                 #endif
-                varying LOWP vec4 v_color;
+                varying LOWP vec4 fragColor;
                 
                 void main() {                   
-                   gl_FragColor = v_color;
+                   gl_FragColor = fragColor;
                 }
             """;
 
-    private static final String HSLT_ATTRIBUTE = "a_hslt";
+
     private static final String COLOR_ATTRIBUTE = "a_color";
-    private static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
@@ -84,8 +96,8 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
     private static final int ARRAY_RESIZE_STEP = 8192;
 
-    private static final float HSLT_RESET = Color.toFloatBits(0f, 0.5f, 0.5f, 1f);
-    private static final float COLOR_RESET = Color.toFloatBits(1f, 1f, 1f, 1f);
+    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0.5f);
+    private static final float COLOR_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 1f);
 
     public int renderCalls;
     public int totalRenderCalls;
@@ -98,14 +110,14 @@ public class PrimitiveRenderer {
     private Mesh mesh;
     private float vertices[];
     private int idx;
-    private float hslt;
+    private float tweak;
     private int srcRGB;
     private int dstRGB;
     private int srcAlpha;
     private int dstAlpha;
     private int u_projTrans;
     private boolean drawing;
-    private float backup_hslt;
+    private float backup_tweak;
     private float backup_color;
     private int backup_srcRGB;
     private int backup_dstRGB;
@@ -117,22 +129,22 @@ public class PrimitiveRenderer {
     }
 
     public PrimitiveRenderer(int size) {
-        this.shader = new ShaderProgram(VERTEX, FRAGMENT);
+        this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.drawing = false;
         this.primitiveType = GL20.GL_POINTS;
         this.color = COLOR_RESET;
         this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
-        this.hslt = HSLT_RESET;
+        this.tweak = TWEAK_RESET;
         this.srcRGB = GL20.GL_SRC_ALPHA;
         this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.srcAlpha = GL20.GL_SRC_ALPHA;
         this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.tempColor = new Color(Color.WHITE);
+        this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        this.backup_hslt = 0;
+        this.backup_tweak = 0;
         this.backup_color = 0f;
         this.backup_srcRGB = GL20.GL_SRC_ALPHA;
         this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
@@ -204,7 +216,7 @@ public class PrimitiveRenderer {
             vertices[idx+2] = 0;
             vertices[idx+3] = vertexColor;
             vertices[idx+4] = color;
-            vertices[idx+5] = hslt;
+            vertices[idx+5] = tweak;
 
             idx += VERTEX_SIZE;
         } catch (ArrayIndexOutOfBoundsException _) {
@@ -221,14 +233,14 @@ public class PrimitiveRenderer {
             vertices[idx+2] = 0;
             vertices[idx+3] = vertexColor;
             vertices[idx+4] = color;
-            vertices[idx+5] = hslt;
+            vertices[idx+5] = tweak;
 
             vertices[idx+6] = x2;
             vertices[idx+7] = y2;
             vertices[idx+8] = 0;
             vertices[idx+9] = vertexColor;
             vertices[idx+10] = color;
-            vertices[idx+11] = hslt;
+            vertices[idx+11] = tweak;
 
             idx += VERTEX_SIZE_X2;
         } catch (ArrayIndexOutOfBoundsException _) {
@@ -245,21 +257,21 @@ public class PrimitiveRenderer {
             vertices[idx+2] = 0;
             vertices[idx+3] = vertexColor;
             vertices[idx+4] = color;
-            vertices[idx+5] = hslt;
+            vertices[idx+5] = tweak;
 
             vertices[idx+6] = x2;
             vertices[idx+7] = y2;
             vertices[idx+8] = 0;
             vertices[idx+9] = vertexColor;
             vertices[idx+10] = color;
-            vertices[idx+11] = hslt;
+            vertices[idx+11] = tweak;
 
             vertices[idx+12] = x3;
             vertices[idx+13] = y3;
             vertices[idx+14] = 0;
             vertices[idx+15] = vertexColor;
             vertices[idx+16] = color;
-            vertices[idx+17] = hslt;
+            vertices[idx+17] = tweak;
 
             idx += VERTEX_SIZE_X3;
         } catch (ArrayIndexOutOfBoundsException _) {
@@ -293,7 +305,7 @@ public class PrimitiveRenderer {
         return new Mesh(Mesh.VertexDataType.VertexArray, true, size, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, HSLT_ATTRIBUTE));
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
     }
 
     private float rgbPacked(float red, float green, float blue, float alpha) {
@@ -303,155 +315,6 @@ public class PrimitiveRenderer {
 
     public int getPrimitiveType() {
         return primitiveType;
-    }
-
-    public Color getColor() {
-        Color.abgr8888ToColor(tempColor, color);
-        return tempColor;
-    }
-
-    public float getPackedColor() {
-        return color;
-    }
-
-    public Color getVertexColor() {
-        Color.abgr8888ToColor(tempColor, vertexColor);
-        return tempColor;
-    }
-
-    public float getPackedVertexColor() {
-        return vertexColor;
-    }
-
-    public void setVertexColor(Color vertexColor) {
-        setVertexColor(vertexColor.r, vertexColor.g, vertexColor.b, vertexColor.a);
-    }
-
-    public void setVertexColor(Color vertexColor, float a) {
-        setVertexColor(vertexColor.r, vertexColor.g, vertexColor.b, a);
-    }
-
-    public void setVertexColor(float r, float g, float b) {
-        setVertexColor(r, g, b, 1f);
-    }
-
-    public void setVertexColor(float r, float g, float b, float a) {
-        this.vertexColor = rgbPacked(r, g, b, a);
-    }
-
-    public void setPackedVertexColor(float vertexColor) {
-        this.vertexColor = color;
-    }
-
-    public void setColor(Color color) {
-        setColor(color.r, color.g, color.b, color.a);
-    }
-
-    public void setColor(Color color, float a) {
-        setColor(color.r, color.g, color.b, a);
-    }
-
-    public void setPackedColor(float color) {
-        this.color = color;
-    }
-
-    public void setColor(float r, float g, float b) {
-        setColor(r, g, b, 1f);
-    }
-
-    public void setColor(float r, float g, float b, float a) {
-        this.color = rgbPacked(r, g, b, a);
-    }
-
-    public float getHue() {
-        int c = NumberUtils.floatToIntColor(hslt);
-        float a = ((c & 0xff000000) >>> 24) / 255f;
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        return ((c & 0x000000ff)) / 255f;
-    }
-
-    public float getSaturation() {
-        int c = NumberUtils.floatToIntColor(hslt);
-        return ((c & 0x0000ff00) >>> 8) / 255f;
-    }
-
-    public float getLightness() {
-        int c = NumberUtils.floatToIntColor(hslt);
-        return ((c & 0x00ff0000) >>> 16) / 255f;
-    }
-
-    public float getTint() {
-        int c = NumberUtils.floatToIntColor(hslt);
-        return ((c & 0xff000000) >>> 24) / 255f;
-    }
-
-    public void setHue(float hue) {
-        int c = NumberUtils.floatToIntColor(hslt);
-        float a = ((c & 0xff000000) >>> 24) / 255f;
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        hslt = rgbPacked(hue, g, b, a);
-    }
-
-    public void setSaturation(float saturation) {
-        int c = NumberUtils.floatToIntColor(hslt);
-        float a = ((c & 0xff000000) >>> 24) / 255f;
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        hslt = rgbPacked(r, saturation, b, a);
-    }
-
-    public void setLightness(float lightness) {
-        int c = NumberUtils.floatToIntColor(hslt);
-        float a = ((c & 0xff000000) >>> 24) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        hslt = rgbPacked(r, g, lightness, a);
-    }
-
-    public void setTint(float tint) {
-        int c = NumberUtils.floatToIntColor(hslt);
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        hslt = rgbPacked(r, g, b, tint);
-    }
-
-    public void setHSLT(float hue, float saturation, float lightness, float tint) {
-        hslt = rgbPacked(hue, saturation, lightness, tint);
-    }
-
-    public void setPackedHSLT(final float hsltPacked) {
-        this.hslt = hsltPacked;
-    }
-
-    public float getPackedHSLT() {
-        return hslt;
-    }
-
-    public void setHSLTReset() {
-        setPackedHSLT(HSLT_RESET);
-    }
-
-    public void setColorReset() {
-        setPackedColor(COLOR_RESET);
-    }
-
-    public void setBlendFunctionReset() {
-        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    public void setHSLTAndColorReset() {
-        setHSLTReset();
-        setColorReset();
-    }
-
-    public void setAllReset() {
-        setHSLTReset();
-        setColorReset();
-        setBlendFunctionReset();
     }
 
     public void setBlendFunction(int srcFunc, int dstFunc) {
@@ -500,18 +363,218 @@ public class PrimitiveRenderer {
         return this.shader;
     }
 
-    public void saveBackup() {
+
+    // ####### Getter / Setters #######
+
+    // ----- Tint Color -----
+
+
+    public void setColor(Color color) {
+        this.color = colorPacked(color.r, color.g, color.b, color.a);
+    }
+
+    public void setColor(Color color, float alpha) {
+        this.color = colorPacked(color.r, color.g, color.b, alpha);
+    }
+
+    public void setColor(float l, float a, float b, float alpha) {
+        this.color = colorPacked(l, a, b, alpha);
+    }
+
+    public void setPackedColor(final float color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        Color.abgr8888ToColor(tempColor, color);
+        return tempColor;
+    }
+
+    public float getPackedColor() {
+        return this.color;
+    }
+
+    public float getR() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x000000ff)) / 255f;
+    }
+
+    public float getG() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x0000ff00) >>> 8) / 255f;
+    }
+
+    public float getB() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x00ff0000) >>> 16) / 255f;
+    }
+
+    public float getAlpha() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0xff000000) >>> 24) / 255f;
+    }
+
+    // ----- Vertex Color -----
+
+    public void setVertexColor(Color color) {
+        this.vertexColor = colorPacked(color.r, color.g, color.b, color.a);
+    }
+
+    public void setVertexColor(Color color, float alpha) {
+        this.vertexColor = colorPacked(color.r, color.g, color.b, alpha);
+    }
+
+    public void setVertexColor(float r, float g, float b, float alpha) {
+        this.vertexColor = colorPacked(r, g, b, alpha);
+    }
+
+    public void setPackedVertexColor(final float vertexColor) {
+        this.vertexColor = vertexColor;
+    }
+
+    public Color getVertexColor() {
+        Color.abgr8888ToColor(tempColor, vertexColor);
+        return tempColor;
+    }
+
+    public float getPackedVertexColor() {
+        return this.vertexColor;
+    }
+
+    public float getVertexR() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x000000ff)) / 255f;
+    }
+
+    public float getVertexG() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x0000ff00) >>> 8) / 255f;
+    }
+
+    public float getVertexB() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0x00ff0000) >>> 16) / 255f;
+    }
+
+    public float getVertexAlpha() {
+        int c = NumberUtils.floatToIntColor(this.color);
+        return ((c & 0xff000000) >>> 24) / 255f;
+    }
+
+    // ----- Tweak -----
+
+    public void setTweak(float L, float A, float B, float contrast) {
+        tweak = colorPacked(L, A, B, contrast);
+    }
+
+    public void setPackedTweak(final float tweak) {
+        this.tweak = tweak;
+    }
+
+    public void setTweakL(float L) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
+        float B = ((c & 0x00ff0000) >>> 16) / 255f;
+        float A = ((c & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPacked(L, A, B, Contrast);
+    }
+
+    public void setTweakA(float A) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
+        float B = ((c & 0x00ff0000) >>> 16) / 255f;
+        float L = ((c & 0x000000ff)) / 255f;
+        tweak = colorPacked(L, A, B, Contrast);
+    }
+
+    public void setTweakB(float B) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
+        float A = ((c & 0x0000ff00) >>> 8) / 255f;
+        float L = ((c & 0x000000ff)) / 255f;
+        tweak = colorPacked(L, A, B, Contrast);
+    }
+
+    public void setTweakContrast(float contrast) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float b = ((c & 0x00ff0000) >>> 16) / 255f;
+        float g = ((c & 0x0000ff00) >>> 8) / 255f;
+        float r = ((c & 0x000000ff)) / 255f;
+        tweak = colorPacked(r, g, b, contrast);
+    }
+
+    public float getTweakL() {
+        int c = NumberUtils.floatToIntColor(this.tweak);
+        return ((c & 0x000000ff)) / 255f;
+    }
+
+    public float getTweakA() {
+        int c = NumberUtils.floatToIntColor(this.tweak);
+        return ((c & 0x0000ff00) >>> 8) / 255f;
+    }
+
+    public float getTweakB() {
+        int c = NumberUtils.floatToIntColor(this.tweak);
+        return ((c & 0x00ff0000) >>> 16) / 255f;
+    }
+
+    public float getTweakContrast() {
+        int c = NumberUtils.floatToIntColor(this.tweak);
+        return ((c & 0xff000000) >>> 24) / 255f;
+    }
+
+    public float getPackedTweak() {
+        return this.tweak;
+    }
+
+    public Color getTweak() {
+        Color.abgr8888ToColor(tempColor, tweak);
+        return tempColor;
+    }
+
+    // ---- RESET & STATE ----
+
+    public void setTweakReset() {
+        setPackedTweak(TWEAK_RESET);
+    }
+
+    public void setColorReset() {
+        setPackedColor(COLOR_RESET);
+    }
+
+    public void setBlendFunctionReset() {
+        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public void setTweakAndColorReset() {
+        setTweakReset();
+        setColorReset();
+    }
+
+    public void setAllReset() {
+        setTweakReset();
+        setColorReset();
+        setBlendFunctionReset();
+    }
+
+    public void saveState() {
         this.backup_color = this.color;
-        this.backup_hslt = this.hslt;
+        this.backup_tweak = this.tweak;
         this.backup_srcRGB = this.srcRGB;
         this.backup_dstRGB = this.dstRGB;
         this.backup_srcAlpha = this.srcAlpha;
         this.backup_dstAlpha = this.dstAlpha;
     }
 
-    public void loadBackup() {
+    public void loadState() {
         setPackedColor(this.backup_color);
-        setPackedHSLT(this.backup_hslt);
+        setPackedTweak(this.backup_tweak);
         setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
+
+    private static float colorPacked(float red, float green, float blue, float alpha) {
+        return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
+                | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
+    }
+
 }

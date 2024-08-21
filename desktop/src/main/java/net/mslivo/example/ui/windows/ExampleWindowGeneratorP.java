@@ -363,7 +363,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         , null, 1f));
             }
         }, ExampleBaseMedia.ICON_EXAMPLE_1, 0);
-        api.component.setColor(textBtn4, Color.LIGHT_GRAY);
+        api.component.setColor(textBtn4, new Color(0.6f,0.5f,0.5f,1f));
         api.component.button.centerContent(textBtn4);
 
         TextButton textBtn5 = api.component.button.textButton.create(10, 9, 8, 2, "Viewport", new ButtonAction() {
@@ -381,7 +381,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.canvas.setCanvasAction(canvas, new CanvasAction() {
             @Override
             public void onPress(int x, int y) {
-                api.component.canvas.clear(canvas, Color.WHITE);
+                api.component.canvas.clear(canvas, Color.WHITE.cpy());
             }
         });
         api.component.addUpdateAction(canvas, new UpdateAction() {
@@ -434,7 +434,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.setColor(imageButton3, Color.GREEN);
         api.component.setColor(imageButton4, Color.BLUE);
         api.component.setColor(imageButton5, Color.YELLOW);
-        api.component.setColor(imageButton6, Color.ORANGE);
+        api.component.setColor(imageButton6, Color.valueOf("F57D4A"));
 
         api.composites.button.makeExclusiveToggleButtons(new Button[]{
                 imageButton3, imageButton4, imageButton5, imageButton6
@@ -446,7 +446,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         });
 
 
-        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.WHITE, SEGMENT_ALIGNMENT.CENTER,8,3);
+        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.GRAY, SEGMENT_ALIGNMENT.CENTER,8,3);
 
         api.window.addUpdateAction(window, new UpdateAction(0) {
             @Override
@@ -461,15 +461,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("Title", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("1", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("2", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("3", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.text.create("Title", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("1", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("2", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("3", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2, 0, Color.MAGENTA, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         canvasSegment,
                 }, new ToolTipAction() {
                     @Override
@@ -568,6 +568,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
+            }
+
+            @Override
+            public Color cellColor(ListItem listItem) {
+                return Color.valueOf("1EBC73");
             }
         };
         api.component.list.setListAction(list1, list1Action);

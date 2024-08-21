@@ -28,9 +28,9 @@ public class ZoomInTransition implements Transition {
 
     @Override
     public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        batch.setColor(1f,1f,1f,1f-zoom);
+        batch.setColor(0.5f,0.5f,0.5f,1f-zoom);
         batch.draw(texture_from, -screenWidth*(zoom/2f),-screenHeight*(zoom/2f),screenWidth*(zoom+1), screenHeight*(zoom+1));
-        batch.setColor(Color.WHITE);
+        batch.setColor(Color.GRAY);
     }
 
     @Override

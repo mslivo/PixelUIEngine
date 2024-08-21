@@ -59,7 +59,7 @@ public abstract class PrimitiveParticleSystem<T> {
             }
         };
         this.particlePool = new ArrayDeque<>(particleLimit);
-        this.backupColor = new Color(Color.WHITE);
+        this.backupColor = new Color(Color.CLEAR);
         this.backupPrimitiveType = 0;
     }
 

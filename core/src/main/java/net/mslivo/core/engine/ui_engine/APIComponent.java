@@ -117,7 +117,7 @@ public final class APIComponent {
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
             AppViewport appViewPort = new AppViewport();
             appViewPort.updateTimer = 0;
-            setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.WHITE);
+            setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY);
             int viewportWidth = appViewPort.width * api.TS();
             int viewportHeight = appViewPort.height * api.TS();
             appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
@@ -361,7 +361,7 @@ public final class APIComponent {
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
                 ImageButton imageButton = new ImageButton();
-                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiConfig.component_defaultColor, Color.WHITE);
+                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiConfig.component_defaultColor, Color.GRAY);
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
@@ -485,7 +485,7 @@ public final class APIComponent {
 
         public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
-            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, Color.WHITE);
+            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, Color.GRAY);
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction;
@@ -947,7 +947,7 @@ public final class APIComponent {
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
-            setComponentCommonInitValuesInternal(textField, x, y, width, 1, Color.WHITE);
+            setComponentCommonInitValuesInternal(textField, x, y, width, 1, Color.GRAY);
             textField.font = uiConfig.component_defaultFont;
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
@@ -1040,7 +1040,7 @@ public final class APIComponent {
 
         public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             Canvas canvas = new Canvas();
-            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.WHITE);
+            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY);
             canvas.colorMap = new ColorMap();
             int widthPx =  api.TS(width);
             int heightPx =  api.TS(height);
@@ -1192,7 +1192,7 @@ public final class APIComponent {
                 canvasImage.y = y;
                 canvasImage.fadeOut = fadeOut;
                 canvasImage.fadeOutSpeed = Math.max(fadeOutSpeed, 0);
-                canvasImage.color = new Color(Color.WHITE);
+                canvasImage.color = new Color(Color.GRAY);
                 canvasImage.arrayIndex = Math.max(arrayIndex, 0);
                 canvasImage.name = Tools.Text.validString("");
                 canvasImage.data = null;
@@ -1370,7 +1370,7 @@ public final class APIComponent {
             Image imageC = new Image();
             int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TS() : 0;
             int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
-            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.WHITE);
+            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
             imageC.imageAction = imageAction;
