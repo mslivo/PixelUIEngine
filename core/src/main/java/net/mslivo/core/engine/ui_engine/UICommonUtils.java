@@ -477,7 +477,7 @@ final class UICommonUtils {
 
     static void contextMenu_close(UIEngineState uiEngineState, Contextmenu contextMenu) {
         if (contextMenu_isOpen(uiEngineState, contextMenu)) {
-            resetOpenComboBoxReference(uiEngineState);
+            resetOpenContextMenuReference(uiEngineState);
             if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
         }
     }

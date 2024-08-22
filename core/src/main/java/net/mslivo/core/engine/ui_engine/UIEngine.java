@@ -1287,7 +1287,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
                     case ContextmenuItem contextMenuItem -> {
                         UICommonUtils.contextMenu_selectItem(uiEngineState, contextMenuItem);
-                        UICommonUtils.resetPressedContextMenuItemReference(uiEngineState);
+                        UICommonUtils.contextMenu_close(uiEngineState, contextMenuItem.addedToContextMenu);
                     }
                     case ComboboxItem comboBoxItem -> {
                         UICommonUtils.comboBox_selectItem(uiEngineState, comboBoxItem);
