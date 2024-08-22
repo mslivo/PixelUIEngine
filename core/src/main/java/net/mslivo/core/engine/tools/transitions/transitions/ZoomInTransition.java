@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.Transition;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class ZoomInTransition implements Transition {
     private float zoom, zoomAcc;
@@ -22,20 +23,19 @@ public class ZoomInTransition implements Transition {
     @Override
     public boolean update() {
         this.zoom += zoomAcc;
-        zoomAcc += 0.001f;
         return this.zoom > 1f;
     }
 
     @Override
-    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        batch.setColor(0.5f,0.5f,0.5f,1f-zoom);
-        batch.draw(texture_from, -screenWidth*(zoom/2f),-screenHeight*(zoom/2f),screenWidth*(zoom+1), screenHeight*(zoom+1));
-        batch.setColor(Color.GRAY);
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+        spriteRenderer.setColor(0.5f,0.5f,0.5f,1f-zoom);
+        spriteRenderer.draw(texture_from, -screenWidth*(zoom/2f),-screenHeight*(zoom/2f),screenWidth*(zoom+1), screenHeight*(zoom+1));
+        spriteRenderer.setColor(Color.GRAY);
     }
 
     @Override
-    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
-        batch.draw(texture_to, 0, 0);
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+        spriteRenderer.draw(texture_to, 0, 0);
     }
 
 }

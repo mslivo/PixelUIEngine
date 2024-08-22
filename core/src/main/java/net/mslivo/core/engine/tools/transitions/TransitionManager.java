@@ -12,17 +12,19 @@ import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class TransitionManager {
     private NestedFrameBuffer frameBuffer_from;
     private TextureRegion texture_from;
     private NestedFrameBuffer frameBuffer_to;
     private TextureRegion texture_to;
-    private SpriteBatch batch_screen;
+    private SpriteRenderer spriteRenderer_screen;
     private Viewport viewport_screen;
     private OrthographicCamera camera_screen;
     private Transition transition;
-    private int transitionSpeed;
+    private float transitionSpeed;
+    private float nextUpdate;
     private boolean initialized;
     private boolean finished;
     private int resolutionWidth, resolutionHeight;
@@ -48,7 +50,7 @@ public class TransitionManager {
         this.init(from, to, transition, transitionSpeed, false);
     }
 
-    public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed, boolean updateUIEngine) {
+    public void init(UIEngine from, UIEngine to, Transition transition, float transitionSpeed, boolean updateUIEngine) {
         if(from == null) throw new RuntimeException("UIEngine from is null");
         if(to == null) throw new RuntimeException("UIEngine to is null");
         if (from.getResolutionWidth() != to.getResolutionWidth())
@@ -58,11 +60,12 @@ public class TransitionManager {
         if (from.getViewportMode() != to.getViewportMode()) throw new RuntimeException("viewportMode does not match");
         this.from = from;
         this.to = to;
+        this.nextUpdate = 0f;
         int resolutionWidth = from.getResolutionWidth();
         int resolutionHeight = from.getResolutionHeight();
         VIEWPORT_MODE VIEWPORTMODE = from.getViewportMode();
         this.transition = transition == null ? new FadeTransition() : transition;
-        this.transitionSpeed = Math.clamp(transitionSpeed, 1, 10);
+        this.transitionSpeed = Math.clamp(transitionSpeed, 0.5f, 10f);
         boolean createNew = this.resolutionWidth != resolutionWidth || this.resolutionHeight != resolutionHeight || this.VIEWPORTMODE != VIEWPORTMODE;
         if (createNew) {
             this.resolutionWidth = resolutionWidth;
@@ -90,28 +93,28 @@ public class TransitionManager {
 
 
         // Capture Buffers
-        batch_screen = batch_screen != null ? batch_screen : new SpriteBatch(8191);
-        batch_screen.setColor(Color.GRAY);
+        spriteRenderer_screen = spriteRenderer_screen != null ? spriteRenderer_screen : new SpriteRenderer();
+        spriteRenderer_screen.setColor(Color.GRAY);
         viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         { // Capture From Framebuffer
             if (updateUIEngine) from.update();
             from.render(true);
             frameBuffer_from.begin();
-            batch_screen.setProjectionMatrix(camera_screen.combined);
-            batch_screen.begin();
-            batch_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
-            batch_screen.end();
+            spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
+            spriteRenderer_screen.begin();
+            spriteRenderer_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer_screen.end();
             frameBuffer_from.end();
         }
         { // Capture To Framebuffer
             if (updateUIEngine) to.update();
             to.render(true);
             frameBuffer_to.begin();
-            batch_screen.setProjectionMatrix(camera_screen.combined);
-            batch_screen.begin();
-            batch_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
-            batch_screen.end();
+            spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
+            spriteRenderer_screen.begin();
+            spriteRenderer_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer_screen.end();
             frameBuffer_to.end();
         }
         transitionMode = this.transition.init(resolutionWidth, resolutionHeight);
@@ -123,11 +126,14 @@ public class TransitionManager {
     public boolean update() {
         if (!initialized) return true;
         if (this.finished) return true;
-        for (int i = 0; i < this.transitionSpeed; i++) {
+
+        this.nextUpdate += transitionSpeed;
+        while (nextUpdate >= 1f){
             if (this.transition.update()) {
                 this.finished = true;
                 return true;
             }
+            nextUpdate -= 1f;
         }
         return false;
     }
@@ -140,26 +146,26 @@ public class TransitionManager {
         // Render Transition
         {
             viewport_screen.apply();
-            batch_screen.setProjectionMatrix(camera_screen.combined);
-            batch_screen.begin();
+            spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
+            spriteRenderer_screen.begin();
             switch (transitionMode) {
                 case FROM_FIRST -> {
-                    this.transition.renderFrom(batch_screen, texture_from);
-                    this.transition.renderTo(batch_screen, texture_to);
+                    this.transition.renderFrom(spriteRenderer_screen, texture_from);
+                    this.transition.renderTo(spriteRenderer_screen, texture_to);
                 }
                 case TO_FIRST -> {
-                    this.transition.renderTo(batch_screen, texture_to);
-                    this.transition.renderFrom(batch_screen, texture_from);
+                    this.transition.renderTo(spriteRenderer_screen, texture_to);
+                    this.transition.renderFrom(spriteRenderer_screen, texture_from);
                 }
             }
-            batch_screen.end();
+            spriteRenderer_screen.end();
         }
 
     }
 
     public void shutdown() {
-        if (batch_screen != null) batch_screen.dispose();
-        this.batch_screen = null;
+        if (spriteRenderer_screen != null) spriteRenderer_screen.dispose();
+        this.spriteRenderer_screen = null;
         if (frameBuffer_to != null) {
             frameBuffer_to.dispose();
             frameBuffer_to = null;

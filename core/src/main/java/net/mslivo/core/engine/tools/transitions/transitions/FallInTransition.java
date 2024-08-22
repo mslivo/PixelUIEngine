@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.Transition;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class FallInTransition implements Transition {
     private float yTo;
@@ -46,15 +47,15 @@ public class FallInTransition implements Transition {
     }
 
     @Override
-    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        batch.setColor(Color.GRAY);
-        batch.draw(texture_from, 0, 0);
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+        spriteRenderer.setColor(Color.GRAY);
+        spriteRenderer.draw(texture_from, 0, 0);
     }
 
     @Override
-    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
-        batch.setColor(Color.GRAY);
-        batch.draw(texture_to, 0, MathUtils.round(yTo));
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+        spriteRenderer.setColor(Color.GRAY);
+        spriteRenderer.draw(texture_to, 0, MathUtils.round(yTo));
     }
 
 

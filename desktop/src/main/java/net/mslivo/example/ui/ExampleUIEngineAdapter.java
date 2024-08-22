@@ -101,6 +101,14 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.config.input.setGamePadMouseStickRightEnabled(true);
         api.config.input.setGamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
         api.config.input.setGamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
+
+
+        api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {
+            @Override
+            public void onRelease() {
+                api.addWindowAsModal(api.composites.modal.createMessageModal("test",new String[]{"test"}, null));
+            }
+        }));
     }
 
     @Override

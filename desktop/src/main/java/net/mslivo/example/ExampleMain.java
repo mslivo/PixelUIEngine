@@ -4,7 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
-import net.mslivo.core.engine.tools.transitions.transitions.FadeTransition;
+import net.mslivo.core.engine.tools.transitions.transitions.*;
 import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
@@ -68,7 +68,7 @@ public class ExampleMain extends ApplicationAdapter {
                             this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition());
+                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new FadeTransition(),1f,true);
                     this.transitionManager.render();
                     state = STATE.TRANSITION;
                     return;

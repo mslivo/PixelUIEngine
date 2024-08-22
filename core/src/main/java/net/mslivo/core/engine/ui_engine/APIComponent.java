@@ -1818,7 +1818,7 @@ public final class APIComponent {
 
     public void setDisabled(Component component, boolean disabled) {
         if (component == null) return;
-        component.disabled = disabled;
+        UICommonUtils.component_setDisabled(uiEngineState, component, disabled);
     }
 
     public void setDisabled(Component[] components, boolean disabled) {

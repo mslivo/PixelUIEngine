@@ -212,6 +212,9 @@ final class UICommonUtils {
 
     static void window_addToScreenAsModal(UIEngineState uiEngineState, Window window) {
         if (uiEngineState.modalWindow == null) {
+            // Closned opened comboxes/menus
+            resetAllReferences(uiEngineState);
+            // Add to Screen
             window.alwaysOnTop = true;
             window.visible = true;
             window.folded = false;
@@ -223,6 +226,7 @@ final class UICommonUtils {
             uiEngineState.modalWindowQueue.add(window);
         }
     }
+
 
     static void window_center(UIEngineState uiEngineState, Window window) {
         int centerX = (uiEngineState.resolutionWidthHalf) - (uiEngineState.tileSize.TL(window.width) / 2);
@@ -281,7 +285,7 @@ final class UICommonUtils {
             appViewPort_resizeCameraTextureAndFrameBuffer(uiEngineState, appViewPort);
         }
         if (component instanceof Canvas canvas) {
-            colorMap_resize(canvas.colorMap, uiEngineState.tileSize.TL(width),uiEngineState.tileSize.TL(height));
+            colorMap_resize(canvas.colorMap, uiEngineState.tileSize.TL(width), uiEngineState.tileSize.TL(height));
         }
     }
 
@@ -415,77 +419,6 @@ final class UICommonUtils {
         if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(false);
     }
 
-    static void window_resetReferences(UIEngineState uiEngineState, Window window) {
-        if (uiEngineState.draggedWindow == window) {
-            uiEngineState.draggedWindow = null;
-            uiEngineState.draggedWindow_offset.set(0, 0);
-        }
-    }
-
-    static void component_resetReferences(UIEngineState uiEngineState, Component component) {
-        if (uiEngineState.pressedButton == component) uiEngineState.pressedButton = null;
-        if (uiEngineState.pressedScrollBarVertical == component) uiEngineState.pressedScrollBarVertical = null;
-        if (uiEngineState.pressedScrollBarHorizontal == component) uiEngineState.pressedScrollBarHorizontal = null;
-        if (uiEngineState.pressedKnob == component) uiEngineState.pressedKnob = null;
-        if (uiEngineState.pressedCanvas == component) uiEngineState.pressedCanvas = null;
-        if (uiEngineState.pressedAppViewPort == component) uiEngineState.pressedAppViewPort = null;
-        if (uiEngineState.pressedTextField == component) {
-            uiEngineState.pressedTextField = null;
-            uiEngineState.pressedTextFieldMouseX = 0;
-        }
-        if (uiEngineState.focusedTextField == component) {
-            uiEngineState.focusedTextField = null;
-            uiEngineState.focusedTextField_repeatedKey = KeyCode.NONE;
-            uiEngineState.focusedTextField_repeatedKeyTimer = 0;
-        }
-        if (uiEngineState.draggedGrid == component) {
-            uiEngineState.draggedGrid = null;
-            uiEngineState.draggedGridFrom.set(0, 0);
-            uiEngineState.draggedGridOffset.set(0, 0);
-            uiEngineState.draggedGridItem = null;
-            uiEngineState.pressedGrid = null;
-            uiEngineState.pressedGridItem = null;
-        }
-        if (uiEngineState.draggedList == component) {
-            uiEngineState.draggedList = null;
-            uiEngineState.draggedListFromIndex = 0;
-            uiEngineState.draggedListOffsetX.set(0, 0);
-            uiEngineState.draggedListItem = null;
-            uiEngineState.pressedList = null;
-            uiEngineState.pressedListItem = null;
-        }
-        if (uiEngineState.openComboBox == component) {
-            uiEngineState.openComboBox = null;
-            uiEngineState.pressedComboBoxItem = null;
-        }
-        if (uiEngineState.pressedCheckBox == component) {
-            uiEngineState.pressedCheckBox = null;
-        }
-    }
-
-    static Object getDraggedUIReference(UIEngineState uiEngineState) {
-        if (uiEngineState.draggedWindow != null) return uiEngineState.draggedWindow;
-        if (uiEngineState.draggedGrid != null) return uiEngineState.draggedGrid;
-        if (uiEngineState.draggedList != null) return uiEngineState.draggedList;
-        return null;
-    }
-
-    static Object getPressedUIReference(UIEngineState uiEngineState) {
-        if (uiEngineState.pressedButton != null) return uiEngineState.pressedButton;
-        if (uiEngineState.pressedScrollBarHorizontal != null) return uiEngineState.pressedScrollBarHorizontal;
-        if (uiEngineState.pressedScrollBarVertical != null) return uiEngineState.pressedScrollBarVertical;
-        if (uiEngineState.pressedKnob != null) return uiEngineState.pressedKnob;
-        if (uiEngineState.pressedCanvas != null) return uiEngineState.pressedCanvas;
-        if (uiEngineState.pressedTextField != null) return uiEngineState.pressedTextField;
-        if (uiEngineState.pressedAppViewPort != null) return uiEngineState.pressedAppViewPort;
-        if (uiEngineState.pressedGrid != null) return uiEngineState.pressedGrid;
-        if (uiEngineState.pressedList != null) return uiEngineState.pressedList;
-        if (uiEngineState.pressedContextMenuItem != null) return uiEngineState.pressedContextMenuItem;
-        if (uiEngineState.pressedComboBoxItem != null) return uiEngineState.pressedComboBoxItem;
-        if (uiEngineState.pressedCheckBox != null) return uiEngineState.pressedCheckBox;
-        return null;
-    }
-
     static void setMouseInteractedUIObject(UIEngineState uiEngineState, Object object) {
         uiEngineState.mouseInteractedUIObjectFrame = object;
     }
@@ -544,12 +477,11 @@ final class UICommonUtils {
 
     static void contextMenu_close(UIEngineState uiEngineState, Contextmenu contextMenu) {
         if (contextMenu_isOpen(uiEngineState, contextMenu)) {
-            uiEngineState.openContextMenu = null;
-            uiEngineState.displayedContextMenuWidth = 0;
-            uiEngineState.pressedContextMenuItem = null;
+            resetOpenComboBoxReference(uiEngineState);
             if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
         }
     }
+
 
     static String progressBar_getProgressText(float progress) {
         return Tools.Text.formatPercent(progress);
@@ -729,6 +661,13 @@ final class UICommonUtils {
         } else {
             textField.contentValid = true;
         }
+    }
+
+    static void component_setDisabled(UIEngineState uiEngineState, Component component, boolean disabled) {
+        if (disabled) {
+            if (component instanceof Combobox combobox) comboBox_close(uiEngineState, combobox);
+        }
+        component.disabled = disabled;
     }
 
     static void component_addToWindow(Component component, UIEngineState uiEngineState, Window window) {
@@ -944,7 +883,7 @@ final class UICommonUtils {
     static void colorMap_copy(ColorMap colorMapFrom, ColorMap colorMapTo) {
         int width = Math.min(colorMapFrom.width, colorMapTo.width);
         int height = Math.min(colorMapFrom.height, colorMapTo.height);
-        for(int ix=0;ix<width;ix++) {
+        for (int ix = 0; ix < width; ix++) {
             for (int iy = 0; iy < height; iy++) {
                 colorMapTo.r[ix][iy] = colorMapFrom.r[ix][iy];
                 colorMapTo.g[ix][iy] = colorMapFrom.g[ix][iy];
@@ -955,7 +894,7 @@ final class UICommonUtils {
     }
 
     static boolean colorMap_inBounds(ColorMap colorMap, int x, int y) {
-        return x < colorMap.width && y < colorMap.height;
+        return x >= 0 && x < colorMap.width && y >= 0 && y < colorMap.height;
     }
 
 
@@ -994,10 +933,10 @@ final class UICommonUtils {
         toolTip.segments.remove(segment);
     }
 
-    static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height){
-        tooltipSegment.width = Math.max(width,0);
-        tooltipSegment.height = Math.max(height,0);
-        if(tooltipSegment instanceof TooltipCanvasSegment tooltipCanvasSegment){
+    static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height) {
+        tooltipSegment.width = Math.max(width, 0);
+        tooltipSegment.height = Math.max(height, 0);
+        if (tooltipSegment instanceof TooltipCanvasSegment tooltipCanvasSegment) {
             UICommonUtils.colorMap_resize(tooltipCanvasSegment.colorMap, uiEngineState.tileSize.TL(width), uiEngineState.tileSize.TL(height));
         }
     }
@@ -1022,8 +961,7 @@ final class UICommonUtils {
 
     static void comboBox_close(UIEngineState uiEngineState, Combobox comboBox) {
         if (comboBox_isOpen(uiEngineState, comboBox)) {
-            uiEngineState.openComboBox = null;
-            uiEngineState.pressedComboBoxItem = null;
+            resetOpenComboBoxReference(uiEngineState);
             if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
         }
     }
@@ -1044,13 +982,12 @@ final class UICommonUtils {
 
     static void textField_unFocus(UIEngineState uiEngineState, Textfield textField) {
         if (textField_isFocused(uiEngineState, textField)) {
-            uiEngineState.focusedTextField = null;
-            uiEngineState.focusedTextField_repeatedKey = KeyCode.NONE;
-            uiEngineState.focusedTextField_repeatedKeyTimer = 0;
+            resetFocusedTextFieldReference(uiEngineState);
             if (textField.textFieldAction != null)
                 textField.textFieldAction.onUnFocus();
         }
     }
+
 
     static void list_setMultiSelect(List list, boolean multiSelect) {
         // Clear selecteditem/items after mode switch
@@ -1413,5 +1350,164 @@ final class UICommonUtils {
         if (state.config.ui_animationTimerFunction == null) return 0f;
         return state.config.ui_animationTimerFunction.getAnimationTimer();
     }
+
+    static void window_resetReferences(UIEngineState uiEngineState, Window window) {
+        if (uiEngineState.draggedWindow == window) {
+            uiEngineState.draggedWindow = null;
+            uiEngineState.draggedWindow_offset.set(0, 0);
+        }
+    }
+
+    static void component_resetReferences(UIEngineState uiEngineState, Component component) {
+        if (uiEngineState.pressedButton == component) resetPressedButtonReference(uiEngineState);
+        if (uiEngineState.pressedScrollBarVertical == component) resetPressedScrollBarVerticalReference(uiEngineState);
+        if (uiEngineState.pressedScrollBarHorizontal == component)
+            resetPressedScrollBarHorizontalReference(uiEngineState);
+        if (uiEngineState.pressedKnob == component) resetPressedKnobReference(uiEngineState);
+        if (uiEngineState.pressedCanvas == component) resetPressedCanvasReference(uiEngineState);
+        if (uiEngineState.pressedAppViewPort == component) resetPressedAppViewPortReference(uiEngineState);
+        if (uiEngineState.pressedTextField == component) resetPressedTextFieldReference(uiEngineState);
+        if (uiEngineState.focusedTextField == component) resetFocusedTextFieldReference(uiEngineState);
+        if (uiEngineState.pressedCheckBox == component) resetPressedCheckBoxReference(uiEngineState);
+
+        if (uiEngineState.draggedGrid == component) {
+            resetDraggedGridReference(uiEngineState);
+            resetPressedGridReference(uiEngineState);
+        }
+        if (uiEngineState.draggedList == component) {
+            resetDraggedListReference(uiEngineState);
+            resetPressedListReference(uiEngineState);
+        }
+        if (uiEngineState.openComboBox == component)
+            resetOpenComboBoxReference(uiEngineState);
+    }
+
+    static void resetAllReferences(UIEngineState uiEngineState) {
+        resetPressedButtonReference(uiEngineState);
+        resetPressedScrollBarVerticalReference(uiEngineState);
+        resetPressedScrollBarHorizontalReference(uiEngineState);
+        resetPressedKnobReference(uiEngineState);
+        resetPressedCanvasReference(uiEngineState);
+        resetPressedAppViewPortReference(uiEngineState);
+        resetPressedTextFieldReference(uiEngineState);
+        resetFocusedTextFieldReference(uiEngineState);
+        resetDraggedGridReference(uiEngineState);
+        resetPressedGridReference(uiEngineState);
+        resetDraggedListReference(uiEngineState);
+        resetPressedListReference(uiEngineState);
+        resetOpenComboBoxReference(uiEngineState);
+        resetPressedCheckBoxReference(uiEngineState);
+        resetOpenContextMenuReference(uiEngineState);
+    }
+
+
+    static void resetOpenContextMenuReference(UIEngineState uiEngineState) {
+        UICommonUtils.resetPressedContextMenuItemReference(uiEngineState);
+        uiEngineState.openContextMenu = null;
+        uiEngineState.displayedContextMenuWidth = 0;
+    }
+
+    static void resetPressedContextMenuItemReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedContextMenuItem = null;
+    }
+
+    static void resetPressedCheckBoxReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedCheckBox = null;
+    }
+
+    static void resetPressedAppViewPortReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedAppViewPort = null;
+    }
+
+    static void resetPressedCanvasReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedCanvas = null;
+    }
+
+    static void resetPressedKnobReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedKnob = null;
+    }
+
+    static void resetPressedScrollBarVerticalReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedScrollBarVertical = null;
+    }
+
+    static void resetPressedScrollBarHorizontalReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedScrollBarHorizontal = null;
+    }
+
+    static void resetPressedButtonReference(UIEngineState uiEngineState) {
+        if (uiEngineState.pressedButton != null && uiEngineState.pressedButton.mode == BUTTON_MODE.DEFAULT)
+            uiEngineState.pressedButton.pressed = false;
+        uiEngineState.pressedButton = null;
+    }
+
+    static void resetPressedTextFieldReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedTextField = null;
+        uiEngineState.pressedTextFieldMouseX = 0;
+    }
+
+    static void resetOpenComboBoxReference(UIEngineState uiEngineState) {
+        resetPressedComboBoxItemReference(uiEngineState);
+        uiEngineState.openComboBox = null;
+    }
+
+    static void resetPressedComboBoxItemReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedComboBoxItem = null;
+    }
+
+    static void resetFocusedTextFieldReference(UIEngineState uiEngineState) {
+        uiEngineState.focusedTextField = null;
+        uiEngineState.focusedTextField_repeatedKey = KeyCode.NONE;
+        uiEngineState.focusedTextField_repeatedKeyTimer = 0;
+    }
+
+    static void resetDraggedGridReference(UIEngineState uiEngineState) {
+        uiEngineState.draggedGrid = null;
+        uiEngineState.draggedGridFrom.set(0, 0);
+        uiEngineState.draggedGridOffset.set(0, 0);
+        uiEngineState.draggedGridItem = null;
+
+    }
+
+    static void resetPressedGridReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedGrid = null;
+        uiEngineState.pressedGridItem = null;
+    }
+
+    static void resetPressedListReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedList = null;
+        uiEngineState.pressedListItem = null;
+    }
+
+    static void resetDraggedListReference(UIEngineState uiEngineState) {
+        uiEngineState.draggedList = null;
+        uiEngineState.draggedListFromIndex = 0;
+        uiEngineState.draggedListOffsetX.set(0, 0);
+        uiEngineState.draggedListItem = null;
+    }
+
+    static Object getDraggedUIReference(UIEngineState uiEngineState) {
+        if (uiEngineState.draggedWindow != null) return uiEngineState.draggedWindow;
+        if (uiEngineState.draggedGrid != null) return uiEngineState.draggedGrid;
+        if (uiEngineState.draggedList != null) return uiEngineState.draggedList;
+        return null;
+    }
+
+    static Object getPressedUIReference(UIEngineState uiEngineState) {
+        if (uiEngineState.pressedButton != null) return uiEngineState.pressedButton;
+        if (uiEngineState.pressedScrollBarHorizontal != null) return uiEngineState.pressedScrollBarHorizontal;
+        if (uiEngineState.pressedScrollBarVertical != null) return uiEngineState.pressedScrollBarVertical;
+        if (uiEngineState.pressedKnob != null) return uiEngineState.pressedKnob;
+        if (uiEngineState.pressedCanvas != null) return uiEngineState.pressedCanvas;
+        if (uiEngineState.pressedTextField != null) return uiEngineState.pressedTextField;
+        if (uiEngineState.pressedAppViewPort != null) return uiEngineState.pressedAppViewPort;
+        if (uiEngineState.pressedGrid != null) return uiEngineState.pressedGrid;
+        if (uiEngineState.pressedList != null) return uiEngineState.pressedList;
+        if (uiEngineState.pressedContextMenuItem != null) return uiEngineState.pressedContextMenuItem;
+        if (uiEngineState.pressedComboBoxItem != null) return uiEngineState.pressedComboBoxItem;
+        if (uiEngineState.pressedCheckBox != null) return uiEngineState.pressedCheckBox;
+        return null;
+    }
+
 
 }

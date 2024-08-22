@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.Transition;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class FadeTransition implements Transition {
     private float fadeOut;
@@ -20,10 +21,10 @@ public class FadeTransition implements Transition {
     @Override
     public boolean update() {
         if(this.fadeOut < 1f){
-            this.fadeOut = Math.min(fadeOut+0.06f,1f);
+            this.fadeOut = Math.min(fadeOut+0.05f,1f);
             return false;
         }else if(this.fadeIn < 1f){
-            this.fadeIn = Math.min(fadeIn+0.06f,1f);
+            this.fadeIn = Math.min(fadeIn+0.05f,1f);
             return false;
         }else{
             return true;
@@ -31,24 +32,24 @@ public class FadeTransition implements Transition {
     }
 
     @Override
-    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
         if(this.fadeOut < 1f){
-            float color = Math.clamp(1f-fadeOut,0f,1f);
-            batch.setColor(color,color,color,1f);
-            batch.draw(texture_from, 0, 0);
-        }else {
-            batch.setColor(Color.GRAY);
+            float color = Math.clamp(0.5f-(fadeOut*0.5f),0f,1f);
+            spriteRenderer.setTweak(color,0.5f,0.5f,0.5f);
+            spriteRenderer.setColor(color,color,color,1f);
+            spriteRenderer.draw(texture_from, 0, 0);
+            spriteRenderer.setAllReset();
         }
     }
 
     @Override
-    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         if(this.fadeOut >= 1 && this.fadeIn <= 1f){
-            float color = Math.clamp(fadeIn,0f,1f);
-            batch.setColor(color,color,color,1f);
-            batch.draw(texture_to, 0, 0);
-        }else{
-            batch.setColor(Color.GRAY);
+            float color = Math.clamp(fadeIn*0.5f,0f,1f);
+            spriteRenderer.setTweak(color,0.5f,0.5f,0.5f);
+            spriteRenderer.setColor(color,color,color,1f);
+            spriteRenderer.draw(texture_to, 0, 0);
+            spriteRenderer.setAllReset();
         }
 
     }

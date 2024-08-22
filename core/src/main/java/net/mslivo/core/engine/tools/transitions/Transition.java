@@ -2,6 +2,7 @@ package net.mslivo.core.engine.tools.transitions;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public interface Transition {
 
@@ -9,7 +10,7 @@ public interface Transition {
 
     boolean update();
 
-    void renderFrom(SpriteBatch batch, TextureRegion texture_from);
-    void renderTo(SpriteBatch batch, TextureRegion texture_to);
+    void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from);
+    void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to);
 
 }

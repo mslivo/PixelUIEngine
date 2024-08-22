@@ -112,16 +112,16 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         }, window.color.a);
 
-        Knob knob = api.component.knob.create(4, 2, null, false);
-        api.component.knob.setTurned(knob, knob.color.a);
+        Knob knob = api.component.knob.create(4, 2, null, false, 1f);
         KnobAction knobAction = new KnobAction() {
             @Override
             public void onTurned(float turned, float amount) {
                 api.component.setAlpha(knob, 0.2f + (turned * 0.8f));
             }
         };
+
         api.component.knob.setKnobAction(knob, knobAction);
-        api.component.setColor(knob, new Color(0.9f, 0.8f, 0.5f, 1f));
+        api.component.setColor(knob, new Color(0.3f, 0.25f, 0.2f, 1f));
 
         Knob knobe = api.component.knob.create(4, 5, null, true);
         api.component.setColor(knobe, Color.RED);
@@ -142,21 +142,24 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 oval.color.r = scrolled;
             }
         }, oval.color.r);
-        api.component.setColor1And2(scrollBarHorizontalR, Color.RED);
+        api.component.setColor(scrollBarHorizontalR, new Color(1f,0f,0f,1f));
+        api.component.setColor2(scrollBarHorizontalR, new Color(0.5f,0f,0f,1f));
         ScrollbarHorizontal scrollBarHorizontalG = api.component.scrollbar.scrollbarHorizontal.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color.g = scrolled;
             }
         }, oval.color.g);
-        api.component.setColor1And2(scrollBarHorizontalG, Color.GREEN);
+        api.component.setColor(scrollBarHorizontalG, new Color(0f,1f,0f,1f));
+        api.component.setColor2(scrollBarHorizontalG, new Color(0f,0.5f,0f,1f));
         ScrollbarHorizontal scrollBarHorizontalB = api.component.scrollbar.scrollbarHorizontal.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color.b = scrolled;
             }
         }, oval.color.b);
-        api.component.setColor1And2(scrollBarHorizontalB, Color.BLUE);
+        api.component.setColor(scrollBarHorizontalB, new Color(0f,0f,1f,1f));
+        api.component.setColor2(scrollBarHorizontalB, new Color(0f,0f,0.5f,1f));
 
 
         Textfield textField = api.component.textfield.create(18, 11, 10, "", null, 128);
@@ -238,7 +241,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Button modal3 = api.component.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composites.modal.createColorModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
+                api.addWindowAsModal(api.composites.modal.createColorPickerModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
             }
         });
 
@@ -579,6 +582,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         ArrayList<ListItem> listItems2 = new ArrayList<>();
         addRandomItemsToList(listItems2, "L2 ");
+
+
 
         List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, false, true, true, true);
         ListAction list2Action = new ListAction<ListItem>() {

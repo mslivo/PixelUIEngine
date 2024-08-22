@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.Transition;
+import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class ZoomOutTransition implements Transition {
     private float zoom, zoomAcc;
@@ -24,14 +25,13 @@ public class ZoomOutTransition implements Transition {
     @Override
     public boolean update() {
         this.zoom -= zoomAcc;
-        zoomAcc += 0.001f;
         return this.zoom < 0f;
     }
 
     @Override
-    public void renderFrom(SpriteBatch batch, TextureRegion texture_from) {
-        if(zoom > 0.1f) {
-            batch.draw(texture_from,
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+        if(zoom > 0f) {
+            spriteRenderer.draw(texture_from,
                     MathUtils.round(screenWidth * (1f - zoom) * 0.5f),
                     MathUtils.round(screenHeight * (1f - zoom) * 0.5f),
                     MathUtils.round(screenWidth * zoom),
@@ -40,9 +40,9 @@ public class ZoomOutTransition implements Transition {
     }
 
     @Override
-    public void renderTo(SpriteBatch batch, TextureRegion texture_to) {
-        batch.setColor(Color.GRAY);
-        batch.draw(texture_to, 0, 0);
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+        spriteRenderer.setColor(Color.GRAY);
+        spriteRenderer.draw(texture_to, 0, 0);
     }
 
 }

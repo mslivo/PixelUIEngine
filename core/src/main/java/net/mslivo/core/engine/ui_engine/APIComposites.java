@@ -440,11 +440,11 @@ public final class APIComposites {
         APICompositeModal() {
         }
 
-        public Window createColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return createColorModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_SELECTOR);
+        public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
+            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_SELECTOR);
         }
 
-        public Window createColorModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
+        public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
 
             TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
 
@@ -521,7 +521,10 @@ public final class APIComposites {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor = api.component.canvas.getPoint(colorCanvas, x, y - 1);
+                            currentColor.r = api.component.canvas.getR(colorCanvas, x, y - 1)*0.5f;
+                            currentColor.g = api.component.canvas.getG(colorCanvas, x, y - 1)*0.5f;
+                            currentColor.b = api.component.canvas.getB(colorCanvas, x, y - 1)*0.5f;
+                            currentColor.a = 1f;
                             if (currentColor != null) {
                                 api.component.setColor(ok, currentColor);
                                 float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
