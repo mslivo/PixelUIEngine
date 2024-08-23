@@ -22,21 +22,21 @@ public class PrimitiveRenderer {
             varying vec4 fragColor;
             const vec3 forward = vec3(1.0 / 3.0);
             
-            vec3 rgbToLab(vec3 start) {
+            vec3 rgbToLabColor(vec3 start) {
                vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
                           pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
                           * (start.rgb * start.rgb), forward);
-               lab.x = pow(lab.x, 1.5);
+               lab.x = pow(lab.x, 1.48);
                lab.yz = lab.yz * 0.5 + 0.5;
                return lab;
             }
             
-            float toOklab(float L) {
-              return pow(L, 1.5);
-            }
-     
-            float fromOklab(float L) {
-              return pow(L, 0.666666);
+            vec3 rgbToLabFragment(vec3 start) {
+               vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
+                          pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
+                          * (start.rgb * start.rgb), forward);
+               lab.x = (pow(lab.x, 1.51)-0.5)*2.0;
+               return lab;
             }
             
             void main()
@@ -44,7 +44,7 @@ public class PrimitiveRenderer {
               // Tint Color
               vec4 v_color = $COLOR_ATTRIBUTE;
               v_color.w = v_color.w * (255.0/254.0);
-              v_color.rgb = rgbToLab(v_color.rgb);
+              v_color.rgb = rgbToLabColor(v_color.rgb);
               
               // Tweak
               vec4 v_tweak = $TWEAK_ATTRIBUTE;
@@ -55,14 +55,17 @@ public class PrimitiveRenderer {
                             
               // Draw
               vec4 tgt = $VERTEXCOLOR_ATTRIBUTE;
-              vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) * pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
-                         * (tgt.rgb * tgt.rgb), forward);
-              lab.x = (toOklab(lab.x) - 0.5) * 2.0;
-              float contrast = (v_tweak.w * (1.5 * 255.0 / 254.0) - 0.75);
+              
+              vec3 lab = rgbToLabFragment(tgt.xyz);
+              
+              //float contrast = (v_tweak.w * (1.5 * 255.0 / 254.0) - 0.75);
+              float contrast = clamp(v_tweak.w-0.5,0.0,1.0);
               lab.xyz = lab.xyz / (contrast * abs(lab.xyz) + (1.0 - contrast));
-              lab.x = fromOklab(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0));
+
+              lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0),0.666666);
               lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
               lab = mat3(1.0, 1.0, 1.0, +0.3963377774, -0.1055613458, -0.0894841775, +0.2158037573, -0.0638541728, -1.2914855480) * lab;
+
               fragColor = vec4(sqrt(clamp(mat3(+4.0767245293, -1.2681437731, -0.0041119885, -3.3072168827, +2.6093323231, -0.7034763098, +0.2307590544, -0.3411344290, +1.7068625689) *
                              (lab * lab * lab),0.0, 1.0)), v_color.a * tgt.a);
             }
@@ -96,7 +99,7 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
     private static final int ARRAY_RESIZE_STEP = 8192;
 
-    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0.5f);
+    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0f);
     private static final float COLOR_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 1f);
 
     public int renderCalls;
