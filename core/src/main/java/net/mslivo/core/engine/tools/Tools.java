@@ -172,7 +172,7 @@ public class Tools {
             config.setDecorated(true);
             config.setMaximized(true);
             config.setForegroundFPS(fps);
-            config.useVsync(false);
+            config.useVsync(true);
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
             if (iconPath != null) config.setWindowIcon(iconPath);
