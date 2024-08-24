@@ -21,7 +21,7 @@ public interface UIEngineAdapter {
         // Draw App Framebuffer
         if(appGrayScale) {
             spriteRenderer.setColor(0.4f,0.4f,0.4f,1);
-            spriteRenderer.setTweak(0.5f,0f,0f,0.5f);
+            spriteRenderer.setTweak(0.5f,0f,0f,0.0f);
         }
         spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
         if(appGrayScale) spriteRenderer.setTweakAndColorReset();

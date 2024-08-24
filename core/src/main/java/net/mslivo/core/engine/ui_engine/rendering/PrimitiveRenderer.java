@@ -17,57 +17,73 @@ public class PrimitiveRenderer {
             attribute vec4 $COLOR_ATTRIBUTE;
             attribute vec4 $VERTEXCOLOR_ATTRIBUTE;
             attribute vec4 $TWEAK_ATTRIBUTE;
+            
             uniform mat4 u_projTrans;
-            varying vec4 v_color;
+            
             varying vec4 fragColor;
+            
             const vec3 forward = vec3(1.0 / 3.0);
+            const float twoThird = 2.0 / 3.0;
+                        
+            const mat3 rgbToLabMatrix = mat3(
+                +0.2104542553, +1.9779984951, +0.0259040371,
+                +0.7936177850, -2.4285922050, +0.7827717662,
+                -0.0040720468, +0.4505937099, -0.8086757660
+            );
             
-            vec3 rgbToLabColor(vec3 start) {
-               vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
-                          pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
-                          * (start.rgb * start.rgb), forward);
-               lab.x = pow(lab.x, 1.48);
-               lab.yz = lab.yz * 0.5 + 0.5;
-               return lab;
+            const mat3 rgbToXyzMatrix = mat3(
+                0.4121656120, 0.2118591070, 0.0883097947,
+                0.5362752080, 0.6807189584, 0.2818474174,
+                0.0514575653, 0.1074065790, 0.6302613616
+            );
+            
+            const mat3 labToRgbMatrix = mat3(
+                1.0, 1.0, 1.0,
+                +0.3963377774, -0.1055613458, -0.0894841775,
+                +0.2158037573, -0.0638541728, -1.2914855480
+            );
+            
+            const mat3 xyzToRgbMatrix = mat3(
+                +4.0767245293, -1.2681437731, -0.0041119885,
+                -3.3072168827, +2.6093323231, -0.7034763098,
+                +0.2307590544, -0.3411344290, +1.7068625689
+            );
+            
+            vec3 rgbToLabColor(vec3 color) {
+                vec3 xyz = rgbToXyzMatrix * (color * color);
+                vec3 lab = rgbToLabMatrix * pow(xyz, forward);
+                lab.x = pow(lab.x, 1.48);
+                lab.yz = lab.yz * 0.5 + 0.5;
+                return lab;
             }
             
-            vec3 rgbToLabFragment(vec3 start) {
-               vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
-                          pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
-                          * (start.rgb * start.rgb), forward);
-               lab.x = (pow(lab.x, 1.51)-0.5)*2.0;
-               return lab;
+            vec3 rgbToLabFragment(vec3 color) {
+                vec3 xyz = rgbToXyzMatrix * (color * color);
+                vec3 lab = rgbToLabMatrix * pow(xyz, forward);
+                lab.x = (pow(lab.x, 1.51) - 0.5) * 2.0;
+                return lab;
             }
             
-            void main()
-            {
-              // Tint Color
-              vec4 v_color = $COLOR_ATTRIBUTE;
-              v_color.w = v_color.w * (255.0/254.0);
-              v_color.rgb = rgbToLabColor(v_color.rgb);
-              
-              // Tweak
-              vec4 v_tweak = $TWEAK_ATTRIBUTE;
-              
-              // Position
-              gl_PointSize = 1.0;
-              gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
-                            
-              // Draw
-              vec4 tgt = $VERTEXCOLOR_ATTRIBUTE;
-              
-              vec3 lab = rgbToLabFragment(tgt.xyz);
-              
-              //float contrast = (v_tweak.w * (1.5 * 255.0 / 254.0) - 0.75);
-              float contrast = clamp(v_tweak.w-0.5,0.0,1.0);
-              lab.xyz = lab.xyz / (contrast * abs(lab.xyz) + (1.0 - contrast));
-
-              lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0),0.666666);
-              lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
-              lab = mat3(1.0, 1.0, 1.0, +0.3963377774, -0.1055613458, -0.0894841775, +0.2158037573, -0.0638541728, -1.2914855480) * lab;
-
-              fragColor = vec4(sqrt(clamp(mat3(+4.0767245293, -1.2681437731, -0.0041119885, -3.3072168827, +2.6093323231, -0.7034763098, +0.2307590544, -0.3411344290, +1.7068625689) *
-                             (lab * lab * lab),0.0, 1.0)), v_color.a * tgt.a);
+            void main() {
+                // Tint Color
+                vec4 v_color = $COLOR_ATTRIBUTE;
+                v_color.w *= 255.0 / 254.0;
+                v_color.rgb = rgbToLabColor(v_color.rgb);
+            
+                // Position
+                gl_PointSize = 1.0;
+                gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
+            
+                // Draw
+                vec3 tgtLab = rgbToLabFragment($VERTEXCOLOR_ATTRIBUTE.rgb);
+                vec3 tweak = $TWEAK_ATTRIBUTE.rgb;
+                vec3 color = v_color.rgb;
+            
+                tgtLab.x = pow(clamp(tgtLab.x * $TWEAK_ATTRIBUTE.x + color.x, 0.0, 1.0), twoThird);
+                tgtLab.yz = clamp((tgtLab.yz * tweak.yz + color.yz - 0.5) * 2.0, -1.0, 1.0);
+                vec3 lab = labToRgbMatrix * tgtLab;
+            
+                fragColor = vec4(sqrt(clamp(xyzToRgbMatrix * (lab * lab * lab), 0.0, 1.0)), v_color.a * $VERTEXCOLOR_ATTRIBUTE.a);
             }
             """
             .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
@@ -99,8 +115,8 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
     private static final int ARRAY_RESIZE_STEP = 8192;
 
-    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0f);
-    private static final float COLOR_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 1f);
+    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0.0f); // Alpha unused on primitiverenderer
+    private static final float COLOR_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 1.0f);
 
     public int renderCalls;
     public int totalRenderCalls;
@@ -373,15 +389,15 @@ public class PrimitiveRenderer {
 
 
     public void setColor(Color color) {
-        this.color = colorPacked(color.r, color.g, color.b, color.a);
+        this.color = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
     public void setColor(Color color, float alpha) {
-        this.color = colorPacked(color.r, color.g, color.b, alpha);
+        this.color = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
     public void setColor(float l, float a, float b, float alpha) {
-        this.color = colorPacked(l, a, b, alpha);
+        this.color = colorPackedRGBA(l, a, b, alpha);
     }
 
     public void setPackedColor(final float color) {
@@ -420,15 +436,15 @@ public class PrimitiveRenderer {
     // ----- Vertex Color -----
 
     public void setVertexColor(Color color) {
-        this.vertexColor = colorPacked(color.r, color.g, color.b, color.a);
+        this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
     public void setVertexColor(Color color, float alpha) {
-        this.vertexColor = colorPacked(color.r, color.g, color.b, alpha);
+        this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
     public void setVertexColor(float r, float g, float b, float alpha) {
-        this.vertexColor = colorPacked(r, g, b, alpha);
+        this.vertexColor = colorPackedRGBA(r, g, b, alpha);
     }
 
     public void setPackedVertexColor(final float vertexColor) {
@@ -466,8 +482,8 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(float L, float A, float B, float contrast) {
-        tweak = colorPacked(L, A, B, contrast);
+    public void setTweak(float L, float A, float B) {
+        tweak = colorPackedRGB(L, A, B);
     }
 
     public void setPackedTweak(final float tweak) {
@@ -476,34 +492,23 @@ public class PrimitiveRenderer {
 
     public void setTweakL(float L) {
         int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
         float B = ((c & 0x00ff0000) >>> 16) / 255f;
         float A = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPacked(L, A, B, Contrast);
+        tweak = colorPackedRGB(L, A, B);
     }
 
     public void setTweakA(float A) {
         int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
         float B = ((c & 0x00ff0000) >>> 16) / 255f;
         float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPacked(L, A, B, Contrast);
+        tweak = colorPackedRGB(L, A, B);
     }
 
     public void setTweakB(float B) {
         int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
         float A = ((c & 0x0000ff00) >>> 8) / 255f;
         float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPacked(L, A, B, Contrast);
-    }
-
-    public void setTweakContrast(float contrast) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        tweak = colorPacked(r, g, b, contrast);
+        tweak = colorPackedRGB(L, A, B);
     }
 
     public float getTweakL() {
@@ -519,11 +524,6 @@ public class PrimitiveRenderer {
     public float getTweakB() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
-    }
-
-    public float getTweakContrast() {
-        int c = NumberUtils.floatToIntColor(this.tweak);
-        return ((c & 0xff000000) >>> 24) / 255f;
     }
 
     public float getPackedTweak() {
@@ -575,8 +575,13 @@ public class PrimitiveRenderer {
         setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
     }
 
-    private static float colorPacked(float red, float green, float blue, float alpha) {
+    private static float colorPackedRGBA(float red, float green, float blue, float alpha) {
         return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
+                | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
+    }
+
+    private static float colorPackedRGB(float red, float green, float blue) {
+        return NumberUtils.intBitsToFloat(((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 

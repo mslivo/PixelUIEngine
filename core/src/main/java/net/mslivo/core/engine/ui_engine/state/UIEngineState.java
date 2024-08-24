@@ -167,7 +167,6 @@ public final class UIEngineState {
 
     /* #################### Misc. ####################  */
 
-    public float animationTimer_ui;
     public Color fontTempColor;
     public UIInputEvents inputEvents;
     public UIInputProcessor inputProcessor;

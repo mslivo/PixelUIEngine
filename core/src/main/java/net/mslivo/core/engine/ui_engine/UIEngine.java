@@ -51,6 +51,7 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
+import java.awt.image.BaseMultiResolutionImage;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -230,7 +231,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.gamePadTranslatedStickRight = new Vector2(0, 0);
 
         // ---- Misc
-        newUIEngineState.animationTimer_ui = 0f;
         newUIEngineState.fontTempColor = new Color(Color.CLEAR);
         newUIEngineState.inputEvents = new UIInputEvents();
         newUIEngineState.inputProcessor = new UIInputProcessor(newUIEngineState.inputEvents, newUIEngineState.gamePadSupport);
@@ -1918,12 +1918,25 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.begin();
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
                 spriteRenderer.draw(uiEngineState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 spriteRenderer.end();
+                spriteRenderer.setTweakReset();
+
             }
         }
 
 
+
+
+        /*
+        spriteRenderer.setAllReset();
+        spriteRenderer.begin();
+        spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
+        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_ICON_COLOR,50,50);
+        spriteRenderer.end();
+
+         */
     }
 
 
@@ -2495,10 +2508,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (grayScale) {
             float avg = ((color.r + color.g + color.b) / 3f) * 0.8f;
             primitiveRenderer.setColor(avg, avg, avg, alpha);
-            primitiveRenderer.setTweak(0.5f, 0f, 0f, 0.5f);
+            primitiveRenderer.setTweak(0.5f, 0f, 0f);
         } else {
             primitiveRenderer.setColor(color, alpha);
-            primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.5f);
+            primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f);
         }
     }
 
@@ -2510,10 +2523,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (grayScale) {
             float avg = ((color.r + color.g + color.b) / 3f) * 0.8f;
             spriteRenderer.setColor(avg, avg, avg, alpha);
-            spriteRenderer.setTweak(0.5f, 0f, 0f, 0.5f);
+            spriteRenderer.setTweak(0.5f, 0f, 0f, 0.0f);
         } else {
             spriteRenderer.setColor(color, alpha);
-            spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.5f);
+            spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
 
         }
     }
@@ -2547,6 +2560,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.drawCMediaSprite(imageButton.image, UICommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset, imageButton.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                     spriteRenderer.loadState();
                 }
+
+
             }
             case Image image -> {
                 if (image.image != null) {

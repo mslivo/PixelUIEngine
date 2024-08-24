@@ -89,7 +89,7 @@ public final class MediaManager {
 
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
-        PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 2, true);
+        PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
         HashSet<CMedia> duplicateCheck = new HashSet<>();
