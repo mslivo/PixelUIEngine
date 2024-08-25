@@ -113,12 +113,17 @@ public class SpriteRenderer implements Batch {
             void main() {
                 // Pixelation
                 vec2 texCoords = v_texCoords;
-                if(v_tweak.w > 0.0){
-                    float pixelSize = 1.0+floor(v_tweak.w * 15.0);
-                    texCoords = texCoords*u_textureSize;
-                    texCoords = floor((texCoords/pixelSize)+0.5)*pixelSize;
-                    texCoords = texCoords/u_textureSize;
-                }
+                
+                // Calculate pixelation factor
+                float pixelSize = 1.0 + floor(v_tweak.w * 15.0);
+                
+                // Compute a multiplier that is exactly 0.0 when v_tweak.w is 0.0
+                float pixelateFactor = step(0.001, v_tweak.w); // Use a small epsilon to avoid artifacts
+                
+                // Apply pixelation effect only when pixelateFactor is 1.0
+                texCoords = texCoords * u_textureSize;
+                texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, pixelateFactor);
+                texCoords = texCoords / u_textureSize;
                 
                 vec4 tgt = texture2D(u_texture, texCoords);
             
