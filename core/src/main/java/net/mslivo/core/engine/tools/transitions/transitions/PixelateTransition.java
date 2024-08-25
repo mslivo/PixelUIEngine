@@ -19,10 +19,10 @@ public class PixelateTransition implements Transition {
     @Override
     public boolean update() {
         if(this.fadeOut < 1f){
-            this.fadeOut = Math.min(fadeOut+0.05f,1f);
+            this.fadeOut = Math.min(fadeOut+0.02f,1f);
             return false;
         }else if(this.fadeIn < 1f){
-            this.fadeIn = Math.min(fadeIn+0.05f,1f);
+            this.fadeIn = Math.min(fadeIn+0.02f,1f);
             return false;
         }else{
             return true;

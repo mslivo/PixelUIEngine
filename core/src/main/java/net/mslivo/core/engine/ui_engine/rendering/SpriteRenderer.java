@@ -74,7 +74,7 @@ public class SpriteRenderer implements Batch {
             varying LOWP vec4 v_tweak;
             
             uniform sampler2D u_texture;
-            uniform vec2 u_textureSizeD4;
+            uniform vec2 u_textureSize;
             
             const vec3 forward = vec3(1.0 / 3.0);
             const float twoThird = 2.0 / 3.0;
@@ -111,12 +111,19 @@ public class SpriteRenderer implements Batch {
             }
             
             void main() {
-            
-                float quantizedTweak = floor(v_tweak.w * 5.0) / 5.0; // Quantize to steps of 0.2
-                vec2 texCoords = mix(v_texCoords, floor((v_texCoords * u_textureSizeD4)+0.5) / u_textureSizeD4, quantizedTweak);
+                // Pixelation
+                vec2 texCoords = v_texCoords;
+                if(v_tweak.w > 0.0){
+                    float pixelSize = 1.0+floor(v_tweak.w * 15.0);
+                    texCoords = texCoords*u_textureSize;
+                    texCoords = floor((texCoords/pixelSize)+0.5)*pixelSize;
+                    texCoords = texCoords/u_textureSize;
+                }
                 
                 vec4 tgt = texture2D(u_texture, texCoords);
             
+                // OkLab Tweaks
+                
                 vec3 lab = rgbToLabFragment(tgt.xyz);
                 lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0), twoThird);
                 lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
@@ -166,7 +173,7 @@ public class SpriteRenderer implements Batch {
     private MediaManager mediaManager;
     private int u_projTrans;
     private int u_texture;
-    private int u_textureSizeD4;
+    private int u_textureSize;
     private Vector2 textureSizeD4Vector;
     public int renderCalls;
     public int totalRenderCalls;
@@ -192,7 +199,7 @@ public class SpriteRenderer implements Batch {
         }
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
-        this.u_textureSizeD4 = this.shader.getUniformLocation("u_textureSizeD4");
+        this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
         this.textureSizeD4Vector = new Vector2(0,0);
         this.drawing = false;
         this.idx = 0;
@@ -1296,8 +1303,8 @@ public class SpriteRenderer implements Batch {
         invTexWidth = 1.0f / texture.getWidth();
         invTexHeight = 1.0f / texture.getHeight();
 
-        this.textureSizeD4Vector.set(texture.getWidth()/PIXELATION_PIXELS, texture.getHeight()/PIXELATION_PIXELS);
-        shader.setUniformf(this.u_textureSizeD4,this.textureSizeD4Vector);
+        this.textureSizeD4Vector.set(texture.getWidth(), texture.getHeight());
+        shader.setUniformf(this.u_textureSize,this.textureSizeD4Vector);
     }
 
     @Override

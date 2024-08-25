@@ -1918,7 +1918,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.begin();
                 Gdx.gl.glClearColor(0, 0, 0, 1);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
+                spriteRenderer.setTweak(0.5f,0.5f,0.5f,0.0f);
                 spriteRenderer.draw(uiEngineState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 spriteRenderer.end();
                 spriteRenderer.setTweakReset();
@@ -2564,6 +2564,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             }
             case Image image -> {
+
                 if (image.image != null) {
                     spriteRenderer.drawCMediaSprite(image.image, UICommonUtils.component_getAbsoluteX(image), UICommonUtils.component_getAbsoluteY(image), image.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }

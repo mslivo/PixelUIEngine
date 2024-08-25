@@ -150,14 +150,19 @@ public class Tools {
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null, false);
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null, true, true);
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, false);
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, true, true);
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath, boolean useAngle) {
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, boolean useAngle) {
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, useAngle,true);
+        }
+
+
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath, boolean useAngle, boolean vSync) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
             boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
@@ -172,7 +177,7 @@ public class Tools {
             config.setDecorated(true);
             config.setMaximized(true);
             config.setForegroundFPS(fps);
-            config.useVsync(true);
+            config.useVsync(vSync);
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
             if (iconPath != null) config.setWindowIcon(iconPath);
