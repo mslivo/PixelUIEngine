@@ -13,6 +13,7 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
+import net.mslivo.core.engine.ui_engine.constants.SHAPE_ROTATION;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
 import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -254,9 +255,14 @@ public final class APIComponent {
         }
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType) {
+            return create(x,y,width,height,shapeType,SHAPE_ROTATION.DEGREE_0);
+        }
+
+        public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation) {
             Shape shape = new Shape();
             setComponentCommonInitValuesInternal(shape, x, y, width, height, uiConfig.component_defaultColor);
             shape.shapeType = shapeType;
+            shape.shapeRotation = shapeRotation;
             return shape;
         }
 

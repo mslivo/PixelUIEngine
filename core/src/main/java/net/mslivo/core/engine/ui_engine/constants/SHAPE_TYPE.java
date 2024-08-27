@@ -4,10 +4,8 @@ public enum SHAPE_TYPE {
     RECT("Rect"),
     DIAMOND("Diamond"),
     OVAL("Oval"),
-    TRIANGLE_LEFT_DOWN("Trangle"),
-    TRIANGLE_RIGHT_DOWN("Triangle"),
-    TRIANGLE_LEFT_UP("Triangle"),
-    TRIANGLE_RIGHT_UP("Triangle");
+    RIGHT_TRIANGLE("Right Triangle"),
+    ISOSCELES_TRIANGLE("Isosceles Triangle");
 
     public final String text;
 

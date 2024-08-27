@@ -133,7 +133,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Shape rect = api.component.shape.create(11, 8, 2, 2, SHAPE_TYPE.RECT);
         api.component.setColor(rect, Color.YELLOW);
 
-        Shape triangle = api.component.shape.create(14, 8, 2, 2, SHAPE_TYPE.TRIANGLE_LEFT_DOWN);
+        Shape triangle = api.component.shape.create(14, 8, 2, 2, SHAPE_TYPE.DIAMOND, SHAPE_ROTATION.DEGREE_0);
         api.component.setColor(triangle, Color.BLUE);
 
         ScrollbarHorizontal scrollBarHorizontalR = api.component.scrollbar.scrollbarHorizontal.create(4, 8, 6, new ScrollBarAction() {

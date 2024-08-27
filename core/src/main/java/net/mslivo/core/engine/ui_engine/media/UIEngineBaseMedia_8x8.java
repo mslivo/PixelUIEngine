@@ -63,13 +63,6 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_OSTEXTINPUT_LOWERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_lowercase.png", 12, 12);
     public static final CMediaArray UI_OSTEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_uppercase.png", 12, 12);
     public static final CMediaImage UI_OSTEXTINPUT_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/ostextinput_selected.png");
-    public static final CMediaImage UI_SHAPE_RECT = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_rect.png");
-    public static final CMediaImage UI_SHAPE_DIAMOND = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_diamond.png");
-    public static final CMediaImage UI_SHAPE_OVAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_oval.png");
-    public static final CMediaImage UI_SHAPE_TRIANGLE_LEFT_DOWN = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_right_triangle_ld.png");
-    public static final CMediaImage UI_SHAPE_TRIANGLE_RIGHT_DOWN = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_right_triangle_rd.png");
-    public static final CMediaImage UI_SHAPE_TRIANGLE_LEFT_UP = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_right_triangle_lu.png");
-    public static final CMediaImage UI_SHAPE_TRIANGLE_RIGHT_UP = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/shape_right_triangle_ru.png");
 
     // Cursors
     public static final CMediaImage UI_CURSOR_ARROW = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "cursors/arrow.png");
@@ -154,13 +147,6 @@ public class UIEngineBaseMedia_8x8 {
             UI_ICON_EXTEND,
             UI_ICON_KEY_DELETE,
             UI_ICON_KEY_CASE,
-            UI_SHAPE_RECT,
-            UI_SHAPE_DIAMOND,
-            UI_SHAPE_OVAL,
-            UI_SHAPE_TRIANGLE_LEFT_DOWN,
-            UI_SHAPE_TRIANGLE_RIGHT_DOWN,
-            UI_SHAPE_TRIANGLE_LEFT_UP,
-            UI_SHAPE_TRIANGLE_RIGHT_UP,
             UI_COLOR_SELECTOR,
             UI_COLOR_SELECTOR_OVERLAY,
             UI_OSTEXTINPUT_CHARACTER,

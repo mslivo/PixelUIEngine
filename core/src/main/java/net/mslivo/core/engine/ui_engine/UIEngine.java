@@ -51,7 +51,6 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
-import java.awt.image.BaseMultiResolutionImage;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2882,18 +2881,100 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
             case Shape shape -> {
                 if (shape.shapeType != null) {
-                    CMediaImage shapeImage = switch (shape.shapeType) {
-                        case OVAL -> UIEngineBaseMedia_8x8.UI_SHAPE_OVAL;
-                        case RECT -> UIEngineBaseMedia_8x8.UI_SHAPE_RECT;
-                        case DIAMOND -> UIEngineBaseMedia_8x8.UI_SHAPE_DIAMOND;
-                        case TRIANGLE_LEFT_DOWN -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_LEFT_DOWN;
-                        case TRIANGLE_RIGHT_DOWN -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_RIGHT_DOWN;
-                        case TRIANGLE_LEFT_UP -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_LEFT_UP;
-                        case TRIANGLE_RIGHT_UP -> UIEngineBaseMedia_8x8.UI_SHAPE_TRIANGLE_RIGHT_UP;
-                    };
+                    spriteRenderer.end();
 
-                    spriteRenderer.drawCMediaImage(shapeImage, UICommonUtils.component_getAbsoluteX(shape), UICommonUtils.component_getAbsoluteY(shape),
-                            0, 0, TS(shape.width), TS(shape.height));
+                    primitiveRenderer.begin(GL20.GL_TRIANGLES);
+                    primitiveRenderer.setVertexColor(shape.color);
+                    final int cx = UICommonUtils.component_getAbsoluteX(shape);
+                    final int cy = UICommonUtils.component_getAbsoluteY(shape);
+                    final int cw = TS(shape.width);
+                    final int ch = TS(shape.height);
+                    final int cw2 =cw/2;
+                    final int ch2 =cw/2;
+                    final int center_x = cx+cw2;
+                    final int center_y = cy+ch2;
+
+                    switch (shape.shapeType){
+                        case RECT -> {
+                            primitiveRenderer.vertex(cx,cy);
+                            primitiveRenderer.vertex(cx+cw,cy);
+                            primitiveRenderer.vertex(cx+cw,cy+ch);
+
+                            primitiveRenderer.vertex(cx,cy);
+                            primitiveRenderer.vertex(cx,cy+ch);
+                            primitiveRenderer.vertex(cx+cw,cy+ch);
+                        }
+                        case OVAL -> {
+                            final float RES = MathUtils.PI2/45f;
+                            for(float ir=0;ir<=MathUtils.PI2;ir+=RES){
+                                primitiveRenderer.vertex(center_x,center_y);
+                                primitiveRenderer.vertex(center_x+(MathUtils.cos(ir)*cw2),center_y+MathUtils.sin(ir)*ch2);
+                                primitiveRenderer.vertex(center_x+(MathUtils.cos(ir+RES)*cw2),center_y+MathUtils.sin(ir+RES)*ch2);
+                            }
+                        }
+                        case RIGHT_TRIANGLE -> {
+                            switch (shape.shapeRotation){
+                                case DEGREE_0 -> {
+                                    primitiveRenderer.vertex(cx,cy);
+                                    primitiveRenderer.vertex(cx,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy);
+                                }
+                                case DEGREE_90 -> {
+                                    primitiveRenderer.vertex(cx,cy);
+                                    primitiveRenderer.vertex(cx,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch);
+                                }
+                                case DEGREE_180 -> {
+                                    primitiveRenderer.vertex(cx,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy);
+                                }
+                                case DEGREE_270 -> {
+                                    primitiveRenderer.vertex(cx,cy);
+                                    primitiveRenderer.vertex(cx+cw,cy);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch);
+                                }
+                            }
+                        }
+                        case ISOSCELES_TRIANGLE -> {
+                            primitiveRenderer.begin(GL20.GL_TRIANGLES);
+                            switch (shape.shapeRotation){
+                                case DEGREE_0 -> {
+                                    primitiveRenderer.vertex(cx,cy);
+                                    primitiveRenderer.vertex(cx+cw,cy);
+                                    primitiveRenderer.vertex(cx+cw2,cy+ch);
+                                }
+                                case DEGREE_90 -> {
+                                    primitiveRenderer.vertex(cx,cy);
+                                    primitiveRenderer.vertex(cx,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch2);
+                                }
+                                case DEGREE_180 -> {
+                                    primitiveRenderer.vertex(cx+cw2,cy);
+                                    primitiveRenderer.vertex(cx,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch);
+                                }
+                                case DEGREE_270 -> {
+                                    primitiveRenderer.vertex(cx,cy+ch2);
+                                    primitiveRenderer.vertex(cx+cw,cy+ch);
+                                    primitiveRenderer.vertex(cx+cw,cy);
+                                }
+                            }
+                        }
+                        case DIAMOND -> {
+                            primitiveRenderer.vertex(cx+cw2,cy);
+                            primitiveRenderer.vertex(cx,cy+ch2);
+                            primitiveRenderer.vertex(cx+cw,cy+ch2);
+
+                            primitiveRenderer.vertex(cx+cw2,cy+ch);
+                            primitiveRenderer.vertex(cx,cy+ch2);
+                            primitiveRenderer.vertex(cx+cw,cy+ch2);
+                        }
+
+                    }
+
+                    primitiveRenderer.end();
+                    spriteRenderer.begin();
                 }
             }
             case Progressbar progressBar -> {
