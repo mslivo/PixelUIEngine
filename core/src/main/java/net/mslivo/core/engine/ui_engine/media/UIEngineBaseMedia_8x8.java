@@ -8,6 +8,7 @@ import net.mslivo.core.engine.media_manager.*;
 public class UIEngineBaseMedia_8x8 {
     private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui_8/";
     private static final int TL = 8;
+    private static final int TL2 = TL*2;
 
     // UI Elements
     public static final CMediaArray UI_WINDOW = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/window.png", TL, TL);
@@ -18,45 +19,53 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_SCROLLBAR_BUTTON_VERTICAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/scrollbar_button_vertical.png", TL, TL);
     public static final CMediaArray UI_SCROLLBAR_BUTTON_HORIZONAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/scrollbar_button_horizontal.png", TL, TL);
     public static final CMediaImage UI_LIST = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/list.png");
-    public static final CMediaImage UI_LIST_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/list_selected.png");
+    public static final CMediaImage UI_LIST_CELL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/list_cell.png");
+    public static final CMediaImage UI_LIST_CELL_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/list_cell_selected.png");
     public static final CMediaArray UI_LIST_DRAG = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/list_drag.png", TL, TL * 2);
     public static final CMediaArray UI_COMBOBOX = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_OPEN = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_open.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_LIST = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_cell.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_LIST_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_LIST_CELL_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell_selected.png", TL, TL);
     public static final CMediaArray UI_TAB_BORDERS = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tab_border.png", TL, TL);
     public static final CMediaArray UI_BORDERS = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/border.png", TL, TL);
     public static final CMediaArray UI_TAB = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tab.png", TL, TL);
     public static final CMediaArray UI_TAB_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tab_selected.png", TL, TL);
     public static final CMediaImage UI_TAB_BIGICON = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tab_bigicon.png");
     public static final CMediaImage UI_TAB_BIGICON_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tab__bigicon_selected.png");
-    public static final CMediaArray UI_COMBOBOX_OPEN = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_open.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_LIST = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_LIST_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_selected.png", TL, TL);
     public static final CMediaImage UI_KNOB_BACKGROUND = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/knob_background.png");
-    public static final CMediaArray UI_KNOB = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/knob.png", TL * 2, TL * 2);
-    public static final CMediaArray UI_KNOB_ENDLESS = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/knob_endless.png", TL * 2, TL * 2);
+    public static final CMediaArray UI_KNOB = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/knob.png", TL2, TL2);
+    public static final CMediaArray UI_KNOB_ENDLESS = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/knob_endless.png", TL2, TL2);
     public static final CMediaArray UI_SEPARATOR_HORIZONTAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/separator_horizontal.png", TL, TL);
     public static final CMediaArray UI_SEPARATOR_VERTICAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/separator_vertical.png", TL, TL);
+    public static final CMediaArray UI_TOOLTIP_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_cell.png", TL, TL);
     public static final CMediaArray UI_TOOLTIP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip.png", TL, TL);
-    public static final CMediaArray UI_TOOLTIP_BORDER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_border.png", TL, TL);
     public static final CMediaImage UI_TOOLTIP_SEGMENT_BORDER = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_segment_border.png");
     public static final CMediaImage UI_TOOLTIP_LINE_HORIZONTAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_horizontal.png");
     public static final CMediaImage UI_TOOLTIP_LINE_VERTICAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_vertical.png");
     public static final CMediaArray UI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu.png", TL, TL);
-    public static final CMediaArray UI_CONTEXT_MENU_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_selected.png", TL, TL);
+    public static final CMediaArray UI_CONTEXT_MENU_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell.png", TL, TL);
+    public static final CMediaArray UI_CONTEXT_MENU_CELL_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell_selected.png", TL, TL);
     public static final CMediaArray UI_TEXTFIELD = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield.png", TL, TL);
-    public static final CMediaArray UI_TEXTFIELD_VALIDATION_OVERLAY = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_validation_overlay.png", TL, TL);
-    public static final CMediaArray UI_TEXTFIELD_FOCUSED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_focused.png", TL, TL);
+    public static final CMediaArray UI_TEXTFIELD_CELL_VALIDATION = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell_validation.png", TL, TL);
+    public static final CMediaArray UI_TEXTFIELD_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell.png", TL, TL);
     public static final CMediaAnimation UI_TEXTFIELD_CARET = MediaManager.create_CMediaAnimation(DIR_UI_GRAPHICS + "ui/textfield_caret.png", 1, TL, 0.4f);
     public static final CMediaArray UI_GRID = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid.png", TL, TL);
     public static final CMediaArray UI_GRID_DRAGGED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged.png", TL, TL);
-    public static final CMediaArray UI_GRID_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_selected.png", TL, TL);
-    public static final CMediaArray UI_GRID_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_x2.png", TL * 2, TL * 2);
-    public static final CMediaArray UI_GRID_DRAGGED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged_x2.png", TL * 2, TL * 2);
-    public static final CMediaArray UI_GRID_SELECTED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_selected_x2.png", TL * 2, TL * 2);
+    public static final CMediaArray UI_GRID_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell.png", TL, TL);
+    public static final CMediaArray UI_GRID_CELL_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_selected.png", TL, TL);
+    public static final CMediaArray UI_GRID_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_x2.png",  TL2,TL2);
+    public static final CMediaArray UI_GRID_DRAGGED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged_x2.png",  TL2,TL2);
+    public static final CMediaArray UI_GRID_CELL_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_x2.png",  TL2,TL2);
+    public static final CMediaArray UI_GRID_CELL_SELECTED_X2 = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_selected_x2.png", TL2,TL2);
     public static final CMediaArray UI_PROGRESSBAR = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/progressbar.png", TL, TL);
     public static final CMediaArray UI_PROGRESSBAR_BAR = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/progressbar_bar.png", TL, TL);
     public static final CMediaImage UI_NOTIFICATION_BAR = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/notification_bar.png");
     public static final CMediaArray UI_CHECKBOX_CHECKBOX = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/checkbox.png", TL, TL);
+    public static final CMediaImage UI_CHECKBOX_CHECKBOX_CELL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/checkbox_cell.png");
     public static final CMediaArray UI_CHECKBOX_RADIO = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/radio.png", TL, TL);
+    public static final CMediaImage UI_CHECKBOX_RADIO_CELL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/radio_cell.png");
     public static final CMediaArray UI_OSTEXTINPUT_CHARACTER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_character.png", 12, 12);
     public static final CMediaArray UI_OSTEXTINPUT_CONFIRM = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_confirm.png", 12, 12);
     public static final CMediaArray UI_OSTEXTINPUT_DELETE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_delete.png", 12, 12);
@@ -99,7 +108,8 @@ public class UIEngineBaseMedia_8x8 {
             UI_SCROLLBAR_BUTTON_VERTICAL,
             UI_SCROLLBAR_BUTTON_HORIZONAL,
             UI_LIST,
-            UI_LIST_SELECTED,
+            UI_LIST_CELL,
+            UI_LIST_CELL_SELECTED,
             UI_LIST_DRAG,
             UI_COMBOBOX,
             UI_TAB_BORDERS,
@@ -110,34 +120,40 @@ public class UIEngineBaseMedia_8x8 {
             UI_TAB_BIGICON_SELECTED,
             UI_COMBOBOX_OPEN,
             UI_COMBOBOX_LIST,
-            UI_COMBOBOX_LIST_SELECTED,
+            UI_COMBOBOX_CELL,
+            UI_COMBOBOX_LIST_CELL,
+            UI_COMBOBOX_LIST_CELL_SELECTED,
             UI_KNOB_BACKGROUND,
             UI_KNOB,
             UI_KNOB_ENDLESS,
             UI_SEPARATOR_HORIZONTAL,
             UI_SEPARATOR_VERTICAL,
-            UI_TOOLTIP,
+            UI_TOOLTIP_CELL,
             UI_TOOLTIP_SEGMENT_BORDER,
-            UI_TOOLTIP_BORDER,
+            UI_TOOLTIP,
             UI_TOOLTIP_LINE_HORIZONTAL,
             UI_TOOLTIP_LINE_VERTICAL,
             UI_CONTEXT_MENU,
-            UI_CONTEXT_MENU_SELECTED,
+            UI_CONTEXT_MENU_CELL,
+            UI_CONTEXT_MENU_CELL_SELECTED,
             UI_TEXTFIELD,
-            UI_TEXTFIELD_VALIDATION_OVERLAY,
-            UI_TEXTFIELD_FOCUSED,
+            UI_TEXTFIELD_CELL_VALIDATION,
+            UI_TEXTFIELD_CELL,
             UI_TEXTFIELD_CARET,
             UI_GRID,
             UI_GRID_DRAGGED,
-            UI_GRID_SELECTED,
+            UI_GRID_CELL,UI_GRID_CELL_SELECTED,
             UI_GRID_X2,
             UI_GRID_DRAGGED_X2,
-            UI_GRID_SELECTED_X2,
+            UI_GRID_CELL_X2,
+            UI_GRID_CELL_SELECTED_X2,
             UI_PROGRESSBAR,
             UI_PROGRESSBAR_BAR,
             UI_NOTIFICATION_BAR,
             UI_CHECKBOX_CHECKBOX,
+            UI_CHECKBOX_CHECKBOX_CELL,
             UI_CHECKBOX_RADIO,
+            UI_CHECKBOX_RADIO_CELL,
             UI_CURSOR_ARROW,
             UI_PIXEL_TRANSPARENT,
             UI_ICON_CLOSE,

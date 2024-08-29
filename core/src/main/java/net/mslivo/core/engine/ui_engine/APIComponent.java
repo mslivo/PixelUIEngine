@@ -490,7 +490,7 @@ public final class APIComponent {
 
         public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
-            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, Color.GRAY);
+            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction;
@@ -867,7 +867,7 @@ public final class APIComponent {
                 width = items.length * (doubleSized ? 2 : 1);
                 height = items[0].length * (doubleSized ? 2 : 1);
             }
-            setComponentCommonInitValuesInternal(grid, x, y, width, height);
+            setComponentCommonInitValuesInternal(grid, x, y, width, height,uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
@@ -952,7 +952,7 @@ public final class APIComponent {
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
-            setComponentCommonInitValuesInternal(textField, x, y, width, 1, Color.GRAY);
+            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             textField.font = uiConfig.component_defaultFont;
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
@@ -1431,7 +1431,7 @@ public final class APIComponent {
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
-            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1);
+            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1,uiEngineState.config.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             comboBox.useIcons = useIcons;
             comboBox.comboBoxAction = comboBoxAction;
             comboBox.comboBoxItems = new ArrayList<>();
@@ -1543,7 +1543,6 @@ public final class APIComponent {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.font = uiConfig.component_defaultFont;
-                comboBoxItem.color = new Color(uiConfig.component_defaultColor);
                 comboBoxItem.icon = icon;
                 comboBoxItem.iconIndex = Math.max(iconIndex, 0);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
@@ -1560,11 +1559,6 @@ public final class APIComponent {
             public void setData(ComboboxItem comboBoxItem, Object data) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.data = data;
-            }
-
-            public void setColor(ComboboxItem comboBoxItem, Color color) {
-                if (comboBoxItem == null || color == null) return;
-                comboBoxItem.color.set(color);
             }
 
             public void setFont(ComboboxItem comboBoxItem, CMediaFont font) {
@@ -1706,7 +1700,7 @@ public final class APIComponent {
 
         public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
-            setComponentCommonInitValuesInternal(list, x, y, width, height);
+            setComponentCommonInitValuesInternal(list, x, y, width, height,uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
@@ -1993,6 +1987,10 @@ public final class APIComponent {
         component.addedToWindow = null;
         component.toolTip = null;
         component.addedToScreen = false;
+    }
+
+    private static Color brighterColor(Color color){
+        return new Color(color).mul(1.2f);
     }
 
 }

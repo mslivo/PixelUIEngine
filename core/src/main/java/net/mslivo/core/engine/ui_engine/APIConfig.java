@@ -20,6 +20,7 @@ public final class APIConfig {
     public final APINotificationsConfig notification;
     public final APITooltipConfig tooltip;
     public final APIMouseTextInputConfig mouseTextInput;
+    public final APIContextMenuConfig contextMenu;
 
     APIConfig(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
@@ -33,6 +34,7 @@ public final class APIConfig {
         this.notification = new APINotificationsConfig();
         this.tooltip = new APITooltipConfig();
         this.mouseTextInput = new APIMouseTextInputConfig();
+        this.contextMenu = new APIContextMenuConfig();
     }
 
     public void setAllDefaultFont(CMediaFont default_font){
@@ -496,6 +498,21 @@ public final class APIConfig {
         public void setFadeOutSpeed(float fadeOutSpeed) {
             uiConfig.tooltip_FadeOutSpeed = fadeOutSpeed;
         }
+    }
+
+    public final class APIContextMenuConfig {
+
+        APIContextMenuConfig(){
+        }
+
+        public Color getDefaultColor() {
+            return uiConfig.contextMenu_defaultColor;
+        }
+
+        public void setDefaultColor(Color tooltip_defaultColor) {
+            uiConfig.contextMenu_defaultColor = tooltip_defaultColor;
+        }
+
     }
 
     public final class APIMouseTextInputConfig {

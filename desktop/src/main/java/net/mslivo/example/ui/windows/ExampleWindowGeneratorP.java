@@ -121,8 +121,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         };
 
         api.component.knob.setKnobAction(knob, knobAction);
-        api.component.setColor(knob, new Color(0.3f, 0.25f, 0.2f, 1f));
-
+        api.component.setColor(knob, Color.YELLOW);
+        api.component.setColor2(knob, Color.BLUE);
         Knob knobe = api.component.knob.create(4, 5, null, true);
         api.component.setColor(knobe, Color.RED);
 
@@ -143,7 +143,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         }, oval.color.r);
         api.component.setColor(scrollBarHorizontalR, new Color(1f,0f,0f,1f));
-        api.component.setColor2(scrollBarHorizontalR, new Color(0.5f,0f,0f,1f));
+        api.component.setColor2(scrollBarHorizontalR, new Color(0.8f,0f,0f,1f));
         ScrollbarHorizontal scrollBarHorizontalG = api.component.scrollbar.scrollbarHorizontal.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
@@ -151,7 +151,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         }, oval.color.g);
         api.component.setColor(scrollBarHorizontalG, new Color(0f,1f,0f,1f));
-        api.component.setColor2(scrollBarHorizontalG, new Color(0f,0.5f,0f,1f));
+        api.component.setColor2(scrollBarHorizontalG, new Color(0f,0.8f,0f,1f));
         ScrollbarHorizontal scrollBarHorizontalB = api.component.scrollbar.scrollbarHorizontal.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
@@ -159,7 +159,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         }, oval.color.b);
         api.component.setColor(scrollBarHorizontalB, new Color(0f,0f,1f,1f));
-        api.component.setColor2(scrollBarHorizontalB, new Color(0f,0f,0.5f,1f));
+        api.component.setColor2(scrollBarHorizontalB, new Color(0f,0f,0.8f,1f));
 
 
         Textfield textField = api.component.textfield.create(18, 11, 10, "", null, 128);
@@ -206,11 +206,25 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Textfield number = api.composites.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
 
         ArrayList<ComboboxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three"));
+
+        ComboboxItem comboboxItem = api.component.comboBox.item.create("One");
+
+
+        ComboboxItem comboboxItem2 = api.component.comboBox.item.create("Two");
+
+
         Combobox comboBox = api.component.comboBox.create(25, 7, 6, new ComboboxItem[]{
-                api.component.comboBox.item.create("One"),
-                api.component.comboBox.item.create("Two"),
+                comboboxItem ,
+                comboboxItem2,
                 api.component.comboBox.item.create("Three"),
 
+        });
+
+        api.component.comboBox.setComboBoxAction(comboBox, new ComboBoxAction() {
+            @Override
+            public Color cellColor(ComboboxItem comboboxItem) {
+                return comboboxItem == comboboxItem2 ? Color.RED : null;
+            }
         });
 
 
@@ -362,10 +376,17 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                                         api.removeAllWindows();
                                     }
                                 }),
-                        }
-                        , null, 1f));
+                        }, new ContextmenuAction() {
+                            @Override
+                            public Color cellColor(ContextmenuItem contextMenuItem) {
+                                return contextMenuItem.text.startsWith("Item 3") ? Color.RED : null;
+                            }
+                        }));
             }
         }, ExampleBaseMedia.ICON_EXAMPLE_1, 0);
+
+
+
         api.component.setColor(textBtn4, new Color(0.6f,0.5f,0.5f,1f));
         api.component.button.centerContent(textBtn4);
 
@@ -464,15 +485,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("Title", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("1", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("2", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("3", Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.text.create("Title", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("1", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("2", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("3", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2, 0, Color.MAGENTA, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         canvasSegment,
                 }, new ToolTipAction() {
                     @Override
@@ -575,7 +596,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Color cellColor(ListItem listItem) {
-                return Color.valueOf("1EBC73");
+                return Color.valueOf("65F7B3");
             }
         };
         api.component.list.setListAction(list1, list1Action);

@@ -53,7 +53,7 @@ public final class APIMouseTextInput {
         if (uiEngineState.openMouseTextInput != null) return;
         MouseTextInput mouseTextInput = new MouseTextInput();
         mouseTextInput.color = new Color(uiConfig.mouseTextInput_defaultColor);
-        mouseTextInput.color2 = new Color(0.25f,0.25f,0.25f,1.0f);
+        mouseTextInput.color2 = new Color(uiConfig.mouseTextInput_defaultColor).mul(0.5f);
         mouseTextInput.font = uiConfig.mouseTextInput_defaultFont;
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;

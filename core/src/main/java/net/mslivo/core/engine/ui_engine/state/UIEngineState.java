@@ -167,14 +167,13 @@ public final class UIEngineState {
 
     /* #################### Misc. ####################  */
 
-    public Color fontTempColor;
     public UIInputEvents inputEvents;
     public UIInputProcessor inputProcessor;
     public int itemInfo_listIndex;
     public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;
     public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_gridValid;
-
+    public Color tempColor;
     public long lastUpdate;
 
 }

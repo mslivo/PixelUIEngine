@@ -373,10 +373,6 @@ public final class APIWindow {
             if (match) {
                 if (componentColor1) api.component.setColor(c, color);
                 if (componentColor2) api.component.setColor2(c, color);
-                if (comboBoxItemColor && c instanceof Combobox comboBox) {
-                    for (int i2 = 0; i2 < comboBox.comboBoxItems.size(); i2++)
-                        api.component.comboBox.item.setColor(comboBox.comboBoxItems.get(i2), color);
-                }
             }
         }
     }

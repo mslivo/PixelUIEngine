@@ -35,14 +35,10 @@ public final class APIContextMenu {
     }
 
     public Contextmenu create(ContextmenuItem[] contextMenuItems) {
-        return create(contextMenuItems, defaultContextMenuAction(), 1f);
+        return create(contextMenuItems, defaultContextMenuAction());
     }
 
     public Contextmenu create(ContextmenuItem[] contextMenuItems, ContextmenuAction contextMenuAction) {
-        return create(contextMenuItems, contextMenuAction, 1f);
-    }
-
-    public Contextmenu create(ContextmenuItem[] contextMenuItems, ContextmenuAction contextMenuAction, float alpha) {
         Contextmenu contextMenu = new Contextmenu();
         contextMenu.items = new ArrayList<>();
         if (contextMenuItems != null) {
@@ -53,7 +49,7 @@ public final class APIContextMenu {
                 }
             }
         }
-        contextMenu.color_a = Math.clamp(alpha, 0f, 1f);
+        contextMenu.color = new Color(uiConfig.contextMenu_defaultColor);
         contextMenu.contextMenuAction = contextMenuAction;
         return contextMenu;
     }
@@ -63,9 +59,9 @@ public final class APIContextMenu {
         contextMenu.contextMenuAction = contextMenuAction;
     }
 
-    public void setAlpha(Contextmenu contextMenu, float alpha) {
+    public void setColor(Contextmenu contextMenu, Color color) {
         if (contextMenu == null) return;
-        contextMenu.color_a = Math.clamp(alpha, 0f, 1f);
+        contextMenu.color.set(color);
     }
 
     public void addContextMenuItem(Contextmenu contextMenu, ContextmenuItem contextMenuItem) {
@@ -131,7 +127,6 @@ public final class APIContextMenu {
             ContextmenuItem contextMenuItem = new ContextmenuItem();
             contextMenuItem.text = Tools.Text.validString(text);
             contextMenuItem.font = uiConfig.component_defaultFont;
-            contextMenuItem.color = new Color(uiConfig.component_defaultColor);
             contextMenuItem.icon = icon;
             contextMenuItem.iconIndex = iconIndex;
             contextMenuItem.name = "";
@@ -152,10 +147,6 @@ public final class APIContextMenu {
             contextMenuItem.data = data;
         }
 
-        public void setColor(ContextmenuItem contextMenuItem, Color color) {
-            if (contextMenuItem == null || color == null) return;
-            contextMenuItem.color.set(color);
-        }
 
         public void setFont(ContextmenuItem contextMenuItem, CMediaFont font) {
             if (contextMenuItem == null) return;

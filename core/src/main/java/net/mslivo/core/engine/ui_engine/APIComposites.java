@@ -521,9 +521,9 @@ public final class APIComposites {
                             return;
                         }
                         if (x != xLast || y != yLast) {
-                            currentColor.r = api.component.canvas.getR(colorCanvas, x, y - 1)*0.5f;
-                            currentColor.g = api.component.canvas.getG(colorCanvas, x, y - 1)*0.5f;
-                            currentColor.b = api.component.canvas.getB(colorCanvas, x, y - 1)*0.5f;
+                            currentColor.r = api.component.canvas.getR(colorCanvas, x, y - 1);
+                            currentColor.g = api.component.canvas.getG(colorCanvas, x, y - 1);
+                            currentColor.b = api.component.canvas.getB(colorCanvas, x, y - 1);
                             currentColor.a = 1f;
                             if (currentColor != null) {
                                 api.component.setColor(ok, currentColor);
@@ -995,6 +995,13 @@ public final class APIComposites {
 
         public void makeExclusiveToggleButtons(Button[] buttons, BiConsumer<Button, Boolean> toggleFunction) {
             if (buttons == null || toggleFunction == null) return;
+            int toggledButtonIndex = -1;
+            for(int i = 0; i < buttons.length; i++){
+                if(buttons[i].pressed){
+                    toggledButtonIndex = i;
+                    break;
+                }
+            }
             for (int i = 0; i < buttons.length; i++) {
                 Button button = buttons[i];
                 api.component.button.setButtonMode(button, BUTTON_MODE.TOGGLE);

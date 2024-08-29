@@ -10,6 +10,9 @@ import java.io.Serializable;
 
 public final class UIConfig implements Serializable, Cloneable {
 
+    private static final Color COlOR_DEFAULT = Color.valueOf("E5E5E5");
+    private static final Color COlOR_DEFAULT_BRIGHT = Color.valueOf("FFFFFF");
+
     private final UIEngineState uiEngineState;
 
     public CMediaSprite ui_cursor;
@@ -46,6 +49,7 @@ public final class UIConfig implements Serializable, Cloneable {
     public Color window_defaultColor;
     public CMediaFont window_defaultFont;
     public Color component_defaultColor;
+    public Color contextMenu_defaultColor;
     public CMediaFont component_defaultFont;
     public int component_appViewportDefaultUpdateTime;
     public float component_listDragAlpha;
@@ -121,9 +125,10 @@ public final class UIConfig implements Serializable, Cloneable {
         input_gamePadMouseButtonsScrollDown = null;
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = true;
-        window_defaultColor = Color.GRAY.cpy();
+        window_defaultColor = COlOR_DEFAULT.cpy();
         window_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        component_defaultColor = Color.GRAY.cpy();
+        component_defaultColor = COlOR_DEFAULT.cpy();
+        contextMenu_defaultColor = COlOR_DEFAULT_BRIGHT.cpy();
         component_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         component_appViewportDefaultUpdateTime = 0;
         component_listDragAlpha = 0.8f;
@@ -148,10 +153,10 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_max = 20;
         notification_defaultDisplayTime = 180;
         notification_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_WHITE;
-        notification_defaultColor = Color.DARK_GRAY.cpy();
+        notification_defaultColor = COlOR_DEFAULT.cpy();
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
-        tooltip_defaultColor = Color.GRAY.cpy();
+        tooltip_defaultColor = COlOR_DEFAULT_BRIGHT.cpy();
         tooltip_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
         tooltip_FadeInSpeed = 0.2f;
         tooltip_FadeOutSpeed = 0.2f;
@@ -174,7 +179,7 @@ public final class UIConfig implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
         mouseTextInput_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        mouseTextInput_defaultColor = Color.GRAY.cpy();
+        mouseTextInput_defaultColor = COlOR_DEFAULT.cpy();
     }
 
     public interface AnimationTimerFunction {

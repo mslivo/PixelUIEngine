@@ -155,11 +155,11 @@ public final class APITooltip {
             }
 
             public TooltipImageSegment create(CMediaSprite sprite) {
-                return create(sprite, 0, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, 0, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex) {
-                return create(sprite, arrayIndex, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, arrayIndex, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color) {
@@ -211,7 +211,7 @@ public final class APITooltip {
             }
 
             public TooltipTextSegment create(String text) {
-                return create(text, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(text, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipTextSegment create(String text, Color color) {
@@ -261,11 +261,11 @@ public final class APITooltip {
 
 
             public TooltipCanvasSegment create() {
-                return create(Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
+                return create(uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
             public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
-                return create(Color.GRAY, alignment, 1, 1, false, false, false);
+                return create(uiConfig.tooltip_defaultColor, alignment, 1, 1, false, false, false);
 
             }
 
