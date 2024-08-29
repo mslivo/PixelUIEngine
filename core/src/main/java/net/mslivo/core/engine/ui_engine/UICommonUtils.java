@@ -712,8 +712,8 @@ final class UICommonUtils {
         component_resetReferences(uiEngineState, component);
 
         // Remove
-        component.addedToWindow = null;
         component.addedToWindow.components.remove(component);
+        component.addedToWindow = null;
     }
 
     static void tab_removeComponent(Tab tab, Component component) {
