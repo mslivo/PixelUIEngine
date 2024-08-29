@@ -7,17 +7,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntSet;
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_ROTATION;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
 import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
+import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -41,9 +42,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipCanvasSegment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,7 +73,7 @@ public final class APIComponent {
         this.api = api;
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig= uiEngineState.config;
+        this.uiConfig = uiEngineState.config;
         this.shape = new APIShape();
         this.button = new APIButton();
         this.tabbar = new APITabbar();
@@ -255,7 +254,7 @@ public final class APIComponent {
         }
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType) {
-            return create(x,y,width,height,shapeType,SHAPE_ROTATION.DEGREE_0);
+            return create(x, y, width, height, shapeType, SHAPE_ROTATION.DEGREE_0);
         }
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation) {
@@ -317,7 +316,7 @@ public final class APIComponent {
                 textButton.font = uiConfig.component_defaultFont;
                 textButton.icon = icon;
                 textButton.iconIndex = iconIndex;
-                UICommonUtils.button_centerContent(uiEngineState,mediaManager, textButton);
+                UICommonUtils.button_centerContent(uiEngineState, mediaManager, textButton);
                 return textButton;
             }
 
@@ -371,7 +370,7 @@ public final class APIComponent {
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
-                UICommonUtils.button_centerContent(uiEngineState,mediaManager, imageButton);
+                UICommonUtils.button_centerContent(uiEngineState, mediaManager, imageButton);
                 return imageButton;
             }
 
@@ -453,7 +452,7 @@ public final class APIComponent {
         }
 
         public void centerContent(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
-            UICommonUtils.button_centerContent(uiEngineState,mediaManager, button);
+            UICommonUtils.button_centerContent(uiEngineState, mediaManager, button);
         }
 
         public void centerContent(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons) {
@@ -969,7 +968,7 @@ public final class APIComponent {
 
         public void setMarkerPosition(Textfield textField, int position) {
             if (textField == null) return;
-            UICommonUtils.textField_setMarkerPosition(uiEngineState,mediaManager, textField, position);
+            UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, position);
         }
 
         public void setContent(Textfield textField, String content) {
@@ -1048,8 +1047,8 @@ public final class APIComponent {
             Canvas canvas = new Canvas();
             setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY);
             canvas.colorMap = new ColorMap();
-            int widthPx =  api.TS(width);
-            int heightPx =  api.TS(height);
+            int widthPx = api.TS(width);
+            int heightPx = api.TS(height);
             canvas.colorMap.width = widthPx;
             canvas.colorMap.height = heightPx;
             canvas.colorMap.r = new float[widthPx][heightPx];
@@ -1078,7 +1077,7 @@ public final class APIComponent {
 
         public boolean isPointInBounds(Canvas canvas, int x, int y) {
             if (canvas == null) return false;
-            return UICommonUtils.colorMap_inBounds(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_inBounds(canvas.colorMap, x, y);
         }
 
         public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
@@ -1141,37 +1140,38 @@ public final class APIComponent {
         }
 
         public void copy(Canvas canvas, ColorMap colorMap) {
-            if(canvas == null) return;
+            if (canvas == null) return;
             UICommonUtils.colorMap_copy(colorMap, canvas.colorMap);
         }
 
         public Color getPoint(Canvas canvas, int x, int y) {
             if (canvas == null) return null;
-            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x, y);
         }
 
         public Color getColor(Canvas canvas, int x, int y) {
             if (canvas == null) return null;
-            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x, y);
         }
 
         public float getR(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_r(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_r(canvas.colorMap, x, y);
         }
 
         public float getG(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_g(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_g(canvas.colorMap, x, y);
         }
 
         public float getB(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_b(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_b(canvas.colorMap, x, y);
         }
+
         public float getA(Canvas canvas, int x, int y) {
             if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_a(canvas.colorMap, x,y);
+            return UICommonUtils.colorMap_a(canvas.colorMap, x, y);
         }
 
         public final class APICanvasImage {
@@ -1343,7 +1343,7 @@ public final class APIComponent {
 
         public void setLines(Text text, String... lines) {
             if (text == null) return;
-            UICommonUtils.text_setLines(uiEngineState,mediaManager, text, lines);
+            UICommonUtils.text_setLines(uiEngineState, mediaManager, text, lines);
         }
 
         public void setFont(Text text, CMediaFont font) {
@@ -1395,7 +1395,7 @@ public final class APIComponent {
 
         public void setImage(Image imageC, CMediaSprite image) {
             if (imageC == null) return;
-            UICommonUtils.image_setImage(uiEngineState,mediaManager, imageC, image);
+            UICommonUtils.image_setImage(uiEngineState, mediaManager, imageC, image);
         }
 
     }
@@ -1872,6 +1872,12 @@ public final class APIComponent {
         UICommonUtils.component_setSize(uiEngineState, component, width, height);
     }
 
+    public void setDimensionsGrid(Component component, int x, int y, int width, int height) {
+        if (component == null) return;
+        setPositionGrid(component, x, y);
+        setSize(component, width, height);
+    }
+
     public void setColor(Component[] components, Color color) {
         if (components == null) return;
         for (int i = 0; i < components.length; i++) setColor(components[i], color);
@@ -1908,7 +1914,7 @@ public final class APIComponent {
 
     public void setAlpha(Component component, float alpha) {
         if (component == null) return;
-        component.color.set(component.color.r,component.color.g,component.color.b,alpha);
+        component.color.set(component.color.r, component.color.g, component.color.b, alpha);
     }
 
     public void setAlpha(Component[] components, float alpha) {
