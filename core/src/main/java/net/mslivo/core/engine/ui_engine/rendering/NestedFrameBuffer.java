@@ -22,6 +22,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     private static final IntBuffer INT_BUFF = ByteBuffer
             .allocateDirect(16 * Integer.BYTES).order(ByteOrder.nativeOrder())
             .asIntBuffer();
+    private static final int[] intReturn = new int[4];
 
 
     public NestedFrameBuffer(Pixmap.Format format, int width, int height) {
@@ -50,8 +51,11 @@ public class NestedFrameBuffer extends FrameBuffer {
     private int[] getViewport() {
         IntBuffer intBuf = INT_BUFF;
         Gdx.gl.glGetIntegerv(GL20.GL_VIEWPORT, intBuf);
-        return new int[]{intBuf.get(0), intBuf.get(1), intBuf.get(2),
-                intBuf.get(3)};
+        intReturn[0] = intBuf.get(0);
+        intReturn[1] = intBuf.get(1);
+        intReturn[2] = intBuf.get(2);
+        intReturn[3] = intBuf.get(3);
+        return intReturn;
     }
 
 

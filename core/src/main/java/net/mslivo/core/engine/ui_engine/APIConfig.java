@@ -37,13 +37,6 @@ public final class APIConfig {
         this.contextMenu = new APIContextMenuConfig();
     }
 
-    public void setAllDefaultFont(CMediaFont default_font){
-        window.setDefaultFont(default_font);
-        component.setDefaultFont(default_font);
-        tooltip.setDefaultFont(default_font);
-        mouseTextInput.setDefaultFont(default_font);
-    }
-
     public final class APIUIConfig {
         APIUIConfig(){
         }
@@ -86,6 +79,22 @@ public final class APIConfig {
 
         public void setAnimationTimerFunction(UIConfig.AnimationTimerFunction ui_animationTimerFunction) {
             uiConfig.ui_animationTimerFunction = ui_animationTimerFunction;
+        }
+
+        public void setFont(CMediaFont cMediaFont){
+            uiConfig.ui_font = cMediaFont;
+        }
+
+        public CMediaFont getFont(){
+            return uiConfig.ui_font;
+        }
+
+        public void setFontDefaultColor(Color color){
+            uiConfig.ui_font_defaultColor.set(color);
+        }
+
+        public Color getFontDefaultColor(){
+            return uiConfig.ui_font_defaultColor.cpy();
         }
 
     }
@@ -315,13 +324,6 @@ public final class APIConfig {
             uiConfig.window_defaultColor = windows_defaultColor;
         }
 
-        public CMediaFont getDefaultFont() {
-            return uiConfig.window_defaultFont;
-        }
-
-        public void setDefaultFont(CMediaFont windows_defaultFont) {
-            uiConfig.window_defaultFont = windows_defaultFont;
-        }
     }
 
     public final class APIComponentConfig {
@@ -333,14 +335,6 @@ public final class APIConfig {
 
         public void setDefaultColor(Color components_defaultColor) {
             uiConfig.component_defaultColor = components_defaultColor;
-        }
-
-        public CMediaFont getDefaultFont() {
-            return uiConfig.component_defaultFont;
-        }
-
-        public void setDefaultFont(CMediaFont components_defaultFont) {
-            uiConfig.component_defaultFont = components_defaultFont;
         }
 
         public int getAppViewportDefaultUpdateTime() {
@@ -421,14 +415,6 @@ public final class APIConfig {
             uiConfig.notification_defaultDisplayTime = notifications_defaultDisplayTime;
         }
 
-        public CMediaFont getDefaultFont() {
-            return uiConfig.notification_defaultFont;
-        }
-
-        public void setDefaultFont(CMediaFont notifications_defaultFont) {
-            uiConfig.notification_defaultFont = notifications_defaultFont;
-        }
-
         public Color getDefaultColor() {
             return uiConfig.notification_defaultColor;
         }
@@ -465,14 +451,6 @@ public final class APIConfig {
 
         public void setDefaultColor(Color tooltip_defaultColor) {
             uiConfig.tooltip_defaultColor = tooltip_defaultColor;
-        }
-
-        public CMediaFont getDefaultFont() {
-            return uiConfig.tooltip_defaultFont;
-        }
-
-        public void setDefaultFont(CMediaFont tooltip_defaultFont) {
-            uiConfig.tooltip_defaultFont = tooltip_defaultFont;
         }
 
         public float getFadeInTime() {
@@ -520,13 +498,6 @@ public final class APIConfig {
         APIMouseTextInputConfig(){
         }
 
-        public CMediaFont getDefaultFont() {
-            return uiConfig.mouseTextInput_defaultFont;
-        }
-
-        public void setDefaultFont(CMediaFont mouseTextInput_defaultFont) {
-            uiConfig.mouseTextInput_defaultFont = mouseTextInput_defaultFont;
-        }
 
         public char[] getDefaultLowerCaseCharacters() {
             return uiConfig.mouseTextInput_defaultLowerCaseCharacters;

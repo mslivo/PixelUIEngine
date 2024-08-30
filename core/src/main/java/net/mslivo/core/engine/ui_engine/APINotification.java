@@ -47,10 +47,10 @@ public final class APINotification {
         notification.clickAble = clickAble;
         notification.displayTime = Math.max(displayTime,0);
         notification.color = new Color(uiConfig.notification_defaultColor);
-        notification.font = uiConfig.notification_defaultFont;
+        notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
         notification.notificationAction = notificationAction;
         notification.timer = 0;
-        int textWidth = mediaManager.getCMediaFontTextWidth(notification.font, notification.text);
+        int textWidth = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, notification.text);
         if (textWidth > uiEngineState.resolutionWidth) {
             int tooMuch = (textWidth - uiEngineState.resolutionWidth);
             notification.state = STATE_NOTIFICATION.INIT_SCROLL;
@@ -88,9 +88,9 @@ public final class APINotification {
         notification.color.set(color);
     }
 
-    public void setFont(Notification notification, CMediaFont font) {
+    public void setFontColor(Notification notification, Color color) {
         if (notification == null) return;
-        notification.font = font;
+        notification.fontColor.set(color);
     }
 
     public void setText(Notification notification, String text) {

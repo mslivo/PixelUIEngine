@@ -2,7 +2,6 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -54,7 +53,7 @@ public final class APIMouseTextInput {
         MouseTextInput mouseTextInput = new MouseTextInput();
         mouseTextInput.color = new Color(uiConfig.mouseTextInput_defaultColor);
         mouseTextInput.color2 = new Color(uiConfig.mouseTextInput_defaultColor).mul(0.5f);
-        mouseTextInput.font = uiConfig.mouseTextInput_defaultFont;
+        mouseTextInput.fontColor = uiConfig.ui_font_defaultColor.cpy();
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
         mouseTextInput.mouseTextInputAction = mouseTextInputAction;
@@ -163,9 +162,9 @@ public final class APIMouseTextInput {
         uiEngineState.openMouseTextInput.mouseTextInputAction = mouseTextInputAction;
     }
 
-    public void setFont(CMediaFont font) {
+    public void setFontColor(Color color) {
         if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.font = font;
+        uiEngineState.openMouseTextInput.fontColor.set(color);
     }
 
 

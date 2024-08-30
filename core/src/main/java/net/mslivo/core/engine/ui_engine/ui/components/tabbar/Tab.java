@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.components.tabbar;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.actions.TabAction;
@@ -12,7 +13,7 @@ public class Tab {
     public int width;
     public TabAction tabAction;
     public Tabbar addedToTabBar;
-    public CMediaFont font;
+    public Color fontColor;
     public CMediaSprite icon;
     public ArrayList<Component> components;
     public int iconIndex;

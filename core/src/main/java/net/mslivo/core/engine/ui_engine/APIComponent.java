@@ -222,13 +222,13 @@ public final class APIComponent {
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
-            progressBar.font = uiConfig.component_defaultFont;
+            progressBar.fontColor = uiConfig.ui_font_defaultColor.cpy();
             return progressBar;
         }
 
-        public void setFont(Progressbar progressBar, CMediaFont font) {
+        public void setFontColor(Progressbar progressBar, Color color) {
             if (progressBar == null) return;
-            progressBar.font = font;
+            progressBar.fontColor.set(color);
         }
 
         public void setProgress(Progressbar progressBar, float progress) {
@@ -313,7 +313,7 @@ public final class APIComponent {
                 setComponentCommonInitValuesInternal(textButton, x, y, width, height);
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
-                textButton.font = uiConfig.component_defaultFont;
+                textButton.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 textButton.icon = icon;
                 textButton.iconIndex = iconIndex;
                 UICommonUtils.button_centerContent(uiEngineState, mediaManager, textButton);
@@ -335,9 +335,9 @@ public final class APIComponent {
                 textButton.text = Tools.Text.validString(text);
             }
 
-            public void setFont(TextButton textButton, CMediaFont font) {
+            public void setFontColor(TextButton textButton, Color color) {
                 if (textButton == null) return;
-                textButton.font = font;
+                textButton.fontColor.set(color);
             }
 
         }
@@ -494,7 +494,7 @@ public final class APIComponent {
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction;
-            checkBox.font = uiConfig.component_defaultFont;
+            checkBox.fontColor = uiConfig.ui_font_defaultColor.cpy();
             checkBox.checked = checked;
             return checkBox;
         }
@@ -504,9 +504,9 @@ public final class APIComponent {
             checkBox.text = Tools.Text.validString(text);
         }
 
-        public void setFont(Checkbox checkBox, CMediaFont font) {
+        public void setFontColor(Checkbox checkBox, Color color) {
             if (checkBox == null) return;
-            checkBox.font = font;
+            checkBox.fontColor.set(color);
         }
 
         public void check(Checkbox checkBox) {
@@ -731,11 +731,11 @@ public final class APIComponent {
                 tab.tabAction = tabAction;
                 tab.icon = icon;
                 tab.iconIndex = iconIndex;
-                tab.font = uiConfig.component_defaultFont;
+                tab.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tab.font, tab.title) + (tab.icon != null ? api.TS() : 0) + api.TS()) / api.TSF());
+                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, tab.title) + (tab.icon != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
                     tab.width = width;
                 }
@@ -807,9 +807,9 @@ public final class APIComponent {
                 tab.title = Tools.Text.validString(title);
             }
 
-            public void setFont(Tab tab, CMediaFont font) {
+            public void setFontColor(Tab tab, Color color) {
                 if (tab == null) return;
-                tab.font = font;
+                tab.fontColor.set(color);
             }
 
             public void setTabAction(Tab tab, TabAction tabAction) {
@@ -953,7 +953,7 @@ public final class APIComponent {
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
             setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
-            textField.font = uiConfig.component_defaultFont;
+            textField.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
                 textField.allowedCharacters.add(allowedCharacters[i]);
@@ -976,9 +976,9 @@ public final class APIComponent {
             UICommonUtils.textField_setContent(textField, content);
         }
 
-        public void setFont(Textfield textField, CMediaFont font) {
+        public void setFontColor(Textfield textField, Color color) {
             if (textField == null) return;
-            textField.font = font;
+            textField.fontColor.set(color);
         }
 
         public void setTextFieldAction(Textfield textField, TextFieldAction textFieldAction) {
@@ -1319,12 +1319,12 @@ public final class APIComponent {
 
         public Text create(int x, int y, String[] lines, TextAction textAction) {
             Text text = new Text();
-            text.font = uiConfig.component_defaultFont;
+            text.fontColor = uiConfig.ui_font_defaultColor.cpy();
             int width = 1;
             int height = 1;
-            if (lines != null && text.font != null) {
+            if (lines != null) {
                 for (int i = 0; i < lines.length; i++) {
-                    int widthT = mediaManager.getCMediaFontTextWidth(text.font, lines[i]);
+                    int widthT = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, lines[i]);
                     if (widthT > width) width = widthT;
                 }
                 width = width / api.TS();
@@ -1346,9 +1346,9 @@ public final class APIComponent {
             UICommonUtils.text_setLines(uiEngineState, mediaManager, text, lines);
         }
 
-        public void setFont(Text text, CMediaFont font) {
+        public void setFontColor(Text text, Color color) {
             if (text == null) return;
-            text.font = font;
+            text.fontColor.set(color);
         }
 
     }
@@ -1542,7 +1542,7 @@ public final class APIComponent {
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaSprite icon, int iconIndex) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
-                comboBoxItem.font = uiConfig.component_defaultFont;
+                comboBoxItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 comboBoxItem.icon = icon;
                 comboBoxItem.iconIndex = Math.max(iconIndex, 0);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
@@ -1561,9 +1561,9 @@ public final class APIComponent {
                 comboBoxItem.data = data;
             }
 
-            public void setFont(ComboboxItem comboBoxItem, CMediaFont font) {
+            public void setFontColor(ComboboxItem comboBoxItem, Color color) {
                 if (comboBoxItem == null) return;
-                comboBoxItem.font = font;
+                comboBoxItem.fontColor.set(color);
             }
 
             public void setComboBoxItemAction(ComboboxItem comboBoxItem, ComboBoxItemAction comboBoxItemAction) {
@@ -1710,7 +1710,7 @@ public final class APIComponent {
             list.dragEnabled = dragEnabled;
             list.dragInEnabled = dragInEnabled;
             list.dragOutEnabled = dragOutEnabled;
-            list.font = uiConfig.component_defaultFont;
+            list.fontColor = uiConfig.ui_font_defaultColor.cpy();
             return list;
         }
 
@@ -1744,9 +1744,9 @@ public final class APIComponent {
             list.listAction = listAction;
         }
 
-        public void setFont(List list, CMediaFont font) {
+        public void setFontColor(List list, Color color) {
             if (list == null) return;
-            list.font = font;
+            list.fontColor.set(color);
         }
 
         public void setMultiSelect(List list, boolean multiSelect) {

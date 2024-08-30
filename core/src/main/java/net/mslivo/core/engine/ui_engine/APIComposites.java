@@ -12,7 +12,7 @@ import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.Window;
@@ -188,7 +188,7 @@ public final class APIComposites {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                Image image = api.component.image.create(x + i, y, UIEngineBaseMedia_8x8.UI_SEPARATOR_HORIZONTAL, index);
+                Image image = api.component.image.create(x + i, y, UIEngineBaseMedia_8.UI_SEPARATOR_HORIZONTAL, index);
                 api.component.setColor(image, uiConfig.component_defaultColor);
                 returnComponents.add(image);
             }
@@ -199,7 +199,7 @@ public final class APIComposites {
             ArrayList<Component> returnComponents = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
-                Image image = api.component.image.create(x, y + i, UIEngineBaseMedia_8x8.UI_SEPARATOR_VERTICAL, index);
+                Image image = api.component.image.create(x, y + i, UIEngineBaseMedia_8.UI_SEPARATOR_VERTICAL, index);
                 api.component.setColor(image, uiConfig.component_defaultColor);
                 returnComponents.add(image);
             }
@@ -217,16 +217,16 @@ public final class APIComposites {
 
             for (int ix = 0; ix < width; ix++) {
 
-                borders.add(api.component.image.create(x + ix, y, UIEngineBaseMedia_8x8.UI_BORDERS, 2));
+                borders.add(api.component.image.create(x + ix, y, UIEngineBaseMedia_8.UI_BORDERS, 2));
 
                 if (ix >= gap) {
-                    borders.add(api.component.image.create(x + ix, y + (height - 1), UIEngineBaseMedia_8x8.UI_BORDERS, 3));
+                    borders.add(api.component.image.create(x + ix, y + (height - 1), UIEngineBaseMedia_8.UI_BORDERS, 3));
                 }
             }
 
             for (int iy = 0; iy < height; iy++) {
-                borders.add(api.component.image.create(x, y + iy, UIEngineBaseMedia_8x8.UI_BORDERS, 0));
-                borders.add(api.component.image.create(x + (width - 1), y + iy, UIEngineBaseMedia_8x8.UI_BORDERS, 1));
+                borders.add(api.component.image.create(x, y + iy, UIEngineBaseMedia_8.UI_BORDERS, 0));
+                borders.add(api.component.image.create(x + (width - 1), y + iy, UIEngineBaseMedia_8.UI_BORDERS, 1));
             }
 
             return borders;
@@ -271,7 +271,7 @@ public final class APIComposites {
                             StringBuilder currentLine = new StringBuilder();
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 String value = split[i2];
-                                if (mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, currentLine + value + " ") >= pixelWidth) {
+                                if (mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, currentLine + value + " ") >= pixelWidth) {
                                     textList.add(currentLine.toString());
                                     currentLine = new StringBuilder(value + " ");
                                 } else {
@@ -337,24 +337,24 @@ public final class APIComposites {
         }
 
         public Text createClickableURL(int x, int y, String url) {
-            return createClickableURL(x, y, url, Tools.Text.toArray(url), UIEngineBaseMedia_8x8.UI_FONT_BLACK, Tools.Text.toArray(url), UIEngineBaseMedia_8x8.UI_FONT_BLACK);
+            return createClickableURL(x, y, url, Tools.Text.toArray(url), Color.BLACK, Tools.Text.toArray(url), Color.BLUE);
         }
 
-        public Text createClickableURL(int x, int y, String url, String[] text, CMediaFont font, String[] textHover, CMediaFont fontHover) {
-            return createClickableText(x, y, text, font, button -> {
+        public Text createClickableURL(int x, int y, String url, String[] text, Color fontColor, String[] textHover, Color fontColorHover) {
+            return createClickableText(x, y, text, fontColor, button -> {
                 try {
                     Desktop.getDesktop().browse(new URI(url));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }, textHover, fontHover);
+            }, textHover, fontColorHover);
         }
 
         public Text createClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick) {
-            return createClickableText(x, y, text, font, onClick, text, font);
+            return createClickableText(x, y, text, Color.BLACK, onClick, text, Color.BLUE);
         }
 
-        public Text createClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick, String[] textHover, CMediaFont fontHover) {
+        public Text createClickableText(int x, int y, String[] text, Color fontColor, IntConsumer onClick, String[] textHover, Color fontColorHover) {
             Text hlText = api.component.text.create(x, y, text);
             api.component.text.setTextAction(hlText, new TextAction() {
                 @Override
@@ -373,10 +373,10 @@ public final class APIComposites {
                             hlText.width * api.TS(),
                             hlText.height * api.TS()
                     )) {
-                        api.component.text.setFont(hlText, fontHover);
+                        api.component.text.setFontColor(hlText, fontColorHover);
                         api.component.text.setLines(hlText, textHover);
                     } else {
-                        api.component.text.setFont(hlText, font);
+                        api.component.text.setFontColor(hlText, fontColor);
                         api.component.text.setLines(hlText, text);
                     }
                 }
@@ -441,7 +441,7 @@ public final class APIComposites {
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_SELECTOR);
+            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8.UI_COLOR_SELECTOR);
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
@@ -451,7 +451,7 @@ public final class APIComposites {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIEngineBaseMedia_8x8.UI_ICON_COLOR, 0);
+            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIEngineBaseMedia_8.UI_ICON_COLOR, 0);
             ImageButton closeButton = api.composites.button.createWindowCloseButton(modal);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -476,7 +476,7 @@ public final class APIComposites {
             Canvas colorCanvas = api.component.canvas.create(0, 2, colorTextureWidthTiles, colorTextureHeightTiles);
 
 
-            CanvasImage cursorOverlay = api.component.canvas.canvasImage.create(UIEngineBaseMedia_8x8.UI_COLOR_SELECTOR_OVERLAY, api.TS() * 8, api.TS() * 4);
+            CanvasImage cursorOverlay = api.component.canvas.canvasImage.create(UIEngineBaseMedia_8.UI_COLOR_SELECTOR_OVERLAY, api.TS() * 8, api.TS() * 4);
             api.component.canvas.addCanvasImage(colorCanvas, cursorOverlay);
 
 
@@ -528,7 +528,7 @@ public final class APIComposites {
                             if (currentColor != null) {
                                 api.component.setColor(ok, currentColor);
                                 float colorBrightness = (0.299f * currentColor.r) + (0.587f * currentColor.g) + (0.114f * currentColor.b);
-                                api.component.button.textButton.setFont(ok, colorBrightness < 0.5 ? UIEngineBaseMedia_8x8.UI_FONT_WHITE : UIEngineBaseMedia_8x8.UI_FONT_BLACK);
+                                api.component.button.textButton.setFontColor(ok, colorBrightness < 0.5 ? Color.WHITE : Color.BLACK);
                                 api.component.canvas.canvasImage.setPosition(cursorOverlay, x - 1, y - 1);
                                 xLast = x;
                                 yLast = y;
@@ -582,13 +582,13 @@ public final class APIComposites {
         public Window createMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, lines[i]);
+                int len = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, lines[i]);
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Math.max(MathUtils.round(longest / (float) api.TS()) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption, UIEngineBaseMedia_8x8.UI_ICON_INFORMATION, 0);
+            Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption, UIEngineBaseMedia_8.UI_ICON_INFORMATION, 0);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -622,13 +622,13 @@ public final class APIComposites {
         public Window createYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
-                    (mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, caption) + 8),
-                    mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text)
+                    (mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, caption) + 8),
+                    mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, text)
             );
 
             int width = Math.max(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = api.window.create(0, 0, width, 5, caption, UIEngineBaseMedia_8x8.UI_ICON_QUESTION, 0);
+            Window modal = api.window.create(0, 0, width, 5, caption, UIEngineBaseMedia_8.UI_ICON_QUESTION, 0);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -670,7 +670,7 @@ public final class APIComposites {
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Math.max(windowMinWidth, 11);
             int wnd_width = Math.clamp(
-                    MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.component_defaultFont, text) / (float) api.TS()) + 2,
+                    MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, text) / (float) api.TS()) + 2,
                     windowMinWidth, Integer.MAX_VALUE);
             int wnd_height = 5;
             if (showOKButton) wnd_height++;
@@ -687,7 +687,7 @@ public final class APIComposites {
 
             }
 
-            Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption, UIEngineBaseMedia_8x8.UI_ICON_INFORMATION, 0);
+            Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption, UIEngineBaseMedia_8.UI_ICON_INFORMATION, 0);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = api.component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -752,7 +752,7 @@ public final class APIComposites {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8x8.UI_ICON_KEY_CASE, 0,
+                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8.UI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
                             public void onToggle(boolean value) {
@@ -770,7 +770,7 @@ public final class APIComposites {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8x8.UI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8.UI_ICON_KEY_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -980,7 +980,7 @@ public final class APIComposites {
         }
 
         public ImageButton createWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_CLOSE);
+            ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia_8.UI_ICON_CLOSE);
             api.component.setName(closeButton, UICommonUtils.WND_CLOSE_BUTTON);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
 
@@ -1100,7 +1100,7 @@ public final class APIComposites {
 
             width = Math.max(width, 1);
             Tabbar tabBar = api.component.tabbar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = api.component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIEngineBaseMedia_8x8.UI_ICON_EXTEND);
+            ImageButton extendButton = api.component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIEngineBaseMedia_8.UI_ICON_EXTEND);
 
             updateExtendableTabBarButtonInternal(tabBar, extendButton);
 

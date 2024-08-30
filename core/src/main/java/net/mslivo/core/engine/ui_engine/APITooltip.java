@@ -232,12 +232,11 @@ public final class APITooltip {
 
             public TooltipTextSegment create(String text, Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
                 TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
-                CMediaFont segmentFont = uiEngineState.config.tooltip_defaultFont;
                 String segmentText = Tools.Text.validString(text);
-                int width = MathUtils.round((mediaManager.getCMediaFontTextWidth(segmentFont, segmentText) + api.TS()) / api.TSF());
+                int width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, segmentText) + api.TS()) / api.TSF());
                 int height = 1;
                 setSegmentValues(tooltipTextSegment, color, alignment, width, height, merge, border, clear);
-                tooltipTextSegment.font = segmentFont;
+                tooltipTextSegment.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 tooltipTextSegment.text = segmentText;
                 return tooltipTextSegment;
             }
@@ -247,9 +246,9 @@ public final class APITooltip {
                 UICommonUtils.tooltip_setTextSegmentText(uiEngineState, mediaManager, tooltipTextSegment, text);
             }
 
-            public void setFont(TooltipTextSegment tooltipTextSegment, CMediaFont font) {
+            public void setFontColor(TooltipTextSegment tooltipTextSegment, Color color) {
                 if (tooltipTextSegment == null) return;
-                tooltipTextSegment.font = font;
+                tooltipTextSegment.fontColor.set(color);
             }
 
         }

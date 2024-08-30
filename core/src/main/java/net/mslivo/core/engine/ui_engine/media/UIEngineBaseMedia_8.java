@@ -5,7 +5,7 @@ import net.mslivo.core.engine.media_manager.*;
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
  */
-public class UIEngineBaseMedia_8x8 {
+public class UIEngineBaseMedia_8 {
     private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui_8/";
     private static final int TL = 8;
     private static final int TL2 = TL*2;
@@ -88,9 +88,8 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT_BLACK = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_black.fnt", 0, 5);
-    public static final CMediaFont UI_FONT_WHITE = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_white.fnt", 0, 5);
-    public static final CMediaFont UI_FONT_TINY = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_tiny.fnt", 0, 5);
+    public static final CMediaFont UI_FONT = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5,true);
+    public static final CMediaFont UI_FONT_TINY = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_tiny.fnt", 0, 5, true);
 
     // Misc
     public static final CMediaImage UI_PIXEL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
@@ -171,8 +170,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_OSTEXTINPUT_LOWERCASE,
             UI_OSTEXTINPUT_DELETE,
             UI_OSTEXTINPUT_SELECTED,
-            UI_FONT_BLACK,
-            UI_FONT_WHITE,
+            UI_FONT,
             UI_FONT_TINY,
             UI_PIXEL
     };

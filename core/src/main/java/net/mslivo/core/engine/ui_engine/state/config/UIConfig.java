@@ -3,18 +3,21 @@ package net.mslivo.core.engine.ui_engine.state.config;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
 import java.io.Serializable;
 
 public final class UIConfig implements Serializable, Cloneable {
 
-    private static final Color COlOR_DEFAULT = Color.valueOf("E5E5E5");
-    private static final Color COlOR_DEFAULT_BRIGHT = Color.valueOf("FFFFFF");
+    private static final Color DEFAULT_COlOR = Color.valueOf("E5E5E5");
+    private static final Color DEFAULT_COlOR_BRIGHT = Color.valueOf("FFFFFF");
+    private static final Color DEFAULT_COLOR_FONT = Color.valueOf("000000");
 
     private final UIEngineState uiEngineState;
 
+    public CMediaFont ui_font;
+    public Color ui_font_defaultColor;
     public CMediaSprite ui_cursor;
     public boolean ui_keyInteractionsDisabled;
     public boolean ui_mouseInteractionsDisabled;
@@ -47,10 +50,8 @@ public final class UIConfig implements Serializable, Cloneable {
     public int[] input_gamePadMouseButtonsScrollDown;
     public boolean window_defaultEnforceScreenBounds;
     public Color window_defaultColor;
-    public CMediaFont window_defaultFont;
     public Color component_defaultColor;
     public Color contextMenu_defaultColor;
-    public CMediaFont component_defaultFont;
     public int component_appViewportDefaultUpdateTime;
     public float component_listDragAlpha;
     public float component_gridDragAlpha;
@@ -59,17 +60,14 @@ public final class UIConfig implements Serializable, Cloneable {
     public float component_mapOverlayDefaultFadeoutSpeed;
     public int notification_max;
     public int notification_defaultDisplayTime;
-    public CMediaFont notification_defaultFont;
     public Color notification_defaultColor;
     public int notification_fadeoutTime;
     public float notification_scrollSpeed;
     public Color tooltip_defaultColor;
-    public CMediaFont tooltip_defaultFont;
     public float tooltip_FadeInSpeed;
     public int tooltip_FadeInDelay;
     public float tooltip_FadeOutSpeed;
     public char[] component_textFieldDefaultAllowedCharacters;
-    public CMediaFont mouseTextInput_defaultFont;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
     public Color mouseTextInput_defaultColor;
@@ -79,7 +77,9 @@ public final class UIConfig implements Serializable, Cloneable {
 
         // Initialize Default Values
         // ##### UI Default Values #####
-        ui_cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
+        ui_font = UIEngineBaseMedia_8.UI_FONT;
+        ui_font_defaultColor = DEFAULT_COLOR_FONT.cpy();
+        ui_cursor = UIEngineBaseMedia_8.UI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;
@@ -125,11 +125,9 @@ public final class UIConfig implements Serializable, Cloneable {
         input_gamePadMouseButtonsScrollDown = null;
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = true;
-        window_defaultColor = COlOR_DEFAULT.cpy();
-        window_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        component_defaultColor = COlOR_DEFAULT.cpy();
-        contextMenu_defaultColor = COlOR_DEFAULT_BRIGHT.cpy();
-        component_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
+        window_defaultColor = DEFAULT_COlOR.cpy();
+        component_defaultColor = DEFAULT_COlOR.cpy();
+        contextMenu_defaultColor = DEFAULT_COlOR_BRIGHT.cpy();
         component_appViewportDefaultUpdateTime = 0;
         component_listDragAlpha = 0.8f;
         component_gridDragAlpha = 0.8f;
@@ -152,12 +150,10 @@ public final class UIConfig implements Serializable, Cloneable {
         };
         notification_max = 20;
         notification_defaultDisplayTime = 180;
-        notification_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_WHITE;
-        notification_defaultColor = COlOR_DEFAULT.cpy();
+        notification_defaultColor = DEFAULT_COlOR.cpy();
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
-        tooltip_defaultColor = COlOR_DEFAULT_BRIGHT.cpy();
-        tooltip_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
+        tooltip_defaultColor = DEFAULT_COlOR_BRIGHT.cpy();
         tooltip_FadeInSpeed = 0.2f;
         tooltip_FadeOutSpeed = 0.2f;
         tooltip_FadeInDelay = 20;
@@ -178,8 +174,7 @@ public final class UIConfig implements Serializable, Cloneable {
                 'X', 'Y', 'Z',
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
-        mouseTextInput_defaultFont = UIEngineBaseMedia_8x8.UI_FONT_BLACK;
-        mouseTextInput_defaultColor = COlOR_DEFAULT.cpy();
+        mouseTextInput_defaultColor = DEFAULT_COlOR.cpy();
     }
 
     public interface AnimationTimerFunction {

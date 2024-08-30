@@ -7,7 +7,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.ComboBoxItemAction;
 
 public class ComboboxItem {
     public String text;
-    public CMediaFont font;
+    public Color fontColor;
     public CMediaSprite icon;
     public int iconIndex;
     public ComboBoxItemAction comboBoxItemAction;

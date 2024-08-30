@@ -1,17 +1,12 @@
 package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
-import net.mslivo.core.engine.ui_engine.rendering.ColorfulBatch;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
@@ -84,7 +79,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         }));
         api.camera.setPosition(api.resolutionWidth() / 2f, api.resolutionHeight() / 2f);
-        api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8x8.UI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8.UI_CURSOR_ARROW));
 
 
         api.config.input.setHardwareMouseEnabled(true);

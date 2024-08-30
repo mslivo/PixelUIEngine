@@ -9,7 +9,7 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -97,7 +97,6 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Text text5 = api.component.text.create(1, 1, new String[]{"A.A"});
 
 
-        api.component.text.setFont(text5, UIEngineBaseMedia_8x8.UI_FONT_TINY);
         ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
         api.window.addComponents(window, components.toArray(new Component[]{}));
         return components;
@@ -194,7 +193,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Progressbar progressBar = api.component.progressbar.create(18, 3, 8, 0, true, true);
         api.component.setColor(progressBar, Color.BLUE);
         api.component.setColor2(progressBar, Color.RED);
-        api.component.progressbar.setFont(progressBar, UIEngineBaseMedia_8x8.UI_FONT_WHITE);
+        api.component.progressbar.setFontColor(progressBar, Color.WHITE);
 
         ScrollbarHorizontal pgScrollbar = api.component.scrollbar.scrollbarHorizontal.create(18, 5, 8, new ScrollBarAction() {
             @Override
@@ -517,10 +516,10 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Image image1 = api.component.image.create(3, 4, ExampleBaseMedia.EXAMPLE_ANIMATION_2);
 
-        Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
+        Text text = api.component.text.create(12, 10, Tools.Text.toArray("Lorem [#FF0000]ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
 
-        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
-        api.component.text.setFont(text2, UIEngineBaseMedia_8x8.UI_FONT_WHITE);
+        Text text2 = api.component.text.create(12, 7, Tools.Text.toArray("Lorem ipsum dolor sit[#FF00FF] amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"));
+        api.component.text.setFontColor(text2, Color.WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabbar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
 

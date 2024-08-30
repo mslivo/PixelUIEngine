@@ -11,7 +11,7 @@ public class Notification {
     public String text;
     public Color color;
     public boolean clickAble;
-    public CMediaFont font;
+    public Color fontColor;
     public int displayTime;
     public int scroll;
     public int scrollMax;

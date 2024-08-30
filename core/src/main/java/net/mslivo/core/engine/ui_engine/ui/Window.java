@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class Window {
     public int x, y, width, height;
     public String title;
-    public CMediaFont font;
+    public Color fontColor;
     public ArrayList<Component> components;
     public ArrayList<UpdateAction> updateActions;
     public String name;

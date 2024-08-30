@@ -1,6 +1,6 @@
 info face="1980v23P03" size=16 bold=0 italic=0 charset="" unicode=0 stretchH=100 smooth=1 aa=1 padding=1,1,1,1 spacing=-2,-10
 common lineHeight=7 base=11 scaleW=512 scaleH=512 pages=1 packed=0
-page id=0 file="font_black.png"
+page id=0 file="font.png"
 chars count=112
 char id=0       x=190  y=10   width=7    height=13   xoffset=0    yoffset=-1   xadvance=6    page=0    chnl=0 
 char id=10      x=0    y=0    width=0    height=0    xoffset=-1   yoffset=0    xadvance=0    page=0    chnl=0 

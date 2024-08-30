@@ -11,7 +11,6 @@ import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.generator.*;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public final class APIWindow {
         window.alwaysOnTop = alwaysOnTop;
         window.moveAble = moveAble;
         window.color = new Color(uiConfig.window_defaultColor);
-        window.font = uiConfig.window_defaultFont;
+        window.fontColor = uiConfig.ui_font_defaultColor.cpy();
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
         window.windowAction = windowAction;
@@ -255,9 +254,9 @@ public final class APIWindow {
         UICommonUtils.window_center(uiEngineState, window);
     }
 
-    public void setFont(Window window, CMediaFont font) {
+    public void setFontColor(Window window, Color color) {
         if (window == null) return;
-        window.font = font;
+        window.fontColor.set(color);
     }
 
     public void addUpdateAction(Window window, UpdateAction updateAction) {

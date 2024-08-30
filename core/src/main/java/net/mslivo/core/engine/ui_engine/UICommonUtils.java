@@ -464,7 +464,7 @@ final class UICommonUtils {
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextmenuItem contextMenuItem = contextMenu.items.get(i);
-            int w = mediaManager.getCMediaFontTextWidth(contextMenuItem.font, contextMenuItem.text);
+            int w = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font,contextMenuItem.text);
             if (contextMenuItem.icon != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
@@ -552,8 +552,8 @@ final class UICommonUtils {
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.icon != null ? uiEngineState.tileSize.TS : 0;
-            int contentWidth = mediaManager.getCMediaFontTextWidth(textButton.font, textButton.text) + 1 + iconWidth;
-            int contentHeight = mediaManager.getCMediaFontTextHeight(textButton.font, textButton.text);
+            int contentWidth = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, textButton.text) + 1 + iconWidth;
+            int contentHeight = mediaManager.getCMediaFontTextHeight(uiEngineState.config.ui_font, textButton.text);
             textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
             textButton.contentOffset_y = MathUtils.round(((uiEngineState.tileSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
         }
@@ -591,8 +591,8 @@ final class UICommonUtils {
         } else {
             String subContent = textField.content.substring(textField.offset, textField.markerPosition);
             int width = uiEngineState.tileSize.TL(textField.width) - 4;
-            if (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
-                while (mediaManager.getCMediaFontTextWidth(textField.font, subContent) > width) {
+            if (mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
+                while (mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
                     textField.offset++;
                     subContent = textField.content.substring(textField.offset, textField.markerPosition);
                 }
@@ -917,7 +917,7 @@ final class UICommonUtils {
 
     static void tooltip_setTextSegmentText(UIEngineState uiEngineState, MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = Tools.Text.validString(text);
-        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(tooltipTextSegment.font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         tooltipTextSegment.height = 1;
     }
 
@@ -1192,7 +1192,7 @@ final class UICommonUtils {
     static void text_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Text text) {
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
-            int widthT = mediaManager.getCMediaFontTextWidth(text.font, text.lines[i]);
+            int widthT = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, text.lines[i]);
             if (widthT > width) width = widthT;
         }
         text.width = width / uiEngineState.tileSize.TS;

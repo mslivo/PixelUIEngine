@@ -126,7 +126,7 @@ public final class APIContextMenu {
         public ContextmenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaSprite icon, int iconIndex) {
             ContextmenuItem contextMenuItem = new ContextmenuItem();
             contextMenuItem.text = Tools.Text.validString(text);
-            contextMenuItem.font = uiConfig.component_defaultFont;
+            contextMenuItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
             contextMenuItem.icon = icon;
             contextMenuItem.iconIndex = iconIndex;
             contextMenuItem.name = "";
@@ -148,9 +148,9 @@ public final class APIContextMenu {
         }
 
 
-        public void setFont(ContextmenuItem contextMenuItem, CMediaFont font) {
+        public void setFontColor(ContextmenuItem contextMenuItem, Color color) {
             if (contextMenuItem == null) return;
-            contextMenuItem.font = font;
+            contextMenuItem.fontColor.set(color);
         }
 
         public void setContextMenuItemAction(ContextmenuItem contextMenuItem, ContextMenuItemAction contextMenuItemAction) {
