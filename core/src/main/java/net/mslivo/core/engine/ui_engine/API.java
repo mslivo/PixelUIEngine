@@ -10,6 +10,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
+import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
@@ -142,6 +143,17 @@ public final class API {
 
     public boolean isContextMenuOpen(Contextmenu contextMenu) {
         return UICommonUtils.contextMenu_isOpen(uiEngineState, contextMenu);
+    }
+
+    /* #################### MouseTextInput #################### */
+
+    public void openMouseTextInput(MouseTextInput mouseTextInput){
+        if(mouseTextInput == null) return;
+        UICommonUtils.mouseTextInput_open(uiEngineState, mouseTextInput);
+    }
+
+    public void closeMouseTextInput(){
+        UICommonUtils.mouseTextInput_close(uiEngineState);
     }
 
     /* #################### Windows #################### */

@@ -9,7 +9,6 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -37,6 +36,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
+import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
@@ -292,12 +292,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.textfield.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
             @Override
             public void onEnter(String content, boolean valid) {
-                api.mouseTextInput.close();
+                api.closeMouseTextInput();
             }
 
             @Override
             public void onFocus() {
-                api.mouseTextInput.open(
+                MouseTextInput mouseTextInput = api.mouseTextInput.create(
                         api.component.absoluteX(osKeyBoardTextInput),
                         api.component.absoluteY(osKeyBoardTextInput)
                         , new MouseTextInputAction() {
@@ -309,7 +309,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         }, null
                 );
 
+                api.mouseTextInput.setColor(mouseTextInput,Color.BLUE);
+                api.mouseTextInput.setColor2(mouseTextInput,Color.RED);
+                api.mouseTextInput.setFontColor(mouseTextInput,Color.YELLOW);
+                api.mouseTextInput.enterCharacters(mouseTextInput,"abc");
                 api.component.textfield.setMarkerPosition(osKeyBoardTextInput, osKeyBoardTextInput.content.length());
+                api.openMouseTextInput(mouseTextInput);
             }
         });
 

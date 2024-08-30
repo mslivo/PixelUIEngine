@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine.ui.mousetextinput;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 
 public class MouseTextInput {
@@ -13,4 +14,6 @@ public class MouseTextInput {
     public int selectedIndex;
     public boolean upperCase;
     public MouseTextInputAction mouseTextInputAction;
+    public IntArray enterCharacterQueue;
+
 }

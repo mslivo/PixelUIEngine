@@ -66,12 +66,12 @@ public class UIEngineBaseMedia_8 {
     public static final CMediaImage UI_CHECKBOX_CHECKBOX_CELL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/checkbox_cell.png");
     public static final CMediaArray UI_CHECKBOX_RADIO = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/radio.png", TL, TL);
     public static final CMediaImage UI_CHECKBOX_RADIO_CELL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/radio_cell.png");
-    public static final CMediaArray UI_OSTEXTINPUT_CHARACTER = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_character.png", 12, 12);
-    public static final CMediaArray UI_OSTEXTINPUT_CONFIRM = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_confirm.png", 12, 12);
-    public static final CMediaArray UI_OSTEXTINPUT_DELETE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_delete.png", 12, 12);
-    public static final CMediaArray UI_OSTEXTINPUT_LOWERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_lowercase.png", 12, 12);
-    public static final CMediaArray UI_OSTEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/ostextinput_uppercase.png", 12, 12);
-    public static final CMediaImage UI_OSTEXTINPUT_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/ostextinput_selected.png");
+    public static final CMediaArray UI_MOUSETEXTINPUT_BUTTON = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_button.png", 12, 12);
+    public static final CMediaArray UI_MOUSETEXTINPUT_CONFIRM = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_confirm.png", 12, 12);
+    public static final CMediaArray UI_MOUSETEXTINPUT_DELETE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_delete.png", 12, 12);
+    public static final CMediaArray UI_MOUSETEXTINPUT_LOWERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_lowercase.png", 12, 12);
+    public static final CMediaArray UI_MOUSETEXTINPUT_UPPERCASE = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_uppercase.png", 12, 12);
+    public static final CMediaImage UI_MOUSETEXTINPUT_SELECTED = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_selected.png");
 
     // Cursors
     public static final CMediaImage UI_CURSOR_ARROW = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "cursors/arrow.png");
@@ -164,12 +164,12 @@ public class UIEngineBaseMedia_8 {
             UI_ICON_KEY_CASE,
             UI_COLOR_SELECTOR,
             UI_COLOR_SELECTOR_OVERLAY,
-            UI_OSTEXTINPUT_CHARACTER,
-            UI_OSTEXTINPUT_CONFIRM,
-            UI_OSTEXTINPUT_UPPERCASE,
-            UI_OSTEXTINPUT_LOWERCASE,
-            UI_OSTEXTINPUT_DELETE,
-            UI_OSTEXTINPUT_SELECTED,
+            UI_MOUSETEXTINPUT_BUTTON,
+            UI_MOUSETEXTINPUT_CONFIRM,
+            UI_MOUSETEXTINPUT_UPPERCASE,
+            UI_MOUSETEXTINPUT_LOWERCASE,
+            UI_MOUSETEXTINPUT_DELETE,
+            UI_MOUSETEXTINPUT_SELECTED,
             UI_FONT,
             UI_FONT_TINY,
             UI_PIXEL

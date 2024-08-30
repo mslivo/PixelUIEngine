@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -26,30 +27,32 @@ public final class APIMouseTextInput {
         };
     }
 
-    public void open(int x, int y) {
-        open(x, y, defaultMouseTextInputConfirmAction(),
+    public MouseTextInput create(int x, int y) {
+        return create(x, y, defaultMouseTextInputConfirmAction(),
                 null,
                 uiConfig.mouseTextInput_defaultLowerCaseCharacters,
                 uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
-    public void open(int x, int y, MouseTextInputAction onConfirm) {
-        open(x, y, onConfirm,
+    public MouseTextInput create(int x, int y, MouseTextInputAction onConfirm) {
+        return create(x, y, onConfirm,
                 null,
                 uiConfig.mouseTextInput_defaultLowerCaseCharacters,
                 uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
-    public void open(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
-        open(x, y, onConfirm,
+    public MouseTextInput create(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
+        return create(x, y, onConfirm,
                 selectedCharacter,
                 uiConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiConfig.mouseTextInput_defaultUpperCaseCharacters
+        );
     }
 
-    public void open(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
-        if (charactersLC == null || charactersUC == null) return;
-        if (uiEngineState.openMouseTextInput != null) return;
+    public MouseTextInput create(int x, int y, MouseTextInputAction mouseTextInputAction, Character selectedCharacter, char[] charactersLC, char[] charactersUC) {
+        charactersLC = charactersLC != null ? charactersLC : new char[]{};
+        charactersUC = charactersUC != null ? charactersUC : new char[]{};
+
         MouseTextInput mouseTextInput = new MouseTextInput();
         mouseTextInput.color = new Color(uiConfig.mouseTextInput_defaultColor);
         mouseTextInput.color2 = new Color(uiConfig.mouseTextInput_defaultColor).mul(0.5f);
@@ -59,6 +62,7 @@ public final class APIMouseTextInput {
         mouseTextInput.mouseTextInputAction = mouseTextInputAction;
         mouseTextInput.upperCase = false;
         mouseTextInput.selectedIndex = 0;
+        mouseTextInput.enterCharacterQueue = new IntArray();
         int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
         mouseTextInput.charactersLC = new char[maxCharacters + 3];
         mouseTextInput.charactersUC = new char[maxCharacters + 3];
@@ -73,98 +77,93 @@ public final class APIMouseTextInput {
         mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
         mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
         mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = '\n';
-        uiEngineState.mTextInputMouseX = Gdx.input.getX();
-        uiEngineState.mTextInputUnlock = false;
-        uiEngineState.openMouseTextInput = mouseTextInput;
+        return mouseTextInput;
     }
 
-    public void close() {
-        UICommonUtils.mouseTextInput_close(uiEngineState);
+    public boolean isUpperCase(MouseTextInput mouseTextInput) {
+        if (mouseTextInput == null) return false;
+        return mouseTextInput.upperCase;
     }
 
-    public boolean isUpperCase() {
-        if (uiEngineState.openMouseTextInput == null) return false;
-        return uiEngineState.openMouseTextInput.upperCase;
+    public void enterChangeCase(MouseTextInput mouseTextInput) {
+        enterChangeCase(mouseTextInput, !mouseTextInput.upperCase);
     }
 
-    public void enterChangeCase() {
-        enterChangeCase(!uiEngineState.openMouseTextInput.upperCase);
-    }
-
-    public void enterChangeCase(boolean upperCase) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        if (uiEngineState.openMouseTextInput.upperCase != upperCase) {
-            enterCharacter('\t');
+    public void enterChangeCase(MouseTextInput mouseTextInput, boolean upperCase) {
+        if (mouseTextInput == null) return;
+        if (mouseTextInput.upperCase != upperCase) {
+            enterCharacter(mouseTextInput,'\t');
         }
     }
 
-    public void enterDelete() {
-        if (uiEngineState.openMouseTextInput == null) return;
-        enterCharacter('\b');
+    public void enterDelete(MouseTextInput mouseTextInput) {
+        if (mouseTextInput == null) return;
+        enterCharacter(mouseTextInput,'\b');
     }
 
-    public void enterConfirm() {
-        if (uiEngineState.openMouseTextInput == null) return;
-        enterCharacter('\n');
+    public void enterConfirm(MouseTextInput mouseTextInput) {
+        if (mouseTextInput == null) return;
+        enterCharacter(mouseTextInput,'\n');
     }
 
-    public void enterCharacters(String text) {
-        if (uiEngineState.openMouseTextInput == null) return;
+    public void enterCharacters(MouseTextInput mouseTextInput, String text) {
+        if (mouseTextInput == null) return;
         char[] characters = text.toCharArray();
-        for (int i = 0; i < characters.length; i++) enterCharacter(characters[i]);
+        for (int i = 0; i < characters.length; i++) enterCharacter(mouseTextInput, characters[i]);
     }
 
-    public void enterCharacter(char character) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.mTextInputAPICharacterQueue.add(character);
+    public void enterCharacter(MouseTextInput mouseTextInput, char character) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.enterCharacterQueue.add(character);
     }
 
-    public void selectCharacter(char character) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        UICommonUtils.mouseTextInput_selectCharacter(uiEngineState.openMouseTextInput, character);
+    public void selectCharacter(MouseTextInput mouseTextInput, char character) {
+        if (mouseTextInput == null) return;
+        UICommonUtils.mouseTextInput_selectCharacter(mouseTextInput, character);
     }
 
-    public void selectIndex(int index) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        UICommonUtils.mouseTextInput_selectIndex(uiEngineState.openMouseTextInput, index);
+    public void selectIndex(MouseTextInput mouseTextInput, int index) {
+        if (mouseTextInput == null) return;
+        UICommonUtils.mouseTextInput_selectIndex(mouseTextInput, index);
     }
 
-    public void setCharacters(char[] charactersLC, char[] charactersUC) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        if (charactersLC == null || charactersUC == null) return;
-        UICommonUtils.mouseTextInput_setCharacters(uiEngineState.openMouseTextInput, charactersLC, charactersUC);
+    public void setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
+        if (mouseTextInput == null) return;
+        charactersLC = charactersLC != null ? charactersLC : new char[]{};
+        charactersUC = charactersUC != null ? charactersUC : new char[]{};
+        UICommonUtils.mouseTextInput_setCharacters(mouseTextInput, charactersLC, charactersUC);
     }
 
-    public void setAlpha(float alpha) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        Color color = uiEngineState.openMouseTextInput.color;
-        uiEngineState.openMouseTextInput.color.set(color.r, color.g, color.b, alpha);
+    public void setAlpha(MouseTextInput mouseTextInput, float alpha) {
+        if (mouseTextInput == null) return;
+        Color color = mouseTextInput.color;
+        mouseTextInput.color.set(color.r, color.g, color.b, alpha);
     }
 
-    public void setColor(Color color) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.color.set(color);
+    public void setColor(MouseTextInput mouseTextInput, Color color) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.color.set(color);
     }
 
-    public void setColor2(Color color2) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.color2.set(color2);
+    public void setColor2(MouseTextInput mouseTextInput, Color color2) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.color2.set(color2);
     }
 
-    public void setPosition(int x, int y) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.x = x - 6;
-        uiEngineState.openMouseTextInput.y = y - 12;
+    public void setPosition(MouseTextInput mouseTextInput, int x, int y) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.x = x - 6;
+        mouseTextInput.y = y - 12;
     }
 
-    public void setMouseTextInputAction(MouseTextInputAction mouseTextInputAction) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.mouseTextInputAction = mouseTextInputAction;
+    public void setMouseTextInputAction(MouseTextInput mouseTextInput, MouseTextInputAction mouseTextInputAction) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.mouseTextInputAction = mouseTextInputAction;
     }
 
-    public void setFontColor(Color color) {
-        if (uiEngineState.openMouseTextInput == null) return;
-        uiEngineState.openMouseTextInput.fontColor.set(color);
+    public void setFontColor(MouseTextInput mouseTextInput, Color color) {
+        if (mouseTextInput == null) return;
+        mouseTextInput.fontColor.set(color);
     }
 
 

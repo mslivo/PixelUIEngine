@@ -1147,6 +1147,12 @@ final class UICommonUtils {
         }
     }
 
+    static void mouseTextInput_open(UIEngineState uiEngineState, MouseTextInput mouseTextInput) {
+        if(uiEngineState.openMouseTextInput != null) return;
+        uiEngineState.mTextInputMouseX = Gdx.input.getX();
+        uiEngineState.mTextInputUnlock = false;
+        uiEngineState.openMouseTextInput = mouseTextInput;
+    }
 
     static void mouseTextInput_close(UIEngineState uiEngineState) {
         // mouseTextInput Keyboard

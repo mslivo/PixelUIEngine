@@ -140,7 +140,6 @@ public final class UIEngineState {
     public boolean mTextInputTranslatedMouse2Down;
     public boolean mTextInputTranslatedMouse3Down;
     public boolean mTextInputUnlock;
-    public IntArray mTextInputAPICharacterQueue;
 
     /* #################### Control #################### */
     public Object lastUIMouseHover; // Last GUI Element the mouse hovered over
