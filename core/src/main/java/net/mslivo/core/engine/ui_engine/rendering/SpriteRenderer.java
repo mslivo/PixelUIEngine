@@ -194,6 +194,8 @@ public class SpriteRenderer implements Batch {
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
+        final int SIZE_INIT = 1024;
+
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -211,6 +213,7 @@ public class SpriteRenderer implements Batch {
         this.lastTexture = null;
         this.transformMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.combinedMatrix = new Matrix4();
         this.tempColor = new Color(Color.GRAY);
         this.color = COLOR_RESET;
@@ -221,34 +224,8 @@ public class SpriteRenderer implements Batch {
         this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.srcAlpha = GL20.GL_SRC_ALPHA;
         this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-
-
-        int size = 1024;
-        Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
-
-        mesh = new Mesh(vertexDataType, false, size * 4, size * 6,
-                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
-
-        projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        vertices = new float[size * SPRITE_SIZE];
-
-        int len = size * 6;
-        short[] indices = new short[len];
-        short j = 0;
-        for (int i = 0; i < len; i += 6, j += 4) {
-            indices[i] = j;
-            indices[i + 1] = (short)(j + 1);
-            indices[i + 2] = (short)(j + 2);
-            indices[i + 3] = (short)(j + 2);
-            indices[i + 4] = (short)(j + 3);
-            indices[i + 5] = j;
-        }
-        mesh.setIndices(indices);
-
+        this.mesh = createMesh(SIZE_INIT);
+        this.vertices = createVerticesArray(SIZE_INIT, null);
         this.backup_color = COLOR_RESET;
         this.backup_tweak = TWEAK_RESET;
         this.backup_srcRGB = GL20.GL_SRC_ALPHA;
