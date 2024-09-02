@@ -101,6 +101,10 @@ public final class APICamera {
         return uiEngineState.camera_app.combined;
     }
 
+    public Matrix4 projectionUI() {
+        return uiEngineState.camera_ui.combined;
+    }
+
     public float viewPortStretchFactorWidth() {
         return uiEngineState.viewport_screen.getWorldWidth() / (float) uiEngineState.viewport_screen.getScreenWidth();
     }

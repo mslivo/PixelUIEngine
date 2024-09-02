@@ -10,10 +10,7 @@ public interface UIEngineAdapter {
     void init(API api, MediaManager mediaManager);
     void update();
     void render(OrthographicCamera camera, AppViewport appViewPort);
-    default void renderUIBefore(OrthographicCamera camera) {
-    }
-    default void renderUIAfter(OrthographicCamera camera) {
-    }
+
     default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
                                  int resolutionWidth, int resolutionHeight, boolean appGrayScale) {
         spriteRenderer.setProjectionMatrix(camera.combined);

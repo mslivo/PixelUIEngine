@@ -1896,9 +1896,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             uiEngineState.frameBuffer_ui.begin();
             Gdx.gl.glClearColor(0, 0, 0, 0f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            this.uiAdapter.renderUIBefore(uiEngineState.camera_ui);
             this.renderUI();
-            this.uiAdapter.renderUIAfter(uiEngineState.camera_ui);
             uiEngineState.frameBuffer_ui.end();
         }
 
