@@ -581,15 +581,27 @@ public class PrimitiveRenderer {
         System.arraycopy(this.blend,0,this.backup_blend,0,4);
     }
 
-    public void setResetValues(float clr_r, float clr_g, float clr_b, float clr_a,float vertex_clr_r, float vertex_clr_g, float vertex_clr_b, float vertex_clr_a, float tweak_l, float tweak_a, float tweak_b, int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
-        this.colorReset = colorPackedRGBA(clr_r,clr_g,clr_b,clr_a);
-        this.vertexColorReset = colorPackedRGBA(vertex_clr_r,vertex_clr_g,vertex_clr_b,vertex_clr_a);
-        this.tweakReset = colorPackedRGB(tweak_l,tweak_a,tweak_b);
+    public void setColorResetValues(float r, float g, float b, float a){
+        this.colorReset = colorPackedRGBA(r,g,b,a);
+        this.setColorReset();
+    }
+
+    public void setVertexColorResetValues(float r, float g, float b, float a){
+        this.vertexColorReset = colorPackedRGBA(r,g,b,a);
+        this.setVertexColorReset();
+    }
+
+    public void setTweakResetValues(float l, float a, float b){
+        this.tweakReset = colorPackedRGB(l,a,b);
+        this.setTweakReset();
+    }
+
+    public void setBlendResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
         this.blendReset[RGB_SRC] = blend_rgb_src;
         this.blendReset[RGB_DST] = blend_rgb_dst;
         this.blendReset[ALPHA_SRC] = blend_alpha_src;
         this.blendReset[ALPHA_DST] = blend_alpha_blend;
-        this.setAllReset();
+        this.setBlendFunctionReset();
     }
 
     private static float colorPackedRGBA(float red, float green, float blue, float alpha) {

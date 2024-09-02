@@ -1785,14 +1785,22 @@ public class SpriteRenderer implements Batch {
         System.arraycopy(this.backup_blend,0,this.blend,0,4);
     }
 
-    public void setResetValues(float clr_r, float clr_g, float clr_b, float clr_a, float tweak_l, float tweak_a, float tweak_b, float tweak_pixelation, int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
-        this.colorReset = colorPackedRGBA(clr_r,clr_g,clr_b,clr_a);
-        this.tweakReset = colorPackedRGBA(tweak_l,tweak_a,tweak_b,tweak_pixelation);
+    public void setColorResetValues(float r, float g, float b, float a){
+        this.colorReset = colorPackedRGBA(r,g,b,a);
+        this.setColorReset();
+    }
+
+    public void setTweakResetValues(float l, float a, float b, float pixelation){
+        this.tweakReset = colorPackedRGBA(l,a,b, pixelation);
+        this.setTweakReset();
+    }
+
+    public void setBlendResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
         this.blendReset[RGB_SRC] = blend_rgb_src;
         this.blendReset[RGB_DST] = blend_rgb_dst;
         this.blendReset[ALPHA_SRC] = blend_alpha_src;
         this.blendReset[ALPHA_DST] = blend_alpha_blend;
-        this.setAllReset();
+        this.setBlendFunctionReset();
     }
 
     private static float colorPackedRGBA(float red, float green, float blue, float alpha) {
