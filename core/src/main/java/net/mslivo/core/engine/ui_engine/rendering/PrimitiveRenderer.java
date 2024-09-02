@@ -114,34 +114,33 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X2 = VERTEX_SIZE*2;
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
     private static final int ARRAY_RESIZE_STEP = 8192;
+    private static final int RGB_SRC = 0,RGB_DST = 1,ALPHA_SRC = 2,ALPHA_DST = 3 ;
 
-    private static final float TWEAK_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0.0f); // Alpha unused on primitiverenderer
-    private static final float COLOR_RESET = Color.toFloatBits(0.5f, 0.5f, 0.5f, 1.0f);
-
-    public int renderCalls;
-    public int totalRenderCalls;
     private final Color tempColor;
     private int primitiveType;
     private final Matrix4 projectionMatrix;
-    private float vertexColor;
-    private float color;
     private ShaderProgram shader;
     private Mesh mesh;
     private float vertices[];
     private int idx;
-    private float tweak;
-    private int srcRGB;
-    private int dstRGB;
-    private int srcAlpha;
-    private int dstAlpha;
     private int u_projTrans;
     private boolean drawing;
+    private int renderCalls;
+    private int totalRenderCalls;
+    private int maxSpritesInBatch;
+
+    private float color;
+    private float vertexColor;
+    private float tweak;
+    private int[] blend;
     private float backup_tweak;
     private float backup_color;
-    private int backup_srcRGB;
-    private int backup_dstRGB;
-    private int backup_srcAlpha;
-    private int backup_dstAlpha;
+    private float backup_vertexColor;
+    private int[] backup_blend;
+    private float tweakReset;
+    private float colorReset;
+    private float vertexColorReset;
+    private int[] blendReset;
 
     public PrimitiveRenderer() {
         this(10240);
@@ -153,24 +152,27 @@ public class PrimitiveRenderer {
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.drawing = false;
         this.primitiveType = GL20.GL_POINTS;
-        this.color = COLOR_RESET;
-        this.vertexColor = rgbPacked(1f, 1f, 1f, 1f);
-        this.tweak = TWEAK_RESET;
-        this.srcRGB = GL20.GL_SRC_ALPHA;
-        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.srcAlpha = GL20.GL_SRC_ALPHA;
-        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        this.backup_tweak = 0;
-        this.backup_color = 0f;
-        this.backup_srcRGB = GL20.GL_SRC_ALPHA;
-        this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
-        this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.vertices = createVerticesArray(ARRAY_RESIZE_STEP * VERTEX_SIZE, null);
         this.mesh = createMesh(ARRAY_RESIZE_STEP * VERTEX_SIZE);
+        this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
+
+        this.tweakReset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
+        this.colorReset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+        this.vertexColorReset = colorPackedRGBA(1f, 1f, 1f, 1f);
+        this.blendReset = new int[]{GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA};
+
+        this.color = colorReset;
+        this.vertexColor = vertexColorReset;
+        this.tweak = tweakReset;
+        this.blend = new int[]{this.blendReset[RGB_SRC],this.blendReset[RGB_DST],this.blendReset[ALPHA_SRC],this.blendReset[ALPHA_DST]};
+
+        this.backup_color = this.color;
+        this.backup_vertexColor = this.vertexColor;
+        this.backup_tweak = this.tweak;
+        this.backup_blend = new int[]{this.blend[RGB_SRC],this.blend[RGB_DST],this.blend[ALPHA_SRC],this.blend[ALPHA_DST]};
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -197,7 +199,7 @@ public class PrimitiveRenderer {
 
         // Blending
         if (!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
 
         this.drawing = true;
     }
@@ -341,32 +343,33 @@ public class PrimitiveRenderer {
     }
 
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
-        if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
+        if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
             return;
-        this.srcRGB = srcFuncColor;
-        this.dstRGB = dstFuncColor;
-        this.srcAlpha = srcFuncAlpha;
-        this.dstAlpha = dstFuncAlpha;
+
+        this.blend[RGB_SRC] = srcFuncColor;
+        this.blend[RGB_DST] = dstFuncColor;
+        this.blend[ALPHA_SRC] = srcFuncAlpha;
+        this.blend[ALPHA_DST] = dstFuncAlpha;
         if (drawing) {
             flush();
-            Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+            Gdx.gl.glBlendFuncSeparate(blend[RGB_SRC], blend[RGB_DST], blend[ALPHA_SRC], blend[ALPHA_DST]);
         }
     }
 
     public int getBlendSrcFunc() {
-        return srcRGB;
+        return blend[RGB_SRC];
     }
 
     public int getBlendDstFunc() {
-        return dstRGB;
+        return blend[RGB_DST];
     }
 
     public int getBlendSrcFuncAlpha() {
-        return srcAlpha;
+        return blend[ALPHA_SRC];
     }
 
     public int getBlendDstFuncAlpha() {
-        return dstAlpha;
+        return blend[ALPHA_DST];
     }
 
     public void setShader(ShaderProgram shader) {
@@ -538,15 +541,19 @@ public class PrimitiveRenderer {
     // ---- RESET & STATE ----
 
     public void setTweakReset() {
-        setPackedTweak(TWEAK_RESET);
+        setPackedTweak(tweakReset);
     }
 
     public void setColorReset() {
-        setPackedColor(COLOR_RESET);
+        setPackedColor(colorReset);
+    }
+
+    public void setVertexColorReset() {
+        setPackedColor(vertexColorReset);
     }
 
     public void setBlendFunctionReset() {
-        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        setBlendFunctionSeparate(blendReset[RGB_SRC],blendReset[RGB_DST],blendReset[ALPHA_SRC],blendReset[ALPHA_DST]);
     }
 
     public void setTweakAndColorReset() {
@@ -562,17 +569,27 @@ public class PrimitiveRenderer {
 
     public void saveState() {
         this.backup_color = this.color;
+        this.backup_vertexColor = this.vertexColor;
         this.backup_tweak = this.tweak;
-        this.backup_srcRGB = this.srcRGB;
-        this.backup_dstRGB = this.dstRGB;
-        this.backup_srcAlpha = this.srcAlpha;
-        this.backup_dstAlpha = this.dstAlpha;
+        System.arraycopy(this.blend,0,this.backup_blend,0,4);
     }
 
     public void loadState() {
         setPackedColor(this.backup_color);
+        setPackedVertexColor(this.backup_vertexColor);
         setPackedTweak(this.backup_tweak);
-        setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
+        System.arraycopy(this.blend,0,this.backup_blend,0,4);
+    }
+
+    public void setResetValues(float clr_r, float clr_g, float clr_b, float clr_a,float vertex_clr_r, float vertex_clr_g, float vertex_clr_b, float vertex_clr_a, float tweak_l, float tweak_a, float tweak_b, int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
+        this.colorReset = colorPackedRGBA(clr_r,clr_g,clr_b,clr_a);
+        this.vertexColorReset = colorPackedRGBA(vertex_clr_r,vertex_clr_g,vertex_clr_b,vertex_clr_a);
+        this.tweakReset = colorPackedRGB(tweak_l,tweak_a,tweak_b);
+        this.blendReset[RGB_SRC] = blend_rgb_src;
+        this.blendReset[RGB_DST] = blend_rgb_dst;
+        this.blendReset[ALPHA_SRC] = blend_alpha_src;
+        this.blendReset[ALPHA_DST] = blend_alpha_blend;
+        this.setAllReset();
     }
 
     private static float colorPackedRGBA(float red, float green, float blue, float alpha) {

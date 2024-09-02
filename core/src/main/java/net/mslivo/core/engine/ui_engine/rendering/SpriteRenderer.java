@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Affine2;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.*;
@@ -146,15 +143,11 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int ARRAY_RESIZE_STEP = 1024;
-    private static final int PIXELATION_PIXELS = 8;
-
-    public static final float TWEAK_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
-    public static final float COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+    private static final int RGB_SRC = 0,RGB_DST = 1,ALPHA_SRC = 2,ALPHA_DST = 3 ;
 
     private final Color tempColor;
     private Mesh mesh;
     private float[] vertices;
-    private float tweak;
     private int idx;
     private Texture lastTexture;
     private float invTexWidth, invTexHeight;
@@ -162,28 +155,25 @@ public class SpriteRenderer implements Batch {
     private final Matrix4 transformMatrix;
     private final Matrix4 projectionMatrix;
     private final Matrix4 combinedMatrix;
-    private int srcRGB;
-    private int dstRGB;
-    private int srcAlpha;
-    private int dstAlpha;
     private ShaderProgram shader;
     private boolean defaultShader;
-    private float backup_tweak;
-    private float backup_color;
-    private int backup_srcRGB;
-    private int backup_dstRGB;
-    private int backup_srcAlpha;
-    private int backup_dstAlpha;
-    protected float color;
     private MediaManager mediaManager;
     private int u_projTrans;
     private int u_texture;
     private int u_textureSize;
     private Vector2 textureSizeD4Vector;
-    public int renderCalls;
-    public int totalRenderCalls;
-    public int maxSpritesInBatch;
-
+    private int renderCalls;
+    private int totalRenderCalls;
+    private int maxSpritesInBatch;
+    private float color;
+    private float tweak;
+    private int[] blend;
+    private float backup_tweak;
+    private float backup_color;
+    private int[] backup_blend;
+    private float tweakReset;
+    private float colorReset;
+    private int[] blendReset;
 
     public SpriteRenderer() {
         this(null, null);
@@ -204,6 +194,7 @@ public class SpriteRenderer implements Batch {
         } else {
             this.shader = shader;
         }
+
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
         this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
@@ -216,22 +207,20 @@ public class SpriteRenderer implements Batch {
         this.projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.combinedMatrix = new Matrix4();
         this.tempColor = new Color(Color.GRAY);
-        this.color = COLOR_RESET;
         this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
         this.invTexWidth = this.invTexHeight = 0;
-        this.tweak = TWEAK_RESET;
-        this.srcRGB = GL20.GL_SRC_ALPHA;
-        this.dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.srcAlpha = GL20.GL_SRC_ALPHA;
-        this.dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
         this.mesh = createMesh(SIZE_INIT);
         this.vertices = createVerticesArray(SIZE_INIT, null);
-        this.backup_color = COLOR_RESET;
-        this.backup_tweak = TWEAK_RESET;
-        this.backup_srcRGB = GL20.GL_SRC_ALPHA;
-        this.backup_dstRGB = GL20.GL_ONE_MINUS_SRC_ALPHA;
-        this.backup_srcAlpha = GL20.GL_SRC_ALPHA;
-        this.backup_dstAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
+
+        this.tweakReset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
+        this.colorReset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+        this.blendReset = new int[]{GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA};
+        this.color = colorReset;
+        this.tweak = tweakReset;
+        this.blend = new int[]{this.blendReset[RGB_SRC],this.blendReset[RGB_DST],this.blendReset[ALPHA_SRC],this.blendReset[ALPHA_DST]};
+        this.backup_color = this.color;
+        this.backup_tweak = this.tweak;
+        this.backup_blend = new int[]{this.blend[RGB_SRC],this.blend[RGB_DST],this.blend[ALPHA_SRC],this.blend[ALPHA_DST]};
         this.mediaManager = mediaManager;
     }
 
@@ -291,7 +280,7 @@ public class SpriteRenderer implements Batch {
         setupMatrices();
 
         if (!Gdx.gl.glIsEnabled(GL20.GL_BLEND)) Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
 
         drawing = true;
     }
@@ -1211,36 +1200,37 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
-        if (srcRGB == srcFuncColor && dstRGB == dstFuncColor && srcAlpha == srcFuncAlpha && dstAlpha == dstFuncAlpha)
+        if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
             return;
-        this.srcRGB = srcFuncColor;
-        this.dstRGB = dstFuncColor;
-        this.srcAlpha = srcFuncAlpha;
-        this.dstAlpha = dstFuncAlpha;
+
+        this.blend[RGB_SRC] = srcFuncColor;
+        this.blend[RGB_DST] = dstFuncColor;
+        this.blend[ALPHA_SRC] = srcFuncAlpha;
+        this.blend[ALPHA_DST] = dstFuncAlpha;
         if (drawing) {
             flush();
-            Gdx.gl.glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+            Gdx.gl.glBlendFuncSeparate(blend[RGB_SRC], blend[RGB_DST], blend[ALPHA_SRC], blend[ALPHA_DST]);
         }
     }
 
     @Override
     public int getBlendSrcFunc() {
-        return srcRGB;
+        return blend[RGB_SRC];
     }
 
     @Override
     public int getBlendDstFunc() {
-        return dstRGB;
+        return blend[RGB_DST];
     }
 
     @Override
     public int getBlendSrcFuncAlpha() {
-        return srcAlpha;
+        return blend[ALPHA_SRC];
     }
 
     @Override
     public int getBlendDstFuncAlpha() {
-        return dstAlpha;
+        return blend[ALPHA_DST];
     }
 
     @Override
@@ -1761,15 +1751,15 @@ public class SpriteRenderer implements Batch {
     // ---- RESET & STATE ----
 
     public void setTweakReset() {
-        setPackedTweak(TWEAK_RESET);
+        setPackedTweak(tweakReset);
     }
 
     public void setColorReset() {
-        setPackedColor(COLOR_RESET);
+        setPackedColor(colorReset);
     }
 
     public void setBlendFunctionReset() {
-        setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        setBlendFunctionSeparate(blendReset[RGB_SRC],blendReset[RGB_DST],blendReset[ALPHA_SRC],blendReset[ALPHA_DST]);
     }
 
     public void setTweakAndColorReset() {
@@ -1786,16 +1776,23 @@ public class SpriteRenderer implements Batch {
     public void saveState() {
         this.backup_color = this.color;
         this.backup_tweak = this.tweak;
-        this.backup_srcRGB = this.srcRGB;
-        this.backup_dstRGB = this.dstRGB;
-        this.backup_srcAlpha = this.srcAlpha;
-        this.backup_dstAlpha = this.dstAlpha;
+        System.arraycopy(this.blend,0,this.backup_blend,0,4);
     }
 
     public void loadState() {
         setPackedColor(this.backup_color);
         setPackedTweak(this.backup_tweak);
-        setBlendFunctionSeparate(backup_srcRGB, backup_dstRGB, backup_srcAlpha, backup_dstAlpha);
+        System.arraycopy(this.backup_blend,0,this.blend,0,4);
+    }
+
+    public void setResetValues(float clr_r, float clr_g, float clr_b, float clr_a, float tweak_l, float tweak_a, float tweak_b, float tweak_pixelation, int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
+        this.colorReset = colorPackedRGBA(clr_r,clr_g,clr_b,clr_a);
+        this.tweakReset = colorPackedRGBA(tweak_l,tweak_a,tweak_b,tweak_pixelation);
+        this.blendReset[RGB_SRC] = blend_rgb_src;
+        this.blendReset[RGB_DST] = blend_rgb_dst;
+        this.blendReset[ALPHA_SRC] = blend_alpha_src;
+        this.blendReset[ALPHA_DST] = blend_alpha_blend;
+        this.setAllReset();
     }
 
     private static float colorPackedRGBA(float red, float green, float blue, float alpha) {
@@ -1803,4 +1800,11 @@ public class SpriteRenderer implements Batch {
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
+    public int getRenderCalls() {
+        return renderCalls;
+    }
+
+    public int getTotalRenderCalls() {
+        return totalRenderCalls;
+    }
 }
