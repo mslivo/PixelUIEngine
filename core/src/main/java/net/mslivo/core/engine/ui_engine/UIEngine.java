@@ -131,10 +131,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager);
-        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
-        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -1904,12 +1904,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
             uiEngineState.frameBuffer_screen.begin();
+
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
                     uiEngineState.frameBuffer_app.getFlippedTextureRegion(), uiEngineState.frameBuffer_ui.getFlippedTextureRegion(),
                     uiEngineState.resolutionWidth, uiEngineState.resolutionHeight,
                     UICommonUtils.window_isModalOpen(uiEngineState)
             );
+
             uiEngineState.frameBuffer_screen.end();
         }
 
@@ -1918,13 +1920,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (drawToScreen) {
                 uiEngineState.viewport_screen.apply();
                 spriteRenderer.begin();
-                Gdx.gl.glClearColor(0, 0, 0, 1);
+                Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
                 spriteRenderer.draw(uiEngineState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 spriteRenderer.end();
                 spriteRenderer.setTweakReset();
-
             }
         }
 

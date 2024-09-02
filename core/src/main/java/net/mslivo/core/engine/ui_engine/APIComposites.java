@@ -416,7 +416,6 @@ public final class APIComposites {
                     @Override
                     public void onCheck(boolean checked) {
                         if (checked) {
-                            //noinspection ForLoopReplaceableByForEach
                             for (int i2 = 0; i2 < checkboxes.length; i2++) {
                                 if (checkboxes[i2] != checkbox) {
                                     Checkbox otherCheckbox = checkboxes[i2];
@@ -1022,6 +1021,9 @@ public final class APIComposites {
                         }
                     }
                 });
+                if(i == toggledButtonIndex){
+                    api.component.button.setToggleDisabled(button, true);
+                }
             }
         }
 

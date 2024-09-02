@@ -1795,11 +1795,19 @@ public class SpriteRenderer implements Batch {
         this.setTweakReset();
     }
 
-    public void setBlendResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
+    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
         this.blendReset[RGB_SRC] = blend_rgb_src;
         this.blendReset[RGB_DST] = blend_rgb_dst;
         this.blendReset[ALPHA_SRC] = blend_alpha_src;
         this.blendReset[ALPHA_DST] = blend_alpha_blend;
+        this.setBlendFunctionReset();
+    }
+
+    public void setBlendFunctionResetValues(int blend_src, int blend_dst){
+        this.blendReset[RGB_SRC] = blend_src;
+        this.blendReset[RGB_DST] = blend_dst;
+        this.blendReset[ALPHA_SRC] = blend_src;
+        this.blendReset[ALPHA_DST] = blend_dst;
         this.setBlendFunctionReset();
     }
 
