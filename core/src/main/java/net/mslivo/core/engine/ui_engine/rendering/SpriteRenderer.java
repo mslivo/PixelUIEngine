@@ -6,10 +6,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.Affine2;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.*;
+
+import java.util.Arrays;
 
 /**
  * A substitute for {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that adds better coloring.
@@ -45,10 +50,10 @@ public class SpriteRenderer implements Batch {
                v_color = $COLOR_ATTRIBUTE;
                v_color.w = v_color.w * (255.0/254.0);
                v_color.rgb = rgbToLabColor(v_color.rgb);
-               
+            
                // Tweak Color
                v_tweak = $TWEAK_ATTRIBUTE;
-               
+            
                // Position & TextCoord
                gl_Position =  u_projTrans * $POSITION_ATTRIBUTE;
                v_texCoords = $TEXCOORD_ATTRIBUTE;
@@ -56,7 +61,7 @@ public class SpriteRenderer implements Batch {
             """
             .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
             .replace("$COLOR_ATTRIBUTE", ShaderProgram.COLOR_ATTRIBUTE)
-            .replace("$TEXCOORD_ATTRIBUTE", ShaderProgram.TEXCOORD_ATTRIBUTE+"0")
+            .replace("$TEXCOORD_ATTRIBUTE", ShaderProgram.TEXCOORD_ATTRIBUTE + "0")
             .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
     private static final String FRAGMENT_SHADER = """
             #ifdef GL_ES
@@ -110,22 +115,22 @@ public class SpriteRenderer implements Batch {
             void main() {
                 // Pixelation
                 vec2 texCoords = v_texCoords;
-                
+            
                 // Calculate pixelation factor
                 float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
-                
+            
                 // Compute a multiplier that is exactly 0.0 when v_tweak.w is 0.0
                 float pixelateFactor = step(0.001, v_tweak.w); // Use a small epsilon to avoid artifacts
-                
+            
                 // Apply pixelation effect only when pixelateFactor is 1.0
                 texCoords = texCoords * u_textureSize;
                 texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, pixelateFactor);
                 texCoords = texCoords / u_textureSize;
-                
+            
                 vec4 tgt = texture2D(u_texture, texCoords);
             
                 // OkLab Tweaks
-                
+            
                 vec3 lab = rgbToLabFragment(tgt.xyz);
                 lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0), twoThird);
                 lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
@@ -143,7 +148,7 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int ARRAY_RESIZE_STEP = 1024;
-    private static final int RGB_SRC = 0,RGB_DST = 1,ALPHA_SRC = 2,ALPHA_DST = 3 ;
+    private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
     private final Color tempColor;
     private Mesh mesh;
@@ -202,7 +207,7 @@ public class SpriteRenderer implements Batch {
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
         this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
-        this.textureSizeD4Vector = new Vector2(0,0);
+        this.textureSizeD4Vector = new Vector2(0, 0);
         this.drawing = false;
         this.idx = 0;
         this.lastTexture = null;
@@ -218,15 +223,15 @@ public class SpriteRenderer implements Batch {
 
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
-        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA};
 
         this.color = reset_color;
         this.tweak = reset_tweak;
-        this.blend = new int[]{this.reset_blend[RGB_SRC],this.reset_blend[RGB_DST],this.reset_blend[ALPHA_SRC],this.reset_blend[ALPHA_DST]};
+        this.blend = new int[]{this.reset_blend[RGB_SRC], this.reset_blend[RGB_DST], this.reset_blend[ALPHA_SRC], this.reset_blend[ALPHA_DST]};
 
         this.backup_color = this.color;
         this.backup_tweak = this.tweak;
-        this.backup_blend = new int[]{this.blend[RGB_SRC],this.blend[RGB_DST],this.blend[ALPHA_SRC],this.blend[ALPHA_DST]};
+        this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
         this.mediaManager = mediaManager;
     }
 
@@ -1257,8 +1262,9 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void setProjectionMatrix(Matrix4 projection) {
+        if (Arrays.equals(projectionMatrix.val, projection.val)) return;
         if (drawing) flush();
-        projectionMatrix.set(projection);
+        this.projectionMatrix.set(projection);
         if (drawing) setupMatrices();
     }
 
@@ -1282,7 +1288,7 @@ public class SpriteRenderer implements Batch {
         invTexHeight = 1.0f / texture.getHeight();
 
         this.textureSizeD4Vector.set(texture.getWidth(), texture.getHeight());
-        shader.setUniformf(this.u_textureSize,this.textureSizeD4Vector);
+        shader.setUniformf(this.u_textureSize, this.textureSizeD4Vector);
     }
 
     @Override
@@ -1782,27 +1788,27 @@ public class SpriteRenderer implements Batch {
     public void saveState() {
         this.backup_color = this.color;
         this.backup_tweak = this.tweak;
-        System.arraycopy(this.blend,0,this.backup_blend,0,4);
+        System.arraycopy(this.blend, 0, this.backup_blend, 0, 4);
     }
 
     public void loadState() {
         setPackedColor(this.backup_color);
         setPackedTweak(this.backup_tweak);
-        setBlendFunctionSeparate(this.backup_blend[RGB_SRC],this.backup_blend[RGB_DST],this.backup_blend[ALPHA_SRC],this.backup_blend[ALPHA_DST]);
+        setBlendFunctionSeparate(this.backup_blend[RGB_SRC], this.backup_blend[RGB_DST], this.backup_blend[ALPHA_SRC], this.backup_blend[ALPHA_DST]);
     }
 
 
-    public void setColorResetValues(float r, float g, float b, float a){
-        this.reset_color = colorPackedRGBA(r,g,b,a);
+    public void setColorResetValues(float r, float g, float b, float a) {
+        this.reset_color = colorPackedRGBA(r, g, b, a);
         this.setColorReset();
     }
 
-    public void setTweakResetValues(float l, float a, float b, float pixelation){
-        this.reset_tweak = colorPackedRGBA(l,a,b, pixelation);
+    public void setTweakResetValues(float l, float a, float b, float pixelation) {
+        this.reset_tweak = colorPackedRGBA(l, a, b, pixelation);
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
+    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -1810,7 +1816,7 @@ public class SpriteRenderer implements Batch {
         this.setBlendFunctionReset();
     }
 
-    public void setBlendFunctionResetValues(int blend_src, int blend_dst){
+    public void setBlendFunctionResetValues(int blend_src, int blend_dst) {
         this.reset_blend[RGB_SRC] = blend_src;
         this.reset_blend[RGB_DST] = blend_dst;
         this.reset_blend[ALPHA_SRC] = blend_src;

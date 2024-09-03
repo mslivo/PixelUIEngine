@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.util.Arrays;
+
 public class PrimitiveRenderer {
 
     private static final String TWEAK_ATTRIBUTE = "a_tweak";
@@ -177,7 +179,14 @@ public class PrimitiveRenderer {
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
+        if (Arrays.equals(projectionMatrix.val, projection.val)) return;
+        if (drawing) flush();
         this.projectionMatrix.set(projection);
+        if (drawing) setupMatrices();
+    }
+
+    protected void setupMatrices() {
+        shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
     }
 
     public Matrix4 getProjectionMatrix() {
@@ -195,7 +204,7 @@ public class PrimitiveRenderer {
         Gdx.gl.glDepthMask(false);
 
         shader.bind();
-        shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
+        setupMatrices();
 
 
         // Blending
