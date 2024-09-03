@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.IntMap;
@@ -32,6 +34,7 @@ public class Tools {
         private static boolean LOG_SYSOUT_DEBUG_ENABLED = true;
         private static boolean LOG_FILE_ENABLED = true;
         private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy][HH:mm:ss");
+
 
         public static void logBenchmark(String... customValues) {
             if (!LOG_SYSOUT_ENABLED) return;
@@ -265,6 +268,12 @@ public class Tools {
     }
 
     public static class File {
+
+        public static void writeFrameBuffer(String fileName){
+            Path path = Path.of(fileName);
+            if(path.toFile().exists()) return;
+            PixmapIO.writePNG(new FileHandle(path.toFile()), Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        }
 
         public static String validFileName(String fileName) {
             if (fileName == null || fileName.trim().length() == 0) {

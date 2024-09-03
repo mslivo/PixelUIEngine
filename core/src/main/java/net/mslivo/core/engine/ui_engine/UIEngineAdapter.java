@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
@@ -14,6 +15,7 @@ public interface UIEngineAdapter {
     default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
                                  int resolutionWidth, int resolutionHeight, boolean appGrayScale) {
         spriteRenderer.setProjectionMatrix(camera.combined);
+        spriteRenderer.setBlendFunction(GL20.GL_ONE,GL20.GL_ONE_MINUS_SRC_ALPHA);
         spriteRenderer.begin();
         // Draw App Framebuffer
         if(appGrayScale) {
@@ -26,7 +28,7 @@ public interface UIEngineAdapter {
         // Draw UI Framebuffer
         spriteRenderer.draw(texture_ui, 0, 0, resolutionWidth, resolutionHeight);
         spriteRenderer.end();
-
+        spriteRenderer.setAllReset();
     }
     void shutdown();
 }

@@ -1894,22 +1894,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         { // Draw GUI
             uiEngineState.frameBuffer_ui.begin();
-            Gdx.gl.glClearColor(0, 0, 0, 0f);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            render_glClear();
             this.renderUI();
             uiEngineState.frameBuffer_ui.end();
         }
 
         { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
             uiEngineState.frameBuffer_screen.begin();
-
+            render_glClear();
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
                     uiEngineState.frameBuffer_app.getFlippedTextureRegion(), uiEngineState.frameBuffer_ui.getFlippedTextureRegion(),
                     uiEngineState.resolutionWidth, uiEngineState.resolutionHeight,
                     UICommonUtils.window_isModalOpen(uiEngineState)
             );
-
             uiEngineState.frameBuffer_screen.end();
         }
 
@@ -1918,9 +1916,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (drawToScreen) {
                 uiEngineState.viewport_screen.apply();
                 spriteRenderer.begin();
-                Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
+                render_glClear();
                 spriteRenderer.draw(uiEngineState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 spriteRenderer.end();
                 spriteRenderer.setTweakReset();
@@ -1940,6 +1936,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
          */
     }
 
+    private void render_glClear(){
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
 
     private void renderGameViewPortFrameBuffer(AppViewport appViewPort) {
         if (render_isComponentNotRendered(appViewPort)) return;
