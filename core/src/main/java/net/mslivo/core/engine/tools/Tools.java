@@ -76,7 +76,6 @@ public class Tools {
             Gdx.app.log(dateTag(), "Done.");
         }
 
-
         public static void debug(String message) {
             if (!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
             if (Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -161,7 +160,7 @@ public class Tools {
         }
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, boolean useAngle) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, useAngle,true);
+            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, useAngle, true);
         }
 
 
@@ -191,8 +190,6 @@ public class Tools {
                 Log.toFile(e, Path.of(appTile + "_error.log"));
             }
         }
-
-
     }
 
 
@@ -269,9 +266,11 @@ public class Tools {
 
     public static class File {
 
-        public static void writeFrameBuffer(String fileName){
+
+
+        public static void writeFrameBuffer(String fileName) {
             Path path = Path.of(fileName);
-            if(path.toFile().exists()) return;
+            if (path.toFile().exists()) return;
             PixmapIO.writePNG(new FileHandle(path.toFile()), Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         }
 
@@ -317,26 +316,44 @@ public class Tools {
             }
         }
 
-        public static void writeObjectToFile(Object data, Path file) throws Exception {
-            Files.createDirectories(file.getParent());
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(file));
-            objectOutputStream.writeObject(data);
-            objectOutputStream.flush();
-            objectOutputStream.close();
-        }
 
         public static Object readObjectFromFile(Path file) throws Exception {
             return readObjectFromFile(file, null);
         }
 
-
         public static Object readObjectFromFile(Path file, HashMap<String, String> classReplacements) throws Exception {
             try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(Files.newInputStream(file), classReplacements)) {
-                Object ret = objectInputStream.readObject();
+                Object readObject = objectInputStream.readObject();
                 objectInputStream.close();
-                return ret;
-            } catch (Exception e) {
-                throw e;
+                return readObject;
+            }
+        }
+
+
+        public static void writeObjectToFile(Object data, Path file) throws Exception {
+            Files.createDirectories(file.getParent());
+            try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(file))){
+                objectOutputStream.writeObject(data);
+                objectOutputStream.flush();
+            }
+        }
+
+        public static void writeTextToFile(String text, Path file) throws Exception {
+            Files.createDirectories(file.getParent());
+            try (FileWriter fileWriter = new FileWriter(file.toFile())) {
+                fileWriter.write(text);
+                fileWriter.flush();
+            }
+        }
+
+        public static String readTextFromFile(Path file) throws Exception {
+            try (FileReader fileReader = new FileReader(file.toFile())) {
+                StringBuilder builder = new StringBuilder();
+                int ch;
+                while ((ch = fileReader.read()) != -1) {
+                    builder.append((char) ch);
+                }
+                return builder.toString();
             }
         }
 
@@ -573,7 +590,7 @@ public class Tools {
             for (int iy = -radius; iy <= radius; iy++) {
                 for (int ix = -radius; ix <= radius; ix++) {
                     if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!radiusFunction.doInRadiusContinue(x,y,x + ix, y + iy)) {
+                        if (!radiusFunction.doInRadiusContinue(x, y, x + ix, y + iy)) {
                             return;
                         }
                     }
@@ -607,13 +624,13 @@ public class Tools {
             if (data != null) {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x,y,x + ((int) (positions >> 32)), y + ((int) positions), data))
+                    if (!radiusFunction.doInRadiusContinue(x, y, x + ((int) (positions >> 32)), y + ((int) positions), data))
                         return;
                 }
             } else {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x,y, x + ((int) (positions >> 32)), y + ((int) positions)))
+                    if (!radiusFunction.doInRadiusContinue(x, y, x + ((int) (positions >> 32)), y + ((int) positions)))
                         return;
                 }
             }
