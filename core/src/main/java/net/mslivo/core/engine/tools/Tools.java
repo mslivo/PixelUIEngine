@@ -126,7 +126,7 @@ public class Tools {
         private static float timeStep;
         private static float timeStepX2;
         private static float timeBetweenUpdates;
-
+        public static final Path ERROR_LOG_FILE = Path.of("error.log");
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
@@ -187,7 +187,7 @@ public class Tools {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
                 Log.log(e);
-                Log.toFile(e, Path.of(appTile + "_error.log"));
+                Log.toFile(e, ERROR_LOG_FILE);
             }
         }
     }
