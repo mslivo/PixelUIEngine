@@ -329,8 +329,7 @@ public class Tools {
             }
         }
 
-
-        public static void writeObjectToFile(Object data, Path file) throws Exception {
+        public static void writeObjectToFile(Path file, Object data) throws Exception {
             Files.createDirectories(file.getParent());
             try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(file))){
                 objectOutputStream.writeObject(data);
@@ -338,7 +337,7 @@ public class Tools {
             }
         }
 
-        public static void writeTextToFile(String text, Path file) throws Exception {
+        public static void writeTextToFile(Path file, String text) throws Exception {
             Files.createDirectories(file.getParent());
             try (FileWriter fileWriter = new FileWriter(file.toFile())) {
                 fileWriter.write(text);
