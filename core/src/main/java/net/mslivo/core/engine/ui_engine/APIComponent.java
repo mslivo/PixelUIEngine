@@ -1757,7 +1757,13 @@ public final class APIComponent {
         public void setSelectedItem(List list, Object selectedItem) {
             if (list == null) return;
             if (list.multiSelect) return;
-            if (list.items != null && list.items.contains(selectedItem)) list.selectedItem = selectedItem;
+            if(selectedItem != null){
+                if(list.items.contains(selectedItem)){
+                    list.selectedItem = selectedItem;
+                }
+            }else{
+                list.selectedItem = null;
+            }
         }
 
         public void setSelectedItems(List list, Object[] selectedItems) {
