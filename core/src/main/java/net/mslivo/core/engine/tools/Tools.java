@@ -32,7 +32,13 @@ import java.util.zip.ZipOutputStream;
  */
 public class Tools {
 
-    public static class Log {
+    public static class App {
+        private static float skipFrameAccumulator = 0f;
+        private static int maxUpdatesPerSecond = 60;
+        private static float timeStep;
+        private static float timeStepX2;
+        private static float timeBetweenUpdates;
+        public static final Path ERROR_LOG_FILE = Path.of("error.log");
         private static final StringBuilder logMessageBuilder = new StringBuilder();
         private static boolean LOG_SYSOUT_ENABLED = true;
         private static boolean LOG_SYSOUT_DEBUG_ENABLED = true;
@@ -80,13 +86,13 @@ public class Tools {
             Gdx.app.log(dateTag(), "Done.");
         }
 
-        public static void debug(String message) {
+        public static void logDebug(String message) {
             if (!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
             if (Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
             Gdx.app.debug(dateTag(), message);
         }
 
-        public static void toFile(String message, Path file) {
+        public static void logToFile(String message, Path file) {
             if (!LOG_FILE_ENABLED) return;
             try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
                 pw.write(message);
@@ -95,7 +101,7 @@ public class Tools {
             }
         }
 
-        public static void toFile(Exception e, Path file) {
+        public static void logToFile(Exception e, Path file) {
             try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
                 logMessageBuilder.setLength(0);
                 logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
@@ -120,17 +126,6 @@ public class Tools {
         public static void setSysOutLogEnabled(boolean logSysout) {
             LOG_SYSOUT_ENABLED = logSysout;
         }
-
-    }
-
-
-    public static class App {
-        private static float skipFrameAccumulator = 0f;
-        private static int maxUpdatesPerSecond = 60;
-        private static float timeStep;
-        private static float timeStepX2;
-        private static float timeBetweenUpdates;
-        public static final Path ERROR_LOG_FILE = Path.of("error.log");
 
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
@@ -190,8 +185,8 @@ public class Tools {
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
-                Log.log(e);
-                Log.toFile(e, ERROR_LOG_FILE);
+                log(e);
+                logToFile(e, ERROR_LOG_FILE);
             }
         }
     }
@@ -313,7 +308,7 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.Log.log(e);
+                Tools.App.log(e);
                 return false;
             }
         }
