@@ -18,10 +18,14 @@ import net.mslivo.core.engine.media_manager.CMedia;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Utility Class
@@ -266,7 +270,7 @@ public class Tools {
 
     public static class File {
 
-
+        private static final String ZIP_ENTRY_NAME = "packed.data";
 
         public static void writeFrameBuffer(String fileName) {
             Path path = Path.of(fileName);
@@ -294,9 +298,7 @@ public class Tools {
                 int count = 1;
                 do {
                     String countExt = count == 1 ? "" : "_" + count;
-                    file = Path.of(folder.toString(), filename
-                            + countExt
-                            + extension);
+                    file = Path.of(folder.toString(), filename + countExt + extension);
                     count++;
                 } while (Files.exists(file));
                 return file;
@@ -318,42 +320,116 @@ public class Tools {
 
 
         public static Object readObjectFromFile(Path file) throws Exception {
-            return readObjectFromFile(file, null);
+            return readObjectFromFile(file, false, null);
         }
 
-        public static Object readObjectFromFile(Path file, HashMap<String, String> classReplacements) throws Exception {
-            try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(Files.newInputStream(file), classReplacements)) {
-                Object readObject = objectInputStream.readObject();
-                objectInputStream.close();
-                return readObject;
+        public static Object readObjectFromFile(Path file, boolean zipped) throws Exception {
+            return readObjectFromFile(file, zipped, null);
+        }
+
+        public static Object readObjectFromFile(Path file, boolean zipped, HashMap<String, String> classReplacements) throws Exception {
+            try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
+                if (zipped) {
+                    try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+                        ZipEntry zipEntry = zipInputStream.getNextEntry();
+                        if (zipEntry != null && zipEntry.getName().equals(ZIP_ENTRY_NAME)) {
+                            try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(zipInputStream, classReplacements)) {
+                                Object readObject = objectInputStream.readObject();
+                                return readObject;
+                            }
+
+                        }
+                    }
+                } else {
+                    try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(fileInputStream, classReplacements)) {
+                        Object readObject = objectInputStream.readObject();
+                        return readObject;
+                    }
+                }
             }
+            return null;
         }
 
         public static void writeObjectToFile(Path file, Object data) throws Exception {
+            writeObjectToFile(file, data, false);
+        }
+
+        public static void writeObjectToFile(Path file, Object data, boolean zipped) throws Exception {
             Files.createDirectories(file.getParent());
-            try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(file))){
-                objectOutputStream.writeObject(data);
-                objectOutputStream.flush();
+
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
+                if (zipped) {
+                    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+                    ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
+                    zipOutputStream.putNextEntry(zipEntry);
+                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(zipOutputStream)) {
+                        objectOutputStream.writeObject(data);
+                        objectOutputStream.flush();
+                    }
+                    zipOutputStream.close();
+                } else {
+                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+                        objectOutputStream.writeObject(data);
+                        objectOutputStream.flush();
+                    }
+                }
             }
+
+
         }
 
         public static void writeTextToFile(Path file, String text) throws Exception {
+            writeTextToFile(file, text, false);
+        }
+
+        public static void writeTextToFile(Path file, String text, boolean zipped) throws Exception {
             Files.createDirectories(file.getParent());
-            try (FileWriter fileWriter = new FileWriter(file.toFile())) {
-                fileWriter.write(text);
-                fileWriter.flush();
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
+                if (zipped) {
+                    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+                    ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
+                    zipOutputStream.putNextEntry(zipEntry);
+                    try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(zipOutputStream, StandardCharsets.UTF_8)) {
+                        outputStreamWriter.write(text);
+                        outputStreamWriter.flush();
+                    }
+                } else {
+                    try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+                        outputStreamWriter.write(text);
+                        outputStreamWriter.flush();
+                    }
+                }
             }
         }
 
-        public static String readTextFromFile(Path file) throws Exception {
-            try (FileReader fileReader = new FileReader(file.toFile())) {
-                StringBuilder builder = new StringBuilder();
-                int ch;
-                while ((ch = fileReader.read()) != -1) {
-                    builder.append((char) ch);
+        public static String readTextFromFile(Path file, boolean zipped) throws Exception {
+            try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
+                if (zipped) {
+                    try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+                        ZipEntry zipEntry = zipInputStream.getNextEntry();
+                        if (zipEntry != null && zipEntry.getName().equals(ZIP_ENTRY_NAME)) {
+                            try (InputStreamReader inputStreamReader = new InputStreamReader(zipInputStream, StandardCharsets.UTF_8)) {
+                                StringBuilder builder = new StringBuilder();
+                                int ch;
+                                while ((ch = inputStreamReader.read()) != -1) {
+                                    builder.append((char) ch);
+                                }
+                                return builder.toString();
+                            }
+                        }
+                    }
+                } else {
+                    try (InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8)) {
+                        StringBuilder builder = new StringBuilder();
+                        int ch;
+                        while ((ch = inputStreamReader.read()) != -1) {
+                            builder.append((char) ch);
+                        }
+                        return builder.toString();
+                    }
                 }
-                return builder.toString();
             }
+            return null;
         }
 
         public static FileHandle findResource(String path) {
@@ -702,17 +778,11 @@ public class Tools {
         }
 
         public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw > Ax &&
-                    By + Bh > Ay &&
-                    Ax + Aw > Bx &&
-                    Ay + Ah > By;
+            return Bx + Bw > Ax && By + Bh > Ay && Ax + Aw > Bx && Ay + Ah > By;
         }
 
         public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
-            return Bx + Bw > Ax &&
-                    By + Bh > Ay &&
-                    Ax + Aw > Bx &&
-                    Ay + Ah > By;
+            return Bx + Bw > Ax && By + Bh > Ay && Ax + Aw > Bx && Ay + Ah > By;
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
