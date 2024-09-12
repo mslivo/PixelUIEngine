@@ -3151,7 +3151,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
         } else {
-            if (withIcon) maxWidth += TS();
+            if (withIcon) maxWidth -= TS();
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }

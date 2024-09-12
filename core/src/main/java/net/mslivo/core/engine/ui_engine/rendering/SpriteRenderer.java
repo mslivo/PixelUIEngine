@@ -1474,13 +1474,13 @@ public class SpriteRenderer implements Batch {
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
         if (cMediaFont == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
-        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y));
+        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
         if (cMediaFont == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
-        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, true, null);
+        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY) {
@@ -1492,7 +1492,7 @@ public class SpriteRenderer implements Batch {
             xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
             yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
-        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset));
+        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset),0, text.length(), 0, Align.left, false, null);
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth, boolean centerX, boolean centerY) {
@@ -1504,7 +1504,7 @@ public class SpriteRenderer implements Batch {
             xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
             yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
-        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, true, null);
+        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, "");
     }
 
     // ----- CMediaSprite -----
