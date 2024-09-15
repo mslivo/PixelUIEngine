@@ -1,6 +1,7 @@
 package net.mslivo.example;
 
 
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import net.mslivo.core.engine.tools.Tools;
 
 public class ExampleLauncherMain {
@@ -12,7 +13,9 @@ public class ExampleLauncherMain {
                 new ExampleMain(),
                 ExampleMainConstants.APP_TITLE,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH,
-                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, 60, null, true, true);
+                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, 60, null,
+                Lwjgl3ApplicationConfiguration.GLEmulation.GL20
+                , true);
 
 
     }
