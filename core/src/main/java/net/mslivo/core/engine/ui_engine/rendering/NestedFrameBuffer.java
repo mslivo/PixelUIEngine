@@ -15,15 +15,15 @@ import java.nio.IntBuffer;
  * Adapted from: https://github.com/crykn/libgdx-screenmanager/wiki/Custom-FrameBuffer-implementation
  */
 public class NestedFrameBuffer extends FrameBuffer {
-    private int previousFBOHandle = -1;
-    private int[] previousViewport = new int[4];
-    private boolean isBound = false;
-    private TextureRegion textureRegion_flipped = null;
-    private static final IntBuffer INT_BUFF = ByteBuffer
-            .allocateDirect(16 * Integer.BYTES).order(ByteOrder.nativeOrder())
-            .asIntBuffer();
-    private static final int[] intReturn = new int[4];
-
+    private static final String ERROR_END_BEGIN = "NestedFrameBuffer.end must be called before begin.";
+    private static final String ERROR_BEGIN_END = "NestedFrameBuffer.begin must be called before end.";
+    private int[] previousViewport;
+    private boolean isBound;
+    private TextureRegion textureRegionFlippedCache;
+    private final IntBuffer intBuffer;
+    private int[] getViewPortCache;
+    private int previousFBOHandle;
+    private int getBoundFBOCache;
 
     public NestedFrameBuffer(Pixmap.Format format, int width, int height) {
         this(format, width, height, false, false);
@@ -35,34 +35,41 @@ public class NestedFrameBuffer extends FrameBuffer {
 
     public NestedFrameBuffer(Pixmap.Format format, int width, int height, boolean hasDepth, boolean hasStencil) {
         super(format, width, height, hasDepth, hasStencil);
-    }
-
-    protected NestedFrameBuffer(NestableFrameBufferBuilder bufferBuilder) {
-        super(bufferBuilder);
+        this.isBound = false;
+        this.previousFBOHandle = -1;
+        this.previousViewport = null;
+        this.intBuffer = ByteBuffer
+                .allocateDirect(16 * Integer.BYTES).order(ByteOrder.nativeOrder())
+                .asIntBuffer();
+        this.getBoundFBOCache = -1;
+        this.getViewPortCache = null;
+        this.textureRegionFlippedCache = null;
     }
 
 
     private int getBoundFboHandle() {
-        IntBuffer intBuf = INT_BUFF;
-        Gdx.gl.glGetIntegerv(GL20.GL_FRAMEBUFFER_BINDING, intBuf);
-        return intBuf.get(0);
+        if(this.getBoundFBOCache != -1) return this.getBoundFBOCache;
+        Gdx.gl.glGetIntegerv(GL20.GL_FRAMEBUFFER_BINDING, this.intBuffer);
+        this.getBoundFBOCache = this.intBuffer.get(0);
+        return this.getBoundFBOCache;
     }
 
     private int[] getViewport() {
-        IntBuffer intBuf = INT_BUFF;
+        if(this.getViewPortCache != null) return this.getViewPortCache;
+        this.getViewPortCache = new int[4];
+        IntBuffer intBuf = intBuffer;
         Gdx.gl.glGetIntegerv(GL20.GL_VIEWPORT, intBuf);
-        intReturn[0] = intBuf.get(0);
-        intReturn[1] = intBuf.get(1);
-        intReturn[2] = intBuf.get(2);
-        intReturn[3] = intBuf.get(3);
-        return intReturn;
+        this.getViewPortCache[0] = intBuf.get(0);
+        this.getViewPortCache[1] = intBuf.get(1);
+        this.getViewPortCache[2] = intBuf.get(2);
+        this.getViewPortCache[3] = intBuf.get(3);
+        return this.getViewPortCache;
     }
-
 
 
     @Override
     public void begin() {
-        if (isBound) throw new RuntimeException("end() has to be called before another draw can begin!");
+        if (isBound) throw new RuntimeException(ERROR_BEGIN_END);
         isBound = true;
 
         previousFBOHandle = getBoundFboHandle();
@@ -75,7 +82,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     @Deprecated
     @Override
     public void bind() {
-        Gdx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, framebufferHandle);
+        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, framebufferHandle);
     }
 
     @Override
@@ -86,51 +93,35 @@ public class NestedFrameBuffer extends FrameBuffer {
 
     @Override
     public void end(int x, int y, int width, int height) {
-        if (!isBound) throw new RuntimeException("begin() has to be called first!");
+        if (!isBound) throw new RuntimeException(ERROR_END_BEGIN);
         isBound = false;
-
-        if (getBoundFboHandle() != framebufferHandle) {
-            throw new IllegalStateException("The currently bound framebuffer ("
-                    + getBoundFboHandle()
-                    + ") doesn't match this one. Make sure the nested framebuffers are closed in the same order they were opened in!");
-        }
-
-        Gdx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
-        Gdx.gl20.glViewport(x, y, width, height);
+        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
+        Gdx.gl.glViewport(x, y, width, height);
     }
 
     @Override
     protected void build() {
         int previousFBOHandle = getBoundFboHandle();
         super.build();
-        Gdx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
+        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
     }
 
     public boolean isBound() {
         return isBound;
     }
 
-    public static class NestableFrameBufferBuilder extends FrameBufferBuilder {
-        public NestableFrameBufferBuilder(int width, int height) {
-            super(width, height);
-        }
-
-        @Override
-        public FrameBuffer build() {
-            return new NestedFrameBuffer(this);
-        }
-
-        boolean hasDepthRenderBuffer() {
-            return hasDepthRenderBuffer;
-        }
+    public void resetCaches(){
+        this.getViewPortCache = null;
+        this.textureRegionFlippedCache = null;
+        this.getBoundFBOCache = -1;
     }
 
     public TextureRegion getFlippedTextureRegion(){
-        if(this.textureRegion_flipped == null){
-            this.textureRegion_flipped = new TextureRegion(this.getColorBufferTexture());
-            this.textureRegion_flipped.flip(false,true);
+        if(this.textureRegionFlippedCache == null){
+            this.textureRegionFlippedCache = new TextureRegion(this.getColorBufferTexture());
+            this.textureRegionFlippedCache.flip(false,true);
         }
-        return this.textureRegion_flipped;
+        return this.textureRegionFlippedCache;
     }
 
 }

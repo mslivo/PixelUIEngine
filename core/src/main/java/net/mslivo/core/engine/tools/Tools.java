@@ -189,6 +189,7 @@ public class Tools {
             config.setDecorated(true);
             config.setMaximized(true);
             config.setForegroundFPS(fps);
+            config.setIdleFPS(fps);
             config.useVsync(vSync);
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
