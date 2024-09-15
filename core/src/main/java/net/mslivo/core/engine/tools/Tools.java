@@ -106,6 +106,7 @@ public class Tools {
                 logMessageBuilder.setLength(0);
                 logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
                 pw.write(logMessageBuilder.toString());
+                e.printStackTrace(pw);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
