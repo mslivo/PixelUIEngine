@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  */
 public abstract class PrimitiveParticleSystem<T> {
 
+    private static final int VERTEXES_MAX = 3;
+    private static final float[] ARRAY_RESET = new float[]{0f,0f,0f};
     private final ArrayList<PrimitiveParticle> particles;
     private final ArrayDeque<PrimitiveParticle> deleteQueue;
     private final int particleLimit;
@@ -189,29 +191,30 @@ public abstract class PrimitiveParticleSystem<T> {
                 case GL20.GL_POINTS -> {
                     configureImmediateRenderer(primitiveRenderer, GL20.GL_POINTS);
                     // Vertex 1
-                    primitiveRenderer.setVertexColor(particle.color_r.get(0), particle.color_g.get(0), particle.color_b.get(0), particle.color_a.get(0));
-                    primitiveRenderer.vertex(particle.x.get(0), particle.y.get(0));
+                    primitiveRenderer.setVertexColor(particle.r[0], particle.g[0],particle.b[0],particle.a[0]);
+                    primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                 }
                 case GL20.GL_LINES -> {
                     configureImmediateRenderer(primitiveRenderer, GL20.GL_LINES);
                     // Vertex 1
-                    primitiveRenderer.setVertexColor(particle.color_r.get(0), particle.color_g.get(0), particle.color_b.get(0), particle.color_a.get(0));
-                    primitiveRenderer.vertex(particle.x.get(0), particle.y.get(0));
+                    primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
+                    primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                     // Vertex 2
-                    primitiveRenderer.setVertexColor(particle.color_r.get(1), particle.color_g.get(1), particle.color_b.get(1), particle.color_a.get(1));
-                    primitiveRenderer.vertex(particle.x.get(1), particle.y.get(1));
+                    primitiveRenderer.setVertexColor(particle.r[1], particle.g[1], particle.b[1], particle.a[1]);
+                    primitiveRenderer.vertex(particle.x[1], particle.y[1]);
                 }
                 case GL20.GL_TRIANGLES -> {
                     configureImmediateRenderer(primitiveRenderer, GL20.GL_TRIANGLES);
+                    configureImmediateRenderer(primitiveRenderer, GL20.GL_LINES);
                     // Vertex 1
-                    primitiveRenderer.setVertexColor(particle.color_r.get(0), particle.color_g.get(0), particle.color_b.get(0), particle.color_a.get(0));
-                    primitiveRenderer.vertex(particle.x.get(0), particle.y.get(0));
+                    primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
+                    primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                     // Vertex 2
-                    primitiveRenderer.setVertexColor(particle.color_r.get(1), particle.color_g.get(1), particle.color_b.get(1), particle.color_a.get(1));
-                    primitiveRenderer.vertex(particle.x.get(1), particle.y.get(1));
+                    primitiveRenderer.setVertexColor(particle.r[1], particle.g[1], particle.b[1], particle.a[1]);
+                    primitiveRenderer.vertex(particle.x[1], particle.y[1]);
                     // Vertex 3
-                    primitiveRenderer.setVertexColor(particle.color_r.get(2), particle.color_g.get(2), particle.color_b.get(2), particle.color_a.get(2));
-                    primitiveRenderer.vertex(particle.x.get(2), particle.y.get(2));
+                    primitiveRenderer.setVertexColor(particle.r[2], particle.g[2], particle.b[2], particle.a[2]);
+                    primitiveRenderer.vertex(particle.x[2], particle.y[2]);
                 }
                 default -> {
                     throw new RuntimeException("Primitive Particle Type \"" + particle.primitiveType + "\" not supported by " + this.getClass().getSimpleName());
@@ -288,26 +291,37 @@ public abstract class PrimitiveParticleSystem<T> {
     }
 
     private void addVertex(PrimitiveParticle<T> particle, float x, float y, float r, float g, float b, float a) {
-        particle.x.add(x);
-        particle.y.add(y);
-        particle.color_r.add(r);
-        particle.color_g.add(g);
-        particle.color_b.add(b);
-        particle.color_a.add(a);
+        particle.x[particle.vertexes] = x;
+        particle.y[particle.vertexes] = y;
+        particle.r[particle.vertexes] = r;
+        particle.g[particle.vertexes] = g;
+        particle.b[particle.vertexes] = b;
+        particle.a[particle.vertexes] = a;
+        particle.vertexes++;
     }
 
 
     private PrimitiveParticle particleNew(int primitiveType, boolean visible) {
         if (!canAddParticle()) return null;
         PrimitiveParticle<T> particle = particlePool.poll();
-        if (particle == null) particle = new PrimitiveParticle<>();
+        if (particle == null){
+            particle = new PrimitiveParticle<>();
+            particle.x = new float[VERTEXES_MAX];
+            particle.y = new float[VERTEXES_MAX];
+            particle.r = new float[VERTEXES_MAX];
+            particle.g = new float[VERTEXES_MAX];
+            particle.b = new float[VERTEXES_MAX];
+            particle.a = new float[VERTEXES_MAX];
+        }
+        System.arraycopy(ARRAY_RESET, 0,particle.x,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0,particle.y,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0,particle.r,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0,particle.g,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0,particle.b,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0,particle.a,0,VERTEXES_MAX);
+
         particle.primitiveType = primitiveType;
-        particle.x.clear();
-        particle.y.clear();
-        particle.color_r.clear();
-        particle.color_g.clear();
-        particle.color_b.clear();
-        particle.color_a.clear();
+        particle.vertexes = 0;
         particle.visible = visible;
         particle.data = particle.data == null ? particleDataProvider.provideNewInstance() : particle.data;
         if (particle.data != null) particleDataProvider.resetInstance(particle.data);
