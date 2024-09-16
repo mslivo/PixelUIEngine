@@ -25,6 +25,18 @@ public abstract class SpriteParticleSystem<T>{
     private final ParticleDataProvider<T> particleDataProvider;
     private final SpriteParticleRenderHook<T> particleRenderHook;
     private final SpriteParticleConsumer<Object> parallelConsumer;
+    public static final SpriteParticleRenderTest DEFAULT_RENDER_TEST = new SpriteParticleRenderTest() {
+        @Override
+        public boolean renderSpriteParticle(SpriteParticle spriteParticle) {
+            return true;
+        }
+    };
+
+    public interface SpriteParticleRenderTest<T> {
+        default boolean renderSpriteParticle(SpriteParticle<T> spriteParticle){
+            return true;
+        }
+    }
 
     public interface SpriteParticleConsumer<O> extends Consumer<SpriteParticle> {
         default void accept(SpriteParticle particle) {
@@ -167,11 +179,15 @@ public abstract class SpriteParticleSystem<T>{
         deleteQueuedParticles();
     }
 
-    public void render(SpriteRenderer batch) {
-        render(batch, 0);
+    public void render(SpriteRenderer spriteRenderer) {
+        render(spriteRenderer, 0, DEFAULT_RENDER_TEST);
     }
 
     public void render(SpriteRenderer spriteRenderer, float animation_timer) {
+        render(spriteRenderer, animation_timer, DEFAULT_RENDER_TEST);
+    }
+
+    public void render(SpriteRenderer spriteRenderer, float animation_timer, SpriteParticleRenderTest renderTest) {
         if (particles.size() == 0) return;
         backupColor.set(spriteRenderer.getColor());
 
@@ -180,6 +196,7 @@ public abstract class SpriteParticleSystem<T>{
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
+            if(!renderTest.renderSpriteParticle(particle)) continue;
             spriteRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             this.particleRenderHook.beforeRenderParticle(spriteRenderer, particle);
             switch (particle.type) {

@@ -2,6 +2,7 @@ package net.mslivo.core.engine.tools.particles.primitive;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
+import net.mslivo.core.engine.tools.particles.sprite.SpriteParticle;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import org.lwjgl.opengl.GL20;
 
@@ -25,6 +26,19 @@ public abstract class PrimitiveParticleSystem<T> {
     private final Color backupColor;
     private int backupPrimitiveType;
     private final PrimitiveParticleConsumer<Object> parallelConsumer;
+    public static final PrimitiveParticleSystem.PrimitiveParticleRenderTest DEFAULT_RENDER_TEST = new PrimitiveParticleSystem.PrimitiveParticleRenderTest() {
+        @Override
+        public boolean renderPrimitiveParticle(PrimitiveParticle spriteParticle) {
+            return true;
+        }
+    };
+
+    public interface PrimitiveParticleRenderTest<T> {
+        default boolean renderPrimitiveParticle(PrimitiveParticle<T> spriteParticle){
+            return true;
+        }
+    }
+
 
     public interface PrimitiveParticleConsumer<O> extends Consumer<PrimitiveParticle> {
         default void accept(PrimitiveParticle particle) {
@@ -175,6 +189,11 @@ public abstract class PrimitiveParticleSystem<T> {
     }
 
     public void render(PrimitiveRenderer primitiveRenderer) {
+        render(primitiveRenderer, DEFAULT_RENDER_TEST);
+    }
+
+
+    public void render(PrimitiveRenderer primitiveRenderer, PrimitiveParticleRenderTest renderTest) {
         if (particles.size() == 0) return;
         this.backupPrimitiveType = primitiveRenderer.getPrimitiveType();
         backupColor.r = primitiveRenderer.getVertexColor().r;
@@ -185,6 +204,7 @@ public abstract class PrimitiveParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             PrimitiveParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
+            if(!renderTest.renderPrimitiveParticle(particle)) continue;
             particleRenderHook.beforeRenderParticle(primitiveRenderer, particle);
 
             switch (particle.primitiveType) {
