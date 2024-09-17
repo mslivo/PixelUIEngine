@@ -602,30 +602,37 @@ public class Tools {
             return value;
         }
 
-        public static Object selectRandom(List list) {
+        public static Object chanceSelectRandom(List list) {
+            if(list.size() == 0) return -1;
             return list.get(MathUtils.random(0, list.size() - 1));
         }
 
-        public static int selectRandom(int... probabilities) {
+        public static int chanceSelectRandom(int[] probabilities) {
+            if(probabilities.length == 0) return -1;
             int sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
-            float[] probabilitiesF = new float[probabilities.length];
-            for (int i = 0; i < probabilitiesF.length; i++) {
-                probabilitiesF[i] = sum == 0 ? (1f / (float) probabilitiesF.length) : (probabilities[i] / (float) sum);
-            }
 
-            return selectRandom(probabilitiesF);
+            int random = MathUtils.random(0,sum);
+            int cumulative = 0;
+            for (int i = 0; i < probabilities.length; i++) {
+                cumulative += probabilities[i];
+                if (random <= cumulative) return i;
+            }
+            return -1;
         }
 
-        public static int selectRandom(float... probabilities) {
-            if (probabilities.length == 0) return -1;
-            float random = MathUtils.random(0f, 1f);
-            float cumulativeProbability = 0f;
+        public static int chanceSelectRandom(float[] probabilities) {
+            if(probabilities.length == 0) return -1;
+            float sum = 0;
+            for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
+
+            float random = MathUtils.random(0f,sum);
+            float cumulative = 0f;
             for (int i = 0; i < probabilities.length; i++) {
-                cumulativeProbability += probabilities[i];
-                if (random <= cumulativeProbability) return i;
+                cumulative += probabilities[i];
+                if (random <= cumulative) return i;
             }
-            return -1; // probabilities must add up to 1f!
+            return -1;
         }
 
         public static boolean chance(float probability) {
