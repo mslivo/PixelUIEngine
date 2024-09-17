@@ -26,12 +26,6 @@ public abstract class SpriteParticleSystem<T>{
     private final SpriteParticleConsumer<Object> parallelConsumer;
     private SpriteParticleRenderHook<T> particleRenderHook;
 
-    public interface SpriteParticleRenderTest<T> {
-        default boolean renderSpriteParticle(SpriteParticle<T> spriteParticle){
-            return true;
-        }
-    }
-
     public interface SpriteParticleConsumer<O> extends Consumer<SpriteParticle> {
         default void accept(SpriteParticle particle) {
         }
