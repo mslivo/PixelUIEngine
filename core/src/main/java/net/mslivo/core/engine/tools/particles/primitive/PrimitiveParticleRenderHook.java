@@ -7,4 +7,8 @@ public interface PrimitiveParticleRenderHook<T> {
     default void beforeRenderParticle(PrimitiveRenderer renderer, PrimitiveParticle<T> particle){return;}
 
     default void afterRenderParticle(PrimitiveRenderer renderer, PrimitiveParticle<T> particle){return;}
+
+    default boolean renderPrimitiveParticle(PrimitiveParticle<T> spriteParticle){
+        return true;
+    }
 }

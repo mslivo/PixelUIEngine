@@ -2,7 +2,6 @@ package net.mslivo.core.engine.tools.particles.primitive;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
-import net.mslivo.core.engine.tools.particles.sprite.SpriteParticle;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import org.lwjgl.opengl.GL20;
 
@@ -16,29 +15,16 @@ import java.util.function.Consumer;
 public abstract class PrimitiveParticleSystem<T> {
 
     private static final int VERTEXES_MAX = 3;
-    private static final float[] ARRAY_RESET = new float[]{0f,0f,0f};
+    private static final float[] ARRAY_RESET = new float[]{0f, 0f, 0f};
     private final ArrayList<PrimitiveParticle> particles;
     private final ArrayDeque<PrimitiveParticle> deleteQueue;
     private final int particleLimit;
     private final ArrayDeque<PrimitiveParticle<T>> particlePool;
     private final ParticleDataProvider<T> particleDataProvider;
-    private final PrimitiveParticleRenderHook<T> particleRenderHook;
     private final Color backupColor;
     private int backupPrimitiveType;
     private final PrimitiveParticleConsumer<Object> parallelConsumer;
-    public static final PrimitiveParticleSystem.PrimitiveParticleRenderTest DEFAULT_RENDER_TEST = new PrimitiveParticleSystem.PrimitiveParticleRenderTest() {
-        @Override
-        public boolean renderPrimitiveParticle(PrimitiveParticle spriteParticle) {
-            return true;
-        }
-    };
-
-    public interface PrimitiveParticleRenderTest<T> {
-        default boolean renderPrimitiveParticle(PrimitiveParticle<T> spriteParticle){
-            return true;
-        }
-    }
-
+    private PrimitiveParticleRenderHook<T> particleRenderHook;
 
     public interface PrimitiveParticleConsumer<O> extends Consumer<PrimitiveParticle> {
         default void accept(PrimitiveParticle particle) {
@@ -83,7 +69,7 @@ public abstract class PrimitiveParticleSystem<T> {
 
     protected PrimitiveParticle<T> addPointParticle(float x1, float y1, float r1, float g1, float b1, float a1) {
         PrimitiveParticle<T> particle = particleNew(GL20.GL_POINTS, true);
-        if(particle == null) return null;
+        if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addParticleToSystem(particle);
         return particle;
@@ -104,7 +90,7 @@ public abstract class PrimitiveParticleSystem<T> {
             float x2, float y2, float r2, float g2, float b2, float a2
     ) {
         PrimitiveParticle<T> particle = particleNew(GL20.GL_LINES, true);
-        if(particle == null) return null;
+        if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addVertex(particle, x2, y2, r2, g2, b2, a2);
         addParticleToSystem(particle);
@@ -137,7 +123,7 @@ public abstract class PrimitiveParticleSystem<T> {
             float x3, float y3, float r3, float g3, float b3, float a3
     ) {
         PrimitiveParticle<T> particle = particleNew(GL20.GL_TRIANGLES, true);
-        if(particle == null) return null;
+        if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addVertex(particle, x2, y2, r2, g2, b2, a2);
         addVertex(particle, x3, y3, r3, g3, b3, a3);
@@ -188,12 +174,8 @@ public abstract class PrimitiveParticleSystem<T> {
         deleteQueuedParticles();
     }
 
+
     public void render(PrimitiveRenderer primitiveRenderer) {
-        render(primitiveRenderer, DEFAULT_RENDER_TEST);
-    }
-
-
-    public void render(PrimitiveRenderer primitiveRenderer, PrimitiveParticleRenderTest renderTest) {
         if (particles.size() == 0) return;
         this.backupPrimitiveType = primitiveRenderer.getPrimitiveType();
         backupColor.r = primitiveRenderer.getVertexColor().r;
@@ -204,14 +186,13 @@ public abstract class PrimitiveParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             PrimitiveParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            if(!renderTest.renderPrimitiveParticle(particle)) continue;
+            if (!particleRenderHook.renderPrimitiveParticle(particle)) continue;
             particleRenderHook.beforeRenderParticle(primitiveRenderer, particle);
-
             switch (particle.primitiveType) {
                 case GL20.GL_POINTS -> {
                     configureImmediateRenderer(primitiveRenderer, GL20.GL_POINTS);
                     // Vertex 1
-                    primitiveRenderer.setVertexColor(particle.r[0], particle.g[0],particle.b[0],particle.a[0]);
+                    primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                 }
                 case GL20.GL_LINES -> {
@@ -293,6 +274,14 @@ public abstract class PrimitiveParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) consumer.accept(particles.get(i), data);
     }
 
+    public PrimitiveParticleRenderHook<T> getParticleRenderHook() {
+        return particleRenderHook;
+    }
+
+    public void setParticleRenderHook(PrimitiveParticleRenderHook<T> particleRenderHook) {
+        this.particleRenderHook = particleRenderHook;
+    }
+
     /* ------- Private Methods ------- */
 
     private void deleteQueuedParticles() {
@@ -320,11 +309,10 @@ public abstract class PrimitiveParticleSystem<T> {
         particle.vertexes++;
     }
 
-
     private PrimitiveParticle particleNew(int primitiveType, boolean visible) {
         if (!canAddParticle()) return null;
         PrimitiveParticle<T> particle = particlePool.poll();
-        if (particle == null){
+        if (particle == null) {
             particle = new PrimitiveParticle<>();
             particle.x = new float[VERTEXES_MAX];
             particle.y = new float[VERTEXES_MAX];
@@ -333,12 +321,12 @@ public abstract class PrimitiveParticleSystem<T> {
             particle.b = new float[VERTEXES_MAX];
             particle.a = new float[VERTEXES_MAX];
         }
-        System.arraycopy(ARRAY_RESET, 0,particle.x,0,VERTEXES_MAX);
-        System.arraycopy(ARRAY_RESET, 0,particle.y,0,VERTEXES_MAX);
-        System.arraycopy(ARRAY_RESET, 0,particle.r,0,VERTEXES_MAX);
-        System.arraycopy(ARRAY_RESET, 0,particle.g,0,VERTEXES_MAX);
-        System.arraycopy(ARRAY_RESET, 0,particle.b,0,VERTEXES_MAX);
-        System.arraycopy(ARRAY_RESET, 0,particle.a,0,VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.x, 0, VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.y, 0, VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.r, 0, VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.g, 0, VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.b, 0, VERTEXES_MAX);
+        System.arraycopy(ARRAY_RESET, 0, particle.a, 0, VERTEXES_MAX);
 
         particle.primitiveType = primitiveType;
         particle.vertexes = 0;

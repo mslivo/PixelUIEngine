@@ -8,4 +8,7 @@ public interface SpriteParticleRenderHook<T> {
 
     default void afterRenderParticle(SpriteRenderer batch, SpriteParticle<T> particle){return;}
 
+    default boolean renderSpriteParticle(SpriteParticle spriteParticle) {
+        return true;
+    }
 }

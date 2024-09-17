@@ -23,14 +23,8 @@ public abstract class SpriteParticleSystem<T>{
     private final int particleLimit;
     private final ArrayDeque<SpriteParticle<T>> particlePool;
     private final ParticleDataProvider<T> particleDataProvider;
-    private final SpriteParticleRenderHook<T> particleRenderHook;
     private final SpriteParticleConsumer<Object> parallelConsumer;
-    public static final SpriteParticleRenderTest DEFAULT_RENDER_TEST = new SpriteParticleRenderTest() {
-        @Override
-        public boolean renderSpriteParticle(SpriteParticle spriteParticle) {
-            return true;
-        }
-    };
+    private SpriteParticleRenderHook<T> particleRenderHook;
 
     public interface SpriteParticleRenderTest<T> {
         default boolean renderSpriteParticle(SpriteParticle<T> spriteParticle){
@@ -158,6 +152,14 @@ public abstract class SpriteParticleSystem<T>{
 
     /* ------- Public Methods ------- */
 
+    public SpriteParticleRenderHook<T> getParticleRenderHook() {
+        return particleRenderHook;
+    }
+
+    public void setParticleRenderHook(SpriteParticleRenderHook<T> particleRenderHook) {
+        this.particleRenderHook = particleRenderHook;
+    }
+
     public MediaManager getMediaManager() {
         return mediaManager;
     }
@@ -180,14 +182,10 @@ public abstract class SpriteParticleSystem<T>{
     }
 
     public void render(SpriteRenderer spriteRenderer) {
-        render(spriteRenderer, 0, DEFAULT_RENDER_TEST);
+        render(spriteRenderer, 0);
     }
 
     public void render(SpriteRenderer spriteRenderer, float animation_timer) {
-        render(spriteRenderer, animation_timer, DEFAULT_RENDER_TEST);
-    }
-
-    public void render(SpriteRenderer spriteRenderer, float animation_timer, SpriteParticleRenderTest renderTest) {
         if (particles.size() == 0) return;
         backupColor.set(spriteRenderer.getColor());
 
@@ -196,7 +194,7 @@ public abstract class SpriteParticleSystem<T>{
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            if(!renderTest.renderSpriteParticle(particle)) continue;
+            if(!particleRenderHook.renderSpriteParticle(particle)) continue;
             spriteRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             this.particleRenderHook.beforeRenderParticle(spriteRenderer, particle);
             switch (particle.type) {
@@ -251,7 +249,6 @@ public abstract class SpriteParticleSystem<T>{
         if (particle == null) return;
         onParticleCreate(particle);
         particles.add(particle);
-        return;
     }
 
     public void shutdown() {
