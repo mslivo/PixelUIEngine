@@ -7,7 +7,7 @@
 	<version>1.0</version>
 	<packaging>pom</packaging>
 	<properties>
-		<java.version>22</java.version>
+		<java.version>23</java.version>
 		<gdx.version>1.12.2-SNAPSHOT</gdx.version>
 		<gdx-controllers.version>2.2.3</gdx-controllers.version>
 		<mainClass>net.mslivo.example.ExampleLauncherMain</mainClass>
