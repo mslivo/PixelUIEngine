@@ -15,7 +15,7 @@ public class ExampleLauncherMain {
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH,
                 ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, 60, null,
                 Lwjgl3ApplicationConfiguration.GLEmulation.GL20
-                , true);
+                , false);
 
 
     }
