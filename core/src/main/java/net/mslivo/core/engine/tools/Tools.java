@@ -226,6 +226,12 @@ public class Tools {
 
         public static String formatNumber(long number) {
             numberBuilder.setLength(0);
+            boolean minus = number < 0;
+            if(minus) {
+                numberBuilder.append("-");
+                number = Math.abs(number);
+            }
+
             String numberString = String.valueOf(number);
             int length = numberString.length();
             for (int i = 0; i < length; i++) {
