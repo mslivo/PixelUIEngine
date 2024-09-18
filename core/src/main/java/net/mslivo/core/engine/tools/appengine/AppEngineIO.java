@@ -32,7 +32,7 @@ public class AppEngineIO {
 
     public AppEngineIO push(Object parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
-        switch (parameter){
+        switch (parameter) {
             case Integer _ -> throw new RuntimeException(ERROR_INT_AUTOBOXING);
             case Float _ -> throw new RuntimeException(ERROR_FLOAT_AUTOBOXING);
             case Boolean _ -> throw new RuntimeException(ERROR_BOOLEAN_AUTOBOXING);
@@ -74,14 +74,14 @@ public class AppEngineIO {
         return this;
     }
 
-    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2,boolean parameter3) {
+    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2, boolean parameter3) {
         pushBoolean(parameter1);
         pushBoolean(parameter2);
         pushBoolean(parameter3);
         return this;
     }
 
-    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2,boolean parameter3,boolean parameter4) {
+    public AppEngineIO pushBoolean(boolean parameter1, boolean parameter2, boolean parameter3, boolean parameter4) {
         pushBoolean(parameter1);
         pushBoolean(parameter2);
         pushBoolean(parameter3);
@@ -150,7 +150,7 @@ public class AppEngineIO {
 
     public Object poll() {
         checkPoll();
-        return switch (parameterTypes[readIndex]){
+        return switch (parameterTypes[readIndex]) {
             case OBJECT -> objectStack[readIndex++];
             case INTEGER -> intStack[readIndex++];
             case FLOAT -> floatStack[readIndex++];
@@ -173,6 +173,14 @@ public class AppEngineIO {
         return floatStack[readIndex++];
     }
 
+    public void skipPolls(int polls) {
+        polls = Math.max(polls,0);
+        for(int i=0;i<polls;i++) {
+            checkPoll();
+            readIndex++;
+        }
+    }
+
 
     public int type() {
         return type;
@@ -181,16 +189,16 @@ public class AppEngineIO {
     public PARAMETER_TYPE nextParameterType() {
         return parameterTypes[readIndex];
     }
-    
-    public int parametersCount(){
+
+    public int parametersCount() {
         return writeIndex;
     }
-    
-    public int parametersLeft(){
-        return writeIndex-readIndex;
+
+    public int parametersLeft() {
+        return writeIndex - readIndex;
     }
 
-    private void checkPoll(){
+    private void checkPoll() {
         if (readIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
         if (readIndex >= writeIndex) throw new RuntimeException(String.format(ERROR_PARAMETERS_COUNT, writeIndex));
     }
