@@ -2742,7 +2742,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         float b = canvas.colorMap.b[icx][icy];
                         primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, a * componentAlpha);
                         primitiveRenderer.setVertexColor(r, g, b, a);
-                        primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx + 1, UICommonUtils.component_getAbsoluteY(canvas) + icy + 1);
+                        primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx , UICommonUtils.component_getAbsoluteY(canvas) + icy );
                     }
                 }
                 primitiveRenderer.setTweakAndColorReset();
