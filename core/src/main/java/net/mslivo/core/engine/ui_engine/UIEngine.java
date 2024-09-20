@@ -123,7 +123,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // -----  App
         newUIEngineState.camera_app = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_app.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.camera_app.position.set(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeightHalf, 0);
+        newUIEngineState.camera_app.position.set(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf, 0);
         newUIEngineState.camera_app.zoom = 1f;
         newUIEngineState.camera_app.update();
         newUIEngineState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, true);
