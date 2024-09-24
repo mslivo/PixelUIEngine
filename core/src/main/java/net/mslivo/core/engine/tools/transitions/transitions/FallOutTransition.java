@@ -12,12 +12,17 @@ public class FallOutTransition implements Transition {
     private float yTo;
     private float ySpeed;
     private int screenHeight;
+
     @Override
-    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE getRenderMode() {
+        return TRANSITION_RENDER_MODE.TO_FIRST;
+    }
+
+    @Override
+    public void init(int screenWidth, int screenHeight) {
         this.yTo = 0;
         this.screenHeight = screenHeight;
         this.ySpeed = MathUtils.round(this.screenHeight /80f);
-        return TRANSITION_RENDER_MODE.TO_FIRST;
     }
 
     @Override
@@ -37,6 +42,11 @@ public class FallOutTransition implements Transition {
     public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_to, 0, 0);
+    }
+
+    @Override
+    public void shutdown() {
+
     }
 
 }

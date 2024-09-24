@@ -23,12 +23,16 @@ public class FallInTransition implements Transition {
     }
 
     @Override
-    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE getRenderMode() {
+        return TRANSITION_RENDER_MODE.FROM_FIRST;
+    }
+
+    @Override
+    public void init(int screenWidth, int screenHeight) {
         this.yTo = screenHeight;
         this.ySpeed = 0f;
         this.screenHeight = screenHeight;
         this.bounce = 5;
-        return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
     @Override
@@ -58,6 +62,10 @@ public class FallInTransition implements Transition {
         spriteRenderer.draw(texture_to, 0, MathUtils.round(yTo));
     }
 
+    @Override
+    public void shutdown() {
+
+    }
 
 
 }

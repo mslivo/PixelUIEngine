@@ -11,13 +11,18 @@ public class ZoomInTransition implements Transition {
     private float zoom, zoomAcc;
     private int screenWidth;
     private int screenHeight;
+
     @Override
-    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE getRenderMode() {
+        return TRANSITION_RENDER_MODE.TO_FIRST;
+    }
+
+    @Override
+    public void init(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 0f;
         this.zoomAcc = 0.02f;
-        return TRANSITION_RENDER_MODE.TO_FIRST;
     }
 
     @Override
@@ -36,6 +41,11 @@ public class ZoomInTransition implements Transition {
     @Override
     public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         spriteRenderer.draw(texture_to, 0, 0);
+    }
+
+    @Override
+    public void shutdown() {
+
     }
 
 }

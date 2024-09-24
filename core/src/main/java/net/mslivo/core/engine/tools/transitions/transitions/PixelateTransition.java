@@ -10,10 +10,14 @@ public class PixelateTransition implements Transition {
     private float fadeIn;
 
     @Override
-    public TRANSITION_RENDER_MODE init(int screenWidth, int screenHeight) {
+    public TRANSITION_RENDER_MODE getRenderMode() {
+        return TRANSITION_RENDER_MODE.FROM_FIRST;
+    }
+
+    @Override
+    public void init(int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
-        return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
     @Override
@@ -48,6 +52,11 @@ public class PixelateTransition implements Transition {
             spriteRenderer.draw(texture_to, 0, 0);
             spriteRenderer.setAllReset();
         }
+
+    }
+
+    @Override
+    public void shutdown() {
 
     }
 

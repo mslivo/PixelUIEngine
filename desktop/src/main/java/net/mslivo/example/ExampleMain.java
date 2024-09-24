@@ -3,6 +3,7 @@ package net.mslivo.example;
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
 import net.mslivo.core.engine.tools.transitions.transitions.*;
 import net.mslivo.core.engine.ui_engine.UIEngine;
@@ -32,7 +33,7 @@ public class ExampleMain extends ApplicationAdapter {
     @Override
     public void create() {
         Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
-        this.transitionManager = new TransitionManager();
+        this.transitionManager = null;
         // Load Assets
         Tools.App.logInProgress("Loading Assets");
         this.mediaManager = new MediaManager();
@@ -68,7 +69,7 @@ public class ExampleMain extends ApplicationAdapter {
                             this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
-                    this.transitionManager.init(this.uiEngine, this.uiEngine_transition, new PixelateTransition(),1f,true);
+                    this.transitionManager = new TransitionManager(this.uiEngine, this.uiEngine_transition, new PixelateTransition(), TRANSITION_SPEED.X1,true);
                     this.transitionManager.render();
                     state = STATE.TRANSITION;
                     return;
@@ -108,7 +109,6 @@ public class ExampleMain extends ApplicationAdapter {
     private void shutdownEngine() {
         this.uiEngine.shutdown();
         this.mediaManager.shutdown();
-        this.transitionManager.shutdown();
     }
 
 

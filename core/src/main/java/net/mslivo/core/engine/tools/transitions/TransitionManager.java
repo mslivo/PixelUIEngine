@@ -2,19 +2,23 @@ package net.mslivo.core.engine.tools.transitions;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import net.mslivo.core.engine.tools.transitions.transitions.FadeTransition;
-import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.UIEngine;
+import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class TransitionManager {
+    private static final String ERROR_UIENGINE_FROM_NULL = "\"from\" UIEngine is null";
+    private static final String ERROR_UIENGINE_TO_NULL = "\"to\" UIEngine is null";
+    private static final String ERROR_TRANSITION_NULL = "\"transition\" is null";
+    private static final String ERROR_RESOLUTION_WIDTH = "\"from\" and \"to\" resolution width does not match";
+    private static final String ERROR_RESOLUTION_HEIGHT = "\"from\" and \"to\" resolution height does not match";
+
     private NestedFrameBuffer frameBuffer_from;
     private TextureRegion texture_from;
     private NestedFrameBuffer frameBuffer_to;
@@ -23,114 +27,92 @@ public class TransitionManager {
     private Viewport viewport_screen;
     private OrthographicCamera camera_screen;
     private Transition transition;
-    private float transitionSpeed;
+    private TRANSITION_SPEED transitionSpeed;
     private float nextUpdate;
-    private boolean initialized;
     private boolean finished;
     private int resolutionWidth, resolutionHeight;
-    private VIEWPORT_MODE VIEWPORTMODE;
-    private TRANSITION_RENDER_MODE transitionMode;
+    private VIEWPORT_MODE viewportMode;
+    private TRANSITION_RENDER_MODE transitionRenderMode;
     private UIEngine from;
     private UIEngine to;
 
-    public TransitionManager() {
-        this.finished = true;
-        this.initialized = false;
-    }
+    public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed, boolean updateUIEngine) {
+        if (from == null) throw new RuntimeException(ERROR_UIENGINE_FROM_NULL);
+        if (to == null) throw new RuntimeException(ERROR_UIENGINE_TO_NULL);
+        if (transition == null) throw new RuntimeException(ERROR_TRANSITION_NULL);
+        if (from.getResolutionWidth() != to.getResolutionWidth()) throw new RuntimeException(ERROR_RESOLUTION_WIDTH);
+        if (from.getResolutionHeight() != to.getResolutionHeight()) throw new RuntimeException(ERROR_RESOLUTION_HEIGHT);
+        if (transitionSpeed == null)
+            transitionSpeed = TRANSITION_SPEED.X1;
 
-    public void init(UIEngine from, UIEngine to) {
-        this.init(from, to, null, 1, false);
-    }
+        if (transitionSpeed == TRANSITION_SPEED.IMMEDIATE) {
+            this.finished = true;
+        } else {
+            this.from = from;
+            this.to = to;
+            this.nextUpdate = 0f;
+            this.resolutionWidth = from.getResolutionWidth();
+            this.resolutionHeight = from.getResolutionHeight();
+            this.viewportMode = from.getViewportMode();
+            this.transition = transition;
+            this.transitionSpeed = transitionSpeed;
 
-    public void init(UIEngine from, UIEngine to, Transition transition) {
-        this.init(from, to, transition, 1, false);
-    }
+            this.frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, this.resolutionWidth, this.resolutionHeight, false);
+            this.frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            this.texture_from = new TextureRegion(this.frameBuffer_from.getColorBufferTexture());
+            this.texture_from.flip(false, true);
 
-    public void init(UIEngine from, UIEngine to, Transition transition, int transitionSpeed) {
-        this.init(from, to, transition, transitionSpeed, false);
-    }
+            this.frameBuffer_to = new NestedFrameBuffer(Pixmap.Format.RGBA8888, this.resolutionWidth, this.resolutionHeight, false);
+            this.frameBuffer_to.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            this.texture_to = new TextureRegion(this.frameBuffer_to.getColorBufferTexture());
+            this.texture_to.flip(false, true);
 
-    public void init(UIEngine from, UIEngine to, Transition transition, float transitionSpeed, boolean updateUIEngine) {
-        if(from == null) throw new RuntimeException("UIEngine from is null");
-        if(to == null) throw new RuntimeException("UIEngine to is null");
-        if (from.getResolutionWidth() != to.getResolutionWidth())
-            throw new RuntimeException("UIEngine internalResolutionWidth does not match");
-        if (from.getResolutionHeight() != to.getResolutionHeight())
-            throw new RuntimeException("UIEngine internalResolutionHeight does not match");
-        if (from.getViewportMode() != to.getViewportMode()) throw new RuntimeException("viewportMode does not match");
-        this.from = from;
-        this.to = to;
-        this.nextUpdate = 0f;
-        int resolutionWidth = from.getResolutionWidth();
-        int resolutionHeight = from.getResolutionHeight();
-        VIEWPORT_MODE VIEWPORTMODE = from.getViewportMode();
-        this.transition = transition == null ? new FadeTransition() : transition;
-        this.transitionSpeed = Math.clamp(transitionSpeed, 0.5f, 10f);
-        boolean createNew = this.resolutionWidth != resolutionWidth || this.resolutionHeight != resolutionHeight || this.VIEWPORTMODE != VIEWPORTMODE;
-        if (createNew) {
-            this.resolutionWidth = resolutionWidth;
-            this.resolutionHeight = resolutionHeight;
-            this.VIEWPORTMODE = VIEWPORTMODE;
+            this.camera_screen = new OrthographicCamera(this.resolutionWidth, this.resolutionHeight);
+            this.camera_screen.setToOrtho(false);
+            this.viewport_screen = createViewport(this.viewportMode, this.camera_screen, this.resolutionWidth, this.resolutionHeight);
 
-            if (frameBuffer_from != null) frameBuffer_from.dispose();
-            frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, resolutionWidth, resolutionHeight, false);
-            frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            texture_from = new TextureRegion(frameBuffer_from.getColorBufferTexture());
-            texture_from.flip(false, true);
+            this.spriteRenderer_screen = new SpriteRenderer();
+            this.spriteRenderer_screen.setColor(Color.GRAY);
+            this.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-            if (frameBuffer_to != null) frameBuffer_to.dispose();
-            frameBuffer_to = new NestedFrameBuffer(Pixmap.Format.RGBA8888, resolutionWidth, resolutionHeight, false);
-            frameBuffer_to.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            texture_to = new TextureRegion(frameBuffer_to.getColorBufferTexture());
-            texture_to.flip(false, true);
+            { // Capture From Framebuffer
+                if (updateUIEngine) from.update();
+                from.render(true);
+                this.frameBuffer_from.begin();
+                this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
+                this.spriteRenderer_screen.begin();
+                this.spriteRenderer_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
+                this.spriteRenderer_screen.end();
+                this.frameBuffer_from.end();
+            }
+            { // Capture To Framebuffer
+                if (updateUIEngine) to.update();
+                to.render(true);
+                this.frameBuffer_to.begin();
+                this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
+                this.spriteRenderer_screen.begin();
+                this.spriteRenderer_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
+                this.spriteRenderer_screen.end();
+                this.frameBuffer_to.end();
+            }
 
-            camera_screen = new OrthographicCamera(resolutionWidth, resolutionHeight);
-            camera_screen.setToOrtho(false);
-            viewport_screen = createViewport(VIEWPORTMODE, camera_screen, resolutionWidth, resolutionHeight);
+            this.transitionRenderMode = this.transition.getRenderMode();
+            if (this.transitionRenderMode == null)
+                this.transitionRenderMode = TRANSITION_RENDER_MODE.FROM_FIRST;
+            this.transition.init(this.resolutionWidth, this.resolutionHeight);
+            this.finished = false;
         }
 
-        // PixmapIO.writePNG(new FileHandle("E:\\from.png"),Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-
-        // Capture Buffers
-        spriteRenderer_screen = spriteRenderer_screen != null ? spriteRenderer_screen : new SpriteRenderer();
-        spriteRenderer_screen.setColor(Color.GRAY);
-        viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-
-        { // Capture From Framebuffer
-            if (updateUIEngine) from.update();
-            from.render(true);
-            frameBuffer_from.begin();
-            spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
-            spriteRenderer_screen.begin();
-            spriteRenderer_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
-            spriteRenderer_screen.end();
-            frameBuffer_from.end();
-        }
-        { // Capture To Framebuffer
-            if (updateUIEngine) to.update();
-            to.render(true);
-            frameBuffer_to.begin();
-            spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
-            spriteRenderer_screen.begin();
-            spriteRenderer_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, resolutionWidth, resolutionHeight);
-            spriteRenderer_screen.end();
-            frameBuffer_to.end();
-        }
-        transitionMode = this.transition.init(resolutionWidth, resolutionHeight);
-        if (transitionMode == null) transitionMode = TRANSITION_RENDER_MODE.FROM_FIRST;
-        this.initialized = true;
-        this.finished = false;
     }
 
     public boolean update() {
-        if (!initialized) return true;
         if (this.finished) return true;
 
-        this.nextUpdate += transitionSpeed;
-        while (nextUpdate >= 1f){
+        this.nextUpdate += transitionSpeed.value;
+        while (nextUpdate >= 1f) {
             if (this.transition.update()) {
-                this.finished = true;
+                finish();
                 return true;
             }
             nextUpdate -= 1f;
@@ -140,7 +122,7 @@ public class TransitionManager {
 
 
     public void render() {
-        if (!initialized) return;
+        if (this.finished) return;
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // Render Transition
@@ -148,7 +130,7 @@ public class TransitionManager {
             viewport_screen.apply();
             spriteRenderer_screen.setProjectionMatrix(camera_screen.combined);
             spriteRenderer_screen.begin();
-            switch (transitionMode) {
+            switch (transitionRenderMode) {
                 case FROM_FIRST -> {
                     this.transition.renderFrom(spriteRenderer_screen, texture_from);
                     this.transition.renderTo(spriteRenderer_screen, texture_to);
@@ -160,39 +142,36 @@ public class TransitionManager {
             }
             spriteRenderer_screen.end();
         }
-
-    }
-
-    public void shutdown() {
-        if (spriteRenderer_screen != null) spriteRenderer_screen.dispose();
-        this.spriteRenderer_screen = null;
-        if (frameBuffer_to != null) {
-            frameBuffer_to.dispose();
-            frameBuffer_to = null;
-            texture_to = null;
-        }
-        if (frameBuffer_from != null) {
-            frameBuffer_from.dispose();
-            frameBuffer_from = null;
-            texture_from = null;
-        }
-        this.camera_screen = null;
-        this.viewport_screen = null;
-        this.resolutionWidth = -1;
-        this.resolutionHeight = -1;
-        this.VIEWPORTMODE = null;
-        this.initialized = false;
-        this.finished = true;
-        this.from = null;
-        this.to = null;
     }
 
     public boolean isFinished() {
         return finished;
     }
 
-    public boolean isInitialized() {
-        return initialized;
+    public UIEngine getFrom() {
+        return from;
+    }
+
+    public UIEngine getTo() {
+        return to;
+    }
+
+    public Transition getTransition() {
+        return transition;
+    }
+
+    public TRANSITION_SPEED getTransitionSpeed() {
+        return transitionSpeed;
+    }
+
+    private void finish() {
+        if (this.finished) return;
+        this.frameBuffer_from.dispose();
+        this.frameBuffer_to.dispose();
+        this.transition.shutdown();
+        this.transition = null;
+        this.camera_screen = null;
+        this.finished = true;
     }
 
     private Viewport createViewport(VIEWPORT_MODE VIEWPORTMODE, OrthographicCamera camera_screen, int internalResolutionWidth, int internalResolutionHeight) {
@@ -202,14 +181,6 @@ public class TransitionManager {
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
             case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
         };
-    }
-
-    public UIEngine getFrom() {
-        return from;
-    }
-
-    public UIEngine getTo() {
-        return to;
     }
 
 }
