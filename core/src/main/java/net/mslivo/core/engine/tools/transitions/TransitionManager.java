@@ -13,9 +13,6 @@ import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class TransitionManager {
-    private static final String ERROR_UIENGINE_FROM_NULL = "\"from\" UIEngine is null";
-    private static final String ERROR_UIENGINE_TO_NULL = "\"to\" UIEngine is null";
-    private static final String ERROR_TRANSITION_NULL = "\"transition\" is null";
     private static final String ERROR_RESOLUTION_WIDTH = "\"from\" and \"to\" resolution width does not match";
     private static final String ERROR_RESOLUTION_HEIGHT = "\"from\" and \"to\" resolution height does not match";
 
@@ -36,18 +33,27 @@ public class TransitionManager {
     private UIEngine from;
     private UIEngine to;
 
+    public TransitionManager(UIEngine from, UIEngine to, Transition transition) {
+        this(from, to, transition, TRANSITION_SPEED.X1, false);
+    }
+
+    public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed) {
+        this(from, to, transition, transitionSpeed, false);
+    }
+
     public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed, boolean updateUIEngine) {
-        if (from == null) throw new RuntimeException(ERROR_UIENGINE_FROM_NULL);
-        if (to == null) throw new RuntimeException(ERROR_UIENGINE_TO_NULL);
-        if (transition == null) throw new RuntimeException(ERROR_TRANSITION_NULL);
-        if (from.getResolutionWidth() != to.getResolutionWidth()) throw new RuntimeException(ERROR_RESOLUTION_WIDTH);
-        if (from.getResolutionHeight() != to.getResolutionHeight()) throw new RuntimeException(ERROR_RESOLUTION_HEIGHT);
         if (transitionSpeed == null)
             transitionSpeed = TRANSITION_SPEED.X1;
+        if (to == null || from == null || transition == null)
+            transitionSpeed = TRANSITION_SPEED.IMMEDIATE;
 
         if (transitionSpeed == TRANSITION_SPEED.IMMEDIATE) {
             this.finished = true;
         } else {
+            if (from.getResolutionWidth() != to.getResolutionWidth())
+                throw new RuntimeException(ERROR_RESOLUTION_WIDTH);
+            if (from.getResolutionHeight() != to.getResolutionHeight())
+                throw new RuntimeException(ERROR_RESOLUTION_HEIGHT);
             this.from = from;
             this.to = to;
             this.nextUpdate = 0f;
