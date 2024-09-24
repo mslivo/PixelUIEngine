@@ -387,6 +387,18 @@ public final class MediaManager {
         };
     }
 
+    public int getCMediaImageWidth(CMediaImage cMedia) {
+        return medias_images[cMedia.mediaManagerIndex()].getRegionWidth();
+    }
+
+    public int getCMediaArrayWidth(CMediaArray array) {
+        return array.regionWidth;
+    }
+
+    public int getCMediaAnimationWidth(CMediaAnimation animation) {
+        return animation.regionWidth;
+    }
+
     public int getCMediaSpriteHeight(CMediaSprite cMedia) {
         return switch (cMedia) {
             case CMediaImage __ -> medias_images[cMedia.mediaManagerIndex()].getRegionHeight();
@@ -394,6 +406,18 @@ public final class MediaManager {
             case CMediaAnimation animation -> animation.regionHeight;
             default -> throw new IllegalStateException("Unexpected value: " + cMedia);
         };
+    }
+
+    public int getCMediaImageHeight(CMediaImage cMedia) {
+        return medias_images[cMedia.mediaManagerIndex()].getRegionHeight();
+    }
+
+    public int getCMediaArrayHeight(CMediaArray array) {
+        return array.regionHeight;
+    }
+
+    public int getCMediaAnimationHeight(CMediaAnimation animation) {
+        return animation.regionHeight;
     }
 
     public int getCMediaArraySize(CMediaArray cMedia) {
