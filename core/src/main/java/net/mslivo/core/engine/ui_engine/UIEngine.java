@@ -2731,7 +2731,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height = TS(canvas.height);
 
                 spriteRenderer.end();
-                primitiveRenderer.begin();
+                primitiveRenderer.begin(GL20.GL_POINTS);
                 render_setColor(primitiveRenderer, Color.GRAY, componentGrayScale);
                 for (int icx = 0; icx < width; icx++) {
                     for (int icy = 0; icy < height; icy++) {

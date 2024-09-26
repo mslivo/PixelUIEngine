@@ -405,7 +405,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         });
 
-        Canvas canvas = api.component.canvas.create(19, 5, 5, 5);
+        Canvas canvas = api.component.canvas.create(18, 5, 5, 5);
         api.component.canvas.setCanvasAction(canvas, new CanvasAction() {
             @Override
             public void onPress(int x, int y) {

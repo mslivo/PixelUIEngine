@@ -26,7 +26,7 @@ public class PrimitiveRenderer {
             
             const vec3 forward = vec3(1.0 / 3.0);
             const float twoThird = 2.0 / 3.0;
-                        
+            
             const mat3 rgbToLabMatrix = mat3(
                 +0.2104542553, +1.9779984951, +0.0259040371,
                 +0.7936177850, -2.4285922050, +0.7827717662,
@@ -67,15 +67,17 @@ public class PrimitiveRenderer {
             }
             
             void main() {
+                gl_PointSize = 1.0;
+     
                 // Tint Color
                 vec4 v_color = $COLOR_ATTRIBUTE;
                 v_color.w *= 255.0 / 254.0;
                 v_color.rgb = rgbToLabColor(v_color.rgb);
             
                 // Position
-                gl_PointSize = 1.0;
+                
                 gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
-            
+                                 
                 // Draw
                 vec3 tgtLab = rgbToLabFragment($VERTEXCOLOR_ATTRIBUTE.rgb);
                 vec3 tweak = $TWEAK_ATTRIBUTE.rgb;
@@ -242,69 +244,14 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         try {
-            vertices[idx] = x;
-            vertices[idx+1] = y;
+            vertices[idx] = (x+0.5f);
+            vertices[idx+1] = (y+0.5f);
             vertices[idx+2] = 0;
             vertices[idx+3] = vertexColor;
             vertices[idx+4] = color;
             vertices[idx+5] = tweak;
 
             idx += VERTEX_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
-    }
-
-    public void vertex(float x1, float y1, float x2, float y2) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-
-        try {
-            vertices[idx] = x1;
-            vertices[idx+1] = y1;
-            vertices[idx+2] = 0;
-            vertices[idx+3] = vertexColor;
-            vertices[idx+4] = color;
-            vertices[idx+5] = tweak;
-
-            vertices[idx+6] = x2;
-            vertices[idx+7] = y2;
-            vertices[idx+8] = 0;
-            vertices[idx+9] = vertexColor;
-            vertices[idx+10] = color;
-            vertices[idx+11] = tweak;
-
-            idx += VERTEX_SIZE_X2;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
-    }
-
-    public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-
-        try {
-            vertices[idx] = x1;
-            vertices[idx+1] = y1;
-            vertices[idx+2] = 0;
-            vertices[idx+3] = vertexColor;
-            vertices[idx+4] = color;
-            vertices[idx+5] = tweak;
-
-            vertices[idx+6] = x2;
-            vertices[idx+7] = y2;
-            vertices[idx+8] = 0;
-            vertices[idx+9] = vertexColor;
-            vertices[idx+10] = color;
-            vertices[idx+11] = tweak;
-
-            vertices[idx+12] = x3;
-            vertices[idx+13] = y3;
-            vertices[idx+14] = 0;
-            vertices[idx+15] = vertexColor;
-            vertices[idx+16] = color;
-            vertices[idx+17] = tweak;
-
-            idx += VERTEX_SIZE_X3;
         } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }

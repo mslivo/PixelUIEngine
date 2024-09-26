@@ -1,6 +1,7 @@
 package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -187,7 +188,26 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
 
+        // Primitive Drawing Test
+        primitiveRenderer.begin(GL20.GL_POINTS);
+        primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.vertex(0,32);
+        primitiveRenderer.vertex(5,32);
+        primitiveRenderer.end();
 
+
+        primitiveRenderer.begin(GL20.GL_LINES);
+        primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.vertex(0,42);
+        primitiveRenderer.vertex(5,42);
+        primitiveRenderer.end();
+
+        primitiveRenderer.begin(GL20.GL_TRIANGLES);
+        primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.vertex(0,52);
+        primitiveRenderer.vertex(5,62);
+        primitiveRenderer.vertex(11,52);
+        primitiveRenderer.end();
     }
 
     @Override

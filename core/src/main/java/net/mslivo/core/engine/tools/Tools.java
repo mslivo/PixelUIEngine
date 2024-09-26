@@ -151,37 +151,12 @@ public class Tools {
             return timeBetweenUpdates;
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, 60, null, Lwjgl3ApplicationConfiguration.GLEmulation.GL20, true);
-        }
-
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, Lwjgl3ApplicationConfiguration.GLEmulation.GL20, true);
-        }
-
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, Lwjgl3ApplicationConfiguration.GLEmulation glEmulation) {
-            launch(applicationAdapter, appTile, resolutionWidth, resolutionHeight, fps, null, glEmulation, true);
-        }
-
-
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, int fps, String iconPath, Lwjgl3ApplicationConfiguration.GLEmulation glEmulation, boolean vSync) {
+        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, String iconPath, int fps, boolean vSync) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setResizable(true);
             boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
 
-            switch (glEmulation){
-                case GL20 -> config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL20, 2, 0);
-                case GL30 -> config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 0);
-                case GL31 -> config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL31, 3, 1);
-                case GL32 -> config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
-                case ANGLE_GLES20 -> {
-                    if(!linux32Bit){
-                        config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 2, 0);
-                    }else{
-                        config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL20, 2, 0);
-                    }
-                }
-            }
+            config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
 
             config.setWindowedMode(resolutionWidth, resolutionHeight);
             config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
