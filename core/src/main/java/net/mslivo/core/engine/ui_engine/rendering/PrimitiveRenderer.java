@@ -299,8 +299,8 @@ public class PrimitiveRenderer {
             vertices[idx + 10] = color;
             vertices[idx + 11] = tweak;
 
-            vertices[idx + 12] = (x2 + 0.5f);
-            vertices[idx + 13] = (y2 + 0.5f);
+            vertices[idx + 12] = (x3 + 0.5f);
+            vertices[idx + 13] = (y3 + 0.5f);
             vertices[idx + 14] = 0;
             vertices[idx + 15] = vertexColor;
             vertices[idx + 16] = color;
