@@ -68,16 +68,16 @@ public class PrimitiveRenderer {
             
             void main() {
                 gl_PointSize = 1.0;
-     
+            
                 // Tint Color
                 vec4 v_color = $COLOR_ATTRIBUTE;
                 v_color.w *= 255.0 / 254.0;
                 v_color.rgb = rgbToLabColor(v_color.rgb);
             
                 // Position
-                
+            
                 gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
-                                 
+            
                 // Draw
                 vec3 tgtLab = rgbToLabFragment($VERTEXCOLOR_ATTRIBUTE.rgb);
                 vec3 tweak = $TWEAK_ATTRIBUTE.rgb;
@@ -103,7 +103,7 @@ public class PrimitiveRenderer {
                  #define LOWP
                 #endif
                 varying LOWP vec4 fragColor;
-                
+            
                 void main() {                   
                    gl_FragColor = fragColor;
                 }
@@ -115,10 +115,10 @@ public class PrimitiveRenderer {
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
-    private static final int VERTEX_SIZE_X2 = VERTEX_SIZE*2;
-    private static final int VERTEX_SIZE_X3 = VERTEX_SIZE*3;
+    private static final int VERTEX_SIZE_X2 = VERTEX_SIZE * 2;
+    private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
     private static final int ARRAY_RESIZE_STEP = 8192;
-    private static final int RGB_SRC = 0,RGB_DST = 1,ALPHA_SRC = 2,ALPHA_DST = 3 ;
+    private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
     private final Color tempColor;
     private int primitiveType;
@@ -167,17 +167,17 @@ public class PrimitiveRenderer {
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
         this.reset_vertexColor = colorPackedRGBA(1f, 1f, 1f, 1f);
-        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA};
 
         this.color = reset_color;
         this.vertexColor = reset_vertexColor;
         this.tweak = reset_tweak;
-        this.blend = new int[]{this.reset_blend[RGB_SRC],this.reset_blend[RGB_DST],this.reset_blend[ALPHA_SRC],this.reset_blend[ALPHA_DST]};
+        this.blend = new int[]{this.reset_blend[RGB_SRC], this.reset_blend[RGB_DST], this.reset_blend[ALPHA_SRC], this.reset_blend[ALPHA_DST]};
 
         this.backup_color = this.color;
         this.backup_vertexColor = this.vertexColor;
         this.backup_tweak = this.tweak;
-        this.backup_blend = new int[]{this.blend[RGB_SRC],this.blend[RGB_DST],this.blend[ALPHA_SRC],this.blend[ALPHA_DST]};
+        this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
     }
 
     public void setProjectionMatrix(Matrix4 projection) {
@@ -244,14 +244,69 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         try {
-            vertices[idx] = (x+0.5f);
-            vertices[idx+1] = (y+0.5f);
-            vertices[idx+2] = 0;
-            vertices[idx+3] = vertexColor;
-            vertices[idx+4] = color;
-            vertices[idx+5] = tweak;
+            vertices[idx] = (x + 0.5f);
+            vertices[idx + 1] = (y + 0.5f);
+            vertices[idx + 2] = 0;
+            vertices[idx + 3] = vertexColor;
+            vertices[idx + 4] = color;
+            vertices[idx + 5] = tweak;
 
             idx += VERTEX_SIZE;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
+    }
+
+    public void vertex(float x1, float y1, float x2, float y2) {
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
+
+        try {
+            vertices[idx] = (x1 + 0.5f);
+            vertices[idx + 1] = (y1 + 0.5f);
+            vertices[idx + 2] = 0;
+            vertices[idx + 3] = vertexColor;
+            vertices[idx + 4] = color;
+            vertices[idx + 5] = tweak;
+
+            vertices[idx + 6] = (x2 + 0.5f);
+            vertices[idx + 7] = (y2 + 0.5f);
+            vertices[idx + 8] = 0;
+            vertices[idx + 9] = vertexColor;
+            vertices[idx + 10] = color;
+            vertices[idx + 11] = tweak;
+
+            idx += VERTEX_SIZE_X2;
+        } catch (ArrayIndexOutOfBoundsException _) {
+            resizeArray();
+        }
+    }
+
+    public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
+
+        try {
+            vertices[idx] = (x1 + 0.5f);
+            vertices[idx + 1] = (y1 + 0.5f);
+            vertices[idx + 2] = 0;
+            vertices[idx + 3] = vertexColor;
+            vertices[idx + 4] = color;
+            vertices[idx + 5] = tweak;
+
+            vertices[idx + 6] = (x2 + 0.5f);
+            vertices[idx + 7] = (y2 + 0.5f);
+            vertices[idx + 8] = 0;
+            vertices[idx + 9] = vertexColor;
+            vertices[idx + 10] = color;
+            vertices[idx + 11] = tweak;
+
+            vertices[idx + 12] = (x2 + 0.5f);
+            vertices[idx + 13] = (y2 + 0.5f);
+            vertices[idx + 14] = 0;
+            vertices[idx + 15] = vertexColor;
+            vertices[idx + 16] = color;
+            vertices[idx + 17] = tweak;
+
+            idx += VERTEX_SIZE_X3;
         } catch (ArrayIndexOutOfBoundsException _) {
             resizeArray();
         }
@@ -529,32 +584,32 @@ public class PrimitiveRenderer {
         this.backup_color = this.color;
         this.backup_vertexColor = this.vertexColor;
         this.backup_tweak = this.tweak;
-        System.arraycopy(this.blend,0,this.backup_blend,0,4);
+        System.arraycopy(this.blend, 0, this.backup_blend, 0, 4);
     }
 
     public void loadState() {
         setPackedColor(this.backup_color);
         setPackedVertexColor(this.backup_vertexColor);
         setPackedTweak(this.backup_tweak);
-        setBlendFunctionSeparate(this.backup_blend[RGB_SRC],this.backup_blend[RGB_DST],this.backup_blend[ALPHA_SRC],this.backup_blend[ALPHA_DST]);
+        setBlendFunctionSeparate(this.backup_blend[RGB_SRC], this.backup_blend[RGB_DST], this.backup_blend[ALPHA_SRC], this.backup_blend[ALPHA_DST]);
     }
 
-    public void setColorResetValues(float r, float g, float b, float a){
-        this.reset_color = colorPackedRGBA(r,g,b,a);
+    public void setColorResetValues(float r, float g, float b, float a) {
+        this.reset_color = colorPackedRGBA(r, g, b, a);
         this.setColorReset();
     }
 
-    public void setVertexColorResetValues(float r, float g, float b, float a){
-        this.reset_vertexColor = colorPackedRGBA(r,g,b,a);
+    public void setVertexColorResetValues(float r, float g, float b, float a) {
+        this.reset_vertexColor = colorPackedRGBA(r, g, b, a);
         this.setVertexColorReset();
     }
 
-    public void setTweakResetValues(float l, float a, float b){
-        this.reset_tweak = colorPackedRGB(l,a,b);
+    public void setTweakResetValues(float l, float a, float b) {
+        this.reset_tweak = colorPackedRGB(l, a, b);
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend){
+    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -562,7 +617,7 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    public void setBlendFunctionResetValues(int blend_src, int blend_dst){
+    public void setBlendFunctionResetValues(int blend_src, int blend_dst) {
         this.reset_blend[RGB_SRC] = blend_src;
         this.reset_blend[RGB_DST] = blend_dst;
         this.reset_blend[ALPHA_SRC] = blend_src;
