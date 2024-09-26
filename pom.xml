@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<java.version>23</java.version>
-		<gdx.version>1.12.2-SNAPSHOT</gdx.version>
+		<gdx.version>1.12.1</gdx.version>
 		<gdx-controllers.version>2.2.3</gdx-controllers.version>
 		<mainClass>net.mslivo.example.ExampleLauncherMain</mainClass>
 	</properties>
