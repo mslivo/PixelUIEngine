@@ -14,11 +14,16 @@ import java.util.Collections;
  */
 public class MusicPlayer {
 
-    public static final byte PLAYMODE_SEQUENTIAL =0, PLAYMODE_RANDOM =1, PLAYMODE_LOOP=2;
+    public enum PLAY_MODE {
+        SEQUENTIAL, RANDOM, LOOP
+    }
 
-    private static final byte STATE_PAUSE=0,STATE_PLAY=1,STATE_STOP=3;
+    private enum STATE {
+        PAUSE, PLAY, STOP
+    }
 
-    private byte playMode, state;
+    private STATE state;
+    private PLAY_MODE playMode;
 
     private final ArrayList<CMediaMusic> playlist;
 
@@ -39,8 +44,8 @@ public class MusicPlayer {
     public MusicPlayer(MediaManager mediaManager){
         this.mediaManager = mediaManager;
         this.playlist = new ArrayList<>();
-        this.playMode = PLAYMODE_SEQUENTIAL;
-        this.state = STATE_STOP;
+        this.playMode = PLAY_MODE.SEQUENTIAL;
+        this.state = STATE.STOP;
         this.playCurrent = null;
         this.playCurrentFileName = "";
         this.playListPosition = 0;
@@ -94,21 +99,21 @@ public class MusicPlayer {
 
     public void update(){
         switch (state){
-            case  STATE_STOP->{
+            case STOP->{
                 if(playCurrent != null){
                     if(playCurrent.isPlaying()){
                         playCurrent.stop();
                     }
                 }
             }
-            case  STATE_PAUSE->{
+            case PAUSE->{
                 if(playCurrent != null){
                     if(playCurrent.isPlaying()){
                         playCurrent.pause();
                     }
                 }
             }
-            case STATE_PLAY -> {
+            case PLAY -> {
                 if(playCurrent != null){
                     if(playCurrent.isPlaying()){
                         if(playCurrent.getVolume() != volume){
@@ -131,7 +136,7 @@ public class MusicPlayer {
 
                         if(playNext){
                             switch (playMode) {
-                                case PLAYMODE_RANDOM -> {
+                                case RANDOM -> {
                                     randomHistory.add(playListPosition);
                                     if (randomHistory.size > 128) randomHistory.removeIndex(0);
 
@@ -145,21 +150,21 @@ public class MusicPlayer {
                                     }
                                     playListPosition = newPosition;
                                 }
-                                case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition + 1 > (playlist.size() - 1) ? 0 : (playListPosition + 1));
-                                case PLAYMODE_LOOP -> {}
+                                case SEQUENTIAL -> playListPosition = (playListPosition + 1 > (playlist.size() - 1) ? 0 : (playListPosition + 1));
+                                case LOOP -> {}
                             }
                             playNext = false;
                         }else if(playPrevious){
                             switch (playMode) {
-                                case PLAYMODE_RANDOM->{
+                                case RANDOM->{
                                     if(randomHistory.isEmpty()){
                                         playListPosition = MathUtils.random(0, playlist.size() - 1);
                                     }else{
                                         playListPosition = randomHistory.get(randomHistory.size-1);
                                     }
                                 }
-                                case PLAYMODE_SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playlist.size()-1 : playListPosition -1);
-                                case PLAYMODE_LOOP -> {}
+                                case SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playlist.size()-1 : playListPosition -1);
+                                case LOOP -> {}
                             }
                             playPrevious = false;
                         }
@@ -183,12 +188,12 @@ public class MusicPlayer {
         }
     }
 
-    public void setPlayModeLoop(){
-        this.playMode = PLAYMODE_LOOP;
+    public void setPlayMode(PLAY_MODE playMode){
+        if(playMode == null) return;
+        this.playMode = playMode;
     }
-
-    public void setPlayModeRandom(){
-        this.playMode = PLAYMODE_RANDOM;
+    public PLAY_MODE getPlayMode(){
+        return this.playMode;
     }
 
     public void playPosition(int playListPosition){
@@ -206,14 +211,6 @@ public class MusicPlayer {
         return playCurrentFileName;
     }
 
-    public int getPlayMode(){
-        return this.playMode;
-    }
-
-    public void setPlayModeSequential(){
-        this.playMode = PLAYMODE_SEQUENTIAL;
-    }
-
     public void setVolume(float volume) {
         this.volume = Math.clamp(volume, 0f, 1f);
     }
@@ -223,25 +220,29 @@ public class MusicPlayer {
     }
 
     public void play(){
-        this.state = STATE_PLAY;
+        this.state = STATE.PLAY;
+    }
+
+    public void stop(){
+        this.state = STATE.STOP;
     }
 
     public void previous(){
         this.playPrevious = true;
-        this.state = STATE_PLAY;
+        this.state = STATE.PLAY;
     }
 
     public void next(){
         this.playNext = true;
-        this.state = STATE_PLAY;
+        this.state = STATE.PLAY;
     }
 
     public void pause(){
-        this.state = (this.state == STATE_PAUSE ? STATE_PLAY : STATE_PAUSE);
+        this.state = (this.state == STATE.PAUSE ? STATE.PLAY : STATE.PAUSE);
     }
 
-    public void stop(){
-        this.state = STATE_STOP;
+    public boolean isPaused(){
+        return state == STATE.PAUSE;
     }
 
     public void shutdown(){
