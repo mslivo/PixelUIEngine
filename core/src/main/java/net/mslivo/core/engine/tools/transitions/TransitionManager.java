@@ -13,8 +13,7 @@ import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 public class TransitionManager {
-    private static final String ERROR_RESOLUTION_WIDTH = "\"from\" and \"to\" resolution width does not match";
-    private static final String ERROR_RESOLUTION_HEIGHT = "\"from\" and \"to\" resolution height does not match";
+    private static final String ERROR_FROM_TO_NULL = "\"from\" and \"to\" are both null";
 
     private NestedFrameBuffer frameBuffer_from;
     private TextureRegion texture_from;
@@ -34,34 +33,26 @@ public class TransitionManager {
     private UIEngine to;
 
     public TransitionManager(UIEngine from, UIEngine to, Transition transition) {
-        this(from, to, transition, TRANSITION_SPEED.X1, false);
+        this(from, to, transition, false);
     }
 
-    public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed) {
-        this(from, to, transition, transitionSpeed, false);
-    }
 
-    public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed, boolean updateUIEngine) {
-        if (transitionSpeed == null)
-            transitionSpeed = TRANSITION_SPEED.X1;
-        if (transition == null)
-            transitionSpeed = TRANSITION_SPEED.IMMEDIATE;
+    public TransitionManager(UIEngine from, UIEngine to, Transition transition, boolean updateUIEngine) {
+        if (from == null && to == null)
+            throw new RuntimeException(ERROR_FROM_TO_NULL);
+
 
         if (transitionSpeed == TRANSITION_SPEED.IMMEDIATE) {
             this.finished = true;
         } else {
-            if (from.getResolutionWidth() != to.getResolutionWidth())
-                throw new RuntimeException(ERROR_RESOLUTION_WIDTH);
-            if (from.getResolutionHeight() != to.getResolutionHeight())
-                throw new RuntimeException(ERROR_RESOLUTION_HEIGHT);
             this.from = from;
             this.to = to;
             this.nextUpdate = 0f;
-            this.resolutionWidth = from.getResolutionWidth();
-            this.resolutionHeight = from.getResolutionHeight();
-            this.viewportMode = from.getViewportMode();
+            this.resolutionWidth = transitionResolutionWidth(from,to);
+            this.resolutionHeight = transitionResolutionHeight(from, to);
+            this.viewportMode = transitionViewPortMode(from, to);
             this.transition = transition;
-            this.transitionSpeed = transitionSpeed;
+            this.transitionSpeed = validateTransitionSpeed(transition);
 
             this.frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, this.resolutionWidth, this.resolutionHeight, false);
             this.frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -94,17 +85,56 @@ public class TransitionManager {
 
     }
 
-    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer, boolean updateUIEngine){
-        if(uiEngine != null) {
+    private int transitionResolutionWidth(UIEngine from, UIEngine to){
+        if(from != null && to == null){
+            return from.getResolutionWidth();
+        }else if(from == null && to != null){
+            return to.getResolutionWidth();
+        }else if(from != null && to != null){
+            return Math.max(from.getResolutionWidth(), to.getResolutionWidth());
+        }
+        return 0;
+    }
+    private int transitionResolutionHeight(UIEngine from, UIEngine to){
+        if(from != null && to == null){
+            return from.getResolutionHeight();
+        }else if(from == null && to != null){
+            return to.getResolutionHeight();
+        }else if(from != null && to != null){
+            return Math.max(from.getResolutionHeight(), to.getResolutionHeight());
+        }
+        return 0;
+    }
+
+    private VIEWPORT_MODE transitionViewPortMode(UIEngine from, UIEngine to){
+        if(from != null && to == null){
+            return from.getViewportMode();
+        }else if(from == null && to != null){
+            return to.getViewportMode();
+        }
+        return to.getViewportMode();
+    }
+
+    private TRANSITION_SPEED validateTransitionSpeed(Transition transition){
+        if (transition == null)
+            return TRANSITION_SPEED.IMMEDIATE;
+        if (transition.transitionSpeed == null)
+            return TRANSITION_SPEED.X1;
+        return transition.transitionSpeed;
+    }
+
+
+    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer, boolean updateUIEngine) {
+        if (uiEngine != null) {
             if (updateUIEngine) uiEngine.update();
             uiEngine.render(true);
         }
         frameBuffer.begin();
         this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
         this.spriteRenderer_screen.begin();
-        if(uiEngine != null) {
+        if (uiEngine != null) {
             this.spriteRenderer_screen.draw(uiEngine.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
-        }else{
+        } else {
             Gdx.gl.glClearColor(0f, 0f, 0f, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         }
@@ -115,7 +145,7 @@ public class TransitionManager {
     public boolean update() {
         if (this.finished) return true;
 
-        this.nextUpdate += transitionSpeed.value;
+        this.nextUpdate += this.transitionSpeed.value;
         while (nextUpdate >= 1f) {
             if (this.transition.update()) {
                 finish();

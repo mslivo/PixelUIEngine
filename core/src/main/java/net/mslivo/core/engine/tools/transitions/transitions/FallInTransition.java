@@ -5,20 +5,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
+import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
-public class FallInTransition implements Transition {
+public class FallInTransition extends Transition {
     private float yTo;
     private float ySpeed;
     private int bounce;
     private int screenHeight;
     private Runnable bounceAction;
 
-    public FallInTransition(){
-        this(null);
+    public FallInTransition(TRANSITION_SPEED transitionSpeed){
+        this(null, transitionSpeed);
     }
-    public FallInTransition(Runnable bounceAction) {
+    public FallInTransition(Runnable bounceAction, TRANSITION_SPEED transitionSpeed) {
+        super(transitionSpeed);
         this.bounceAction = bounceAction;
     }
 

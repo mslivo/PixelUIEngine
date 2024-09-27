@@ -4,12 +4,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
+import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
-public class FadeTransition implements Transition {
+public class FadeTransition extends Transition {
     private float fadeOut;
     private float fadeIn;
+
+    public FadeTransition(TRANSITION_SPEED transitionSpeed){
+        super(transitionSpeed);
+    }
 
     @Override
     public TRANSITION_RENDER_MODE getRenderMode() {

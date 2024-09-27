@@ -2,12 +2,17 @@ package net.mslivo.core.engine.tools.transitions.transitions;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
+import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
-public class PixelateTransition implements Transition {
+public class PixelateTransition extends Transition {
     private float fadeOut;
     private float fadeIn;
+
+    public PixelateTransition(TRANSITION_SPEED transitionSpeed) {
+        super(transitionSpeed);
+    }
 
     @Override
     public TRANSITION_RENDER_MODE getRenderMode() {

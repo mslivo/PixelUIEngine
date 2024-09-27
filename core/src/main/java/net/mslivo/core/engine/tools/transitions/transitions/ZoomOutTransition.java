@@ -5,13 +5,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
+import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
-public class ZoomOutTransition implements Transition {
+public class ZoomOutTransition extends Transition {
     private float zoom, zoomAcc;
     private int screenWidth;
     private int screenHeight;
+
+    public ZoomOutTransition(TRANSITION_SPEED transitionSpeed) {
+        super(transitionSpeed);
+    }
 
     @Override
     public TRANSITION_RENDER_MODE getRenderMode() {
