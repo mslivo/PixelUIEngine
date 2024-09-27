@@ -44,7 +44,7 @@ public class TransitionManager {
     public TransitionManager(UIEngine from, UIEngine to, Transition transition, TRANSITION_SPEED transitionSpeed, boolean updateUIEngine) {
         if (transitionSpeed == null)
             transitionSpeed = TRANSITION_SPEED.X1;
-        if (to == null || from == null || transition == null)
+        if (transition == null)
             transitionSpeed = TRANSITION_SPEED.IMMEDIATE;
 
         if (transitionSpeed == TRANSITION_SPEED.IMMEDIATE) {
@@ -81,26 +81,9 @@ public class TransitionManager {
             this.spriteRenderer_screen.setColor(Color.GRAY);
             this.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-            { // Capture From Framebuffer
-                if (updateUIEngine) from.update();
-                from.render(true);
-                this.frameBuffer_from.begin();
-                this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
-                this.spriteRenderer_screen.begin();
-                this.spriteRenderer_screen.draw(from.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
-                this.spriteRenderer_screen.end();
-                this.frameBuffer_from.end();
-            }
-            { // Capture To Framebuffer
-                if (updateUIEngine) to.update();
-                to.render(true);
-                this.frameBuffer_to.begin();
-                this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
-                this.spriteRenderer_screen.begin();
-                this.spriteRenderer_screen.draw(to.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
-                this.spriteRenderer_screen.end();
-                this.frameBuffer_to.end();
-            }
+
+            this.captureUIEngineFrameBuffer(this.from, this.frameBuffer_from, updateUIEngine);
+            this.captureUIEngineFrameBuffer(this.to, this.frameBuffer_to, updateUIEngine);
 
             this.transitionRenderMode = this.transition.getRenderMode();
             if (this.transitionRenderMode == null)
@@ -109,7 +92,24 @@ public class TransitionManager {
             this.finished = false;
         }
 
+    }
 
+    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer, boolean updateUIEngine){
+        if(uiEngine != null) {
+            if (updateUIEngine) uiEngine.update();
+            uiEngine.render(true);
+        }
+        frameBuffer.begin();
+        this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
+        this.spriteRenderer_screen.begin();
+        if(uiEngine != null) {
+            this.spriteRenderer_screen.draw(uiEngine.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
+        }else{
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        }
+        this.spriteRenderer_screen.end();
+        frameBuffer.end();
     }
 
     public boolean update() {
