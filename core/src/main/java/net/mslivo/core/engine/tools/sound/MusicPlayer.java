@@ -54,7 +54,7 @@ public class MusicPlayer {
         this.volume = 1f;
     }
 
-    public void playlist_clear(){
+    public void playlistClear(){
         playlist.clear();
     }
 
