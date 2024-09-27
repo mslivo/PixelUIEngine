@@ -107,7 +107,7 @@ public abstract class SpriteParticleSystem<T>{
     /* ------- Animation ------- */
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -119,7 +119,7 @@ public abstract class SpriteParticleSystem<T>{
     }
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
