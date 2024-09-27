@@ -8,10 +8,12 @@ public abstract class Transition {
     public final TRANSITION_SPEED transitionSpeed;
 
     public Transition() {
-        this.transitionSpeed = TRANSITION_SPEED.X1;
+        this.transitionSpeed = TRANSITION_SPEED.DEFAULT;
     }
 
     public Transition(TRANSITION_SPEED transitionSpeed) {
+        if(transitionSpeed == null)
+            transitionSpeed = TRANSITION_SPEED.DEFAULT;
         this.transitionSpeed = transitionSpeed;
     }
 

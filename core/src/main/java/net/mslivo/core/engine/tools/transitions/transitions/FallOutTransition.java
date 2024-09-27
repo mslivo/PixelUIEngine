@@ -14,6 +14,10 @@ public class FallOutTransition extends Transition {
     private float ySpeed;
     private int screenHeight;
 
+    public FallOutTransition() {
+        super();
+    }
+
     public FallOutTransition(TRANSITION_SPEED transitionSpeed) {
         super(transitionSpeed);
     }

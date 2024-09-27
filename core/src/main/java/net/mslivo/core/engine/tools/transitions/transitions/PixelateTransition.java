@@ -10,6 +10,10 @@ public class PixelateTransition extends Transition {
     private float fadeOut;
     private float fadeIn;
 
+    public PixelateTransition() {
+        super();
+    }
+
     public PixelateTransition(TRANSITION_SPEED transitionSpeed) {
         super(transitionSpeed);
     }

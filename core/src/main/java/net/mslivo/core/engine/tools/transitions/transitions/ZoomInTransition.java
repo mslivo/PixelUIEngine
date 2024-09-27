@@ -13,6 +13,10 @@ public class ZoomInTransition extends Transition {
     private int screenWidth;
     private int screenHeight;
 
+    public ZoomInTransition() {
+        super();
+    }
+
     public ZoomInTransition(TRANSITION_SPEED transitionSpeed) {
         super(transitionSpeed);
     }

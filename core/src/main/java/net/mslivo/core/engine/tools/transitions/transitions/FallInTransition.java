@@ -16,6 +16,10 @@ public class FallInTransition extends Transition {
     private int screenHeight;
     private Runnable bounceAction;
 
+    public FallInTransition(){
+        this(null, null);
+    }
+
     public FallInTransition(TRANSITION_SPEED transitionSpeed){
         this(null, transitionSpeed);
     }

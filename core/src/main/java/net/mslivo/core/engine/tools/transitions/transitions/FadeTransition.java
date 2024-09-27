@@ -12,6 +12,10 @@ public class FadeTransition extends Transition {
     private float fadeOut;
     private float fadeIn;
 
+    public FadeTransition(){
+        super();
+    }
+
     public FadeTransition(TRANSITION_SPEED transitionSpeed){
         super(transitionSpeed);
     }
