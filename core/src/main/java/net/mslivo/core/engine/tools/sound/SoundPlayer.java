@@ -98,9 +98,9 @@ public class SoundPlayer {
     private long playSoundInternal(CMediaSound cMediaSound, float volume, float pitch, float pan, boolean loop) {
         long id;
         if(loop) {
-            id= mediaManager.getCMediaSound(cMediaSound).play(volume * this.volume, pitch, pan);
-        }else{
             id = mediaManager.getCMediaSound(cMediaSound).loop(volume * this.volume,pitch,pan);
+        }else{
+            id= mediaManager.getCMediaSound(cMediaSound).play(volume * this.volume, pitch, pan);
         }
         playedSounds.add(cMediaSound);
         return id;
@@ -117,9 +117,9 @@ public class SoundPlayer {
         }
         long id;
         if(loop) {
-            id= mediaManager.getCMediaSound(cMediaSound).play(playVolume * this.volume, pitch, pan);
-        }else{
             id = mediaManager.getCMediaSound(cMediaSound).loop(playVolume * this.volume,pitch,pan);
+        }else{
+            id= mediaManager.getCMediaSound(cMediaSound).play(playVolume * this.volume, pitch, pan);
         }
         playedSounds.add(cMediaSound);
         return id;
