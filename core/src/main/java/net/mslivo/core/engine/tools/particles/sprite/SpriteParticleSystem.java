@@ -181,38 +181,39 @@ public abstract class SpriteParticleSystem<T>{
 
     public void render(SpriteRenderer spriteRenderer, float animation_timer) {
         if (particles.size() == 0) return;
-        backupColor.set(spriteRenderer.getColor());
 
-        configureSpriteRenderer(spriteRenderer);
+
+        spriteRendererBegin(spriteRenderer);
 
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
             if(!particleRenderHook.renderSpriteParticle(particle)) continue;
-            spriteRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
             this.particleRenderHook.beforeRenderParticle(spriteRenderer, particle);
+
+
             switch (particle.type) {
                 case SPRITE_FONT -> {
                     if (particle.text != null && particle.font != null) {
-                        BitmapFont font = mediaManager.getCMediaFont(particle.font);
-                        backupColor_font.r = font.getColor().r;
-                        backupColor_font.g = font.getColor().g;
-                        backupColor_font.b = font.getColor().b;
-                        backupColor_font.a = font.getColor().a;
-                        // performance: dont use mediamanager
-                        font.setColor(particle.r, particle.g, particle.b, particle.a);
-                        font.draw(spriteRenderer, particle.text, (particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y));
-                        font.setColor(backupColor_font);
+                        spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
+                        spriteRenderer.drawCMediaFont(particle.font,(particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y), particle.text);
+                        spriteRendererRestoreBackup(spriteRenderer);
                     }
                 }
                 case SPRITE_IMAGE -> {
+                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaImageScale((CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
+                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 case SPRITE_ARRAY -> {
+                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaArrayScale((CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
+                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 case SPRITE_ANIMATION -> {
+                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaAnimationScale((CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer + particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
+                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
@@ -220,12 +221,19 @@ public abstract class SpriteParticleSystem<T>{
             }
             this.particleRenderHook.afterRenderParticle(spriteRenderer, particle);
         }
+    }
 
-        // Set Back
+    private void spriteRendererRestoreBackup(SpriteRenderer spriteRenderer){
         spriteRenderer.setColor(backupColor);
     }
 
-    private void configureSpriteRenderer(SpriteRenderer spriteRenderer){
+    private void spriteRendererSetColorAndSaveBackup(SpriteRenderer spriteRenderer, SpriteParticle spriteParticle){
+        backupColor.set(spriteRenderer.getColor());
+        spriteRenderer.setColor(spriteParticle.r*spriteRenderer.getR(), spriteParticle.g*spriteRenderer.getG(), spriteParticle.b*spriteRenderer.getB(), spriteParticle.a*spriteRenderer.getAlpha());
+    }
+
+
+    private void spriteRendererBegin(SpriteRenderer spriteRenderer){
         if(!spriteRenderer.isDrawing()){
             spriteRenderer.begin();
         }
