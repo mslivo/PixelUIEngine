@@ -113,7 +113,7 @@ public abstract class SpriteParticleSystem<T>{
     }
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
