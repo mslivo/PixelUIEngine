@@ -166,7 +166,7 @@ public final class MediaManager {
                 }
                 case CMediaAnimation cMediaAnimation -> {
                     cMediaAnimation.setMediaManagerIndex(animationsIdx);
-                    medias_animations[animationsIdx++] = new ExtendedAnimation(cMediaAnimation.animation_speed,
+                    medias_animations[animationsIdx++] = new ExtendedAnimation(cMediaAnimation.animationSpeed,
                             splitFrames(cMediaAnimation.file(), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                             cMediaAnimation.playMode
                     );

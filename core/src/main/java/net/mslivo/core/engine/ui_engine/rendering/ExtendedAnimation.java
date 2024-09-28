@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Array;
 public final class ExtendedAnimation {
 
     private final TextureRegion[] keyFrames;
-    private float frameDuration;
+    private float animationSpeed;
     private float animationDuration;
     private float stateTimeOffset;
     private int lastFrameNumber;
@@ -21,12 +21,12 @@ public final class ExtendedAnimation {
         NORMAL, REVERSED, LOOP, LOOP_REVERSED, LOOP_PINGPONG, LOOP_RANDOM,
     }
 
-    public ExtendedAnimation(float frameDuration, Array<TextureRegion> keyFrames, PlayMode playMode) {
-        this.frameDuration = frameDuration;
+    public ExtendedAnimation(float animationSpeed, Array<TextureRegion> keyFrames, PlayMode playMode) {
+        this.animationSpeed = animationSpeed;
         this.keyFrames = new TextureRegion[keyFrames.size];
         for (int i = 0; i < keyFrames.size; i++)
             this.keyFrames[i] = keyFrames.get(i);
-        this.animationDuration = keyFrames.size * frameDuration;
+        this.animationDuration = keyFrames.size * animationSpeed;
         this.playMode = playMode;
         this.stateTimeOffset = 0;
     }
@@ -40,7 +40,7 @@ public final class ExtendedAnimation {
 
         stateTime = Math.max(stateTime - this.stateTimeOffset, 0);
 
-        int frameNumber = (int) (stateTime / frameDuration);
+        int frameNumber = (int) (stateTime / animationSpeed);
         switch (playMode) {
             case NORMAL:
                 frameNumber = Math.min(keyFrames.length - 1, frameNumber);
@@ -54,7 +54,7 @@ public final class ExtendedAnimation {
                     frameNumber = keyFrames.length - 2 - (frameNumber - keyFrames.length);
                 break;
             case LOOP_RANDOM:
-                int lastFrameNumber = (int) ((lastStateTime) / frameDuration);
+                int lastFrameNumber = (int) ((lastStateTime) / animationSpeed);
                 if (lastFrameNumber != frameNumber) {
                     frameNumber = MathUtils.random(keyFrames.length - 1);
                 } else {
@@ -84,17 +84,17 @@ public final class ExtendedAnimation {
     }
 
     public boolean isAnimationFinished(float stateTime) {
-        int frameNumber = (int) (stateTime / frameDuration);
+        int frameNumber = (int) (stateTime / animationSpeed);
         return keyFrames.length - 1 < frameNumber;
     }
 
-    public void setFrameDuration(float frameDuration) {
-        this.frameDuration = frameDuration;
-        this.animationDuration = keyFrames.length * frameDuration;
+    public void setAnimationSpeed(float animationSpeed) {
+        this.animationSpeed = animationSpeed;
+        this.animationDuration = keyFrames.length * animationSpeed;
     }
 
-    public float getFrameDuration() {
-        return frameDuration;
+    public float getAnimationSpeed() {
+        return animationSpeed;
     }
 
     public float getAnimationDuration() {
