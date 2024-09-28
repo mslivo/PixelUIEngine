@@ -496,7 +496,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         api.toolTip.segment.text.create("2", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("3", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_2, 0, Color.MAGENTA, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0, Color.MAGENTA, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         canvasSegment,
                 }, new ToolTipAction() {

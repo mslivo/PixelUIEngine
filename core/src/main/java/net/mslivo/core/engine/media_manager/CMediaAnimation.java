@@ -3,8 +3,11 @@ package net.mslivo.core.engine.media_manager;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public final class CMediaAnimation extends CMediaSprite implements Serializable {
+    private final int hash;
+
     public final int regionWidth;
     public final int regionHeight;
     public final float animationSpeed;
@@ -20,6 +23,22 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.frameOffset = frameOffset;
         this.frameLength = frameLength;
         this.playMode = playMode;
+        this.hash = Objects.hash(filename, regionWidth, regionHeight, animationSpeed, frameOffset, frameLength, playMode);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof CMediaAnimation cMediaAnimation) {
+            return cMediaAnimation.hash == this.hash;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
     }
 
 }
