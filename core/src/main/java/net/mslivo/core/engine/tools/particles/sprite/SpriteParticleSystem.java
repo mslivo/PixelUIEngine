@@ -1,9 +1,8 @@
 package net.mslivo.core.engine.tools.particles.sprite;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import net.mslivo.core.engine.media_manager.*;
-import net.mslivo.core.engine.tools.particles.*;
+import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
 import java.util.ArrayDeque;
@@ -13,11 +12,10 @@ import java.util.function.Consumer;
 /*
  * Particle System must be extended and implemented
  */
-public abstract class SpriteParticleSystem<T>{
+public abstract class SpriteParticleSystem<T> {
 
     private final MediaManager mediaManager;
-    private final Color backupColor;
-    private final Color backupColor_font;
+    private final Color spriteRendererBackupColor;
     private final ArrayList<SpriteParticle> particles;
     private final ArrayDeque<SpriteParticle> deleteQueue;
     private final int particleLimit;
@@ -25,6 +23,7 @@ public abstract class SpriteParticleSystem<T>{
     private final ParticleDataProvider<T> particleDataProvider;
     private final SpriteParticleConsumer<Object> parallelConsumer;
     private SpriteParticleRenderHook<T> particleRenderHook;
+    private boolean wasDrawing;
 
     public interface SpriteParticleConsumer<O> extends Consumer<SpriteParticle> {
         default void accept(SpriteParticle particle) {
@@ -34,24 +33,26 @@ public abstract class SpriteParticleSystem<T>{
         }
     }
 
-    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit){
+    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit) {
         this(mediaManager, particleLimit, null, null);
     }
 
-    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider){
+    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider) {
         this(mediaManager, particleLimit, particleDataProvider, null);
     }
 
-    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider, SpriteParticleRenderHook<T> particleRenderHook){
+    public SpriteParticleSystem(MediaManager mediaManager, int particleLimit, ParticleDataProvider<T> particleDataProvider, SpriteParticleRenderHook<T> particleRenderHook) {
         this.particles = new ArrayList<>();
         this.deleteQueue = new ArrayDeque<>();
         this.particleLimit = Math.max(particleLimit, 0);
-        this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {};
-        this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new SpriteParticleRenderHook<T>() {};
+        this.particleDataProvider = particleDataProvider != null ? particleDataProvider : new ParticleDataProvider<T>() {
+        };
+        this.particleRenderHook = particleRenderHook != null ? particleRenderHook : new SpriteParticleRenderHook<T>() {
+        };
         this.parallelConsumer = new SpriteParticleConsumer<>() {
             @Override
             public void accept(SpriteParticle particle) {
-                if (particle!= null && !SpriteParticleSystem.this.updateParticle(particle)) {
+                if (particle != null && !SpriteParticleSystem.this.updateParticle(particle)) {
                     synchronized (deleteQueue) {
                         deleteQueue.add(particle);
                     }
@@ -60,8 +61,8 @@ public abstract class SpriteParticleSystem<T>{
         };
         this.particlePool = new ArrayDeque<>(particleLimit);
         this.mediaManager = mediaManager;
-        this.backupColor = new Color();
-        this.backupColor_font = new Color();
+        this.spriteRendererBackupColor = new Color(Color.CLEAR);
+        this.wasDrawing = false;
     }
 
     /* ------- Font ------- */
@@ -182,38 +183,36 @@ public abstract class SpriteParticleSystem<T>{
     public void render(SpriteRenderer spriteRenderer, float animation_timer) {
         if (particles.size() == 0) return;
 
+        this.spriteRendererBackupColor.set(spriteRenderer.getColor());
 
-        spriteRendererBegin(spriteRenderer);
+        if (spriteRenderer.isDrawing()) {
+            this.wasDrawing = true;
+        } else {
+            this.wasDrawing = false;
+            spriteRenderer.begin();
+        }
+
 
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            if(!particleRenderHook.renderSpriteParticle(particle)) continue;
+            if (!particleRenderHook.renderSpriteParticle(particle)) continue;
+
+            spriteRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
+
             this.particleRenderHook.beforeRenderParticle(spriteRenderer, particle);
-
-
             switch (particle.type) {
                 case SPRITE_FONT -> {
-                    if (particle.text != null && particle.font != null) {
-                        spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
-                        spriteRenderer.drawCMediaFont(particle.font,(particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y), particle.text);
-                        spriteRendererRestoreBackup(spriteRenderer);
-                    }
+                    spriteRenderer.drawCMediaFont(particle.font, (particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y), particle.text);
                 }
                 case SPRITE_IMAGE -> {
-                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaImageScale((CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 case SPRITE_ARRAY -> {
-                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaArrayScale((CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 case SPRITE_ANIMATION -> {
-                    spriteRendererSetColorAndSaveBackup(spriteRenderer,particle);
                     spriteRenderer.drawCMediaAnimationScale((CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer + particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
-                    spriteRendererRestoreBackup(spriteRenderer);
                 }
                 default -> {
                     throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
@@ -221,20 +220,15 @@ public abstract class SpriteParticleSystem<T>{
             }
             this.particleRenderHook.afterRenderParticle(spriteRenderer, particle);
         }
+
+        spriteRenderer.setColor(spriteRendererBackupColor);
+        if (!wasDrawing) {
+            spriteRenderer.end();
+        }
     }
 
-    private void spriteRendererRestoreBackup(SpriteRenderer spriteRenderer){
-        spriteRenderer.setColor(backupColor);
-    }
-
-    private void spriteRendererSetColorAndSaveBackup(SpriteRenderer spriteRenderer, SpriteParticle spriteParticle){
-        backupColor.set(spriteRenderer.getColor());
-        spriteRenderer.setColor(spriteParticle.r*spriteRenderer.getR(), spriteParticle.g*spriteRenderer.getG(), spriteParticle.b*spriteRenderer.getB(), spriteParticle.a*spriteRenderer.getAlpha());
-    }
-
-
-    private void spriteRendererBegin(SpriteRenderer spriteRenderer){
-        if(!spriteRenderer.isDrawing()){
+    private void spriteRendererBegin(SpriteRenderer spriteRenderer) {
+        if (!spriteRenderer.isDrawing()) {
             spriteRenderer.begin();
         }
     }
@@ -292,7 +286,7 @@ public abstract class SpriteParticleSystem<T>{
     private SpriteParticle particleNew(SpriteParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaSprite appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
         if (!canAddParticle()) return null;
         SpriteParticle<T> particle = particlePool.poll();
-        if(particle == null) particle = new SpriteParticle<>();
+        if (particle == null) particle = new SpriteParticle<>();
         particle.type = type;
         particle.x = x;
         particle.y = y;
@@ -312,15 +306,17 @@ public abstract class SpriteParticleSystem<T>{
         particle.animation_offset = animation_offset;
         particle.visible = visible;
         particle.data = particle.data == null ? particleDataProvider.provideNewInstance() : particle.data;
-        if(particle.data != null) particleDataProvider.resetInstance(particle.data);
+        if (particle.data != null) particleDataProvider.resetInstance(particle.data);
         return particle;
     }
 
     /* ------- Abstract Methods ------- */
 
-    protected void onParticleCreate(SpriteParticle<T> particle){};
+    protected void onParticleCreate(SpriteParticle<T> particle) {
+    }
 
-    protected void onParticleDestroy(SpriteParticle<T> particle){};
+    protected void onParticleDestroy(SpriteParticle<T> particle) {
+    }
 
     protected abstract boolean updateParticle(SpriteParticle<T> particle);
 

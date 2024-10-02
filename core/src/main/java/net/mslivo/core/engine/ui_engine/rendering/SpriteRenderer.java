@@ -1472,7 +1472,7 @@ public class SpriteRenderer implements Batch {
     // ----- CMediaFont -----
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
-        if (cMediaFont == null) return;
+        if (cMediaFont == null || text == null) return;
         BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
         bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
     }

@@ -21,10 +21,13 @@ public abstract class PrimitiveParticleSystem<T> {
     private final int particleLimit;
     private final ArrayDeque<PrimitiveParticle<T>> particlePool;
     private final ParticleDataProvider<T> particleDataProvider;
-    private final Color backupColor;
-    private int backupPrimitiveType;
+    private final Color primitiveRendererBackupVertexColor;
+    private final Color primitiveRendererBackupColor;
+    private int primitiveRendererBackupPrimitiveType;
     private final PrimitiveParticleConsumer<Object> parallelConsumer;
     private PrimitiveParticleRenderHook<T> particleRenderHook;
+    private boolean wasDrawing;
+    private int wasDrawingType;
 
     public interface PrimitiveParticleConsumer<O> extends Consumer<PrimitiveParticle> {
         default void accept(PrimitiveParticle particle) {
@@ -61,8 +64,11 @@ public abstract class PrimitiveParticleSystem<T> {
             }
         };
         this.particlePool = new ArrayDeque<>(particleLimit);
-        this.backupColor = new Color(Color.CLEAR);
-        this.backupPrimitiveType = 0;
+        this.primitiveRendererBackupVertexColor = new Color(Color.CLEAR);
+        this.primitiveRendererBackupColor = new Color(Color.CLEAR);
+        this.primitiveRendererBackupPrimitiveType = 0;
+        this.wasDrawing = false;
+        this.wasDrawingType = 0;
     }
 
     /* ------- Point ------- */
@@ -177,26 +183,36 @@ public abstract class PrimitiveParticleSystem<T> {
 
     public void render(PrimitiveRenderer primitiveRenderer) {
         if (particles.size() == 0) return;
-        this.backupPrimitiveType = primitiveRenderer.getPrimitiveType();
-        backupColor.r = primitiveRenderer.getVertexColor().r;
-        backupColor.g = primitiveRenderer.getVertexColor().g;
-        backupColor.b = primitiveRenderer.getVertexColor().b;
-        backupColor.a = primitiveRenderer.getVertexColor().a;
+
+        this.primitiveRendererBackupPrimitiveType = primitiveRenderer.getPrimitiveType();
+        this.primitiveRendererBackupVertexColor.set(primitiveRenderer.getVertexColor());
+        this.primitiveRendererBackupColor.set(primitiveRenderer.getColor());
+
+        if(primitiveRenderer.isDrawing()){
+            this.wasDrawing = true;
+            this.wasDrawingType = primitiveRenderer.getPrimitiveType();
+        }else{
+            this.wasDrawing = false;
+        }
+
 
         for (int i = 0; i < particles.size(); i++) {
             PrimitiveParticle<T> particle = particles.get(i);
             if (!particle.visible) continue;
             if (!particleRenderHook.renderPrimitiveParticle(particle)) continue;
+
+
             particleRenderHook.beforeRenderParticle(primitiveRenderer, particle);
+
             switch (particle.primitiveType) {
                 case GL20.GL_POINTS -> {
-                    configureImmediateRenderer(primitiveRenderer, GL20.GL_POINTS);
+                    primitiveRendererSetType(primitiveRenderer, GL20.GL_POINTS);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                 }
                 case GL20.GL_LINES -> {
-                    configureImmediateRenderer(primitiveRenderer, GL20.GL_LINES);
+                    primitiveRendererSetType(primitiveRenderer, GL20.GL_LINES);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
@@ -205,8 +221,7 @@ public abstract class PrimitiveParticleSystem<T> {
                     primitiveRenderer.vertex(particle.x[1], particle.y[1]);
                 }
                 case GL20.GL_TRIANGLES -> {
-                    configureImmediateRenderer(primitiveRenderer, GL20.GL_TRIANGLES);
-                    configureImmediateRenderer(primitiveRenderer, GL20.GL_LINES);
+                    primitiveRendererSetType(primitiveRenderer, GL20.GL_TRIANGLES);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
@@ -222,22 +237,31 @@ public abstract class PrimitiveParticleSystem<T> {
                 }
             }
             particleRenderHook.afterRenderParticle(primitiveRenderer, particle);
+
         }
 
         // Set Back
-        primitiveRenderer.setVertexColor(backupColor);
-        if (backupPrimitiveType != primitiveRenderer.getPrimitiveType()) {
-            configureImmediateRenderer(primitiveRenderer, backupPrimitiveType);
+        primitiveRenderer.setVertexColor(primitiveRendererBackupVertexColor);
+        primitiveRenderer.setColor(primitiveRendererBackupColor);
+
+        if(!wasDrawing){
+            if(primitiveRenderer.isDrawing())
+                primitiveRenderer.end();
+        }else{
+            if(primitiveRenderer.getPrimitiveType() != wasDrawingType){
+                primitiveRenderer.end();
+                primitiveRenderer.begin(wasDrawingType);
+            }
         }
+
     }
 
-    private void configureImmediateRenderer(PrimitiveRenderer renderer, int primitiveType) {
-        if (renderer.isDrawing()) {
-            if (renderer.getPrimitiveType() != primitiveType) {
-                renderer.end();
+    private void primitiveRendererSetType(PrimitiveRenderer renderer, int primitiveType) {
+        if (renderer.getPrimitiveType() == primitiveType) {
+            if(!renderer.isDrawing())
                 renderer.begin(primitiveType);
-            }
-        } else {
+        }else{
+            renderer.end();
             renderer.begin(primitiveType);
         }
     }
