@@ -616,6 +616,14 @@ public class Tools {
             return -1;
         }
 
+        public static float randomRange(float[] range){
+            return MathUtils.random(range[0], range[1]);
+        }
+
+        public static int randomRange(int[] range){
+            return MathUtils.random(range[0], range[1]);
+        }
+
         public static boolean chance(float probability) {
             return MathUtils.random(0f, 1f) < probability;
         }
