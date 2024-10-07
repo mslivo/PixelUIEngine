@@ -671,11 +671,11 @@ public class Tools {
             }
         }
 
-        public static void tilesDoInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
-            tilesDoInRadius(x, y, radius, radiusFunction, null);
+        public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
+            doInRadius(x, y, radius, radiusFunction, null);
         }
 
-        public static <O> void tilesDoInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
+        public static <O> void doInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
             LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new LongArray();
@@ -710,7 +710,7 @@ public class Tools {
 
         }
 
-        public static boolean tilesIsAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
+        public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
             for (int x = x1 - 1; x <= x1 + 1; x++) {
                 yloop:
                 for (int y = y1 - 1; y <= y1 + 1; y++) {
