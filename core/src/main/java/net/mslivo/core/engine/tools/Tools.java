@@ -637,6 +637,10 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
+        public static boolean randomChance() {
+            return MathUtils.random(1,2) == 1;
+        }
+
         public static <T> T randomSelect(T[] array) {
             if (array == null || array.length == 0) return null;
             return array[MathUtils.random(0, array.length - 1)];
