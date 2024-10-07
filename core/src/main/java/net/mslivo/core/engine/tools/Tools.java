@@ -462,25 +462,25 @@ public class Tools {
 
     public static class Calc {
 
-        public static float maxOfValues(float... values) {
+        public static float maxOfValues(float[] values) {
             float sum = 0;
             for (float f : values) if (f > sum) sum = f;
             return sum;
         }
 
-        public static float minOfValues(float... values) {
+        public static float minOfValues(float[] values) {
             float sum = Float.MAX_VALUE;
             for (float f : values) if (f < sum) sum = f;
             return sum;
         }
 
-        public static int average(int... values) {
+        public static int average(int[] values) {
             float sum = 0;
             for (float n : values) sum = sum + n;
             return MathUtils.round(sum / values.length);
         }
 
-        public static int average(float[] weights, int... values) {
+        public static int average(float[] weights, int[] values) {
             int sum = 0;
             for (int i = 0; i < values.length; i++) {
                 sum = sum + MathUtils.round(values[i] * weights[i]);
@@ -488,13 +488,13 @@ public class Tools {
             return sum;
         }
 
-        public static float average(float... values) {
+        public static float average(float[] values) {
             float sum = 0;
             for (float n : values) sum = sum + n;
             return sum / values.length;
         }
 
-        public static float average(float[] weights, float... values) {
+        public static float average(float[] weights, float[] values) {
             float sum = 0;
             for (int i = 0; i < values.length; i++) {
                 sum = sum + (values[i] * weights[i]);
@@ -619,20 +619,20 @@ public class Tools {
             return MathUtils.random(range[0], range[1]);
         }
 
-        public static boolean chance(float probability) {
+        public static boolean randomChance(float probability) {
             return MathUtils.random(0f, 1f) < probability;
         }
 
-        public static boolean chance(double probability) {
+        public static boolean randomChance(double probability) {
             return MathUtils.random(0f, 1f) < probability;
         }
 
-        public static boolean chance(int oneIn) {
+        public static boolean randomChance(int oneIn) {
             if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
         }
 
-        public static boolean chance(long oneIn) {
+        public static boolean randomChance(long oneIn) {
             if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
         }
@@ -671,11 +671,11 @@ public class Tools {
             }
         }
 
-        public static void doInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
-            doInRadius(x, y, radius, radiusFunction, null);
+        public static void tilesDoInRadius(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
+            tilesDoInRadius(x, y, radius, radiusFunction, null);
         }
 
-        public static <O> void doInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
+        public static <O> void tilesDoInRadius(int x, int y, int radius, DoInRadiusFunction<O> radiusFunction, O data) {
             LongArray cached = doInRadiusCache.get(radius);
             if (cached == null) {
                 cached = new LongArray();
@@ -710,7 +710,7 @@ public class Tools {
 
         }
 
-        public static boolean isAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
+        public static boolean tilesIsAdjacent(int x1, int y1, int x2, int y2, int map_size, boolean diagonal) {
             for (int x = x1 - 1; x <= x1 + 1; x++) {
                 yloop:
                 for (int y = y1 - 1; y <= y1 + 1; y++) {
@@ -743,16 +743,29 @@ public class Tools {
             return 1.0f / x;
         }
 
+        public static float distanceFast(int x1, int y1, int x2, int y2) {
+            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
+        }
+
+        public static float fastInvSqrt(float x) {
+            float xhalf = 0.5f * x;
+            int i = Float.floatToIntBits(x);      // Treat float's bits as an integer
+            i = 0x5f3759df - (i >> 1);            // Magic constant and bit manipulation
+            x = Float.intBitsToFloat(i);          // Convert bits back to float
+            x = x * (1.5f - xhalf * x * x);       // One iteration of Newton's method
+            return x;
+        }
+
+        public static float fastSqrt(float x) {
+            return 1.0f / fastInvSqrt(x);         // Use inverse square root to get sqrt
+        }
+
         public static int distance(int x1, int y1, int x2, int y2) {
             return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
         }
 
         public static float distance(float x1, float y1, float x2, float y2) {
             return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        }
-
-        public static float distanceFast(int x1, int y1, int x2, int y2) {
-            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
         }
 
         public static boolean isWithinDistance(int x1, int y1, int x2, int y2, int distance) {
