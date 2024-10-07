@@ -547,19 +547,19 @@ public class Tools {
             }
         }
 
-        public static int applyRandomness(int value, float randomness) {
+        public static int randomApply(int value, float randomness) {
             if (randomness == 0) return value;
             randomness = Math.clamp(randomness, 0f, 1f);
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
-        public static long applyRandomness(long value, float randomness) {
+        public static long randomApply(long value, float randomness) {
             if (randomness == 0) return value;
             randomness = Math.clamp(randomness, 0f, 1f);
             return MathUtils.round(value * MathUtils.random((1 - randomness), (1 + randomness)));
         }
 
-        public static float applyRandomness(float value, float randomness) {
+        public static float randomApply(float value, float randomness) {
             if (randomness == 0) return value;
             randomness = Math.clamp(randomness, 0f, 1f);
             return value * MathUtils.random((1 - randomness), (1 + randomness));
@@ -583,12 +583,7 @@ public class Tools {
             return value;
         }
 
-        public static Object chanceSelectRandom(List list) {
-            if(list.size() == 0) return -1;
-            return list.get(MathUtils.random(0, list.size() - 1));
-        }
-
-        public static int chanceSelectRandom(int[] probabilities) {
+        public static int randomSelectProbabilities(int[] probabilities) {
             if(probabilities.length == 0) return -1;
             int sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
@@ -602,7 +597,7 @@ public class Tools {
             return -1;
         }
 
-        public static int chanceSelectRandom(float[] probabilities) {
+        public static int randomSelectProbabilities(float[] probabilities) {
             if(probabilities.length == 0) return -1;
             float sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
@@ -642,12 +637,12 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
-        public static <T> T chooseRandom(T[] array) {
+        public static <T> T randomSelect(T[] array) {
             if (array == null || array.length == 0) return null;
             return array[MathUtils.random(0, array.length - 1)];
         }
 
-        public static <T> T chooseRandom(List<T> list) {
+        public static <T> T randomSelect(List<T> list) {
             if (list == null || list.size() == 0) return null;
             return list.get(MathUtils.random(0, list.size() - 1));
         }
