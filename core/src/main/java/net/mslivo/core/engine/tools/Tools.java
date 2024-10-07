@@ -747,19 +747,6 @@ public class Tools {
             return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
         }
 
-        public static float fastInvSqrt(float x) {
-            float xhalf = 0.5f * x;
-            int i = Float.floatToIntBits(x);      // Treat float's bits as an integer
-            i = 0x5f3759df - (i >> 1);            // Magic constant and bit manipulation
-            x = Float.intBitsToFloat(i);          // Convert bits back to float
-            x = x * (1.5f - xhalf * x * x);       // One iteration of Newton's method
-            return x;
-        }
-
-        public static float fastSqrt(float x) {
-            return 1.0f / fastInvSqrt(x);         // Use inverse square root to get sqrt
-        }
-
         public static int distance(int x1, int y1, int x2, int y2) {
             return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
         }
