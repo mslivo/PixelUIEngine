@@ -474,13 +474,13 @@ public class Tools {
             return sum;
         }
 
-        public static int average(int[] values) {
+        public static int average(int... values) {
             float sum = 0;
             for (float n : values) sum = sum + n;
             return MathUtils.round(sum / values.length);
         }
 
-        public static int average(float[] weights, int[] values) {
+        public static int average(float[] weights, int... values) {
             int sum = 0;
             for (int i = 0; i < values.length; i++) {
                 sum = sum + MathUtils.round(values[i] * weights[i]);
@@ -488,13 +488,13 @@ public class Tools {
             return sum;
         }
 
-        public static float average(float[] values) {
+        public static float average(float... values) {
             float sum = 0;
             for (float n : values) sum = sum + n;
             return sum / values.length;
         }
 
-        public static float average(float[] weights, float[] values) {
+        public static float average(float[] weights, float... values) {
             float sum = 0;
             for (int i = 0; i < values.length; i++) {
                 sum = sum + (values[i] * weights[i]);
