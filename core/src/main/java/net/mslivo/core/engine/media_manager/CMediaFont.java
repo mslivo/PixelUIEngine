@@ -18,18 +18,4 @@ public final class CMediaFont extends CMedia implements Serializable {
         this.hash = Objects.hash(filename, offset_x, offset_y, markupEnabled);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof CMediaFont cMediaFont) {
-            return cMediaFont.hash == this.hash;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return hash;
-    }
 }

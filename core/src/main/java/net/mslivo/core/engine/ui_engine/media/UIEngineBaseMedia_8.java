@@ -172,6 +172,6 @@ public class UIEngineBaseMedia_8 {
             UI_MOUSETEXTINPUT_SELECTED,
             UI_FONT,
             UI_FONT_TINY,
-            UI_PIXEL
+            UI_PIXEL,
     };
 }

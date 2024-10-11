@@ -90,7 +90,6 @@ public final class MediaManager {
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
-        HashSet<CMedia> duplicateCheck = new HashSet<>();
         int step = 0;
         int stepsMax = 0;
 
@@ -101,12 +100,9 @@ public final class MediaManager {
         while ((loadMedia = loadMediaList.poll()) != null) {
             if (!Tools.File.findResource(loadMedia.file).exists()) {
                 throw new RuntimeException(String.format(ERROR_FILE_NOT_FOUND, loadMedia.file()));
-            } else if (duplicateCheck.contains(loadMedia)) {
-                throw new RuntimeException(String.format(ERROR_DUPLICATE, loadMedia.file()));
             } else if (loadMedia.mediaManagerIndex() != MEDIAMANGER_INDEX_NONE) {
                 throw new RuntimeException(String.format(ERROR_ALREADY_LOADED_OTHER, loadMedia.file()));
             }
-
             if (loadMedia instanceof CMediaSprite || loadMedia.getClass() == CMediaFont.class) {
                 imageCMediaLoadStack.add(loadMedia);
             } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
@@ -124,7 +120,6 @@ public final class MediaManager {
                 default -> {
                 }
             }
-            duplicateCheck.add(loadMedia);
             stepsMax++;
         }
         medias_images = new TextureRegion[imagesMax];
@@ -133,13 +128,12 @@ public final class MediaManager {
         medias_fonts = new BitmapFont[fontsMax];
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
-        duplicateCheck.clear();
 
         // 2. Load Image Data Into Pixmap Packer
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
 
-            String textureFileName = imageMedia.getClass() == CMediaFont.class ? imageMedia.file().replace(".fnt", ".png") : imageMedia.file();
+            String textureFileName = imageMedia.getClass() == CMediaFont.class ? bitmapFontTextureName(imageMedia.file()) : imageMedia.file();
             if(pixmapPacker.getRect(textureFileName) == null) { // dont pack same file doubled
                 TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
                 textureData.prepare();
@@ -160,7 +154,7 @@ public final class MediaManager {
             switch (imageMedia) {
                 case CMediaImage cMediaImage -> {
                     cMediaImage.setMediaManagerIndex(imagesIdx);
-                    medias_images[imagesIdx++] = textureAtlas.findRegion(cMediaImage.file());
+                    medias_images[imagesIdx++] = new TextureRegion(textureAtlas.findRegion(cMediaImage.file()));
                 }
                 case CMediaArray cMediaArray -> {
                     cMediaArray.setMediaManagerIndex(arraysIdx);
@@ -175,7 +169,8 @@ public final class MediaManager {
                     );
                 }
                 case CMediaFont cMediaFont -> {
-                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file()), textureAtlas.findRegion(cMediaFont.file()));
+                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file()),
+                            new TextureRegion(textureAtlas.findRegion(bitmapFontTextureName(cMediaFont.file()))));
                     bitmapFont.setColor(Color.GRAY);
                     bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
                     cMediaFont.setMediaManagerIndex(fontsIdx);
@@ -211,6 +206,10 @@ public final class MediaManager {
         // 7. Finished
         this.loaded = true;
         return true;
+    }
+
+    private String bitmapFontTextureName(String fontFile){
+        return fontFile.replace(".fnt",".png");
     }
 
     private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,

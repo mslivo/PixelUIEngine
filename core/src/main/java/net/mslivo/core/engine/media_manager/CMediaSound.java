@@ -11,18 +11,4 @@ public final class CMediaSound extends CMedia implements Serializable {
         this.hash = Objects.hash(filename);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof CMediaSound cMediaSound) {
-            return cMediaSound.hash == this.hash;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return hash;
-    }
 }

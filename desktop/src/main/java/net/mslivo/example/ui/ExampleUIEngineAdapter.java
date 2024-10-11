@@ -136,6 +136,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                         x, y, animation_timer);
             }
         }
+
         batch.end();
 
 

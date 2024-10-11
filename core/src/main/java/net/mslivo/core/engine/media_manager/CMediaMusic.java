@@ -11,18 +11,4 @@ public final class CMediaMusic extends CMedia implements Serializable {
         this.hash = Objects.hash(filename);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof CMediaMusic cMediaMusic) {
-            return cMediaMusic.hash == this.hash;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return hash;
-    }
 }
