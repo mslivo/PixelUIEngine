@@ -98,7 +98,7 @@ char id=122     x=130  y=7    width=5    height=7    xoffset=-1   yoffset=-1   x
 char id=123     x=206  y=0    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
 char id=124     x=0    y=0    width=3    height=7    xoffset=-1   yoffset=-1   xadvance=2    page=0    chnl=0 
 char id=125     x=211  y=0    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
-char id=126     x=290  y=0    width=5    height=4    xoffset=-1   yoffset=1   xadvance=4    page=0    chnl=0 
+char id=126     x=290  y=0    width=5    height=4    xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
 
 
 char id=500     x=0    y=25   width=8   height=7     xoffset=-1   yoffset=-1   xadvance=7   page=0    chnl=0
