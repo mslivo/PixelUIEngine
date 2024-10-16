@@ -1,6 +1,5 @@
 package net.mslivo.core.engine.tools;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -21,8 +20,11 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -38,94 +40,72 @@ public class Tools {
         private static float timeStep;
         private static float timeStepX2;
         private static float timeBetweenUpdates;
-        public static final Path ERROR_LOG_FILE = Path.of("error.log");
-        private static final StringBuilder logMessageBuilder = new StringBuilder();
-        private static boolean LOG_SYSOUT_ENABLED = true;
-        private static boolean LOG_SYSOUT_DEBUG_ENABLED = true;
-        private static boolean LOG_FILE_ENABLED = true;
-        private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy][HH:mm:ss");
+        private static final Path ERROR_LOG_FILE = Path.of("error.log");
+        private static ArrayDeque<ForkJoinTask> parallelTaskList = new ArrayDeque<>();
 
-
-        public static void logBenchmark(String... customValues) {
-            if (!LOG_SYSOUT_ENABLED) return;
-            logMessageBuilder.setLength(0);
-            StringBuilder custom = new StringBuilder();
-            for (int i = 0; i < customValues.length; i++)
-                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
-            logMessageBuilder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
-            logMessageBuilder.append(" FPS | ");
-            logMessageBuilder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
-            logMessageBuilder.append("MB RAM | ");
-            logMessageBuilder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
-            logMessageBuilder.append(" Threads");
-            logMessageBuilder.append(custom);
-            Gdx.app.log(dateTag(), logMessageBuilder.toString());
+        public static void runParallel(int[] array, IntConsumer consumer) {
+            runParallel(array, consumer, array.length);
         }
 
-        public static void log(String msg) {
-            if (!LOG_SYSOUT_ENABLED) return;
-            Gdx.app.log(dateTag(), msg);
-        }
+        public static void runParallel(int[] array, IntConsumer consumer, int size) {
+            if(array.length == 0) return;
+            final int parallelism = ForkJoinPool.commonPool().getParallelism();
+            final int listSize = size;
 
-        public static void log(Exception e) {
-            if (!LOG_SYSOUT_ENABLED) return;
-            logMessageBuilder.setLength(0);
-            logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-            Gdx.app.error(dateTag(), logMessageBuilder.toString(), e);
-        }
+            int taskCount = Math.min(parallelism, listSize);
+            int chunkSize = (int) Math.ceil((double) listSize / taskCount);
 
-        public static void logInProgress(String what) {
-            if (!LOG_SYSOUT_ENABLED) return;
-            logMessageBuilder.setLength(0);
-            logMessageBuilder.append(what).append("...");
-            Gdx.app.log(dateTag(), logMessageBuilder.toString());
-        }
+            for (int i = 0; i < taskCount; i++) {
+                int start = i * chunkSize;
+                int end = Math.min(start + chunkSize, listSize);
 
-        public static void logDone() {
-            if (!LOG_SYSOUT_ENABLED) return;
-            Gdx.app.log(dateTag(), "Done.");
-        }
-
-        public static void logDebug(String message) {
-            if (!LOG_SYSOUT_ENABLED || !LOG_SYSOUT_DEBUG_ENABLED) return;
-            if (Gdx.app.getLogLevel() != Application.LOG_DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
-            Gdx.app.debug(dateTag(), message);
-        }
-
-        public static void logToFile(String message, Path file) {
-            if (!LOG_FILE_ENABLED) return;
-            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
-                pw.write(message);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+                ForkJoinTask forkJoinTask = ForkJoinPool.commonPool().submit(() -> {
+                    for (int i2 = start; i2 < end; i2++) {
+                        consumer.accept(array[i2]);
+                    }
+                });
+                parallelTaskList.add(forkJoinTask);
             }
+
+            while (!parallelTaskList.isEmpty())
+                parallelTaskList.poll().join();
         }
 
-        public static void logToFile(Exception e, Path file) {
-            try (PrintWriter pw = new PrintWriter(new FileWriter(file.toString(), true))) {
-                logMessageBuilder.setLength(0);
-                logMessageBuilder.append("Exception \"").append(e.getClass().getSimpleName()).append("\" occured" + System.lineSeparator());
-                pw.write(logMessageBuilder.toString());
+        public static <T> void runParallel(List<T> list, Consumer<T> consumer) {
+            runParallel(list, consumer, list.size());
+        }
+
+        public static <T> void runParallel(List<T> list, Consumer<T> consumer, int size) {
+            if(list.size() == 0) return;
+            final int parallelism = ForkJoinPool.commonPool().getParallelism();
+            final int listSize = size;
+
+            int taskCount = Math.min(parallelism, listSize);
+            int chunkSize = (int) Math.ceil((double) listSize / taskCount);
+
+            for (int i = 0; i < taskCount; i++) {
+                int start = i * chunkSize;
+                int end = Math.min(start + chunkSize, listSize);
+
+                ForkJoinTask forkJoinTask = ForkJoinPool.commonPool().submit(() -> {
+                    for (int i2 = start; i2 < end; i2++) {
+                        consumer.accept(list.get(i2));
+                    }
+                });
+                parallelTaskList.add(forkJoinTask);
+            }
+
+            while (!parallelTaskList.isEmpty())
+                parallelTaskList.poll().join();
+        }
+
+        public static void exceptionToFile(Exception e) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(ERROR_LOG_FILE.toString(), true))) {
+                pw.write("Exception \"" + (e.getClass().getSimpleName()) + "\" occured" + System.lineSeparator());
                 e.printStackTrace(pw);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-
-        private static String dateTag() {
-            return sdf.format(new Date());
-        }
-
-        public static void setFileLogEnabled(boolean fileLogEnabled) {
-            LOG_FILE_ENABLED = fileLogEnabled;
-        }
-
-        public static void setDebugLogEnabled(boolean sysOutLogEnabled) {
-            LOG_SYSOUT_DEBUG_ENABLED = sysOutLogEnabled;
-        }
-
-        public static void setSysOutLogEnabled(boolean logSysout) {
-            LOG_SYSOUT_ENABLED = logSysout;
         }
 
         public static void setTargetUpdates(int updatesPerSecond) {
@@ -172,8 +152,8 @@ public class Tools {
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
-                log(e);
-                logToFile(e, ERROR_LOG_FILE);
+                e.printStackTrace();
+                Tools.App.exceptionToFile(e);
             }
         }
     }
@@ -181,7 +161,23 @@ public class Tools {
 
     public static class Text {
 
-        private static final StringBuilder numberBuilder = new StringBuilder();
+        private static final StringBuilder builder = new StringBuilder();
+
+        public static String benchmark(String... customValues) {
+            builder.setLength(0);
+            StringBuilder custom = new StringBuilder();
+            for (int i = 0; i < customValues.length; i++)
+                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
+            builder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
+            builder.append(" FPS | ");
+            builder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
+            builder.append("MB RAM | ");
+            builder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
+            builder.append(" Threads");
+            builder.append(custom);
+            return builder.toString();
+        }
+
 
         public static String[] toArray(String text) {
             return toArray(text, true);
@@ -200,20 +196,20 @@ public class Tools {
         }
 
         public static String formatNumber(long number) {
-            numberBuilder.setLength(0);
+            builder.setLength(0);
             boolean minus = number < 0;
-            if(minus) {
-                numberBuilder.append("-");
+            if (minus) {
+                builder.append("-");
                 number = Math.abs(number);
             }
 
             String numberString = String.valueOf(number);
             int length = numberString.length();
             for (int i = 0; i < length; i++) {
-                if (i > 0 && (length - i) % 3 == 0) numberBuilder.append(".");
-                numberBuilder.append(numberString.charAt(i));
+                if (i > 0 && (length - i) % 3 == 0) builder.append(".");
+                builder.append(numberString.charAt(i));
             }
-            return numberBuilder.toString();
+            return builder.toString();
         }
 
 
@@ -301,7 +297,6 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
-                Tools.App.log(e);
                 return false;
             }
         }
@@ -584,11 +579,11 @@ public class Tools {
         }
 
         public static int randomSelectProbabilities(int[] probabilities) {
-            if(probabilities.length == 0) return -1;
+            if (probabilities.length == 0) return -1;
             int sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
-            int random = MathUtils.random(0,sum);
+            int random = MathUtils.random(0, sum);
             int cumulative = 0;
             for (int i = 0; i < probabilities.length; i++) {
                 cumulative += probabilities[i];
@@ -598,11 +593,11 @@ public class Tools {
         }
 
         public static int randomSelectProbabilities(float[] probabilities) {
-            if(probabilities.length == 0) return -1;
+            if (probabilities.length == 0) return -1;
             float sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
-            float random = MathUtils.random(0f,sum);
+            float random = MathUtils.random(0f, sum);
             float cumulative = 0f;
             for (int i = 0; i < probabilities.length; i++) {
                 cumulative += probabilities[i];
@@ -611,11 +606,11 @@ public class Tools {
             return -1;
         }
 
-        public static float randomRange(float[] range){
+        public static float randomRange(float[] range) {
             return MathUtils.random(range[0], range[1]);
         }
 
-        public static int randomRange(int[] range){
+        public static int randomRange(int[] range) {
             return MathUtils.random(range[0], range[1]);
         }
 
@@ -638,7 +633,7 @@ public class Tools {
         }
 
         public static boolean randomChance() {
-            return MathUtils.random(1,2) == 1;
+            return MathUtils.random(1, 2) == 1;
         }
 
         public static <T> T randomSelect(T[] array) {

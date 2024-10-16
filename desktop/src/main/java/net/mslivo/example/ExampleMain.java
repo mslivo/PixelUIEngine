@@ -3,9 +3,8 @@ package net.mslivo.example;
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
-import net.mslivo.core.engine.tools.transitions.transitions.*;
+import net.mslivo.core.engine.tools.transitions.transitions.PixelateTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
@@ -35,20 +34,20 @@ public class ExampleMain extends ApplicationAdapter {
         Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = null;
         // Load Assets
-        Tools.App.logInProgress("Loading Assets");
+        System.out.println("Loading Assets");
         this.mediaManager = new MediaManager();
         this.mediaManager.prepareUICMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
-        Tools.App.logDone();
+        System.out.println("Done.");
 
         // Input/Render
-        Tools.App.logInProgress("Starting UI");
+        System.out.println("Starting UI");
         this.uiEngine = new UIEngine<>(
                 new ExampleUIEngineAdapter(),
                 this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                 ExampleMainConstants.viewportMode, true);
-        Tools.App.logDone();
+        System.out.println("Done.");
 
         this.state = STATE.RUN;
     }
@@ -69,7 +68,7 @@ public class ExampleMain extends ApplicationAdapter {
                             this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
-                    this.transitionManager = new TransitionManager(this.uiEngine, this.uiEngine_transition, new PixelateTransition(),true);
+                    this.transitionManager = new TransitionManager(this.uiEngine, this.uiEngine_transition, new PixelateTransition(), true);
                     this.transitionManager.render();
                     state = STATE.TRANSITION;
                     return;
@@ -94,16 +93,16 @@ public class ExampleMain extends ApplicationAdapter {
 
         // Debug Output
         if (System.currentTimeMillis() - timer_debug_info > 5000) {
-            Tools.App.logBenchmark();
+            System.out.println(Tools.Text.benchmark());
             timer_debug_info = System.currentTimeMillis();
         }
     }
 
     @Override
     public void dispose() {
-        Tools.App.logInProgress("Shutting down...");
+        System.out.println("Shutting down...");
         this.shutdownEngine();
-        Tools.App.logDone();
+        System.out.println("Done.");
     }
 
     private void shutdownEngine() {
