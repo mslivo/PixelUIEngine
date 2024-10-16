@@ -48,12 +48,12 @@ public class Tools {
         }
 
         public static void runParallel(int[] array, IntConsumer consumer, int size) {
-            if(array.length == 0) return;
+            if (array.length == 0) return;
             final int parallelism = ForkJoinPool.commonPool().getParallelism();
             final int listSize = size;
 
             int taskCount = Math.min(parallelism, listSize);
-            int chunkSize = (int) Math.ceil((double) listSize / taskCount);
+            int chunkSize = MathUtils.ceil(listSize / (float) taskCount);
 
             for (int i = 0; i < taskCount; i++) {
                 int start = i * chunkSize;
@@ -76,12 +76,12 @@ public class Tools {
         }
 
         public static <T> void runParallel(List<T> list, Consumer<T> consumer, int size) {
-            if(list.size() == 0) return;
+            if (list.size() == 0) return;
             final int parallelism = ForkJoinPool.commonPool().getParallelism();
             final int listSize = size;
 
             int taskCount = Math.min(parallelism, listSize);
-            int chunkSize = (int) Math.ceil((double) listSize / taskCount);
+            int chunkSize = MathUtils.ceil(listSize / (float) taskCount);
 
             for (int i = 0; i < taskCount; i++) {
                 int start = i * chunkSize;
