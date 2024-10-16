@@ -70,12 +70,12 @@ char id=94      x=285  y=0    width=5    height=4    xoffset=-1   yoffset=-1   x
 char id=95      x=298  y=0    width=5    height=3    xoffset=-1   yoffset=4    xadvance=4    page=0    chnl=0 
 char id=96      x=274  y=0    width=4    height=4    xoffset=-1   yoffset=-1   xadvance=3    page=0    chnl=0 
 char id=97      x=5    y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
-char id=98      x=10   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
-char id=99      x=15   y=7    width=4    height=7    xoffset=-1   yoffset=-1   xadvance=3    page=0    chnl=0 
+char id=98      x=10   y=8    width=5    height=6    xoffset=-1   yoffset=0    xadvance=4    page=0    chnl=0 
+char id=99      x=15   y=9    width=4    height=5    xoffset=-1   yoffset=1    xadvance=3    page=0    chnl=0 
 char id=100     x=20   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
 char id=101     x=25   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
 char id=102     x=30   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
-char id=103     x=35   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
+char id=103     x=35   y=9    width=5    height=6    xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
 char id=104     x=40   y=7    width=5    height=7    xoffset=-1   yoffset=-1   xadvance=4    page=0    chnl=0 
 char id=105     x=45   y=7    width=3    height=7    xoffset=-1   yoffset=-1   xadvance=2    page=0    chnl=0 
 char id=106     x=50   y=7    width=4    height=7    xoffset=-1   yoffset=-1   xadvance=3    page=0    chnl=0 
