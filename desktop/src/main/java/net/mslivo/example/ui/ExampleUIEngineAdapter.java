@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
@@ -79,9 +79,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 api.closeAllWindows();
             }
         }));
-        api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8.UI_CURSOR_ARROW));
+        api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8x8.UI_CURSOR_ARROW));
 
-        api.config.ui.setFont(UIEngineBaseMedia_8.UI_FONT_TINY);
+        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT_TINY);
 
         api.config.input.setHardwareMouseEnabled(true);
 

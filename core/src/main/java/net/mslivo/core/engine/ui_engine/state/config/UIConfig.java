@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine.state.config;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 
 import java.io.Serializable;
@@ -77,9 +77,9 @@ public final class UIConfig implements Serializable, Cloneable {
 
         // Initialize Default Values
         // ##### UI Default Values #####
-        ui_font = UIEngineBaseMedia_8.UI_FONT;
+        ui_font = UIEngineBaseMedia_8x8.UI_FONT;
         ui_font_defaultColor = DEFAULT_COLOR_FONT.cpy();
-        ui_cursor = UIEngineBaseMedia_8.UI_CURSOR_ARROW;
+        ui_cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
         ui_keyInteractionsDisabled = false;
         ui_mouseInteractionsDisabled = false;
         ui_foldWindowsOnDoubleClick = true;

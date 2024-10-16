@@ -12,12 +12,11 @@ import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8;
+import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -52,7 +51,7 @@ public final class MediaManager {
 
     /* ----- Prepare ----- */
     public boolean prepareUICMedia() {
-        return prepareCMedia(UIEngineBaseMedia_8.ALL);
+        return prepareCMedia(UIEngineBaseMedia_8x8.ALL);
     }
 
     public boolean prepareCMedia(CMedia cMedia) {

@@ -5,8 +5,8 @@ import net.mslivo.core.engine.media_manager.*;
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
  */
-public class UIEngineBaseMedia_8 {
-    private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui_8/";
+public class UIEngineBaseMedia_8x8 {
+    private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui_8x8/";
     private static final int TL = 8;
     private static final int TL2 = TL*2;
 
