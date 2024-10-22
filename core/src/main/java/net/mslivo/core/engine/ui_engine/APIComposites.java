@@ -217,7 +217,7 @@ public final class APIComposites {
 
             api.component.setPositionGrid(backButton, x, y);
             api.component.setPositionGrid(text, x+1, y);
-            int textWidthTiles = MathUtils.ceil(mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax)/api.TSF())+1;
+            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax)+1)/api.TSF());
             api.component.setPositionGrid(forwardButton, (x+1)+textWidthTiles, y);
             api.component.text.setLines(text, Tools.Text.toArray(pageString));
             return;
