@@ -92,17 +92,17 @@ public final class APIComposites {
         private static final String PAGE_TEXT = "%s/%s";
 
         public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction){
-            return createPageableReadOnlyGrid(x,y,width,height,items,gridAction);
+            return createPageableReadOnlyGrid(x,y,width,height,items,gridAction, false, false);
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean doubleSized){
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean multiselect, boolean doubleSized){
 
             int gridHeight = height-1;
             final AtomicInteger currentPage = new AtomicInteger(0);
 
             ArrayList<Object[][]> pages = new ArrayList<>();
 
-            Grid grid = api.component.grid.create(x, y+1, null, null, false,false, false, false,doubleSized);
+            Grid grid = api.component.grid.create(x, y+1, null, null, multiselect,false, false, false,doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0,0,1,1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
             Text pageText = api.component.text.create(0,0, new String[]{});
             ImageButton forwardButton = api.component.button.imageButton.create(0,0, 1,1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
