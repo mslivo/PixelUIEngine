@@ -9,6 +9,7 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
+import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -515,6 +516,29 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.window.addComponents(window, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
         api.component.tabbar.tab.addTabComponents(tabImageButton, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
 
+        ArrayList<String> items = new ArrayList<>();
+       /// for(int i=0;i<40;i++)
+          //  items.add("Item "+i);
+        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, new GridAction() {
+            @Override
+            public int iconIndex(Object listItem) {
+                return 0;
+            }
+
+            @Override
+            public Tooltip toolTip(Object listItem) {
+                return api.toolTip.create(listItem.toString());
+            }
+
+            @Override
+            public CMediaSprite icon(Object listItem) {
+                return ExampleBaseMedia.ICON_EXAMPLE_1;
+            }
+        }, false);
+        api.component.tabbar.tab.addTabComponents(tabImageButton, readableGrid);
+        api.window.addComponents(window, readableGrid);
+
+
         /* Text / Image / Seperator */
 
         Tab tabTextImage = api.component.tabbar.tab.create("Text/Image");
@@ -527,6 +551,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.text.setFontColor(text2, Color.WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabbar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
+
+
 
 
         // Tab Bar

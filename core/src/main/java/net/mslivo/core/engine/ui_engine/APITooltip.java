@@ -36,6 +36,12 @@ public final class APITooltip {
         };
     }
 
+    public Tooltip create(String text) {
+        return create(new TooltipSegment[]{
+                segment.text.create(text)
+        }, defaultToolTipAction());
+    }
+
     public Tooltip create(TooltipSegment[] segments) {
         return create(segments, defaultToolTipAction(), 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
     }

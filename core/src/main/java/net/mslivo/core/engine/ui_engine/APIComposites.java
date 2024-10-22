@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.LongArray;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaImage;
@@ -24,6 +25,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
+import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarVertical;
@@ -39,6 +41,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -53,6 +56,7 @@ public final class APIComposites {
     private final UIConfig uiConfig;
 
     public final APICompositeList list;
+    public final APICompositeGrid grid;
     public final APICompositeImage image;
     public final APICompositeText text;
     public final APICompositeHotkey hotkey;
@@ -78,6 +82,167 @@ public final class APIComposites {
         this.button = new APICompositeButton();
         this.textfield = new APICompositeTextfield();
         this.tabBar = new APICompositeTabbar();
+        this.grid = new APICompositeGrid();
+    }
+
+    public final class APICompositeGrid {
+        APICompositeGrid() {
+        }
+
+        private static final String PAGE_TEXT = "%s/%s";
+
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction){
+            return createPageableReadOnlyGrid(x,y,width,height,items,gridAction);
+        }
+
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean doubleSized){
+
+            int gridHeight = height-1;
+            final AtomicInteger currentPage = new AtomicInteger(0);
+
+            ArrayList<Object[][]> pages = new ArrayList<>();
+
+            Grid grid = api.component.grid.create(x, y+1, null, null, false,false, false, false,doubleSized);
+            ImageButton backButton = api.component.button.imageButton.create(0,0,1,1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
+            Text pageText = api.component.text.create(0,0, new String[]{});
+            ImageButton forwardButton = api.component.button.imageButton.create(0,0, 1,1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
+
+
+            api.component.button.setButtonAction(backButton, new ButtonAction() {
+                @Override
+                public void onRelease() {
+                    currentPage.set(Math.max(currentPage.get()-1,0));
+                    pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
+                    api.component.grid.setItems(grid, pages.get(currentPage.get()));
+                }
+            });
+            api.component.button.setButtonAction(forwardButton, new ButtonAction() {
+                @Override
+                public void onRelease() {
+                    currentPage.set(Math.min(currentPage.get()+1,pages.size()-1));
+                    pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
+                    api.component.grid.setItems(grid, pages.get(currentPage.get()));
+                }
+            });
+
+            api.component.grid.setGridAction(grid, new GridAction() {
+                @Override
+                public boolean canDragFromGrid(Grid fromGrid) {
+                    return false;
+                }
+
+                @Override
+                public boolean canDragFromList(List fromList) {
+                    return false;
+                }
+
+                @Override
+                public boolean canDragIntoApp() {
+                    return false;
+                }
+
+                @Override
+                public Color cellColor(Object listItem, int x, int y) {
+                    return gridAction.cellColor(listItem,x,y);
+                }
+
+                @Override
+                public CMediaSprite icon(Object listItem) {
+                    return gridAction.icon(listItem);
+                }
+
+                @Override
+                public int iconIndex(Object listItem) {
+                    return gridAction.iconIndex(listItem);
+                }
+
+                @Override
+                public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
+                    return;
+                }
+
+                @Override
+                public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
+                    return;
+                }
+
+                @Override
+                public void onDragIntoApp(Object listItem, int x, int y, int screenX, int screenY) {
+                    return;
+                }
+
+                @Override
+                public boolean onItemSelected(Object listItem) {
+                    return gridAction.onItemSelected(listItem);
+                }
+
+                @Override
+                public Tooltip toolTip(Object listItem) {
+                    return gridAction.toolTip(listItem);
+                }
+            });
+
+            api.component.addUpdateAction(grid, new UpdateAction(0,true) {
+                int itemsSizeLast = -1;
+                @Override
+                public void onUpdate() {
+                    if( itemsSizeLast != items.size()){
+                        pageableGridUpdateGridResize(pages, width, gridHeight, items);
+                        currentPage.set(Math.clamp(currentPage.get(), 0, pages.size()-1));
+                        api.component.grid.setItems(grid, pages.get(currentPage.get()));
+                        pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
+                        itemsSizeLast = items.size();
+                    }
+
+                }
+            });
+
+            return new Component[]{
+                    grid, backButton, pageText, forwardButton
+            };
+        }
+
+        private void pageableGridUpdateButtons(int x, int y, ImageButton backButton, ImageButton forwardButton, Text text, int currentPage, int pagesMax){
+            String pageStringMax = String.format(PAGE_TEXT, pagesMax+1,pagesMax+1);
+            String pageString = String.format(PAGE_TEXT, currentPage+1,pagesMax+1);
+
+            api.component.setPositionGrid(backButton, x, y);
+            api.component.setPositionGrid(text, x+1, y);
+            int textWidthTiles = MathUtils.ceil(mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax)/api.TSF())+1;
+            api.component.setPositionGrid(forwardButton, (x+1)+textWidthTiles, y);
+            api.component.text.setLines(text, Tools.Text.toArray(pageString));
+            return;
+        }
+
+        private void pageableGridUpdateGridResize(ArrayList<Object[][]> pages, int width, int height, ArrayList items){
+            int pageSize = width*height;
+            int pagesCount = MathUtils.floor(items.size()/(float)pageSize);
+            if(items.size()%pageSize > 0 || items.size() == 0) pagesCount++;
+
+            pages.clear();
+            for(int i=0;i<pagesCount;i++){
+                Object[][] page = new Object[width][height];
+                pages.add(page);
+            }
+
+            int pageIndex = 0;
+            int ix = 0;
+            int iy = height-1;
+            for(int i=0;i<items.size();i++){
+                Object[][] page = pages.get(pageIndex);
+
+                page[ix][iy] = items.get(i);
+                ix++;
+                if(ix > width-1) {
+                    ix = 0;
+                    iy--;
+                    if(iy < 0){
+                        iy = height-1;
+                        pageIndex++;
+                    }
+                }
+            }
+        }
     }
 
     public final class APICompositeList {
@@ -450,7 +615,7 @@ public final class APIComposites {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIEngineBaseMedia_8x8.UI_ICON_COLOR, 0);
+            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIEngineBaseMedia_8x8.UI_ICON_COLOR_PICKER, 0);
             ImageButton closeButton = api.composites.button.createWindowCloseButton(modal);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override

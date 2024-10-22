@@ -81,7 +81,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }));
         api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8x8.UI_CURSOR_ARROW));
 
-        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT_TINY);
+        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT);
 
         api.config.input.setHardwareMouseEnabled(true);
 

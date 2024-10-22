@@ -77,14 +77,15 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaImage UI_CURSOR_ARROW = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "cursors/arrow.png");
 
     // Icons
-    public static final CMediaImage UI_ICON_CLOSE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/close.png");
-    public static final CMediaImage UI_ICON_COLOR = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/color.png");
-    public static final CMediaImage UI_ICON_INFORMATION = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/information.png");
-    public static final CMediaImage UI_ICON_QUESTION = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/question.png");
-    public static final CMediaImage UI_ICON_EXTEND = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/extend.png");
-
-    public static final CMediaImage UI_ICON_KEY_DELETE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/delete.png");
-    public static final CMediaImage UI_ICON_KEY_CASE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/case.png");
+    public static final CMediaImage UI_ICON_CLOSE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/close.icon.png");
+    public static final CMediaImage UI_ICON_COLOR_PICKER = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/color_picker.icon.png");
+    public static final CMediaImage UI_ICON_INFORMATION = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/information.icon.png");
+    public static final CMediaImage UI_ICON_QUESTION = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/question.icon.png");
+    public static final CMediaImage UI_ICON_EXTEND = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/extend.icon.png");
+    public static final CMediaImage UI_ICON_BACK = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/back.icon.png");
+    public static final CMediaImage UI_ICON_FORWARD = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/forward.icon.png");
+    public static final CMediaImage UI_ICON_KEY_DELETE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/key_delete.icon.png");
+    public static final CMediaImage UI_ICON_KEY_CASE = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "icons/key_case.icon.png");
 
 
     // Fonts
@@ -156,7 +157,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_CURSOR_ARROW,
             UI_PIXEL_TRANSPARENT,
             UI_ICON_CLOSE,
-            UI_ICON_COLOR,
+            UI_ICON_COLOR_PICKER,
             UI_ICON_INFORMATION,
             UI_ICON_QUESTION,
             UI_ICON_EXTEND,
@@ -173,5 +174,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_FONT,
             UI_FONT_TINY,
             UI_PIXEL,
+            UI_ICON_BACK,
+            UI_ICON_FORWARD
     };
 }
