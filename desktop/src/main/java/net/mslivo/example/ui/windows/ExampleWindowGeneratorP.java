@@ -534,7 +534,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public CMediaSprite icon(Object listItem) {
                 return ExampleBaseMedia.ICON_EXAMPLE_1;
             }
-        }, false);
+        });
         api.component.tabbar.tab.addTabComponents(tabImageButton, readableGrid);
         api.window.addComponents(window, readableGrid);
 
