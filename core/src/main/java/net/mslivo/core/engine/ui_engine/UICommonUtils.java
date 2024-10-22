@@ -464,7 +464,7 @@ final class UICommonUtils {
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextmenuItem contextMenuItem = contextMenu.items.get(i);
-            int w = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font,contextMenuItem.text);
+            int w = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
             if (contextMenuItem.icon != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
@@ -988,6 +988,40 @@ final class UICommonUtils {
         }
     }
 
+    static void list_setSelectedItem(List list, Object selectedItem) {
+        // Clear selecteditem/items after mode switch
+        if (selectedItem != null && list.items.contains(selectedItem)) {
+            if (list.multiSelect) {
+                list.selectedItems.add(selectedItem);
+            } else {
+                list.selectedItem = selectedItem;
+            }
+        } else {
+            list.selectedItem = null;
+        }
+    }
+
+
+
+    static void list_setSelectedItems(List list, Object[] selectedItems) {
+        if (list.multiSelect) {
+            list.selectedItems.clear();
+            if (selectedItems != null) {
+                for (int i = 0; i < selectedItems.length; i++) {
+                    if (selectedItems[i] != null && list.items.contains(selectedItems)) {
+                        list.selectedItems.add(selectedItems[i]);
+                    }
+                }
+            }
+        } else {
+            if (selectedItems != null && selectedItems[0] != null && list.items.contains(selectedItems[0])) {
+                list.selectedItem = selectedItems[0];
+            } else {
+                list.selectedItem = null;
+            }
+        }
+    }
+
 
     static void list_setMultiSelect(List list, boolean multiSelect) {
         // Clear selecteditem/items after mode switch
@@ -1116,6 +1150,46 @@ final class UICommonUtils {
         return;
     }
 
+    static void grid_setSelectedItems(Grid grid, Object[] selectedItems) {
+        if (grid.multiSelect) {
+            grid.selectedItems.clear();
+            if (selectedItems != null) {
+                for (int i = 0; i < selectedItems.length; i++) {
+                    if (selectedItems[i] != null && grid_contains(grid, selectedItems)) {
+                        grid.selectedItems.add(selectedItems[i]);
+                    }
+                }
+            }
+        } else {
+            if (selectedItems != null && selectedItems[0] != null && grid_contains(grid, selectedItems[0])) {
+                grid.selectedItem = selectedItems[0];
+            } else {
+                grid.selectedItem = null;
+            }
+        }
+    }
+
+    static void grid_setSelectedItem(Grid grid, Object selectedItem){
+        if (selectedItem != null && grid_contains(grid, selectedItem)) {
+            if (grid.multiSelect) {
+                grid.selectedItems.add(selectedItem);
+            } else {
+                grid.selectedItem = selectedItem;
+            }
+        } else {
+            grid.selectedItem = null;
+        }
+    }
+
+    static boolean grid_contains(Grid grid, Object object){
+        for(int ix=0;ix<grid.items.length;ix++) {
+            for (int iy = 0; iy < grid.items[0].length; iy++) {
+                if(grid.items[ix][iy] == object)
+                    return true;
+            }
+        }
+        return false;
+    }
 
     static boolean grid_canDragIntoGrid(UIEngineState uiEngineState, Grid grid) {
         List draggedList = uiEngineState.draggedList;
@@ -1148,7 +1222,7 @@ final class UICommonUtils {
     }
 
     static void mouseTextInput_open(UIEngineState uiEngineState, MouseTextInput mouseTextInput) {
-        if(uiEngineState.openMouseTextInput != null) return;
+        if (uiEngineState.openMouseTextInput != null) return;
         uiEngineState.mTextInputMouseX = Gdx.input.getX();
         uiEngineState.mTextInputUnlock = false;
         uiEngineState.openMouseTextInput = mouseTextInput;

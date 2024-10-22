@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntSet;
-import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -867,7 +866,7 @@ public final class APIComponent {
                 width = items.length * (doubleSized ? 2 : 1);
                 height = items[0].length * (doubleSized ? 2 : 1);
             }
-            setComponentCommonInitValuesInternal(grid, x, y, width, height,uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
@@ -915,6 +914,15 @@ public final class APIComponent {
             UICommonUtils.grid_setItems(grid, items);
         }
 
+        public void setSelectedItem(Grid grid, Object selectedItem) {
+            if (grid == null) return;
+            UICommonUtils.grid_setSelectedItem(grid, selectedItem);
+        }
+
+        public void setSelectedItems(Grid grid, Object[] selectedItems) {
+            if (grid == null) return;
+            UICommonUtils.grid_setSelectedItems(grid, selectedItems);
+        }
 
     }
 
@@ -1431,7 +1439,7 @@ public final class APIComponent {
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
-            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1,uiEngineState.config.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             comboBox.useIcons = useIcons;
             comboBox.comboBoxAction = comboBoxAction;
             comboBox.comboBoxItems = new ArrayList<>();
@@ -1700,7 +1708,7 @@ public final class APIComponent {
 
         public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
-            setComponentCommonInitValuesInternal(list, x, y, width, height,uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
@@ -1754,24 +1762,24 @@ public final class APIComponent {
             UICommonUtils.list_setMultiSelect(list, multiSelect);
         }
 
-        public void setSelectedItem(List list, Object selectedItem) {
+        public void setSelectedItemByText(List list, String text) {
             if (list == null) return;
-            if (list.multiSelect) return;
-            if(selectedItem != null){
-                if(list.items.contains(selectedItem)){
-                    list.selectedItem = selectedItem;
+            for(int i=0;i<list.items.size();i++){
+                if(list.listAction.text(list.items.get(i)).equals(text)){
+                    UICommonUtils.list_setSelectedItem(list, list.items.get(i));
+                    return;
                 }
-            }else{
-                list.selectedItem = null;
             }
         }
 
+        public void setSelectedItem(List list, Object selectedItem) {
+            if (list == null) return;
+            UICommonUtils.list_setSelectedItem(list, selectedItem);
+        }
+
         public void setSelectedItems(List list, Object[] selectedItems) {
-            if (list == null || selectedItems == null) return;
-            if (!list.multiSelect) return;
-            list.selectedItems.clear();
-            for (int i = 0; i < selectedItems.length; i++)
-                if (selectedItems[i] != null) list.selectedItems.add(selectedItems[i]);
+            if (list == null) return;
+            UICommonUtils.list_setSelectedItems(list, selectedItems);
         }
 
     }
@@ -1995,7 +2003,7 @@ public final class APIComponent {
         component.addedToScreen = false;
     }
 
-    private static Color brighterColor(Color color){
+    private static Color brighterColor(Color color) {
         return new Color(color).mul(1.2f);
     }
 
