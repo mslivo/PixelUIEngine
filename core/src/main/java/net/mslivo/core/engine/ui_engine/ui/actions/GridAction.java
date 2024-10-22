@@ -38,11 +38,11 @@ public abstract class GridAction<T> extends CommonActions {
         return false;
     }
 
-    public Color cellColor(T gridItem, int x, int y) {
+    public Color cellColor(T gridItem) {
         return null;
     }
 
-    public void onDragIntoApp(T gridItem, int x, int y, int screenX, int screenY) {
+    public void onDragIntoApp(T gridItem, int from_x, int from_y, int screenX, int screenY) {
     }
 
     public boolean canDragIntoApp() {

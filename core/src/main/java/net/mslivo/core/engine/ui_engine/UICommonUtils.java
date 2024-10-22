@@ -1546,7 +1546,13 @@ final class UICommonUtils {
         uiEngineState.draggedGridFrom.set(0, 0);
         uiEngineState.draggedGridOffset.set(0, 0);
         uiEngineState.draggedGridItem = null;
+    }
 
+    static void resetDraggedListReference(UIEngineState uiEngineState) {
+        uiEngineState.draggedList = null;
+        uiEngineState.draggedListFromIndex = 0;
+        uiEngineState.draggedListOffset.set(0, 0);
+        uiEngineState.draggedListItem = null;
     }
 
     static void resetPressedGridReference(UIEngineState uiEngineState) {
@@ -1559,12 +1565,6 @@ final class UICommonUtils {
         uiEngineState.pressedListItem = null;
     }
 
-    static void resetDraggedListReference(UIEngineState uiEngineState) {
-        uiEngineState.draggedList = null;
-        uiEngineState.draggedListFromIndex = 0;
-        uiEngineState.draggedListOffsetX.set(0, 0);
-        uiEngineState.draggedListItem = null;
-    }
 
     static Object getDraggedUIReference(UIEngineState uiEngineState) {
         if (uiEngineState.draggedWindow != null) return uiEngineState.draggedWindow;

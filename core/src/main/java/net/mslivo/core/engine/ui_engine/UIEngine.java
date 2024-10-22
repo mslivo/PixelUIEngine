@@ -131,10 +131,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager);
-        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
-        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA,GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -199,7 +199,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedGridItem = null;
         newUIEngineState.draggedListItem = null;
         newUIEngineState.draggedList = null;
-        newUIEngineState.draggedListOffsetX = new GridPoint2();
+        newUIEngineState.draggedListOffset = new GridPoint2();
         newUIEngineState.draggedListFromIndex = 0;
         newUIEngineState.pressedList = null;
         newUIEngineState.pressedListItem = null;
@@ -1188,10 +1188,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             if (UICommonUtils.grid_positionValid(grid, inv_x, inv_y)) {
                                 Object pressedGridItem = grid.items[inv_x][inv_y];
                                 if (pressedGridItem != null && grid.dragEnabled) {
-                                    uiEngineState.draggedGridFrom.x = inv_x;
-                                    uiEngineState.draggedGridFrom.y = inv_y;
-                                    uiEngineState.draggedGridOffset.x = uiEngineState.mouse_ui.x - (x_grid + (inv_x * tileSize));
-                                    uiEngineState.draggedGridOffset.y = uiEngineState.mouse_ui.y - (y_grid + (inv_y * tileSize));
+                                    uiEngineState.draggedGridFrom.set(inv_x, inv_y);
+                                    uiEngineState.draggedGridOffset.set(uiEngineState.mouse_ui.x - (x_grid + (inv_x * tileSize)), uiEngineState.mouse_ui.y - (y_grid + (inv_y * tileSize)));
                                     uiEngineState.draggedGridItem = grid.items[inv_x][inv_y];
                                     uiEngineState.draggedGrid = grid;
                                 }
@@ -1207,8 +1205,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             }
                             if (pressedListItem != null && list.dragEnabled) {
                                 uiEngineState.draggedListFromIndex = uiEngineState.itemInfo_listIndex;
-                                uiEngineState.draggedListOffsetX.x = uiEngineState.mouse_ui.x - (UICommonUtils.component_getAbsoluteX(list));
-                                uiEngineState.draggedListOffsetX.y = (uiEngineState.mouse_ui.y - UICommonUtils.component_getAbsoluteY(list)) % 8;
+                                uiEngineState.draggedListOffset.set(uiEngineState.mouse_ui.x - (UICommonUtils.component_getAbsoluteX(list)),
+                                        (uiEngineState.mouse_ui.y - UICommonUtils.component_getAbsoluteY(list)) % 8);
                                 uiEngineState.draggedListItem = pressedListItem;
                                 uiEngineState.draggedList = list;
                             }
@@ -1434,10 +1432,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             }
                         } else if (UICommonUtils.list_canDragIntoScreen(list)) {
                             if (list.listAction != null) list.listAction.onDragIntoApp(
-                                    dragItem,
-                                    dragFromIndex,
-                                    uiEngineState.mouse_ui.x,
-                                    uiEngineState.mouse_ui.y
+                                    dragItem, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
                             );
                         }
                         // reset
@@ -1471,10 +1466,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         } else if (UICommonUtils.grid_canDragIntoScreen(grid)) {
                             if (grid.gridAction != null)
                                 grid.gridAction.onDragIntoApp(
-                                        dragItem,
-                                        dragFromX, dragFromY,
-                                        uiEngineState.mouse_ui.x,
-                                        uiEngineState.mouse_ui.y
+                                        dragItem, dragFromX, dragFromY , uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
                                 );
                         }
                         // reset
@@ -1936,7 +1928,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
          */
     }
 
-    private void render_glClear(){
+    private void render_glClear() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
@@ -2651,7 +2643,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                     uiEngineState.tempColor.set(component.color2);
 
-                    if (list.listAction != null && list.items != null && itemIndex < list.items.size()) {
+                    if (list.listAction != null && item != null) {
                         Color cellColorAction = list.listAction.cellColor(item);
                         if (cellColorAction != null)
                             uiEngineState.tempColor.set(cellColorAction);
@@ -2742,7 +2734,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         float b = canvas.colorMap.b[icx][icy];
                         primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, a * componentAlpha);
                         primitiveRenderer.setVertexColor(r, g, b, a);
-                        primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx , UICommonUtils.component_getAbsoluteY(canvas) + icy );
+                        primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx, UICommonUtils.component_getAbsoluteY(canvas) + icy);
                     }
                 }
                 primitiveRenderer.setTweakAndColorReset();
@@ -2837,51 +2829,48 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 for (int ix = 0; ix < gridWidth; ix++) {
                     for (int iy = 0; iy < gridHeight; iy++) {
-                        if (grid.items != null) {
+                        Object item = grid.items[ix][iy];
 
-
-                            CMediaArray cellGraphic;
-                            CMediaArray gridGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_X2 : UIEngineBaseMedia_8x8.UI_GRID;
-                            boolean selected = grid.items[ix][iy] != null && grid.items[ix][iy] == grid.selectedItem;
-                            if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
-                                cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia_8x8.UI_GRID_DRAGGED;
+                        CMediaArray cellGraphic;
+                        CMediaArray gridGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_X2 : UIEngineBaseMedia_8x8.UI_GRID;
+                        boolean selected = item != null && item == grid.selectedItem;
+                        if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
+                            cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia_8x8.UI_GRID_DRAGGED;
+                        } else {
+                            if (selected) {
+                                cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_CELL_SELECTED_X2 : UIEngineBaseMedia_8x8.UI_GRID_CELL_SELECTED;
                             } else {
-                                if (selected) {
-                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_CELL_SELECTED_X2 : UIEngineBaseMedia_8x8.UI_GRID_CELL_SELECTED;
-                                } else {
-                                    cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_CELL_X2 : UIEngineBaseMedia_8x8.UI_GRID_CELL;
-                                }
+                                cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_CELL_X2 : UIEngineBaseMedia_8x8.UI_GRID_CELL;
                             }
+                        }
 
-                            // Draw Cell
-                            uiEngineState.tempColor.set(grid.color2);
+                        uiEngineState.tempColor.set(grid.color2);
+                        // Draw Cell
+                        if (grid.gridAction != null && item != null) {
+                            Color cellColorAction = grid.gridAction.cellColor(item);
+                            if (cellColorAction != null)
+                                uiEngineState.tempColor.set(cellColorAction);
+                        }
+                        spriteRenderer.saveState();
+                        render_setColor(spriteRenderer, uiEngineState.tempColor, componentAlpha, gridGrayScale);
 
-                            if (grid.gridAction != null) {
-                                Color cellColorAction = grid.gridAction.cellColor(grid.items[ix][iy], ix, iy);
-                                if (cellColorAction != null)
-                                    uiEngineState.tempColor.set(cellColorAction);
-                            }
+                        int index = grid.doubleSized ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
+                        spriteRenderer.drawCMediaArray(cellGraphic, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), index);
+
+                        spriteRenderer.loadState();
+
+                        // Draw Outer
+                        spriteRenderer.drawCMediaArray(gridGraphic, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), index);
+
+
+                        // Draw Icon
+                        CMediaSprite cellIcon = (item != null && grid.gridAction != null) ? grid.gridAction.icon(item) : null;
+                        if (cellIcon != null) {
                             spriteRenderer.saveState();
-                            render_setColor(spriteRenderer, uiEngineState.tempColor, componentAlpha, gridGrayScale);
-
-                            int index = grid.doubleSized ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
-                            spriteRenderer.drawCMediaArray(cellGraphic, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), index);
-
+                            spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
+                            int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(item) : 0;
+                            spriteRenderer.drawCMediaSprite(cellIcon, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                             spriteRenderer.loadState();
-
-                            // Draw Outer
-                            spriteRenderer.drawCMediaArray(gridGraphic, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), index);
-
-
-                            // Draw Icon
-                            CMediaSprite cellIcon = (grid.items[ix][iy] != null && grid.gridAction != null) ? grid.gridAction.icon(grid.items[ix][iy]) : null;
-                            if (cellIcon != null) {
-                                spriteRenderer.saveState();
-                                spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
-                                int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(grid.items[ix][iy]) : 0;
-                                spriteRenderer.drawCMediaSprite(cellIcon, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
-                                spriteRenderer.loadState();
-                            }
                         }
                     }
                 }
@@ -3100,7 +3089,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
             Object dragItem = uiEngineState.draggedGridItem;
             if (dragGrid.gridAction != null) {
                 float dragAlpha = dragGrid.color.a * uiEngineState.config.component_listDragAlpha;
-
                 spriteRenderer.setColor(Color.GRAY, dragAlpha);
                 CMediaSprite icon = dragGrid.gridAction.icon(dragItem);
                 if (icon != null)
@@ -3108,8 +3096,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         } else if (uiEngineState.draggedList != null) {
             List dragList = uiEngineState.draggedList;
-            int dragOffsetX = uiEngineState.draggedListOffsetX.x;
-            int dragOffsetY = uiEngineState.draggedListOffsetX.y;
+            int dragOffsetX = uiEngineState.draggedListOffset.x;
+            int dragOffsetY = uiEngineState.draggedListOffset.y;
             Object dragItem = uiEngineState.draggedListItem;
 
             if (dragList.listAction != null) {

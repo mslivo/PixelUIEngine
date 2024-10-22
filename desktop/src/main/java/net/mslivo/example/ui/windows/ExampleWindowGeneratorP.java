@@ -626,7 +626,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Color cellColor(ListItem listItem) {
-                return Color.valueOf("65F7B3");
+                return listItem != null ? Color.valueOf("65F7B3") : Color.BLUE;
             }
         };
         api.component.list.setListAction(list1, list1Action);
@@ -792,7 +792,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,false, true, false, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,false, true, true, false, true);
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override
@@ -828,8 +828,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
 
             @Override
-            public void onDragIntoApp(ListItem listItem, int x, int y, int screenX, int screenY) {
-                invItems3[x][y] = null;
+            public void onDragIntoApp(ListItem listItem, int from_x, int from_y ,int screenX, int screenY) {
+                invItems3[from_x][from_y] = null;
                 api.addNotification(api.notification.create(listItem.text + " " + screenX + "," + screenY));
             }
 

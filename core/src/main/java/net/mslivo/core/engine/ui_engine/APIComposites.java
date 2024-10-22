@@ -125,63 +125,6 @@ public final class APIComposites {
                 }
             });
 
-            api.component.grid.setGridAction(grid, new GridAction() {
-                @Override
-                public boolean canDragFromGrid(Grid fromGrid) {
-                    return false;
-                }
-
-                @Override
-                public boolean canDragFromList(List fromList) {
-                    return false;
-                }
-
-                @Override
-                public boolean canDragIntoApp() {
-                    return false;
-                }
-
-                @Override
-                public Color cellColor(Object listItem, int x, int y) {
-                    return gridAction.cellColor(listItem,x,y);
-                }
-
-                @Override
-                public CMediaSprite icon(Object listItem) {
-                    return gridAction.icon(listItem);
-                }
-
-                @Override
-                public int iconIndex(Object listItem) {
-                    return gridAction.iconIndex(listItem);
-                }
-
-                @Override
-                public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
-                    return;
-                }
-
-                @Override
-                public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
-                    return;
-                }
-
-                @Override
-                public void onDragIntoApp(Object listItem, int x, int y, int screenX, int screenY) {
-                    return;
-                }
-
-                @Override
-                public boolean onItemSelected(Object listItem) {
-                    return gridAction.onItemSelected(listItem);
-                }
-
-                @Override
-                public Tooltip toolTip(Object listItem) {
-                    return gridAction.toolTip(listItem);
-                }
-            });
-
             api.component.addUpdateAction(grid, new UpdateAction(0,true) {
                 int itemsSizeLast = -1;
                 @Override
@@ -197,9 +140,75 @@ public final class APIComposites {
                 }
             });
 
+            pageableReadOnlyGridSetGridAction(grid, gridAction);
+
             return new Component[]{
                     grid, backButton, pageText, forwardButton
             };
+        }
+
+        public void pageableReadOnlyGridSetGridAction(Grid grid, GridAction gridAction){
+            if(gridAction != null){
+                grid.gridAction = new GridAction() {
+                    @Override
+                    public boolean canDragFromGrid(Grid fromGrid) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean canDragFromList(List fromList) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean canDragIntoApp() {
+                        return false;
+                    }
+
+                    @Override
+                    public Color cellColor(Object listItem) {
+                        return gridAction.cellColor(listItem);
+                    }
+
+                    @Override
+                    public CMediaSprite icon(Object listItem) {
+                        return gridAction.icon(listItem);
+                    }
+
+                    @Override
+                    public int iconIndex(Object listItem) {
+                        return gridAction.iconIndex(listItem);
+                    }
+
+                    @Override
+                    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
+                        return;
+                    }
+
+                    @Override
+                    public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
+                        return;
+                    }
+
+                    @Override
+                    public void onDragIntoApp(Object listItem, int from_x, int from_y, int screenX, int screenY) {
+                        return;
+                    }
+
+                    @Override
+                    public boolean onItemSelected(Object listItem) {
+                        return gridAction.onItemSelected(listItem);
+                    }
+
+                    @Override
+                    public Tooltip toolTip(Object listItem) {
+                        return gridAction.toolTip(listItem);
+                    }
+                };
+            }else{
+                grid.gridAction = null;
+                return;
+            }
         }
 
         private void pageableGridUpdateButtons(int x, int y, ImageButton backButton, ImageButton forwardButton, Text text, int currentPage, int pagesMax){

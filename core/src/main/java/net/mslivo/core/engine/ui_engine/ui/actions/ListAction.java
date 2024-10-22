@@ -51,7 +51,7 @@ public abstract class ListAction<T> extends CommonActions {
         return null;
     }
 
-    public void onDragIntoApp(T listItem, int index, int mouseX, int mouseY) {
+    public void onDragIntoApp(T listItem, int mouseX, int mouseY) {
     }
 
     public boolean canDragIntoApp() {
