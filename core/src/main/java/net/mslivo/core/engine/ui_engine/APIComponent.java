@@ -835,30 +835,34 @@ public final class APIComponent {
         }
 
         public Grid create(int x, int y, Object[][] items) {
-            return create(x, y, items, defaultGridAction(), false, false, false, false, false);
+            return create(x, y, items, defaultGridAction(), Color.LIGHT_GRAY, false, false, false, false, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction) {
-            return create(x, y, items, gridAction, false, false, false, false, false);
+            return create(x, y, items, gridAction, Color.LIGHT_GRAY, false, false, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect) {
-            return create(x, y, items, gridAction, multiSelect, false, false, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor) {
+            return create(x, y, items, gridAction, selectedColor, false, false, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled) {
-            return create(x, y, items, gridAction, multiSelect, dragEnabled, false, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect) {
+            return create(x, y, items, gridAction, selectedColor, multiSelect, false, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
-            return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled) {
+            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-            return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
+            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, dragOutEnabled, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
+            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
+        }
+
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
             Grid grid = new Grid();
             int width = 1;
             int height = 1;
@@ -876,6 +880,7 @@ public final class APIComponent {
             grid.dragOutEnabled = dragOutEnabled;
             grid.doubleSized = doubleSized;
             grid.multiSelect = multiSelect;
+            grid.selectedColor = selectedColor != null ? new Color(selectedColor) : Color.LIGHT_GRAY;
             return grid;
         }
 
@@ -1764,8 +1769,8 @@ public final class APIComponent {
 
         public void setSelectedItemByText(List list, String text) {
             if (list == null) return;
-            for(int i=0;i<list.items.size();i++){
-                if(list.listAction.text(list.items.get(i)).equals(text)){
+            for (int i = 0; i < list.items.size(); i++) {
+                if (list.listAction.text(list.items.get(i)).equals(text)) {
                     UICommonUtils.list_setSelectedItem(list, list.items.get(i));
                     return;
                 }

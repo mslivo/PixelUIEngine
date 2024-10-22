@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.components.grid;
 
+import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.actions.GridAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 
@@ -15,4 +16,6 @@ public class Grid<T> extends Component {
     public boolean dragOutEnabled;
     public boolean dragInEnabled;
     public boolean doubleSized;
+    public Color selectedColor;
+
 }

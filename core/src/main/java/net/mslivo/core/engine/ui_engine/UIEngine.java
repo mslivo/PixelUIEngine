@@ -1349,49 +1349,59 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.resetPressedKnobReference(uiEngineState);
                     }
                     case Grid grid -> {
-                        boolean select = grid.gridAction != null ? grid.gridAction.onItemSelected(uiEngineState.pressedGridItem) : true;
-                        if (uiEngineState.pressedGridItem != null) {
-                            if (select) {
-                                if (grid.multiSelect) {
-                                    if (!grid.selectedItems.contains(uiEngineState.pressedGridItem)) {
-                                        grid.selectedItems.add(uiEngineState.pressedGridItem);
+                        UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, grid);
+
+                        if(uiEngineState.draggedGrid == null || uiEngineState.itemInfo_gridPos.equals(uiEngineState.draggedGridFrom)) { // Only when not dragged elsewhere
+                            boolean select = grid.gridAction != null ? grid.gridAction.onItemSelected(uiEngineState.pressedGridItem) : true;
+
+                            if (uiEngineState.pressedGridItem != null) {
+                                if (select) {
+                                    if (grid.multiSelect) {
+                                        ArrayList selectedNew = new ArrayList();
+                                        selectedNew.addAll(grid.selectedItems);
+
+                                        if (grid.selectedItems.contains(uiEngineState.pressedGridItem))
+                                            selectedNew.remove(uiEngineState.pressedGridItem);
+                                        else selectedNew.add(uiEngineState.pressedGridItem);
+
+                                        UICommonUtils.grid_setSelectedItems(grid, selectedNew.toArray());
                                     } else {
-                                        grid.selectedItems.remove(uiEngineState.pressedGridItem);
+                                        UICommonUtils.grid_setSelectedItem(grid, uiEngineState.pressedGridItem);
                                     }
-                                    grid.selectedItem = null;
-                                } else {
-                                    grid.selectedItems.clear();
-                                    grid.selectedItem = uiEngineState.pressedGridItem;
                                 }
-                            }
-                        } else {
-                            if (select) {
-                                grid.selectedItems.clear();
-                                grid.selectedItem = null;
+                            } else {
+                                if (select) {
+                                    grid.selectedItems.clear();
+                                    grid.selectedItem = null;
+                                }
                             }
                         }
                         UICommonUtils.resetPressedGridReference(uiEngineState);
                     }
                     case List list -> {
-                        boolean select = list.listAction != null ? list.listAction.onItemSelected(uiEngineState.pressedListItem) : true;
-                        if (uiEngineState.pressedListItem != null) {
-                            if (select) {
-                                if (list.multiSelect) {
-                                    if (!list.selectedItems.contains(uiEngineState.pressedListItem)) {
-                                        list.selectedItems.add(uiEngineState.pressedListItem);
+                        UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
+                        if(uiEngineState.draggedList == null || uiEngineState.itemInfo_listIndex == uiEngineState.draggedListFromIndex) { // Only when not dragged elsewhere
+                            boolean select = list.listAction != null ? list.listAction.onItemSelected(uiEngineState.pressedListItem) : true;
+                            if (uiEngineState.pressedListItem != null) {
+                                if (select) {
+                                    if (list.multiSelect) {
+                                        ArrayList selectedNew = new ArrayList();
+                                        selectedNew.addAll(list.selectedItems);
+
+                                        if (list.selectedItems.contains(uiEngineState.pressedListItem))
+                                            selectedNew.remove(uiEngineState.pressedListItem);
+                                        else selectedNew.add(uiEngineState.pressedListItem);
+
+                                        UICommonUtils.list_setSelectedItems(list, selectedNew.toArray());
                                     } else {
-                                        list.selectedItems.remove(uiEngineState.pressedListItem);
+                                        UICommonUtils.list_setSelectedItem(list, uiEngineState.pressedListItem);
                                     }
-                                    list.selectedItem = null;
-                                } else {
-                                    list.selectedItems.clear();
-                                    list.selectedItem = uiEngineState.pressedListItem;
                                 }
-                            }
-                        } else {
-                            if (select) {
-                                list.selectedItems.clear();
-                                list.selectedItem = null;
+                            } else {
+                                if (select) {
+                                    list.selectedItems.clear();
+                                    list.selectedItem = null;
+                                }
                             }
                         }
                         UICommonUtils.resetPressedListReference(uiEngineState);
@@ -1466,7 +1476,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         } else if (UICommonUtils.grid_canDragIntoScreen(grid)) {
                             if (grid.gridAction != null)
                                 grid.gridAction.onDragIntoApp(
-                                        dragItem, dragFromX, dragFromY , uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
+                                        dragItem, dragFromX, dragFromY, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
                                 );
                         }
                         // reset
@@ -2833,7 +2843,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                         CMediaArray cellGraphic;
                         CMediaArray gridGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_X2 : UIEngineBaseMedia_8x8.UI_GRID;
-                        boolean selected = item != null && item == grid.selectedItem;
+                        boolean selected = grid.multiSelect ? grid.selectedItems.contains(item) : item != null && item == grid.selectedItem;
                         if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
                             cellGraphic = grid.doubleSized ? UIEngineBaseMedia_8x8.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia_8x8.UI_GRID_DRAGGED;
                         } else {
@@ -2867,7 +2877,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         CMediaSprite cellIcon = (item != null && grid.gridAction != null) ? grid.gridAction.icon(item) : null;
                         if (cellIcon != null) {
                             spriteRenderer.saveState();
-                            spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
+                            if (selected) {
+                                spriteRenderer.setColor(grid.selectedColor.r, grid.selectedColor.g, grid.selectedColor.b, componentAlpha);
+                            } else {
+                                spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
+                            }
                             int iconIndex = grid.gridAction != null ? grid.gridAction.iconIndex(item) : 0;
                             spriteRenderer.drawCMediaSprite(cellIcon, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize), iconIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                             spriteRenderer.loadState();

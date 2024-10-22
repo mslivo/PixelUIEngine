@@ -519,7 +519,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ArrayList<String> items = new ArrayList<>();
              for(int i=0;i<40;i++)
             items.add("Item "+i);
-        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items,null, new GridAction() {
+        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
                 return 0;
@@ -534,7 +534,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public CMediaSprite icon(Object listItem) {
                 return ExampleBaseMedia.ICON_EXAMPLE_1;
             }
-        });
+        },Color.WHITE, null);
         api.component.tabbar.tab.addTabComponents(tabImageButton, readableGrid);
         api.window.addComponents(window, readableGrid);
 
@@ -697,7 +697,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems = new ListItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
-        Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true);
+        Grid grid1 = api.component.grid.create(18, 2, invItems, null, null, true, true, true);
 
         GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
@@ -745,7 +745,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems2 = new ListItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
-        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true);
+        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, null, true, true, true);
 
         GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
@@ -792,7 +792,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,false, true, true, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,null, false, true, true, false, true);
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override

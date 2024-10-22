@@ -1008,7 +1008,7 @@ final class UICommonUtils {
             list.selectedItems.clear();
             if (selectedItems != null) {
                 for (int i = 0; i < selectedItems.length; i++) {
-                    if (selectedItems[i] != null && list.items.contains(selectedItems)) {
+                    if (selectedItems[i] != null && list.items.contains(selectedItems[i])) {
                         list.selectedItems.add(selectedItems[i]);
                     }
                 }
@@ -1155,7 +1155,7 @@ final class UICommonUtils {
             grid.selectedItems.clear();
             if (selectedItems != null) {
                 for (int i = 0; i < selectedItems.length; i++) {
-                    if (selectedItems[i] != null && grid_contains(grid, selectedItems)) {
+                    if (selectedItems[i] != null && grid_contains(grid, selectedItems[i])) {
                         grid.selectedItems.add(selectedItems[i]);
                     }
                 }
