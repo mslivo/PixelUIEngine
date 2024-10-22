@@ -517,9 +517,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.tabbar.tab.addTabComponents(tabImageButton, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
 
         ArrayList<String> items = new ArrayList<>();
-       /// for(int i=0;i<40;i++)
-          //  items.add("Item "+i);
-        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, new GridAction() {
+             for(int i=0;i<40;i++)
+            items.add("Item "+i);
+        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items,null, new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
                 return 0;

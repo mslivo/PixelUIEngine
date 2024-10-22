@@ -7,15 +7,15 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.LongArray;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaImage;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -41,6 +41,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -91,64 +92,81 @@ public final class APIComposites {
 
         private static final String PAGE_TEXT = "%s/%s";
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction){
-            return createPageableReadOnlyGrid(x,y,width,height,items,gridAction, false, false);
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem) {
+            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, preSelectedItem, false, false);
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean multiselect, boolean doubleSized){
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem, boolean multiselect, boolean doubleSized) {
 
-            int gridHeight = height-1;
+            int gridHeight = height - 1;
             final AtomicInteger currentPage = new AtomicInteger(0);
 
             ArrayList<Object[][]> pages = new ArrayList<>();
 
-            Grid grid = api.component.grid.create(x, y+1, null, null, multiselect,false, false, false,doubleSized);
-            ImageButton backButton = api.component.button.imageButton.create(0,0,1,1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
-            Text pageText = api.component.text.create(0,0, new String[]{});
-            ImageButton forwardButton = api.component.button.imageButton.create(0,0, 1,1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
+            Grid grid = api.component.grid.create(x, y + 1, null, null, multiselect, false, false, false, doubleSized);
+            ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
+            Text pageText = api.component.text.create(0, 0, new String[]{});
+            ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
 
             api.component.button.setButtonAction(backButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    currentPage.set(Math.max(currentPage.get()-1,0));
-                    pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
-                    api.component.grid.setItems(grid, pages.get(currentPage.get()));
+                    currentPage.set(Math.max(currentPage.get() - 1, 0));
+                    pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+                    pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
                 }
             });
             api.component.button.setButtonAction(forwardButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    currentPage.set(Math.min(currentPage.get()+1,pages.size()-1));
-                    pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
-                    api.component.grid.setItems(grid, pages.get(currentPage.get()));
+                    currentPage.set(Math.min(currentPage.get() + 1, pages.size() - 1));
+                    pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+                    pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
                 }
             });
 
-            api.component.addUpdateAction(grid, new UpdateAction(0,true) {
-                int itemsSizeLast = -1;
+            api.component.addUpdateAction(grid, new UpdateAction(0, true) {
+                 ArrayList refList = new ArrayList(items);
+
                 @Override
                 public void onUpdate() {
-                    if( itemsSizeLast != items.size()){
-                        pageableGridUpdateGridResize(pages, width, gridHeight, items);
-                        currentPage.set(Math.clamp(currentPage.get(), 0, pages.size()-1));
-                        api.component.grid.setItems(grid, pages.get(currentPage.get()));
-                        pageableGridUpdateButtons(x,y, backButton, forwardButton, pageText, currentPage.get(), pages.size()-1);
-                        itemsSizeLast = items.size();
+                    if (!Objects.equals(items, refList)) {
+                        pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
+                        pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+                        refList = new ArrayList(items);
                     }
 
                 }
             });
 
+            pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
             pageableReadOnlyGridSetGridAction(grid, gridAction);
+            pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+
+            if (preSelectedItem != null) {
+                pageLoop:
+                for (int i = 0; i < pages.size(); i++) {
+                    Object[][] array = pages.get(i);
+                    for (int ix = 0; ix < array.length; ix++) {
+                        for (int iy = 0; iy < array[0].length; iy++) {
+                            if (array[ix][iy] == preSelectedItem) {
+                                currentPage.set(i);
+                                break pageLoop;
+                            }
+                        }
+                    }
+                }
+                api.component.grid.setSelectedItem(grid, preSelectedItem);
+            }
 
             return new Component[]{
                     grid, backButton, pageText, forwardButton
             };
         }
 
-        public void pageableReadOnlyGridSetGridAction(Grid grid, GridAction gridAction){
-            if(gridAction != null){
+        public void pageableReadOnlyGridSetGridAction(Grid grid, GridAction gridAction) {
+            if (gridAction != null) {
                 grid.gridAction = new GridAction() {
                     @Override
                     public boolean canDragFromGrid(Grid fromGrid) {
@@ -205,52 +223,53 @@ public final class APIComposites {
                         return gridAction.toolTip(listItem);
                     }
                 };
-            }else{
+            } else {
                 grid.gridAction = null;
                 return;
             }
         }
 
-        private void pageableGridUpdateButtons(int x, int y, ImageButton backButton, ImageButton forwardButton, Text text, int currentPage, int pagesMax){
-            String pageStringMax = String.format(PAGE_TEXT, pagesMax+1,pagesMax+1);
-            String pageString = String.format(PAGE_TEXT, currentPage+1,pagesMax+1);
+        private void pageableGridUpdateButtonsText(int x, int y, ImageButton backButton, ImageButton forwardButton, Text text, int currentPage, int pagesMax) {
+            String pageStringMax = String.format(PAGE_TEXT, pagesMax + 1, pagesMax + 1);
+            String pageString = String.format(PAGE_TEXT, currentPage + 1, pagesMax + 1);
 
             api.component.setPositionGrid(backButton, x, y);
-            api.component.setPositionGrid(text, x+1, y);
-            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax)+1)/api.TSF());
-            api.component.setPositionGrid(forwardButton, (x+1)+textWidthTiles, y);
+            api.component.setPositionGrid(text, x + 1, y);
+            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
+            api.component.setPositionGrid(forwardButton, (x + 1) + textWidthTiles, y);
             api.component.text.setLines(text, Tools.Text.toArray(pageString));
             return;
         }
 
-        private void pageableGridUpdateGridResize(ArrayList<Object[][]> pages, int width, int height, ArrayList items){
-            int pageSize = width*height;
-            int pagesCount = MathUtils.floor(items.size()/(float)pageSize);
-            if(items.size()%pageSize > 0 || items.size() == 0) pagesCount++;
+        private void pageableGridUpdateGridResize(Grid grid, int setToPage, ArrayList<Object[][]> pages, int width, int height, ArrayList items) {
+            int pageSize = width * height;
+            int pagesCount = MathUtils.floor(items.size() / (float) pageSize);
+            if (items.size() % pageSize > 0 || items.size() == 0) pagesCount++;
 
             pages.clear();
-            for(int i=0;i<pagesCount;i++){
+            for (int i = 0; i < pagesCount; i++) {
                 Object[][] page = new Object[width][height];
                 pages.add(page);
             }
 
             int pageIndex = 0;
             int ix = 0;
-            int iy = height-1;
-            for(int i=0;i<items.size();i++){
+            int iy = height - 1;
+            for (int i = 0; i < items.size(); i++) {
                 Object[][] page = pages.get(pageIndex);
 
                 page[ix][iy] = items.get(i);
                 ix++;
-                if(ix > width-1) {
+                if (ix > width - 1) {
                     ix = 0;
                     iy--;
-                    if(iy < 0){
-                        iy = height-1;
+                    if (iy < 0) {
+                        iy = height - 1;
                         pageIndex++;
                     }
                 }
             }
+            api.component.grid.setItems(grid, pages.get(setToPage));
         }
     }
 
@@ -1169,8 +1188,8 @@ public final class APIComposites {
         public void makeExclusiveToggleButtons(Button[] buttons, BiConsumer<Button, Boolean> toggleFunction) {
             if (buttons == null || toggleFunction == null) return;
             int toggledButtonIndex = -1;
-            for(int i = 0; i < buttons.length; i++){
-                if(buttons[i].pressed){
+            for (int i = 0; i < buttons.length; i++) {
+                if (buttons[i].pressed) {
                     toggledButtonIndex = i;
                     break;
                 }
@@ -1195,7 +1214,7 @@ public final class APIComposites {
                         }
                     }
                 });
-                if(i == toggledButtonIndex){
+                if (i == toggledButtonIndex) {
                     api.component.button.setToggleDisabled(button, true);
                 }
             }
