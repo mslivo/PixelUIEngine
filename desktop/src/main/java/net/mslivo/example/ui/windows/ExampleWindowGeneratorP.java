@@ -137,6 +137,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         }, window.color.a);
 
         Knob knob = api.component.knob.create(4, 2, null, false, 1f);
+        //api.component.setColor1And2(knob, api.config.component.getDefaultColor(), Color.BLACK);
+
         KnobAction knobAction = new KnobAction() {
             @Override
             public void onTurned(float turned, float amount) {
@@ -147,8 +149,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.knob.setKnobAction(knob, knobAction);
         api.component.setColor(knob, Color.YELLOW);
         api.component.setColor2(knob, Color.BLUE);
+
         Knob knobe = api.component.knob.create(4, 5, null, true);
-        api.component.setColor(knobe, Color.RED);
 
         // Shape
         Shape oval = api.component.shape.create(11, 3, 4, 4, SHAPE_TYPE.OVAL);
@@ -216,8 +218,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
 
         Progressbar progressBar = api.component.progressbar.create(18, 3, 8, 0, true, true);
-        api.component.setColor(progressBar, Color.BLUE);
-        api.component.setColor2(progressBar, Color.RED);
+
         api.component.progressbar.setFontColor(progressBar, Color.WHITE);
 
         ScrollbarHorizontal pgScrollbar = api.component.scrollbar.scrollbarHorizontal.create(18, 5, 8, new ScrollBarAction() {

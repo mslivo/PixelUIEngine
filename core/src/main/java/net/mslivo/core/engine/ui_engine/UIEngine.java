@@ -2893,8 +2893,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.end();
 
                     primitiveRenderer.begin(GL20.GL_TRIANGLES);
-                    render_setColor(primitiveRenderer, Color.GRAY, componentAlpha, componentGrayScale);
-                    primitiveRenderer.setVertexColor(shape.color);
+                    render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
+                    primitiveRenderer.setVertexColor(shape.color2);
                     final int cx = UICommonUtils.component_getAbsoluteX(shape);
                     final int cy = UICommonUtils.component_getAbsoluteY(shape);
                     final int cw = TS(shape.width);

@@ -330,11 +330,11 @@ public final class APIConfig {
         APIComponentConfig(){
         }
         public Color getDefaultColor() {
-            return uiConfig.component_defaultColor;
+            return uiConfig.component_defaultColor.cpy();
         }
 
         public void setDefaultColor(Color components_defaultColor) {
-            uiConfig.component_defaultColor = components_defaultColor;
+            uiConfig.component_defaultColor = components_defaultColor.cpy();
         }
 
         public int getAppViewportDefaultUpdateTime() {
@@ -416,11 +416,11 @@ public final class APIConfig {
         }
 
         public Color getDefaultColor() {
-            return uiConfig.notification_defaultColor;
+            return uiConfig.notification_defaultColor.cpy();
         }
 
         public void setDefaultColor(Color notifications_defaultColor) {
-            uiConfig.notification_defaultColor = notifications_defaultColor;
+            uiConfig.notification_defaultColor = notifications_defaultColor.cpy();
         }
 
         public int getFadeoutTime() {
@@ -446,11 +446,11 @@ public final class APIConfig {
         }
 
         public Color getDefaultColor() {
-            return uiConfig.tooltip_defaultColor;
+            return uiConfig.tooltip_defaultColor.cpy();
         }
 
         public void setDefaultColor(Color tooltip_defaultColor) {
-            uiConfig.tooltip_defaultColor = tooltip_defaultColor;
+            uiConfig.tooltip_defaultColor = tooltip_defaultColor.cpy();
         }
 
         public float getFadeInTime() {
@@ -484,11 +484,11 @@ public final class APIConfig {
         }
 
         public Color getDefaultColor() {
-            return uiConfig.contextMenu_defaultColor;
+            return uiConfig.contextMenu_defaultColor.cpy();
         }
 
         public void setDefaultColor(Color tooltip_defaultColor) {
-            uiConfig.contextMenu_defaultColor = tooltip_defaultColor;
+            uiConfig.contextMenu_defaultColor = tooltip_defaultColor.cpy();
         }
 
     }

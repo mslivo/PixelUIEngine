@@ -117,7 +117,7 @@ public final class APIComponent {
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
             AppViewport appViewPort = new AppViewport();
             appViewPort.updateTimer = 0;
-            setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY);
+            setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY, Color.GRAY);
             int viewportWidth = appViewPort.width * api.TS();
             int viewportHeight = appViewPort.height * api.TS();
             appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
@@ -218,7 +218,7 @@ public final class APIComponent {
 
         public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
             Progressbar progressBar = new Progressbar();
-            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor);
+            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor, darkerColor(uiConfig.component_defaultColor));
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
@@ -259,7 +259,7 @@ public final class APIComponent {
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation) {
             Shape shape = new Shape();
-            setComponentCommonInitValuesInternal(shape, x, y, width, height, uiConfig.component_defaultColor);
+            setComponentCommonInitValuesInternal(shape, x, y, width, height, Color.GRAY, Color.GRAY);
             shape.shapeType = shapeType;
             shape.shapeRotation = shapeRotation;
             return shape;
@@ -460,6 +460,15 @@ public final class APIComponent {
         APICheckbox() {
         }
 
+        private CheckboxAction defaultCheckboxAction(){
+            return new CheckboxAction() {
+                @Override
+                public void onCheck(boolean checked) {
+                    CheckboxAction.super.onCheck(checked);
+                }
+            };
+        }
+
         public Checkbox create(int x, int y, String text) {
             return create(x, y, text, CHECKBOX_STYLE.CHECKBOX, null, false);
         }
@@ -474,10 +483,10 @@ public final class APIComponent {
 
         public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
-            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, brigtherColor(uiConfig.component_defaultColor));
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
-            checkBox.checkBoxAction = checkBoxAction;
+            checkBox.checkBoxAction = checkBoxAction != null ? checkBoxAction : defaultCheckboxAction();
             checkBox.fontColor = uiConfig.ui_font_defaultColor.cpy();
             checkBox.checked = checked;
             return checkBox;
@@ -843,7 +852,7 @@ public final class APIComponent {
                 width = items.length * (doubleSized ? 2 : 1);
                 height = items[0].length * (doubleSized ? 2 : 1);
             }
-            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiConfig.component_defaultColor, brigtherColor(uiConfig.component_defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
@@ -937,7 +946,7 @@ public final class APIComponent {
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
-            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, brigtherColor(uiConfig.component_defaultColor));
             textField.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
@@ -1030,7 +1039,7 @@ public final class APIComponent {
 
         public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             Canvas canvas = new Canvas();
-            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY);
+            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY,Color.GRAY);
             canvas.colorMap = new ColorMap();
             int widthPx = api.TS(width);
             int heightPx = api.TS(height);
@@ -1263,7 +1272,7 @@ public final class APIComponent {
 
         public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
             Knob knob = new Knob();
-            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, Color.BLACK);
+            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, darkerColor(uiConfig.component_defaultColor));
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
             knob.knobAction = knobAction != null ? knobAction : defaultKnobAction();
@@ -1360,7 +1369,7 @@ public final class APIComponent {
             Image imageC = new Image();
             int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TS() : 0;
             int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
-            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY);
+            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY,Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
             imageC.imageAction = imageAction != null ? imageAction : defaultImageAction();
@@ -1415,7 +1424,7 @@ public final class APIComponent {
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
-            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, brigtherColor(uiEngineState.config.component_defaultColor));
             comboBox.useIcons = useIcons;
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : defaultComboBoxAction();
             comboBox.comboBoxItems = new ArrayList<>();
@@ -1588,7 +1597,7 @@ public final class APIComponent {
 
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarHorizontal scrollBarHorizontal = new ScrollbarHorizontal();
-                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1);
+                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiConfig.component_defaultColor, darkerColor(uiConfig.component_defaultColor));
                 scrollBarHorizontal.scrollBarAction = scrollBarAction != null ? scrollBarAction : defaultScrollBarAction();
                 scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarHorizontal;
@@ -1611,7 +1620,7 @@ public final class APIComponent {
 
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarVertical scrollBarVertical = new ScrollbarVertical();
-                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length);
+                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiConfig.component_defaultColor, darkerColor(uiConfig.component_defaultColor));
                 scrollBarVertical.scrollBarAction = scrollBarAction != null ? scrollBarAction : defaultScrollBarAction();
                 scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarVertical;
@@ -1668,7 +1677,7 @@ public final class APIComponent {
 
         public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
-            setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, brigtherColor(uiConfig.component_defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
@@ -1866,17 +1875,17 @@ public final class APIComponent {
         component.color2.set(color);
     }
 
-    public void setColor1And2(Component component, Color color) {
+    public void setColor1And2(Component component, Color color1, Color color2) {
         if (component == null) return;
-        setColor(component, color);
-        setColor2(component, color);
+        setColor(component, color1);
+        setColor2(component, color2);
     }
 
-    public void setColor1And2(Component[] components, Color color) {
+    public void setColor1And2(Component[] components, Color color1,Color color2) {
         if (components == null) return;
         for (int i = 0; i < components.length; i++) {
-            setColor(components[i], color);
-            setColor2(components[i], color);
+            setColor(components[i], color1);
+            setColor2(components[i], color2);
         }
     }
 
@@ -1939,18 +1948,14 @@ public final class APIComponent {
         setComponentCommonInitValuesInternal(component, x, y, width, height, uiConfig.component_defaultColor, uiConfig.component_defaultColor);
     }
 
-    private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color) {
-        setComponentCommonInitValuesInternal(component, x, y, width, height, color, color);
-    }
-
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
         // Align to grid per default
         component.x = (x * api.TS());
         component.y = (y * api.TS());
         component.width = width;
         component.height = height;
-        component.color = new Color(color1);
-        component.color2 = new Color(color2);
+        component.color = color1.cpy();
+        component.color2 = color2.cpy();
         component.disabled = false;
         component.updateActions = new ArrayList<>();
         component.data = null;
@@ -1963,8 +1968,14 @@ public final class APIComponent {
         component.addedToScreen = false;
     }
 
-    private static Color brighterColor(Color color) {
-        return new Color(color).mul(1.2f);
+    private Color darkerColor(Color color){
+        float amount = 0.7f;
+        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
+    }
+
+    private Color brigtherColor(Color color){
+        float amount = 1.3f;
+        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
     }
 
 }

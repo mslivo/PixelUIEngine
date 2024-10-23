@@ -22,14 +22,19 @@ public final class APIHotkey {
         this.mediaManager = mediaManager;
     }
 
-    private HotKeyAction defaultHotKeyAction = new HotKeyAction() {
-    };
+    private HotKeyAction defaultHotKeyAction(){
+      return new HotKeyAction() {
+          @Override
+          public void onPress() {
+          }
+      };
+    }
 
     public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
         HotKey hotKey = new HotKey();
         hotKey.pressed = false;
         hotKey.keyCodes = keyCodes != null ? Arrays.copyOf(keyCodes, keyCodes.length) : new int[]{};
-        hotKey.hotKeyAction = hotKeyAction != null ? hotKeyAction : defaultHotKeyAction;
+        hotKey.hotKeyAction = hotKeyAction != null ? hotKeyAction : defaultHotKeyAction();
         hotKey.name = "";
         hotKey.data = null;
         return hotKey;
