@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine.rendering;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
@@ -1473,38 +1473,48 @@ public class SpriteRenderer implements Batch {
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
         if (cMediaFont == null || text == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
-        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
+        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        fontCache.clear();
+        fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
+        fontCache.draw(this, this.getAlpha());
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
         if (cMediaFont == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
-        bitmapFont.draw(this, text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
+        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        fontCache.clear();
+        fontCache.addText( text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
+        fontCache.draw(this, this.getAlpha());
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY) {
         if (cMediaFont == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
         int xOffset = cMediaFont.offset_x;
         int yOffset = cMediaFont.offset_y;
         if (centerX)
             xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
             yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
-        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset),0, text.length(), 0, Align.left, false, null);
+
+        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        fontCache.clear();
+        fontCache.addText(text, (x + xOffset), (y + yOffset),0, text.length(), 0, Align.left, false, null);
+        fontCache.draw(this, this.getAlpha());
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth, boolean centerX, boolean centerY) {
         if (cMediaFont == null) return;
-        BitmapFont bitmapFont = mediaManager.getCMediaFont(cMediaFont);
         int xOffset = cMediaFont.offset_x;
         int yOffset = cMediaFont.offset_y;
         if (centerX)
             xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
             yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
-        bitmapFont.draw(this, text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, "");
+
+        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        fontCache.clear();
+        fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, "");
+        fontCache.draw(this, this.getAlpha());
     }
 
     // ----- CMediaSprite -----

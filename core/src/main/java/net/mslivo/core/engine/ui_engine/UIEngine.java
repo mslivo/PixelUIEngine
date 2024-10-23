@@ -1913,14 +1913,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
 
-        /*
-        spriteRenderer.setAllReset();
-        spriteRenderer.begin();
-        spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
-        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_ICON_COLOR,50,50);
-        spriteRenderer.end();
-
-         */
     }
 
     private void render_glClear() {
@@ -2348,7 +2340,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> TS(tooltip_width) - image_width - 2;
                     };
-                    spriteRenderer.setColor(0.5f,0.5f,0.5f, segmentAlpha);
+                    spriteRenderer.setColor(Color.GRAY, segmentAlpha);
                     spriteRenderer.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }
                 case TooltipCanvasSegment canvasSegment -> {
@@ -2356,7 +2348,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int height = TS(canvasSegment.height);
                     spriteRenderer.end();
                     primitiveRenderer.begin();
-                    primitiveRenderer.setColor(0.5f,0.5f,0.5f, segmentAlpha);
+                    primitiveRenderer.setColor(Color.GRAY, segmentAlpha);
 
                     int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
                         case LEFT -> 0;
@@ -2705,7 +2697,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         float r = canvas.colorMap.r[icx][icy];
                         float g = canvas.colorMap.g[icx][icy];
                         float b = canvas.colorMap.b[icx][icy];
-                        primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, a * componentAlpha);
+                        primitiveRenderer.setColor(Color.GRAY, a * componentAlpha);
                         primitiveRenderer.setVertexColor(r, g, b, a);
                         primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx, UICommonUtils.component_getAbsoluteY(canvas) + icy);
                     }
@@ -2752,7 +2744,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
 
                 if (!textField.contentValid) {
-                    spriteRenderer.setColor(0.5f, 0.5f, 0.5f, componentAlpha);
+                    spriteRenderer.setColor(Color.GRAY, componentAlpha);
                     for (int ix = 0; ix < textField.width; ix++) {
                         int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL_VALIDATION, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField), index);
@@ -3096,7 +3088,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-        font.setColor(color.r, color.g, color.b, alpha);
+        spriteRenderer.saveState();
+        spriteRenderer.setColor(Color.GRAY, alpha);
+        font.setColor(color.r, color.g, color.b, 1f);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
         } else {
@@ -3104,6 +3098,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
+        spriteRenderer.loadState();
     }
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, int arrayIndex, Color color, boolean bigMode, float alpha) {
