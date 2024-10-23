@@ -9,6 +9,7 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
+import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -538,9 +539,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ArrayList<String> items = new ArrayList<>();
              for(int i=0;i<40;i++)
             items.add("Item "+i);
-        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, null, null);
-        Grid grid = (Grid) readableGrid[0];
-        api.composites.grid.pageableReadOnlyGridSetGridAction(grid,new GridAction() {
+        APIComposites.APICompositeGrid.PageAbleReadOnlyGrid pageGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, null);
+        api.composites.grid.pageableReadOnlyGridSetGridAction(pageGrid,new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
                 return 0;
@@ -558,11 +558,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public Color iconColor(Object item) {
-                return grid.selectedItem == item ? Color.LIGHT_GRAY : Color.GRAY;
+                return pageGrid.grid.selectedItem == item ? Color.LIGHT_GRAY : Color.GRAY;
             }
         });
-        api.component.tabbar.tab.addTabComponents(tabImageButton, readableGrid);
-        api.window.addComponents(window, readableGrid);
+        api.component.tabbar.tab.addTabComponents(tabImageButton, pageGrid.allComponents);
+        api.window.addComponents(window, pageGrid.allComponents);
 
 
         /* Text / Image / Seperator */

@@ -92,41 +92,65 @@ public final class APIComposites {
 
         private static final String PAGE_TEXT = "%s/%s";
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, null, false, false);
+        public class PageAbleReadOnlyGrid{
+            public final Grid grid;
+            public final ImageButton backButton;
+            public final ImageButton forwardButton;
+            public final Text text;
+            public final Component[] allComponents;
+            public final ArrayList items;
+            public final ArrayList<Object[][]> pages;
+            public final AtomicInteger currentPage;
+            public final int width, height, gridHeight;
+            public final int x,y;
+            public PageAbleReadOnlyGrid(Grid grid, ImageButton backButton, ImageButton forwardButton, Text text , ArrayList items, ArrayList<Object[][]> pages, int x, int y, int width, int height) {
+                this.backButton = backButton;
+                this.forwardButton = forwardButton;
+                this.grid = grid;
+                this.pages = pages;
+                this.text = text;
+                this.items = items;
+                this.allComponents = new Component[]{
+                        grid, backButton,forwardButton,text
+                };
+                this.width = width;
+                this.height = height;
+                this.gridHeight = height-1;
+                this.x = x;
+                this.y = y;
+                this.currentPage = new AtomicInteger();
+            }
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction,  preSelectedItem, false, false);
+        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction) {
+            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false, false);
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem, boolean multiselect, boolean doubleSized) {
-
-            int gridHeight = height - 1;
-            final AtomicInteger currentPage = new AtomicInteger(0);
+        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean multiselect, boolean doubleSized) {
 
             ArrayList<Object[][]> pages = new ArrayList<>();
-
             Grid grid = api.component.grid.create(x, y + 1, null, null, multiselect, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
-            Text pageText = api.component.text.create(0, 0, new String[]{});
+            Text pageText = api.component.text.create(x, y, new String[]{});
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
+
+            PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x,y, width, height);
 
 
             api.component.button.setButtonAction(backButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    currentPage.set(Math.max(currentPage.get() - 1, 0));
-                    pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
-                    pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
+                    pageGrid.currentPage.set(Math.max(pageGrid.currentPage.get() - 1, 0));
+                    pageableGridUpdatePages(pageGrid);
+                    pageableGridUpdateButtonsText(pageGrid);
                 }
             });
             api.component.button.setButtonAction(forwardButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    currentPage.set(Math.min(currentPage.get() + 1, pages.size() - 1));
-                    pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
-                    pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
+                    pageGrid.currentPage.set(Math.min(pageGrid.currentPage.get() + 1, pages.size() - 1));
+                    pageableGridUpdatePages(pageGrid);
+                    pageableGridUpdateButtonsText(pageGrid);
                 }
             });
 
@@ -136,151 +160,153 @@ public final class APIComposites {
                 @Override
                 public void onUpdate() {
                     if (!Objects.equals(items, refList)) {
-                        pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
-                        pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+                        pageableGridUpdatePages(pageGrid);
+                        pageableGridUpdateButtonsText(pageGrid);
                         refList = new ArrayList(items);
                     }
 
                 }
             });
 
-            pageableGridUpdateGridResize(grid, currentPage.get(), pages, width, gridHeight, items);
-            pageableReadOnlyGridSetGridAction(grid, gridAction);
-            pageableGridUpdateButtonsText(x, y, backButton, forwardButton, pageText, currentPage.get(), pages.size() - 1);
+            pageableGridUpdatePages(pageGrid);
+            pageableGridUpdateButtonsText(pageGrid);
+            pageableReadOnlyGridSetGridAction(pageGrid, gridAction);
 
-            if (preSelectedItem != null) {
-                pageLoop:
-                for (int i = 0; i < pages.size(); i++) {
-                    Object[][] array = pages.get(i);
-                    for (int ix = 0; ix < array.length; ix++) {
-                        for (int iy = 0; iy < array[0].length; iy++) {
-                            if (array[ix][iy] == preSelectedItem) {
-                                currentPage.set(i);
-                                break pageLoop;
-                            }
-                        }
-                    }
+            return pageGrid;
+        }
+
+        public void pageableReadOnlyGridSetGridAction(PageAbleReadOnlyGrid pageGrid, GridAction gridAction) {
+            if(gridAction == null) return;
+            pageGrid.grid.gridAction = new GridAction() {
+                @Override
+                public boolean canDragFromGrid(Grid fromGrid) {
+                    return false;
                 }
-                api.component.grid.setSelectedItem(grid, preSelectedItem);
-            }
 
-            return new Component[]{
-                    grid, backButton, pageText, forwardButton
+                @Override
+                public boolean canDragFromList(List fromList) {
+                    return false;
+                }
+
+                @Override
+                public boolean canDragIntoApp() {
+                    return false;
+                }
+
+                @Override
+                public Color cellColor(Object listItem) {
+                    return gridAction.cellColor(listItem);
+                }
+
+                @Override
+                public CMediaSprite icon(Object listItem) {
+                    return gridAction.icon(listItem);
+                }
+
+                @Override
+                public int iconIndex(Object listItem) {
+                    return gridAction.iconIndex(listItem);
+                }
+
+                @Override
+                public Color iconColor(Object item) {
+                    return gridAction.iconColor(item);
+                }
+
+                @Override
+                public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
+                    return;
+                }
+
+                @Override
+                public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
+                    return;
+                }
+
+                @Override
+                public void onDragIntoApp(Object listItem, int from_x, int from_y, int to_x, int to_y) {
+                    return;
+                }
+
+                @Override
+                public boolean onItemSelected(Object listItem) {
+                    return gridAction.onItemSelected(listItem);
+                }
+
+                @Override
+                public Tooltip toolTip(Object listItem) {
+                    return gridAction.toolTip(listItem);
+                }
             };
         }
 
-        public void pageableReadOnlyGridSetGridAction(Grid grid, GridAction gridAction) {
-            if (gridAction != null) {
-                grid.gridAction = new GridAction() {
-                    @Override
-                    public boolean canDragFromGrid(Grid fromGrid) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean canDragFromList(List fromList) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean canDragIntoApp() {
-                        return false;
-                    }
-
-                    @Override
-                    public Color cellColor(Object listItem) {
-                        return gridAction.cellColor(listItem);
-                    }
-
-                    @Override
-                    public CMediaSprite icon(Object listItem) {
-                        return gridAction.icon(listItem);
-                    }
-
-                    @Override
-                    public int iconIndex(Object listItem) {
-                        return gridAction.iconIndex(listItem);
-                    }
-
-                    @Override
-                    public Color iconColor(Object item) {
-                        return gridAction.iconColor(item);
-                    }
-
-                    @Override
-                    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
-                        return;
-                    }
-
-                    @Override
-                    public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
-                        return;
-                    }
-
-                    @Override
-                    public void onDragIntoApp(Object listItem, int from_x, int from_y, int to_x, int to_y) {
-                        return;
-                    }
-
-                    @Override
-                    public boolean onItemSelected(Object listItem) {
-                        return gridAction.onItemSelected(listItem);
-                    }
-
-                    @Override
-                    public Tooltip toolTip(Object listItem) {
-                        return gridAction.toolTip(listItem);
-                    }
-                };
-            } else {
-                grid.gridAction = null;
+        public void pageAbleGridSelectItem(APICompositeGrid.PageAbleReadOnlyGrid pageAbleReadOnlyGrid, Object item){
+            if(item == null)
                 return;
+            pageLoop:
+            for (int i = 0; i < pageAbleReadOnlyGrid.items.size(); i++) {
+                Object[][] array = pageAbleReadOnlyGrid.pages.get(i);
+                for (int ix = 0; ix < array.length; ix++) {
+                    for (int iy = 0; iy < array[0].length; iy++) {
+                        if (array[ix][iy] == item) {
+                            pageAbleReadOnlyGrid.currentPage.set(i);
+                            break pageLoop;
+                        }
+                    }
+                }
             }
         }
 
-        private void pageableGridUpdateButtonsText(int x, int y, ImageButton backButton, ImageButton forwardButton, Text text, int currentPage, int pagesMax) {
-            String pageStringMax = String.format(PAGE_TEXT, pagesMax + 1, pagesMax + 1);
-            String pageString = String.format(PAGE_TEXT, currentPage + 1, pagesMax + 1);
+        private void pageableGridUpdatePages(PageAbleReadOnlyGrid pageGrid) {
+            int pageSize = pageGrid.width * pageGrid.gridHeight;
+            int pagesCount = MathUtils.floor(pageGrid.items.size() / (float) pageSize);
+            if (pageGrid.items.size() % pageSize > 0 || pageGrid.items.size() == 0) pagesCount++;
 
-            api.component.setPositionGrid(backButton, x, y);
-            api.component.setPositionGrid(text, x + 1, y);
-            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
-            api.component.setPositionGrid(forwardButton, (x + 1) + textWidthTiles, y);
-            api.component.text.setLines(text, Tools.Text.toArray(pageString));
-            return;
-        }
-
-        private void pageableGridUpdateGridResize(Grid grid, int setToPage, ArrayList<Object[][]> pages, int width, int height, ArrayList items) {
-            int pageSize = width * height;
-            int pagesCount = MathUtils.floor(items.size() / (float) pageSize);
-            if (items.size() % pageSize > 0 || items.size() == 0) pagesCount++;
-
-            pages.clear();
+            pageGrid.pages.clear();
             for (int i = 0; i < pagesCount; i++) {
-                Object[][] page = new Object[width][height];
-                pages.add(page);
+                Object[][] page = new Object[pageGrid.width][pageGrid.gridHeight];
+                pageGrid.pages.add(page);
             }
 
             int pageIndex = 0;
             int ix = 0;
-            int iy = height - 1;
-            for (int i = 0; i < items.size(); i++) {
-                Object[][] page = pages.get(pageIndex);
-
-                page[ix][iy] = items.get(i);
+            int iy = pageGrid.gridHeight-1;
+            for (int i = 0; i < pageGrid.items.size(); i++) {
+                Object[][] page = pageGrid.pages.get(pageIndex);
+                page[ix][iy] = pageGrid.items.get(i);
                 ix++;
-                if (ix > width - 1) {
+                if (ix > pageGrid.width - 1) {
                     ix = 0;
                     iy--;
                     if (iy < 0) {
-                        iy = height - 1;
+                        iy = pageGrid.gridHeight-1;
                         pageIndex++;
                     }
                 }
             }
-            api.component.grid.setItems(grid, pages.get(setToPage));
+
+            pageGrid.currentPage.set(Math.clamp(pageGrid.currentPage.get(),0,pagesCount-1));
+            api.component.grid.setItems(pageGrid.grid,pageGrid.pages.get(pageGrid.currentPage.get()));
+        }
+
+        private void pageableGridUpdateButtonsText(APICompositeGrid.PageAbleReadOnlyGrid pageGrid) {
+            String pageStringMax = String.format(PAGE_TEXT, pageGrid.pages.size(), pageGrid.pages.size() );
+            String pageString = String.format(PAGE_TEXT, pageGrid.currentPage.get() + 1, pageGrid.pages.size() );
+
+            api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, pageGrid.y);
+            api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, pageGrid.y);
+            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
+            api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, pageGrid.y);
+            api.component.text.setLines(pageGrid.text, Tools.Text.toArray(pageString));
+            return;
         }
     }
+
+
+
+
+
+
 
     public final class APICompositeList {
         APICompositeList() {
