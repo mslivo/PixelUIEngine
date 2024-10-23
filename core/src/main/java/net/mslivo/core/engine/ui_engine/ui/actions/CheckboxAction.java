@@ -1,8 +1,8 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class CheckboxAction extends CommonActions {
+public interface CheckboxAction extends CommonActions {
 
-    public void onCheck(boolean checked) {
+    default void onCheck(boolean checked) {
     }
 
 }

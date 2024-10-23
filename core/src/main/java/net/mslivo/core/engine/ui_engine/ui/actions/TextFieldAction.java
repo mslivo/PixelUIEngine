@@ -1,24 +1,24 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class TextFieldAction extends CommonActions {
+public interface TextFieldAction extends CommonActions {
 
-    public boolean isContentValid(String newContent) {
+    default boolean isContentValid(String newContent) {
         return true;
     }
 
-    public void onContentChange(String newContent, boolean valid) {
+    default void onContentChange(String newContent, boolean valid) {
     }
 
-    public void onTyped(char character) {
+    default void onTyped(char character) {
     }
 
-    public void onEnter(String content, boolean valid) {
+    default void onEnter(String content, boolean valid) {
     }
 
-    public void onFocus() {
+    default void onFocus() {
     }
 
-    public void onUnFocus() {
+    default void onUnFocus() {
     }
 
 }

@@ -1,9 +1,9 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class HotKeyAction {
+public interface HotKeyAction {
 
-    public void onPress(){}
+    default void onPress(){}
 
-    public void onRelease(){}
+    default void onRelease(){}
 
 }

@@ -1,11 +1,11 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class ToolTipAction {
+public interface ToolTipAction {
 
-    public void onDisplay() {
+    default void onDisplay() {
     }
 
-    public void onUpdate() {
+    default void onUpdate() {
     }
 
 }

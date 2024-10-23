@@ -1,14 +1,14 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class KnobAction extends CommonActions {
+public interface KnobAction extends CommonActions {
 
-    public void onTurned(float turned, float amount){
+    default void onTurned(float turned, float amount){
     }
 
-    public void onPress(){
+    default void onPress(){
     }
 
-    public void onRelease(){
+    default void onRelease(){
     }
 
 

@@ -6,38 +6,34 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
-public abstract class GridAction<T> extends CommonActions implements ItemIconSupport<T> {
+public interface GridAction<T> extends CommonActions, ItemIconSupport<T>, ItemCellColorSupport<T>{
 
-    public Tooltip toolTip(T gridItem) {
+    default Tooltip toolTip(T gridItem) {
         return null;
     }
 
-    public boolean onItemSelected(T gridItem) {
+    default boolean onItemSelected(T gridItem) {
         return true;
     }
 
-    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
+    default void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int to_x, int to_y) {
     }
 
-    public void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
+    default void onDragFromList(List fromList, int fromIndex, int to_x, int to_y) {
     }
 
-    public boolean canDragFromGrid(Grid fromGrid) {
+    default boolean canDragFromGrid(Grid fromGrid) {
         return false;
     }
 
-    public boolean canDragFromList(List fromList) {
+    default boolean canDragFromList(List fromList) {
         return false;
     }
 
-    public Color cellColor(T gridItem) {
-        return Color.GRAY;
+    default void onDragIntoApp(T gridItem, int from_x, int from_y, int screenX, int screenY) {
     }
 
-    public void onDragIntoApp(T gridItem, int from_x, int from_y, int screenX, int screenY) {
-    }
-
-    public boolean canDragIntoApp() {
+    default boolean canDragIntoApp() {
         return false;
     }
 

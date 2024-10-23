@@ -5,47 +5,43 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
-public abstract class ListAction<T> extends CommonActions implements ItemIconSupport<T> {
+public interface ListAction<T> extends CommonActions, ItemIconSupport<T>, ItemCellColorSupport<T> {
 
-    public Tooltip toolTip(T listItem) {
+    default Tooltip toolTip(T listItem) {
         return null;
     }
 
-    public String text(T listItem) {
+    default String text(T listItem) {
         return listItem.toString();
     }
 
-    public boolean onItemSelected(T listItem) {
+    default boolean onItemSelected(T listItem) {
         return true;
     }
 
-    public void onScrolled(float scrolled) {
-
+    default void onScrolled(float scrolled) {
     }
+
     /* Drag */
 
-    public void onDragFromList(List fromList, int fromIndex, int toIndex) {
+    default void onDragFromList(List fromList, int fromIndex, int toIndex) {
     }
 
-    public void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int toIndex) {
+    default void onDragFromGrid(Grid fromGrid, int from_x, int from_y, int toIndex) {
     }
 
-    public boolean canDragFromList(List list) {
+    default boolean canDragFromList(List list) {
         return false;
     }
 
-    public boolean canDragFromGrid(Grid fromGrid) {
+    default boolean canDragFromGrid(Grid fromGrid) {
         return false;
     }
 
-    public Color cellColor(T listItem) {
-        return null;
+    default void onDragIntoApp(T listItem, int mouseX, int mouseY) {
     }
 
-    public void onDragIntoApp(T listItem, int mouseX, int mouseY) {
-    }
-
-    public boolean canDragIntoApp() {
+    default boolean canDragIntoApp() {
         return false;
     }
 

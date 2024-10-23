@@ -2180,28 +2180,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), TS(comboBox.width), TS());
                             CMediaArray comboBoxCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL;
 
-                            uiEngineState.tempColor.set(comboBox.color2);
-                            if (comboBox.comboBoxAction != null) {
-                                Color cellColor = comboBoxItem.comboBoxItemAction.cellColor();
-                                if (cellColor != null)
-                                    uiEngineState.tempColor.set(cellColor);
-                            }
-
+                            // Cell
                             spriteRenderer.saveState();
-                            render_setColor(spriteRenderer, uiEngineState.tempColor, componentAlpha, componentGrayScale);
+                            render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
                             spriteRenderer.drawCMediaArray(comboBoxCellGraphic, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), index);
                             spriteRenderer.loadState();
 
+                            // Cell - Underline
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), index);
+
+                            // Cell Content
+                            render_drawFont(comboBoxItem.text, comboBoxItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), 2, 1, TS(comboBox.width),
+                                    comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem));
                         }
                     }
 
-                    /* Text */
-                    for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
-                        ComboboxItem comboBoxItem = comboBox.comboBoxItems.get(i);
-                        render_drawFont(comboBoxItem.text, comboBoxItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(i) - TS(), 2, 1, TS(comboBox.width),
-                                comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem));
-                    }
+
                 }
             }
             default -> {
@@ -2229,26 +2223,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, contextMenu.x, contextMenu.y - TS() - TS(iy), TS(uiEngineState.displayedContextMenuWidth), TS());
                     CMediaArray contextMenuCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL;
 
-                    uiEngineState.tempColor.set(contextMenu.color);
-                    Color cellColor = contextMenuItem.contextMenuItemAction.cellColor();
-                    uiEngineState.tempColor.set(cellColor);
-
+                    // Cell
                     spriteRenderer.saveState();
-                    render_setColor(spriteRenderer, uiEngineState.tempColor, contextMenu.color.a, contextMenuGrayScale);
+                    render_setColor(spriteRenderer, contextMenuItem.contextMenuItemAction.cellColor(), contextMenu.color.a, contextMenuGrayScale);
                     spriteRenderer.drawCMediaArray(contextMenuCellGraphic, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS(), index);
                     spriteRenderer.loadState();
 
+                    // Cell Underline
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS(), index);
+
+                    // Cell Content
+                    render_drawFont(contextMenuItem.text, contextMenuItem.fontColor, contextMenu.color.a, contextMenu.x, contextMenu.y - TS(iy) - TS(), 2, 1, TS(width),
+                            contextMenuItem.contextMenuItemAction.icon(), contextMenuItem.contextMenuItemAction.iconIndex(), contextMenuItem.contextMenuItemAction.iconColor());
 
                 }
             }
 
-            /* Text */
-            for (int iy = 0; iy < contextMenu.items.size(); iy++) {
-                ContextMenuItem contextmenuItem = contextMenu.items.get(iy);
-                render_drawFont(contextmenuItem.text, contextmenuItem.fontColor, contextMenu.color.a, contextMenu.x, contextMenu.y - TS(iy) - TS(), 2, 1, TS(width),
-                        contextmenuItem.contextMenuItemAction.icon(), contextmenuItem.contextMenuItemAction.iconIndex(), contextmenuItem.contextMenuItemAction.iconColor());
-            }
+
 
         }
 
@@ -2651,29 +2642,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                     boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
 
-                    uiEngineState.tempColor.set(component.color2);
-
-                    if (list.listAction != null && item != null) {
-                        Color cellColorAction = list.listAction.cellColor(item);
-                        if (cellColorAction != null)
-                            uiEngineState.tempColor.set(cellColorAction);
-                    }
-
+                    // Cell
                     spriteRenderer.saveState();
-                    render_setColor(spriteRenderer, uiEngineState.tempColor, componentAlpha, listGrayScale);
-
+                    Color cellColor = item != null ? list.listAction.cellColor(item) : list.color2;
+                    render_setColor(spriteRenderer, cellColor, componentAlpha, listGrayScale);
                     for (int ix = 0; ix < list.width; ix++) {
                         CMediaImage listSelectedGraphic = selected ? UIEngineBaseMedia_8x8.UI_LIST_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_LIST_CELL;
                         spriteRenderer.drawCMediaImage(listSelectedGraphic, UICommonUtils.component_getAbsoluteX(list) + TS(ix), UICommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY));
                     }
-
                     spriteRenderer.loadState();
 
+                    // Cell UnderLine
                     for (int ix = 0; ix < list.width; ix++) {
                         spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_LIST, UICommonUtils.component_getAbsoluteX(list) + TS(ix), UICommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY));
                     }
 
-                    // Text
+                    // Cell Content
                     if (item != null) {
                         String text = list.listAction.text(item);
                         render_drawFont(text, list.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(list), UICommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY), 1, 2, TS(list.width),
@@ -2688,31 +2672,26 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Combobox comboBox -> {
-                // Box
 
-                uiEngineState.tempColor.set(comboBox.color2);
-                if (comboBox.selectedItem != null) {
-                    Color cellColor = comboBox.selectedItem.comboBoxItemAction.cellColor();
-                    uiEngineState.tempColor.set(cellColor);
-                }
-
+                // Cell
                 spriteRenderer.saveState();
-                render_setColor(spriteRenderer, uiEngineState.tempColor, componentAlpha, componentGrayScale);
-
+                Color cellColor = comboBox.selectedItem != null ? comboBox.selectedItem.comboBoxItemAction.cellColor() : comboBox.color2;
+                render_setColor(spriteRenderer, cellColor, componentAlpha, componentGrayScale);
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_CELL, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox), index);
                 }
 
-                spriteRenderer.loadState();
-
+                // ComboBox
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
                     CMediaArray comboMedia = UICommonUtils.comboBox_isOpen(uiEngineState, comboBox) ? UIEngineBaseMedia_8x8.UI_COMBOBOX_OPEN : UIEngineBaseMedia_8x8.UI_COMBOBOX;
                     spriteRenderer.drawCMediaArray(comboMedia, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox), index);
                 }
 
-                // Text
+
+                spriteRenderer.loadState();
+                // Cell Content
                 if (comboBox.selectedItem != null && comboBox.comboBoxAction != null) {
                     render_drawFont(comboBox.selectedItem.text, comboBox.selectedItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox), 2, 1, TS(comboBox.width - 1),
                             comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem));
@@ -2890,7 +2869,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         spriteRenderer.drawCMediaImage(tabGraphic, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar));
                         int selected_offset = selected ? 0 : 1;
                         render_drawIcon(tab.tabAction.icon(), UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset) + selected_offset, UICommonUtils.component_getAbsoluteY(tabBar) - selected_offset,
-                                tab.tabAction.iconIndex(),tab.tabAction.iconColor(),true, componentAlpha);
+                                tab.tabAction.iconIndex(), tab.tabAction.iconColor(), true, componentAlpha);
                     } else {
                         CMediaArray tabGraphic = selected ? UIEngineBaseMedia_8x8.UI_TAB_SELECTED : UIEngineBaseMedia_8x8.UI_TAB;
                         for (int ix = 0; ix < tabWidth; ix++) {
@@ -2930,7 +2909,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.end();
 
                     primitiveRenderer.begin(GL20.GL_TRIANGLES);
-                    render_setColor(primitiveRenderer,Color.GRAY, componentAlpha, componentGrayScale);
+                    render_setColor(primitiveRenderer, Color.GRAY, componentAlpha, componentGrayScale);
                     primitiveRenderer.setVertexColor(shape.color);
                     final int cx = UICommonUtils.component_getAbsoluteX(shape);
                     final int cy = UICommonUtils.component_getAbsoluteY(shape);
@@ -3089,7 +3068,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (dragGrid.gridAction != null) {
                 float dragAlpha = dragGrid.color.a * uiEngineState.config.component_listDragAlpha;
                 render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
-                        dragGrid.gridAction.iconIndex(dragItem),dragGrid.gridAction.iconColor(dragItem),dragGrid.bigMode, dragAlpha);
+                        dragGrid.gridAction.iconIndex(dragItem), dragGrid.gridAction.iconColor(dragItem), dragGrid.bigMode, dragAlpha);
             }
         } else if (uiEngineState.draggedList != null) {
             List dragList = uiEngineState.draggedList;

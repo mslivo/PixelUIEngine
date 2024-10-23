@@ -1,28 +1,23 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import net.mslivo.core.engine.ui_engine.ui.Window;
+public interface WindowAction extends CommonActions, IconSupport {
 
-public abstract class WindowAction extends CommonActions implements IconSupport {
-
-    public WindowAction() {
+    default void onMove(int x, int y) {
     }
 
-    public void onMove(int x, int y) {
+    default void onFold() {
     }
 
-    public void onFold() {
+    default void onUnfold() {
     }
 
-    public void onUnfold() {
+    default void onRemove() {
     }
 
-    public void onRemove() {
+    default void onAdd() {
     }
 
-    public void onAdd() {
-    }
-
-    public void onMessageReceived(int type, Object... parameters) {
+    default void onMessageReceived(int type, Object... parameters) {
     }
 
 }

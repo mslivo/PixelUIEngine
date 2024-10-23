@@ -2,15 +2,15 @@ package net.mslivo.core.engine.ui_engine.ui.actions;
 
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 
-public abstract class ComboBoxAction extends CommonActions implements ItemIconSupport<ComboboxItem> {
+public interface ComboBoxAction extends CommonActions, ItemIconSupport<ComboboxItem> {
 
-    public void onItemSelected(ComboboxItem selectedItem) {
+    default void onItemSelected(ComboboxItem selectedItem) {
     }
 
-    public void onOpen() {
+    default void onOpen() {
     }
 
-    public void onClose() {
+    default void onClose() {
     }
 
 }

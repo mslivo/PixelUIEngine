@@ -1,17 +1,14 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-/**
- * Created by Admin on 10.03.2019.
- */
-public abstract class ButtonAction extends CommonActions implements IconSupport {
+public interface ButtonAction extends CommonActions, IconSupport {
 
-    public void onPress() {
+    default void onPress() {
     }
 
-    public void onRelease() {
+    default void onRelease() {
     }
 
-    public void onToggle(boolean value) {
+    default void onToggle(boolean value) {
     }
 
 }

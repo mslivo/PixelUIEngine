@@ -218,7 +218,7 @@ public final class APIComposites {
                     }
 
                     @Override
-                    public void onDragIntoApp(Object listItem, int from_x, int from_y, int screenX, int screenY) {
+                    public void onDragIntoApp(Object listItem, int from_x, int from_y, int to_x, int to_y) {
                         return;
                     }
 

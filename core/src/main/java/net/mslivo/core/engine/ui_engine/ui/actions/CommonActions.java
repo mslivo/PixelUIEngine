@@ -1,14 +1,14 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class CommonActions {
+public interface CommonActions {
 
-    public void onMouseClick(int button) {
+    default void onMouseClick(int button) {
     }
 
-    public void onMouseDoubleClick(int button) {
+    default void onMouseDoubleClick(int button) {
     }
 
-    public void onMouseScroll(float scrolled) {
+    default void onMouseScroll(float scrolled) {
     }
 
 }
