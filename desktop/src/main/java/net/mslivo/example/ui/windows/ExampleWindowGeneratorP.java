@@ -9,7 +9,6 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -35,7 +34,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -59,7 +58,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         this.mediaManager = mediaManager;
 
         /* Window */
-        Window window = api.window.create(0, 0, 40, 18, title, ExampleBaseMedia.ICON_EXAMPLE_WINDOW, 0);
+        Window window = api.window.create(0, 0, 40, 18, title, new WindowAction() {
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_WINDOW;
+            }
+        });
 
         api.window.addComponent(window, api.composites.button.createWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
@@ -75,10 +79,30 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ArrayList<Component> components_tab4 = createTab4(api,window);
 
         ArrayList<Tab> tabs = new ArrayList<>();
-        tabs.add(api.component.tabbar.tab.create("Tab I", ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE, 0, components_tab1.toArray(new Component[]{})));
-        tabs.add(api.component.tabbar.tab.create("Tab II", ExampleBaseMedia.ICON_EXAMPLE_BULLET_GREEN, 0, components_tab2.toArray(new Component[]{})));
-        tabs.add(api.component.tabbar.tab.create("Tab III", ExampleBaseMedia.ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab3.toArray(new Component[]{})));
-        tabs.add(api.component.tabbar.tab.create("Font", ExampleBaseMedia.ICON_EXAMPLE_BULLET_ORANGE, 0, components_tab4.toArray(new Component[]{})));
+        tabs.add(api.component.tabbar.tab.create("Tab I", components_tab1.toArray(new Component[]{}), new TabAction() {
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
+            }
+        }));
+        tabs.add(api.component.tabbar.tab.create("Tab II", components_tab2.toArray(new Component[]{}), new TabAction() {
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
+            }
+        }));
+        tabs.add(api.component.tabbar.tab.create("Tab III",  components_tab3.toArray(new Component[]{}), new TabAction() {
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
+            }
+        }));
+        tabs.add(api.component.tabbar.tab.create("Font", components_tab4.toArray(new Component[]{}), new TabAction() {
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
+            }
+        }));
 
 
         ArrayList<Component> tabBarComponents = api.composites.tabBar.createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
@@ -220,12 +244,6 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         });
 
-        api.component.comboBox.setComboBoxAction(comboBox, new ComboBoxAction() {
-            @Override
-            public Color cellColor(ComboboxItem comboboxItem) {
-                return comboboxItem == comboboxItem2 ? Color.RED : null;
-            }
-        });
 
 
         Button modal1 = api.component.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
@@ -341,7 +359,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public void onToggle(boolean value) {
 
             }
-        }, null, 0, BUTTON_MODE.TOGGLE);
+        }, BUTTON_MODE.TOGGLE);
         api.component.tabbar.tab.addTabComponent(tabTextButton, textBtn1);
         api.component.button.centerContent(textBtn1);
         api.component.setColor(textBtn1, Color.ORANGE);
@@ -359,7 +377,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public void onRelease() {
 
                 api.openContextMenu(api.contextMenu.create(
-                        new ContextmenuItem[]{
+                        new ContextMenuItem[]{
                                 api.contextMenu.item.create("Item 1y", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
@@ -381,14 +399,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                                         api.removeAllWindows();
                                     }
                                 }),
-                        }, new ContextmenuAction() {
-                            @Override
-                            public Color cellColor(ContextmenuItem contextMenuItem) {
-                                return contextMenuItem.text.startsWith("Item 3") ? Color.RED : null;
-                            }
-                        }));
+                        },null));
             }
-        }, ExampleBaseMedia.ICON_EXAMPLE_1, 0);
+        });
 
 
 
@@ -519,7 +532,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ArrayList<String> items = new ArrayList<>();
              for(int i=0;i<40;i++)
             items.add("Item "+i);
-        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, new GridAction() {
+        Component[] readableGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, null, null);
+        Grid grid = (Grid) readableGrid[0];
+        api.composites.grid.pageableReadOnlyGridSetGridAction(grid,new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
                 return 0;
@@ -534,7 +549,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public CMediaSprite icon(Object listItem) {
                 return ExampleBaseMedia.ICON_EXAMPLE_1;
             }
-        },Color.WHITE, null);
+
+            @Override
+            public Color iconColor(Object item) {
+                return grid.selectedItem == item ? Color.LIGHT_GRAY : Color.GRAY;
+            }
+        });
         api.component.tabbar.tab.addTabComponents(tabImageButton, readableGrid);
         api.window.addComponents(window, readableGrid);
 
@@ -580,6 +600,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         List list1 = api.component.list.create(2, 2, 6, 12, listItems1, null, true, true, true);
         ListAction list1Action = new ListAction<ListItem>() {
+
             @Override
             public CMediaSprite icon(ListItem listItem) {
                 return listItem.icon;
@@ -697,7 +718,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems = new ListItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
-        Grid grid1 = api.component.grid.create(18, 2, invItems, null, null, true, true, true);
+        Grid grid1 = api.component.grid.create(18, 2, invItems, null,  true, true, true);
 
         GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
@@ -737,6 +758,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 api.addNotification(api.notification.create("Selected: " + listItem));
                 return true;
             }
+
+            @Override
+            public Color iconColor(ListItem item) {
+                return grid1.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
+            }
         };
         api.component.grid.setGridAction(grid1, gridAction1);
         api.window.addComponent(window, grid1);
@@ -745,7 +771,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems2 = new ListItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
-        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, null, true, true, true);
+        Grid grid2 = api.component.grid.create(25, 2, invItems2, null,  true, true, true);
 
         GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
@@ -785,6 +811,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 api.addNotification(api.notification.create("Selected: " + listItem));
                 return true;
             }
+
+            @Override
+            public Color iconColor(ListItem item) {
+                return grid2.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
+            }
+
         };
         api.component.grid.setGridAction(grid2, gridAction2);
         api.window.addComponent(window, grid2);
@@ -792,7 +824,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ListItem[][] invItems3 = new ListItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
-        Grid grid3 = api.component.grid.create(32, 2, invItems3, null,null, false, true, true, false, true);
+        Grid grid3 = api.component.grid.create(32, 2, invItems3, null, false, true, true, false, true);
 
         GridAction gridAction3 = new GridAction<ListItem>() {
             @Override
@@ -837,6 +869,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public boolean canDragIntoApp() {
                 return true;
             }
+
+            @Override
+            public Color iconColor(ListItem item) {
+                return item == grid3.selectedItem ? Color.LIGHT_GRAY : Color.GRAY;
+            }
+
         };
         api.component.grid.setGridAction(grid3, gridAction3);
         api.window.addComponent(window, grid3);

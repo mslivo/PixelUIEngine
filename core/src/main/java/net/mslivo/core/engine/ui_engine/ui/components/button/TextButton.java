@@ -7,6 +7,4 @@ import net.mslivo.core.engine.media_manager.CMediaSprite;
 public class TextButton extends Button {
     public String text;
     public Color fontColor;
-    public CMediaSprite icon;
-    public int iconIndex;
 }

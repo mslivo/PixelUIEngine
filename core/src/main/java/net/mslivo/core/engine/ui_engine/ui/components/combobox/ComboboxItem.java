@@ -8,8 +8,6 @@ import net.mslivo.core.engine.ui_engine.ui.actions.ComboBoxItemAction;
 public class ComboboxItem {
     public String text;
     public Color fontColor;
-    public CMediaSprite icon;
-    public int iconIndex;
     public ComboBoxItemAction comboBoxItemAction;
     public Combobox addedToComboBox;
     public String name;

@@ -6,5 +6,4 @@ public abstract class TabBarAction extends CommonActions {
 
     public void onChangeTab(int index, Tab tab){}
 
-
 }

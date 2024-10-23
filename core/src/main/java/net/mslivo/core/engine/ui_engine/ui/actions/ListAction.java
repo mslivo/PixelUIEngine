@@ -1,23 +1,14 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
-public abstract class ListAction<T> extends CommonActions {
-
-    public CMediaSprite icon(T listItem) {
-        return null;
-    }
+public abstract class ListAction<T> extends CommonActions implements ItemIconSupport<T> {
 
     public Tooltip toolTip(T listItem) {
         return null;
-    }
-
-    public int iconIndex(T listItem) { // if CMedia is CMediaArray
-        return 0;
     }
 
     public String text(T listItem) {

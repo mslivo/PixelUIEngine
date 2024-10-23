@@ -1,9 +1,8 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
 
-public abstract class ComboBoxAction extends CommonActions {
+public abstract class ComboBoxAction extends CommonActions implements ItemIconSupport<ComboboxItem> {
 
     public void onItemSelected(ComboboxItem selectedItem) {
     }
@@ -14,7 +13,4 @@ public abstract class ComboBoxAction extends CommonActions {
     public void onClose() {
     }
 
-    public Color cellColor(ComboboxItem comboboxItem) {
-        return null;
-    }
 }

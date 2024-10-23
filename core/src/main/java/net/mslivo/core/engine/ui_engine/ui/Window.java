@@ -28,7 +28,5 @@ public class Window {
     public boolean visible;
     public boolean enforceScreenBounds;
     public WindowAction windowAction;
-    public CMediaSprite icon;
-    public int iconIndex;
     public boolean addedToScreen;
 }

@@ -6,18 +6,10 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
-public abstract class GridAction<T> extends CommonActions {
-
-    public CMediaSprite icon(T gridItem) {
-        return null;
-    }
+public abstract class GridAction<T> extends CommonActions implements ItemIconSupport<T> {
 
     public Tooltip toolTip(T gridItem) {
         return null;
-    }
-
-    public int iconIndex(T gridItem) {
-        return 0;
     }
 
     public boolean onItemSelected(T gridItem) {
@@ -39,7 +31,7 @@ public abstract class GridAction<T> extends CommonActions {
     }
 
     public Color cellColor(T gridItem) {
-        return null;
+        return Color.GRAY;
     }
 
     public void onDragIntoApp(T gridItem, int from_x, int from_y, int screenX, int screenY) {

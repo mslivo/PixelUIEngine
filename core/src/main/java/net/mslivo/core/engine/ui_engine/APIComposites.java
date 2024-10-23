@@ -34,7 +34,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
@@ -93,25 +93,21 @@ public final class APIComposites {
         private static final String PAGE_TEXT = "%s/%s";
 
         public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, Color.GRAY, null, false, false);
+            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, null, false, false);
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Color selectedColor) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, selectedColor, null, false, false);
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem) {
+            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction,  preSelectedItem, false, false);
         }
 
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Color selectedColor, Object preSelectedItem) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, selectedColor, preSelectedItem, false, false);
-        }
-
-        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Color selectedColor, Object preSelectedItem, boolean multiselect, boolean doubleSized) {
+        public Component[] createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, Object preSelectedItem, boolean multiselect, boolean doubleSized) {
 
             int gridHeight = height - 1;
             final AtomicInteger currentPage = new AtomicInteger(0);
 
             ArrayList<Object[][]> pages = new ArrayList<>();
 
-            Grid grid = api.component.grid.create(x, y + 1, null, null, selectedColor, multiselect, false, false, false, doubleSized);
+            Grid grid = api.component.grid.create(x, y + 1, null, null, multiselect, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
             Text pageText = api.component.text.create(0, 0, new String[]{});
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
@@ -204,6 +200,11 @@ public final class APIComposites {
                     @Override
                     public int iconIndex(Object listItem) {
                         return gridAction.iconIndex(listItem);
+                    }
+
+                    @Override
+                    public Color iconColor(Object item) {
+                        return gridAction.iconColor(item);
                     }
 
                     @Override
@@ -651,7 +652,7 @@ public final class APIComposites {
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
 
-            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption, UIEngineBaseMedia_8x8.UI_ICON_COLOR_PICKER, 0);
+            Window modal = api.window.create(0, 0, colorTextureWidthTiles + 1, colorTextureHeightTiles + 4, caption);
             ImageButton closeButton = api.composites.button.createWindowCloseButton(modal);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
                 @Override
@@ -788,7 +789,7 @@ public final class APIComposites {
             ArrayList<Component> componentsList = new ArrayList<>();
             final int WIDTH = Math.max(MathUtils.round(longest / (float) api.TS()) + 2, 12);
             final int HEIGHT = 4 + lines.length;
-            Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption, UIEngineBaseMedia_8x8.UI_ICON_INFORMATION, 0);
+            Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption);
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
@@ -828,7 +829,7 @@ public final class APIComposites {
 
             int width = Math.max(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12);
             if (width % 2 == 0) width++;
-            Window modal = api.window.create(0, 0, width, 5, caption, UIEngineBaseMedia_8x8.UI_ICON_QUESTION, 0);
+            Window modal = api.window.create(0, 0, width, 5, caption);
 
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
@@ -887,7 +888,7 @@ public final class APIComposites {
 
             }
 
-            Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption, UIEngineBaseMedia_8x8.UI_ICON_INFORMATION, 0);
+            Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption);
             ArrayList<Component> componentsList = new ArrayList<>();
 
             Text textC = api.component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
@@ -1322,7 +1323,7 @@ public final class APIComposites {
                 api.component.button.setButtonAction(extendButton, new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        ArrayList<ContextmenuItem> contextMenuItems = new ArrayList<>();
+                        ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
                         for (int i2 = 0; i2 < invisibleTabs.size(); i2++) {
                             Tab invisibleTab = invisibleTabs.get(i2);
                             contextMenuItems.add(api.contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
@@ -1333,9 +1334,9 @@ public final class APIComposites {
                                     api.component.tabbar.selectTab(tabBar, 0);
                                     updateExtendableTabBarButtonInternal(tabBar, extendButton);
                                 }
-                            }, invisibleTab.icon, 0));
+                            }));
                         }
-                        Contextmenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(new ContextmenuItem[0]));
+                        Contextmenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         api.openContextMenu(selectTabMenu);
                     }
                 });

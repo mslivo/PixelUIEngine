@@ -292,41 +292,25 @@ public final class APIComponent {
             }
 
             public TextButton create(int x, int y, int width, int height, String text) {
-                return create(x, y, width, height, text, defaultButtonAction(), null, 0, BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, text, defaultButtonAction(), BUTTON_MODE.DEFAULT, false);
             }
 
             public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
-                return create(x, y, width, height, text, buttonAction, null, 0, BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, text, buttonAction, BUTTON_MODE.DEFAULT, false);
             }
 
-            public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex) {
-                return create(x, y, width, height, text, buttonAction, icon, iconIndex, BUTTON_MODE.DEFAULT, false);
+            public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, BUTTON_MODE buttonMode) {
+                return create(x, y, width, height, text, buttonAction, buttonMode, false);
             }
 
-            public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex, BUTTON_MODE buttonMode) {
-                return create(x, y, width, height, text, buttonAction, icon, iconIndex, buttonMode, false);
-            }
-
-            public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, CMediaSprite icon, int iconIndex, BUTTON_MODE buttonMode, boolean togglePressed) {
+            public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
                 TextButton textButton = new TextButton();
                 setComponentCommonInitValuesInternal(textButton, x, y, width, height);
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
                 textButton.fontColor = uiConfig.ui_font_defaultColor.cpy();
-                textButton.icon = icon;
-                textButton.iconIndex = iconIndex;
                 UICommonUtils.button_centerContent(uiEngineState, mediaManager, textButton);
                 return textButton;
-            }
-
-            public void setIcon(TextButton textButton, CMediaSprite icon) {
-                if (textButton == null) return;
-                textButton.icon = icon;
-            }
-
-            public void setIconIndex(TextButton textButton, int iconIndex) {
-                if (textButton == null) return;
-                textButton.iconIndex = Math.max(iconIndex, 0);
             }
 
             public void setText(TextButton textButton, String text) {
@@ -709,32 +693,26 @@ public final class APIComponent {
             }
 
             public Tab create(String title) {
-                return create(title, null, 0, null, defaultTabAction(), 0);
+                return create(title, null, defaultTabAction(), 0);
             }
 
-            public Tab create(String title, CMediaSprite icon, int iconIndex) {
-                return create(title, icon, iconIndex, null, defaultTabAction(), 0);
+            public Tab create(String title, Component[] components) {
+                return create(title, components, defaultTabAction(), 0);
             }
 
-            public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components) {
-                return create(title, icon, iconIndex, components, defaultTabAction(), 0);
+            public Tab create(String title, Component[] components, TabAction tabAction) {
+                return create(title, components, tabAction, 0);
             }
 
-            public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components, TabAction tabAction) {
-                return create(title, icon, iconIndex, components, tabAction, 0);
-            }
-
-            public Tab create(String title, CMediaSprite icon, int iconIndex, Component[] components, TabAction tabAction, int width) {
+            public Tab create(String title, Component[] components, TabAction tabAction, int width) {
                 Tab tab = new Tab();
                 tab.title = Tools.Text.validString(title);
                 tab.tabAction = tabAction;
-                tab.icon = icon;
-                tab.iconIndex = iconIndex;
                 tab.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, tab.title) + (tab.icon != null ? api.TS() : 0) + api.TS()) / api.TSF());
+                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
                     tab.width = width;
                 }
@@ -758,11 +736,6 @@ public final class APIComponent {
             public void setData(Tab tab, Object data) {
                 if (tab == null) return;
                 tab.data = data;
-            }
-
-            public void setIconIndex(Tab tab, int iconIndex) {
-                if (tab == null) return;
-                tab.iconIndex = Math.max(iconIndex, 0);
             }
 
             public void addTabComponent(Tab tab, Component component) {
@@ -794,11 +767,6 @@ public final class APIComponent {
             public void removeAllTabComponents(Tab tab) {
                 if (tab == null) return;
                 removeTabComponents(tab, tab.components.toArray(new Component[]{}));
-            }
-
-            public void setIcon(Tab tab, CMediaSprite icon) {
-                if (tab == null) return;
-                tab.icon = icon;
             }
 
             public void setTitle(Tab tab, String title) {
@@ -835,34 +803,30 @@ public final class APIComponent {
         }
 
         public Grid create(int x, int y, Object[][] items) {
-            return create(x, y, items, defaultGridAction(), Color.LIGHT_GRAY, false, false, false, false, false);
+            return create(x, y, items, defaultGridAction(), false, false, false, false, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction) {
-            return create(x, y, items, gridAction, Color.LIGHT_GRAY, false, false, false, false, false);
+            return create(x, y, items, gridAction, false, false, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor) {
-            return create(x, y, items, gridAction, selectedColor, false, false, false, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect) {
+            return create(x, y, items, gridAction,  multiSelect, false, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect) {
-            return create(x, y, items, gridAction, selectedColor, multiSelect, false, false, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled) {
+            return create(x, y, items, gridAction, multiSelect, dragEnabled, false, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled) {
-            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, false, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
+            return create(x, y, items, gridAction,  multiSelect, dragEnabled, dragOutEnabled, false, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
-            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, dragOutEnabled, false, false);
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
+            return create(x, y, items, gridAction,  multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
         }
 
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-            return create(x, y, items, gridAction, selectedColor, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
-        }
-
-        public Grid create(int x, int y, Object[][] items, GridAction gridAction, Color selectedColor, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
+        public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
             Grid grid = new Grid();
             int width = 1;
             int height = 1;
@@ -878,14 +842,13 @@ public final class APIComponent {
             grid.dragEnabled = dragEnabled;
             grid.dragInEnabled = dragInEnabled;
             grid.dragOutEnabled = dragOutEnabled;
-            grid.doubleSized = doubleSized;
+            grid.bigMode = doubleSized;
             grid.multiSelect = multiSelect;
-            grid.selectedColor = selectedColor != null ? new Color(selectedColor) : Color.LIGHT_GRAY;
             return grid;
         }
 
         public void setDoubleSized(Grid grid, boolean doubleSized) {
-            grid.doubleSized = doubleSized;
+            grid.bigMode = doubleSized;
             UICommonUtils.grid_updateSize(grid);
         }
 
@@ -1545,19 +1508,13 @@ public final class APIComponent {
             }
 
             public ComboboxItem create(String text) {
-                return create(text, defaultComboBoxItemAction(), null, 0);
+                return create(text, defaultComboBoxItemAction());
             }
 
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
-                return create(text, comboBoxItemAction, null, 0);
-            }
-
-            public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, CMediaSprite icon, int iconIndex) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
-                comboBoxItem.icon = icon;
-                comboBoxItem.iconIndex = Math.max(iconIndex, 0);
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction;
                 comboBoxItem.name = "";
                 comboBoxItem.data = null;
@@ -1587,16 +1544,6 @@ public final class APIComponent {
             public void setText(ComboboxItem comboBoxItem, String text) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.text = Tools.Text.validString(text);
-            }
-
-            public void setIcon(ComboboxItem comboBoxItem, CMediaSprite icon) {
-                if (comboBoxItem == null) return;
-                comboBoxItem.icon = icon;
-            }
-
-            public void setIconIndex(ComboboxItem comboBoxItem, int index) {
-                if (comboBoxItem == null) return;
-                comboBoxItem.iconIndex = Math.max(index, 0);
             }
 
         }

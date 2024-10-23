@@ -35,34 +35,30 @@ public final class APIWindow {
     }
 
     public Window create(int x, int y, int width, int height) {
-        return create(x, y, width, height, "", null, 0, null, false, true, true, true);
+        return create(x, y, width, height, "", defaultWindowAction(), false, true, true, true);
     }
 
     public Window create(int x, int y, int width, int height, String title) {
-        return create(x, y, width, height, title, null, 0, null, false, true, true, true);
+        return create(x, y, width, height, title,  defaultWindowAction(), false, true, true, true);
     }
 
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex) {
-        return create(x, y, width, height, title, icon, iconIndex, null, false, true, true, true);
+    public Window create(int x, int y, int width, int height, String title, WindowAction windowAction) {
+        return create(x, y, width, height, title, windowAction, false, true, true, true);
     }
 
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction) {
-        return create(x, y, width, height, title, icon, iconIndex, windowAction, false, true, true, true);
+    public Window create(int x, int y, int width, int height, String title, WindowAction windowAction, boolean alwaysOnTop) {
+        return create(x, y, width, height, title, windowAction, alwaysOnTop, true, true, true);
     }
 
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop) {
-        return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, true, true, true);
+    public Window create(int x, int y, int width, int height, String title, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
+        return create(x, y, width, height, title, windowAction, alwaysOnTop, moveAble, true, true);
     }
 
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble) {
-        return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, true, true);
+    public Window create(int x, int y, int width, int height, String title, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
+        return create(x, y, width, height, title, windowAction, alwaysOnTop, moveAble, hasTitleBar, true);
     }
 
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar) {
-        return create(x, y, width, height, title, icon, iconIndex, windowAction, alwaysOnTop, moveAble, hasTitleBar, true);
-    }
-
-    public Window create(int x, int y, int width, int height, String title, CMediaSprite icon, int iconIndex, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
+    public Window create(int x, int y, int width, int height, String title, WindowAction windowAction, boolean alwaysOnTop, boolean moveAble, boolean hasTitleBar, boolean visible) {
         Window window = new Window();
         window.x = x;
         window.y = y;
@@ -76,8 +72,6 @@ public final class APIWindow {
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
         window.windowAction = windowAction;
-        window.icon = icon;
-        window.iconIndex = iconIndex;
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;
@@ -90,16 +84,6 @@ public final class APIWindow {
     public void setEnforceScreenBounds(Window window, boolean enforceScreenBounds) {
         if (window == null) return;
         window.enforceScreenBounds = enforceScreenBounds;
-    }
-
-    public void setIcon(Window window, CMediaSprite icon) {
-        if (window == null) return;
-        window.icon = icon;
-    }
-
-    public void setIconIndex(Window window, int iconIndex) {
-        if (window == null) return;
-        window.iconIndex = Math.max(iconIndex, 0);
     }
 
     public void setVisible(Window window, boolean visible) {

@@ -2,15 +2,13 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.CMediaFont;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
-import net.mslivo.core.engine.ui_engine.ui.actions.ContextmenuAction;
+import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuAction;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 
 import java.util.ArrayList;
 
@@ -29,16 +27,16 @@ public final class APIContextMenu {
         this.item = new APIContextMenuItem();
     }
 
-    private ContextmenuAction defaultContextMenuAction() {
-        return new ContextmenuAction() {
+    private ContextMenuAction defaultContextMenuAction() {
+        return new ContextMenuAction() {
         };
     }
 
-    public Contextmenu create(ContextmenuItem[] contextMenuItems) {
+    public Contextmenu create(ContextMenuItem[] contextMenuItems) {
         return create(contextMenuItems, defaultContextMenuAction());
     }
 
-    public Contextmenu create(ContextmenuItem[] contextMenuItems, ContextmenuAction contextMenuAction) {
+    public Contextmenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
         Contextmenu contextMenu = new Contextmenu();
         contextMenu.items = new ArrayList<>();
         if (contextMenuItems != null) {
@@ -54,7 +52,7 @@ public final class APIContextMenu {
         return contextMenu;
     }
 
-    public void setContextMenuAction(Contextmenu contextMenu, ContextmenuAction contextMenuAction) {
+    public void setContextMenuAction(Contextmenu contextMenu, ContextMenuAction contextMenuAction) {
         if (contextMenu == null) return;
         contextMenu.contextMenuAction = contextMenuAction;
     }
@@ -64,22 +62,22 @@ public final class APIContextMenu {
         contextMenu.color.set(color);
     }
 
-    public void addContextMenuItem(Contextmenu contextMenu, ContextmenuItem contextMenuItem) {
+    public void addContextMenuItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
         UICommonUtils.contextMenu_addItem(contextMenu, contextMenuItem);
     }
 
-    public void addContextMenuItems(Contextmenu contextMenu, ContextmenuItem[] contextMenuItems) {
+    public void addContextMenuItems(Contextmenu contextMenu, ContextMenuItem[] contextMenuItems) {
         if (contextMenu == null || contextMenuItems == null) return;
         for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
     }
 
-    public void removeContextMenuItem(Contextmenu contextMenu, ContextmenuItem contextMenuItem) {
+    public void removeContextMenuItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
         UICommonUtils.contextMenu_removeItem(contextMenu, contextMenuItem);
     }
 
-    public void removeContextMenuItems(Contextmenu contextMenu, ContextmenuItem[] contextMenuItems) {
+    public void removeContextMenuItems(Contextmenu contextMenu, ContextMenuItem[] contextMenuItems) {
         if (contextMenu == null || contextMenuItems == null) return;
         for (int i = 0; i < contextMenuItems.length; i++)
             removeContextMenuItem(contextMenu, contextMenuItems[i]);
@@ -87,20 +85,20 @@ public final class APIContextMenu {
 
     public void removeAllContextMenuItems(Contextmenu contextMenu) {
         if (contextMenu == null) return;
-        removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextmenuItem[]{}));
+        removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
     }
 
-    public ArrayList<ContextmenuItem> findContextMenuItemsByName(Contextmenu contextMenu, String name) {
+    public ArrayList<ContextMenuItem> findContextMenuItemsByName(Contextmenu contextMenu, String name) {
         if (contextMenu == null || name == null) return new ArrayList<>();
-        ArrayList<ContextmenuItem> result = new ArrayList<>();
+        ArrayList<ContextMenuItem> result = new ArrayList<>();
         for (int i = 0; i < contextMenu.items.size(); i++)
             if (name.equals(contextMenu.items.get(i).name)) result.add(contextMenu.items.get(i));
         return result;
     }
 
-    public ContextmenuItem findContextMenuItemByName(Contextmenu contextMenu, String name) {
+    public ContextMenuItem findContextMenuItemByName(Contextmenu contextMenu, String name) {
         if (contextMenu == null || name == null) return null;
-        ArrayList<ContextmenuItem> result = findContextMenuItemsByName(contextMenu, name);
+        ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
         return result.size() > 0 ? result.getFirst() : null;
     }
 
@@ -115,20 +113,14 @@ public final class APIContextMenu {
             };
         }
 
-        public ContextmenuItem create(String text) {
-            return create(text, defaultContextMenuItemAction(), null, 0);
+        public ContextMenuItem create(String text) {
+            return create(text, defaultContextMenuItemAction());
         }
 
-        public ContextmenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
-            return create(text, contextMenuItemAction, null, 0);
-        }
-
-        public ContextmenuItem create(String text, ContextMenuItemAction contextMenuItemAction, CMediaSprite icon, int iconIndex) {
-            ContextmenuItem contextMenuItem = new ContextmenuItem();
+        public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
+            ContextMenuItem contextMenuItem = new ContextMenuItem();
             contextMenuItem.text = Tools.Text.validString(text);
             contextMenuItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
-            contextMenuItem.icon = icon;
-            contextMenuItem.iconIndex = iconIndex;
             contextMenuItem.name = "";
             contextMenuItem.data = null;
             contextMenuItem.contextMenuItemAction = contextMenuItemAction;
@@ -136,44 +128,34 @@ public final class APIContextMenu {
             return contextMenuItem;
         }
 
-        public void setName(ContextmenuItem contextMenuItem, String name) {
+        public void setName(ContextMenuItem contextMenuItem, String name) {
             if (contextMenuItem == null) return;
             contextMenuItem.name = Tools.Text.validString(name);
 
         }
 
-        public void setData(ContextmenuItem contextMenuItem, Object data) {
+        public void setData(ContextMenuItem contextMenuItem, Object data) {
             if (contextMenuItem == null) return;
             contextMenuItem.data = data;
         }
 
 
-        public void setFontColor(ContextmenuItem contextMenuItem, Color color) {
+        public void setFontColor(ContextMenuItem contextMenuItem, Color color) {
             if (contextMenuItem == null) return;
             contextMenuItem.fontColor.set(color);
         }
 
-        public void setContextMenuItemAction(ContextmenuItem contextMenuItem, ContextMenuItemAction contextMenuItemAction) {
+        public void setContextMenuItemAction(ContextMenuItem contextMenuItem, ContextMenuItemAction contextMenuItemAction) {
             if (contextMenuItem == null) return;
             contextMenuItem.contextMenuItemAction = contextMenuItemAction;
         }
 
-        public void setText(ContextmenuItem contextMenuItem, String text) {
+        public void setText(ContextMenuItem contextMenuItem, String text) {
             if (contextMenuItem == null) return;
             contextMenuItem.text = Tools.Text.validString(text);
         }
 
-        public void setIcon(ContextmenuItem contextMenuItem, CMediaSprite icon) {
-            if (contextMenuItem == null) return;
-            contextMenuItem.icon = icon;
-        }
-
-        public void setIconIndex(ContextmenuItem contextMenuItem, int index) {
-            if (contextMenuItem == null) return;
-            contextMenuItem.iconIndex = Math.max(index, 0);
-        }
-
-        public void selectItem(ContextmenuItem contextMenuItem) {
+        public void selectItem(ContextMenuItem contextMenuItem) {
             if (contextMenuItem == null) return;
             UICommonUtils.contextMenu_selectItem(uiEngineState, contextMenuItem);
         }

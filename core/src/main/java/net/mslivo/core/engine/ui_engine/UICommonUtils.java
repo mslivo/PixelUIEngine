@@ -46,7 +46,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextmenuItem;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -463,9 +463,9 @@ final class UICommonUtils {
         contextMenu.y = y;
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
-            ContextmenuItem contextMenuItem = contextMenu.items.get(i);
+            ContextMenuItem contextMenuItem = contextMenu.items.get(i);
             int w = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
-            if (contextMenuItem.icon != null) w = w + uiEngineState.tileSize.TS;
+            if (contextMenuItem.contextMenuItemAction.icon() != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
         uiEngineState.displayedContextMenuWidth = (textwidth + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TS;
@@ -551,7 +551,7 @@ final class UICommonUtils {
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
-            int iconWidth = textButton.icon != null ? uiEngineState.tileSize.TS : 0;
+            int iconWidth = textButton.buttonAction.icon() != null ? uiEngineState.tileSize.TS : 0;
             int contentWidth = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, textButton.text) + 1 + iconWidth;
             int contentHeight = mediaManager.getCMediaFontTextHeight(uiEngineState.config.ui_font, textButton.text);
             textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
@@ -572,7 +572,7 @@ final class UICommonUtils {
     }
 
     static void grid_updateSize(Grid grid) {
-        int factor = grid.doubleSized ? 2 : 1;
+        int factor = grid.bigMode ? 2 : 1;
         if (grid.items != null) {
             grid.width = grid.items.length * factor;
             grid.height = grid.items[0].length * factor;
@@ -746,19 +746,19 @@ final class UICommonUtils {
         tabBar.tabs.remove(tab);
     }
 
-    static void contextMenu_addItem(Contextmenu contextMenu, ContextmenuItem contextMenuItem) {
+    static void contextMenu_addItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != null) return;
         contextMenuItem.addedToContextMenu = contextMenu;
         contextMenu.items.add(contextMenuItem);
     }
 
-    static void contextMenu_removeItem(Contextmenu contextMenu, ContextmenuItem contextMenuItem) {
+    static void contextMenu_removeItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
         contextMenu.items.remove(contextMenuItem);
     }
 
-    static void contextMenu_selectItem(UIEngineState uiEngineState, ContextmenuItem contextMenuItem) {
+    static void contextMenu_selectItem(UIEngineState uiEngineState, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu == null) return;
         Contextmenu ContextMenu = contextMenuItem.addedToContextMenu;
         if (contextMenuItem.contextMenuItemAction != null)
@@ -1134,7 +1134,7 @@ final class UICommonUtils {
     }
 
     static void grid_updateItemInfoAtMousePosition(UIEngineState uiEngineState, Grid grid) {
-        int tileSize = grid.doubleSized ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
+        int tileSize = grid.bigMode ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
         int x_grid = UICommonUtils.component_getAbsoluteX(grid);
         int y_grid = UICommonUtils.component_getAbsoluteY(grid);
         int inv_to_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;

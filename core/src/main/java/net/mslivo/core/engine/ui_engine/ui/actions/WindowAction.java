@@ -1,6 +1,8 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public abstract class WindowAction extends CommonActions {
+import net.mslivo.core.engine.ui_engine.ui.Window;
+
+public abstract class WindowAction extends CommonActions implements IconSupport {
 
     public WindowAction() {
     }

@@ -14,9 +14,7 @@ public class Tab {
     public TabAction tabAction;
     public Tabbar addedToTabBar;
     public Color fontColor;
-    public CMediaSprite icon;
     public ArrayList<Component> components;
-    public int iconIndex;
     public String name;
     public Object data;
 }

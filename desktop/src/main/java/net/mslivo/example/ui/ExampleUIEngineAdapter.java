@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
@@ -54,7 +55,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             public void onRelease() {
                 api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window", mediaManager));
             }
-        }, null, 0, BUTTON_MODE.DEFAULT);
+
+        },  BUTTON_MODE.DEFAULT);
 
         api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
