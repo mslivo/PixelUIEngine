@@ -89,8 +89,8 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5,true);
-    public static final CMediaFont UI_FONT_TINY = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_tiny.fnt", 0, 5, true);
+    public static final CMediaFont UI_FONT = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5);
+    public static final CMediaFont UI_FONT_TINY = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font_tiny.fnt", 0, 5);
 
     // Misc
     public static final CMediaImage UI_PIXEL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");

@@ -240,17 +240,18 @@ public final class APIComposites {
             };
         }
 
-        public void pageAbleGridSelectItem(APICompositeGrid.PageAbleReadOnlyGrid pageAbleReadOnlyGrid, Object item){
+        public void pageAbleGridSelectItem(APICompositeGrid.PageAbleReadOnlyGrid pageGrid, Object item){
             if(item == null)
                 return;
-            pageLoop:
-            for (int i = 0; i < pageAbleReadOnlyGrid.items.size(); i++) {
-                Object[][] array = pageAbleReadOnlyGrid.pages.get(i);
+            for (int i = 0; i < pageGrid.items.size(); i++) {
+                Object[][] array = pageGrid.pages.get(i);
                 for (int ix = 0; ix < array.length; ix++) {
                     for (int iy = 0; iy < array[0].length; iy++) {
                         if (array[ix][iy] == item) {
-                            pageAbleReadOnlyGrid.currentPage.set(i);
-                            break pageLoop;
+                            pageGrid.currentPage.set(i);
+                            api.component.grid.setItems(pageGrid.grid,pageGrid.pages.get(pageGrid.currentPage.get()));
+                            api.component.grid.setSelectedItem(pageGrid.grid, item);
+                            return;
                         }
                     }
                 }

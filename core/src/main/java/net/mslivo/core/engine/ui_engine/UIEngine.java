@@ -2326,6 +2326,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             }
 
+            // Content
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
                     // Text
@@ -2347,15 +2348,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> TS(tooltip_width) - image_width - 2;
                     };
-                    spriteRenderer.setColorReset();
+                    spriteRenderer.setColor(0.5f,0.5f,0.5f, segmentAlpha);
                     spriteRenderer.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }
                 case TooltipCanvasSegment canvasSegment -> {
                     int width = TS(canvasSegment.width);
                     int height = TS(canvasSegment.height);
-
                     spriteRenderer.end();
                     primitiveRenderer.begin();
+                    primitiveRenderer.setColor(0.5f,0.5f,0.5f, segmentAlpha);
 
                     int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
                         case LEFT -> 0;
@@ -2373,7 +2374,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             float b = canvasSegment.colorMap.b[icx][icy];
                             int vx = canvas_x + icx + 1;
                             int vy = tooltip_y + TS(iy) + icy + 1;
-                            primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, a * segmentAlpha);
                             primitiveRenderer.setVertexColor(r, g, b, a);
                             primitiveRenderer.vertex(vx, vy);
                         }
@@ -2408,8 +2408,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
         switch (direction) {
             case LEFT, RIGHT -> {
-
-
+                //
             }
             case UP, DOWN -> {
                 int yOffset = direction == DIRECTION.UP ? 0 : -TS2();
@@ -3096,6 +3095,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_drawIcon(icon, x, y, iconIndex, iconColor, false, alpha);
         }
 
+
         uiEngineState.tempColor.set(font.getColor());
         font.setColor(color.r, color.g, color.b, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
@@ -3106,6 +3106,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     maxWidth);
         }
         font.setColor(uiEngineState.tempColor);
+        spriteRenderer.loadState();
     }
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, int arrayIndex, Color color, boolean bigMode, float alpha) {

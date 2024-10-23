@@ -510,7 +510,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("Title", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("[#FF0000]Title[]Test", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
                         api.toolTip.segment.text.create("1", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),

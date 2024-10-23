@@ -300,7 +300,7 @@ public final class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        return create_CMediaFont(file, offset_x, offset_y, false);
+        return create_CMediaFont(file, offset_x, offset_y, true);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
