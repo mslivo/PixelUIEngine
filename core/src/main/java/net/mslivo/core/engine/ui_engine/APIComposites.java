@@ -391,7 +391,6 @@ public final class APIComposites {
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
                 Image image = api.component.image.create(x + i, y, UIEngineBaseMedia_8x8.UI_SEPARATOR_HORIZONTAL, index);
-                api.component.setColor(image, uiConfig.component_defaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -402,7 +401,6 @@ public final class APIComposites {
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
                 Image image = api.component.image.create(x, y + i, UIEngineBaseMedia_8x8.UI_SEPARATOR_VERTICAL, index);
-                api.component.setColor(image, uiConfig.component_defaultColor);
                 returnComponents.add(image);
             }
             return returnComponents;

@@ -2527,7 +2527,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = component.disabled || (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow != component.addedToWindow);
-        ;
+
 
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
 

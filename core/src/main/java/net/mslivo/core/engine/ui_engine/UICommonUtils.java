@@ -1571,5 +1571,15 @@ final class UICommonUtils {
         return null;
     }
 
+    static Color color_darker(Color color){
+        float amount = 0.7f;
+        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
+    }
+
+    static Color color_brigther(Color color){
+        float amount = 1.3f;
+        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
+    }
+
 
 }
