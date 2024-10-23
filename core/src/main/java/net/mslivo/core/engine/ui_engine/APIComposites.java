@@ -241,8 +241,9 @@ public final class APIComposites {
         }
 
         public void pageAbleGridSelectItem(APICompositeGrid.PageAbleReadOnlyGrid pageGrid, Object item){
-            if(item == null)
-                return;
+            if(item == null){
+                api.component.grid.setSelectedItem(pageGrid.grid, null);
+            }
             for (int i = 0; i < pageGrid.items.size(); i++) {
                 Object[][] array = pageGrid.pages.get(i);
                 for (int ix = 0; ix < array.length; ix++) {
