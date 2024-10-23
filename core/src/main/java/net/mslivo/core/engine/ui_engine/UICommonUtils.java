@@ -45,8 +45,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -156,19 +156,17 @@ final class UICommonUtils {
 
     static void window_fold(Window window) {
         window.folded = true;
-        if (window.windowAction != null) window.windowAction.onFold();
+        window.windowAction.onFold();
     }
 
     static void window_unFold(Window window) {
         window.folded = false;
-        if (window.windowAction != null) window.windowAction.onUnfold();
+        window.windowAction.onUnfold();
     }
 
     static void window_receiveMessage(Window window, int type, Object... parameters) {
         if (window == null) return;
-        if (window.windowAction != null) {
-            window.windowAction.onMessageReceived(type, parameters);
-        }
+        window.windowAction.onMessageReceived(type, parameters);
     }
 
     static void window_bringToFront(UIEngineState uiEngineState, Window window) {
@@ -238,18 +236,16 @@ final class UICommonUtils {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         uiEngineState.windows.add(window);
-        if (window.windowAction != null) window.windowAction.onAdd();
+        window.windowAction.onAdd();
         window_enforceScreenBounds(uiEngineState, window);
     }
 
     static boolean window_close(UIEngineState uiEngineState, Window window) {
         for (int i = 0; i < window.components.size(); i++) {
             if (window.components.get(i).name.equals(WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton) {
-                if (closeButton.buttonAction != null) {
-                    UICommonUtils.button_press(closeButton);
-                    UICommonUtils.button_release(closeButton);
-                    return true;
-                }
+                UICommonUtils.button_press(closeButton);
+                UICommonUtils.button_release(closeButton);
+                return true;
             }
         }
         return false;
@@ -270,7 +266,7 @@ final class UICommonUtils {
         // Remove
         window.addedToScreen = false;
         uiEngineState.windows.remove(window);
-        if (window.windowAction != null) window.windowAction.onRemove();
+        window.windowAction.onRemove();
 
         // Add Next Modal from Queue queue
         if (uiEngineState.modalWindowQueue.size() > 0)
@@ -399,24 +395,24 @@ final class UICommonUtils {
 
     static void hotkey_press(HotKey hotKey) {
         hotKey.pressed = true;
-        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onPress();
+        hotKey.hotKeyAction.onPress();
     }
 
     static void hotkey_release(HotKey hotKey) {
         hotKey.pressed = false;
-        if (hotKey.hotKeyAction != null) hotKey.hotKeyAction.onRelease();
+        hotKey.hotKeyAction.onRelease();
     }
 
     static void checkbox_check(Checkbox checkBox) {
         if (checkBox.checked) return;
         checkBox.checked = true;
-        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(true);
+        checkBox.checkBoxAction.onCheck(true);
     }
 
     static void checkbox_unCheck(Checkbox checkBox) {
         if (!checkBox.checked) return;
         checkBox.checked = false;
-        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(false);
+        checkBox.checkBoxAction.onCheck(false);
     }
 
     static void setMouseInteractedUIObject(UIEngineState uiEngineState, Object object) {
@@ -470,15 +466,14 @@ final class UICommonUtils {
         }
         uiEngineState.displayedContextMenuWidth = (textwidth + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TS;
         uiEngineState.openContextMenu = contextMenu;
-        if (uiEngineState.openContextMenu.contextMenuAction != null)
-            uiEngineState.openContextMenu.contextMenuAction.onOpen();
+        uiEngineState.openContextMenu.contextMenuAction.onOpen();
         return true;
     }
 
     static void contextMenu_close(UIEngineState uiEngineState, Contextmenu contextMenu) {
         if (contextMenu_isOpen(uiEngineState, contextMenu)) {
             resetOpenContextMenuReference(uiEngineState);
-            if (contextMenu.contextMenuAction != null) contextMenu.contextMenuAction.onClose();
+            contextMenu.contextMenuAction.onClose();
         }
     }
 
@@ -510,22 +505,21 @@ final class UICommonUtils {
     static void tabBar_selectTab(Tabbar tabBar, int index) {
         tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size() - 1);
         Tab tab = tabBar.tabs.get(tabBar.selectedTab);
-        if (tab.tabAction != null) tab.tabAction.onSelect();
-        if (tabBar.tabBarAction != null)
-            tabBar.tabBarAction.onChangeTab(index, tab);
+        tab.tabAction.onSelect();
+        tabBar.tabBarAction.onChangeTab(index, tab);
     }
 
 
     static void button_press(Button button) {
         if (button.pressed || button.mode != BUTTON_MODE.DEFAULT) return;
         button.pressed = true;
-        if (button.buttonAction != null) button.buttonAction.onPress();
+        button.buttonAction.onPress();
     }
 
     static void button_release(Button button) {
         if (!button.pressed || button.mode != BUTTON_MODE.DEFAULT) return;
         button.pressed = false;
-        if (button.buttonAction != null) button.buttonAction.onRelease();
+        button.buttonAction.onRelease();
     }
 
     static void button_toggle(Button button) {
@@ -539,7 +533,7 @@ final class UICommonUtils {
     static void button_toggle(Button button, boolean pressed) {
         if (button.toggleDisabled || button.pressed == pressed || button.mode != BUTTON_MODE.TOGGLE) return;
         button.pressed = pressed;
-        if (button.buttonAction != null) button.buttonAction.onToggle(button.pressed);
+        button.buttonAction.onToggle(button.pressed);
     }
 
     static void button_centerContent(UIEngineState uiEngineState, MediaManager mediaManager, Button button) {
@@ -633,8 +627,7 @@ final class UICommonUtils {
                     UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.content.length());
             case Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
                 UICommonUtils.textField_unFocus(uiEngineState, textField); // Unfocus
-                if (textField.textFieldAction != null)
-                    textField.textFieldAction.onEnter(textField.content, textField.contentValid);
+                textField.textFieldAction.onEnter(textField.content, textField.contentValid);
             }
             default -> {
             }
@@ -646,8 +639,7 @@ final class UICommonUtils {
             String newContent = textField.content.substring(0, textField.markerPosition) + character + textField.content.substring(textField.markerPosition);
             UICommonUtils.textField_setContent(textField, newContent);
             UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition + 1);
-            if (textField.textFieldAction != null)
-                textField.textFieldAction.onTyped(character);
+            textField.textFieldAction.onTyped(character);
         }
     }
 
@@ -655,12 +647,8 @@ final class UICommonUtils {
         if (content.length() > textField.contentMaxLength) content = content.substring(0, textField.contentMaxLength);
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Math.clamp(textField.markerPosition, 0, textField.content.length());
-        if (textField.textFieldAction != null) {
-            textField.contentValid = textField.textFieldAction.isContentValid(content);
-            textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
-        } else {
-            textField.contentValid = true;
-        }
+        textField.contentValid = textField.textFieldAction.isContentValid(content);
+        textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
     }
 
     static void component_setDisabled(UIEngineState uiEngineState, Component component, boolean disabled) {
@@ -761,10 +749,8 @@ final class UICommonUtils {
     static void contextMenu_selectItem(UIEngineState uiEngineState, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu == null) return;
         Contextmenu ContextMenu = contextMenuItem.addedToContextMenu;
-        if (contextMenuItem.contextMenuItemAction != null)
-            contextMenuItem.contextMenuItemAction.onSelect();
-        if (ContextMenu.contextMenuAction != null)
-            ContextMenu.contextMenuAction.onItemSelected(contextMenuItem);
+        contextMenuItem.contextMenuItemAction.onSelect();
+        ContextMenu.contextMenuAction.onItemSelected(contextMenuItem);
         UICommonUtils.contextMenu_close(uiEngineState, ContextMenu);
     }
 
@@ -772,10 +758,8 @@ final class UICommonUtils {
         if (comboBoxItem.addedToComboBox == null) return;
         Combobox comboBox = comboBoxItem.addedToComboBox;
         comboBox.selectedItem = comboBoxItem;
-        if (comboBoxItem.comboBoxItemAction != null)
-            comboBoxItem.comboBoxItemAction.onSelect();
-        if (comboBox.comboBoxAction != null)
-            comboBox.comboBoxAction.onItemSelected(comboBoxItem);
+        comboBoxItem.comboBoxItemAction.onSelect();
+        comboBox.comboBoxAction.onItemSelected(comboBoxItem);
         UICommonUtils.comboBox_close(uiEngineState, comboBox);
     }
 
@@ -956,13 +940,13 @@ final class UICommonUtils {
         }
         // Open this one
         uiEngineState.openComboBox = comboBox;
-        if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onOpen();
+        comboBox.comboBoxAction.onOpen();
     }
 
     static void comboBox_close(UIEngineState uiEngineState, Combobox comboBox) {
         if (comboBox_isOpen(uiEngineState, comboBox)) {
             resetOpenComboBoxReference(uiEngineState);
-            if (comboBox.comboBoxAction != null) comboBox.comboBoxAction.onClose();
+            comboBox.comboBoxAction.onClose();
         }
     }
 
@@ -977,14 +961,13 @@ final class UICommonUtils {
         }
         // Focus this one
         uiEngineState.focusedTextField = textField;
-        if (textField.textFieldAction != null) textField.textFieldAction.onFocus();
+        textField.textFieldAction.onFocus();
     }
 
     static void textField_unFocus(UIEngineState uiEngineState, Textfield textField) {
         if (textField_isFocused(uiEngineState, textField)) {
             resetFocusedTextFieldReference(uiEngineState);
-            if (textField.textFieldAction != null)
-                textField.textFieldAction.onUnFocus();
+            textField.textFieldAction.onUnFocus();
         }
     }
 
@@ -1000,7 +983,6 @@ final class UICommonUtils {
             list.selectedItem = null;
         }
     }
-
 
 
     static void list_setSelectedItems(List list, Object[] selectedItems) {
@@ -1044,15 +1026,15 @@ final class UICommonUtils {
         }
         float oldValue = knob.turned;
         knob.turned = Math.clamp(newValue, 0f, 1f);
-        if (knob.knobAction != null) knob.knobAction.onTurned(knob.turned, (newValue - oldValue));
+        knob.knobAction.onTurned(knob.turned, (newValue - oldValue));
     }
 
     static boolean list_canDragIntoScreen(List list) {
-        return list.dragEnabled && list.dragOutEnabled && list.listAction != null && list.listAction.canDragIntoApp();
+        return list.dragEnabled && list.dragOutEnabled && list.listAction.canDragIntoApp();
     }
 
     static boolean grid_canDragIntoScreen(Grid grid) {
-        return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction != null && grid.gridAction.canDragIntoApp();
+        return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction.canDragIntoApp();
     }
 
     static boolean list_canDragIntoList(UIEngineState uiEngineState, List list) {
@@ -1061,7 +1043,7 @@ final class UICommonUtils {
 
         if (draggedList != null && draggedList == list && draggedList.dragEnabled) return true; // Into itself
 
-        if (list.dragInEnabled && !list.disabled && list.listAction != null) {
+        if (list.dragInEnabled && !list.disabled) {
             if (draggedGrid != null) {
                 return !uiEngineState.draggedGrid.disabled && uiEngineState.draggedGrid.dragOutEnabled &&
                         list.listAction.canDragFromGrid(uiEngineState.draggedGrid);
@@ -1101,7 +1083,7 @@ final class UICommonUtils {
     }
 
     static void list_updateItemInfoAtMousePosition(UIEngineState uiEngineState, List list) {
-        if (list.items != null && list.listAction != null) {
+        if (list.items != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
             itemFrom = Math.max(itemFrom, 0);
             int x_list = UICommonUtils.component_getAbsoluteX(list);
@@ -1169,7 +1151,7 @@ final class UICommonUtils {
         }
     }
 
-    static void grid_setSelectedItem(Grid grid, Object selectedItem){
+    static void grid_setSelectedItem(Grid grid, Object selectedItem) {
         if (selectedItem != null && grid_contains(grid, selectedItem)) {
             if (grid.multiSelect) {
                 grid.selectedItems.add(selectedItem);
@@ -1181,10 +1163,10 @@ final class UICommonUtils {
         }
     }
 
-    static boolean grid_contains(Grid grid, Object object){
-        for(int ix=0;ix<grid.items.length;ix++) {
+    static boolean grid_contains(Grid grid, Object object) {
+        for (int ix = 0; ix < grid.items.length; ix++) {
             for (int iy = 0; iy < grid.items[0].length; iy++) {
-                if(grid.items[ix][iy] == object)
+                if (grid.items[ix][iy] == object)
                     return true;
             }
         }
@@ -1197,7 +1179,7 @@ final class UICommonUtils {
 
         if (draggedGrid != null && draggedGrid == grid && draggedGrid.dragEnabled) return true; // Into itself
 
-        if (grid.dragInEnabled && !grid.disabled && grid.gridAction != null) {
+        if (grid.dragInEnabled && !grid.disabled) {
             if (uiEngineState.draggedGridItem != null) {
                 return !uiEngineState.draggedGrid.disabled && uiEngineState.draggedGrid.dragOutEnabled &&
                         grid.gridAction.canDragFromGrid(uiEngineState.draggedGrid);
@@ -1296,19 +1278,19 @@ final class UICommonUtils {
 
     static void scrollBar_scroll(Scrollbar scrollBar, float scrolled) {
         scrollBar.scrolled = Math.clamp(scrolled, 0f, 1f);
-        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
+        scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
     }
 
     static void scrollBar_pressButton(Scrollbar scrollBar) {
         if (scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = true;
-        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
+        scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
     }
 
     static void scrollBar_releaseButton(Scrollbar scrollBar) {
         if (!scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = false;
-        if (scrollBar.scrollBarAction != null) scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
+        scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
     }
 
     static float scrollBar_calculateScrolled(UIEngineState uiEngineState, Scrollbar scrollBar, int mouse_ui_x, int mouse_ui_y) {
@@ -1334,7 +1316,7 @@ final class UICommonUtils {
 
     static void list_scroll(List list, float scrolled) {
         list.scrolled = Math.clamp(scrolled, 0f, 1f);
-        if (list.listAction != null) list.listAction.onScrolled(list.scrolled);
+        list.listAction.onScrolled(list.scrolled);
     }
 
 

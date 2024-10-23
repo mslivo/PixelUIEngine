@@ -364,7 +364,7 @@ public final class APIComposites {
                 Object item = searchList.get(i);
                 if (searchArrayLists && item instanceof ArrayList itemList) {
                     searchBarSearchItemsInternal(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
-                } else if (list.listAction != null && list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
+                } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                     resultList.add(item);
                 } else if (searchTooltips) {
                     Tooltip tooltip = list.listAction.toolTip(item);

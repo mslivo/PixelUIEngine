@@ -21,6 +21,7 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
+import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
@@ -292,7 +293,7 @@ public final class APIComponent {
             }
 
             public TextButton create(int x, int y, int width, int height, String text) {
-                return create(x, y, width, height, text, defaultButtonAction(), BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, text, null,  BUTTON_MODE.DEFAULT, false);
             }
 
             public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
@@ -332,11 +333,11 @@ public final class APIComponent {
             }
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image) {
-                return create(x, y, width, height, image, 0, defaultButtonAction(), BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, image, 0, null, BUTTON_MODE.DEFAULT, false);
             }
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex) {
-                return create(x, y, width, height, image, arrayIndex, defaultButtonAction(), BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, image, arrayIndex, null, BUTTON_MODE.DEFAULT, false);
             }
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction) {
@@ -369,82 +370,82 @@ public final class APIComponent {
 
         }
 
-        public void setButtonAction(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, ButtonAction buttonAction) {
+        public void setButtonAction(Button button, ButtonAction buttonAction) {
             if (button == null) return;
             button.buttonAction = buttonAction;
         }
 
-        public void press(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
+        public void press(Button button) {
             if (button == null) return;
             UICommonUtils.button_press(button);
         }
 
-        public void press(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons, boolean pressed) {
+        public void press(Button[] buttons, boolean pressed) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) press(buttons[i]);
         }
 
-        public void release(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
+        public void release(Button button) {
             if (button == null) return;
             UICommonUtils.button_release(button);
         }
 
-        public void release(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons) {
+        public void release(Button[] buttons) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) release(buttons[i]);
         }
 
-        public void toggle(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
+        public void toggle(Button button) {
             if (button == null) return;
             UICommonUtils.button_toggle(button);
         }
 
-        public void toggle(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons) {
+        public void toggle(Button[] buttons) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) toggle(buttons[i]);
         }
 
-        public void toggle(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, boolean pressed) {
+        public void toggle(Button button, boolean pressed) {
             if (button == null) return;
             UICommonUtils.button_toggle(button, pressed);
         }
 
-        public void toggle(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons, boolean pressed) {
+        public void toggle(Button[] buttons, boolean pressed) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) toggle(buttons[i], pressed);
         }
 
-        public void setButtonMode(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, BUTTON_MODE buttonMode) {
+        public void setButtonMode(Button button, BUTTON_MODE buttonMode) {
             if (button == null) return;
             button.mode = buttonMode;
         }
 
-        public void setContentOffset(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, int x, int y) {
+        public void setContentOffset(Button button, int x, int y) {
             if (button == null) return;
             button.contentOffset_x = x;
             button.contentOffset_y = y;
         }
 
-        public void setContentOffset(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons, int x, int y) {
+        public void setContentOffset(Button[] buttons, int x, int y) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) setContentOffset(buttons[i], x, y);
         }
 
-        public void setToggleDisabled(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, boolean disabled) {
+        public void setToggleDisabled(Button button, boolean disabled) {
             button.toggleDisabled = disabled;
         }
 
-        public void centerContent(net.mslivo.core.engine.ui_engine.ui.components.button.Button button) {
+        public void centerContent(Button button) {
             UICommonUtils.button_centerContent(uiEngineState, mediaManager, button);
         }
 
-        public void centerContent(net.mslivo.core.engine.ui_engine.ui.components.button.Button[] buttons) {
+        public void centerContent(Button[] buttons) {
             if (buttons == null) return;
             for (int i = 0; i < buttons.length; i++) centerContent(buttons[i]);
         }
 
-        private void setButtonCommonInitValuesInternal(net.mslivo.core.engine.ui_engine.ui.components.button.Button button, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
-            button.buttonAction = buttonAction;
+        private void setButtonCommonInitValuesInternal(Button button, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
+            button.buttonAction = buttonAction != null ? buttonAction : defaultButtonAction();
             button.mode = buttonMode;
             button.contentOffset_x = 0;
             button.contentOffset_y = 0;
@@ -525,6 +526,14 @@ public final class APIComponent {
 
     public final class APITabbar {
 
+        private TabBarAction defaultTabBarAction() {
+            return new TabBarAction() {
+                @Override
+                public void onChangeTab(int index, Tab tab) {
+                }
+            };
+        }
+
         public final APITab tab;
 
         APITabbar() {
@@ -540,21 +549,21 @@ public final class APIComponent {
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction) {
-            return create(x, y, width, tabs, selectedTab, tabBarAction, false, 0, 0, false);
+            return create(x, y, width, tabs, selectedTab, null, false, 0, 0, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight) {
-            return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 0, false);
+            return create(x, y, width, tabs, selectedTab, null, border, borderHeight, 0, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset) {
-            return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, tabOffset, false);
+            return create(x, y, width, tabs, selectedTab, null, border, borderHeight, tabOffset, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
             Tabbar tabBar = new Tabbar();
             setComponentCommonInitValuesInternal(tabBar, x, y, width, (bigIconMode ? 2 : 1));
-            tabBar.tabBarAction = tabBarAction;
+            tabBar.tabBarAction = tabBarAction != null ? tabBarAction : defaultTabBarAction();
             tabBar.border = border;
             tabBar.borderHeight = Math.max(borderHeight, 0);
             tabBar.tabOffset = Math.max(tabOffset, 0);
@@ -697,7 +706,7 @@ public final class APIComponent {
             }
 
             public Tab create(String title, Component[] components) {
-                return create(title, components, defaultTabAction(), 0);
+                return create(title, components, null, 0);
             }
 
             public Tab create(String title, Component[] components, TabAction tabAction) {
@@ -707,7 +716,7 @@ public final class APIComponent {
             public Tab create(String title, Component[] components, TabAction tabAction, int width) {
                 Tab tab = new Tab();
                 tab.title = Tools.Text.validString(title);
-                tab.tabAction = tabAction;
+                tab.tabAction = tabAction != null ? tabAction : defaultTabAction();
                 tab.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
@@ -803,7 +812,7 @@ public final class APIComponent {
         }
 
         public Grid create(int x, int y, Object[][] items) {
-            return create(x, y, items, defaultGridAction(), false, false, false, false, false);
+            return create(x, y, items, null, false, false, false, false, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction) {
@@ -838,7 +847,7 @@ public final class APIComponent {
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
-            grid.gridAction = gridAction;
+            grid.gridAction = gridAction != null ? gridAction : defaultGridAction();
             grid.dragEnabled = dragEnabled;
             grid.dragInEnabled = dragInEnabled;
             grid.dragOutEnabled = dragOutEnabled;
@@ -905,13 +914,13 @@ public final class APIComponent {
         }
 
         public Textfield create(int x, int y, int width) {
-            return create(x, y, width, "", defaultTextFieldAction(), 32,
+            return create(x, y, width, "", null, 32,
                     uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content) {
-            return create(x, y, width, content, defaultTextFieldAction(), 32,
+            return create(x, y, width, content, null, 32,
                     uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
@@ -935,7 +944,7 @@ public final class APIComponent {
                 textField.allowedCharacters.add(allowedCharacters[i]);
             textField.offset = 0;
             textField.content = Tools.Text.validString(content);
-            textField.textFieldAction = textFieldAction;
+            textField.textFieldAction = textFieldAction != null ? textFieldAction : defaultTextFieldAction();
             textField.markerPosition = textField.content.length();
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
@@ -1012,7 +1021,7 @@ public final class APIComponent {
         }
 
         public Canvas create(int x, int y, int width, int height) {
-            return create(x, y, width, height, defaultCanvasAction(), null);
+            return create(x, y, width, height, null, null);
         }
 
         public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
@@ -1031,8 +1040,7 @@ public final class APIComponent {
             canvas.colorMap.g = new float[widthPx][heightPx];
             canvas.colorMap.b = new float[widthPx][heightPx];
             canvas.colorMap.a = new float[widthPx][heightPx];
-
-            canvas.canvasAction = canvasAction;
+            canvas.canvasAction = canvasAction != null ? canvasAction : defaultCanvasAction();
             canvas.canvasImages = new ArrayList<>();
             if (canvasImages != null) {
                 for (int i = 0; i < canvasImages.length; i++) {
@@ -1242,7 +1250,7 @@ public final class APIComponent {
         }
 
         public Knob create(int x, int y) {
-            return create(x, y, defaultKnobAction(), false, 0f);
+            return create(x, y, null, false, 0f);
         }
 
         public Knob create(int x, int y, KnobAction knobAction) {
@@ -1258,7 +1266,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, Color.BLACK);
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
-            knob.knobAction = knobAction;
+            knob.knobAction = knobAction != null ? knobAction : defaultKnobAction();
             return knob;
         }
 
@@ -1290,7 +1298,7 @@ public final class APIComponent {
         }
 
         public Text create(int x, int y, String[] lines) {
-            return create(x, y, lines, defaultTextAction());
+            return create(x, y, lines, null);
         }
 
         public Text create(int x, int y, String[] lines, TextAction textAction) {
@@ -1307,7 +1315,7 @@ public final class APIComponent {
                 height = lines.length;
             }
             setComponentCommonInitValuesInternal(text, x, y, width, height);
-            text.textAction = textAction;
+            text.textAction = textAction != null ? textAction : defaultTextAction();
             text.lines = Tools.Text.validStringArray(lines);
             return text;
         }
@@ -1340,11 +1348,11 @@ public final class APIComponent {
         }
 
         public Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0, defaultImageAction());
+            return create(x, y, image, 0, null);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex, defaultImageAction());
+            return create(x, y, image, arrayIndex, null);
         }
 
 
@@ -1355,7 +1363,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
-            imageC.imageAction = imageAction;
+            imageC.imageAction = imageAction != null ? imageAction : defaultImageAction();
             return imageC;
         }
 
@@ -1390,11 +1398,11 @@ public final class APIComponent {
         }
 
         public Combobox create(int x, int y, int width) {
-            return create(x, y, width, null, defaultComboBoxAction(), false, null);
+            return create(x, y, width, null, null, false, null);
         }
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems) {
-            return create(x, y, width, combobBoxItems, defaultComboBoxAction(), false, null);
+            return create(x, y, width, combobBoxItems, null, false, null);
         }
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
@@ -1409,7 +1417,7 @@ public final class APIComponent {
             Combobox comboBox = new Combobox();
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, brighterColor(uiConfig.component_defaultColor));
             comboBox.useIcons = useIcons;
-            comboBox.comboBoxAction = comboBoxAction;
+            comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : defaultComboBoxAction();
             comboBox.comboBoxItems = new ArrayList<>();
             if (combobBoxItems != null) {
                 for (int i = 0; i < combobBoxItems.length; i++) {
@@ -1508,14 +1516,14 @@ public final class APIComponent {
             }
 
             public ComboboxItem create(String text) {
-                return create(text, defaultComboBoxItemAction());
+                return create(text, null);
             }
 
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
-                comboBoxItem.comboBoxItemAction = comboBoxItemAction;
+                comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : defaultComboBoxItemAction();
                 comboBoxItem.name = "";
                 comboBoxItem.data = null;
                 return comboBoxItem;
@@ -1571,7 +1579,7 @@ public final class APIComponent {
             }
 
             public ScrollbarHorizontal create(int x, int y, int length) {
-                return create(x, y, length, defaultScrollBarAction(), 0f);
+                return create(x, y, length, null, 0f);
             }
 
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction) {
@@ -1581,7 +1589,7 @@ public final class APIComponent {
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarHorizontal scrollBarHorizontal = new ScrollbarHorizontal();
                 setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1);
-                scrollBarHorizontal.scrollBarAction = scrollBarAction;
+                scrollBarHorizontal.scrollBarAction = scrollBarAction != null ? scrollBarAction : defaultScrollBarAction();
                 scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarHorizontal;
             }
@@ -1594,7 +1602,7 @@ public final class APIComponent {
             }
 
             public ScrollbarVertical create(int x, int y, int length) {
-                return create(x, y, length, defaultScrollBarAction(), 0f);
+                return create(x, y, length, null, 0f);
             }
 
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction) {
@@ -1604,7 +1612,7 @@ public final class APIComponent {
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarVertical scrollBarVertical = new ScrollbarVertical();
                 setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length);
-                scrollBarVertical.scrollBarAction = scrollBarAction;
+                scrollBarVertical.scrollBarAction = scrollBarAction != null ? scrollBarAction : defaultScrollBarAction();
                 scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarVertical;
             }
@@ -1634,11 +1642,11 @@ public final class APIComponent {
         }
 
         public List create(int x, int y, int width, int height) {
-            return create(x, y, width, height, null, defaultListAction(), false, false, false, false);
+            return create(x, y, width, height, null, null, false, false, false, false);
         }
 
         public List create(int x, int y, int width, int height, ArrayList items) {
-            return create(x, y, width, height, items, defaultListAction(), false, false, false, false);
+            return create(x, y, width, height, items, null, false, false, false, false);
         }
 
         public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction) {
@@ -1664,7 +1672,7 @@ public final class APIComponent {
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
-            list.listAction = listAction;
+            list.listAction = listAction != null ? listAction : defaultListAction();
             list.multiSelect = multiSelect;
             list.scrolled = 0f;
             list.dragEnabled = dragEnabled;

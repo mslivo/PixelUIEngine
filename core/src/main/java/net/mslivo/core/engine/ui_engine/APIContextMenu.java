@@ -33,7 +33,7 @@ public final class APIContextMenu {
     }
 
     public Contextmenu create(ContextMenuItem[] contextMenuItems) {
-        return create(contextMenuItems, defaultContextMenuAction());
+        return create(contextMenuItems, null);
     }
 
     public Contextmenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
@@ -48,7 +48,7 @@ public final class APIContextMenu {
             }
         }
         contextMenu.color = new Color(uiConfig.contextMenu_defaultColor);
-        contextMenu.contextMenuAction = contextMenuAction;
+        contextMenu.contextMenuAction = contextMenuAction != null ? contextMenuAction : defaultContextMenuAction();
         return contextMenu;
     }
 

@@ -39,11 +39,11 @@ public final class APITooltip {
     public Tooltip create(String text) {
         return create(new TooltipSegment[]{
                 segment.text.create(text)
-        }, defaultToolTipAction());
+        }, null);
     }
 
     public Tooltip create(TooltipSegment[] segments) {
-        return create(segments, defaultToolTipAction(), 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
+        return create(segments, null, 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
@@ -81,7 +81,7 @@ public final class APITooltip {
                 }
             }
         }
-        tooltip.toolTipAction = toolTipAction;
+        tooltip.toolTipAction = toolTipAction != null ? toolTipAction : defaultToolTipAction();
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
     }

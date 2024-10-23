@@ -35,11 +35,11 @@ public final class APIWindow {
     }
 
     public Window create(int x, int y, int width, int height) {
-        return create(x, y, width, height, "", defaultWindowAction(), false, true, true, true);
+        return create(x, y, width, height, "", null, false, true, true, true);
     }
 
     public Window create(int x, int y, int width, int height, String title) {
-        return create(x, y, width, height, title,  defaultWindowAction(), false, true, true, true);
+        return create(x, y, width, height, title,  null, false, true, true, true);
     }
 
     public Window create(int x, int y, int width, int height, String title, WindowAction windowAction) {
@@ -71,7 +71,7 @@ public final class APIWindow {
         window.fontColor = uiConfig.ui_font_defaultColor.cpy();
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
-        window.windowAction = windowAction;
+        window.windowAction = windowAction != null ? windowAction : defaultWindowAction();
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;

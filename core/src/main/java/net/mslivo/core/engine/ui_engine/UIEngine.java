@@ -502,8 +502,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 // Control ChangeCase
                 case '\t' -> {
                     mouseTextInput.upperCase = !mouseTextInput.upperCase;
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
+                    mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
                 }
                 // Control Delete
                 case '\b' -> {
@@ -511,8 +510,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     uiEngineState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
                     uiEngineState.inputEvents.keyUp = true;
                     uiEngineState.inputEvents.keyUpKeyCodes.add(KeyCode.Key.BACKSPACE);
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onDelete();
+                    mouseTextInput.mouseTextInputAction.onDelete();
                 }
                 // Control Confirm
                 case '\n' -> {
@@ -523,8 +521,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 default -> {
                     uiEngineState.inputEvents.keyTyped = true;
                     uiEngineState.inputEvents.keyTypedCharacters.add(c);
-                    if (mouseTextInput.mouseTextInputAction != null)
-                        mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
+                    mouseTextInput.mouseTextInputAction.onEnterCharacter(c);
                 }
             }
         }
@@ -1021,7 +1018,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         for (int ikc = 0; ikc < hotKey.keyCodes.length; ikc++) {
                             if (hotKey.keyCodes[ikc] == keyUpKeyCode) {
                                 hotKey.pressed = false;
-                                if (hotKey.hotKeyAction != null) UICommonUtils.hotkey_release(hotKey);
+                                UICommonUtils.hotkey_release(hotKey);
                                 break hkLoop;
                             }
                         }
@@ -1161,16 +1158,16 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         }
                         case Knob knob -> {
                             uiEngineState.pressedKnob = knob;
-                            if (knob.knobAction != null) knob.knobAction.onPress();
+                            knob.knobAction.onPress();
                         }
                         case Canvas canvas -> {
-                            if (canvas.canvasAction != null) canvas.canvasAction.onPress(
+                            canvas.canvasAction.onPress(
                                     UICommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, canvas),
                                     UICommonUtils.component_getRelativeMouseY(uiEngineState.mouse_ui.y, canvas));
                             uiEngineState.pressedCanvas = canvas;
                         }
                         case AppViewport appViewPort -> {
-                            if (appViewPort.appViewPortAction != null) appViewPort.appViewPortAction.onPress(
+                            appViewPort.appViewPortAction.onPress(
                                     UICommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, appViewPort),
                                     UICommonUtils.component_getRelativeMouseY(uiEngineState.mouse_ui.y, appViewPort));
                             uiEngineState.pressedAppViewPort = appViewPort;
@@ -1282,7 +1279,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (processMouseUpPressed) {
                 switch (pressedUIObject) {
                     case Canvas canvas -> {
-                        if (canvas.canvasAction != null) canvas.canvasAction.onRelease();
+                        canvas.canvasAction.onRelease();
                         UICommonUtils.resetPressedCanvasReference(uiEngineState);
                     }
                     case ContextMenuItem contextMenuItem -> {
@@ -1299,7 +1296,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
                     case Checkbox checkBox -> {
                         checkBox.checked = !checkBox.checked;
-                        if (checkBox.checkBoxAction != null) checkBox.checkBoxAction.onCheck(checkBox.checked);
+                        checkBox.checkBoxAction.onCheck(checkBox.checked);
                         UICommonUtils.resetPressedCheckBoxReference(uiEngineState);
                     }
                     case Textfield textField -> {
@@ -1328,8 +1325,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.resetPressedTextFieldReference(uiEngineState);
                     }
                     case AppViewport appViewPort -> {
-                        if (appViewPort.appViewPortAction != null)
-                            appViewPort.appViewPortAction.onRelease();
+
+                        appViewPort.appViewPortAction.onRelease();
                         UICommonUtils.resetPressedAppViewPortReference(uiEngineState);
                     }
                     case Button button -> {
@@ -1345,14 +1342,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.resetPressedScrollBarHorizontalReference(uiEngineState);
                     }
                     case Knob knob -> {
-                        if (knob.knobAction != null) knob.knobAction.onRelease();
+                        knob.knobAction.onRelease();
                         UICommonUtils.resetPressedKnobReference(uiEngineState);
                     }
                     case Grid grid -> {
                         UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, grid);
 
                         if (uiEngineState.draggedGrid == null || uiEngineState.itemInfo_gridPos.equals(uiEngineState.draggedGridFrom)) { // Only when not dragged elsewhere
-                            boolean select = grid.gridAction != null ? grid.gridAction.onItemSelected(uiEngineState.pressedGridItem) : true;
+                            boolean select = grid.gridAction.onItemSelected(uiEngineState.pressedGridItem);
 
                             if (uiEngineState.pressedGridItem != null) {
                                 if (select) {
@@ -1381,7 +1378,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     case List list -> {
                         UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
                         if (uiEngineState.draggedList == null || uiEngineState.itemInfo_listIndex == uiEngineState.draggedListFromIndex) { // Only when not dragged elsewhere
-                            boolean select = list.listAction != null ? list.listAction.onItemSelected(uiEngineState.pressedListItem) : true;
+                            boolean select = list.listAction.onItemSelected(uiEngineState.pressedListItem);
                             if (uiEngineState.pressedListItem != null) {
                                 if (select) {
                                     if (list.multiSelect) {
@@ -1426,22 +1423,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                     UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, hoverList);
                                     if (uiEngineState.itemInfo_listValid) {
                                         int toIndex = uiEngineState.itemInfo_listIndex;
-                                        if (hoverList.listAction != null)
-                                            hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
+                                        hoverList.listAction.onDragFromList(list, dragFromIndex, toIndex);
                                     }
                                 }
                             } else if (lastUIMouseHover instanceof Grid hoverGrid) {
                                 if (UICommonUtils.grid_canDragIntoGrid(uiEngineState, hoverGrid)) {
                                     UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, hoverGrid);
                                     if (uiEngineState.itemInfo_gridValid) {
-                                        if (hoverGrid.gridAction != null)
-                                            hoverGrid.gridAction.onDragFromList(list, dragFromIndex,
-                                                    uiEngineState.itemInfo_gridPos.x, uiEngineState.itemInfo_gridPos.y);
+                                        hoverGrid.gridAction.onDragFromList(list, dragFromIndex,
+                                                uiEngineState.itemInfo_gridPos.x, uiEngineState.itemInfo_gridPos.y);
                                     }
                                 }
                             }
                         } else if (UICommonUtils.list_canDragIntoScreen(list)) {
-                            if (list.listAction != null) list.listAction.onDragIntoApp(
+                            list.listAction.onDragIntoApp(
                                     dragItem, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
                             );
                         }
@@ -1457,10 +1452,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                 if (UICommonUtils.grid_canDragIntoGrid(uiEngineState, hoverGrid)) {
                                     UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, hoverGrid);
                                     if (uiEngineState.itemInfo_gridValid) {
-                                        if (hoverGrid.gridAction != null)
-                                            hoverGrid.gridAction.onDragFromGrid(grid,
-                                                    dragFromX, dragFromY,
-                                                    uiEngineState.itemInfo_gridPos.x, uiEngineState.itemInfo_gridPos.y);
+                                        hoverGrid.gridAction.onDragFromGrid(grid,
+                                                dragFromX, dragFromY,
+                                                uiEngineState.itemInfo_gridPos.x, uiEngineState.itemInfo_gridPos.y);
                                     }
                                 }
                             } else if (uiEngineState.lastUIMouseHover instanceof List hoverList) {
@@ -1468,16 +1462,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                     UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, hoverList);
                                     if (uiEngineState.itemInfo_listValid) {
                                         int toIndex = uiEngineState.itemInfo_listIndex;
-                                        if (hoverList.listAction != null)
-                                            hoverList.listAction.onDragFromGrid(grid, dragFromX, dragFromY, toIndex);
+                                        hoverList.listAction.onDragFromGrid(grid, dragFromX, dragFromY, toIndex);
                                     }
                                 }
                             }
                         } else if (UICommonUtils.grid_canDragIntoScreen(grid)) {
-                            if (grid.gridAction != null)
-                                grid.gridAction.onDragIntoApp(
-                                        dragItem, dragFromX, dragFromY, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
-                                );
+                            grid.gridAction.onDragIntoApp(
+                                    dragItem, dragFromX, dragFromY, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y
+                            );
                         }
                         // reset
                         UICommonUtils.resetDraggedGridReference(uiEngineState);
@@ -1531,8 +1523,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                 uiEngineState.mouse_ui.x - uiEngineState.draggedWindow_offset.x,
                                 uiEngineState.mouse_ui.y - uiEngineState.draggedWindow_offset.y);
 
-                        if (draggedWindow.windowAction != null)
-                            draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
+                        draggedWindow.windowAction.onMove(draggedWindow.x, draggedWindow.y);
                     }
                     case null, default -> {
                     }
@@ -1673,22 +1664,19 @@ public final class UIEngine<T extends UIEngineAdapter> {
             Component hoverComponent = (Component) uiEngineState.lastUIMouseHover;
             Object toolTipSubItem = null;
             if (hoverComponent instanceof List list) {
-                if (list.listAction != null) {
-                    UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
-                    if (uiEngineState.itemInfo_listValid) {
-                        toolTipSubItem = uiEngineState.itemInfo_listIndex < list.items.size() ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
-                    }
+
+                UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
+                if (uiEngineState.itemInfo_listValid) {
+                    toolTipSubItem = uiEngineState.itemInfo_listIndex < list.items.size() ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
                 }
             } else if (hoverComponent instanceof Grid grid) {
                 int tileSize = grid.bigMode ? TS2() : TS();
-                if (grid.gridAction != null) {
-                    int x_grid = UICommonUtils.component_getAbsoluteX(grid);
-                    int y_grid = UICommonUtils.component_getAbsoluteY(grid);
-                    int inv_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
-                    int inv_y = (uiEngineState.mouse_ui.y - y_grid) / tileSize;
-                    if (UICommonUtils.grid_positionValid(grid, inv_x, inv_y)) {
-                        toolTipSubItem = grid.items[inv_x][inv_y];
-                    }
+                int x_grid = UICommonUtils.component_getAbsoluteX(grid);
+                int y_grid = UICommonUtils.component_getAbsoluteY(grid);
+                int inv_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
+                int inv_y = (uiEngineState.mouse_ui.y - y_grid) / tileSize;
+                if (UICommonUtils.grid_positionValid(grid, inv_x, inv_y)) {
+                    toolTipSubItem = grid.items[inv_x][inv_y];
                 }
             }
 
@@ -1746,15 +1734,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     uiEngineState.tooltip_wait_delay = false;
                     uiEngineState.tooltip_delay_timer = 0;
                     uiEngineState.tooltip_fadePct = 0f;
-                    if (uiEngineState.tooltip.toolTipAction != null)
-                        uiEngineState.tooltip.toolTipAction.onDisplay();
+                    uiEngineState.tooltip.toolTipAction.onDisplay();
                 }
             } else if (uiEngineState.tooltip_fadePct < 1f) {
                 uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct + uiEngineState.config.tooltip_FadeInSpeed, 0f, 1f);
             } else {
-                if (uiEngineState.tooltip.toolTipAction != null) {
-                    uiEngineState.tooltip.toolTipAction.onUpdate();
-                }
+                uiEngineState.tooltip.toolTipAction.onUpdate();
             }
 
             uiEngineState.fadeOutTooltip = uiEngineState.tooltip;
@@ -2240,7 +2225,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
 
-
         }
 
 
@@ -2607,7 +2591,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.loadState();
             }
             case List list -> {
-                boolean itemsValid = (list.items != null && list.items.size() > 0 && list.listAction != null);
+                boolean itemsValid = (list.items != null && list.items.size() > 0);
                 int itemFrom = 0;
                 if (itemsValid) {
                     itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
@@ -2634,7 +2618,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int itemIndex = itemFrom + iy;
                     int itemOffsetY = (((list.height - 1)) - (iy));
                     Object item = null;
-                    if (list.items != null && list.items.size() > 0 && list.listAction != null) {
+                    if (list.items != null && list.items.size() > 0) {
                         if (itemIndex < list.items.size()) {
                             item = list.items.get(itemIndex);
                         }
@@ -2692,7 +2676,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 spriteRenderer.loadState();
                 // Cell Content
-                if (comboBox.selectedItem != null && comboBox.comboBoxAction != null) {
+                if (comboBox.selectedItem != null) {
                     render_drawFont(comboBox.selectedItem.text, comboBox.selectedItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox), 2, 1, TS(comboBox.width - 1),
                             comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem));
                 }
@@ -3065,26 +3049,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
             int dragOffsetX = uiEngineState.draggedGridOffset.x;
             int dragOffsetY = uiEngineState.draggedGridOffset.y;
             Object dragItem = uiEngineState.draggedGridItem;
-            if (dragGrid.gridAction != null) {
-                float dragAlpha = dragGrid.color.a * uiEngineState.config.component_listDragAlpha;
-                render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
-                        dragGrid.gridAction.iconIndex(dragItem), dragGrid.gridAction.iconColor(dragItem), dragGrid.bigMode, dragAlpha);
-            }
+            float dragAlpha =  componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
+            render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
+                    dragGrid.gridAction.iconIndex(dragItem), dragGrid.gridAction.iconColor(dragItem), dragGrid.bigMode, dragAlpha);
         } else if (uiEngineState.draggedList != null) {
             List dragList = uiEngineState.draggedList;
             int dragOffsetX = uiEngineState.draggedListOffset.x;
             int dragOffsetY = uiEngineState.draggedListOffset.y;
             Object dragItem = uiEngineState.draggedListItem;
+            float dragAlpha = componentAlpha(dragList) * uiEngineState.config.component_listDragAlpha;
+            // List
+            spriteRenderer.setColor(Color.GRAY, dragAlpha);
+            // Text
+            String text = dragList.listAction.text(dragItem);
+            render_drawFont(text, dragList.fontColor, dragAlpha, uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY, 2, 1,
+                    TS(dragList.width), dragList.listAction.icon(dragItem), dragList.listAction.iconIndex(dragItem), dragList.listAction.iconColor(dragItem));
 
-            if (dragList.listAction != null) {
-                float dragAlpha = dragList.color.a * uiEngineState.config.component_listDragAlpha;
-                // List
-                spriteRenderer.setColor(Color.GRAY, dragAlpha);
-                // Text
-                String text = dragList.listAction.text(dragItem);
-                render_drawFont(text, dragList.fontColor, dragAlpha, uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY, 2, 1,
-                        TS(dragList.width), dragList.listAction.icon(dragItem), dragList.listAction.iconIndex(dragItem), dragList.listAction.iconColor(dragItem));
-            }
         }
 
         spriteRenderer.setTweakAndColorReset();

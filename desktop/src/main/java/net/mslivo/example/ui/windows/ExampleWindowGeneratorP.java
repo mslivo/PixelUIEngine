@@ -584,7 +584,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
 
         Tabbar tabbar = api.component.tabbar.create(2, window.height - 5, window.width - 4, new Tab[]{tabTextButton, tabImageButton, tabTextImage},
-                0, null, true, window.height - 7, 0, false);
+                0, new TabBarAction() {
+                    @Override
+                    public void onChangeTab(int index, Tab tab) {
+                    }
+                }, true, window.height - 7, 0, false);
         api.window.addComponent(window, tabbar);
 
 
