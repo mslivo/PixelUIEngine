@@ -3096,7 +3096,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-        uiEngineState.tempFontColor.set(font.getColor());
         font.setColor(color.r, color.g, color.b, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
@@ -3105,8 +3104,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
-        font.setColor(uiEngineState.tempFontColor);
-        spriteRenderer.loadState();
     }
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, int arrayIndex, Color color, boolean bigMode, float alpha) {
