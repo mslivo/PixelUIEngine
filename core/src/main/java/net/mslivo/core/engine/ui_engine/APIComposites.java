@@ -123,13 +123,13 @@ public final class APIComposites {
         }
 
         public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction) {
-            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false, false);
+            return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false);
         }
 
-        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean multiselect, boolean doubleSized) {
+        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean doubleSized) {
 
             ArrayList<Object[][]> pages = new ArrayList<>();
-            Grid grid = api.component.grid.create(x, y + 1, null, null, multiselect, false, false, false, doubleSized);
+            Grid grid = api.component.grid.create(x, y + 1, null, null, false, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
             Text pageText = api.component.text.create(x, y, new String[]{});
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
