@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.Array;
 public final class ExtendedAnimation {
 
     private final TextureRegion[] keyFrames;
-    private float animationSpeed;
     private float animationDuration;
+    private float animationSpeed;
     private float stateTimeOffset;
     private int lastFrameNumber;
     private float lastStateTime;
@@ -21,14 +21,34 @@ public final class ExtendedAnimation {
         NORMAL, REVERSED, LOOP, LOOP_REVERSED, LOOP_PINGPONG, LOOP_RANDOM,
     }
 
-    public ExtendedAnimation(float animationSpeed, Array<TextureRegion> keyFrames, PlayMode playMode) {
+    public ExtendedAnimation(float animationSpeed, TextureRegion[] keyFrames, PlayMode playMode) {
+        this.keyFrames = new TextureRegion[keyFrames.length];
+        for (int i = 0; i < keyFrames.length; i++)
+            this.keyFrames[i] = keyFrames[i];
+
+        this.playMode = playMode;
         this.animationSpeed = animationSpeed;
+        this.animationDuration = this.keyFrames.length * animationSpeed;
+        this.stateTimeOffset = 0;
+    }
+
+    public ExtendedAnimation(float animationSpeed, Array<TextureRegion> keyFrames, PlayMode playMode) {
         this.keyFrames = new TextureRegion[keyFrames.size];
         for (int i = 0; i < keyFrames.size; i++)
             this.keyFrames[i] = keyFrames.get(i);
-        this.animationDuration = keyFrames.size * animationSpeed;
+
         this.playMode = playMode;
+        this.animationSpeed = animationSpeed;
+        this.animationDuration = this.keyFrames.length * animationSpeed;
         this.stateTimeOffset = 0;
+    }
+
+    public ExtendedAnimation cpy(){
+        ExtendedAnimation animation = new ExtendedAnimation(this.animationSpeed, this.keyFrames, this.playMode);
+        animation.stateTimeOffset = this.stateTimeOffset;
+        animation.lastStateTime = this.lastStateTime;
+        animation.lastFrameNumber = this.lastFrameNumber;
+        return animation;
     }
 
     public TextureRegion getKeyFrame(float stateTime) {
