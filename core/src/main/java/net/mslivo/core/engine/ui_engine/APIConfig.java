@@ -445,12 +445,12 @@ public final class APIConfig {
         APITooltipConfig(){
         }
 
-        public Color getDefaultColor() {
-            return uiConfig.tooltip_defaultColor.cpy();
+        public Color getDefaultCellColor() {
+            return uiConfig.tooltip_defaultCellColor.cpy();
         }
 
-        public void setDefaultColor(Color tooltip_defaultColor) {
-            uiConfig.tooltip_defaultColor = tooltip_defaultColor.cpy();
+        public void setDefaultCellColor(Color tooltip_defaultColor) {
+            uiConfig.tooltip_defaultCellColor = tooltip_defaultColor.cpy();
         }
 
         public float getFadeInTime() {

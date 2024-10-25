@@ -495,7 +495,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         });
 
 
-        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.GRAY, SEGMENT_ALIGNMENT.CENTER,8,3);
+        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,8,3);
 
         api.window.addUpdateAction(window, new UpdateAction(0) {
             @Override
@@ -510,15 +510,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("1", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("2", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("3", Color.WHITE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0, Color.MAGENTA, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.text.create("[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("1", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("2", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("3", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         canvasSegment,
                 }, new ToolTipAction() {
                     @Override

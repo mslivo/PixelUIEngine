@@ -5,7 +5,8 @@ import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
 
 public abstract class TooltipSegment {
     public Tooltip addedToTooltip;
-    public Color color;
+    public Color cellColor;
+    public Color contentColor;
     public SEGMENT_ALIGNMENT alignment;
     public int width;
     public int height;

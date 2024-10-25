@@ -2277,8 +2277,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         int iy = tooltip_height;
         for (int is = 0; is < tooltip.segments.size(); is++) {
             TooltipSegment segment = segments.get(is);
-            float segmentAlpha = segment.color.a * uiEngineState.tooltip_fadePct;
-            float borderAlpha = tooltip.color_border.a * uiEngineState.tooltip_fadePct;
+            final float segmentAlpha = segment.cellColor.a * uiEngineState.tooltip_fadePct;
+            final float borderAlpha = tooltip.color_border.a * uiEngineState.tooltip_fadePct;
             // Background
             if (!segment.merge) {
                 iy -= segment.height;
@@ -2300,7 +2300,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // Background
                     if (!segment.clear) {
                         for (int tx = 0; tx < tooltip_width; tx++) {
-                            spriteRenderer.setColor(segment.color, segmentAlpha);
+                            spriteRenderer.setColor(segment.cellColor, segmentAlpha);
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_CELL, tooltip_x + TS(tx), tooltip_y + TS(y_combined), render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference));
                         }
                     }
@@ -2318,7 +2318,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             }
 
+
             // Content
+            final float contentAlpha = segment.contentColor.a * uiEngineState.tooltip_fadePct;
+
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
                     // Text
@@ -2329,7 +2332,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
                         case RIGHT -> TS(tooltip_width) - text_width - 3;
                     };
-                    render_drawFont(textSegment.text, textSegment.fontColor, segmentAlpha, text_x, text_y, 1, 1);
+                    spriteRenderer.setColorReset();
+                    render_drawFont(textSegment.text, textSegment.contentColor, contentAlpha, text_x, text_y, 1, 1);
                 }
                 case TooltipImageSegment imageSegment -> {
                     int image_width = mediaManager.getCMediaSpriteWidth(imageSegment.image);
@@ -2340,7 +2344,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> TS(tooltip_width) - image_width - 2;
                     };
-                    spriteRenderer.setColor(Color.GRAY, segmentAlpha);
+                    spriteRenderer.setColor(imageSegment.contentColor, contentAlpha);
                     spriteRenderer.drawCMediaSprite(imageSegment.image, image_x, image_y, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState));
                 }
                 case TooltipCanvasSegment canvasSegment -> {
@@ -2348,7 +2352,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int height = TS(canvasSegment.height);
                     spriteRenderer.end();
                     primitiveRenderer.begin();
-                    primitiveRenderer.setColor(Color.GRAY, segmentAlpha);
+                    primitiveRenderer.setColor(canvasSegment.contentColor, segmentAlpha);
 
                     int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
                         case LEFT -> 0;

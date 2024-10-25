@@ -2,7 +2,6 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -125,7 +124,7 @@ public final class APITooltip {
 
         public void setColor(TooltipSegment tooltipSegment, Color color) {
             if (tooltipSegment == null || color == null) return;
-            tooltipSegment.color.set(color);
+            tooltipSegment.cellColor.set(color);
         }
 
         public void setAlignment(TooltipSegment tooltipSegment, SEGMENT_ALIGNMENT alignment) {
@@ -143,9 +142,10 @@ public final class APITooltip {
             UICommonUtils.tooltip_resizeSegment(uiEngineState, tooltipSegment, width, height);
         }
 
-        private void setSegmentValues(TooltipSegment tooltipSegment, Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
+        private void setSegmentValues(TooltipSegment tooltipSegment, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
             tooltipSegment.addedToTooltip = null;
-            tooltipSegment.color = new Color(color);
+            tooltipSegment.cellColor = new Color(cellColor);
+            tooltipSegment.contentColor = new Color(contentColor);
             tooltipSegment.alignment = alignment;
             tooltipSegment.width = width;
             tooltipSegment.height = height;
@@ -161,30 +161,30 @@ public final class APITooltip {
             }
 
             public TooltipImageSegment create(CMediaSprite sprite) {
-                return create(sprite, 0, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, 0, uiConfig.tooltip_defaultCellColor,Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex) {
-                return create(sprite, arrayIndex, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, arrayIndex, uiConfig.tooltip_defaultCellColor,Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color) {
-                return create(sprite, arrayIndex, color, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color cellColor,Color contentColor) {
+                return create(sprite, arrayIndex, cellColor, contentColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color, SEGMENT_ALIGNMENT alignment) {
-                return create(sprite, arrayIndex, color, alignment, false, false, false);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment) {
+                return create(sprite, arrayIndex, cellColor, contentColor, alignment, false, false, false);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color, SEGMENT_ALIGNMENT alignment, boolean merge) {
-                return create(sprite, arrayIndex, color, alignment, merge, false, false);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge) {
+                return create(sprite, arrayIndex, cellColor, contentColor, alignment, merge, false, false);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
-                return create(sprite, arrayIndex, color, alignment, merge, border, false);
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
+                return create(sprite, arrayIndex, cellColor, contentColor, alignment, merge, border, false);
             }
 
-            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
+            public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
                 TooltipImageSegment tooltipImageSegment = new TooltipImageSegment();
 
                 int width = 0, height = 0;
@@ -193,7 +193,7 @@ public final class APITooltip {
                     height = MathUtils.round((mediaManager.getCMediaSpriteHeight(sprite) + api.TS()) / api.TSF());
                 }
 
-                setSegmentValues(tooltipImageSegment, color, alignment, width, height, merge, border, clear);
+                setSegmentValues(tooltipImageSegment, cellColor,contentColor, alignment, width, height, merge, border, clear);
                 tooltipImageSegment.image = sprite;
                 tooltipImageSegment.arrayIndex = Math.max(arrayIndex, 0);
                 return tooltipImageSegment;
@@ -217,32 +217,31 @@ public final class APITooltip {
             }
 
             public TooltipTextSegment create(String text) {
-                return create(text, uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(text, uiConfig.tooltip_defaultCellColor,uiConfig.ui_font_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
-            public TooltipTextSegment create(String text, Color color) {
-                return create(text, color, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+            public TooltipTextSegment create(String text, Color cellColor,Color contentColor) {
+                return create(text, cellColor,contentColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
-            public TooltipTextSegment create(String text, Color color, SEGMENT_ALIGNMENT alignment) {
-                return create(text, color, alignment, false, false, false);
+            public TooltipTextSegment create(String text, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment) {
+                return create(text, cellColor,contentColor, alignment, false, false, false);
             }
 
-            public TooltipTextSegment create(String text, Color color, SEGMENT_ALIGNMENT alignment, boolean merge) {
-                return create(text, color, alignment, merge, false, false);
+            public TooltipTextSegment create(String text, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge) {
+                return create(text, cellColor,contentColor, alignment, merge, false, false);
             }
 
-            public TooltipTextSegment create(String text, Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
-                return create(text, color, alignment, merge, border, false);
+            public TooltipTextSegment create(String text, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border) {
+                return create(text, cellColor,contentColor, alignment, merge, border, false);
             }
 
-            public TooltipTextSegment create(String text, Color color, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
+            public TooltipTextSegment create(String text, Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
                 TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
                 String segmentText = Tools.Text.validString(text);
                 int width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, segmentText) + api.TS()) / api.TSF());
                 int height = 1;
-                setSegmentValues(tooltipTextSegment, color, alignment, width, height, merge, border, clear);
-                tooltipTextSegment.fontColor = uiConfig.ui_font_defaultColor.cpy();
+                setSegmentValues(tooltipTextSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
                 tooltipTextSegment.text = segmentText;
                 return tooltipTextSegment;
             }
@@ -250,11 +249,6 @@ public final class APITooltip {
             public void setText(TooltipTextSegment tooltipTextSegment, String text) {
                 if (tooltipTextSegment == null) return;
                 UICommonUtils.tooltip_setTextSegmentText(uiEngineState, mediaManager, tooltipTextSegment, text);
-            }
-
-            public void setFontColor(TooltipTextSegment tooltipTextSegment, Color color) {
-                if (tooltipTextSegment == null) return;
-                tooltipTextSegment.fontColor.set(color);
             }
 
         }
@@ -266,34 +260,34 @@ public final class APITooltip {
 
 
             public TooltipCanvasSegment create() {
-                return create(uiConfig.tooltip_defaultColor, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
+                return create(uiConfig.tooltip_defaultCellColor,Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
             public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
-                return create(uiConfig.tooltip_defaultColor, alignment, 1, 1, false, false, false);
+                return create(uiConfig.tooltip_defaultCellColor,Color.GRAY, alignment, 1, 1, false, false, false);
 
             }
 
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment) {
-                return create(color, alignment, 1, 1, false, false, false);
+            public TooltipCanvasSegment create(Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment) {
+                return create(cellColor, contentColor, alignment, 1, 1, false, false, false);
             }
 
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height) {
-                return create(color, alignment, width, height, false, false, false);
+            public TooltipCanvasSegment create(Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height) {
+                return create(cellColor, contentColor, alignment, width, height, false, false, false);
             }
 
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
-                return create(color, alignment, width, height, merge, false, false);
+            public TooltipCanvasSegment create(Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
+                return create(cellColor, contentColor, alignment, width, height, merge, false, false);
 
             }
 
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
-                return create(color, alignment, width, height, merge, border, false);
+            public TooltipCanvasSegment create(Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
+                return create(cellColor, contentColor, alignment, width, height, merge, border, false);
             }
 
-            public TooltipCanvasSegment create(Color color, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
+            public TooltipCanvasSegment create(Color cellColor,Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
                 TooltipCanvasSegment tooltipCanvasSegment = new TooltipCanvasSegment();
-                setSegmentValues(tooltipCanvasSegment, color, alignment, width, height, merge, border, clear);
+                setSegmentValues(tooltipCanvasSegment, cellColor,contentColor, alignment, width, height, merge, border, clear);
                 tooltipCanvasSegment.colorMap = new ColorMap();
                 int widthPx = api.TS(width);
                 int heightPx = api.TS(height);

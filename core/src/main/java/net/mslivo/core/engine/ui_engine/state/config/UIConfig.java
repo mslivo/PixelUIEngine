@@ -63,7 +63,7 @@ public final class UIConfig implements Serializable, Cloneable {
     public Color notification_defaultColor;
     public int notification_fadeoutTime;
     public float notification_scrollSpeed;
-    public Color tooltip_defaultColor;
+    public Color tooltip_defaultCellColor;
     public float tooltip_FadeInSpeed;
     public int tooltip_FadeInDelay;
     public float tooltip_FadeOutSpeed;
@@ -153,7 +153,7 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_defaultColor = DEFAULT_COlOR.cpy();
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
-        tooltip_defaultColor = DEFAULT_COlOR_BRIGHT.cpy();
+        tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
         tooltip_FadeInSpeed = 0.2f;
         tooltip_FadeOutSpeed = 0.2f;
         tooltip_FadeInDelay = 20;
