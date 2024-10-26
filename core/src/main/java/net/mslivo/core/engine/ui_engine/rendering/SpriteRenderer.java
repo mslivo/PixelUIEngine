@@ -64,16 +64,11 @@ public class SpriteRenderer implements Batch {
             .replace("$TEXCOORD_ATTRIBUTE", ShaderProgram.TEXCOORD_ATTRIBUTE + "0")
             .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
     private static final String FRAGMENT_SHADER = """
-            #ifdef GL_ES
-                #define LOWP lowp
-                precision mediump float;
-            #else
-                #define LOWP
-            #endif
+            precision mediump float;
             
             varying vec2 v_texCoords;
-            varying LOWP vec4 v_color;
-            varying LOWP vec4 v_tweak;
+            varying vec4 v_color;
+            varying vec4 v_tweak;
             
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
@@ -114,7 +109,7 @@ public class SpriteRenderer implements Batch {
             
             void main() {
                 // Pixelation
-                highp vec2 texCoords = v_texCoords;
+                vec2 texCoords = v_texCoords;
             
                 // Calculate pixelation factor
                 float  pixelSize = 2.0 + floor(v_tweak.w * 14.0);

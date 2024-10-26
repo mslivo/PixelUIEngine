@@ -136,7 +136,7 @@ public class Tools {
             config.setResizable(true);
             boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
 
-            config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 2, 0);
+            config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
 
             config.setWindowedMode(resolutionWidth, resolutionHeight);
             config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
