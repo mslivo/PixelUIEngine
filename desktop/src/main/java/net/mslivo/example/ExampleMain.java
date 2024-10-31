@@ -1,6 +1,7 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
@@ -103,7 +104,7 @@ public class ExampleMain extends ApplicationAdapter {
         System.out.println("Shutting down...");
         this.shutdownEngine();
         System.out.println("Done.");
-        System.exit(0);
+        Gdx.app.exit();
     }
 
     private void shutdownEngine() {

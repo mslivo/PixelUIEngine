@@ -3111,7 +3111,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.saveState();
         spriteRenderer.setColor(color.r, color.g, color.b, color.a * alpha);
         int scale = bigMode ? TS2() : TS();
-        spriteRenderer.drawCMediaSpriteScale(icon, x, y, 0, 0, scale, scale, UICommonUtils.ui_getAnimationTimer(uiEngineState), arrayIndex);
+
+        int renderWidth = Math.min(mediaManager.getCMediaSpriteWidth(icon), scale);
+        int renderHeight = Math.min(mediaManager.getCMediaSpriteHeight(icon), scale);
+        int xOffset = (scale-renderWidth)/2;
+        int yOffset = (scale-renderHeight)/2;
+
+        spriteRenderer.drawCMediaSpriteScale(icon, x+xOffset, y+yOffset, 0, 0, renderWidth, renderHeight, UICommonUtils.ui_getAnimationTimer(uiEngineState), arrayIndex);
         spriteRenderer.loadState();
     }
 
