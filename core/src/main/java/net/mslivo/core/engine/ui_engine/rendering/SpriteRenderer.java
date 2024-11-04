@@ -64,14 +64,25 @@ public class SpriteRenderer implements Batch {
             .replace("$TEXCOORD_ATTRIBUTE", ShaderProgram.TEXCOORD_ATTRIBUTE + "0")
             .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
     private static final String FRAGMENT_SHADER = """
-            precision mediump float;
+            #ifdef GL_ES
+                #define LOW lowp
+                #define MED mediump
+                #define HIGH highp
+                precision mediump float;
+            #else
+                #define MED
+                #define LOW
+                #define HIGH
+            #endif
+
             
+
             varying vec2 v_texCoords;
             varying vec4 v_color;
             varying vec4 v_tweak;
             
-            uniform sampler2D u_texture;
-            uniform vec2 u_textureSize;
+            uniform MED sampler2D u_texture;
+            uniform MED vec2 u_textureSize;
             
             const vec3 forward = vec3(1.0 / 3.0);
             const float twoThird = 2.0 / 3.0;
@@ -109,29 +120,23 @@ public class SpriteRenderer implements Batch {
             
             void main() {
                 // Pixelation
-                vec2 texCoords = v_texCoords;
+                MED vec2 texCoords = v_texCoords;
             
                 // Calculate pixelation factor
-                float  pixelSize = 2.0 + floor(v_tweak.w * 14.0);
-            
-                // Compute a multiplier that is exactly 0.0 when v_tweak.w is 0.0
-                float pixelateFactor = step(0.001, v_tweak.w); // Use a small epsilon to avoid artifacts
-            
-                // Apply pixelation effect only when pixelateFactor is 1.0
+                MED float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
+                
                 texCoords = texCoords * u_textureSize;
-                texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, pixelateFactor);
+                texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                 texCoords = texCoords / u_textureSize;
-            
-                vec4 tgt = texture2D(u_texture, texCoords);
-            
+                
                 // OkLab Tweaks
-            
-                vec3 lab = rgbToLabFragment(tgt.xyz);
+                MED vec4 tgt = texture2D(u_texture, texCoords);
+                MED vec3 lab = rgbToLabFragment(tgt.xyz);
                 lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0), twoThird);
                 lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
-            
                 lab = lab2rgbMat1 * lab;
-                vec3 rgb = sqrt(clamp(lab2rgbMat2 * (lab * lab * lab), 0.0, 1.0));
+                // back to RGB
+                MED vec3 rgb = sqrt(clamp(lab2rgbMat2 * (lab * lab * lab), 0.0, 1.0));
             
                 gl_FragColor = vec4(rgb, v_color.a * tgt.a);
             }
@@ -949,7 +954,7 @@ public class SpriteRenderer implements Batch {
             vertices[idx + 23] = tweak;
 
             idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
+        } catch (ArrayIndexOutOfBoundsException _ ) {
             resizeArray();
         }
     }

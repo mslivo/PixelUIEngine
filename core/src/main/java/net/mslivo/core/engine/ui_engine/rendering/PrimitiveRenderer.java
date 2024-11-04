@@ -96,7 +96,16 @@ public class PrimitiveRenderer {
             .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
 
     private static final String FRAGMENT_SHADER = """
-                precision mediump float;
+                #ifdef GL_ES
+                    #define LOW lowp
+                    #define MED mediump
+                    #define HIGH highp
+                    precision mediump float;
+                #else
+                    #define MED
+                    #define LOW
+                    #define HIGH
+                #endif
                 
                 varying vec4 fragColor;
             
