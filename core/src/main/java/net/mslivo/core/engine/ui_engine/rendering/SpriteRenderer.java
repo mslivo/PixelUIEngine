@@ -74,9 +74,9 @@ public class SpriteRenderer implements Batch {
                 #define LOW
                 #define HIGH
             #endif
-
             
-
+            
+            
             varying vec2 v_texCoords;
             varying vec4 v_color;
             varying vec4 v_tweak;
@@ -124,11 +124,11 @@ public class SpriteRenderer implements Batch {
             
                 // Calculate pixelation factor
                 MED float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
-                
+            
                 texCoords = texCoords * u_textureSize;
                 texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                 texCoords = texCoords / u_textureSize;
-                
+            
                 // OkLab Tweaks
                 MED vec4 tgt = texture2D(u_texture, texCoords);
                 MED vec3 lab = rgbToLabFragment(tgt.xyz);
@@ -251,7 +251,10 @@ public class SpriteRenderer implements Batch {
     }
 
 
-    private void resizeArray() {
+    private void checkAndResize(int sizeNeeded) {
+        if ((idx + sizeNeeded) < this.vertices.length)
+            return;
+
         int verticesSizeNew = this.vertices.length + ARRAY_RESIZE_STEP;
         this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
 
@@ -412,39 +415,39 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x1;
-            vertices[idx + 1] = y1;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
 
-            vertices[idx + 6] = x2;
-            vertices[idx + 7] = y2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 12] = x3;
-            vertices[idx + 13] = y3;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx] = x1;
+        vertices[idx + 1] = y1;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 18] = x4;
-            vertices[idx + 19] = y4;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 6] = x2;
+        vertices[idx + 7] = y2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 12] = x3;
+        vertices[idx + 13] = y3;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
+
+        vertices[idx + 18] = x4;
+        vertices[idx + 19] = y4;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -481,39 +484,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x;
-            vertices[idx + 1] = y;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 6] = x;
-            vertices[idx + 7] = fy2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 12] = fx2;
-            vertices[idx + 13] = fy2;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            vertices[idx + 18] = fx2;
-            vertices[idx + 19] = y;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -537,39 +538,38 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x;
-            vertices[idx + 1] = y;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 6] = x;
-            vertices[idx + 7] = fy2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = fx2;
-            vertices[idx + 13] = fy2;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 18] = fx2;
-            vertices[idx + 19] = y;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -588,40 +588,37 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float tweak = this.tweak;
+        checkAndResize(SPRITE_SIZE);
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-        try {
-            vertices[idx] = x;
-            vertices[idx + 1] = y;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 6] = x;
-            vertices[idx + 7] = fy2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            vertices[idx + 12] = fx2;
-            vertices[idx + 13] = fy2;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
 
-            vertices[idx + 18] = fx2;
-            vertices[idx + 19] = y;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        idx += SPRITE_SIZE;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
     }
 
     @Override
@@ -650,39 +647,37 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x;
-            vertices[idx + 1] = y;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 6] = x;
-            vertices[idx + 7] = fy2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 12] = fx2;
-            vertices[idx + 13] = fy2;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            vertices[idx + 18] = fx2;
-            vertices[idx + 19] = y;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -794,39 +789,38 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x;
-            vertices[idx + 1] = y;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 6] = x;
-            vertices[idx + 7] = fy2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = fx2;
-            vertices[idx + 13] = fy2;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = x;
+        vertices[idx + 7] = fy2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 18] = fx2;
-            vertices[idx + 19] = y;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 12] = fx2;
+        vertices[idx + 13] = fy2;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 18] = fx2;
+        vertices[idx + 19] = y;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -924,39 +918,38 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x1;
-            vertices[idx + 1] = y1;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 6] = x2;
-            vertices[idx + 7] = y2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = x1;
+        vertices[idx + 1] = y1;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = x3;
-            vertices[idx + 13] = y3;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = x2;
+        vertices[idx + 7] = y2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 18] = x4;
-            vertices[idx + 19] = y4;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 12] = x3;
+        vertices[idx + 13] = y3;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _ ) {
-            resizeArray();
-        }
+        vertices[idx + 18] = x4;
+        vertices[idx + 19] = y4;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -1070,39 +1063,38 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x1;
-            vertices[idx + 1] = y1;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u1;
-            vertices[idx + 4] = v1;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 6] = x2;
-            vertices[idx + 7] = y2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u2;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = x1;
+        vertices[idx + 1] = y1;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u1;
+        vertices[idx + 4] = v1;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = x3;
-            vertices[idx + 13] = y3;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u3;
-            vertices[idx + 16] = v3;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = x2;
+        vertices[idx + 7] = y2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u2;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 18] = x4;
-            vertices[idx + 19] = y4;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u4;
-            vertices[idx + 22] = v4;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 12] = x3;
+        vertices[idx + 13] = y3;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u3;
+        vertices[idx + 16] = v3;
+        vertices[idx + 17] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 18] = x4;
+        vertices[idx + 19] = y4;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u4;
+        vertices[idx + 22] = v4;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @Override
@@ -1136,39 +1128,38 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        try {
-            vertices[idx] = x1;
-            vertices[idx + 1] = y1;
-            vertices[idx + 2] = color;
-            vertices[idx + 3] = u;
-            vertices[idx + 4] = v;
-            vertices[idx + 5] = tweak;
+        checkAndResize(SPRITE_SIZE);
 
-            vertices[idx + 6] = x2;
-            vertices[idx + 7] = y2;
-            vertices[idx + 8] = color;
-            vertices[idx + 9] = u;
-            vertices[idx + 10] = v2;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = x1;
+        vertices[idx + 1] = y1;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = x3;
-            vertices[idx + 13] = y3;
-            vertices[idx + 14] = color;
-            vertices[idx + 15] = u2;
-            vertices[idx + 16] = v2;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = x2;
+        vertices[idx + 7] = y2;
+        vertices[idx + 8] = color;
+        vertices[idx + 9] = u;
+        vertices[idx + 10] = v2;
+        vertices[idx + 11] = tweak;
 
-            vertices[idx + 18] = x4;
-            vertices[idx + 19] = y4;
-            vertices[idx + 20] = color;
-            vertices[idx + 21] = u2;
-            vertices[idx + 22] = v;
-            vertices[idx + 23] = tweak;
+        vertices[idx + 12] = x3;
+        vertices[idx + 13] = y3;
+        vertices[idx + 14] = color;
+        vertices[idx + 15] = u2;
+        vertices[idx + 16] = v2;
+        vertices[idx + 17] = tweak;
 
-            idx += SPRITE_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 18] = x4;
+        vertices[idx + 19] = y4;
+        vertices[idx + 20] = color;
+        vertices[idx + 21] = u2;
+        vertices[idx + 22] = v;
+        vertices[idx + 23] = tweak;
+
+        idx += SPRITE_SIZE;
+
     }
 
     @SuppressWarnings("RedundantCast") // These casts are absolutely not redundant! Java 9 changed Buffer ABI.
@@ -1483,7 +1474,7 @@ public class SpriteRenderer implements Batch {
         if (cMediaFont == null) return;
         BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
         fontCache.clear();
-        fontCache.addText( text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
+        fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
         fontCache.draw(this, this.getAlpha());
     }
 
@@ -1498,7 +1489,7 @@ public class SpriteRenderer implements Batch {
 
         BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
         fontCache.clear();
-        fontCache.addText(text, (x + xOffset), (y + yOffset),0, text.length(), 0, Align.left, false, null);
+        fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), 0, Align.left, false, null);
         fontCache.draw(this, this.getAlpha());
     }
 

@@ -106,7 +106,7 @@ public class PrimitiveRenderer {
                     #define LOW
                     #define HIGH
                 #endif
-                
+            
                 varying vec4 fragColor;
             
                 void main() {                   
@@ -248,80 +248,81 @@ public class PrimitiveRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        try {
-            vertices[idx] = (x + 0.5f);
-            vertices[idx + 1] = (y + 0.5f);
-            vertices[idx + 2] = 0;
-            vertices[idx + 3] = vertexColor;
-            vertices[idx + 4] = color;
-            vertices[idx + 5] = tweak;
+        checkAndResize(VERTEX_SIZE);
 
-            idx += VERTEX_SIZE;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx] = (x + 0.5f);
+        vertices[idx + 1] = (y + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
+
+        idx += VERTEX_SIZE;
+
     }
 
     public void vertex(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        try {
-            vertices[idx] = (x1 + 0.5f);
-            vertices[idx + 1] = (y1 + 0.5f);
-            vertices[idx + 2] = 0;
-            vertices[idx + 3] = vertexColor;
-            vertices[idx + 4] = color;
-            vertices[idx + 5] = tweak;
+        checkAndResize(VERTEX_SIZE_X2);
 
-            vertices[idx + 6] = (x2 + 0.5f);
-            vertices[idx + 7] = (y2 + 0.5f);
-            vertices[idx + 8] = 0;
-            vertices[idx + 9] = vertexColor;
-            vertices[idx + 10] = color;
-            vertices[idx + 11] = tweak;
 
-            idx += VERTEX_SIZE_X2;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx] = (x1 + 0.5f);
+        vertices[idx + 1] = (y1 + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
+
+        vertices[idx + 6] = (x2 + 0.5f);
+        vertices[idx + 7] = (y2 + 0.5f);
+        vertices[idx + 8] = 0;
+        vertices[idx + 9] = vertexColor;
+        vertices[idx + 10] = color;
+        vertices[idx + 11] = tweak;
+
+        idx += VERTEX_SIZE_X2;
+
     }
 
     public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        try {
-            vertices[idx] = (x1 + 0.5f);
-            vertices[idx + 1] = (y1 + 0.5f);
-            vertices[idx + 2] = 0;
-            vertices[idx + 3] = vertexColor;
-            vertices[idx + 4] = color;
-            vertices[idx + 5] = tweak;
+        checkAndResize(VERTEX_SIZE_X3);
 
-            vertices[idx + 6] = (x2 + 0.5f);
-            vertices[idx + 7] = (y2 + 0.5f);
-            vertices[idx + 8] = 0;
-            vertices[idx + 9] = vertexColor;
-            vertices[idx + 10] = color;
-            vertices[idx + 11] = tweak;
+        vertices[idx] = (x1 + 0.5f);
+        vertices[idx + 1] = (y1 + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
 
-            vertices[idx + 12] = (x3 + 0.5f);
-            vertices[idx + 13] = (y3 + 0.5f);
-            vertices[idx + 14] = 0;
-            vertices[idx + 15] = vertexColor;
-            vertices[idx + 16] = color;
-            vertices[idx + 17] = tweak;
+        vertices[idx + 6] = (x2 + 0.5f);
+        vertices[idx + 7] = (y2 + 0.5f);
+        vertices[idx + 8] = 0;
+        vertices[idx + 9] = vertexColor;
+        vertices[idx + 10] = color;
+        vertices[idx + 11] = tweak;
 
-            idx += VERTEX_SIZE_X3;
-        } catch (ArrayIndexOutOfBoundsException _) {
-            resizeArray();
-        }
+        vertices[idx + 12] = (x3 + 0.5f);
+        vertices[idx + 13] = (y3 + 0.5f);
+        vertices[idx + 14] = 0;
+        vertices[idx + 15] = vertexColor;
+        vertices[idx + 16] = color;
+        vertices[idx + 17] = tweak;
+
+        idx += VERTEX_SIZE_X3;
+
     }
 
     public boolean isDrawing() {
         return drawing;
     }
 
-    private void resizeArray() {
+    private void checkAndResize(int sizeNeeded) {
+        if ((idx + sizeNeeded) < this.vertices.length)
+            return;
+
         int verticesSizeNew = this.vertices.length + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
         this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
 
