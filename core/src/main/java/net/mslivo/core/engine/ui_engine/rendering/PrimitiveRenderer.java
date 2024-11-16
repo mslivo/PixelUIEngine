@@ -120,6 +120,7 @@ public class PrimitiveRenderer {
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
+    private static final int INDICES_SIZE = 3;
     private static final int VERTEX_SIZE_X2 = VERTEX_SIZE * 2;
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
     private static final int ARRAY_RESIZE_STEP = 8192;
@@ -129,7 +130,7 @@ public class PrimitiveRenderer {
     private int primitiveType;
     private ShaderProgram shader;
     private Mesh mesh;
-    private float vertices[];
+    private float[] vertices;
     private int idx;
     private int u_projTrans;
     private boolean drawing;
@@ -161,11 +162,12 @@ public class PrimitiveRenderer {
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.drawing = false;
-        this.primitiveType = GL20.GL_POINTS;
+        this.primitiveType = GL20.GL_NONE;
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP * VERTEX_SIZE, null);
-        this.mesh = createMesh(ARRAY_RESIZE_STEP * VERTEX_SIZE);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP, null);
+
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -257,6 +259,7 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = color;
         vertices[idx + 5] = tweak;
 
+
         idx += VERTEX_SIZE;
 
     }
@@ -265,7 +268,6 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         checkAndResize(VERTEX_SIZE_X2);
-
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
@@ -323,16 +325,15 @@ public class PrimitiveRenderer {
         if ((idx + sizeNeeded) < this.vertices.length)
             return;
 
-        int verticesSizeNew = this.vertices.length + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
-        this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
+        int sizeNew = (this.mesh.getMaxVertices() / VERTEX_SIZE) + ARRAY_RESIZE_STEP;
 
+        this.vertices = createVerticesArray(sizeNew, this.vertices);
         this.mesh.dispose();
-        int meshSizeNew = mesh.getMaxVertices() + (ARRAY_RESIZE_STEP * VERTEX_SIZE);
-        this.mesh = createMesh(meshSizeNew);
+        this.mesh = createMesh(sizeNew);
     }
 
     private float[] createVerticesArray(int size, float[] copyFrom) {
-        float[] newVertices = new float[size];
+        float[] newVertices = new float[size * VERTEX_SIZE];
         // Copy from Old if exists
         if (copyFrom != null) {
             System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
@@ -342,11 +343,71 @@ public class PrimitiveRenderer {
 
     private Mesh createMesh(int size) {
         Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
-        return new Mesh(vertexDataType, true, size, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+        Mesh mesh = new Mesh(vertexDataType, true, size * VERTEX_SIZE, 0, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
+        return mesh;
     }
+
+    private short[] createMeshIndices(int primitiveType, int size) {
+        int len = switch (primitiveType) {
+            case GL20.GL_TRIANGLES -> size * 3; // 3 indices per triangle
+            case GL20.GL_TRIANGLE_STRIP ->
+                // 3 indices for the first triangle, 1 index for each additional triangle
+                    size + 2; // (size triangles, where size >= 2)
+            case GL20.GL_LINES -> size * 2; // 2 indices per line
+            case GL20.GL_LINE_STRIP ->
+                // 2 indices for the first line, 1 index for each additional line
+                    size + 1; // (size lines, where size >= 1)
+            case GL20.GL_POINTS -> size; // 1 index per point
+            default -> throw new IllegalArgumentException("Unsupported primitive type: " + primitiveType);
+        };
+
+        // Determine the number of indices required based on the primitive type
+
+        // Initialize the index array
+        short[] indices = new short[len];
+
+        // Generate indices based on the primitive type
+        switch (primitiveType) {
+            case GL20.GL_TRIANGLES -> {
+                for (int i = 0, vi = 0; i < len; i += 3, vi += 3) {
+                    indices[i] = (short) vi;        // First vertex of triangle
+                    indices[i + 1] = (short) (vi + 1);  // Second vertex of triangle
+                    indices[i + 2] = (short) (vi + 2);  // Third vertex of triangle
+                }
+            }
+            case GL20.GL_TRIANGLE_STRIP -> {
+
+                for (int i = 0, vi = 0; i < len; i++, vi++) {
+                    indices[i] = (short) -1;        // Connect vertices in a strip
+                }
+
+
+            }
+            case GL20.GL_LINES -> {
+                for (int i = 0, vi = 0; i < len; i += 2, vi += 2) {
+                    indices[i] = (short) vi;        // First vertex of line
+                    indices[i + 1] = (short) (vi + 1);  // Second vertex of line
+                }
+            }
+            case GL20.GL_LINE_STRIP -> {
+                for (int i = 0, vi = 0; i < len; i++, vi++) {
+                    indices[i] = (short) vi;        // Connect vertices in a strip
+                }
+            }
+            case GL20.GL_POINTS -> {
+                for (int i = 0; i < len; i++) {
+                    indices[i] = (short) i;         // Each index is a point
+                }
+            }
+            default -> throw new IllegalArgumentException("Unsupported primitive type: " + primitiveType);
+        }
+
+        return indices;
+    }
+
 
     private float rgbPacked(float red, float green, float blue, float alpha) {
         return Float.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)

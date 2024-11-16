@@ -193,8 +193,6 @@ public class SpriteRenderer implements Batch {
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
-        final int SIZE_INIT = 1024;
-
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -216,8 +214,8 @@ public class SpriteRenderer implements Batch {
         this.tempColor = new Color(Color.GRAY);
         this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
         this.invTexWidth = this.invTexHeight = 0;
-        this.mesh = createMesh(SIZE_INIT);
-        this.vertices = createVerticesArray(SIZE_INIT, null);
+        this.mesh = createMesh(ARRAY_RESIZE_STEP);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP, null);
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 

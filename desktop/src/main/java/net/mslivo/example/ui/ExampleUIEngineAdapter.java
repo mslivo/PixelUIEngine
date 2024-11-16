@@ -3,6 +3,7 @@ package net.mslivo.example.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -163,55 +164,48 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         primitiveRenderer.setProjectionMatrix(camera.combined);
-        primitiveRenderer.begin();
-        for (int ix = 0; ix < 10; ix++) {
-            for (int iy = 0; iy < 10; iy++) {
-                primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                primitiveRenderer.vertex(100 + ix, 100 + iy);
-            }
-        }
-        primitiveRenderer.end();
-
-
-        primitiveRenderer.begin(GL20.GL_LINES);
-        for (int ix = 0; ix < 10; ix++) {
-            for (int iy = 0; iy < 10; iy++) {
-                primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                primitiveRenderer.vertex(0, 0);
-                primitiveRenderer.vertex(100 + ix, 100 + iy);
-            }
-        }
-        primitiveRenderer.end();
-
-        primitiveRenderer.begin(GL20.GL_TRIANGLES);
-
-        primitiveRenderer.vertex(0, 0);
-        primitiveRenderer.vertex(100, 100);
-        primitiveRenderer.vertex(200, 0);
-        primitiveRenderer.end();
-
 
 
         // Primitive Drawing Test
+
         primitiveRenderer.begin(GL20.GL_POINTS);
         primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.vertex(0,32);
-        primitiveRenderer.vertex(5,32);
+        primitiveRenderer.vertex(50,50);
+        primitiveRenderer.vertex(51,50);
+        primitiveRenderer.vertex(52,50);
+        primitiveRenderer.vertex(53,50);
+        primitiveRenderer.vertex(54,50);
         primitiveRenderer.end();
 
-
         primitiveRenderer.begin(GL20.GL_LINES);
-        primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.vertex(0,42);
-        primitiveRenderer.vertex(5,42);
+        primitiveRenderer.setVertexColor(Color.RED);
+        primitiveRenderer.vertex(50, 60);
+        primitiveRenderer.vertex(55,60);
         primitiveRenderer.end();
 
         primitiveRenderer.begin(GL20.GL_TRIANGLES);
-        primitiveRenderer.setVertexColor(1f,1f,1f,1f);
-        primitiveRenderer.vertex(0,52);
-        primitiveRenderer.vertex(5,62);
-        primitiveRenderer.vertex(11,52);
+        primitiveRenderer.setVertexColor(Color.GREEN);
+        primitiveRenderer.vertex(50, 70);
+        primitiveRenderer.vertex(55,80);
+        primitiveRenderer.vertex(60,70);
+
+        primitiveRenderer.vertex(50+15, 70);
+        primitiveRenderer.vertex(55+15,80);
+        primitiveRenderer.vertex(60+15,70);
         primitiveRenderer.end();
+
+        primitiveRenderer.begin(GL20.GL_TRIANGLE_STRIP);
+
+        primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.vertex(100,100);
+        primitiveRenderer.vertex(120,100);
+        primitiveRenderer.vertex(110,120);
+
+        primitiveRenderer.vertex(100,140);
+        primitiveRenderer.vertex(120,140);
+        primitiveRenderer.vertex(110,160);
+        primitiveRenderer.end();
+
     }
 
     @Override
