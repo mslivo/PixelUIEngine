@@ -258,10 +258,9 @@ public class SpriteRenderer implements Batch {
         if ((idx + sizeNeeded) < this.vertices.length)
             return;
 
-        int sizeNew = vertexData.getNumMaxVertices() + ARRAY_RESIZE_STEP;
+        int sizeNew = (this.vertexData.getNumMaxVertices()/VERTEX_SIZE) + ARRAY_RESIZE_STEP;
 
-        this.vertices = createVerticesArray(sizeNew + ARRAY_RESIZE_STEP, this.vertices);
-
+        this.vertices = createVerticesArray(sizeNew, this.vertices);
 
         this.vertexData.dispose();
         this.vertexData = createVertexData(sizeNew);
