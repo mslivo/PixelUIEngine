@@ -3,9 +3,7 @@ package net.mslivo.example.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
@@ -177,11 +175,13 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(54,50);
         primitiveRenderer.end();
 
+
         primitiveRenderer.begin(GL20.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
         primitiveRenderer.vertex(55,60);
         primitiveRenderer.end();
+
 
         primitiveRenderer.begin(GL20.GL_TRIANGLES);
         primitiveRenderer.setVertexColor(Color.GREEN);
@@ -195,16 +195,25 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
         primitiveRenderer.begin(GL20.GL_TRIANGLE_STRIP);
+        primitiveRenderer.setVertexColor(Color.RED);
+
+        primitiveRenderer.vertex(100,140);
+        primitiveRenderer.vertex(120,140);
+        primitiveRenderer.vertex(110,160);
+        primitiveRenderer.vertex(110,170);
+
+        primitiveRenderer.primitiveRestart();
+
 
         primitiveRenderer.setVertexColor(Color.BLUE);
         primitiveRenderer.vertex(100,100);
         primitiveRenderer.vertex(120,100);
         primitiveRenderer.vertex(110,120);
 
-        primitiveRenderer.vertex(100,140);
-        primitiveRenderer.vertex(120,140);
-        primitiveRenderer.vertex(110,160);
+        primitiveRenderer.primitiveRestart();
+
         primitiveRenderer.end();
+
 
     }
 
