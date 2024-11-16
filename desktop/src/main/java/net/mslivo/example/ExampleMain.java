@@ -93,7 +93,7 @@ public class ExampleMain extends ApplicationAdapter {
         }
 
         // Debug Output
-        if (System.currentTimeMillis() - timer_debug_info > 5000) {
+        if (System.currentTimeMillis() - timer_debug_info > 1000) {
             System.out.println(Tools.Text.benchmark());
             timer_debug_info = System.currentTimeMillis();
         }
