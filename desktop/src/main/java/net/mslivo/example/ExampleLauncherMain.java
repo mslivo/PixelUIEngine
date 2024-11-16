@@ -2,6 +2,7 @@ package net.mslivo.example;
 
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.Tools;
 
 public class ExampleLauncherMain {
