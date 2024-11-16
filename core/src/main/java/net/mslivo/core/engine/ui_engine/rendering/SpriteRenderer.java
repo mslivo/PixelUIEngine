@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -151,7 +151,8 @@ public class SpriteRenderer implements Batch {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
     private final Color tempColor;
-    private Mesh mesh;
+    private VertexData vertexData;
+    private IndexData indexData;
     private float[] vertices;
     private int idx;
     private Texture lastTexture;
@@ -214,7 +215,8 @@ public class SpriteRenderer implements Batch {
         this.tempColor = new Color(Color.GRAY);
         this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
         this.invTexWidth = this.invTexHeight = 0;
-        this.mesh = createMesh(ARRAY_RESIZE_STEP);
+        this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
+        this.indexData = createIndexData(ARRAY_RESIZE_STEP);
         this.vertices = createVerticesArray(ARRAY_RESIZE_STEP, null);
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -233,7 +235,7 @@ public class SpriteRenderer implements Batch {
         this.mediaManager = mediaManager;
     }
 
-    private short[] createMeshIndices(int size) {
+    private IndexBufferObject createIndexData(int size) {
         int len = size * INDICES_SIZE;
         short j = 0;
         short[] indices = new short[len];
@@ -245,7 +247,10 @@ public class SpriteRenderer implements Batch {
             indices[i + 4] = (short) (j + 3);
             indices[i + 5] = j;
         }
-        return indices;
+
+        IndexBufferObject indexBufferObject = new IndexBufferObject(true, size * INDICES_SIZE);
+        indexBufferObject.setIndices(indices, 0, indices.length);
+        return indexBufferObject;
     }
 
 
@@ -253,12 +258,15 @@ public class SpriteRenderer implements Batch {
         if ((idx + sizeNeeded) < this.vertices.length)
             return;
 
-        int verticesSizeNew = this.vertices.length + ARRAY_RESIZE_STEP;
-        this.vertices = createVerticesArray(verticesSizeNew, this.vertices);
+        int sizeNew = vertexData.getNumMaxVertices() + ARRAY_RESIZE_STEP;
 
-        this.mesh.dispose();
-        int meshSizeNew = mesh.getMaxVertices() + ARRAY_RESIZE_STEP;
-        this.mesh = createMesh(meshSizeNew);
+        this.vertices = createVerticesArray(sizeNew + ARRAY_RESIZE_STEP, this.vertices);
+
+
+        this.vertexData.dispose();
+        this.vertexData = createVertexData(sizeNew);
+        this.indexData.dispose();
+        this.indexData = createIndexData(sizeNew);
     }
 
     private float[] createVerticesArray(int size, float[] copyFrom) {
@@ -270,16 +278,12 @@ public class SpriteRenderer implements Batch {
         return newVertices;
     }
 
-    private Mesh createMesh(int size) {
-        Mesh.VertexDataType vertexDataType = (Gdx.gl30 != null) ? Mesh.VertexDataType.VertexBufferObjectWithVAO : Mesh.VertexDataType.VertexArray;
-        Mesh mesh = new Mesh(vertexDataType,
-                true, size * VERTEX_SIZE, size * INDICES_SIZE,
+    private VertexData createVertexData(int size) {
+        return new VertexBufferObjectWithVAO(true,size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
-        mesh.setIndices(createMeshIndices(size));
-        return mesh;
     }
 
     @Override
@@ -1174,10 +1178,14 @@ public class SpriteRenderer implements Batch {
 
         lastTexture.bind();
 
-        mesh.setVertices(vertices, 0, idx);
-        mesh.getIndicesBuffer(true).position(0);
-        mesh.getIndicesBuffer(true).limit(count);
-        mesh.render(shader, GL32.GL_TRIANGLES, 0, count);
+        vertexData.setVertices(this.vertices,0, this.idx);
+        indexData.getBuffer(true).position(0);
+        indexData.getBuffer(true).limit(count);
+
+        vertexData.bind(shader);
+        indexData.bind();
+
+        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES,count,GL20.GL_UNSIGNED_SHORT,0);
 
         idx = 0;
     }
@@ -1235,7 +1243,8 @@ public class SpriteRenderer implements Batch {
 
     @Override
     public void dispose() {
-        mesh.dispose();
+        vertexData.dispose();
+        indexData.dispose();
         if (defaultShader && shader != null) shader.dispose();
     }
 

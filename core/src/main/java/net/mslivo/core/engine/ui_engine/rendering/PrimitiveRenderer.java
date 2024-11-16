@@ -219,14 +219,9 @@ public class PrimitiveRenderer {
         shader.bind();
         setupMatrices();
 
-
         // Blending
         Gdx.gl.glEnable(GL32.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
-
-        if (this.primitiveType == GL32.GL_LINE_STRIP || this.primitiveType == GL32.GL_TRIANGLE_STRIP) {
-            //Gdx.gl32.glEnable(GL30.GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        }
 
         this.drawing = true;
     }
@@ -236,11 +231,6 @@ public class PrimitiveRenderer {
         if (idx > 0) flush();
         Gdx.gl.glDepthMask(true);
         this.drawing = false;
-
-        if (this.primitiveType == GL32.GL_LINE_STRIP || this.primitiveType == GL32.GL_TRIANGLE_STRIP) {
-            //Gdx.gl32.glDisable(GL30.GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        }
-
     }
 
     public void primitiveRestart() {
