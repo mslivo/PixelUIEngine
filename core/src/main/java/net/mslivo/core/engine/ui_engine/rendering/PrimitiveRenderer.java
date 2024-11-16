@@ -240,7 +240,7 @@ public class PrimitiveRenderer {
 
         vertices[idx] = 0f; // x
         vertices[idx + 1] = 0f; // y
-        vertices[idx + 2] = 1f; // z - positive value triggers primitive restart
+        vertices[idx + 2] = Float.MAX_VALUE; // z - positive value triggers primitive restart
         vertices[idx + 3] = 0f;
         vertices[idx + 4] = 0f;
         vertices[idx + 5] = 0f;
