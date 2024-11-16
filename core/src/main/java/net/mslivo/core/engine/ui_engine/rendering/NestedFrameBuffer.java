@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine.rendering;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -49,7 +49,7 @@ public class NestedFrameBuffer extends FrameBuffer {
 
     private int getBoundFboHandle() {
         if(this.getBoundFBOCache != -1) return this.getBoundFBOCache;
-        Gdx.gl.glGetIntegerv(GL20.GL_FRAMEBUFFER_BINDING, this.intBuffer);
+        Gdx.gl.glGetIntegerv(GL32.GL_FRAMEBUFFER_BINDING, this.intBuffer);
         this.getBoundFBOCache = this.intBuffer.get(0);
         return this.getBoundFBOCache;
     }
@@ -58,7 +58,7 @@ public class NestedFrameBuffer extends FrameBuffer {
         if(this.getViewPortCache != null) return this.getViewPortCache;
         this.getViewPortCache = new int[4];
         IntBuffer intBuf = intBuffer;
-        Gdx.gl.glGetIntegerv(GL20.GL_VIEWPORT, intBuf);
+        Gdx.gl.glGetIntegerv(GL32.GL_VIEWPORT, intBuf);
         this.getViewPortCache[0] = intBuf.get(0);
         this.getViewPortCache[1] = intBuf.get(1);
         this.getViewPortCache[2] = intBuf.get(2);
@@ -82,7 +82,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     @Deprecated
     @Override
     public void bind() {
-        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, framebufferHandle);
+        Gdx.gl.glBindFramebuffer(GL32.GL_FRAMEBUFFER, framebufferHandle);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     public void end(int x, int y, int width, int height) {
         if (!isBound) throw new RuntimeException(ERROR_END_BEGIN);
         isBound = false;
-        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
+        Gdx.gl.glBindFramebuffer(GL32.GL_FRAMEBUFFER, previousFBOHandle);
         Gdx.gl.glViewport(x, y, width, height);
     }
 
@@ -103,7 +103,7 @@ public class NestedFrameBuffer extends FrameBuffer {
     protected void build() {
         int previousFBOHandle = getBoundFboHandle();
         super.build();
-        Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, previousFBOHandle);
+        Gdx.gl.glBindFramebuffer(GL32.GL_FRAMEBUFFER, previousFBOHandle);
     }
 
     public boolean isBound() {

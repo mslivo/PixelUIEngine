@@ -166,7 +166,7 @@ public class PrimitiveRenderer {
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.drawing = false;
-        this.primitiveType = GL20.GL_NONE;
+        this.primitiveType = GL32.GL_NONE;
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
         this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
@@ -178,7 +178,7 @@ public class PrimitiveRenderer {
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
         this.reset_vertexColor = colorPackedRGBA(1f, 1f, 1f, 1f);
-        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
         this.color = reset_color;
         this.vertexColor = reset_vertexColor;
@@ -207,7 +207,7 @@ public class PrimitiveRenderer {
     }
 
     public void begin() {
-        begin(GL20.GL_POINTS);
+        begin(GL32.GL_POINTS);
     }
 
     public void begin(int primitiveType) {
@@ -221,10 +221,10 @@ public class PrimitiveRenderer {
 
 
         // Blending
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glEnable(GL32.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
 
-        if (this.primitiveType == GL20.GL_LINE_STRIP || this.primitiveType == GL20.GL_TRIANGLE_STRIP) {
+        if (this.primitiveType == GL32.GL_LINE_STRIP || this.primitiveType == GL32.GL_TRIANGLE_STRIP) {
             //Gdx.gl32.glEnable(GL30.GL_PRIMITIVE_RESTART_FIXED_INDEX);
         }
 
@@ -237,7 +237,7 @@ public class PrimitiveRenderer {
         Gdx.gl.glDepthMask(true);
         this.drawing = false;
 
-        if (this.primitiveType == GL20.GL_LINE_STRIP || this.primitiveType == GL20.GL_TRIANGLE_STRIP) {
+        if (this.primitiveType == GL32.GL_LINE_STRIP || this.primitiveType == GL32.GL_TRIANGLE_STRIP) {
             //Gdx.gl32.glDisable(GL30.GL_PRIMITIVE_RESTART_FIXED_INDEX);
         }
 
@@ -245,7 +245,6 @@ public class PrimitiveRenderer {
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-
 
         checkAndResize(VERTEX_SIZE);
 
@@ -256,9 +255,6 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = 0f;
         vertices[idx + 5] = 0f;
         idx += VERTEX_SIZE;
-
-
-
     }
 
 

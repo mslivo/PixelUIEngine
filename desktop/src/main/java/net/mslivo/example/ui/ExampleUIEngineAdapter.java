@@ -2,7 +2,7 @@ package net.mslivo.example.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.*;
@@ -125,7 +125,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     @Override
     public void render(OrthographicCamera camera, AppViewport appViewPort) {
         animation_timer += Gdx.graphics.getDeltaTime();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);
 
         // Draw app based on data
         batch.setProjectionMatrix(camera.combined);
@@ -166,7 +166,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         // Primitive Drawing Test
 
-        primitiveRenderer.begin(GL20.GL_POINTS);
+        primitiveRenderer.begin(GL32.GL_POINTS);
         primitiveRenderer.setVertexColor(Color.BLUE);
         primitiveRenderer.vertex(50,50);
         primitiveRenderer.vertex(51,50);
@@ -176,14 +176,14 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
 
-        primitiveRenderer.begin(GL20.GL_LINES);
+        primitiveRenderer.begin(GL32.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
         primitiveRenderer.vertex(55,60);
         primitiveRenderer.end();
 
 
-        primitiveRenderer.begin(GL20.GL_TRIANGLES);
+        primitiveRenderer.begin(GL32.GL_TRIANGLES);
         primitiveRenderer.setVertexColor(Color.GREEN);
         primitiveRenderer.vertex(50, 70);
         primitiveRenderer.vertex(55,80);
@@ -194,7 +194,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(60+15,70);
         primitiveRenderer.end();
 
-        primitiveRenderer.begin(GL20.GL_TRIANGLE_STRIP);
+        primitiveRenderer.begin(GL32.GL_LINE_STRIP);
         primitiveRenderer.setVertexColor(Color.RED);
 
         primitiveRenderer.vertex(100,140);

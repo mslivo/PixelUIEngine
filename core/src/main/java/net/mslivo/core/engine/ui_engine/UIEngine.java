@@ -99,7 +99,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);
         /*  Call Adapter Init */
         this.uiAdapter.init(this.api, this.mediaManager);
     }
@@ -131,10 +131,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager);
-        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
-        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -1917,7 +1917,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_glClear() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);
     }
 
     private void renderGameViewPortFrameBuffer(AppViewport appViewPort) {
@@ -2692,7 +2692,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height = TS(canvas.height);
 
                 spriteRenderer.end();
-                primitiveRenderer.begin(GL20.GL_POINTS);
+                primitiveRenderer.begin(GL32.GL_POINTS);
                 render_setColor(primitiveRenderer, Color.GRAY, componentGrayScale);
                 for (int icx = 0; icx < width; icx++) {
                     for (int icy = 0; icy < height; icy++) {
@@ -2887,7 +2887,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (shape.shapeType != null) {
                     spriteRenderer.end();
 
-                    primitiveRenderer.begin(GL20.GL_TRIANGLES);
+                    primitiveRenderer.begin(GL32.GL_TRIANGLES);
                     render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
                     primitiveRenderer.setVertexColor(shape.color2);
                     final int cx = UICommonUtils.component_getAbsoluteX(shape);
@@ -2942,7 +2942,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             }
                         }
                         case ISOSCELES_TRIANGLE -> {
-                            primitiveRenderer.begin(GL20.GL_TRIANGLES);
+                            primitiveRenderer.begin(GL32.GL_TRIANGLES);
                             switch (shape.shapeRotation) {
                                 case DEGREE_0 -> {
                                     primitiveRenderer.vertex(cx, cy);

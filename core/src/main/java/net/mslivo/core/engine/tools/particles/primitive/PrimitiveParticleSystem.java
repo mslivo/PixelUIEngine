@@ -3,7 +3,7 @@ package net.mslivo.core.engine.tools.particles.primitive;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
-import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public abstract class PrimitiveParticleSystem<T> {
     /* ------- Point ------- */
 
     protected PrimitiveParticle<T> addPointParticle(float x1, float y1, float r1, float g1, float b1, float a1) {
-        PrimitiveParticle<T> particle = particleNew(GL20.GL_POINTS, true);
+        PrimitiveParticle<T> particle = particleNew(GL32.GL_POINTS, true);
         if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addParticleToSystem(particle);
@@ -95,7 +95,7 @@ public abstract class PrimitiveParticleSystem<T> {
             float x1, float y1, float r1, float g1, float b1, float a1,
             float x2, float y2, float r2, float g2, float b2, float a2
     ) {
-        PrimitiveParticle<T> particle = particleNew(GL20.GL_LINES, true);
+        PrimitiveParticle<T> particle = particleNew(GL32.GL_LINES, true);
         if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addVertex(particle, x2, y2, r2, g2, b2, a2);
@@ -128,7 +128,7 @@ public abstract class PrimitiveParticleSystem<T> {
             float x2, float y2, float r2, float g2, float b2, float a2,
             float x3, float y3, float r3, float g3, float b3, float a3
     ) {
-        PrimitiveParticle<T> particle = particleNew(GL20.GL_TRIANGLES, true);
+        PrimitiveParticle<T> particle = particleNew(GL32.GL_TRIANGLES, true);
         if (particle == null) return null;
         addVertex(particle, x1, y1, r1, g1, b1, a1);
         addVertex(particle, x2, y2, r2, g2, b2, a2);
@@ -205,14 +205,14 @@ public abstract class PrimitiveParticleSystem<T> {
             particleRenderHook.beforeRenderParticle(primitiveRenderer, particle);
 
             switch (particle.primitiveType) {
-                case GL20.GL_POINTS -> {
-                    primitiveRendererSetType(primitiveRenderer, GL20.GL_POINTS);
+                case GL32.GL_POINTS -> {
+                    primitiveRendererSetType(primitiveRenderer, GL32.GL_POINTS);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
                 }
-                case GL20.GL_LINES -> {
-                    primitiveRendererSetType(primitiveRenderer, GL20.GL_LINES);
+                case GL32.GL_LINES -> {
+                    primitiveRendererSetType(primitiveRenderer, GL32.GL_LINES);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);
@@ -220,8 +220,8 @@ public abstract class PrimitiveParticleSystem<T> {
                     primitiveRenderer.setVertexColor(particle.r[1], particle.g[1], particle.b[1], particle.a[1]);
                     primitiveRenderer.vertex(particle.x[1], particle.y[1]);
                 }
-                case GL20.GL_TRIANGLES -> {
-                    primitiveRendererSetType(primitiveRenderer, GL20.GL_TRIANGLES);
+                case GL32.GL_TRIANGLES -> {
+                    primitiveRendererSetType(primitiveRenderer, GL32.GL_TRIANGLES);
                     // Vertex 1
                     primitiveRenderer.setVertexColor(particle.r[0], particle.g[0], particle.b[0], particle.a[0]);
                     primitiveRenderer.vertex(particle.x[0], particle.y[0]);

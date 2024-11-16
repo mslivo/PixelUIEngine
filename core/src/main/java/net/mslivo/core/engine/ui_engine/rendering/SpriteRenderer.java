@@ -221,7 +221,7 @@ public class SpriteRenderer implements Batch {
 
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
-        this.reset_blend = new int[]{GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
         this.color = reset_color;
         this.tweak = reset_tweak;
@@ -291,7 +291,7 @@ public class SpriteRenderer implements Batch {
         shader.bind();
         setupMatrices();
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glEnable(GL32.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
 
         drawing = true;
@@ -1177,7 +1177,7 @@ public class SpriteRenderer implements Batch {
         mesh.setVertices(vertices, 0, idx);
         mesh.getIndicesBuffer(true).position(0);
         mesh.getIndicesBuffer(true).limit(count);
-        mesh.render(shader, GL20.GL_TRIANGLES, 0, count);
+        mesh.render(shader, GL32.GL_TRIANGLES, 0, count);
 
         idx = 0;
     }
