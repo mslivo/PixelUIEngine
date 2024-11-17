@@ -1187,7 +1187,7 @@ public class SpriteRenderer implements Batch {
         vertexData.bind(shader);
         indexData.bind();
 
-        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, count, GL20.GL_UNSIGNED_SHORT, 0);
+        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, count, GL32.GL_UNSIGNED_SHORT, 0);
 
         idx = 0;
     }
