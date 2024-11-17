@@ -129,7 +129,7 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
     private static final int ARRAY_RESIZE_STEP = 8192;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String SIZE_ERROR = "Flush detected - vertices.length->%";
+    private static final String SIZE_ERROR = "Flush detected - vertices.length->%d";
 
     private final Color tempColor;
     private int primitiveType;
@@ -274,7 +274,6 @@ public class PrimitiveRenderer {
     public void dispose() {
         this.vertexData.dispose();
     }
-
 
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
