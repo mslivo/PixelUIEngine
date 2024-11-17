@@ -150,7 +150,7 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String SIZE_ERROR = "Flush detected - vertices.length->%d";
+    private static final String FLUSH_WARNING = "Flush detected | vertices.length->%d | %s";
 
     private final Color tempColor;
     private VertexData vertexData;
@@ -174,7 +174,7 @@ public class SpriteRenderer implements Batch {
     private int renderCalls;
     private int totalRenderCalls;
     private int maxSpritesInBatch;
-    private boolean debugMode;
+    private boolean flushWarning;
 
     private float color;
     private float tweak;
@@ -204,8 +204,8 @@ public class SpriteRenderer implements Batch {
         this(mediaManager, shader, size, false);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size, boolean debugMode) {
-        if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
+    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size, boolean flushWarning) {
+        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -215,7 +215,7 @@ public class SpriteRenderer implements Batch {
             this.shader = shader;
         }
 
-        this.debugMode = debugMode;
+        this.flushWarning = flushWarning;
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
         this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
@@ -303,6 +303,9 @@ public class SpriteRenderer implements Batch {
         drawing = false;
     }
 
+    private void printFlushWarning(int idx){
+        System.err.println(String.format(FLUSH_WARNING, idx, Thread.currentThread().getStackTrace()[2].toString()));
+    }
 
     @Override
     public void draw(Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
@@ -314,8 +317,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -455,8 +458,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -523,8 +526,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -579,8 +582,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -636,8 +639,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -780,10 +783,11 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
+
         final float fx2 = x + width;
         final float fy2 = y + height;
         final float u = region.getU();
@@ -837,10 +841,11 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
+
         // bottom left and top right corner points relative to origin
         final float worldOriginX = x + originX;
         final float worldOriginY = y + originY;
@@ -966,10 +971,11 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
+
         // bottom left and top right corner points relative to origin
         final float worldOriginX = x + originX;
         final float worldOriginY = y + originY;
@@ -1111,8 +1117,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR, idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 

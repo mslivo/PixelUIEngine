@@ -129,7 +129,7 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
     private static final int ARRAY_RESIZE_STEP = 8192;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String SIZE_ERROR = "Flush detected - vertices.length->%d";
+    private static final String FLUSH_WARNING = "Flush detected | vertices.length->%d | %s";
 
     private final Color tempColor;
     private int primitiveType;
@@ -157,7 +157,7 @@ public class PrimitiveRenderer {
     private float reset_color;
     private float reset_vertexColor;
     private int[] reset_blend;
-    private boolean debugMode;
+    private boolean flushWarning;
 
     public PrimitiveRenderer() {
         this(SIZE_MAX, false);
@@ -167,7 +167,7 @@ public class PrimitiveRenderer {
         this(size, false);
     }
 
-    public PrimitiveRenderer(int size, boolean debugMode) {
+    public PrimitiveRenderer(int size, boolean flushWarning) {
         if (size > 32767) throw new IllegalArgumentException("Can't have more than 32767 vertexes: " + size);
 
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
@@ -179,7 +179,7 @@ public class PrimitiveRenderer {
         this.idx = 0;
         this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
         this.vertices = createVerticesArray(ARRAY_RESIZE_STEP);
-        this.debugMode = debugMode;
+        this.flushWarning = flushWarning;
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -216,6 +216,10 @@ public class PrimitiveRenderer {
 
     public void begin() {
         begin(GL32.GL_POINTS);
+    }
+
+    private void printFlushWarning(int idx){
+        System.err.println(String.format(FLUSH_WARNING, idx, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
     public void begin(int primitiveType) {
@@ -279,8 +283,8 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         if (idx == vertices.length) {
-            if(debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR,idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -299,8 +303,8 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         if (idx == vertices.length) {
-            if(debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR,idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
@@ -325,8 +329,8 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         if (idx == vertices.length) {
-            if(debugMode)
-                throw new RuntimeException(String.format(SIZE_ERROR,idx));
+            if (flushWarning)
+                printFlushWarning(idx);
             flush();
         }
 
