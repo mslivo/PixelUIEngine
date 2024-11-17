@@ -142,12 +142,13 @@ public class SpriteRenderer implements Batch {
             }
             """;
 
+    public static final int SIZE_MAX = 8191;
+
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
     private static final int VERTEX_SIZE = 4;
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
-    private static final int ARRAY_RESIZE_STEP = 1024;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
     private final Color tempColor;
@@ -186,14 +187,15 @@ public class SpriteRenderer implements Batch {
     private final int[] reset_blend;
 
     public SpriteRenderer() {
-        this(null, null);
+        this(null, null, SIZE_MAX);
     }
 
     public SpriteRenderer(MediaManager mediaManager) {
-        this(mediaManager, null);
+        this(mediaManager, null, SIZE_MAX);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
+    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size) {
+        if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -215,9 +217,9 @@ public class SpriteRenderer implements Batch {
         this.tempColor = new Color(Color.GRAY);
         this.renderCalls = this.totalRenderCalls = this.maxSpritesInBatch = 0;
         this.invTexWidth = this.invTexHeight = 0;
-        this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
-        this.indexData = createIndexData(ARRAY_RESIZE_STEP);
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP, null);
+        this.vertexData = createVertexData(size);
+        this.indexData = createIndexData(size);
+        this.vertices = createVerticesArray(size);
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 
@@ -253,27 +255,8 @@ public class SpriteRenderer implements Batch {
         return indexBufferObject;
     }
 
-
-    private void checkAndResize(int sizeNeeded) {
-        if ((idx + sizeNeeded) < this.vertices.length)
-            return;
-
-        int sizeNew = (this.vertexData.getNumMaxVertices()/VERTEX_SIZE) + ARRAY_RESIZE_STEP;
-
-        this.vertices = createVerticesArray(sizeNew, this.vertices);
-
-        this.vertexData.dispose();
-        this.vertexData = createVertexData(sizeNew);
-        this.indexData.dispose();
-        this.indexData = createIndexData(sizeNew);
-    }
-
-    private float[] createVerticesArray(int size, float[] copyFrom) {
+    private float[] createVerticesArray(int size) {
         float[] newVertices = new float[size * SPRITE_SIZE];
-        // Copy from Old if exists
-        if (copyFrom != null) {
-            System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
-        }
         return newVertices;
     }
 
@@ -416,9 +399,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-
-        checkAndResize(SPRITE_SIZE);
-
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
         vertices[idx + 2] = color;
@@ -485,7 +465,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        checkAndResize(SPRITE_SIZE);
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -539,8 +518,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        checkAndResize(SPRITE_SIZE);
-
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -589,7 +566,7 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float tweak = this.tweak;
-        checkAndResize(SPRITE_SIZE);
+
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -648,7 +625,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        checkAndResize(SPRITE_SIZE);
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -790,8 +766,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        checkAndResize(SPRITE_SIZE);
-
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -918,8 +892,6 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float tweak = this.tweak;
-
-        checkAndResize(SPRITE_SIZE);
 
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1064,7 +1036,6 @@ public class SpriteRenderer implements Batch {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        checkAndResize(SPRITE_SIZE);
 
         vertices[idx] = x1;
         vertices[idx + 1] = y1;
@@ -1128,8 +1099,6 @@ public class SpriteRenderer implements Batch {
 
         final float color = this.color;
         final float tweak = this.tweak;
-
-        checkAndResize(SPRITE_SIZE);
 
         vertices[idx] = x1;
         vertices[idx + 1] = y1;

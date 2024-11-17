@@ -119,16 +119,17 @@ public class PrimitiveRenderer {
             """;
 
 
+    public static final int SIZE_MAX = 32767;
     private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
-    private static final int INDICES_SIZE = 3;
     private static final int VERTEX_SIZE_X2 = VERTEX_SIZE * 2;
     private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
     private static final int ARRAY_RESIZE_STEP = 8192;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
+
 
     private final Color tempColor;
     private int primitiveType;
@@ -158,10 +159,12 @@ public class PrimitiveRenderer {
     private int[] reset_blend;
 
     public PrimitiveRenderer() {
-        this(10240);
+        this(SIZE_MAX);
     }
 
     public PrimitiveRenderer(int size) {
+        if (size > 32767) throw new IllegalArgumentException("Can't have more than 32767 vertexes: " + size);
+
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
@@ -170,7 +173,7 @@ public class PrimitiveRenderer {
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
         this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP, null);
+        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP);
 
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -236,7 +239,6 @@ public class PrimitiveRenderer {
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkAndResize(VERTEX_SIZE);
 
         vertices[idx] = 0f; // x
         vertices[idx + 1] = 0f; // y
@@ -272,8 +274,8 @@ public class PrimitiveRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-
-        checkAndResize(VERTEX_SIZE);
+        if (idx == vertices.length)
+            flush();
 
         vertices[idx] = (x + 0.5f);
         vertices[idx + 1] = (y + 0.5f);
@@ -289,7 +291,8 @@ public class PrimitiveRenderer {
     public void vertex(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkAndResize(VERTEX_SIZE_X2);
+        if (idx == vertices.length)
+            flush();
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
@@ -311,7 +314,8 @@ public class PrimitiveRenderer {
     public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        checkAndResize(VERTEX_SIZE_X3);
+        if (idx == vertices.length)
+            flush();
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
@@ -341,23 +345,8 @@ public class PrimitiveRenderer {
         return drawing;
     }
 
-    private void checkAndResize(int sizeNeeded) {
-        if ((idx + sizeNeeded) < this.vertices.length)
-            return;
-
-        int sizeNew = (this.vertexData.getNumMaxVertices() / VERTEX_SIZE) + ARRAY_RESIZE_STEP;
-
-        this.vertices = createVerticesArray(sizeNew, this.vertices);
-        this.vertexData.dispose();
-        this.vertexData = createVertexData(sizeNew);
-    }
-
-    private float[] createVerticesArray(int size, float[] copyFrom) {
+    private float[] createVerticesArray(int size) {
         float[] newVertices = new float[size * VERTEX_SIZE];
-        // Copy from Old if exists
-        if (copyFrom != null) {
-            System.arraycopy(copyFrom, 0, newVertices, 0, Math.min(copyFrom.length, newVertices.length));
-        }
         return newVertices;
     }
 
