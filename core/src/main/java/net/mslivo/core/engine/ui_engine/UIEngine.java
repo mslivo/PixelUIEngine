@@ -130,7 +130,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
-        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager,null, SpriteRenderer.SIZE_MAX, true);
+        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager);
         newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer();
