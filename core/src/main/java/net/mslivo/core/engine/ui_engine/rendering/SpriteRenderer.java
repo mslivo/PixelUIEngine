@@ -147,7 +147,7 @@ public class SpriteRenderer implements Batch {
 
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
-    private static final int VERTEX_SIZE = 4;
+    private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
