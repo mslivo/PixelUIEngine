@@ -122,7 +122,7 @@ public class PrimitiveRenderer {
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String FLUSH_WARNING = "Intermediate flush detected | vertices.length->%d | %s";
+    private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
 
     private final Color tempColor;
     private int primitiveType;
@@ -135,6 +135,7 @@ public class PrimitiveRenderer {
     private int renderCalls;
     private int totalRenderCalls;
 
+    private int intermediateFlushes;
     private final Matrix4 projectionMatrix;
     private float color;
     private float vertexColor;
@@ -175,7 +176,7 @@ public class PrimitiveRenderer {
         this.flushWarning = flushWarning;
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+        this.intermediateFlushes = 0;
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
         this.reset_vertexColor = colorPackedRGBA(1f, 1f, 1f, 1f);
@@ -211,8 +212,8 @@ public class PrimitiveRenderer {
         begin(GL32.GL_POINTS);
     }
 
-    private void printFlushWarning(int idx){
-        System.err.println(String.format(FLUSH_WARNING, idx, Thread.currentThread().getStackTrace()[2].toString()));
+    private void printFlushWarning(){
+        System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes+1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
     public void begin(int primitiveType) {
@@ -235,6 +236,10 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (idx > 0) flush();
         Gdx.gl.glDepthMask(true);
+        if (flushWarning && this.intermediateFlushes > 0) {
+            printFlushWarning();
+        }
+        this.intermediateFlushes = 0;
         this.drawing = false;
     }
 
@@ -242,8 +247,8 @@ public class PrimitiveRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
+
             flush();
         }
 
@@ -283,8 +288,7 @@ public class PrimitiveRenderer {
         // Vertex 1
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -304,8 +308,7 @@ public class PrimitiveRenderer {
         // Vertex 1
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -321,8 +324,7 @@ public class PrimitiveRenderer {
         // Vertex 2
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -341,8 +343,7 @@ public class PrimitiveRenderer {
 
         // Vertex 1
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -358,8 +359,7 @@ public class PrimitiveRenderer {
         // Vertex 2
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -375,8 +375,7 @@ public class PrimitiveRenderer {
         // Vertex 3
 
         if(idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -388,12 +387,6 @@ public class PrimitiveRenderer {
         vertices[idx + 5] = tweak;
 
         idx += VERTEX_SIZE;
-    }
-
-    private void checkFlush(){
-        if (idx == vertices.length) {
-
-        }
     }
 
     public boolean isDrawing() {

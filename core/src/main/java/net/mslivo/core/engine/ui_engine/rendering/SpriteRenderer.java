@@ -151,7 +151,7 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String FLUSH_WARNING = "Intermediate flush detected | vertices.length->%d | %s";
+    private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
 
     private final Color tempColor;
     private VertexData vertexData;
@@ -176,7 +176,7 @@ public class SpriteRenderer implements Batch {
     private int totalRenderCalls;
     private int maxSpritesInBatch;
     private boolean flushWarning;
-
+    private int intermediateFlushes;
     private float color;
     private float tweak;
     private final int[] blend;
@@ -223,6 +223,7 @@ public class SpriteRenderer implements Batch {
         this.textureSizeD4Vector = new Vector2(0, 0);
         this.drawing = false;
         this.idx = 0;
+        this.intermediateFlushes = 0;
         this.lastTexture = null;
         this.transformMatrix = new Matrix4();
         this.combinedMatrix = new Matrix4();
@@ -307,11 +308,15 @@ public class SpriteRenderer implements Batch {
         if (idx > 0) flush();
         lastTexture = null;
         Gdx.gl.glDepthMask(true);
+        if (flushWarning && this.intermediateFlushes > 0) {
+            printFlushWarning();
+        }
+        this.intermediateFlushes = 0;
         drawing = false;
     }
 
-    private void printFlushWarning(int idx){
-        System.err.println(String.format(FLUSH_WARNING, idx, Thread.currentThread().getStackTrace()[2].toString()));
+    private void printFlushWarning(){
+        System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes+1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
     @Override
@@ -324,8 +329,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -465,8 +469,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -533,8 +536,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -589,8 +591,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -646,8 +647,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture)
             switchTexture(texture);
         else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -790,8 +790,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -848,8 +847,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -978,8 +976,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
@@ -1124,8 +1121,7 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
-            if (flushWarning)
-                printFlushWarning(idx);
+            this.intermediateFlushes++;
             flush();
         }
 
