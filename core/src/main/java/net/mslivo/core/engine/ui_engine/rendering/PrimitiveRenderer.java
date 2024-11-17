@@ -168,7 +168,7 @@ public class PrimitiveRenderer {
     }
 
     public PrimitiveRenderer(int size, boolean flushWarning) {
-        if (size > 32767) throw new IllegalArgumentException("Can't have more than 32767 vertexes: " + size);
+        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than 32767 vertexes: " + size);
 
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
