@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.*;
 
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 
 /**
@@ -142,7 +143,7 @@ public class SpriteRenderer implements Batch {
             }
             """;
 
-    public static final int SIZE_MAX = 8191;
+    public static final int SIZE_MAX = 16383;
 
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "SpriteRenderer.begin must be called before end.";
@@ -150,7 +151,7 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String FLUSH_WARNING = "Flush detected | vertices.length->%d | %s";
+    private static final String FLUSH_WARNING = "Intermediate flush detected | vertices.length->%d | %s";
 
     private final Color tempColor;
     private VertexData vertexData;
@@ -205,7 +206,7 @@ public class SpriteRenderer implements Batch {
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size, boolean flushWarning) {
-        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
+        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than "+SIZE_MAX+" sprites per batch: " + size);
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
             if (!this.shader.isCompiled())
@@ -250,20 +251,26 @@ public class SpriteRenderer implements Batch {
 
     private IndexBufferObject createIndexData(int size) {
         int len = size * INDICES_SIZE;
-        short j = 0;
+        int j = 0;
         short[] indices = new short[len];
+
         for (int i = 0; i < len; i += 6, j += 4) {
-            indices[i] = j;
-            indices[i + 1] = (short) (j + 1);
-            indices[i + 2] = (short) (j + 2);
-            indices[i + 3] = (short) (j + 2);
-            indices[i + 4] = (short) (j + 3);
-            indices[i + 5] = j;
+            indices[i] = intToUnsignedShort(j);
+            indices[i + 1] = intToUnsignedShort(j + 1);
+            indices[i + 2] = intToUnsignedShort (j + 2);
+            indices[i + 3] = intToUnsignedShort (j + 2);
+            indices[i + 4] = intToUnsignedShort (j + 3);
+            indices[i + 5] = intToUnsignedShort(j);
         }
 
         IndexBufferObject indexBufferObject = new IndexBufferObject(true, size * INDICES_SIZE);
         indexBufferObject.setIndices(indices, 0, indices.length);
+
         return indexBufferObject;
+    }
+
+    public static short intToUnsignedShort(int value) {
+        return (short) (value & 0xFFFF);
     }
 
     private float[] createVerticesArray(int size) {

@@ -69,10 +69,6 @@ public class PrimitiveRenderer {
             void main() {
                 gl_PointSize = 1.0;
             
-                if($POSITION_ATTRIBUTE.x == 16.0 && $POSITION_ATTRIBUTE.y == 16.0){
-                    return;
-                }
-            
                 // Tint Color
                 vec4 v_color = $COLOR_ATTRIBUTE;
                 v_color.w *= 255.0 / 254.0;
@@ -119,17 +115,14 @@ public class PrimitiveRenderer {
             """;
 
 
-    public static final int SIZE_MAX = 32767;
+    public static final int SIZE_MAX = 65534;
     private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int VERTEX_SIZE = 6;
-    private static final int VERTEX_SIZE_X2 = VERTEX_SIZE * 2;
-    private static final int VERTEX_SIZE_X3 = VERTEX_SIZE * 3;
-    private static final int ARRAY_RESIZE_STEP = 8192;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
-    private static final String FLUSH_WARNING = "Flush detected | vertices.length->%d | %s";
+    private static final String FLUSH_WARNING = "Intermediate flush detected | vertices.length->%d | %s";
 
     private final Color tempColor;
     private int primitiveType;
@@ -168,7 +161,7 @@ public class PrimitiveRenderer {
     }
 
     public PrimitiveRenderer(int size, boolean flushWarning) {
-        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than 32767 vertexes: " + size);
+        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than "+SIZE_MAX+" vertexes: " + size);
 
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
@@ -177,8 +170,8 @@ public class PrimitiveRenderer {
         this.primitiveType = GL32.GL_NONE;
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
-        this.vertexData = createVertexData(ARRAY_RESIZE_STEP);
-        this.vertices = createVerticesArray(ARRAY_RESIZE_STEP);
+        this.vertexData = createVertexData(size);
+        this.vertices = createVerticesArray(size);
         this.flushWarning = flushWarning;
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -248,6 +241,11 @@ public class PrimitiveRenderer {
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
+        if(idx == vertices.length) {
+            if (flushWarning)
+                printFlushWarning(idx);
+            flush();
+        }
 
         vertices[idx] = 0f; // x
         vertices[idx + 1] = 0f; // y
@@ -282,7 +280,9 @@ public class PrimitiveRenderer {
     public void vertex(float x, float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        if (idx == vertices.length) {
+        // Vertex 1
+
+        if(idx == vertices.length) {
             if (flushWarning)
                 printFlushWarning(idx);
             flush();
@@ -295,14 +295,15 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = color;
         vertices[idx + 5] = tweak;
 
-
         idx += VERTEX_SIZE;
     }
 
     public void vertex(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        if (idx == vertices.length) {
+        // Vertex 1
+
+        if(idx == vertices.length) {
             if (flushWarning)
                 printFlushWarning(idx);
             flush();
@@ -315,25 +316,35 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = color;
         vertices[idx + 5] = tweak;
 
-        vertices[idx + 6] = (x2 + 0.5f);
-        vertices[idx + 7] = (y2 + 0.5f);
-        vertices[idx + 8] = 0;
-        vertices[idx + 9] = vertexColor;
-        vertices[idx + 10] = color;
-        vertices[idx + 11] = tweak;
+        idx += VERTEX_SIZE;
 
-        idx += VERTEX_SIZE_X2;
+        // Vertex 2
+
+        if(idx == vertices.length) {
+            if (flushWarning)
+                printFlushWarning(idx);
+            flush();
+        }
+
+        vertices[idx] = (x2 + 0.5f);
+        vertices[idx + 1] = (y2 + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
+
+        idx += VERTEX_SIZE;
     }
 
     public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        if (idx == vertices.length) {
+        // Vertex 1
+        if(idx == vertices.length) {
             if (flushWarning)
                 printFlushWarning(idx);
             flush();
         }
-
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
@@ -342,21 +353,47 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = color;
         vertices[idx + 5] = tweak;
 
-        vertices[idx + 6] = (x2 + 0.5f);
-        vertices[idx + 7] = (y2 + 0.5f);
-        vertices[idx + 8] = 0;
-        vertices[idx + 9] = vertexColor;
-        vertices[idx + 10] = color;
-        vertices[idx + 11] = tweak;
+        idx += VERTEX_SIZE;
 
-        vertices[idx + 12] = (x3 + 0.5f);
-        vertices[idx + 13] = (y3 + 0.5f);
-        vertices[idx + 14] = 0;
-        vertices[idx + 15] = vertexColor;
-        vertices[idx + 16] = color;
-        vertices[idx + 17] = tweak;
+        // Vertex 2
 
-        idx += VERTEX_SIZE_X3;
+        if(idx == vertices.length) {
+            if (flushWarning)
+                printFlushWarning(idx);
+            flush();
+        }
+
+        vertices[idx] = (x2 + 0.5f);
+        vertices[idx + 1] = (y2 + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
+
+        idx += VERTEX_SIZE;
+
+        // Vertex 3
+
+        if(idx == vertices.length) {
+            if (flushWarning)
+                printFlushWarning(idx);
+            flush();
+        }
+
+        vertices[idx] = (x3 + 0.5f);
+        vertices[idx + 1] = (y3 + 0.5f);
+        vertices[idx + 2] = 0;
+        vertices[idx + 3] = vertexColor;
+        vertices[idx + 4] = color;
+        vertices[idx + 5] = tweak;
+
+        idx += VERTEX_SIZE;
+    }
+
+    private void checkFlush(){
+        if (idx == vertices.length) {
+
+        }
     }
 
     public boolean isDrawing() {
@@ -369,7 +406,8 @@ public class PrimitiveRenderer {
     }
 
     private VertexData createVertexData(int size) {
-        VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE, new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+        VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
+                new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
