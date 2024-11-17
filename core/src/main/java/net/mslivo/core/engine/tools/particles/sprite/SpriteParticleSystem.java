@@ -2,6 +2,7 @@ package net.mslivo.core.engine.tools.particles.sprite;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.*;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
@@ -161,7 +162,7 @@ public abstract class SpriteParticleSystem<T> {
 
     public void updateParallel() {
         if (particles.size() == 0) return;
-        particles.parallelStream().forEach(this.parallelConsumer);
+        Tools.App.runParallel(this.particles, this.parallelConsumer);
         deleteQueuedParticles();
     }
 

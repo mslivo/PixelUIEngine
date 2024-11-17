@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.tools.particles.primitive;
 
 import com.badlogic.gdx.graphics.Color;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import org.lwjgl.opengl.GL32;
@@ -165,7 +166,7 @@ public abstract class PrimitiveParticleSystem<T> {
 
     public void updateParallel() {
         if (particles.size() == 0) return;
-        particles.parallelStream().forEach(this.parallelConsumer);
+        Tools.App.runParallel(this.particles, this.parallelConsumer);
         deleteQueuedParticles();
     }
 
