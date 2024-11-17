@@ -150,6 +150,7 @@ public class SpriteRenderer implements Batch {
     private static final int INDICES_SIZE = 6;
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
+    private static final String SIZE_ERROR = "Flush detected - vertices.length->%";
 
     private final Color tempColor;
     private VertexData vertexData;
@@ -173,6 +174,7 @@ public class SpriteRenderer implements Batch {
     private int renderCalls;
     private int totalRenderCalls;
     private int maxSpritesInBatch;
+    private boolean debugMode;
 
     private float color;
     private float tweak;
@@ -187,14 +189,22 @@ public class SpriteRenderer implements Batch {
     private final int[] reset_blend;
 
     public SpriteRenderer() {
-        this(null, null, SIZE_MAX);
+        this(null, null, SIZE_MAX, false);
     }
 
     public SpriteRenderer(MediaManager mediaManager) {
-        this(mediaManager, null, SIZE_MAX);
+        this(mediaManager, null, SIZE_MAX, false);
+    }
+
+    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
+        this(mediaManager, shader, SIZE_MAX, false);
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size) {
+        this(mediaManager, shader, size, false);
+    }
+
+    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, int size, boolean debugMode) {
         if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
         if (shader == null) {
             this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
@@ -205,6 +215,7 @@ public class SpriteRenderer implements Batch {
             this.shader = shader;
         }
 
+        this.debugMode = debugMode;
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
         this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
@@ -261,7 +272,7 @@ public class SpriteRenderer implements Batch {
     }
 
     private VertexData createVertexData(int size) {
-        return new VertexBufferObjectWithVAO(true,size * VERTEX_SIZE,
+        return new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
@@ -302,8 +313,11 @@ public class SpriteRenderer implements Batch {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (idx == vertices.length)
+        else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
+        }
 
         // bottom left and top right corner points relative to origin
         final float worldOriginX = x + originX;
@@ -440,8 +454,11 @@ public class SpriteRenderer implements Batch {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (idx == vertices.length) //
+        else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
+        }
 
         float u = srcX * invTexWidth;
         float v = (srcY + srcHeight) * invTexHeight;
@@ -505,8 +522,11 @@ public class SpriteRenderer implements Batch {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (idx == vertices.length) //
+        else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
+        }
 
         final float u = srcX * invTexWidth;
         final float v = (srcY + srcHeight) * invTexHeight;
@@ -558,8 +578,11 @@ public class SpriteRenderer implements Batch {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (idx == vertices.length) //
+        else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
+        }
 
         final float fx2 = x + width;
         final float fy2 = y + height;
@@ -612,8 +635,11 @@ public class SpriteRenderer implements Batch {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (idx == vertices.length) //
+        else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
+        }
 
         final float fx2 = x + width;
         final float fy2 = y + height;
@@ -754,6 +780,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
         }
         final float fx2 = x + width;
@@ -808,9 +836,11 @@ public class SpriteRenderer implements Batch {
         Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (idx == vertices.length) //
+        } else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
-
+        }
         // bottom left and top right corner points relative to origin
         final float worldOriginX = x + originX;
         final float worldOriginY = y + originY;
@@ -935,9 +965,11 @@ public class SpriteRenderer implements Batch {
         Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (idx == vertices.length) //
+        } else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
-
+        }
         // bottom left and top right corner points relative to origin
         final float worldOriginX = x + originX;
         final float worldOriginY = y + originY;
@@ -1079,6 +1111,8 @@ public class SpriteRenderer implements Batch {
         if (texture != lastTexture) {
             switchTexture(texture);
         } else if (idx == vertices.length) {
+            if (debugMode)
+                throw new RuntimeException(String.format(SIZE_ERROR, idx));
             flush();
         }
 
@@ -1146,14 +1180,14 @@ public class SpriteRenderer implements Batch {
 
         lastTexture.bind();
 
-        vertexData.setVertices(this.vertices,0, this.idx);
+        vertexData.setVertices(this.vertices, 0, this.idx);
         indexData.getBuffer(true).position(0);
         indexData.getBuffer(true).limit(count);
 
         vertexData.bind(shader);
         indexData.bind();
 
-        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES,count,GL20.GL_UNSIGNED_SHORT,0);
+        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, count, GL20.GL_UNSIGNED_SHORT, 0);
 
         idx = 0;
     }
