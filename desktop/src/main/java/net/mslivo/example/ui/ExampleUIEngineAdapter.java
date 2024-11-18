@@ -176,6 +176,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
 
+
         primitiveRenderer.begin(GL32.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
@@ -194,7 +195,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(60+15,70);
         primitiveRenderer.end();
 
-        primitiveRenderer.begin(GL32.GL_TRIANGLE_STRIP);
+        primitiveRenderer.begin(GL32.GL_LINE_STRIP);
         primitiveRenderer.setVertexColor(Color.RED);
 
         primitiveRenderer.vertex(100,140);
@@ -202,7 +203,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(110,160);
         primitiveRenderer.vertex(110,170);
 
-        //primitiveRenderer.primitiveRestart();
+        primitiveRenderer.primitiveRestart();
 
         primitiveRenderer.setVertexColor(Color.BLUE);
         primitiveRenderer.vertex(100,100);

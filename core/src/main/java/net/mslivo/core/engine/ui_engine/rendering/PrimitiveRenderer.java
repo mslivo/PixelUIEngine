@@ -123,7 +123,7 @@ public class PrimitiveRenderer {
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
-    private static final int VERTEX_SIZE = 6;
+    private static final int VERTEX_SIZE = 5;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final short PRIMITIVE_RESTART = -1;
@@ -290,6 +290,8 @@ public class PrimitiveRenderer {
             flush();
         }
 
+        // Insert Restart Index
+
         final int currentIndex = idx/VERTEX_SIZE;
         final int maxIndex = size/VERTEX_SIZE;
 
@@ -297,12 +299,13 @@ public class PrimitiveRenderer {
         shortBuffer.limit(maxIndex);
         shortBuffer.put(currentIndex,PRIMITIVE_RESTART);
 
-        vertices[idx] = 0f; // y
-        vertices[idx + 1] = 0f; // y
+        // Insert Dummy Vertex
+
+        vertices[idx] = 0f;
+        vertices[idx + 1] = 0f;
         vertices[idx + 2] = 0f;
         vertices[idx + 3] = 0f;
         vertices[idx + 4] = 0f;
-        vertices[idx + 5] = 0f;
         idx+=VERTEX_SIZE;
 
         this.indexResets.add(currentIndex);
@@ -317,7 +320,6 @@ public class PrimitiveRenderer {
         renderCalls++;
         totalRenderCalls++;
 
-
         int count = idx/VERTEX_SIZE;
 
         this.vertexData.setVertices(vertices, 0, idx);
@@ -328,7 +330,6 @@ public class PrimitiveRenderer {
         indexBuffer.limit(count);
         indexData.bind();
 
-        //Gdx.gl32.glDrawArrays(primitiveType, 0, idx);
         Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
         idx = 0;
     }
@@ -350,10 +351,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x + 0.5f);
         vertices[idx + 1] = (y + 0.5f);
-        vertices[idx + 2] = 0f;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
     }
@@ -370,10 +370,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = 0;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
 
@@ -386,10 +385,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x2 + 0.5f);
         vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = 0;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
     }
@@ -405,10 +403,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = 0;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
 
@@ -421,10 +418,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x2 + 0.5f);
         vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = 0;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
 
@@ -437,10 +433,9 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x3 + 0.5f);
         vertices[idx + 1] = (y3 + 0.5f);
-        vertices[idx + 2] = 0;
-        vertices[idx + 3] = vertexColor;
-        vertices[idx + 4] = color;
-        vertices[idx + 5] = tweak;
+        vertices[idx + 2] = vertexColor;
+        vertices[idx + 3] = color;
+        vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
     }
@@ -456,7 +451,7 @@ public class PrimitiveRenderer {
 
     private VertexData createVertexData(int size) {
         VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
-                new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
