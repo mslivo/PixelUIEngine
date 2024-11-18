@@ -153,6 +153,7 @@ public class SpriteRenderer implements Batch {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
 
+    private int size;
     private final Color tempColor;
     private VertexData vertexData;
     private IndexData indexData;
@@ -216,6 +217,7 @@ public class SpriteRenderer implements Batch {
             this.shader = shader;
         }
 
+        this.size = size;
         this.flushWarning = flushWarning;
         this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
         this.u_texture = this.shader.getUniformLocation("u_texture");
@@ -234,7 +236,6 @@ public class SpriteRenderer implements Batch {
         this.indexData = createIndexData(size);
         this.vertices = createVerticesArray(size);
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
 
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
@@ -1190,10 +1191,11 @@ public class SpriteRenderer implements Batch {
         lastTexture.bind();
 
         vertexData.setVertices(this.vertices, 0, this.idx);
-        indexData.getBuffer(true).position(0);
-        indexData.getBuffer(true).limit(count);
-
         vertexData.bind(shader);
+
+        ShortBuffer indexBuffer = indexData.getBuffer(true);
+        indexBuffer.position(0);
+        indexBuffer.limit(count);
         indexData.bind();
 
         Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, count, GL32.GL_UNSIGNED_SHORT, 0);

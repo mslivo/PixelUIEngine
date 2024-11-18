@@ -5,8 +5,11 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.nio.ShortBuffer;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public class PrimitiveRenderer {
@@ -123,17 +126,21 @@ public class PrimitiveRenderer {
     private static final int VERTEX_SIZE = 6;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
+    private static final short PRIMITIVE_RESTART = -1;
 
     private final Color tempColor;
     private int primitiveType;
     private ShaderProgram shader;
     private VertexData vertexData;
+    private IndexData indexData;
     private float[] vertices;
     private int idx;
     private int u_projTrans;
     private boolean drawing;
     private int renderCalls;
     private int totalRenderCalls;
+    private int size;
+    private IntArray indexResets;
 
     private int intermediateFlushes;
     private final Matrix4 projectionMatrix;
@@ -167,12 +174,15 @@ public class PrimitiveRenderer {
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
+        this.size = size;
         this.drawing = false;
         this.primitiveType = GL32.GL_NONE;
         this.tempColor = new Color(Color.GRAY);
         this.idx = 0;
         this.vertexData = createVertexData(size);
+        this.indexData = createIndexData(size);
         this.vertices = createVerticesArray(size);
+        this.indexResets = new IntArray();
         this.flushWarning = flushWarning;
         this.renderCalls = this.totalRenderCalls = 0;
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -216,6 +226,24 @@ public class PrimitiveRenderer {
         System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes+1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
+    private IndexBufferObject createIndexData(int size) {
+        int len = size;
+        short[] indices = new short[len];
+
+        for (int i = 0; i < size;i++) {
+            indices[i] = intToUnsignedShort(i);
+        }
+
+        IndexBufferObject indexBufferObject = new IndexBufferObject(true, size);
+        indexBufferObject.setIndices(indices, 0, indices.length);
+
+        return indexBufferObject;
+    }
+
+    public static short intToUnsignedShort(int value) {
+        return (short) (value & 0xFFFF);
+    }
+
     public void begin(int primitiveType) {
         if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         this.primitiveType = primitiveType;
@@ -227,6 +255,7 @@ public class PrimitiveRenderer {
 
         // Blending
         Gdx.gl.glEnable(GL32.GL_BLEND);
+        Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
         Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
 
         this.drawing = true;
@@ -241,6 +270,16 @@ public class PrimitiveRenderer {
         }
         this.intermediateFlushes = 0;
         this.drawing = false;
+
+        // Reset indices
+        if(!indexResets.isEmpty()){
+            ShortBuffer shortBuffer = indexData.getBuffer(true);
+            for(int i=0;i<indexResets.size;i++) {
+                int resetIndex = indexResets.get(i);
+                shortBuffer.put(resetIndex,intToUnsignedShort(resetIndex));
+            }
+            indexResets.clear();
+        }
     }
 
     public void primitiveRestart() {
@@ -248,17 +287,26 @@ public class PrimitiveRenderer {
 
         if(idx == vertices.length) {
             this.intermediateFlushes++;
-
             flush();
         }
 
-        vertices[idx] = 0f; // x
+        final int currentIndex = idx/VERTEX_SIZE;
+        final int maxIndex = size/VERTEX_SIZE;
+
+        ShortBuffer shortBuffer = indexData.getBuffer(true);
+        shortBuffer.limit(maxIndex);
+        shortBuffer.put(currentIndex,PRIMITIVE_RESTART);
+
+        vertices[idx] = 0f; // y
         vertices[idx + 1] = 0f; // y
-        vertices[idx + 2] = Float.MAX_VALUE; // z - positive value triggers primitive restart
+        vertices[idx + 2] = 0f;
         vertices[idx + 3] = 0f;
         vertices[idx + 4] = 0f;
         vertices[idx + 5] = 0f;
-        idx += VERTEX_SIZE;
+        idx+=VERTEX_SIZE;
+
+        this.indexResets.add(currentIndex);
+
     }
 
 
@@ -270,10 +318,18 @@ public class PrimitiveRenderer {
         totalRenderCalls++;
 
 
+        int count = idx/VERTEX_SIZE;
 
         this.vertexData.setVertices(vertices, 0, idx);
         this.vertexData.bind(this.shader);
-        Gdx.gl32.glDrawArrays(primitiveType, 0, idx);
+
+        ShortBuffer indexBuffer = indexData.getBuffer(true);
+        indexBuffer.position(0);
+        indexBuffer.limit(count);
+        indexData.bind();
+
+        //Gdx.gl32.glDrawArrays(primitiveType, 0, idx);
+        Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
         idx = 0;
     }
 
@@ -294,7 +350,7 @@ public class PrimitiveRenderer {
 
         vertices[idx] = (x + 0.5f);
         vertices[idx + 1] = (y + 0.5f);
-        vertices[idx + 2] = 0;
+        vertices[idx + 2] = 0f;
         vertices[idx + 3] = vertexColor;
         vertices[idx + 4] = color;
         vertices[idx + 5] = tweak;
