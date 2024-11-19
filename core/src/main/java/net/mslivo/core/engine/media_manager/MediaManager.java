@@ -333,15 +333,14 @@ public final class MediaManager {
         return cMediaArray;
     }
 
-    public Object getCMediaSprite(CMediaSprite cMediaSprite) {
+    public TextureRegion getCMediaSprite(CMediaSprite cMediaSprite, int arrayIndex, float animationTimer) {
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images[cMediaImage.mediaManagerIndex()];
-            case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex()];
-            case CMediaArray cMediaArray -> medias_arrays[cMediaArray.mediaManagerIndex()];
+            case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex()].getKeyFrame(animationTimer);
+            case CMediaArray cMediaArray -> medias_arrays[cMediaArray.mediaManagerIndex()][arrayIndex];
             default -> throw new IllegalStateException("Unexpected value: " + cMediaSprite);
         };
     }
-
 
     public TextureRegion getCMediaImage(CMediaImage cMedia) {
         return medias_images[cMedia.mediaManagerIndex()];

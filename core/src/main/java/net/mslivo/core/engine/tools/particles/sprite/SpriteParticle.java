@@ -4,7 +4,6 @@ import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 
 public class SpriteParticle<D> {
-    public SpriteParticleType type;
     public float x, y;
     public float r, g, b, a;
     public float rotation, scaleX, scaleY;

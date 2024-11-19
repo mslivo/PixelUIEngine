@@ -69,19 +69,19 @@ public abstract class SpriteParticleSystem<T> {
     /* ------- Font ------- */
 
     protected SpriteParticle<T> addFontParticle(CMediaFont cMediaFont, String text, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_FONT, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
+        SpriteParticle<T> particle = particleNew(x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addFontParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_FONT, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
+        SpriteParticle<T> particle = particleNew(x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addFontParticle(CMediaFont cMediaFont, String text, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_FONT, x, y, r, g, b, a, 0f, 1f, 1f, 0, origin_x, origin_y, null, cMediaFont, text, 0f, true);
+        SpriteParticle<T> particle = particleNew( x, y, r, g, b, a, 0f, 1f, 1f, 0, origin_x, origin_y, null, cMediaFont, text, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -89,19 +89,19 @@ public abstract class SpriteParticleSystem<T> {
     /* ------- Image ------- */
 
     protected SpriteParticle<T> addImageParticle(CMediaImage cMediaImage, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_IMAGE, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaImage, null, null, 0f, true);
+        SpriteParticle<T> particle = particleNew( x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaImage, null, null, 0f, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addImageParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_IMAGE, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0, 0, cMediaImage, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew( x, y, r, g, b, a, 0f, 1f, 1f, 0, 0, 0, cMediaImage, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addImageParticle(CMediaImage cMediaImage, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_IMAGE, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaImage, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew( x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaImage, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -109,19 +109,19 @@ public abstract class SpriteParticleSystem<T> {
     /* ------- Animation ------- */
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew( x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew( x, y, r, g, b, a, 0f, 1f, 1f, 0, 0f, 0f, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addAnimationParticle(CMediaAnimation cMediaAnimation, float animation_offset, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ANIMATION, x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaAnimation, null, null, animation_offset, true);
+        SpriteParticle<T> particle = particleNew(x, y, r, g, b, a, rotation, scaleX, scaleY, 0, origin_x, origin_y, cMediaAnimation, null, null, animation_offset, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -129,19 +129,19 @@ public abstract class SpriteParticleSystem<T> {
     /* ------- Array ------- */
 
     protected SpriteParticle<T> addArrayParticle(CMediaArray cMediaArray, int array_index, float x, float y) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew(x, y, 0.5f, 0.5f, 0.5f, 1f, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addArrayParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, r, g, b, a, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew(x, y, r, g, b, a, 0f, 1f, 1f, array_index, 0f, 0f, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
 
     protected SpriteParticle<T> addArrayParticle(CMediaArray cMediaArray, int array_index, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float rotation, float scaleX, float scaleY) {
-        SpriteParticle<T> particle = particleNew(SpriteParticleType.SPRITE_ARRAY, x, y, r, g, b, a, rotation, scaleX, scaleY, array_index, origin_x, origin_y, cMediaArray, null, null, 0, true);
+        SpriteParticle<T> particle = particleNew(x, y, r, g, b, a, rotation, scaleX, scaleY, array_index, origin_x, origin_y, cMediaArray, null, null, 0, true);
         addParticleToSystem(particle);
         return particle;
     }
@@ -202,23 +202,17 @@ public abstract class SpriteParticleSystem<T> {
             spriteRenderer.setColor(particle.r, particle.g, particle.b, particle.a);
 
             this.particleRenderHook.beforeRenderParticle(spriteRenderer, particle);
-            switch (particle.type) {
-                case SPRITE_FONT -> {
-                    spriteRenderer.drawCMediaFont(particle.font, (particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y), particle.text);
-                }
-                case SPRITE_IMAGE -> {
-                    spriteRenderer.drawCMediaImageScale((CMediaImage) particle.appearance, particle.x, particle.y, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                }
-                case SPRITE_ARRAY -> {
-                    spriteRenderer.drawCMediaArrayScale((CMediaArray) particle.appearance, particle.x, particle.y, particle.array_index, particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY, particle.rotation);
-                }
-                case SPRITE_ANIMATION -> {
-                    spriteRenderer.drawCMediaAnimationScale((CMediaAnimation) particle.appearance, particle.x, particle.y, (animation_timer + particle.animation_offset), particle.origin_x, particle.origin_y, particle.scaleX, particle.scaleY);
-                }
-                default -> {
-                    throw new RuntimeException("Particle Type " + particle.type.name() + " not supported by " + this.getClass().getSimpleName());
-                }
+
+            if(particle.appearance instanceof CMediaSprite) {
+                spriteRenderer.drawCMediaSprite(particle.appearance, particle.array_index, animation_timer + particle.animation_offset,
+                        particle.x, particle.y, particle.origin_x, particle.origin_y,
+                        mediaManager.getCMediaSpriteWidth(particle.appearance), mediaManager.getCMediaSpriteHeight(particle.appearance),
+                        particle.scaleX, particle.scaleY, particle.rotation
+                );
+            }else if(particle.font != null){
+                spriteRenderer.drawCMediaFont(particle.font, (particle.x + particle.font.offset_x), (particle.y + particle.font.offset_y), particle.text);
             }
+
             this.particleRenderHook.afterRenderParticle(spriteRenderer, particle);
         }
 
@@ -284,11 +278,10 @@ public abstract class SpriteParticleSystem<T> {
         this.particlePool.add(particle);
     }
 
-    private SpriteParticle particleNew(SpriteParticleType type, float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaSprite appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
+    private SpriteParticle particleNew(float x, float y, float r, float g, float b, float a, float rotation, float scaleX, float scaleY, int array_index, float origin_x, float origin_y, CMediaSprite appearance, CMediaFont font, String text, float animation_offset, boolean visible) {
         if (!canAddParticle()) return null;
         SpriteParticle<T> particle = particlePool.poll();
         if (particle == null) particle = new SpriteParticle<>();
-        particle.type = type;
         particle.x = x;
         particle.y = y;
         particle.r = r;
