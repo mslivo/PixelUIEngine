@@ -8,4 +8,5 @@ public class Image extends Component {
     public CMediaSprite image;
     public int arrayIndex;
     public ImageAction imageAction;
+    public boolean flipX, flipY;
 }

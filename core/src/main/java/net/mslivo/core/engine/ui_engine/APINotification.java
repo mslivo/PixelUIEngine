@@ -2,7 +2,6 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.STATE_NOTIFICATION;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -50,7 +49,7 @@ public final class APINotification {
         notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
         notification.notificationAction = notificationAction != null ? notificationAction : defaultNotificationAction();
         notification.timer = 0;
-        int textWidth = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, notification.text);
+        int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
         if (textWidth > uiEngineState.resolutionWidth) {
             int tooMuch = (textWidth - uiEngineState.resolutionWidth);
             notification.state = STATE_NOTIFICATION.INIT_SCROLL;

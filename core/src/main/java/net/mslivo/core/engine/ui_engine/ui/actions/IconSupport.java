@@ -17,4 +17,7 @@ public interface IconSupport {
         return Color.GRAY;
     }
 
+    default boolean iconFlipX(){return false;}
+
+    default boolean iconFlipY(){return false;}
 }

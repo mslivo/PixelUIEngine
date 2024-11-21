@@ -206,7 +206,7 @@ public abstract class SpriteParticleSystem<T> {
             if(particle.appearance instanceof CMediaSprite) {
                 spriteRenderer.drawCMediaSprite(particle.appearance, particle.array_index, animation_timer + particle.animation_offset,
                         particle.x, particle.y, particle.origin_x, particle.origin_y,
-                        mediaManager.getCMediaSpriteWidth(particle.appearance), mediaManager.getCMediaSpriteHeight(particle.appearance),
+                        mediaManager.spriteWidth(particle.appearance), mediaManager.spriteHeight(particle.appearance),
                         particle.scaleX, particle.scaleY, particle.rotation
                 );
             }else if(particle.font != null){

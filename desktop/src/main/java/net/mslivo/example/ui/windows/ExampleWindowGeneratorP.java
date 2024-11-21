@@ -461,7 +461,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             @Override
             public void onRelease() {
                 int index = imageButton2.arrayIndex + 1;
-                if (index > mediaManager.getCMediaArraySize((CMediaArray) imageButton2.image) - 1) {
+                if (index > mediaManager.arraySize((CMediaArray) imageButton2.image) - 1) {
                     index = 0;
                 }
 
@@ -517,7 +517,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         api.toolTip.segment.text.create("2", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("3", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0,true, false, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         canvasSegment,
                 }, new ToolTipAction() {

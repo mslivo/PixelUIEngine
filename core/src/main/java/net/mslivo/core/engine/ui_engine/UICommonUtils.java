@@ -460,7 +460,7 @@ final class UICommonUtils {
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size(); i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
-            int w = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
+            int w = mediaManager.fontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
             if (contextMenuItem.contextMenuItemAction.icon() != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
@@ -540,14 +540,14 @@ final class UICommonUtils {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
-            imageButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(imageButton.width) - mediaManager.getCMediaSpriteWidth(imageButton.image)) / 2f);
-            imageButton.contentOffset_y = MathUtils.round((uiEngineState.tileSize.TL(imageButton.height) - mediaManager.getCMediaSpriteHeight(imageButton.image)) / 2f);
+            imageButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(imageButton.width) - mediaManager.spriteWidth(imageButton.image)) / 2f);
+            imageButton.contentOffset_y = MathUtils.round((uiEngineState.tileSize.TL(imageButton.height) - mediaManager.spriteHeight(imageButton.image)) / 2f);
 
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.buttonAction.icon() != null ? uiEngineState.tileSize.TS : 0;
-            int contentWidth = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, textButton.text) + 1 + iconWidth;
-            int contentHeight = mediaManager.getCMediaFontTextHeight(uiEngineState.config.ui_font, textButton.text);
+            int contentWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, textButton.text) + 1 + iconWidth;
+            int contentHeight = mediaManager.fontTextHeight(uiEngineState.config.ui_font, textButton.text);
             textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
             textButton.contentOffset_y = MathUtils.round(((uiEngineState.tileSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
         }
@@ -585,8 +585,8 @@ final class UICommonUtils {
         } else {
             String subContent = textField.content.substring(textField.offset, textField.markerPosition);
             int width = uiEngineState.tileSize.TL(textField.width) - 4;
-            if (mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
-                while (mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
+            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
+                while (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
                     textField.offset++;
                     subContent = textField.content.substring(textField.offset, textField.markerPosition);
                 }
@@ -891,8 +891,8 @@ final class UICommonUtils {
     static void tooltip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
         tooltipImageSegment.image = image;
         if (tooltipImageSegment.image != null) {
-            tooltipImageSegment.width = MathUtils.round((mediaManager.getCMediaSpriteWidth(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
-            tooltipImageSegment.height = MathUtils.round((mediaManager.getCMediaSpriteHeight(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+            tooltipImageSegment.width = MathUtils.round((mediaManager.spriteWidth(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+            tooltipImageSegment.height = MathUtils.round((mediaManager.spriteHeight(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         } else {
             tooltipImageSegment.width = 1;
             tooltipImageSegment.height = 1;
@@ -901,7 +901,7 @@ final class UICommonUtils {
 
     static void tooltip_setTextSegmentText(UIEngineState uiEngineState, MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = Tools.Text.validString(text);
-        tooltipTextSegment.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+        tooltipTextSegment.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineState.config.ui_font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         tooltipTextSegment.height = 1;
     }
 
@@ -1254,7 +1254,7 @@ final class UICommonUtils {
     static void text_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Text text) {
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
-            int widthT = mediaManager.getCMediaFontTextWidth(uiEngineState.config.ui_font, text.lines[i]);
+            int widthT = mediaManager.fontTextWidth(uiEngineState.config.ui_font, text.lines[i]);
             if (widthT > width) width = widthT;
         }
         text.width = width / uiEngineState.tileSize.TS;
@@ -1267,8 +1267,8 @@ final class UICommonUtils {
     }
 
     static void image_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC) {
-        imageC.width = imageC.image != null ? mediaManager.getCMediaSpriteWidth(imageC.image) / uiEngineState.tileSize.TS : 0;
-        imageC.height = imageC.image != null ? mediaManager.getCMediaSpriteHeight(imageC.image) / uiEngineState.tileSize.TS : 0;
+        imageC.width = imageC.image != null ? mediaManager.spriteWidth(imageC.image) / uiEngineState.tileSize.TS : 0;
+        imageC.height = imageC.image != null ? mediaManager.spriteHeight(imageC.image) / uiEngineState.tileSize.TS : 0;
     }
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {

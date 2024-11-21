@@ -98,9 +98,9 @@ public class SoundPlayer {
     private long playSoundInternal(CMediaSound cMediaSound, float volume, float pitch, float pan, boolean loop) {
         long id;
         if(loop) {
-            id = mediaManager.getCMediaSound(cMediaSound).loop(volume * this.volume,pitch,pan);
+            id = mediaManager.sound(cMediaSound).loop(volume * this.volume,pitch,pan);
         }else{
-            id= mediaManager.getCMediaSound(cMediaSound).play(volume * this.volume, pitch, pan);
+            id= mediaManager.sound(cMediaSound).play(volume * this.volume, pitch, pan);
         }
         playedSounds.add(cMediaSound);
         return id;
@@ -117,9 +117,9 @@ public class SoundPlayer {
         }
         long id;
         if(loop) {
-            id = mediaManager.getCMediaSound(cMediaSound).loop(playVolume * this.volume,pitch,pan);
+            id = mediaManager.sound(cMediaSound).loop(playVolume * this.volume,pitch,pan);
         }else{
-            id= mediaManager.getCMediaSound(cMediaSound).play(playVolume * this.volume, pitch, pan);
+            id= mediaManager.sound(cMediaSound).play(playVolume * this.volume, pitch, pan);
         }
         playedSounds.add(cMediaSound);
         return id;
@@ -127,7 +127,7 @@ public class SoundPlayer {
 
     public void stopAllSounds() {
         CMediaSound[] playedSoundsArray = playedSounds.toArray(new CMediaSound[0]);
-        for (int i = 0; i < playedSoundsArray.length; i++) mediaManager.getCMediaSound(playedSoundsArray[i]).stop();
+        for (int i = 0; i < playedSoundsArray.length; i++) mediaManager.sound(playedSoundsArray[i]).stop();
     }
 
     public void update() {

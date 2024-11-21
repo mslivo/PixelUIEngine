@@ -730,7 +730,7 @@ public final class APIComponent {
                 tab.name = "";
                 tab.data = null;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
+                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiConfig.ui_font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
                     tab.width = width;
                 }
@@ -1317,7 +1317,7 @@ public final class APIComponent {
             int height = 1;
             if (lines != null) {
                 for (int i = 0; i < lines.length; i++) {
-                    int widthT = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, lines[i]);
+                    int widthT = mediaManager.fontTextWidth(uiConfig.ui_font, lines[i]);
                     if (widthT > width) width = widthT;
                 }
                 width = width / api.TS();
@@ -1357,22 +1357,29 @@ public final class APIComponent {
         }
 
         public Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0, null);
+            return create(x, y, image, 0,  false , false, null);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex, null);
+            return create(x, y, image, arrayIndex,false, false, null);
         }
 
 
-        public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction) {
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY) {
+            return create(x, y, image, arrayIndex,flipX, flipY, null);
+        }
+
+
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY, ImageAction imageAction) {
             Image imageC = new Image();
-            int width = image != null ? mediaManager.getCMediaSpriteWidth(image) / api.TS() : 0;
-            int height = image != null ? mediaManager.getCMediaSpriteHeight(image) / api.TS() : 0;
+            int width = image != null ? mediaManager.spriteWidth(image) / api.TS() : 0;
+            int height = image != null ? mediaManager.spriteHeight(image) / api.TS() : 0;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY,Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
             imageC.imageAction = imageAction != null ? imageAction : defaultImageAction();
+            imageC.flipX = flipX;
+            imageC.flipY = flipY;
             return imageC;
         }
 
@@ -1386,11 +1393,16 @@ public final class APIComponent {
             image.arrayIndex = Math.max(arrayIndex, 0);
         }
 
-        public void setImage(Image imageC, CMediaSprite image) {
-            if (imageC == null) return;
-            UICommonUtils.image_setImage(uiEngineState, mediaManager, imageC, image);
+        public void setImage(Image image, CMediaSprite imageSprite) {
+            if (image == null) return;
+            UICommonUtils.image_setImage(uiEngineState, mediaManager, image, imageSprite);
         }
 
+        public void setFlipXY(Image image, boolean flipX, boolean flipY){
+            if (image == null) return;
+            image.flipX = flipX;
+            image.flipY = flipY;
+        }
     }
 
     public final class APICombobox {

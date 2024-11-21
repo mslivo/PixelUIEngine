@@ -1333,208 +1333,208 @@ public class SpriteRenderer implements Batch {
     // ----- CMediaSprite -----
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region, x, y);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float width, float height) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region, x, y, width, height);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region.getTexture(), x, y, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, boolean clockwise) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation, clockwise);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region.getTexture(), x, y, originX, originY, width, height, scaleX, scaleY, rotation, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float width, float height, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region.getTexture(), x, y, width, height, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region.getTexture(), x, y, width, height, u, v, u2, v2);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float[] spriteVertices, int offset, int count) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region.getTexture(), spriteVertices, offset, count);
     }
 
     public void drawCMediaSprite(CMediaSprite cMediaSprite, int index, float animationTimer, float width, float height, Affine2 transform) {
-        TextureRegion region = mediaManager.getCMediaSprite(cMediaSprite, index, animationTimer);
+        TextureRegion region = mediaManager.sprite(cMediaSprite, index, animationTimer);
         this.draw(region, width, height, transform);
     }
 
     // ----- CMediaimage -----
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region, x, y);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float width, float height) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region, x, y, width, height);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region.getTexture(), x, y, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, boolean clockwise) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation, clockwise);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region.getTexture(), x, y, originX, originY, width, height, scaleX, scaleY, rotation, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float width, float height, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region.getTexture(), x, y, width, height, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region.getTexture(), x, y, width, height, u, v, u2, v2);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float[] spriteVertices, int offset, int count) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region.getTexture(), spriteVertices, offset, count);
     }
 
     public void drawCMediaImage(CMediaImage cMediaImage, float width, float height, Affine2 transform) {
-        TextureRegion region = mediaManager.getCMediaImage(cMediaImage);
+        TextureRegion region = mediaManager.image(cMediaImage);
         this.draw(region, width, height, transform);
     }
 
     // ----- CMediaArray -----
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region, x, y);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float width, float height) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region, x, y, width, height);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region.getTexture(), x, y, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, boolean clockwise) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation, clockwise);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region.getTexture(), x, y, originX, originY, width, height, scaleX, scaleY, rotation, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float width, float height, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region.getTexture(), x, y, width, height, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region.getTexture(), x, y, width, height, u, v, u2, v2);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float[] spriteVertices, int offset, int count) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region.getTexture(), spriteVertices, offset, count);
     }
 
     public void drawCMediaArray(CMediaArray cMediaArray, int index, float width, float height, Affine2 transform) {
-        TextureRegion region = mediaManager.getCMediaArray(cMediaArray, index);
+        TextureRegion region = mediaManager.array(cMediaArray, index);
         this.draw(region, width, height, transform);
     }
 
     // ----- CMediaAnimation -----
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region, x, y);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float width, float height) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region, x, y, width, height);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region.getTexture(), x, y, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, boolean clockwise) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region, x, y, originX, originY, width, height, scaleX, scaleY, rotation, clockwise);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region.getTexture(), x, y, originX, originY, width, height, scaleX, scaleY, rotation, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float width, float height, int srcX, int srcY, int srcWidth, int srcHeight, boolean flipX, boolean flipY) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region.getTexture(), x, y, width, height, region.getRegionX() + srcX, region.getRegionY() + srcY, srcWidth, srcHeight, flipX, flipY);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float x, float y, float width, float height, float u, float v, float u2, float v2) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region.getTexture(), x, y, width, height, u, v, u2, v2);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float[] spriteVertices, int offset, int count) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region.getTexture(), spriteVertices, offset, count);
     }
 
     public void drawCMediaAnimation(CMediaAnimation cMediaAnimation, float animationTimer, float width, float height, Affine2 transform) {
-        TextureRegion region = mediaManager.getCMediaAnimation(cMediaAnimation).getKeyFrame(animationTimer);
+        TextureRegion region = mediaManager.animation(cMediaAnimation).getKeyFrame(animationTimer);
         this.draw(region, width, height, transform);
     }
 
@@ -1542,7 +1542,7 @@ public class SpriteRenderer implements Batch {
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
         if (cMediaFont == null || text == null) return;
-        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
         fontCache.draw(this, this.getAlpha());
@@ -1550,7 +1550,7 @@ public class SpriteRenderer implements Batch {
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
         if (cMediaFont == null) return;
-        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
         fontCache.draw(this, this.getAlpha());
@@ -1561,11 +1561,11 @@ public class SpriteRenderer implements Batch {
         int xOffset = cMediaFont.offset_x;
         int yOffset = cMediaFont.offset_y;
         if (centerX)
-            xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
+            xOffset -= MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
-            yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
+            yOffset -= MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f);
 
-        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), 0, Align.left, false, null);
         fontCache.draw(this, this.getAlpha());
@@ -1576,11 +1576,11 @@ public class SpriteRenderer implements Batch {
         int xOffset = cMediaFont.offset_x;
         int yOffset = cMediaFont.offset_y;
         if (centerX)
-            xOffset -= MathUtils.round(mediaManager.getCMediaFontTextWidth(cMediaFont, text) / 2f);
+            xOffset -= MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
-            yOffset -= MathUtils.round(mediaManager.getCMediaFontTextHeight(cMediaFont, text) / 2f);
+            yOffset -= MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f);
 
-        BitmapFontCache fontCache = mediaManager.getCMediaFont(cMediaFont).getCache();
+        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, "");
         fontCache.draw(this, this.getAlpha());

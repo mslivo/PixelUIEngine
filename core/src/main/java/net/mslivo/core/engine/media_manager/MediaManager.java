@@ -333,7 +333,7 @@ public final class MediaManager {
         return cMediaArray;
     }
 
-    public TextureRegion getCMediaSprite(CMediaSprite cMediaSprite, int arrayIndex, float animationTimer) {
+    public TextureRegion sprite(CMediaSprite cMediaSprite, int arrayIndex, float animationTimer) {
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images[cMediaImage.mediaManagerIndex()];
             case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex()].getKeyFrame(animationTimer);
@@ -342,27 +342,27 @@ public final class MediaManager {
         };
     }
 
-    public TextureRegion getCMediaImage(CMediaImage cMedia) {
+    public TextureRegion image(CMediaImage cMedia) {
         return medias_images[cMedia.mediaManagerIndex()];
     }
 
-    public ExtendedAnimation getCMediaAnimation(CMediaAnimation cMedia) {
+    public ExtendedAnimation animation(CMediaAnimation cMedia) {
         return medias_animations[cMedia.mediaManagerIndex()];
     }
 
-    public TextureRegion getCMediaArray(CMediaArray cMedia, int arrayIndex) {
+    public TextureRegion array(CMediaArray cMedia, int arrayIndex) {
         return medias_arrays[cMedia.mediaManagerIndex()][arrayIndex];
     }
 
-    public Sound getCMediaSound(CMediaSound cMediaSound) {
+    public Sound sound(CMediaSound cMediaSound) {
         return medias_sounds[cMediaSound.mediaManagerIndex()];
     }
 
-    public Music getCMediaMusic(CMediaMusic cMediaMusic) {
+    public Music music(CMediaMusic cMediaMusic) {
         return medias_music[cMediaMusic.mediaManagerIndex()];
     }
 
-    public int getCMediaSpriteWidth(CMediaSprite cMedia) {
+    public int spriteWidth(CMediaSprite cMedia) {
         return switch (cMedia) {
             case CMediaImage __ -> medias_images[cMedia.mediaManagerIndex()].getRegionWidth();
             case CMediaArray array -> array.regionWidth;
@@ -371,19 +371,19 @@ public final class MediaManager {
         };
     }
 
-    public int getCMediaImageWidth(CMediaImage cMedia) {
+    public int imageWidth(CMediaImage cMedia) {
         return medias_images[cMedia.mediaManagerIndex()].getRegionWidth();
     }
 
-    public int getCMediaArrayWidth(CMediaArray array) {
+    public int arrayWidth(CMediaArray array) {
         return array.regionWidth;
     }
 
-    public int getCMediaAnimationWidth(CMediaAnimation animation) {
+    public int animationWidth(CMediaAnimation animation) {
         return animation.regionWidth;
     }
 
-    public int getCMediaSpriteHeight(CMediaSprite cMedia) {
+    public int spriteHeight(CMediaSprite cMedia) {
         return switch (cMedia) {
             case CMediaImage __ -> medias_images[cMedia.mediaManagerIndex()].getRegionHeight();
             case CMediaArray array -> array.regionHeight;
@@ -392,33 +392,33 @@ public final class MediaManager {
         };
     }
 
-    public int getCMediaImageHeight(CMediaImage cMedia) {
+    public int imageHeight(CMediaImage cMedia) {
         return medias_images[cMedia.mediaManagerIndex()].getRegionHeight();
     }
 
-    public int getCMediaArrayHeight(CMediaArray array) {
+    public int arrayHeight(CMediaArray array) {
         return array.regionHeight;
     }
 
-    public int getCMediaAnimationHeight(CMediaAnimation animation) {
+    public int animationHeight(CMediaAnimation animation) {
         return animation.regionHeight;
     }
 
-    public int getCMediaArraySize(CMediaArray cMedia) {
+    public int arraySize(CMediaArray cMedia) {
         return medias_arrays[cMedia.mediaManagerIndex()].length;
     }
 
-    public BitmapFont getCMediaFont(CMediaFont cMedia) {
+    public BitmapFont font(CMediaFont cMedia) {
         return medias_fonts[cMedia.mediaManagerIndex()];
     }
 
-    public int getCMediaFontTextWidth(CMediaFont font, String text) {
-        glyphLayout.setText(getCMediaFont(font), text);
+    public int fontTextWidth(CMediaFont font, String text) {
+        glyphLayout.setText(font(font), text);
         return (int) glyphLayout.width;
     }
 
-    public int getCMediaFontTextHeight(CMediaFont font, String text) {
-        glyphLayout.setText(getCMediaFont(font), text);
+    public int fontTextHeight(CMediaFont font, String text) {
+        glyphLayout.setText(font(font), text);
         return (int) glyphLayout.height;
     }
 

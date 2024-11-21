@@ -6,4 +6,5 @@ public class TooltipImageSegment extends TooltipSegment {
 
     public CMediaSprite image;
     public int arrayIndex;
+    public boolean flipX, flipY;
 }

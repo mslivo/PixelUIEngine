@@ -297,7 +297,7 @@ public final class APIComposites {
 
             api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, pageGrid.y);
             api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, pageGrid.y);
-            int textWidthTiles = MathUtils.ceil((mediaManager.getCMediaFontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
+            int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
             api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, pageGrid.y);
             api.component.text.setLines(pageGrid.text, Tools.Text.toArray(pageString));
             return;
@@ -499,7 +499,7 @@ public final class APIComposites {
                             StringBuilder currentLine = new StringBuilder();
                             for (int i2 = 0; i2 < split.length; i2++) {
                                 String value = split[i2];
-                                if (mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, currentLine + value + " ") >= pixelWidth) {
+                                if (mediaManager.fontTextWidth(uiConfig.ui_font, currentLine + value + " ") >= pixelWidth) {
                                     textList.add(currentLine.toString());
                                     currentLine = new StringBuilder(value + " ");
                                 } else {
@@ -673,7 +673,7 @@ public final class APIComposites {
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
 
-            TextureRegion colorTexture = mediaManager.getCMediaImage(colors);
+            TextureRegion colorTexture = mediaManager.image(colors);
 
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
             final int colorTextureHeightTiles = colorTexture.getRegionHeight() / 8;
@@ -809,7 +809,7 @@ public final class APIComposites {
         public Window createMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, lines[i]);
+                int len = mediaManager.fontTextWidth(uiConfig.ui_font, lines[i]);
                 if (len > longest) longest = len;
             }
             ArrayList<Component> componentsList = new ArrayList<>();
@@ -849,8 +849,8 @@ public final class APIComposites {
         public Window createYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
-                    (mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, caption) + 8),
-                    mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, text)
+                    (mediaManager.fontTextWidth(uiConfig.ui_font, caption) + 8),
+                    mediaManager.fontTextWidth(uiConfig.ui_font, text)
             );
 
             int width = Math.max(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12);
@@ -897,7 +897,7 @@ public final class APIComposites {
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Math.max(windowMinWidth, 11);
             int wnd_width = Math.clamp(
-                    MathUtils.round(mediaManager.getCMediaFontTextWidth(uiConfig.ui_font, text) / (float) api.TS()) + 2,
+                    MathUtils.round(mediaManager.fontTextWidth(uiConfig.ui_font, text) / (float) api.TS()) + 2,
                     windowMinWidth, Integer.MAX_VALUE);
             int wnd_height = 5;
             if (showOKButton) wnd_height++;

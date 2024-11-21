@@ -17,4 +17,8 @@ public interface ItemIconSupport<T> {
         return Color.GRAY;
     }
 
+    default boolean iconFlipX(){return false;}
+
+    default boolean iconFlipY(){return false;}
+
 }
