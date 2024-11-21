@@ -237,6 +237,16 @@ public final class APIComposites {
                 public Tooltip toolTip(Object listItem) {
                     return gridAction.toolTip(listItem);
                 }
+
+                @Override
+                public boolean iconFlipX() {
+                    return gridAction.iconFlipX();
+                }
+
+                @Override
+                public boolean iconFlipY() {
+                    return gridAction.iconFlipY();
+                }
             };
         }
 
