@@ -1910,8 +1910,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-
-
     }
 
     private void render_glClear() {
@@ -2050,7 +2048,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.cursor != null) {
             int center_x = mediaManager.spriteWidth(uiEngineState.cursor) / 2;
             int center_y = mediaManager.spriteHeight(uiEngineState.cursor) / 2;
-            spriteRenderer.drawCMediaSprite(uiEngineState.cursor,0, UICommonUtils.ui_getAnimationTimer(uiEngineState),
+            spriteRenderer.drawCMediaSprite(uiEngineState.cursor, 0, UICommonUtils.ui_getAnimationTimer(uiEngineState),
                     (uiEngineState.mouse_ui.x - center_x), (uiEngineState.mouse_ui.y - center_y));
         }
         spriteRenderer.setTweakAndColorReset();
@@ -2168,7 +2166,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             // Cell Content
                             render_drawFont(comboBoxItem.text, comboBoxItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), 2, 1, TS(comboBox.width),
                                     comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
-                                    comboBox.comboBoxAction.iconFlipX(),comboBox.comboBoxAction.iconFlipY());
+                                    comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                         }
                     }
 
@@ -2212,7 +2210,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // Cell Content
                     render_drawFont(contextMenuItem.text, contextMenuItem.fontColor, contextMenu.color.a, contextMenu.x, contextMenu.y - TS(iy) - TS(), 2, 1, TS(width),
                             contextMenuItem.contextMenuItemAction.icon(), contextMenuItem.contextMenuItemAction.iconIndex(), contextMenuItem.contextMenuItemAction.iconColor(),
-                            contextMenuItem.contextMenuItemAction.iconFlipX(),contextMenuItem.contextMenuItemAction.iconFlipY());
+                            contextMenuItem.contextMenuItemAction.iconFlipX(), contextMenuItem.contextMenuItemAction.iconFlipY());
 
                 }
             }
@@ -2348,8 +2346,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.setColor(imageSegment.contentColor, contentAlpha);
                     int width = mediaManager.spriteWidth(imageSegment.image);
                     int height = mediaManager.spriteHeight(imageSegment.image);
-                    spriteRenderer.drawCMediaSprite(imageSegment.image,imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), image_x, image_y,
-                            width,height,0,0,width,height,imageSegment.flipX,imageSegment.flipY
+                    spriteRenderer.drawCMediaSprite(imageSegment.image, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), image_x, image_y,
+                            width, height, 0, 0, width, height, imageSegment.flipX, imageSegment.flipY
                     );
                 }
                 case TooltipCanvasSegment canvasSegment -> {
@@ -2463,7 +2461,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_WINDOW, render_getWindowCMediaIndex(ix, iy, window.width, window.height, window.hasTitleBar), window.x + TS(ix), window.y + TS(iy));
                 }
             } else {
-                spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_WINDOW,  render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar), window.x + TS(ix), window.y + (TS(window.height - 1)));
+                spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_WINDOW, render_getWindowCMediaIndex(ix, (window.height - 1), window.width, window.height, window.hasTitleBar), window.x + TS(ix), window.y + (TS(window.height - 1)));
             }
         }
 
@@ -2471,7 +2469,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (window.hasTitleBar) {
             render_drawFont(window.title, window.fontColor, window.color.a, window.x, window.y + TS(window.height) - TS(), 1, 1, TS(window.width - 1),
                     window.windowAction.icon(), window.windowAction.iconIndex(), window.windowAction.iconColor(),
-                    window.windowAction.iconFlipX(),window.windowAction.iconFlipY());
+                    window.windowAction.iconFlipX(), window.windowAction.iconFlipY());
         }
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
@@ -2538,19 +2536,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int pressed_offset = button.pressed ? 1 : 0;
                 for (int ix = 0; ix < button.width; ix++) {
                     for (int iy = 0; iy < button.height; iy++) {
-                        spriteRenderer.drawCMediaArray(buttonGraphic,render_get16TilesCMediaIndex(ix, iy, button.width, button.height), UICommonUtils.component_getAbsoluteX(button) + TS(ix), UICommonUtils.component_getAbsoluteY(button) + TS(iy));
+                        spriteRenderer.drawCMediaArray(buttonGraphic, render_get16TilesCMediaIndex(ix, iy, button.width, button.height), UICommonUtils.component_getAbsoluteX(button) + TS(ix), UICommonUtils.component_getAbsoluteY(button) + TS(iy));
                     }
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
                         render_drawFont(textButton.text, textButton.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset, 1, 2, TS(button.width),
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
-                                textButton.buttonAction.iconFlipX(),textButton.buttonAction.iconFlipY());
+                                textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
                     }
                 } else if (button instanceof ImageButton imageButton) {
                     spriteRenderer.saveState();
                     spriteRenderer.setColor(imageButton.color2, componentAlpha);
-                    spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), UICommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset);
+                    if (imageButton.image != null)
+                        spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), UICommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset);
                     spriteRenderer.loadState();
                 }
 
@@ -2562,8 +2561,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int height = mediaManager.spriteHeight(image.image);
                     spriteRenderer.drawCMediaSprite(image.image, image.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
                             UICommonUtils.component_getAbsoluteX(image), UICommonUtils.component_getAbsoluteY(image),
-                            width, height,0,0,width,height, image.flipX, image.flipY
-                            );
+                            width, height, 0, 0, width, height, image.flipX, image.flipY
+                    );
                 }
             }
             case Text text -> {
@@ -2588,12 +2587,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case ScrollbarHorizontal scrollBarHorizontal -> {
                 for (int i = 0; i < scrollBarHorizontal.width; i++) {
                     int index = (i == 0 ? 0 : (i == (scrollBarHorizontal.width - 1) ? 2 : 1));
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_HORIZONTAL, index,UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + TS(i), UICommonUtils.component_getAbsoluteY(scrollBarHorizontal));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_HORIZONTAL, index, UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + TS(i), UICommonUtils.component_getAbsoluteY(scrollBarHorizontal));
                 }
                 int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * TS(scrollBarHorizontal.width - 1));
                 spriteRenderer.saveState();
                 render_setColor(spriteRenderer, scrollBarHorizontal.color2, componentAlpha, componentGrayScale);
-                spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_BUTTON_HORIZONAL, (scrollBarHorizontal.buttonPressed ? 1 : 0),UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommonUtils.component_getAbsoluteY(scrollBarHorizontal));
+                spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_SCROLLBAR_BUTTON_HORIZONAL, (scrollBarHorizontal.buttonPressed ? 1 : 0), UICommonUtils.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, UICommonUtils.component_getAbsoluteY(scrollBarHorizontal));
                 spriteRenderer.loadState();
             }
             case List list -> {
@@ -2658,7 +2657,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 if (dragEnabled && dragValid) {
                     for (int ix = 0; ix < list.width; ix++) {
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_LIST_DRAG,  render_getListDragCMediaIndex(ix, list.width), drag_x + TS(ix), drag_y);
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_LIST_DRAG, render_getListDragCMediaIndex(ix, list.width), drag_x + TS(ix), drag_y);
                     }
                 }
             }
@@ -2670,14 +2669,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 render_setColor(spriteRenderer, cellColor, componentAlpha, componentGrayScale);
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_CELL,index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_CELL, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox));
                 }
 
                 // ComboBox
                 for (int ix = 0; ix < comboBox.width; ix++) {
                     int index = ix == 0 ? 0 : (ix == comboBox.width - 1 ? 2 : 1);
                     CMediaArray comboMedia = UICommonUtils.comboBox_isOpen(uiEngineState, comboBox) ? UIEngineBaseMedia_8x8.UI_COMBOBOX_OPEN : UIEngineBaseMedia_8x8.UI_COMBOBOX;
-                    spriteRenderer.drawCMediaArray(comboMedia, index,UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox));
+                    spriteRenderer.drawCMediaArray(comboMedia, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox));
                 }
 
 
@@ -2686,7 +2685,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (comboBox.selectedItem != null) {
                     render_drawFont(comboBox.selectedItem.text, comboBox.selectedItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox), 2, 1, TS(comboBox.width - 1),
                             comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem),
-                            comboBox.comboBoxAction.iconFlipX(),comboBox.comboBoxAction.iconFlipY());
+                            comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                 }
             }
             case Knob knob -> {
@@ -2694,7 +2693,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 render_setColor(spriteRenderer, knob.color2, componentAlpha, componentGrayScale);
                 if (knob.endless) {
                     int index = MathUtils.round(knob.turned * 31);
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB_ENDLESS,index, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB_ENDLESS, index, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
                 } else {
                     int index = MathUtils.round(knob.turned * 25);
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB, index, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
@@ -2750,21 +2749,21 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD, index,UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD, index, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
                 }
 
                 spriteRenderer.saveState();
                 render_setColor(spriteRenderer, textField.color2, componentAlpha, componentGrayScale);
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL, index,UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL, index, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
                 }
 
                 if (!textField.contentValid) {
                     spriteRenderer.setColor(Color.GRAY, componentAlpha);
                     for (int ix = 0; ix < textField.width; ix++) {
                         int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL_VALIDATION,index, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL_VALIDATION, index, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
                     }
                 }
                 spriteRenderer.loadState();
@@ -2774,7 +2773,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     if (UICommonUtils.textField_isFocused(uiEngineState, textField)) {
                         int xOffset = render_textWidth(textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                         if (xOffset < TS(textField.width)) {
-                            spriteRenderer.drawCMediaAnimation(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CARET,UICommonUtils.ui_getAnimationTimer(uiEngineState), UICommonUtils.component_getAbsoluteX(textField) + xOffset, UICommonUtils.component_getAbsoluteY(textField));
+                            spriteRenderer.drawCMediaAnimation(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CARET, UICommonUtils.ui_getAnimationTimer(uiEngineState), UICommonUtils.component_getAbsoluteX(textField) + xOffset, UICommonUtils.component_getAbsoluteY(textField));
                         }
                     }
                 }
@@ -2831,11 +2830,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         spriteRenderer.saveState();
                         render_setColor(spriteRenderer, cellColor, componentAlpha, gridGrayScale);
                         int index = grid.bigMode ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
-                        spriteRenderer.drawCMediaArray(cellGraphic, index,UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
+                        spriteRenderer.drawCMediaArray(cellGraphic, index, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
                         spriteRenderer.loadState();
 
                         // Draw Grid
-                        spriteRenderer.drawCMediaArray(gridGraphic,index, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
+                        spriteRenderer.drawCMediaArray(gridGraphic, index, UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
 
                         // Icon
                         if (item != null) {
@@ -2867,7 +2866,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     } else {
                         CMediaArray tabGraphic = selected ? UIEngineBaseMedia_8x8.UI_TAB_SELECTED : UIEngineBaseMedia_8x8.UI_TAB;
                         for (int ix = 0; ix < tabWidth; ix++) {
-                            spriteRenderer.drawCMediaArray(tabGraphic,render_getTabCMediaIndex(ix, tab.width), UICommonUtils.component_getAbsoluteX(tabBar) + TS(ix) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar));
+                            spriteRenderer.drawCMediaArray(tabGraphic, render_getTabCMediaIndex(ix, tab.width), UICommonUtils.component_getAbsoluteX(tabBar) + TS(ix) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar));
                         }
                     }
 
@@ -2883,19 +2882,19 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 // Top Border Top
                 for (int ix = 0; ix < topBorder; ix++) {
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, 2,UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset + ix), UICommonUtils.component_getAbsoluteY(tabBar));
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, 2, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset + ix), UICommonUtils.component_getAbsoluteY(tabBar));
                 }
 
                 if (tabBar.border) {
                     // Bottom
                     for (int ix = 0; ix < tabBar.width; ix++) {
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS,2, UICommonUtils.component_getAbsoluteX(tabBar) + TS(ix), UICommonUtils.component_getAbsoluteY(tabBar) - TS(tabBar.borderHeight));
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, 2, UICommonUtils.component_getAbsoluteX(tabBar) + TS(ix), UICommonUtils.component_getAbsoluteY(tabBar) - TS(tabBar.borderHeight));
                     }
                     // Left/Right
                     for (int iy = 0; iy < tabBar.borderHeight; iy++) {
                         int yOffset = TS(iy + 1);
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS,0, UICommonUtils.component_getAbsoluteX(tabBar), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset);
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS,1, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabBar.width - 1), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset);
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, 0, UICommonUtils.component_getAbsoluteX(tabBar), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset);
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TAB_BORDERS, 1, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabBar.width - 1), UICommonUtils.component_getAbsoluteY(tabBar) - yOffset);
                     }
                 }
             }
@@ -3014,9 +3013,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int index = ix == 0 ? 0 : ix == (progressBar.width - 1) ? 2 : 1;
                     if (xOffset < pixels) {
                         if (pixels - xOffset < TS()) {
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR,index, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), pixels - xOffset, TS());
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR, index, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), pixels - xOffset, TS());
                         } else {
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR,index, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar));
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_PROGRESSBAR_BAR, index, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar));
                         }
                     }
                 }
@@ -3038,7 +3037,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.drawCMediaImage(checkBoxCellGraphic, UICommonUtils.component_getAbsoluteX(checkBox), UICommonUtils.component_getAbsoluteY(checkBox));
                 spriteRenderer.loadState();
 
-                spriteRenderer.drawCMediaArray(checkBoxGraphic,(checkBox.checked ? 1 : 0), UICommonUtils.component_getAbsoluteX(checkBox), UICommonUtils.component_getAbsoluteY(checkBox));
+                spriteRenderer.drawCMediaArray(checkBoxGraphic, (checkBox.checked ? 1 : 0), UICommonUtils.component_getAbsoluteX(checkBox), UICommonUtils.component_getAbsoluteY(checkBox));
 
                 render_drawFont(checkBox.text, checkBox.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(checkBox) + TS(), UICommonUtils.component_getAbsoluteY(checkBox), 1, 1);
             }
@@ -3060,7 +3059,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             int dragOffsetX = uiEngineState.draggedGridOffset.x;
             int dragOffsetY = uiEngineState.draggedGridOffset.y;
             Object dragItem = uiEngineState.draggedGridItem;
-            float dragAlpha =  componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
+            float dragAlpha = componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
             render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
                     dragGrid.gridAction.iconIndex(dragItem), dragGrid.gridAction.iconColor(dragItem), dragGrid.bigMode, dragAlpha,
                     dragGrid.gridAction.iconFlipX(), dragGrid.gridAction.iconFlipY());
@@ -3134,11 +3133,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
         int height = mediaManager.spriteHeight(icon);
         int renderWidth = Math.min(width, scale);
         int renderHeight = Math.min(height, scale);
-        int xOffset = (scale-renderWidth)/2;
-        int yOffset = (scale-renderHeight)/2;
+        int xOffset = (scale - renderWidth) / 2;
+        int yOffset = (scale - renderHeight) / 2;
 
         spriteRenderer.drawCMediaSprite(icon, arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
-                x+xOffset, y+yOffset,renderWidth ,renderHeight,0,0,width, height,flipX,flipY);
+                x + xOffset, y + yOffset, renderWidth, renderHeight, 0, 0, width, height, flipX, flipY);
         spriteRenderer.loadState();
     }
 

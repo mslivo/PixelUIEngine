@@ -338,7 +338,6 @@ public final class MediaManager {
             case CMediaImage cMediaImage -> medias_images[cMediaImage.mediaManagerIndex()];
             case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex()].getKeyFrame(animationTimer);
             case CMediaArray cMediaArray -> medias_arrays[cMediaArray.mediaManagerIndex()][arrayIndex];
-            default -> throw new IllegalStateException("Unexpected value: " + cMediaSprite);
         };
     }
 
