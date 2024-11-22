@@ -171,7 +171,6 @@ public class UIEngineBaseMedia_8x8 {
             UI_MOUSETEXTINPUT_DELETE,
             UI_MOUSETEXTINPUT_SELECTED,
             UI_FONT,
-            UI_FONT_TINY,
             UI_PIXEL,
             UI_ICON_BACK,
             UI_ICON_FORWARD
