@@ -20,4 +20,15 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
         this.hash = Objects.hash(filename, regionWidth, regionHeight, frameOffset, frameLength);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o.hashCode() == this.hash;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
 }

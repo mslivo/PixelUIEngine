@@ -11,4 +11,15 @@ public final class CMediaImage extends CMediaSprite implements Serializable {
         this.hash = Objects.hash(filename);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o.hashCode() == this.hash;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
 }

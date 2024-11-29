@@ -11,4 +11,15 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         this.hash = Objects.hash(filename);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o.hashCode() == this.hash;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
 }

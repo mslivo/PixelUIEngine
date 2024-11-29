@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
@@ -14,7 +17,10 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,10 +41,10 @@ public final class MediaManager {
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
     private static final GridPoint2[] PIXEL_DIRECTIONS = new GridPoint2[]{
-            new GridPoint2(-1,0),new GridPoint2(-1,1),new GridPoint2(0,1),new GridPoint2(1,1),
-            new GridPoint2(1,0),new GridPoint2(1,-1),new GridPoint2(0,-1),new GridPoint2(-1,-1)
+            new GridPoint2(-1, 0), new GridPoint2(-1, 1), new GridPoint2(0, 1), new GridPoint2(1, 1),
+            new GridPoint2(1, 0), new GridPoint2(1, -1), new GridPoint2(0, -1), new GridPoint2(-1, -1)
     };
-    private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0"+System.lineSeparator();
+    private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0" + System.lineSeparator();
     private boolean loaded = false;
     private Sound[] medias_sounds = null;
     private Music[] medias_music = null;
@@ -92,28 +98,28 @@ public final class MediaManager {
     }
 
 
-    private Pixmap createFontModifyPixmapAddOutline(Pixmap pixmap, Color outlineColor, boolean outlineOnly){
+    private Pixmap createFontModifyPixmapAddOutline(Pixmap pixmap, Color outlineColor, boolean outlineOnly) {
         pixmap.setBlending(Pixmap.Blending.None);
         // detect outline
         final ArrayDeque<GridPoint2> outLinePoints = new ArrayDeque<>();
         final ArrayDeque<GridPoint2> removePoints = new ArrayDeque<>();
-        for(int ix=0;ix<pixmap.getWidth();ix++){
-            for(int iy=0;iy<pixmap.getHeight();iy++){
-                int pixel = pixmap.getPixel(ix,iy);
+        for (int ix = 0; ix < pixmap.getWidth(); ix++) {
+            for (int iy = 0; iy < pixmap.getHeight(); iy++) {
+                int pixel = pixmap.getPixel(ix, iy);
                 float a = getPixelAlpha(pixel);
 
-                if(a == 0f) {
+                if (a == 0f) {
                     continue;
                 }
 
-                if(outlineOnly)
-                    removePoints.add(new GridPoint2(ix,iy));
+                if (outlineOnly)
+                    removePoints.add(new GridPoint2(ix, iy));
 
-                for(int ip=0;ip<PIXEL_DIRECTIONS.length;ip++){
+                for (int ip = 0; ip < PIXEL_DIRECTIONS.length; ip++) {
                     GridPoint2 direction = PIXEL_DIRECTIONS[ip];
-                    int x = ix+direction.x;
-                    int y = iy+direction.y;
-                    if(x >= 0 && x < pixmap.getWidth() && y >= 0 && y < pixmap.getHeight()) {
+                    int x = ix + direction.x;
+                    int y = iy + direction.y;
+                    if (x >= 0 && x < pixmap.getWidth() && y >= 0 && y < pixmap.getHeight()) {
                         if (getPixelAlpha(pixmap.getPixel(x, y)) == 0f)
                             outLinePoints.add(new GridPoint2(x, y));
                     }
@@ -124,41 +130,41 @@ public final class MediaManager {
 
         // create outline
         final int outlineColorRGBA8888 = Color.rgba8888(outlineColor);
-        while (!outLinePoints.isEmpty()){
+        while (!outLinePoints.isEmpty()) {
             GridPoint2 outlinePixel = outLinePoints.poll();
-            pixmap.drawPixel(outlinePixel.x,outlinePixel.y, outlineColorRGBA8888);
+            pixmap.drawPixel(outlinePixel.x, outlinePixel.y, outlineColorRGBA8888);
         }
         // remove
         final int clearColorRGBA8888 = Color.rgba8888(Color.CLEAR);
 
-        while (!removePoints.isEmpty()){
+        while (!removePoints.isEmpty()) {
             GridPoint2 removePixel = removePoints.poll();
-            pixmap.drawPixel(removePixel.x,removePixel.y, clearColorRGBA8888);
+            pixmap.drawPixel(removePixel.x, removePixel.y, clearColorRGBA8888);
         }
         return pixmap;
     }
 
 
-    private CreateFontResult createFontAddSymbols(Pixmap pixmap, CMediaFontSymbol[] symbols){
+    private CreateFontResult createFontAddSymbols(Pixmap pixmap, CMediaFontSymbol[] symbols) {
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
         Pixmap[] symbolPixmaps = new Pixmap[symbols.length];
-        for(int i=0;i<symbols.length;i++){
+        for (int i = 0; i < symbols.length; i++) {
             symbolPixmaps[i] = createTexturePixmap(symbols[i].file);
         }
 
         int symbolAreaHeight = 0;
         int symbolHeightMax = 0;
         int xCurrent = 0;
-        for(int i=0;i<symbolPixmaps.length;i++){
+        for (int i = 0; i < symbolPixmaps.length; i++) {
             Pixmap symbolPixmap = symbolPixmaps[i];
             symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
-            if((xCurrent+symbolPixmap.getWidth()) >= pixmap.getWidth()){
+            if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
                 symbolAreaHeight += symbolHeightMax;
                 symbolHeightMax = 0;
                 xCurrent = 0;
-            }else{
-                xCurrent+= symbolPixmap.getWidth();
+            } else {
+                xCurrent += symbolPixmap.getWidth();
             }
         }
         symbolAreaHeight += symbolHeightMax;
@@ -166,7 +172,7 @@ public final class MediaManager {
         // Create Symbol Area
         int newWidth = pixmap.getWidth();
         int originalHeight = pixmap.getHeight();
-        int newHeight = originalHeight+symbolAreaHeight;
+        int newHeight = originalHeight + symbolAreaHeight;
         Pixmap newPixmap = new Pixmap(newWidth, newHeight, pixmap.getFormat());
         newPixmap.setBlending(Pixmap.Blending.None);
         newPixmap.setColor(0, 0, 0, 0);
@@ -177,41 +183,49 @@ public final class MediaManager {
         // copy symbols
         xCurrent = 0;
         int yCurrent = originalHeight;
-        for(int i=0;i<symbolPixmaps.length;i++){
+        for (int i = 0; i < symbolPixmaps.length; i++) {
             Pixmap symbolPixmap = symbolPixmaps[i];
             symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
-            if((xCurrent+symbolPixmap.getWidth()) >= pixmap.getWidth()){
+            if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
                 yCurrent += symbolHeightMax;
                 symbolHeightMax = 0;
                 xCurrent = 0;
-            }else{
-                newPixmap.drawPixmap( symbolPixmap, xCurrent, yCurrent);
-                fntFileData.append(String.format(FONT_FILE_DATA,FONT_CUSTOM_SYMBOL_OFFSET+symbols[i].id,
-                        xCurrent, yCurrent,symbolPixmap.getWidth(),
-                        symbolPixmap.getHeight(),-1,
-                        12-symbolPixmap.getHeight(),
-                        symbolPixmap.getWidth()-1));
+            } else {
+                newPixmap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
+                fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbols[i].id,
+                        xCurrent, yCurrent, symbolPixmap.getWidth(),
+                        symbolPixmap.getHeight(), -1,
+                        12 - symbolPixmap.getHeight(),
+                        symbolPixmap.getWidth() - 1));
 
-                xCurrent+= symbolPixmap.getWidth();
+                xCurrent += symbolPixmap.getWidth();
             }
         }
 
         // Dispose Symbol Pixmaps
-        for(int i=0;i<symbolPixmaps.length;i++)
+        for (int i = 0; i < symbolPixmaps.length; i++)
             symbolPixmaps[i].dispose();
 
 
         return new CreateFontResult(pixmap, fntFileData.toString());
     }
 
-    private CreateFontResult createFont(String fontTextureFileName, Color outlineColor, boolean outlineOnly, CMediaFontSymbol[] symbols){
+    private CreateFontResult createFont(String fontTextureFileName, Color outlineColor, boolean outlineOnly,boolean outlineSymbols, CMediaFontSymbol[] symbols) {
         CreateFontResult result = new CreateFontResult(createTexturePixmap(fontTextureFileName), "");
 
-        if(symbols.length > 0){
+        boolean outLine = !outlineColor.equals(Color.CLEAR);
+
+        if (symbols.length > 0) {
+            if(outLine && !outlineSymbols){
+                createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
+                // outline before adding symbols
+            }
+
             result = createFontAddSymbols(result.pixmap, symbols);
         }
 
-        if(!outlineColor.equals(Color.CLEAR)){
+        if (outLine && outlineSymbols ) {
+            // outline everything
             createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
         }
 
@@ -219,12 +233,11 @@ public final class MediaManager {
     }
 
 
-
-    private float getPixelAlpha(int pixel){
+    private float getPixelAlpha(int pixel) {
         return (pixel & 0xFF) / 255f;
     }
 
-    private Pixmap createTexturePixmap(String textureFileName){
+    private Pixmap createTexturePixmap(String textureFileName) {
         TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
         textureData.prepare();
         return textureData.consumePixmap();
@@ -236,6 +249,7 @@ public final class MediaManager {
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
         HashMap<CMediaFont, String> createFontFNTFileData = new HashMap<>();
+        HashMap<CMediaFont, String> createFontFNTPackedName = new HashMap<>();
         int step = 0;
         int stepsMax = 0;
 
@@ -276,24 +290,30 @@ public final class MediaManager {
         medias_music = new Music[musicMax];
 
         // 2. Load Image Data Into Pixmap Packer
+        int fontCount = 1;
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
 
             String textureFileName = imageMedia instanceof CMediaFont ? getFontTextureName(imageMedia.file()) : imageMedia.file();
-            if(pixmapPacker.getRect(textureFileName) == null) {
-                Pixmap pixmap;
-                if(imageMedia instanceof CMediaFont cMediaFont){
-                    CreateFontResult result = createFont(textureFileName, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.symbols);
-                    createFontFNTFileData.put(cMediaFont, result.fontFileData);
-                    pixmapPacker.pack(textureFileName, result.pixmap);
-                    result.pixmap.dispose();
-                }else{
+
+            Pixmap pixmap;
+            if (imageMedia instanceof CMediaFont cMediaFont) {
+                CreateFontResult result = createFont(textureFileName, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.outlineSymbols,cMediaFont.symbols);
+                // pack
+                String packedName = textureFileName.replace(".png","_"+fontCount+".png");
+                createFontFNTFileData.put(cMediaFont, result.fontFileData);
+                createFontFNTPackedName.put(cMediaFont, packedName);
+                pixmapPacker.pack(packedName, result.pixmap);
+                result.pixmap.dispose();
+                fontCount++;
+            } else {
+                if (pixmapPacker.getRect(textureFileName) == null) {
                     pixmap = createTexturePixmap(textureFileName);
                     pixmapPacker.pack(textureFileName, pixmap);
                     pixmap.dispose();
                 }
-
             }
+
 
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file(), step, stepsMax);
@@ -326,7 +346,7 @@ public final class MediaManager {
                 case CMediaFont cMediaFont -> {
                     BitmapFont bitmapFont = new BitmapFont(
                             new FontFileHandle(Tools.File.findResource(cMediaFont.file()), createFontFNTFileData.get(cMediaFont)),
-                            new TextureRegion(textureAtlas.findRegion(getFontTextureName(cMediaFont.file())))
+                            new TextureRegion(textureAtlas.findRegion(createFontFNTPackedName.get(cMediaFont)))
                     );
                     bitmapFont.setColor(Color.GRAY);
                     bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
@@ -339,6 +359,8 @@ public final class MediaManager {
         }
         pixmapPacker.dispose();
         imageCMediaLoadStack.clear();
+        createFontFNTFileData.clear();
+        createFontFNTPackedName.clear();
 
         // 6. Fill CMedia Arrays with Sound Data
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
@@ -365,8 +387,8 @@ public final class MediaManager {
         return true;
     }
 
-    private String getFontTextureName(String fontFile){
-        return fontFile.replace(".fnt",".png");
+    private String getFontTextureName(String fontFile) {
+        return fontFile.replace(".fnt", ".png");
     }
 
     private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,
@@ -458,23 +480,23 @@ public final class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        return create_CMediaFont(file, offset_x, offset_y, true, null, false, null);
+        return create_CMediaFont(file, offset_x, offset_y, true,null, null, false, false);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
-        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, null, false, null);
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled,null, null, false, false);
     }
 
-    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, Color outlineColor, boolean outlineOnly) {
-        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, outlineColor, outlineOnly, null);
+    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols) {
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled,symbols, null, false, false);
     }
 
-    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, Color outlineColor, boolean outlineOnly, CMediaFontSymbol[] symbols) {
-        CMediaFont cMediaFont = new CMediaFont(file, offset_x, offset_y, markupEnabled, outlineColor, outlineOnly, symbols);
+    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly, boolean outlineSymbols) {
+        CMediaFont cMediaFont = new CMediaFont(file, offset_x, offset_y, markupEnabled, symbols, outlineColor, outlineOnly,outlineSymbols);
         return cMediaFont;
     }
 
-    public static CMediaFontSymbol create_CMediaFontSymbol(int id, String file){
+    public static CMediaFontSymbol create_CMediaFontSymbol(int id, String file) {
         return new CMediaFontSymbol(id, file);
     }
 
@@ -505,7 +527,8 @@ public final class MediaManager {
     public TextureRegion sprite(CMediaSprite cMediaSprite, int arrayIndex, float animationTimer) {
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images[cMediaImage.mediaManagerIndex()];
-            case CMediaAnimation cMediaAnimation -> medias_animations[cMediaAnimation.mediaManagerIndex()].getKeyFrame(animationTimer);
+            case CMediaAnimation cMediaAnimation ->
+                    medias_animations[cMediaAnimation.mediaManagerIndex()].getKeyFrame(animationTimer);
             case CMediaArray cMediaArray -> medias_arrays[cMediaArray.mediaManagerIndex()][arrayIndex];
         };
     }
