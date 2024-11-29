@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import net.mslivo.core.engine.media_manager.CMedia;
+import net.mslivo.core.engine.media_manager.CMediaFontSymbol;
+import net.mslivo.core.engine.media_manager.MediaManager;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -222,8 +224,27 @@ public class Tools {
             return String.format("%.2f%%", percentDecimal * 100f);
         }
 
-        public static String customChar(int number) {
-            return (Character.toString((char) (500 + number)));
+        public static String fontSymbol(CMediaFontSymbol cMediaFontSymbol, boolean neutralColor) {
+            return fontSymbol(cMediaFontSymbol.id, neutralColor);
+        }
+
+        public static String fontSymbol(CMediaFontSymbol cMediaFontSymbol) {
+            return fontSymbol(cMediaFontSymbol.id, true);
+        }
+
+        public static String fontSymbol(int id) {
+            return fontSymbol(id, true);
+        }
+
+        public static String fontSymbol(int id, boolean neutralColor) {
+            String symbol = Character.toString((char) (MediaManager.FONT_CUSTOM_SYMBOL_OFFSET + id));
+            if(neutralColor){
+                builder.setLength(0);
+                builder.append("[#7F7F7F]").append(symbol).append("[]");
+                return builder.toString();
+            }else{
+                return symbol;
+            }
         }
 
         public static String validString(String string) {

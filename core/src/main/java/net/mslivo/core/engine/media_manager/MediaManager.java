@@ -3,20 +3,21 @@ package net.mslivo.core.engine.media_manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
+import java.io.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 public final class MediaManager {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int MEDIAMANGER_INDEX_NONE = -1;
+    public static final int FONT_CUSTOM_SYMBOL_OFFSET = 512;
     private static final String ERROR_NOT_LOADED = "CMedia File \"%s\": is not loaded into MediaManager";
     private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in another MediaManager";
     private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
@@ -32,6 +34,11 @@ public final class MediaManager {
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
+    private static final GridPoint2[] PIXEL_DIRECTIONS = new GridPoint2[]{
+            new GridPoint2(-1,0),new GridPoint2(-1,1),new GridPoint2(0,1),new GridPoint2(1,1),
+            new GridPoint2(1,0),new GridPoint2(1,-1),new GridPoint2(0,-1),new GridPoint2(-1,-1)
+    };
+    private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0"+System.lineSeparator();
     private boolean loaded = false;
     private Sound[] medias_sounds = null;
     private Music[] medias_music = null;
@@ -84,11 +91,151 @@ public final class MediaManager {
         return loadAssets(pageWidth, pageHeight, null, Texture.TextureFilter.Nearest);
     }
 
+
+    private Pixmap createFontModifyPixmapAddOutline(Pixmap pixmap, Color outlineColor, boolean outlineOnly){
+        pixmap.setBlending(Pixmap.Blending.None);
+        // detect outline
+        final ArrayDeque<GridPoint2> outLinePoints = new ArrayDeque<>();
+        final ArrayDeque<GridPoint2> removePoints = new ArrayDeque<>();
+        for(int ix=0;ix<pixmap.getWidth();ix++){
+            for(int iy=0;iy<pixmap.getHeight();iy++){
+                int pixel = pixmap.getPixel(ix,iy);
+                float a = getPixelAlpha(pixel);
+
+                if(a == 0f) {
+                    continue;
+                }
+
+                if(outlineOnly)
+                    removePoints.add(new GridPoint2(ix,iy));
+
+                for(int ip=0;ip<PIXEL_DIRECTIONS.length;ip++){
+                    GridPoint2 direction = PIXEL_DIRECTIONS[ip];
+                    int x = ix+direction.x;
+                    int y = iy+direction.y;
+                    if(x >= 0 && x < pixmap.getWidth() && y >= 0 && y < pixmap.getHeight()) {
+                        if (getPixelAlpha(pixmap.getPixel(x, y)) == 0f)
+                            outLinePoints.add(new GridPoint2(x, y));
+                    }
+
+                }
+            }
+        }
+
+        // create outline
+        final int outlineColorRGBA8888 = Color.rgba8888(outlineColor);
+        while (!outLinePoints.isEmpty()){
+            GridPoint2 outlinePixel = outLinePoints.poll();
+            pixmap.drawPixel(outlinePixel.x,outlinePixel.y, outlineColorRGBA8888);
+        }
+        // remove
+        final int clearColorRGBA8888 = Color.rgba8888(Color.CLEAR);
+
+        while (!removePoints.isEmpty()){
+            GridPoint2 removePixel = removePoints.poll();
+            pixmap.drawPixel(removePixel.x,removePixel.y, clearColorRGBA8888);
+        }
+        return pixmap;
+    }
+
+
+    private CreateFontResult createFontAddSymbols(Pixmap pixmap, CMediaFontSymbol[] symbols){
+        // Load Symbols
+        StringBuilder fntFileData = new StringBuilder();
+        Pixmap[] symbolPixmaps = new Pixmap[symbols.length];
+        for(int i=0;i<symbols.length;i++){
+            symbolPixmaps[i] = createTexturePixmap(symbols[i].file);
+        }
+
+        int symbolAreaHeight = 0;
+        int symbolHeightMax = 0;
+        int xCurrent = 0;
+        for(int i=0;i<symbolPixmaps.length;i++){
+            Pixmap symbolPixmap = symbolPixmaps[i];
+            symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+            if((xCurrent+symbolPixmap.getWidth()) >= pixmap.getWidth()){
+                symbolAreaHeight += symbolHeightMax;
+                symbolHeightMax = 0;
+                xCurrent = 0;
+            }else{
+                xCurrent+= symbolPixmap.getWidth();
+            }
+        }
+        symbolAreaHeight += symbolHeightMax;
+
+        // Create Symbol Area
+        int newWidth = pixmap.getWidth();
+        int originalHeight = pixmap.getHeight();
+        int newHeight = originalHeight+symbolAreaHeight;
+        Pixmap newPixmap = new Pixmap(newWidth, newHeight, pixmap.getFormat());
+        newPixmap.setBlending(Pixmap.Blending.None);
+        newPixmap.setColor(0, 0, 0, 0);
+        newPixmap.fill();
+        newPixmap.drawPixmap(pixmap, 0, 0);
+        pixmap = newPixmap;
+
+        // copy symbols
+        xCurrent = 0;
+        int yCurrent = originalHeight;
+        for(int i=0;i<symbolPixmaps.length;i++){
+            Pixmap symbolPixmap = symbolPixmaps[i];
+            symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+            if((xCurrent+symbolPixmap.getWidth()) >= pixmap.getWidth()){
+                yCurrent += symbolHeightMax;
+                symbolHeightMax = 0;
+                xCurrent = 0;
+            }else{
+                newPixmap.drawPixmap( symbolPixmap, xCurrent, yCurrent);
+                fntFileData.append(String.format(FONT_FILE_DATA,FONT_CUSTOM_SYMBOL_OFFSET+symbols[i].id,
+                        xCurrent, yCurrent,symbolPixmap.getWidth(),
+                        symbolPixmap.getHeight(),-1,
+                        symbolHeightMax-symbolPixmap.getHeight(),
+                        symbolPixmap.getWidth()-1));
+
+                xCurrent+= symbolPixmap.getWidth();
+            }
+        }
+
+        // Dispose Symbol Pixmaps
+        for(int i=0;i<symbolPixmaps.length;i++)
+            symbolPixmaps[i].dispose();
+
+
+        return new CreateFontResult(pixmap, fntFileData.toString());
+    }
+
+    private CreateFontResult createFont(String fontTextureFileName, Color outlineColor, boolean outlineOnly, CMediaFontSymbol[] symbols){
+        CreateFontResult result = new CreateFontResult(createTexturePixmap(fontTextureFileName), "");
+
+        if(symbols.length > 0){
+            result = createFontAddSymbols(result.pixmap, symbols);
+        }
+
+        if(!outlineColor.equals(Color.CLEAR)){
+            createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
+        }
+
+        return result;
+    }
+
+
+
+    private float getPixelAlpha(int pixel){
+        return (pixel & 0xFF) / 255f;
+    }
+
+    private Pixmap createTexturePixmap(String textureFileName){
+        TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
+        textureData.prepare();
+        return textureData.consumePixmap();
+    }
+
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
         ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
         ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
+        HashMap<CMediaFont, String> createFontFNTFileData = new HashMap<>();
         int step = 0;
         int stepsMax = 0;
 
@@ -132,13 +279,22 @@ public final class MediaManager {
         for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
             CMedia imageMedia = imageCMediaLoadStack.get(i);
 
-            String textureFileName = imageMedia.getClass() == CMediaFont.class ? bitmapFontTextureName(imageMedia.file()) : imageMedia.file();
-            if(pixmapPacker.getRect(textureFileName) == null) { // dont pack same file doubled
-                TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
-                textureData.prepare();
-                pixmapPacker.pack(textureFileName, textureData.consumePixmap());
-                textureData.disposePixmap();
+            String textureFileName = imageMedia instanceof CMediaFont ? getFontTextureName(imageMedia.file()) : imageMedia.file();
+            if(pixmapPacker.getRect(textureFileName) == null) {
+                Pixmap pixmap;
+                if(imageMedia instanceof CMediaFont cMediaFont){
+                    CreateFontResult result = createFont(textureFileName, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.symbols);
+                    createFontFNTFileData.put(cMediaFont, result.fontFileData);
+                    pixmapPacker.pack(textureFileName, result.pixmap);
+                    result.pixmap.dispose();
+                }else{
+                    pixmap = createTexturePixmap(textureFileName);
+                    pixmapPacker.pack(textureFileName, pixmap);
+                    pixmap.dispose();
+                }
+
             }
+
             step++;
             if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file(), step, stepsMax);
         }
@@ -168,8 +324,10 @@ public final class MediaManager {
                     );
                 }
                 case CMediaFont cMediaFont -> {
-                    BitmapFont bitmapFont = new BitmapFont(Tools.File.findResource(cMediaFont.file()),
-                            new TextureRegion(textureAtlas.findRegion(bitmapFontTextureName(cMediaFont.file()))));
+                    BitmapFont bitmapFont = new BitmapFont(
+                            new FontFileHandle(Tools.File.findResource(cMediaFont.file()), createFontFNTFileData.get(cMediaFont)),
+                            new TextureRegion(textureAtlas.findRegion(getFontTextureName(cMediaFont.file())))
+                    );
                     bitmapFont.setColor(Color.GRAY);
                     bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
                     cMediaFont.setMediaManagerIndex(fontsIdx);
@@ -207,7 +365,7 @@ public final class MediaManager {
         return true;
     }
 
-    private String bitmapFontTextureName(String fontFile){
+    private String getFontTextureName(String fontFile){
         return fontFile.replace(".fnt",".png");
     }
 
@@ -300,13 +458,24 @@ public final class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        return create_CMediaFont(file, offset_x, offset_y, true);
+        return create_CMediaFont(file, offset_x, offset_y, true, null, false, null);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
-        CMediaFont cMediaFont = new CMediaFont(
-                file, offset_x, offset_y, markupEnabled);
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, null, false, null);
+    }
+
+    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, Color outlineColor, boolean outlineOnly) {
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, outlineColor, outlineOnly, null);
+    }
+
+    public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, Color outlineColor, boolean outlineOnly, CMediaFontSymbol[] symbols) {
+        CMediaFont cMediaFont = new CMediaFont(file, offset_x, offset_y, markupEnabled, outlineColor, outlineOnly, symbols);
         return cMediaFont;
+    }
+
+    public static CMediaFontSymbol create_CMediaFontSymbol(int id, String file){
+        return new CMediaFontSymbol(id, file);
     }
 
     public static CMediaMusic create_CMediaMusic(String file) {
@@ -430,4 +599,47 @@ public final class MediaManager {
     public boolean isLoaded() {
         return loaded;
     }
+
+    private class CreateFontResult {
+        public final Pixmap pixmap;
+        public final String fontFileData;
+
+        public CreateFontResult(Pixmap pixmap, String fontFileData) {
+            this.pixmap = pixmap;
+            this.fontFileData = fontFileData;
+        }
+    }
+
+    private class FontFileHandle extends FileHandle {
+        private final byte[] modifiedData;
+
+        public FontFileHandle(FileHandle originalFile, String additionalData) {
+            super(originalFile.file());
+
+            // Read original file content
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (InputStream inputStream = originalFile.read()) {
+                int bytesRead;
+                byte[] buffer = new byte[1024];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                // Append additional data
+                outputStream.write(additionalData.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Store the combined data
+            this.modifiedData = outputStream.toByteArray();
+        }
+
+        @Override
+        public InputStream read() {
+            // Provide the modified data as an InputStream
+            return new ByteArrayInputStream(modifiedData);
+        }
+    }
+
 }

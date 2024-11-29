@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
@@ -52,7 +53,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window", mediaManager));
+                api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window"+ Tools.Text.fontSymbol(2), mediaManager));
             }
 
         },  BUTTON_MODE.DEFAULT);
