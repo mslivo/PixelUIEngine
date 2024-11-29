@@ -189,7 +189,7 @@ public final class MediaManager {
                 fntFileData.append(String.format(FONT_FILE_DATA,FONT_CUSTOM_SYMBOL_OFFSET+symbols[i].id,
                         xCurrent, yCurrent,symbolPixmap.getWidth(),
                         symbolPixmap.getHeight(),-1,
-                        symbolHeightMax-symbolPixmap.getHeight(),
+                        12-symbolPixmap.getHeight(),
                         symbolPixmap.getWidth()-1));
 
                 xCurrent+= symbolPixmap.getWidth();
