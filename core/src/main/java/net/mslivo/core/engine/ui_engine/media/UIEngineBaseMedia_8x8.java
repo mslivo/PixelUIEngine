@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine.media;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import net.mslivo.core.engine.media_manager.*;
 
 /**
@@ -90,14 +91,7 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5,true, Color.CLEAR, false,
-            new CMediaFontSymbol[]{
-                    MediaManager.create_CMediaFontSymbol(0,DIR_UI_GRAPHICS+"fonts/symbol_1.png"),
-                    MediaManager.create_CMediaFontSymbol(1,DIR_UI_GRAPHICS+"fonts/symbol_2.png"),
-                    MediaManager.create_CMediaFontSymbol(2,DIR_UI_GRAPHICS+"fonts/symbol_3.png"),
-
-
-            });
+    public static final CMediaFont UI_FONT = MediaManager.create_CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5);
 
     // Misc
     public static final CMediaImage UI_PIXEL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
