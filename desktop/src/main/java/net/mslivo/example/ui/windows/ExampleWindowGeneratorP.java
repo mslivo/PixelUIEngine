@@ -119,7 +119,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Text text1 = api.component.text.create(1, 5, new String[]{"ABCDEFGHIJKLMNOPQRSTUVWXYZ"});
         Text text2 = api.component.text.create(1, 4, new String[]{"abcdefghijklmnopqrstuvwxyz"});
         Text text3 = api.component.text.create(1, 3, new String[]{"0123456789"});
-        Text text4 = api.component.text.create(1, 2, new String[]{"!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A¢£¤¥¦§¨©´·×÷€"});
+        Text text4 = api.component.text.create(1, 2, new String[]{"!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A£¥¦§\"©'·×÷€"});
         Text text5 = api.component.text.create(1, 1, new String[]{"A.A"});
 
 
@@ -312,7 +312,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Checkbox checkBox2 = api.component.checkbox.create(18, 2, "Radio", CHECKBOX_STYLE.RADIO);
 
-        AppViewport appViewPort = api.component.appViewport.create(29, 9, 4, 4, null, 100, 100, 1);
+        AppViewport appViewPort = api.component.appViewport.create(29, 9, 4, 4, new AppViewPortAction() {}, 100, 100, 1);
 
         Textfield osKeyBoardTextInput = api.component.textfield.create(18, 13, 10, "", null, 128);
         api.component.textfield.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {

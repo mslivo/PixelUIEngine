@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.tools.sound;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.CMediaSound;
+import net.mslivo.core.engine.media_manager.CMediaSoundEffect;
 import net.mslivo.core.engine.tools.Tools;
 
 import java.util.HashSet;
@@ -14,7 +14,7 @@ public class SoundPlayer {
     private float volume;
     private float camera_x, camera_y;
     private final MediaManager mediaManager;
-    HashSet<CMediaSound> playedSounds;
+    HashSet<CMediaSoundEffect> playedSounds;
 
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
@@ -39,74 +39,74 @@ public class SoundPlayer {
         this.range = Math.max(range2D, 1);
     }
 
-    public long playSound(CMediaSound cMediaSound) {
-        return playSoundInternal(cMediaSound, 1, 1, 0, false);
+    public long playSound(CMediaSoundEffect cMediaSoundEffect) {
+        return playSoundInternal(cMediaSoundEffect, 1, 1, 0, false);
     }
 
-    public long playSound(CMediaSound cMediaSound, float volume) {
-        return playSoundInternal(cMediaSound, volume, 1, 0, false);
+    public long playSound(CMediaSoundEffect cMediaSoundEffect, float volume) {
+        return playSoundInternal(cMediaSoundEffect, volume, 1, 0, false);
     }
 
-    public long playSound(CMediaSound cMediaSound, float volume, float pitch) {
-        return playSoundInternal(cMediaSound, volume, pitch, 0, false);
+    public long playSound(CMediaSoundEffect cMediaSoundEffect, float volume, float pitch) {
+        return playSoundInternal(cMediaSoundEffect, volume, pitch, 0, false);
     }
 
-    public long playSound(CMediaSound cMediaSound, float volume, float pitch, float pan) {
-        return playSoundInternal(cMediaSound, volume, pitch, pan, false);
+    public long playSound(CMediaSoundEffect cMediaSoundEffect, float volume, float pitch, float pan) {
+        return playSoundInternal(cMediaSoundEffect, volume, pitch, pan, false);
     }
 
-    public long loopSound(CMediaSound cMediaSound) {
-        return playSoundInternal(cMediaSound, 1, 1, 0, true);
+    public long loopSound(CMediaSoundEffect cMediaSoundEffect) {
+        return playSoundInternal(cMediaSoundEffect, 1, 1, 0, true);
     }
 
-    public long loopSound(CMediaSound cMediaSound, float volume) {
-        return playSoundInternal(cMediaSound, volume, 1, 0, true);
+    public long loopSound(CMediaSoundEffect cMediaSoundEffect, float volume) {
+        return playSoundInternal(cMediaSoundEffect, volume, 1, 0, true);
     }
 
-    public long loopSound(CMediaSound cMediaSound, float volume, float pitch) {
-        return playSoundInternal(cMediaSound, volume, pitch, 0, true);
+    public long loopSound(CMediaSoundEffect cMediaSoundEffect, float volume, float pitch) {
+        return playSoundInternal(cMediaSoundEffect, volume, pitch, 0, true);
     }
 
-    public long loopSound(CMediaSound cMediaSound, float volume, float pitch, float pan) {
-        return playSoundInternal(cMediaSound, volume, pitch, pan, true);
+    public long loopSound(CMediaSoundEffect cMediaSoundEffect, float volume, float pitch, float pan) {
+        return playSoundInternal(cMediaSoundEffect, volume, pitch, pan, true);
     }
 
-    public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, 1, 1, false);
+    public long playSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, 1, 1, false);
     }
 
-    public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, volume, 1, false);
+    public long playSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y, float volume) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, volume, 1, false);
     }
 
-    public long playSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, volume, pitch, false);
+    public long playSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y, float volume, float pitch) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, volume, pitch, false);
     }
 
-    public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, 1, 1, true);
+    public long loopSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, 1, 1, true);
     }
 
-    public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, volume, 1, true);
+    public long loopSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y, float volume) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, volume, 1, true);
     }
 
-    public long loopSound2D(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch) {
-        return playSound2DInternal(cMediaSound, position_x, position_y, volume, pitch, true);
+    public long loopSound2D(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y, float volume, float pitch) {
+        return playSound2DInternal(cMediaSoundEffect, position_x, position_y, volume, pitch, true);
     }
 
-    private long playSoundInternal(CMediaSound cMediaSound, float volume, float pitch, float pan, boolean loop) {
+    private long playSoundInternal(CMediaSoundEffect cMediaSoundEffect, float volume, float pitch, float pan, boolean loop) {
         long id;
         if(loop) {
-            id = mediaManager.sound(cMediaSound).loop(volume * this.volume,pitch,pan);
+            id = mediaManager.sound(cMediaSoundEffect).loop(volume * this.volume,pitch,pan);
         }else{
-            id= mediaManager.sound(cMediaSound).play(volume * this.volume, pitch, pan);
+            id= mediaManager.sound(cMediaSoundEffect).play(volume * this.volume, pitch, pan);
         }
-        playedSounds.add(cMediaSound);
+        playedSounds.add(cMediaSoundEffect);
         return id;
     }
 
-    private long playSound2DInternal(CMediaSound cMediaSound, float position_x, float position_y, float volume, float pitch, boolean loop) {
+    private long playSound2DInternal(CMediaSoundEffect cMediaSoundEffect, float position_x, float position_y, float volume, float pitch, boolean loop) {
         float playVolume = (range - (Math.clamp(Tools.Calc.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
         playVolume = playVolume * volume * this.volume;
         float pan = 0;
@@ -117,16 +117,16 @@ public class SoundPlayer {
         }
         long id;
         if(loop) {
-            id = mediaManager.sound(cMediaSound).loop(playVolume * this.volume,pitch,pan);
+            id = mediaManager.sound(cMediaSoundEffect).loop(playVolume * this.volume,pitch,pan);
         }else{
-            id= mediaManager.sound(cMediaSound).play(playVolume * this.volume, pitch, pan);
+            id= mediaManager.sound(cMediaSoundEffect).play(playVolume * this.volume, pitch, pan);
         }
-        playedSounds.add(cMediaSound);
+        playedSounds.add(cMediaSoundEffect);
         return id;
     }
 
     public void stopAllSounds() {
-        CMediaSound[] playedSoundsArray = playedSounds.toArray(new CMediaSound[0]);
+        CMediaSoundEffect[] playedSoundsArray = playedSounds.toArray(new CMediaSoundEffect[0]);
         for (int i = 0; i < playedSoundsArray.length; i++) mediaManager.sound(playedSoundsArray[i]).stop();
     }
 

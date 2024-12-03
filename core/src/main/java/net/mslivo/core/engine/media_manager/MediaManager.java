@@ -9,21 +9,19 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
-import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Admin on 07.02.2019.
@@ -32,14 +30,16 @@ public final class MediaManager {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int MEDIAMANGER_INDEX_NONE = -1;
     public static final int FONT_CUSTOM_SYMBOL_OFFSET = 512;
-    private static final String ERROR_NOT_LOADED = "CMedia File \"%s\": is not loaded into MediaManager";
     private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in another MediaManager";
-    private static final String ERROR_DUPLICATE = "CMedia File \"%s\": Duplicate file detected";
     private static final String ERROR_FILE_NOT_FOUND = "CMedia File \"%s\": Does not exist";
-    private static final String ERROR_UNKNOWN_FORMAT = "CMedia File \"%s\": class \"%s\" not supported";
+    private static final String ERROR_SPLIT_FRAMES = "Error splitting frames for: \"%s\": Negative frameCount = %d";
+    private static final String ERROR_READ_FONT = "Error reading font file \"%s\"";
+    private static final String ERROR_READ_FONT_FILE_DESCRIPTOR = "Error reading font file \"%s\": file= descriptor not found";
+    private static final String PACKED_FONT_NAME = "%s_%d.packed";
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
+    private static final Pattern FNT_FILE_PATTERN = Pattern.compile("file=\"([^\"]+)\"");
     private static final GridPoint2[] PIXEL_DIRECTIONS = new GridPoint2[]{
             new GridPoint2(-1, 0), new GridPoint2(-1, 1), new GridPoint2(0, 1), new GridPoint2(1, 1),
             new GridPoint2(1, 0), new GridPoint2(1, -1), new GridPoint2(0, -1), new GridPoint2(-1, -1)
@@ -55,8 +55,6 @@ public final class MediaManager {
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
-    private ObjLoader objLoader = null;
-    private G3dModelLoader g3dLoader = null;
 
     public MediaManager() {
         unloadAndReset();
@@ -150,7 +148,7 @@ public final class MediaManager {
         StringBuilder fntFileData = new StringBuilder();
         Pixmap[] symbolPixmaps = new Pixmap[symbols.length];
         for (int i = 0; i < symbols.length; i++) {
-            symbolPixmaps[i] = createTexturePixmap(symbols[i].file);
+            symbolPixmaps[i] = createTexturePixmap(Tools.File.findResource(symbols[i].file));
         }
 
         int symbolAreaHeight = 0;
@@ -210,13 +208,13 @@ public final class MediaManager {
         return new CreateFontResult(pixmap, fntFileData.toString());
     }
 
-    private CreateFontResult createFont(String fontTextureFileName, Color outlineColor, boolean outlineOnly,boolean outlineSymbols, CMediaFontSymbol[] symbols) {
-        CreateFontResult result = new CreateFontResult(createTexturePixmap(fontTextureFileName), "");
+    private CreateFontResult createFont(FileHandle textureFileHandle, Color outlineColor, boolean outlineOnly, boolean outlineSymbols, CMediaFontSymbol[] symbols) {
+        CreateFontResult result = new CreateFontResult(createTexturePixmap(textureFileHandle), "");
 
         boolean outLine = !outlineColor.equals(Color.CLEAR);
 
         if (symbols.length > 0) {
-            if(outLine && !outlineSymbols){
+            if (outLine && !outlineSymbols) {
                 createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
                 // outline before adding symbols
             }
@@ -224,7 +222,7 @@ public final class MediaManager {
             result = createFontAddSymbols(result.pixmap, symbols);
         }
 
-        if (outLine && outlineSymbols ) {
+        if (outLine && outlineSymbols) {
             // outline everything
             createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
         }
@@ -237,8 +235,8 @@ public final class MediaManager {
         return (pixel & 0xFF) / 255f;
     }
 
-    private Pixmap createTexturePixmap(String textureFileName) {
-        TextureData textureData = TextureData.Factory.loadFromFile(Tools.File.findResource(textureFileName), null, false);
+    private Pixmap createTexturePixmap(FileHandle textureFileHandle) {
+        TextureData textureData = TextureData.Factory.loadFromFile(textureFileHandle, null, false);
         textureData.prepare();
         return textureData.consumePixmap();
     }
@@ -246,8 +244,9 @@ public final class MediaManager {
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
-        ArrayList<CMedia> imageCMediaLoadStack = new ArrayList<>();
-        ArrayList<CMedia> soundCMediaLoadStack = new ArrayList<>();
+        ArrayList<CMediaFont> fontCMediaLoadStack = new ArrayList<>();
+        ArrayList<CMediaSprite> spriteCMediaLoadStack = new ArrayList<>();
+        ArrayList<CMediaSound> soundCMediaLoadStack = new ArrayList<>();
         HashMap<CMediaFont, String> createFontFNTFileData = new HashMap<>();
         HashMap<CMediaFont, String> createFontFNTPackedName = new HashMap<>();
         int step = 0;
@@ -263,22 +262,20 @@ public final class MediaManager {
             } else if (loadMedia.mediaManagerIndex() != MEDIAMANGER_INDEX_NONE) {
                 throw new RuntimeException(String.format(ERROR_ALREADY_LOADED_OTHER, loadMedia.file()));
             }
-            if (loadMedia instanceof CMediaSprite || loadMedia.getClass() == CMediaFont.class) {
-                imageCMediaLoadStack.add(loadMedia);
-            } else if (loadMedia.getClass() == CMediaSound.class || loadMedia.getClass() == CMediaMusic.class) {
-                soundCMediaLoadStack.add(loadMedia);
-            } else {
-                throw new RuntimeException(String.format(ERROR_UNKNOWN_FORMAT, loadMedia.file(), loadMedia.getClass().getSimpleName()));
+
+            switch (loadMedia) {
+                case CMediaSprite cMediaSprite -> spriteCMediaLoadStack.add(cMediaSprite);
+                case CMediaSound cMediaSound -> soundCMediaLoadStack.add(cMediaSound);
+                case CMediaFont cMediaFont -> fontCMediaLoadStack.add(cMediaFont);
             }
+
             switch (loadMedia) {
                 case CMediaImage _ -> imagesMax++;
                 case CMediaArray _ -> arraysMax++;
                 case CMediaAnimation _ -> animationsMax++;
                 case CMediaFont _ -> fontsMax++;
-                case CMediaSound _ -> soundMax++;
+                case CMediaSoundEffect _ -> soundMax++;
                 case CMediaMusic _ -> musicMax++;
-                default -> {
-                }
             }
             stepsMax++;
         }
@@ -289,44 +286,50 @@ public final class MediaManager {
         medias_sounds = new Sound[soundMax];
         medias_music = new Music[musicMax];
 
-        // 2. Load Image Data Into Pixmap Packer
-        int fontCount = 1;
-        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-            CMedia imageMedia = imageCMediaLoadStack.get(i);
+        // Load Sprite Data Into Pixmap Packer
+        for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
+            CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
 
-            String textureFileName = imageMedia instanceof CMediaFont ? getFontTextureName(imageMedia.file()) : imageMedia.file();
-
-            Pixmap pixmap;
-            if (imageMedia instanceof CMediaFont cMediaFont) {
-                CreateFontResult result = createFont(textureFileName, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.outlineSymbols,cMediaFont.symbols);
-                // pack
-                String packedName = textureFileName.replace(".png","_"+fontCount+".png");
-                createFontFNTFileData.put(cMediaFont, result.fontFileData);
-                createFontFNTPackedName.put(cMediaFont, packedName);
-                pixmapPacker.pack(packedName, result.pixmap);
-                result.pixmap.dispose();
-                fontCount++;
-            } else {
-                if (pixmapPacker.getRect(textureFileName) == null) {
-                    pixmap = createTexturePixmap(textureFileName);
-                    pixmapPacker.pack(textureFileName, pixmap);
-                    pixmap.dispose();
-                }
+            FileHandle textureFileHandle = Tools.File.findResource(cMediaSprite.file());
+            String packedTextureName = cMediaSprite.file();
+            if (pixmapPacker.getRect(packedTextureName) == null) {
+                Pixmap pixmap = createTexturePixmap(textureFileHandle);
+                pixmapPacker.pack(packedTextureName, pixmap);
+                pixmap.dispose();
             }
 
-
             step++;
-            if (loadProgress != null) loadProgress.onLoadStep(imageMedia.file(), step, stepsMax);
+            if (loadProgress != null) loadProgress.onLoadStep(cMediaSprite.file(), step, stepsMax);
         }
 
-        // 4. Create TextureAtlas
+        // Create and Load Font Data Into Pixmap Packer
+        int fontCount = 1;
+        for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
+            CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
+
+            FileHandle textureFileHandle = getBitmapFontTextureHandle(Tools.File.findResource(cMediaFont.file()));
+            String packedFontTextureName = String.format(PACKED_FONT_NAME, cMediaFont.file(), fontCount);
+            CreateFontResult fontResult = createFont(textureFileHandle, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.outlineSymbols, cMediaFont.symbols);
+
+            // pack
+            createFontFNTFileData.put(cMediaFont, fontResult.fontFileData);
+            createFontFNTPackedName.put(cMediaFont, packedFontTextureName);
+            pixmapPacker.pack(packedFontTextureName, fontResult.pixmap);
+            fontResult.pixmap.dispose();
+            fontCount++;
+            step++;
+            if (loadProgress != null) loadProgress.onLoadStep(cMediaFont.file(), step, stepsMax);
+        }
+
+        // Create TextureAtlas
         this.textureAtlas = new TextureAtlas();
         pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
+        pixmapPacker.dispose();
 
-        // 5. Fill Arrays with TextureAtlas Data
-        for (int i = 0; i < imageCMediaLoadStack.size(); i++) {
-            CMedia imageMedia = imageCMediaLoadStack.get(i);
-            switch (imageMedia) {
+        // Fill Sprite CMedia Arrays with TextureAtlas Data
+        for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
+            CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
+            switch (cMediaSprite) {
                 case CMediaImage cMediaImage -> {
                     cMediaImage.setMediaManagerIndex(imagesIdx);
                     medias_images[imagesIdx++] = new TextureRegion(textureAtlas.findRegion(cMediaImage.file()));
@@ -343,38 +346,35 @@ public final class MediaManager {
                             cMediaAnimation.playMode
                     );
                 }
-                case CMediaFont cMediaFont -> {
-                    BitmapFont bitmapFont = new BitmapFont(
-                            new FontFileHandle(Tools.File.findResource(cMediaFont.file()), createFontFNTFileData.get(cMediaFont)),
-                            new TextureRegion(textureAtlas.findRegion(createFontFNTPackedName.get(cMediaFont)))
-                    );
-                    bitmapFont.setColor(Color.GRAY);
-                    bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
-                    cMediaFont.setMediaManagerIndex(fontsIdx);
-                    medias_fonts[fontsIdx++] = bitmapFont;
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + imageMedia);
             }
-            loadedMediaList.add(imageMedia);
+            loadedMediaList.add(cMediaSprite);
         }
-        pixmapPacker.dispose();
-        imageCMediaLoadStack.clear();
-        createFontFNTFileData.clear();
-        createFontFNTPackedName.clear();
+        // Fill Font CMedia Arrays with TextureAtlas Data
+
+        for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
+            CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
+            BitmapFont bitmapFont = new BitmapFont(
+                    new FontFileHandle(Tools.File.findResource(cMediaFont.file()), createFontFNTFileData.get(cMediaFont)),
+                    new TextureRegion(textureAtlas.findRegion(createFontFNTPackedName.get(cMediaFont)))
+            );
+            bitmapFont.setColor(Color.GRAY);
+            bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
+            cMediaFont.setMediaManagerIndex(fontsIdx);
+            medias_fonts[fontsIdx++] = bitmapFont;
+        }
 
         // 6. Fill CMedia Arrays with Sound Data
         for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
-            CMedia soundMedia = soundCMediaLoadStack.get(i);
+            CMediaSound soundMedia = soundCMediaLoadStack.get(i);
             switch (soundMedia) {
-                case CMediaSound cMediaSound -> {
-                    cMediaSound.setMediaManagerIndex(soundIdx);
-                    medias_sounds[soundIdx++] = Gdx.audio.newSound(Tools.File.findResource(cMediaSound.file()));
+                case CMediaSoundEffect cMediaSoundEffect -> {
+                    cMediaSoundEffect.setMediaManagerIndex(soundIdx);
+                    medias_sounds[soundIdx++] = Gdx.audio.newSound(Tools.File.findResource(cMediaSoundEffect.file()));
                 }
                 case CMediaMusic cMediaMusic -> {
                     cMediaMusic.setMediaManagerIndex(musicIdx);
                     medias_music[musicIdx++] = Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file()));
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + soundMedia);
             }
             loadedMediaList.add(soundMedia);
             step++;
@@ -382,13 +382,29 @@ public final class MediaManager {
         }
         soundCMediaLoadStack.clear();
 
-        // 7. Finished
+        // 7. Clean up & Finish
+        spriteCMediaLoadStack.clear();
+        createFontFNTFileData.clear();
+        createFontFNTPackedName.clear();
         this.loaded = true;
         return true;
     }
 
-    private String getFontTextureName(String fontFile) {
-        return fontFile.replace(".fnt", ".png");
+    private FileHandle getBitmapFontTextureHandle(FileHandle fontFileHandle) {
+        try (BufferedReader bufferedReader = fontFileHandle.reader(1024, Charset.defaultCharset().name())) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+
+                Matcher matcher = FNT_FILE_PATTERN.matcher(line);
+                if (matcher.find()) {
+                    return Tools.File.findResource(fontFileHandle.parent() + "/" + matcher.group(1));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(ERROR_READ_FONT, e);
+        }
+
+        throw new RuntimeException(ERROR_READ_FONT_FILE_DESCRIPTOR);
     }
 
     private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,
@@ -401,7 +417,7 @@ public final class MediaManager {
         int frameCount = maxFrames - frameOffset;
         if (frameCount == 0) return new Array<>();
         if (frameCount < 0)
-            throw new RuntimeException("Error loading: \"" + file + "\": Negative frameCount = " + frameCount);
+            throw new RuntimeException(String.format(ERROR_SPLIT_FRAMES, file, frameCount));
 
 
         TextureRegion[][] tmp = textureRegion.split(tile_width, tile_height);
@@ -480,19 +496,19 @@ public final class MediaManager {
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y) {
-        return create_CMediaFont(file, offset_x, offset_y, true,null, null, false, false);
+        return create_CMediaFont(file, offset_x, offset_y, true, null, null, false, false);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
-        return create_CMediaFont(file, offset_x, offset_y, markupEnabled,null, null, false, false);
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, null, null, false, false);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols) {
-        return create_CMediaFont(file, offset_x, offset_y, markupEnabled,symbols, null, false, false);
+        return create_CMediaFont(file, offset_x, offset_y, markupEnabled, symbols, null, false, false);
     }
 
     public static CMediaFont create_CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly, boolean outlineSymbols) {
-        CMediaFont cMediaFont = new CMediaFont(file, offset_x, offset_y, markupEnabled, symbols, outlineColor, outlineOnly,outlineSymbols);
+        CMediaFont cMediaFont = new CMediaFont(file, offset_x, offset_y, markupEnabled, symbols, outlineColor, outlineOnly, outlineSymbols);
         return cMediaFont;
     }
 
@@ -504,8 +520,8 @@ public final class MediaManager {
         return new CMediaMusic(file);
     }
 
-    public static CMediaSound create_CMediaSound(String file) {
-        return new CMediaSound(file);
+    public static CMediaSoundEffect create_CMediaSoundEffect(String file) {
+        return new CMediaSoundEffect(file);
     }
 
     public static CMediaArray create_CMediaArray(String file, int tileWidth, int tileHeight) {
@@ -545,8 +561,8 @@ public final class MediaManager {
         return medias_arrays[cMedia.mediaManagerIndex()][arrayIndex];
     }
 
-    public Sound sound(CMediaSound cMediaSound) {
-        return medias_sounds[cMediaSound.mediaManagerIndex()];
+    public Sound sound(CMediaSoundEffect cMediaSoundEffect) {
+        return medias_sounds[cMediaSoundEffect.mediaManagerIndex()];
     }
 
     public Music music(CMediaMusic cMediaMusic) {

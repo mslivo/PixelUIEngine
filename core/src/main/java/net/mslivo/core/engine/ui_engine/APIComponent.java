@@ -98,8 +98,13 @@ public final class APIComponent {
 
         }
 
+        private AppViewPortAction defaultAppViewPortAction() {
+            return new AppViewPortAction() {
+            };
+        }
+
         public AppViewport create(int x, int y, int width, int height) {
-            return create(x, y, width, height, null, 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, defaultAppViewPortAction(), 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction) {
