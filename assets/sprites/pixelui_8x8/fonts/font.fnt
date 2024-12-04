@@ -35,7 +35,7 @@ char id=99      x=15    y=19   width=6    height=6     xoffset=-1   yoffset=6   
 char id=100     x=20    y=18   width=7    height=7     xoffset=-1   yoffset=5    xadvance=6    page=0    chnl=0 
 char id=101     x=27    y=19   width=7    height=6     xoffset=-1   yoffset=6    xadvance=6    page=0    chnl=0 
 char id=102     x=34    y=18   width=6    height=7     xoffset=-1   yoffset=5    xadvance=5    page=0    chnl=0 
-char id=103     x=40    y=18   width=7    height=8     xoffset=-1   yoffset=6    xadvance=6    page=0    chnl=0 
+char id=103     x=40    y=18   width=7    height=7     xoffset=-1   yoffset=6    xadvance=6    page=0    chnl=0 
 char id=104     x=47    y=18   width=7    height=7     xoffset=-1   yoffset=5    xadvance=6    page=0    chnl=0 
 char id=105     x=54    y=18   width=4    height=7     xoffset=-1   yoffset=5    xadvance=3    page=0    chnl=0 
 char id=106     x=58    y=17   width=4    height=8     xoffset=-1   yoffset=5    xadvance=3    page=0    chnl=0 
