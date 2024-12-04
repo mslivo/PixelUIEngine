@@ -1,13 +1,14 @@
 package net.mslivo.example;
 
 
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.math.MathUtils;
+
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.tools.particle_new.ParticleSystem;
 
 public class ExampleLauncherMain {
 
     public static void main(String[] args) {
+
 
         Tools.App.launch(
                 new ExampleMain(),

@@ -4,8 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.tools.particle_new.ParticleSystem;
+import net.mslivo.core.engine.tools.particle_new.ParticleUpdater;
+import net.mslivo.core.engine.tools.particle_new.particles.ImageParticle;
+import net.mslivo.core.engine.tools.particle_new.particles.Particle;
+import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
@@ -17,7 +23,9 @@ import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
+import net.mslivo.example.ui.media.ParticleData;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
+
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private static final boolean IM_PERFORMANCE_TEST = false;
@@ -25,8 +33,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
-    private SpriteRenderer batch;
+    private SpriteRenderer spriteRenderer;
     private PrimitiveRenderer primitiveRenderer;
+    private ParticleSystem<ParticleDataInner> particleSystem;
+    public static class ParticleDataInner{
+        int randomData = 0;
+
+        public ParticleDataInner() {
+        }
+    }
+
 
     public ExampleUIEngineAdapter() {
     }
@@ -44,7 +60,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.batch = new SpriteRenderer(mediaManager);
+        this.spriteRenderer = new SpriteRenderer(mediaManager);
         this.primitiveRenderer = new PrimitiveRenderer();
 
         api.config.window.setDefaultEnforceScreenBounds(false);
@@ -107,6 +123,23 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 api.addWindowAsModal(api.composites.modal.createMessageModal("test",new String[]{"test"}, null));
             }
         }));
+
+        this.particleSystem = new ParticleSystem<>(mediaManager, spriteRenderer, new ParticleUpdater<>() {
+            @Override
+            public boolean updateParticle(Particle<ParticleDataInner> particle) {
+                if(particle instanceof ImageParticle<ParticleDataInner> imageParticle){
+                    imageParticle.x += MathUtils.random(-1,1);
+                    imageParticle.y--;
+                    return imageParticle.y >= 0 ? true :false;
+                }
+                return true;
+            }
+
+            @Override
+            public void resetParticleData(ParticleDataInner particleData) {
+                return;
+            }
+        }, ParticleDataInner.class);
     }
 
     @Override
@@ -120,6 +153,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 case KeyCode.Key.E -> api.input.mouse.emulated.setPositionNextComponent();
             }
         }
+
+        if(Tools.Calc.randomChance(60)){
+            particleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight());
+        }
+
+        particleSystem.updateParallel();
     }
 
 
@@ -129,18 +168,18 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);
 
         // Draw app based on data
-        batch.setProjectionMatrix(camera.combined);
+        spriteRenderer.setProjectionMatrix(camera.combined);
 
-        batch.begin();
+        spriteRenderer.begin();
 
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
-                batch.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,animation_timer,
+                spriteRenderer.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,animation_timer,
                         x, y);
             }
         }
 
-        batch.end();
+        spriteRenderer.end();
 
 
         primitiveRenderer.setColorReset();
@@ -214,6 +253,10 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.end();
 
+
+        spriteRenderer.begin();
+        particleSystem.render();
+        spriteRenderer.end();
 
     }
 

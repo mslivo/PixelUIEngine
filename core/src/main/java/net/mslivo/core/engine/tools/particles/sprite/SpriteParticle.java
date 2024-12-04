@@ -7,8 +7,9 @@ public class SpriteParticle<D> {
     public float x, y;
     public float r, g, b, a;
     public float rotation, scaleX, scaleY;
-    public int array_index;
     public float origin_x, origin_y;
+    public int array_index;
+
     public CMediaSprite appearance;
     public CMediaFont font;
     public String text;
