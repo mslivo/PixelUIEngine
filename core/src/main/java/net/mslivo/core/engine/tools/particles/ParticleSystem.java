@@ -19,7 +19,7 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     protected final ParticleUpdater<T> particleUpdater;
     protected final ArrayList<Particle<T>> particles;
 
-    public ParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
+    protected ParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
         this.dataClass = dataClass;
         this.numParticles = 0;
         this.maxParticles = Math.max(maxParticles, 0);

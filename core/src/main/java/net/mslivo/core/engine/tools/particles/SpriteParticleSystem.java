@@ -25,28 +25,32 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
     public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer, float animation_timer) {
         if (super.numParticles == 0) return;
         this.spriteRendererBackupColor.set(spriteRenderer.getColor());
-
         for (int i = 0; i < particles.size(); i++) {
-            Particle<T> particle = particles.get(i);
+            SpriteParticle<T> particle = (SpriteParticle) particles.get(i);
             if (!particle.visible) continue;
-            if (particle instanceof ImageParticle<T> imageParticle) {
-                spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
-                spriteRenderer.drawCMediaImage(imageParticle.sprite, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
-                        mediaManager.imageWidth(imageParticle.sprite), mediaManager.imageHeight(imageParticle.sprite),
-                        imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
-            } else if (particle instanceof ArrayParticle<T> arrayParticle) {
-                spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
-                spriteRenderer.drawCMediaArray(arrayParticle.sprite, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
-                        mediaManager.arrayWidth(arrayParticle.sprite), mediaManager.arrayHeight(arrayParticle.sprite),
-                        arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
-            } else if (particle instanceof AnimationParticle<T> animationParticle) {
-                spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
-                spriteRenderer.drawCMediaAnimation(animationParticle.sprite, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
-                        mediaManager.animationWidth(animationParticle.sprite), mediaManager.animationHeight(animationParticle.sprite),
-                        animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
-            } else if (particle instanceof TextParticle<T> textParticle) {
-                spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
-                spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
+            switch (particle) {
+                case ImageParticle<T> imageParticle -> {
+                    spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
+                    spriteRenderer.drawCMediaImage(imageParticle.sprite, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
+                            mediaManager.imageWidth(imageParticle.sprite), mediaManager.imageHeight(imageParticle.sprite),
+                            imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
+                }
+                case ArrayParticle<T> arrayParticle -> {
+                    spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
+                    spriteRenderer.drawCMediaArray(arrayParticle.sprite, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
+                            mediaManager.arrayWidth(arrayParticle.sprite), mediaManager.arrayHeight(arrayParticle.sprite),
+                            arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
+                }
+                case AnimationParticle<T> animationParticle -> {
+                    spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
+                    spriteRenderer.drawCMediaAnimation(animationParticle.sprite, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
+                            mediaManager.animationWidth(animationParticle.sprite), mediaManager.animationHeight(animationParticle.sprite),
+                            animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
+                }
+                case TextParticle<T> textParticle -> {
+                    spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
+                    spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
+                }
             }
         }
 
@@ -160,7 +164,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
             particle = new ImageParticle<>();
 
         super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
-        particleSetSpriteParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
+        particleSetTextureBasedParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
         particle.sprite = sprite;
         return particle;
     }
@@ -170,7 +174,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         if (particle == null)
             particle = new ArrayParticle<>();
         super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
-        particleSetSpriteParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
+        particleSetTextureBasedParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
         particle.sprite = sprite;
         particle.arrayIndex = arrayIndex;
         return particle;
@@ -181,7 +185,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         if (particle == null)
             particle = new AnimationParticle<>();
         super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
-        particleSetSpriteParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
+        particleSetTextureBasedParticleData(particle, origin_x, origin_y, scaleX, scaleY, rotation);
         particle.sprite = sprite;
         particle.animationOffset = animationOffset;
         return particle;
@@ -199,11 +203,11 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         return particle;
     }
 
-    private void particleSetSpriteParticleData(SpriteParticle<T> spriteParticle, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
-        spriteParticle.origin_x = origin_x;
-        spriteParticle.origin_y = origin_y;
-        spriteParticle.scaleX = scaleX;
-        spriteParticle.scaleY = scaleY;
-        spriteParticle.rotation = rotation;
+    private void particleSetTextureBasedParticleData(TextureBasedParticle<T> textureBasedParticle, float origin_x, float origin_y, float scaleX, float scaleY, float rotation) {
+        textureBasedParticle.origin_x = origin_x;
+        textureBasedParticle.origin_y = origin_y;
+        textureBasedParticle.scaleX = scaleX;
+        textureBasedParticle.scaleY = scaleY;
+        textureBasedParticle.rotation = rotation;
     }
 }

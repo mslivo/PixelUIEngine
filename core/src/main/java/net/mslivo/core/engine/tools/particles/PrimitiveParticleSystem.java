@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.tools.particles;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.tools.particles.particles.Particle;
 import net.mslivo.core.engine.tools.particles.particles.PrimitiveParticle;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 
@@ -23,24 +22,22 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         if (super.numParticles == 0) return;
         this.primitiveRendererBackupColor.set(primitiveRenderer.getVertexColor());
         for (int i = 0; i < particles.size(); i++) {
-            Particle<T> particle = particles.get(i);
-            if (!particle.visible) continue;
-            if (particle instanceof PrimitiveParticle primitiveParticle) {
-                // check for correct type
-                if (primitiveRenderer.getPrimitiveType() != primitiveParticle.primitiveType) {
-                    primitiveRenderer.end();
-                    primitiveRenderer.begin(primitiveParticle.primitiveType);
-                }
+            PrimitiveParticle<T> primitiveParticle = (PrimitiveParticle) particles.get(i);
+            if (!primitiveParticle.visible) continue;
+            // check for correct type
+            if (primitiveRenderer.getPrimitiveType() != primitiveParticle.primitiveType) {
+                primitiveRenderer.end();
+                primitiveRenderer.begin(primitiveParticle.primitiveType);
+            }
 
-                primitiveRenderer.setVertexColor(primitiveParticle.r, primitiveParticle.g, primitiveParticle.b, primitiveParticle.a);
-                primitiveRenderer.vertex(primitiveParticle.x, primitiveParticle.y);
+            primitiveRenderer.setVertexColor(primitiveParticle.r, primitiveParticle.g, primitiveParticle.b, primitiveParticle.a);
+            primitiveRenderer.vertex(primitiveParticle.x, primitiveParticle.y);
 
 
-                // Additional Vertexes
-                for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
-                    primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
-                    primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
-                }
+            // Additional Vertexes
+            for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
+                primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
+                primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
             }
         }
         primitiveRenderer.setVertexColor(primitiveRendererBackupColor);
