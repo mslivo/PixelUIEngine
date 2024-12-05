@@ -1,8 +1,6 @@
-package net.mslivo.core.engine.tools.particle_new;
+package net.mslivo.core.engine.tools.particles;
 
-import net.mslivo.core.engine.tools.particle_new.particles.Particle;
-
-import java.io.StringReader;
+import net.mslivo.core.engine.tools.particles.particles.Particle;
 
 public interface ParticleUpdater<T> {
     default boolean updateParticle(Particle<T> particle){

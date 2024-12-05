@@ -3,7 +3,6 @@ package net.mslivo.example;
 
 
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.particle_new.ParticleSystem;
 
 public class ExampleLauncherMain {
 

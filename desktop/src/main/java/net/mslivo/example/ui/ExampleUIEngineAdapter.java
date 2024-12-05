@@ -7,11 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.particle_new.ParticleSystem;
-import net.mslivo.core.engine.tools.particle_new.ParticleUpdater;
-import net.mslivo.core.engine.tools.particle_new.particles.ImageParticle;
-import net.mslivo.core.engine.tools.particle_new.particles.Particle;
-import net.mslivo.core.engine.tools.particles.ParticleDataProvider;
+import net.mslivo.core.engine.tools.particles.ParticleUpdater;
+import net.mslivo.core.engine.tools.particles.PrimitiveParticleSystem;
+import net.mslivo.core.engine.tools.particles.SpriteParticleSystem;
+import net.mslivo.core.engine.tools.particles.particles.Particle;
 import net.mslivo.core.engine.ui_engine.*;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
@@ -23,7 +22,6 @@ import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
-import net.mslivo.example.ui.media.ParticleData;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 
@@ -35,7 +33,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private boolean resetPressed;
     private SpriteRenderer spriteRenderer;
     private PrimitiveRenderer primitiveRenderer;
-    private ParticleSystem<ParticleDataInner> particleSystem;
+    private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
+    private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
     public static class ParticleDataInner{
         int randomData = 0;
 
@@ -124,22 +123,22 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         }));
 
-        this.particleSystem = new ParticleSystem<>(mediaManager, spriteRenderer, new ParticleUpdater<>() {
+        ParticleUpdater<ParticleDataInner> particleUpdater = new ParticleUpdater<>() {
             @Override
             public boolean updateParticle(Particle<ParticleDataInner> particle) {
-                if(particle instanceof ImageParticle<ParticleDataInner> imageParticle){
-                    imageParticle.x += MathUtils.random(-1,1);
-                    imageParticle.y--;
-                    return imageParticle.y >= 0 ? true :false;
-                }
-                return true;
+                particle.x += MathUtils.random(-1,1);
+                particle.y--;
+                return particle.y >= 0 ? true :false;
             }
 
             @Override
             public void resetParticleData(ParticleDataInner particleData) {
                 return;
             }
-        }, ParticleDataInner.class);
+        };
+
+        this.spriteParticleSystem = new SpriteParticleSystem<>(ParticleDataInner.class, particleUpdater);
+        this.primitiveParticleSystem = new PrimitiveParticleSystem<>(ParticleDataInner.class, particleUpdater);
     }
 
     @Override
@@ -154,11 +153,18 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         }
 
-        if(Tools.Calc.randomChance(60)){
-            particleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight());
+        if(Tools.Calc.randomChance(30)){
+            spriteParticleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight());
+            primitiveParticleSystem.addPrimitiveParticle(GL32.GL_LINES,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight(),
+                    MathUtils.random(0f,1f),MathUtils.random(0f,1f),MathUtils.random(0f,1f),1f,
+                    MathUtils.random(-5,5),10,
+                    MathUtils.random(0f,1f),MathUtils.random(0f,1f),MathUtils.random(0f,1f),1f
+
+            );
         }
 
-        particleSystem.updateParallel();
+        spriteParticleSystem.updateParallel();
+        primitiveParticleSystem.updateParallel();
     }
 
 
@@ -180,7 +186,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
 
         spriteRenderer.end();
-
 
         primitiveRenderer.setColorReset();
         if (IM_PERFORMANCE_TEST) {
@@ -255,9 +260,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         spriteRenderer.begin();
-        particleSystem.render();
+
+        spriteParticleSystem.render(mediaManager,spriteRenderer);
+
         spriteRenderer.end();
 
+        primitiveRenderer.begin();
+        primitiveParticleSystem.render(primitiveRenderer);
+
+
+        primitiveRenderer.end();
     }
 
     @Override

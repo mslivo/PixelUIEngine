@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.particle_new.particles;
+package net.mslivo.core.engine.tools.particles.particles;
 
 import net.mslivo.core.engine.media_manager.CMediaAnimation;
 
