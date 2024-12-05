@@ -33,7 +33,6 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
             primitiveRenderer.setVertexColor(primitiveParticle.r, primitiveParticle.g, primitiveParticle.b, primitiveParticle.a);
             primitiveRenderer.vertex(primitiveParticle.x, primitiveParticle.y);
 
-
             // Additional Vertexes
             for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
                 primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
