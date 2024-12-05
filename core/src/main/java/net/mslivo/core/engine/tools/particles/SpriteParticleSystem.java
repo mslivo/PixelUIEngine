@@ -85,6 +85,10 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         return particle;
     }
 
+    public ArrayParticle<T> addArrayParticle(CMediaArray cMediaArray, int arrayIndex, float x, float y) {
+        return addArrayParticle(cMediaArray, arrayIndex, x, y, 0.5f, 0.5f, 0.5f, 1.0f, 0f, 0f, 1f, 1f, 0f, true);
+    }
+
     public ArrayParticle<T> addArrayParticle(CMediaArray cMediaArray, int arrayIndex, float x, float y, float r, float g, float b, float a) {
         return addArrayParticle(cMediaArray, arrayIndex, x, y, r, g, b, a, 0f, 0f, 1f, 1f, 0f, true);
     }
