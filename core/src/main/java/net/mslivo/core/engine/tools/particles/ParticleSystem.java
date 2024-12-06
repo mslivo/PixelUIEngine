@@ -67,6 +67,10 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         return numParticles;
     }
 
+    public boolean hasAnyParticles(){
+        return numParticles > 0;
+    }
+
     public void removeAllParticles() {
         this.deleteQueue.addAll(this.particles);
         deleteQueuedParticles();
