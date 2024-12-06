@@ -76,6 +76,14 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         deleteQueuedParticles();
     }
 
+    public int getMaxParticles() {
+        return maxParticles;
+    }
+
+    public void setMaxParticles(int maxParticles){
+        this.maxParticles = Math.max(maxParticles,0);
+    }
+
     public void shutdown() {
         removeAllParticles();
         particlePools.values().forEach(particlePool -> particlePool.clear());
