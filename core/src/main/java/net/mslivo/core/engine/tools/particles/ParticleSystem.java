@@ -147,6 +147,10 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         }
     }
 
+    public ArrayList<Particle<T>> getParticles() {
+        return particles;
+    }
+
     private void deleteQueuedParticles() {
         Particle<T> deleteParticle;
         while ((deleteParticle = deleteQueue.poll()) != null) {
