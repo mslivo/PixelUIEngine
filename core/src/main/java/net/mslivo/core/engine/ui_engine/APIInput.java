@@ -38,8 +38,8 @@ public final class APIInput {
     }
 
     public boolean isAnyInputHoveringOrUsingUI(){
-        if(mouse.useUIObject() != null || mouse.hoverUIObject() != null) return true;
-        if(keyboard.useUIObject() != null) return true;
+        if(mouse.isUsingOrHoveringAnyUIObject()) return true;
+        if(keyboard.isUsingAnyUIObject()) return true;
         return false;
     }
 
@@ -80,6 +80,18 @@ public final class APIInput {
         public boolean isUseUIObjectName(String name) {
             if(name == null) return false;
             return uiEngineState.mouseInteractedUIObjectFrame != null && name.equals(mouseUIObjectName(uiEngineState.mouseInteractedUIObjectFrame));
+        }
+
+        public boolean isUsingAnyUIObject(){
+            return useUIObject() != null;
+        }
+
+        public boolean isHoveringAnyUIObject(){
+            return hoverUIObject() != null;
+        }
+
+        public boolean isUsingOrHoveringAnyUIObject(){
+            return isUsingAnyUIObject() || isHoveringAnyUIObject();
         }
 
         public MOUSE_CONTROL_MODE currentControlMode() {
@@ -236,6 +248,10 @@ public final class APIInput {
         public boolean isUseUIObjectName(String name) {
             if(name == null) return false;
             return uiEngineState.keyboardInteractedUIObjectFrame != null && name.equals(keyboardUIObjectName(uiEngineState.keyboardInteractedUIObjectFrame));
+        }
+
+        public boolean isUsingAnyUIObject() {
+            return useUIObject() != null;
         }
 
         public final class APIEvent {
