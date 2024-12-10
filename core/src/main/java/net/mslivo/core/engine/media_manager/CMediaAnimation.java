@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public final class CMediaAnimation extends CMediaSprite implements Serializable {
-    private final int hash;
 
-    public final int regionWidth;
-    public final int regionHeight;
-    public final float animationSpeed;
-    public final int frameOffset;
-    public final int frameLength;
-    public final ExtendedAnimation.PlayMode playMode;
+    public int regionWidth;
+    public int regionHeight;
+    public float animationSpeed;
+    public int frameOffset;
+    public int frameLength;
+    public ExtendedAnimation.PlayMode playMode;
+
+    public CMediaAnimation() {
+    }
 
     CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
         super(filename);
@@ -23,18 +25,26 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.frameOffset = frameOffset;
         this.frameLength = frameLength;
         this.playMode = playMode;
-        this.hash = Objects.hash(filename, regionWidth, regionHeight, animationSpeed, frameOffset, frameLength, playMode);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return o.hashCode() == this.hash;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CMediaAnimation that = (CMediaAnimation) o;
+        return regionWidth == that.regionWidth && regionHeight == that.regionHeight && Float.compare(animationSpeed, that.animationSpeed) == 0 && frameOffset == that.frameOffset && frameLength == that.frameLength && playMode == that.playMode;
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        int result = super.hashCode();
+        result = 31 * result + regionWidth;
+        result = 31 * result + regionHeight;
+        result = 31 * result + Float.hashCode(animationSpeed);
+        result = 31 * result + frameOffset;
+        result = 31 * result + frameLength;
+        result = 31 * result + playMode.hashCode();
+        return result;
     }
-
 }

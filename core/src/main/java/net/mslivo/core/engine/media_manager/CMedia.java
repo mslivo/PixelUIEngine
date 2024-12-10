@@ -1,26 +1,28 @@
 package net.mslivo.core.engine.media_manager;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract sealed class CMedia implements Serializable permits CMediaFont, CMediaSound, CMediaSprite {
-    public final String file;
-    private int mediaManagerIndex;
+    public String file;
+
+    public CMedia(){
+    }
 
     CMedia(String file) {
         this.file = file;
-        this.mediaManagerIndex = MediaManager.MEDIAMANGER_INDEX_NONE;
     }
 
-    public void setMediaManagerIndex(int mediaManagerIndex) {
-        this.mediaManagerIndex = mediaManagerIndex;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CMedia cMedia = (CMedia) o;
+        return Objects.equals(file, cMedia.file);
     }
 
-    public int mediaManagerIndex() {
-        return mediaManagerIndex;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(file);
     }
-
-    public String file() {
-        return file;
-    }
-
 }

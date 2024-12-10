@@ -4,31 +4,39 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public final class CMediaArray extends CMediaSprite implements Serializable {
-    private final int hash;
+    public int regionWidth;
+    public int regionHeight;
+    public int frameOffset;
+    public int frameLength;
 
-    public final int regionWidth;
-    public final int regionHeight;
-    public final int frameOffset;
-    public final int frameLength;
+    public CMediaArray(){
 
-    CMediaArray(String filename, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
+    }
+
+    public CMediaArray(String filename, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
         super(filename);
         this.regionWidth = regionWidth;
         this.regionHeight = regionHeight;
         this.frameOffset = frameOffset;
         this.frameLength = frameLength;
-        this.hash = Objects.hash(filename, regionWidth, regionHeight, frameOffset, frameLength);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return o.hashCode() == this.hash;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CMediaArray that = (CMediaArray) o;
+        return regionWidth == that.regionWidth && regionHeight == that.regionHeight && frameOffset == that.frameOffset && frameLength == that.frameLength;
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        int result = super.hashCode();
+        result = 31 * result + regionWidth;
+        result = 31 * result + regionHeight;
+        result = 31 * result + frameOffset;
+        result = 31 * result + frameLength;
+        return result;
     }
-
 }

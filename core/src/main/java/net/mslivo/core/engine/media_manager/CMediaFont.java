@@ -3,31 +3,33 @@ package net.mslivo.core.engine.media_manager;
 import com.badlogic.gdx.graphics.Color;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
 
 public final class CMediaFont extends CMedia implements Serializable {
-    private final int hash;
-    public final int offset_x;
-    public final int offset_y;
-    public final boolean markupEnabled;
-    public final Color outlineColor;
-    public final boolean outlineOnly;
-    public final boolean outlineSymbols;
-    public final CMediaFontSymbol[] symbols;
+    public int offset_x;
+    public int offset_y;
+    public boolean markupEnabled;
+    public Color outlineColor;
+    public boolean outlineOnly;
+    public boolean outlineSymbols;
+    public CMediaFontSymbol[] symbols;
 
-    CMediaFont(String filename, int offset_x, int offset_y, boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
+    public CMediaFont(){
+
+    }
+
+    public CMediaFont(String filename, int offset_x, int offset_y, boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
         super(filename);
         this.offset_x = offset_x;
         this.offset_y = offset_y;
         this.markupEnabled = markupEnabled;
 
         this.outlineSymbols = outlineSymbols;
-        int symbolHash = 0;
         if(symbols != null) {
             this.symbols = new CMediaFontSymbol[symbols.length];
             for (int i = 0; i < symbols.length; i++) {
                 this.symbols[i] = new CMediaFontSymbol(symbols[i].id, symbols[i].file);
-                symbolHash += this.symbols[i].hashCode();
             }
         }else{
             this.symbols = new CMediaFontSymbol[0];
@@ -35,20 +37,27 @@ public final class CMediaFont extends CMedia implements Serializable {
 
         this.outlineColor = outlineColor != null ? outlineColor.cpy() : Color.CLEAR.cpy();
         this.outlineOnly = outlineOnly;
-
-        this.hash = Objects.hash(filename, offset_x, offset_y, markupEnabled, outlineColor, outlineOnly, outlineSymbols, symbolHash);
     }
-
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return o.hashCode() == this.hash;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CMediaFont that = (CMediaFont) o;
+        return offset_x == that.offset_x && offset_y == that.offset_y && markupEnabled == that.markupEnabled && outlineOnly == that.outlineOnly && outlineSymbols == that.outlineSymbols && outlineColor.equals(that.outlineColor) && Arrays.equals(symbols, that.symbols);
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        int result = super.hashCode();
+        result = 31 * result + offset_x;
+        result = 31 * result + offset_y;
+        result = 31 * result + Boolean.hashCode(markupEnabled);
+        result = 31 * result + outlineColor.hashCode();
+        result = 31 * result + Boolean.hashCode(outlineOnly);
+        result = 31 * result + Boolean.hashCode(outlineSymbols);
+        result = 31 * result + Arrays.hashCode(symbols);
+        return result;
     }
-
 }

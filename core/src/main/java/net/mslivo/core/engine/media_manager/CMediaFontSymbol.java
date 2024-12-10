@@ -4,25 +4,29 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public final class CMediaFontSymbol implements Serializable {
-    private final int hash;
-    public final int id;
-    public final String file;
+    public int id;
+    public String file;
 
-    CMediaFontSymbol(int id, String file) {
+    public CMediaFontSymbol(){
+    }
+
+    public CMediaFontSymbol(int id, String file) {
         this.id = id;
         this.file = file;
-        this.hash = Objects.hash(id, file);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return o.hashCode() == this.hash;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CMediaFontSymbol symbol = (CMediaFontSymbol) o;
+        return id == symbol.id && Objects.equals(file, symbol.file);
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        int result = id;
+        result = 31 * result + Objects.hashCode(file);
+        return result;
     }
-
 }

@@ -4,7 +4,11 @@ import java.io.Serializable;
 
 public sealed abstract class CMediaSprite extends CMedia implements Serializable permits CMediaImage, CMediaArray, CMediaAnimation {
 
-    CMediaSprite(String filename) {
+    public CMediaSprite(){
+        super();
+    }
+
+    public CMediaSprite(String filename) {
         super(filename);
     }
 

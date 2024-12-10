@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 public sealed abstract class CMediaSound extends CMedia implements Serializable permits CMediaSoundEffect, CMediaMusic {
 
-    CMediaSound(String filename) {
+    public CMediaSound(){
+    }
+
+    public CMediaSound(String filename) {
         super(filename);
     }
 
