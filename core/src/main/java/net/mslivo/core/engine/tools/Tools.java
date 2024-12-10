@@ -383,7 +383,7 @@ public class Tools {
         }
 
         public static boolean writeTextToFile(Path file, String text)  {
-            writeTextToFile(file, text, false);
+            return writeTextToFile(file, text, false);
         }
 
         public static boolean writeTextToFile(Path file, String text, boolean zipped)  {
