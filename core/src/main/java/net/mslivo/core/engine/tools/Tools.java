@@ -382,31 +382,36 @@ public class Tools {
 
         }
 
-        public static void writeTextToFile(Path file, String text) throws Exception {
+        public static boolean writeTextToFile(Path file, String text)  {
             writeTextToFile(file, text, false);
         }
 
-        public static void writeTextToFile(Path file, String text, boolean zipped) throws Exception {
-            Files.createDirectories(file.getParent());
-            try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
-                if (zipped) {
-                    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
-                    ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
-                    zipOutputStream.putNextEntry(zipEntry);
-                    try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(zipOutputStream, StandardCharsets.UTF_8)) {
-                        outputStreamWriter.write(text);
-                        outputStreamWriter.flush();
-                    }
-                } else {
-                    try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-                        outputStreamWriter.write(text);
-                        outputStreamWriter.flush();
+        public static boolean writeTextToFile(Path file, String text, boolean zipped)  {
+            try {
+                Files.createDirectories(file.getParent());
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
+                    if (zipped) {
+                        ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+                        ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
+                        zipOutputStream.putNextEntry(zipEntry);
+                        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(zipOutputStream, StandardCharsets.UTF_8)) {
+                            outputStreamWriter.write(text);
+                            outputStreamWriter.flush();
+                        }
+                    } else {
+                        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+                            outputStreamWriter.write(text);
+                            outputStreamWriter.flush();
+                        }
                     }
                 }
+            }catch (Exception e) {
+                return false;
             }
+            return true;
         }
 
-        public static String readTextFromFile(Path file, boolean zipped) throws Exception {
+        public static String readTextFromFile(Path file, boolean zipped) {
             try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
                 if (zipped) {
                     try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
@@ -432,6 +437,8 @@ public class Tools {
                         return builder.toString();
                     }
                 }
+            } catch (Exception e) {
+                return null;
             }
             return null;
         }
