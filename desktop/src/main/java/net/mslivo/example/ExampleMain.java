@@ -104,7 +104,6 @@ public class ExampleMain extends ApplicationAdapter {
         System.out.println("Shutting down...");
         this.shutdownEngine();
         System.out.println("Done.");
-        Gdx.app.exit();
     }
 
     private void shutdownEngine() {
