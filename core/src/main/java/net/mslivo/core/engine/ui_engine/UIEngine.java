@@ -2569,7 +2569,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int textHeight = TS(text.height - 1);
                 if (text.lines != null && text.lines.length > 0) {
                     for (int i = 0; i < text.lines.length; i++) {
-                        render_drawFont(text.lines[i], text.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text) + textHeight - TS(i), 1, 1);
+                        render_drawFont(text.lines[i], text.fontColor,
+                                componentAlpha,
+                                UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text) + textHeight - TS(i),
+                                1, 1,TS(text.width),
+                                text.textAction.icon(), text.textAction.iconIndex(), text.textAction.iconColor(),
+                                text.textAction.iconFlipX(), text.textAction.iconFlipY());
                     }
                 }
             }

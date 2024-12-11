@@ -1323,9 +1323,9 @@ public final class APIComponent {
             if (lines != null) {
                 for (int i = 0; i < lines.length; i++) {
                     int widthT = mediaManager.fontTextWidth(uiConfig.ui_font, lines[i]);
-                    if (widthT > width) width = widthT;
+                    width = Math.max(width, widthT);
                 }
-                width = width / api.TS();
+                width = MathUtils.ceil(width / (float)api.TS());
                 height = lines.length;
             }
             setComponentCommonInitValuesInternal(text, x, y, width, height);

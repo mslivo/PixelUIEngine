@@ -361,8 +361,8 @@ final class UICommonUtils {
         }
 
         // Screen component collision
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
-            Component screenComponent = uiEngineState.screenComponents.get(i);
+        for (int isc = uiEngineState.screenComponents.size()-1; isc>= 0; isc--) {
+            Component screenComponent = uiEngineState.screenComponents.get(isc);
             if (component_isComponentAtPosition(uiEngineState, x, y, screenComponent)) return screenComponent;
         }
         return null;
@@ -546,7 +546,7 @@ final class UICommonUtils {
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.buttonAction.icon() != null ? uiEngineState.tileSize.TS : 0;
-            int contentWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, textButton.text) + 1 + iconWidth;
+            int contentWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, textButton.text) + iconWidth;
             int contentHeight = mediaManager.fontTextHeight(uiEngineState.config.ui_font, textButton.text);
             textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
             textButton.contentOffset_y = MathUtils.round(((uiEngineState.tileSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
@@ -1255,9 +1255,11 @@ final class UICommonUtils {
         int width = 0;
         for (int i = 0; i < text.lines.length; i++) {
             int widthT = mediaManager.fontTextWidth(uiEngineState.config.ui_font, text.lines[i]);
-            if (widthT > width) width = widthT;
+            width = Math.max(width,widthT);
         }
-        text.width = width / uiEngineState.tileSize.TS;
+        text.width = MathUtils.ceil(width / (float)uiEngineState.tileSize.TS);
+        if(text.textAction != null && text.textAction.icon() != null)
+            text.width++;
         text.height = text.lines.length;
     }
 
