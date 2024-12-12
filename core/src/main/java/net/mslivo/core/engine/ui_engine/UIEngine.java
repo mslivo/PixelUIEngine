@@ -139,10 +139,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.update();
-        newUIEngineState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
-        newUIEngineState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newUIEngineState.frameBuffer_ui_modal = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
-        newUIEngineState.frameBuffer_ui_modal.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newUIEngineState.frameBuffer_uiComponent = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBuffer_uiComponent.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newUIEngineState.frameBuffer_uiModal = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBuffer_uiModal.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         // ----- UpScaler
         newUIEngineState.upscaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.viewportMode, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.textureFilter_screen = UICommonUtils.viewport_determineUpscaleTextureFilter(newUIEngineState.viewportMode);
@@ -1881,15 +1881,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
         { // Draw GUI
-            uiEngineState.frameBuffer_ui.begin();
+            uiEngineState.frameBuffer_uiComponent.begin();
             render_glClear();
-            this.renderUI();
-            uiEngineState.frameBuffer_ui.end();
+            this.renderUIComponentLayer();
+            uiEngineState.frameBuffer_uiComponent.end();
 
-            uiEngineState.frameBuffer_ui_modal.begin();
+            uiEngineState.frameBuffer_uiModal.begin();
             render_glClear();
             this.renderUIModalLayer();
-            uiEngineState.frameBuffer_ui_modal.end();
+            uiEngineState.frameBuffer_uiModal.end();
         }
 
         { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
@@ -1898,7 +1898,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
                     uiEngineState.frameBuffer_app.getFlippedTextureRegion(),
-                    uiEngineState.frameBuffer_ui.getFlippedTextureRegion(), uiEngineState.frameBuffer_ui_modal.getFlippedTextureRegion(),
+                    uiEngineState.frameBuffer_uiComponent.getFlippedTextureRegion(), uiEngineState.frameBuffer_uiModal.getFlippedTextureRegion(),
                     uiEngineState.resolutionWidth, uiEngineState.resolutionHeight,
                     UICommonUtils.window_isModalOpen(uiEngineState)
             );
@@ -1972,7 +1972,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.end();
     }
 
-    private void renderUI() {
+    private void renderUIComponentLayer() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
@@ -3195,7 +3195,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Textures
         uiEngineState.frameBuffer_app.dispose();
-        uiEngineState.frameBuffer_ui.dispose();
+        uiEngineState.frameBuffer_uiComponent.dispose();
         uiEngineState.frameBuffer_screen.dispose();
 
     }
@@ -3241,7 +3241,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     public NestedFrameBuffer getFrameBufferUI() {
-        return uiEngineState.frameBuffer_ui;
+        return uiEngineState.frameBuffer_uiComponent;
     }
 
     private int TS(int size) {

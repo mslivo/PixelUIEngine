@@ -64,8 +64,8 @@ public final class UIEngineState {
     public SpriteRenderer spriteRenderer_ui;
     public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
-    public NestedFrameBuffer frameBuffer_ui;
-    public NestedFrameBuffer frameBuffer_ui_modal;
+    public NestedFrameBuffer frameBuffer_uiComponent;
+    public NestedFrameBuffer frameBuffer_uiModal;
 
     /* #################### Graphics: Screen #################### */
     public int upscaleFactor_screen;
