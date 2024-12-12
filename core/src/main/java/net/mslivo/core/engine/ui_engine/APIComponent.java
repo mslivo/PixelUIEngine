@@ -1317,13 +1317,12 @@ public final class APIComponent {
 
         public Text create(int x, int y, String text, TextAction textAction) {
             Text textC = new Text();
-            textC.fontColor = uiConfig.ui_font_defaultColor.cpy();
-            int width = 1;
+            int width = text != null ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiConfig.ui_font,text) / (float)api.TS()),1) : 1;;
             int height = 1;
-            width = Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiConfig.ui_font,text) / (float)api.TS()),1);
             setComponentCommonInitValuesInternal(textC, x, y, width, height);
-            textC.textAction = textAction != null ? textAction : defaultTextAction();
+            textC.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textC.text = Tools.Text.validString(text);
+            textC.textAction = textAction != null ? textAction : defaultTextAction();
             return textC;
         }
 
