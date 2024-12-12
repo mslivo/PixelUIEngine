@@ -1246,21 +1246,8 @@ final class UICommonUtils {
 
     }
 
-    static void text_setLines(UIEngineState uiEngineState, MediaManager mediaManager, Text text, String[] lines) {
-        text.lines = Tools.Text.validStringArray(lines);
-        UICommonUtils.text_updateSize(uiEngineState, mediaManager, text);
-    }
-
-    static void text_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Text text) {
-        int width = 0;
-        for (int i = 0; i < text.lines.length; i++) {
-            int widthT = mediaManager.fontTextWidth(uiEngineState.config.ui_font, text.lines[i]);
-            width = Math.max(width,widthT);
-        }
-        text.width = MathUtils.ceil(width / (float)uiEngineState.tileSize.TS);
-        if(text.textAction != null && text.textAction.icon() != null)
-            text.width++;
-        text.height = text.lines.length;
+    static void text_setText(UIEngineState uiEngineState, Text textC, String text) {
+        textC.text = Tools.Text.validString(text);
     }
 
     static void image_setImage(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC, CMediaSprite image) {

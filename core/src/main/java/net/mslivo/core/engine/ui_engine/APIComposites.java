@@ -131,7 +131,7 @@ public final class APIComposites {
             ArrayList<Object[][]> pages = new ArrayList<>();
             Grid grid = api.component.grid.create(x, y + 1, null, null, false, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
-            Text pageText = api.component.text.create(x, y, new String[]{});
+            Text pageText = api.component.text.create(x, y, "");
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x,y, width, height);
@@ -309,7 +309,7 @@ public final class APIComposites {
             api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, pageGrid.y);
             int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
             api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, pageGrid.y);
-            api.component.text.setLines(pageGrid.text, Tools.Text.toArray(pageString));
+            api.component.text.setText(pageGrid.text, pageString);
             return;
         }
     }
@@ -479,9 +479,9 @@ public final class APIComposites {
             Text[][] ret = new Text[2][column1Text.length];
 
             for (int iy = 0; iy < column1Text.length; iy++) {
-                Text text1 = api.component.text.create(x, y + ((column1Text.length - 1) - iy), Tools.Text.toArray(column1Text[iy]));
+                Text text1 = api.component.text.create(x, y + ((column1Text.length - 1) - iy), column1Text[iy]);
                 ret[0][iy] = text1;
-                Text text2 = api.component.text.create(x + col1Width, y + (column1Text.length - 1 - iy), new String[]{});
+                Text text2 = api.component.text.create(x + col1Width, y + (column1Text.length - 1 - iy), "");
                 ret[1][iy] = text2;
             }
             return ret;
@@ -490,13 +490,11 @@ public final class APIComposites {
         public ArrayList<Component> createScrollAbleText(int x, int y, int width, int height, String[] text) {
             ArrayList<Component> result = new ArrayList<>();
 
-            Text textField = api.component.text.create(x, y, null);
-            api.component.setSize(textField, width - 1, height);
             ScrollbarVertical scrollBarVertical = api.component.scrollbar.scrollbarVertical.create(x + width - 1, y, height);
             String[] textConverted;
             String[] textDisplayedLines = new String[height];
 
-            // Cut Text to Fit
+            // Scrollbar
             if (text != null) {
                 ArrayList<String> textList = new ArrayList<>();
                 int pixelWidth = ((width - 1) * api.TS());
@@ -529,26 +527,31 @@ public final class APIComposites {
                 textConverted = new String[]{};
             }
 
-            // Actions
-            api.component.text.setTextAction(textField, new TextAction() {
-                @Override
-                public void onMouseScroll(float scrolled) {
-                    float scrollAmount = (-1 / (float) Math.max(textConverted.length, 1)) * api.input.mouse.event.scrolledAmount();
-                    UICommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
-                }
-            });
+            // Text
+            Text[] texts = new Text[height];
+            for(int i=0;i<height;i++){
+                texts[i] = api.component.text.create(x, y+1, null);
+                api.component.setSize(texts[i], width - 1, height);
+                api.component.text.setTextAction(texts[i], new TextAction() {
+                    @Override
+                    public void onMouseScroll(float scrolled) {
+                        float scrollAmount = (-1 / (float) Math.max(textConverted.length, 1)) * api.input.mouse.event.scrolledAmount();
+                        UICommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
+                    }
+                });
+                result.add(texts[i]);
+            }
+
             api.component.scrollbar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolledPct) {
                     float scrolled = 1f - scrolledPct;
-
                     int scrolledTextIndex;
                     if (textConverted.length > height) {
                         scrolledTextIndex = MathUtils.round((textConverted.length - height) * scrolled);
                     } else {
                         scrolledTextIndex = 0;
                     }
-
                     for (int iy = 0; iy < height; iy++) {
                         int textIndex = scrolledTextIndex + iy;
                         if (textIndex < textConverted.length) {
@@ -557,6 +560,11 @@ public final class APIComposites {
                             textDisplayedLines[iy] = "";
                         }
                     }
+
+                    for(int i=0;i<texts.length;i++){
+                        api.component.text.setText(texts[i], textDisplayedLines[i]);
+                    }
+
                 }
             });
 
@@ -566,19 +574,18 @@ public final class APIComposites {
                 api.component.setDisabled(scrollBarVertical, true);
             }
 
-            api.component.text.setLines(textField, textDisplayedLines);
 
 
             result.add(scrollBarVertical);
-            result.add(textField);
+
             return result;
         }
 
         public Text createClickableURL(int x, int y, String url) {
-            return createClickableURL(x, y, url, Tools.Text.toArray(url), Color.BLACK, Tools.Text.toArray(url), Color.BLUE);
+            return createClickableURL(x, y, url, url, Color.BLACK, url, Color.BLUE);
         }
 
-        public Text createClickableURL(int x, int y, String url, String[] text, Color fontColor, String[] textHover, Color fontColorHover) {
+        public Text createClickableURL(int x, int y, String url, String text, Color fontColor, String textHover, Color fontColorHover) {
             return createClickableText(x, y, text, fontColor, button -> {
                 try {
                     Desktop.getDesktop().browse(new URI(url));
@@ -588,11 +595,11 @@ public final class APIComposites {
             }, textHover, fontColorHover);
         }
 
-        public Text createClickableText(int x, int y, String[] text, CMediaFont font, IntConsumer onClick) {
+        public Text createClickableText(int x, int y, String text, CMediaFont font, IntConsumer onClick) {
             return createClickableText(x, y, text, Color.BLACK, onClick, text, Color.BLUE);
         }
 
-        public Text createClickableText(int x, int y, String[] text, Color fontColor, IntConsumer onClick, String[] textHover, Color fontColorHover) {
+        public Text createClickableText(int x, int y, String text, Color fontColor, IntConsumer onClick, String textHover, Color fontColorHover) {
             Text hlText = api.component.text.create(x, y, text);
             api.component.text.setTextAction(hlText, new TextAction() {
                 @Override
@@ -612,10 +619,10 @@ public final class APIComposites {
                             hlText.height * api.TS()
                     )) {
                         api.component.text.setFontColor(hlText, fontColorHover);
-                        api.component.text.setLines(hlText, textHover);
+                        api.component.text.setText(hlText, textHover);
                     } else {
                         api.component.text.setFontColor(hlText, fontColor);
-                        api.component.text.setLines(hlText, text);
+                        api.component.text.setText(hlText, text);
                     }
                 }
             });
@@ -829,7 +836,7 @@ public final class APIComposites {
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
-                texts[i] = api.component.text.create(0, HEIGHT - 3 - i, Tools.Text.toArray(lines[i]));
+                texts[i] = api.component.text.create(0, HEIGHT - 3 - i, lines[i]);
                 componentsList.add(texts[i]);
             }
 
@@ -870,7 +877,7 @@ public final class APIComposites {
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
 
-            Text textC = api.component.text.create(0, 2, new String[]{text});
+            Text textC = api.component.text.create(0, 2, text);
             int xOffset = 0;
             Button yesC = api.component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
                 @Override
@@ -927,7 +934,7 @@ public final class APIComposites {
             Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption);
             ArrayList<Component> componentsList = new ArrayList<>();
 
-            Text textC = api.component.text.create(0, showOKButton ? 3 : 2, Tools.Text.toArray(text));
+            Text textC = api.component.text.create(0, showOKButton ? 3 : 2, text);
             api.component.move(textC, api.TS_HALF(), api.TS_HALF());
             componentsList.add(textC);
 

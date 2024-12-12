@@ -2599,15 +2599,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case Text text -> {
-                int textHeight = TS(text.height - 1);
-                if (text.lines != null && text.lines.length > 0) {
-                    for (int i = 0; i < text.lines.length; i++) {
-                        render_drawFont(text.lines[i], UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text) + textHeight - TS(i),
-                                text.fontColor, componentAlpha, componentGrayScale,
-                                1, 1, TS(text.width),
-                                text.textAction.icon(), text.textAction.iconIndex(), text.textAction.iconColor(),
-                                text.textAction.iconFlipX(), text.textAction.iconFlipY());
-                    }
+                if (text.text != null && !text.text.isEmpty()) {
+                    render_drawFont(text.text, UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text),
+                            text.fontColor, componentAlpha, componentGrayScale,
+                            1, 1, TS(text.width),
+                            text.textAction.icon(), text.textAction.iconIndex(), text.textAction.iconColor(),
+                            text.textAction.iconFlipX(), text.textAction.iconFlipY());
                 }
             }
             case ScrollbarVertical scrollBarVertical -> {

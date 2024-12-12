@@ -1311,27 +1311,20 @@ public final class APIComponent {
             };
         }
 
-        public Text create(int x, int y, String[] lines) {
-            return create(x, y, lines, null);
+        public Text create(int x, int y, String text) {
+            return create(x, y, text, null);
         }
 
-        public Text create(int x, int y, String[] lines, TextAction textAction) {
-            Text text = new Text();
-            text.fontColor = uiConfig.ui_font_defaultColor.cpy();
+        public Text create(int x, int y, String text, TextAction textAction) {
+            Text textC = new Text();
+            textC.fontColor = uiConfig.ui_font_defaultColor.cpy();
             int width = 1;
             int height = 1;
-            if (lines != null) {
-                for (int i = 0; i < lines.length; i++) {
-                    int widthT = mediaManager.fontTextWidth(uiConfig.ui_font, lines[i]);
-                    width = Math.max(width, widthT);
-                }
-                width = MathUtils.ceil(width / (float)api.TS());
-                height = lines.length;
-            }
-            setComponentCommonInitValuesInternal(text, x, y, width, height);
-            text.textAction = textAction != null ? textAction : defaultTextAction();
-            text.lines = Tools.Text.validStringArray(lines);
-            return text;
+            width = Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiConfig.ui_font,text) / (float)api.TS()),1);
+            setComponentCommonInitValuesInternal(textC, x, y, width, height);
+            textC.textAction = textAction != null ? textAction : defaultTextAction();
+            textC.text = Tools.Text.validString(text);
+            return textC;
         }
 
         public void setTextAction(Text text, TextAction textAction) {
@@ -1339,9 +1332,9 @@ public final class APIComponent {
             text.textAction = textAction;
         }
 
-        public void setLines(Text text, String... lines) {
-            if (text == null) return;
-            UICommonUtils.text_setLines(uiEngineState, mediaManager, text, lines);
+        public void setText(Text textC, String text) {
+            if (textC == null) return;
+            UICommonUtils.text_setText(uiEngineState,textC, text);
         }
 
         public void setFontColor(Text text, Color color) {
