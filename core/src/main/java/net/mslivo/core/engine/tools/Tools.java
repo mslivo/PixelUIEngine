@@ -802,7 +802,7 @@ public class Tools {
         }
 
         public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw >= Ax && By + Bh >= Ay && Ax + Aw >= Bx && Ay + Ah > By;
+            return Bx + Bw >= Ax && By + Bh >= Ay && Ax + Aw >= Bx && Ay + Ah >= By;
         }
 
         public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
