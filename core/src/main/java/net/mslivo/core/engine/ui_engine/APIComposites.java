@@ -132,6 +132,7 @@ public final class APIComposites {
             Grid grid = api.component.grid.create(x, y + 1, null, null, false, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
             Text pageText = api.component.text.create(x, y, "");
+            api.component.setSize(pageText,width,1);
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x,y, width, height);
