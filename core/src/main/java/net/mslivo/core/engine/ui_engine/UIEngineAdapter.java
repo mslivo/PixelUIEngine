@@ -12,23 +12,30 @@ public interface UIEngineAdapter {
     void update();
     void render(OrthographicCamera camera, AppViewport appViewPort);
 
-    default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,
-                                 int resolutionWidth, int resolutionHeight, boolean appGrayScale) {
+    default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_ui,TextureRegion texture_ui_modal,
+                                 int resolutionWidth, int resolutionHeight, boolean grayScale) {
         spriteRenderer.setProjectionMatrix(camera.combined);
         spriteRenderer.setBlendFunction(GL32.GL_ONE,GL32.GL_ONE_MINUS_SRC_ALPHA);
         spriteRenderer.begin();
-        // Draw App Framebuffer
-        if(appGrayScale) {
+
+        if(grayScale){
             spriteRenderer.setColor(0.4f,0.4f,0.4f,1);
             spriteRenderer.setTweak(0.5f,0f,0f,0.0f);
-        }
-        spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
-        if(appGrayScale) spriteRenderer.setTweakAndColorReset();
+            spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer.draw(texture_ui, 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer.setTweakAndColorReset();
 
-        // Draw UI Framebuffer
-        spriteRenderer.draw(texture_ui, 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer.draw(texture_ui_modal, 0, 0, resolutionWidth, resolutionHeight);
+        }else{
+            spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer.draw(texture_ui, 0, 0, resolutionWidth, resolutionHeight);
+            spriteRenderer.draw(texture_ui_modal, 0, 0, resolutionWidth, resolutionHeight);
+        }
+
         spriteRenderer.end();
         spriteRenderer.setAllReset();
     }
+
     void shutdown();
+
 }

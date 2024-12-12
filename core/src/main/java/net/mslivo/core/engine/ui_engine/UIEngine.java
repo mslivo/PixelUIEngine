@@ -141,6 +141,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.camera_ui.update();
         newUIEngineState.frameBuffer_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
         newUIEngineState.frameBuffer_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newUIEngineState.frameBuffer_ui_modal = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBuffer_ui_modal.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         // ----- UpScaler
         newUIEngineState.upscaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.viewportMode, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.textureFilter_screen = UICommonUtils.viewport_determineUpscaleTextureFilter(newUIEngineState.viewportMode);
@@ -1883,6 +1885,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_glClear();
             this.renderUI();
             uiEngineState.frameBuffer_ui.end();
+
+            uiEngineState.frameBuffer_ui_modal.begin();
+            render_glClear();
+            this.renderUIModalLayer();
+            uiEngineState.frameBuffer_ui_modal.end();
         }
 
         { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
@@ -1890,7 +1897,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_glClear();
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
-                    uiEngineState.frameBuffer_app.getFlippedTextureRegion(), uiEngineState.frameBuffer_ui.getFlippedTextureRegion(),
+                    uiEngineState.frameBuffer_app.getFlippedTextureRegion(),
+                    uiEngineState.frameBuffer_ui.getFlippedTextureRegion(), uiEngineState.frameBuffer_ui_modal.getFlippedTextureRegion(),
                     uiEngineState.resolutionWidth, uiEngineState.resolutionHeight,
                     UICommonUtils.window_isModalOpen(uiEngineState)
             );
@@ -1928,6 +1936,41 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
     }
 
+    private void renderUIModalLayer() {
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+
+        spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+
+        spriteRenderer.begin();
+
+        // Modal Windows
+        for (int i = 0; i < uiEngineState.windows.size(); i++) {
+            Window window = uiEngineState.windows.get(i);
+            render_drawWindow(window, true);
+        }
+
+        // Notifications
+        render_drawNotifications();
+
+        // Context Menu
+        render_drawContextMenu();
+
+        // Tooltip
+        render_drawTooltip();
+
+        // OnScreenTextInput
+        render_mouseTextInput();
+
+        // Cursor Drag & Drop
+        render_drawCursorDragAndDrop();
+
+        // Cursor
+        render_drawCursor();
+
+        spriteRenderer.end();
+    }
 
     private void renderUI() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
@@ -1953,25 +1996,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // Draw Windows
         for (int i = 0; i < uiEngineState.windows.size(); i++) {
             Window window = uiEngineState.windows.get(i);
-            render_drawWindow(window);
+            render_drawWindow(window, false);
         }
-
-        // Notifications
-        render_drawNotifications();
-
-        // Context Menu
-        render_drawContextMenu();
-
-        // Tooltip
-        render_drawTooltip();
-
-        // OnScreenTextInput
-        render_mouseTextInput();
-
-        // Cursor
-        render_drawCursorDragAndDrop();
-
-        render_drawCursor();
 
         spriteRenderer.end();
 
@@ -1979,15 +2005,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
         primitiveRenderer.setTweakAndColorReset();
     }
 
-
     private void render_mouseTextInput() {
         if (uiEngineState.openMouseTextInput == null) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-
-        MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
-        Color color = uiEngineState.openMouseTextInput.color;
-        Color color2 = uiEngineState.openMouseTextInput.color2;
-        Color colorFont = uiEngineState.openMouseTextInput.fontColor;
+        final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
+        final Color color1 = uiEngineState.openMouseTextInput.color;
+        final Color color2 = uiEngineState.openMouseTextInput.color2;
+        final Color colorFont = uiEngineState.openMouseTextInput.fontColor;
+        final float textInputAlpha = color1.a;
         final int CHARACTERS = 4;
         char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
@@ -1995,35 +2020,35 @@ public final class UIEngine<T extends UIEngineAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), color, colorFont, mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont,textInputAlpha, mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), color, colorFont, mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont,textInputAlpha, mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
-        render_mouseTextInputCharacter(chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, color, colorFont, mouseTextInput.upperCase, uiEngineState.mTextInputMouse1Pressed);
+        render_mouseTextInputCharacter(chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, color1, colorFont,textInputAlpha, mouseTextInput.upperCase, uiEngineState.mTextInputMouse1Pressed);
 
         // Selection
-        spriteRenderer.setColor(color2, color.a);
+        render_setColor(spriteRenderer, color2, textInputAlpha, false);
         spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
         spriteRenderer.setTweakAndColorReset();
     }
 
-    private void render_mouseTextInputCharacter(char c, int x, int y, Color color, Color colorFont, boolean upperCase, boolean pressed) {
+    private void render_mouseTextInputCharacter(char c, int x, int y, Color color1, Color colorFont, float textInputAlpha, boolean upperCase, boolean pressed) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final int pressedIndex = pressed ? 1 : 0;
 
-        spriteRenderer.setColor(color);
-        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_BUTTON, x, y, pressedIndex);
+        render_setColor(spriteRenderer, color1, textInputAlpha, false);
+        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_BUTTON, pressedIndex, x, y);
 
         switch (c) {
             case '\n', '\t', '\b' -> {
-                spriteRenderer.setColor(colorFont);
+                render_setColor(spriteRenderer, colorFont, colorFont.a*color1.a, false);
                 CMediaArray specialCharacterSprite = switch (c) {
                     case '\n' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
                     case '\t' ->
@@ -2031,11 +2056,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     case '\b' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
                     default -> throw new IllegalStateException("Unexpected value: " + c);
                 };
-                spriteRenderer.drawCMediaArray(specialCharacterSprite, x, y, pressedIndex);
+                spriteRenderer.drawCMediaArray(specialCharacterSprite, pressedIndex, x, y);
             }
             default -> {
                 int offset = pressed ? 1 : 0;
-                render_drawFont(String.valueOf(c), colorFont, 1.0f, x + 2 + offset, y + 2 - offset);
+                render_drawFont(String.valueOf(c), x + 2 + offset, y + 2 - offset, colorFont, textInputAlpha, false);
             }
         }
 
@@ -2131,12 +2156,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return (component.addedToWindow != null ? (component.color.a * component.addedToWindow.color.a) : component.color.a);
     }
 
+    private boolean componentGrayScale(Component component) {
+        return component.disabled;
+    }
+
     private void render_drawComponentTopLayer(Component component) {
         if (render_isComponentNotRendered(component)) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float componentAlpha = componentAlpha(component);
-        final boolean componentGrayScale = component.disabled || (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow != component.addedToWindow);
-        ;
+        final boolean componentGrayScale = componentGrayScale(component);
 
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
 
@@ -2157,14 +2185,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             // Cell
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
-                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), index);
+                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
                             spriteRenderer.loadState();
 
                             // Cell - Underline
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), index);
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, comboBoxItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), 2, 1, TS(comboBox.width),
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(comboBox.width),
                                     comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
                                     comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                         }
@@ -2181,14 +2209,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawContextMenu() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final boolean contextMenuGrayScale = UICommonUtils.window_isModalOpen(uiEngineState);
 
         if (uiEngineState.openContextMenu != null) {
 
-            Contextmenu contextMenu = uiEngineState.openContextMenu;
-            int width = uiEngineState.displayedContextMenuWidth;
-            int height = contextMenu.items.size();
-
+            final Contextmenu contextMenu = uiEngineState.openContextMenu;
+            final int width = uiEngineState.displayedContextMenuWidth;
+            final int height = contextMenu.items.size();
+            final float contextMenuAlpha = contextMenu.color.a;
 
             /* Menu */
             for (int iy = 0; iy < height; iy++) {
@@ -2200,15 +2227,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                     // Cell
                     spriteRenderer.saveState();
-                    render_setColor(spriteRenderer, contextMenuItem.contextMenuItemAction.cellColor(), contextMenu.color.a, contextMenuGrayScale);
-                    spriteRenderer.drawCMediaArray(contextMenuCellGraphic, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS(), index);
+                    render_setColor(spriteRenderer, contextMenuItem.contextMenuItemAction.cellColor(), contextMenuAlpha, false);
+                    spriteRenderer.drawCMediaArray(contextMenuCellGraphic, index, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS());
                     spriteRenderer.loadState();
 
                     // Cell Underline
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS(), index);
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, index, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS());
 
                     // Cell Content
-                    render_drawFont(contextMenuItem.text, contextMenuItem.fontColor, contextMenu.color.a, contextMenu.x, contextMenu.y - TS(iy) - TS(), 2, 1, TS(width),
+                    render_drawFont(contextMenuItem.text, contextMenu.x, contextMenu.y - TS(iy) - TS(), contextMenuItem.fontColor, contextMenuAlpha, false, 2, 1, TS(width),
                             contextMenuItem.contextMenuItemAction.icon(), contextMenuItem.contextMenuItemAction.iconIndex(), contextMenuItem.contextMenuItemAction.iconColor(),
                             contextMenuItem.contextMenuItemAction.iconFlipX(), contextMenuItem.contextMenuItemAction.iconFlipY());
 
@@ -2223,12 +2250,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawTooltip() {
-        Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
+        final Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
         if (tooltip == null) return;
         if (tooltip.segments.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
-        ArrayList<TooltipSegment> segments = tooltip.segments;
+        final float lineAlpha = tooltip.color_line.a*uiEngineState.tooltip_fadePct;
+        final ArrayList<TooltipSegment> segments = tooltip.segments;
 
         // Determine Dimensions
         int tooltip_width = tooltip.minWidth;
@@ -2241,9 +2269,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (tooltip_width == 0 || tooltip_height == 0) return;
         // Determine Position
 
-        int lineLengthAbs = TS(tooltip.lineLength);
-
-        DIRECTION direction = switch (tooltip.direction) {
+        final int lineLengthAbs = TS(tooltip.lineLength);
+        final DIRECTION direction = switch (tooltip.direction) {
             case RIGHT ->
                     uiEngineState.mouse_ui.x + lineLengthAbs > uiEngineState.resolutionWidth - TS(tooltip_width) ? DIRECTION.LEFT : DIRECTION.RIGHT;
             case LEFT ->
@@ -2278,7 +2305,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             TooltipSegment segment = segments.get(is);
             final float segmentAlpha = segment.cellColor.a * uiEngineState.tooltip_fadePct;
             final float borderAlpha = tooltip.color_border.a * uiEngineState.tooltip_fadePct;
-            // Background
+            final float contentAlpha = segment.contentColor.a * uiEngineState.tooltip_fadePct;
+
+            // Segment Background
             if (!segment.merge) {
                 iy -= segment.height;
                 int width_reference = tooltip_width;
@@ -2299,14 +2328,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // Background
                     if (!segment.clear) {
                         for (int tx = 0; tx < tooltip_width; tx++) {
-                            spriteRenderer.setColor(segment.cellColor, segmentAlpha);
+                            render_setColor(spriteRenderer, segment.cellColor, segmentAlpha, false);
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_CELL, render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         }
                     }
 
                     // Border
                     for (int tx = 0; tx < tooltip_width; tx++) {
-                        spriteRenderer.setColor(tooltip.color_border, borderAlpha);
+                        render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
                         // tooltip border
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         // segmentborder
@@ -2319,7 +2348,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
             // Content
-            final float contentAlpha = segment.contentColor.a * uiEngineState.tooltip_fadePct;
 
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
@@ -2331,8 +2359,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
                         case RIGHT -> TS(tooltip_width) - text_width - 3;
                     };
-                    spriteRenderer.setColorReset();
-                    render_drawFont(textSegment.text, textSegment.contentColor, contentAlpha, text_x, text_y, 1, 1);
+                    render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 1);
                 }
                 case TooltipImageSegment imageSegment -> {
                     int image_width = mediaManager.spriteWidth(imageSegment.image);
@@ -2343,7 +2370,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
                         case RIGHT -> TS(tooltip_width) - image_width - 2;
                     };
-                    spriteRenderer.setColor(imageSegment.contentColor, contentAlpha);
+                    render_setColor(spriteRenderer, imageSegment.contentColor, contentAlpha, false);
                     int width = mediaManager.spriteWidth(imageSegment.image);
                     int height = mediaManager.spriteHeight(imageSegment.image);
                     spriteRenderer.drawCMediaSprite(imageSegment.image, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), image_x, image_y,
@@ -2355,8 +2382,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int height = TS(canvasSegment.height);
                     spriteRenderer.end();
                     primitiveRenderer.begin();
-                    primitiveRenderer.setColor(canvasSegment.contentColor, segmentAlpha);
-
+                    render_setColor(primitiveRenderer,canvasSegment.contentColor, segmentAlpha, false);
                     int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
                         case LEFT -> 0;
                         case CENTER ->
@@ -2387,7 +2413,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Draw line
-        spriteRenderer.setColor(tooltip.color_line);
+        render_setColor(spriteRenderer, tooltip.color_line, lineAlpha, false);
         for (int i = 0; i < tooltip.lineLength; i++) {
             int xOffset = switch (direction) {
                 case LEFT -> -TS(i + 1);
@@ -2422,25 +2448,26 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private void render_drawNotifications() {
         if (uiEngineState.notifications.size() == 0) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
-        final boolean notificationGrayScale = UICommonUtils.window_isModalOpen(uiEngineState);
+        final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
 
         int y = 0;
         int yOffsetSlideFade = 0;
         for (int i = 0; i < uiEngineState.notifications.size(); i++) {
-            Notification notification = uiEngineState.notifications.get(i);
+            final Notification notification = uiEngineState.notifications.get(i);
+            final float notificationAlpha = notification.color.a;
+
             if (notification.state == STATE_NOTIFICATION.FADEOUT) {
                 float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification_fadeoutTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             spriteRenderer.saveState();
-            render_setColor(spriteRenderer, notification.color, notification.color.a, notificationGrayScale);
+            render_setColor(spriteRenderer, notification.color, notificationAlpha, false);
             for (int ix = 0; ix < width; ix++) {
                 spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_NOTIFICATION_BAR, TS(ix), uiEngineState.resolutionHeight - TS() - TS(y) + yOffsetSlideFade);
             }
             spriteRenderer.loadState();
             int xOffset = (TS(width) / 2) - (render_textWidth(notification.text) / 2) - notification.scroll;
-            render_drawFont(notification.text, notification.fontColor, notification.color.a, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade);
+            render_drawFont(notification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, notification.fontColor, notificationAlpha, false);
             y = y + 1;
 
         }
@@ -2448,12 +2475,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.setTweakAndColorReset();
     }
 
-    private void render_drawWindow(Window window) {
+    private void render_drawWindow(Window window, boolean modals) {
         if (!window.visible) return;
-        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final boolean windowGrayScale = (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow != window);
+        if (modals) {
+            if (uiEngineState.modalWindow != window)
+                return;
+        } else {
+            if (uiEngineState.modalWindow == window)
+                return;
+        }
 
-        render_setColor(spriteRenderer, window.color, window.color.a, windowGrayScale);
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final float windowAlpha = window.color.a;
+
+        render_setColor(spriteRenderer, window.color, windowAlpha, false);
 
         for (int ix = 0; ix < window.width; ix++) {
             if (!window.folded) {
@@ -2467,7 +2502,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
         if (window.hasTitleBar) {
-            render_drawFont(window.title, window.fontColor, window.color.a, window.x, window.y + TS(window.height) - TS(), 1, 1, TS(window.width - 1),
+            render_drawFont(window.title, window.x, window.y + TS(window.height) - TS(),
+                    window.fontColor, windowAlpha, false, 1, 1, TS(window.width - 1),
                     window.windowAction.icon(), window.windowAction.iconIndex(), window.windowAction.iconColor(),
                     window.windowAction.iconFlipX(), window.windowAction.iconFlipY());
         }
@@ -2494,10 +2530,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.setTweakAndColorReset();
     }
 
-    private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, boolean grayScale) {
-        render_setColor(primitiveRenderer, color, color.a, grayScale);
-    }
-
     private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
         if (grayScale) {
             float avg = ((color.r + color.g + color.b) / 3f) * 0.8f;
@@ -2520,13 +2552,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
     }
 
+
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
-        final boolean componentGrayScale = component.disabled || (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow != component.addedToWindow);
-
+        final boolean componentGrayScale = component.disabled;
 
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
 
@@ -2541,13 +2573,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.text, textButton.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset, 1, 2, TS(button.width),
+                        render_drawFont(textButton.text, UICommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset,
+                                textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(button.width),
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
                                 textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
                     }
                 } else if (button instanceof ImageButton imageButton) {
                     spriteRenderer.saveState();
-                    spriteRenderer.setColor(imageButton.color2, componentAlpha);
+                    render_setColor(spriteRenderer, imageButton.color2, componentAlpha, componentGrayScale);
                     if (imageButton.image != null)
                         spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), UICommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset);
                     spriteRenderer.loadState();
@@ -2569,10 +2602,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int textHeight = TS(text.height - 1);
                 if (text.lines != null && text.lines.length > 0) {
                     for (int i = 0; i < text.lines.length; i++) {
-                        render_drawFont(text.lines[i], text.fontColor,
-                                componentAlpha,
-                                UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text) + textHeight - TS(i),
-                                1, 1,TS(text.width),
+                        render_drawFont(text.lines[i], UICommonUtils.component_getAbsoluteX(text), UICommonUtils.component_getAbsoluteY(text) + textHeight - TS(i),
+                                text.fontColor, componentAlpha, componentGrayScale,
+                                1, 1, TS(text.width),
                                 text.textAction.icon(), text.textAction.iconIndex(), text.textAction.iconColor(),
                                 text.textAction.iconFlipX(), text.textAction.iconFlipY());
                     }
@@ -2654,7 +2686,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // Cell Content
                     if (item != null) {
                         String text = list.listAction.text(item);
-                        render_drawFont(text, list.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(list), UICommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY), 1, 2, TS(list.width),
+                        render_drawFont(text, UICommonUtils.component_getAbsoluteX(list), UICommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY),
+                                list.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(list.width),
                                 list.listAction.icon(item), list.listAction.iconIndex(item), list.listAction.iconColor(item),
                                 list.listAction.iconFlipX(), list.listAction.iconFlipY());
                     }
@@ -2688,7 +2721,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.loadState();
                 // Cell Content
                 if (comboBox.selectedItem != null) {
-                    render_drawFont(comboBox.selectedItem.text, comboBox.selectedItem.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox), 2, 1, TS(comboBox.width - 1),
+                    render_drawFont(comboBox.selectedItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox),
+                            comboBox.selectedItem.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(comboBox.width - 1),
                             comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem),
                             comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                 }
@@ -2707,10 +2741,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Canvas canvas -> {
                 int width = TS(canvas.width);
                 int height = TS(canvas.height);
-
                 spriteRenderer.end();
                 primitiveRenderer.begin(GL32.GL_POINTS);
-                render_setColor(primitiveRenderer, Color.GRAY, componentGrayScale);
+                render_setColor(primitiveRenderer,Color.GRAY, componentAlpha, componentGrayScale);
                 for (int icx = 0; icx < width; icx++) {
                     for (int icy = 0; icy < height; icy++) {
                         float a = canvas.colorMap.a[icx][icy];
@@ -2718,7 +2751,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         float r = canvas.colorMap.r[icx][icy];
                         float g = canvas.colorMap.g[icx][icy];
                         float b = canvas.colorMap.b[icx][icy];
-                        primitiveRenderer.setColor(Color.GRAY, a * componentAlpha);
+
                         primitiveRenderer.setVertexColor(r, g, b, a);
                         primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx, UICommonUtils.component_getAbsoluteY(canvas) + icy);
                     }
@@ -2738,7 +2771,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
                     if (UICommonUtils.canvas_isImageInsideCanvas(uiEngineState, canvas, canvasImage.x, canvasImage.y)) {
                         spriteRenderer.saveState();
-                        render_setColor(spriteRenderer, canvasImage.color, (canvasImage.color.a * componentAlpha), componentGrayScale);
+                        render_setColor(spriteRenderer, canvasImage.color, componentAlpha, componentGrayScale);
                         int imageWidthOffset = mediaManager.spriteWidth(canvasImage.image) / 2;
                         int imageHeightOffset = mediaManager.spriteHeight(canvasImage.image) / 2;
                         spriteRenderer.drawCMediaSprite(canvasImage.image,
@@ -2765,7 +2798,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
 
                 if (!textField.contentValid) {
-                    spriteRenderer.setColor(Color.GRAY, componentAlpha);
+                    render_setColor(spriteRenderer, Color.GRAY, componentAlpha, false);
                     for (int ix = 0; ix < textField.width; ix++) {
                         int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CELL_VALIDATION, index, UICommonUtils.component_getAbsoluteX(textField) + TS(ix), UICommonUtils.component_getAbsoluteY(textField));
@@ -2774,7 +2807,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.loadState();
 
                 if (textField.content != null) {
-                    render_drawFont(textField.content.substring(textField.offset), textField.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(textField), UICommonUtils.component_getAbsoluteY(textField), 1, 2, TS(textField.width) - 4);
+                    render_drawFont(textField.content.substring(textField.offset), UICommonUtils.component_getAbsoluteX(textField), UICommonUtils.component_getAbsoluteY(textField),
+                            textField.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(textField.width) - 4);
                     if (UICommonUtils.textField_isFocused(uiEngineState, textField)) {
                         int xOffset = render_textWidth(textField.content.substring(textField.offset, textField.markerPosition)) + 2;
                         if (xOffset < TS(textField.width)) {
@@ -2844,7 +2878,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         // Icon
                         if (item != null) {
                             render_drawIcon(grid.gridAction.icon(item), UICommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), UICommonUtils.component_getAbsoluteY(grid) + (iy * tileSize),
-                                    grid.gridAction.iconIndex(item), grid.gridAction.iconColor(item), grid.bigMode, componentAlpha,
+                                    grid.gridAction.iconColor(item), componentAlpha, componentGrayScale, grid.gridAction.iconIndex(item), grid.bigMode,
                                     grid.gridAction.iconFlipX(), grid.gridAction.iconFlipY());
                         }
                     }
@@ -2866,7 +2900,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         spriteRenderer.drawCMediaImage(tabGraphic, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar));
                         int selected_offset = selected ? 0 : 1;
                         render_drawIcon(tab.tabAction.icon(), UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset) + selected_offset, UICommonUtils.component_getAbsoluteY(tabBar) - selected_offset,
-                                tab.tabAction.iconIndex(), tab.tabAction.iconColor(), true, componentAlpha,
+                                tab.tabAction.iconColor(), componentAlpha, componentGrayScale,
+                                tab.tabAction.iconIndex(), true,
                                 tab.tabAction.iconFlipX(), tab.tabAction.iconFlipY());
                     } else {
                         CMediaArray tabGraphic = selected ? UIEngineBaseMedia_8x8.UI_TAB_SELECTED : UIEngineBaseMedia_8x8.UI_TAB;
@@ -2876,7 +2911,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
 
                     if (!tabBar.bigIconMode) {
-                        render_drawFont(tab.title, tab.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar), 2, 1, TS(tabWidth),
+                        render_drawFont(tab.title, UICommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), UICommonUtils.component_getAbsoluteY(tabBar),
+                                tab.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(tabWidth),
                                 tab.tabAction.icon(), tab.tabAction.iconIndex(), tab.tabAction.iconColor(),
                                 tab.tabAction.iconFlipX(), tab.tabAction.iconFlipY());
                     }
@@ -3029,7 +3065,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (progressBar.progressText) {
                     String percentTxt = progressBar.progressText2Decimal ? UICommonUtils.progressBar_getProgressText2Decimal(progressBar.progress) : UICommonUtils.progressBar_getProgressText(progressBar.progress);
                     int xOffset = (TS(progressBar.width) / 2) - (render_textWidth(percentTxt) / 2);
-                    render_drawFont(percentTxt, progressBar.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), 0, 1);
+                    render_drawFont(percentTxt, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), progressBar.fontColor, componentAlpha, componentGrayScale, 0, 1);
                 }
             }
             case Checkbox checkBox -> {
@@ -3044,7 +3080,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 spriteRenderer.drawCMediaArray(checkBoxGraphic, (checkBox.checked ? 1 : 0), UICommonUtils.component_getAbsoluteX(checkBox), UICommonUtils.component_getAbsoluteY(checkBox));
 
-                render_drawFont(checkBox.text, checkBox.fontColor, componentAlpha, UICommonUtils.component_getAbsoluteX(checkBox) + TS(), UICommonUtils.component_getAbsoluteY(checkBox), 1, 1);
+                render_drawFont(checkBox.text, UICommonUtils.component_getAbsoluteX(checkBox) + TS(), UICommonUtils.component_getAbsoluteY(checkBox), checkBox.fontColor, componentAlpha, componentGrayScale, 1, 1);
             }
             case AppViewport appViewPort -> {
                 spriteRenderer.draw(appViewPort.textureRegion, UICommonUtils.component_getAbsoluteX(appViewPort), UICommonUtils.component_getAbsoluteY(appViewPort));
@@ -3060,25 +3096,24 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.draggedGrid != null) {
-            Grid dragGrid = uiEngineState.draggedGrid;
-            int dragOffsetX = uiEngineState.draggedGridOffset.x;
-            int dragOffsetY = uiEngineState.draggedGridOffset.y;
-            Object dragItem = uiEngineState.draggedGridItem;
-            float dragAlpha = componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
+            final Grid dragGrid = uiEngineState.draggedGrid;
+            final int dragOffsetX = uiEngineState.draggedGridOffset.x;
+            final int dragOffsetY = uiEngineState.draggedGridOffset.y;
+            final Object dragItem = uiEngineState.draggedGridItem;
+            final float dragAlpha = componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
             render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
-                    dragGrid.gridAction.iconIndex(dragItem), dragGrid.gridAction.iconColor(dragItem), dragGrid.bigMode, dragAlpha,
+                    dragGrid.gridAction.iconColor(dragItem), dragAlpha, false,
+                    dragGrid.gridAction.iconIndex(dragItem), dragGrid.bigMode,
                     dragGrid.gridAction.iconFlipX(), dragGrid.gridAction.iconFlipY());
         } else if (uiEngineState.draggedList != null) {
-            List dragList = uiEngineState.draggedList;
-            int dragOffsetX = uiEngineState.draggedListOffset.x;
-            int dragOffsetY = uiEngineState.draggedListOffset.y;
-            Object dragItem = uiEngineState.draggedListItem;
-            float dragAlpha = componentAlpha(dragList) * uiEngineState.config.component_listDragAlpha;
-            // List
-            spriteRenderer.setColor(Color.GRAY, dragAlpha);
-            // Text
+            final List dragList = uiEngineState.draggedList;
+            final int dragOffsetX = uiEngineState.draggedListOffset.x;
+            final int dragOffsetY = uiEngineState.draggedListOffset.y;
+            final Object dragItem = uiEngineState.draggedListItem;
+            final float dragAlpha = componentAlpha(dragList) * uiEngineState.config.component_listDragAlpha;
             String text = dragList.listAction.text(dragItem);
-            render_drawFont(text, dragList.fontColor, dragAlpha, uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY, 2, 1,
+            render_drawFont(text, uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
+                    dragList.fontColor, dragAlpha, false, 2, 1,
                     TS(dragList.width), dragList.listAction.icon(dragItem), dragList.listAction.iconIndex(dragItem), dragList.listAction.iconColor(dragItem),
                     dragList.listAction.iconFlipX(), dragList.listAction.iconFlipY());
 
@@ -3092,31 +3127,32 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return mediaManager.fontTextWidth(uiEngineState.config.ui_font, text);
     }
 
-    private void render_drawFont(String text, Color color, float alpha, int x, int y) {
-        render_drawFont(text, color, alpha, x, y, 0, 0, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
+    private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale) {
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, 0, 0, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
     }
 
-    private void render_drawFont(String text, Color color, float alpha, int x, int y, int textXOffset, int textYOffset) {
-        render_drawFont(text, color, alpha, x, y, textXOffset, textYOffset, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
+    private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset) {
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
     }
 
-    private void render_drawFont(String text, Color color, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth) {
-        render_drawFont(text, color, alpha, x, y, textXOffset, textYOffset, maxWidth, null, 0, null, false, false);
+    private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth) {
+        render_drawFont(text, x, y, alpha, iconGrayScale, color, textXOffset, textYOffset, maxWidth);
+    }
+
+    private void render_drawFont(String text, int x, int y, float alpha, boolean iconGrayScale, Color color, int textXOffset, int textYOffset, int maxWidth) {
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null, 0, null, false, false);
     }
 
 
-    private void render_drawFont(String text, Color color, float alpha, int x, int y, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY) {
+    private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final BitmapFont font = mediaManager.font(uiEngineState.config.ui_font);
         final boolean withIcon = icon != null;
         if (withIcon) {
-            render_drawIcon(icon, x, y, iconIndex, iconColor, false, alpha, iconFlipX, iconFlipY);
+            render_drawIcon(icon, x, y, iconColor, alpha, iconGrayScale, iconIndex, false, iconFlipX, iconFlipY);
         }
 
-
-        spriteRenderer.saveState();
-        spriteRenderer.setColor(Color.GRAY, alpha);
-        font.setColor(color.r, color.g, color.b, 1f);
+        font.setColor(color.r, color.g, color.b, alpha);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
         } else {
@@ -3124,14 +3160,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
-        spriteRenderer.loadState();
     }
 
-    private void render_drawIcon(CMediaSprite icon, int x, int y, int arrayIndex, Color color, boolean bigMode, float alpha, boolean flipX, boolean flipY) {
+    private void render_drawIcon(CMediaSprite icon, int x, int y, Color color, float iconAlpha, boolean iconGrayscale, int arrayIndex, boolean bigMode, boolean flipX, boolean flipY) {
         if (icon == null) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         spriteRenderer.saveState();
-        spriteRenderer.setColor(color.r, color.g, color.b, color.a * alpha);
+        render_setColor(spriteRenderer, color, iconAlpha, iconGrayscale);
         int scale = bigMode ? TS2() : TS();
 
         int width = mediaManager.spriteWidth(icon);

@@ -254,8 +254,6 @@ public final class MediaManager {
 
         // split into Image and Sound data, skip duplicates, check format and index
         CMedia loadMedia;
-        int imagesMax = 0, arraysMax = 0, animationsMax = 0, fontsMax = 0, soundMax = 0, musicMax = 0;
-        int imagesIdx = 0, arraysIdx = 0, animationsIdx = 0, fontsIdx = 0, soundIdx = 0, musicIdx = 0;
         while ((loadMedia = loadMediaList.poll()) != null) {
             if (!Tools.File.findResource(loadMedia.file).exists()) {
                 throw new RuntimeException(String.format(ERROR_FILE_NOT_FOUND, loadMedia.file));
@@ -267,14 +265,6 @@ public final class MediaManager {
                 case CMediaFont cMediaFont -> fontCMediaLoadStack.add(cMediaFont);
             }
 
-            switch (loadMedia) {
-                case CMediaImage _ -> imagesMax++;
-                case CMediaArray _ -> arraysMax++;
-                case CMediaAnimation _ -> animationsMax++;
-                case CMediaFont _ -> fontsMax++;
-                case CMediaSoundEffect _ -> soundMax++;
-                case CMediaMusic _ -> musicMax++;
-            }
             stepsMax++;
         }
         medias_images = new HashMap<>();
