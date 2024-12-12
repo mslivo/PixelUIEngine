@@ -298,7 +298,7 @@ public final class APIComponent {
             }
 
             public TextButton create(int x, int y, int width, int height, String text) {
-                return create(x, y, width, height, text, null,  BUTTON_MODE.DEFAULT, false);
+                return create(x, y, width, height, text, null, BUTTON_MODE.DEFAULT, false);
             }
 
             public TextButton create(int x, int y, int width, int height, String text, ButtonAction buttonAction) {
@@ -465,7 +465,7 @@ public final class APIComponent {
         APICheckbox() {
         }
 
-        private CheckboxAction defaultCheckboxAction(){
+        private CheckboxAction defaultCheckboxAction() {
             return new CheckboxAction() {
                 @Override
                 public void onCheck(boolean checked) {
@@ -834,7 +834,7 @@ public final class APIComponent {
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect) {
-            return create(x, y, items, gridAction,  multiSelect, false, false, false, false);
+            return create(x, y, items, gridAction, multiSelect, false, false, false, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled) {
@@ -842,11 +842,11 @@ public final class APIComponent {
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
-            return create(x, y, items, gridAction,  multiSelect, dragEnabled, dragOutEnabled, false, false);
+            return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, false, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
-            return create(x, y, items, gridAction,  multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
+            return create(x, y, items, gridAction, multiSelect, dragEnabled, dragOutEnabled, dragInEnabled, false);
         }
 
         public Grid create(int x, int y, Object[][] items, GridAction gridAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled, boolean doubleSized) {
@@ -1044,7 +1044,7 @@ public final class APIComponent {
 
         public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
             Canvas canvas = new Canvas();
-            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY,Color.GRAY);
+            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY, Color.GRAY);
             canvas.colorMap = new ColorMap();
             int widthPx = api.TS(width);
             int heightPx = api.TS(height);
@@ -1311,15 +1311,14 @@ public final class APIComponent {
             };
         }
 
-        public Text create(int x, int y, String text) {
-            return create(x, y, text, null);
+        public Text create(int x, int y, int width, String text) {
+            return create(x, y, width, text, null);
         }
 
-        public Text create(int x, int y, String text, TextAction textAction) {
+        public Text create(int x, int y, int width, String text, TextAction textAction) {
             Text textC = new Text();
-            int width = text != null ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiConfig.ui_font,text) / (float)api.TS()),1) : 1;;
-            int height = 1;
-            setComponentCommonInitValuesInternal(textC, x, y, width, height);
+            width = text != null  && width <= 0 ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiConfig.ui_font,text) / (float)api.TS()),1) : width; // autowidth
+            setComponentCommonInitValuesInternal(textC, x, y, width, 1);
             textC.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textC.text = Tools.Text.validString(text);
             textC.textAction = textAction != null ? textAction : defaultTextAction();
@@ -1333,7 +1332,7 @@ public final class APIComponent {
 
         public void setText(Text textC, String text) {
             if (textC == null) return;
-            UICommonUtils.text_setText(uiEngineState,textC, text);
+            UICommonUtils.text_setText(uiEngineState, textC, text);
         }
 
         public void setFontColor(Text text, Color color) {
@@ -1354,16 +1353,16 @@ public final class APIComponent {
         }
 
         public Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0,  false , false, null);
+            return create(x, y, image, 0, false, false, null);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex,false, false, null);
+            return create(x, y, image, arrayIndex, false, false, null);
         }
 
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY) {
-            return create(x, y, image, arrayIndex,flipX, flipY, null);
+            return create(x, y, image, arrayIndex, flipX, flipY, null);
         }
 
 
@@ -1371,7 +1370,7 @@ public final class APIComponent {
             Image imageC = new Image();
             int width = image != null ? mediaManager.spriteWidth(image) / api.TS() : 0;
             int height = image != null ? mediaManager.spriteHeight(image) / api.TS() : 0;
-            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY,Color.GRAY);
+            setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
             imageC.imageAction = imageAction != null ? imageAction : defaultImageAction();
@@ -1395,7 +1394,7 @@ public final class APIComponent {
             UICommonUtils.image_setImage(uiEngineState, mediaManager, image, imageSprite);
         }
 
-        public void setFlipXY(Image image, boolean flipX, boolean flipY){
+        public void setFlipXY(Image image, boolean flipX, boolean flipY) {
             if (image == null) return;
             image.flipX = flipX;
             image.flipY = flipY;
@@ -1890,7 +1889,7 @@ public final class APIComponent {
         setColor2(component, color2);
     }
 
-    public void setColor1And2(Component[] components, Color color1,Color color2) {
+    public void setColor1And2(Component[] components, Color color1, Color color2) {
         if (components == null) return;
         for (int i = 0; i < components.length; i++) {
             setColor(components[i], color1);

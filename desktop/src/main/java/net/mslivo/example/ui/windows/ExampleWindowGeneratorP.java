@@ -116,11 +116,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
 
     private ArrayList<Component> createTab4(API api,Window window) {
-        Text text1 = api.component.text.create(1, 5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        Text text2 = api.component.text.create(1, 4, "abcdefghijklmnopqrstuvwxyz");
-        Text text3 = api.component.text.create(1, 3, "0123456789");
-        Text text4 = api.component.text.create(1, 2, "!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A£¥¦§\"©'·×÷€");
-        Text text5 = api.component.text.create(1, 1, "A.A");
+        Text text1 = api.component.text.create(1, 5,0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        Text text2 = api.component.text.create(1, 4,0, "abcdefghijklmnopqrstuvwxyz");
+        Text text3 = api.component.text.create(1, 3,0, "0123456789");
+        Text text4 = api.component.text.create(1, 2,0, "!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A£¥¦§\"©'·×÷€");
+        Text text5 = api.component.text.create(1, 1,0, "A.A");
 
 
         ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
@@ -571,9 +571,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Image image1 = api.component.image.create(3, 4, ExampleBaseMedia.EXAMPLE_ANIMATION_2);
 
-        Text text = api.component.text.create(12, 10, "Lorem [#FF0000]ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
+        Text text = api.component.text.create(12, 10, 0,"Lorem [#FF0000]ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
 
-        Text text2 = api.component.text.create(12, 7, "Lorem ipsum dolor sit[#FF00FF] amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
+        Text text2 = api.component.text.create(12, 7, 0,"Lorem ipsum dolor sit[#FF00FF] amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
         api.component.text.setFontColor(text2, Color.WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabbar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});

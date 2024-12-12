@@ -131,8 +131,7 @@ public final class APIComposites {
             ArrayList<Object[][]> pages = new ArrayList<>();
             Grid grid = api.component.grid.create(x, y + 1, null, null, false, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
-            Text pageText = api.component.text.create(x, y, "");
-            api.component.setSize(pageText,width,1);
+            Text pageText = api.component.text.create(x, y, width, "");
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x,y, width, height);
@@ -476,13 +475,13 @@ public final class APIComposites {
         APICompositeText() {
         }
 
-        public Text[][] createTable(int x, int y, String[] column1Text, int col1Width) {
+        public Text[][] createTable(int x, int y, String[] column1Text, int col1Width,int col2Width) {
             Text[][] ret = new Text[2][column1Text.length];
 
             for (int iy = 0; iy < column1Text.length; iy++) {
-                Text text1 = api.component.text.create(x, y + ((column1Text.length - 1) - iy), column1Text[iy]);
+                Text text1 = api.component.text.create(x, y + ((column1Text.length - 1) - iy), col1Width, column1Text[iy]);
                 ret[0][iy] = text1;
-                Text text2 = api.component.text.create(x + col1Width, y + (column1Text.length - 1 - iy), "");
+                Text text2 = api.component.text.create(x + col1Width, y + (column1Text.length - 1 - iy), col2Width, "");
                 ret[1][iy] = text2;
             }
             return ret;
@@ -531,8 +530,7 @@ public final class APIComposites {
             // Text
             Text[] texts = new Text[height];
             for(int i=0;i<height;i++){
-                texts[i] = api.component.text.create(x, y+1, null);
-                api.component.setSize(texts[i], width - 1, height);
+                texts[i] = api.component.text.create(x, y+1, width - 1, null);
                 api.component.text.setTextAction(texts[i], new TextAction() {
                     @Override
                     public void onMouseScroll(float scrolled) {
@@ -601,7 +599,7 @@ public final class APIComposites {
         }
 
         public Text createClickableText(int x, int y, String text, Color fontColor, IntConsumer onClick, String textHover, Color fontColorHover) {
-            Text hlText = api.component.text.create(x, y, text);
+            Text hlText = api.component.text.create(x, y, 0, text);
             api.component.text.setTextAction(hlText, new TextAction() {
                 @Override
                 public void onMouseClick(int button) {
@@ -837,7 +835,7 @@ public final class APIComposites {
 
             Text[] texts = new Text[lines.length];
             for (int i = 0; i < lines.length; i++) {
-                texts[i] = api.component.text.create(0, HEIGHT - 3 - i, lines[i]);
+                texts[i] = api.component.text.create(0, HEIGHT - 3 - i,0, lines[i]);
                 componentsList.add(texts[i]);
             }
 
@@ -878,7 +876,7 @@ public final class APIComposites {
             int width1 = MathUtils.round(width / 2f) - 1;
             int width2 = width - width1 - 1;
 
-            Text textC = api.component.text.create(0, 2, text);
+            Text textC = api.component.text.create(0, 2,0, text);
             int xOffset = 0;
             Button yesC = api.component.button.textButton.create(xOffset, 0, width1, 1, yes, new ButtonAction() {
                 @Override
@@ -935,7 +933,7 @@ public final class APIComposites {
             Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption);
             ArrayList<Component> componentsList = new ArrayList<>();
 
-            Text textC = api.component.text.create(0, showOKButton ? 3 : 2, text);
+            Text textC = api.component.text.create(0, showOKButton ? 3 : 2,0, text);
             api.component.move(textC, api.TS_HALF(), api.TS_HALF());
             componentsList.add(textC);
 
