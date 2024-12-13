@@ -2152,10 +2152,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return 4;
     }
 
-    private int render_getContextMenuCMediaIndex(int x, int width, boolean top) {
-        if (x == 0) return top ? 0 : 3;
-        if (x == width - 1) return top ? 2 : 5;
-        return top ? 1 : 4;
+    private int render_get3TilesCMediaIndex(int x, int width) {
+        if (x == 0 ) return 0;
+        if (x == width - 1) return 2;
+        return 1;
     }
 
 
@@ -2185,7 +2185,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     for (int iy = 0; iy < height; iy++) {
                         ComboboxItem comboBoxItem = comboBox.comboBoxItems.get(iy);
                         for (int ix = 0; ix < width; ix++) {
-                            int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                            int index = render_get9TilesCMediaIndex(ix, iy, width, height);
                             boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), TS(comboBox.width), TS());
                             CMediaArray comboBoxCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL;
 
@@ -2228,7 +2228,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             for (int iy = 0; iy < height; iy++) {
                 ContextMenuItem contextMenuItem = contextMenu.items.get(iy);
                 for (int ix = 0; ix < width; ix++) {
-                    int index = render_getContextMenuCMediaIndex(ix, width, false);
+                    int index = render_get9TilesCMediaIndex(ix, iy, width, height);
                     boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, contextMenu.x, contextMenu.y - TS() - TS(iy), TS(uiEngineState.displayedContextMenuWidth), TS());
                     CMediaArray contextMenuCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL;
 
@@ -2252,8 +2252,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
             // Top
             if(!contextMenu.items.isEmpty()) {
                 for (int ix = 0; ix < width; ix++) {
-                    int index = render_getContextMenuCMediaIndex(ix, width, true);
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, index, contextMenu.x + TS(ix), contextMenu.y);
+                    int index = render_get3TilesCMediaIndex(ix, width);
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_TOP, index, contextMenu.x + TS(ix), contextMenu.y);
                 }
             }
 

@@ -47,6 +47,7 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaImage UI_TOOLTIP_LINE_HORIZONTAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_horizontal.png");
     public static final CMediaImage UI_TOOLTIP_LINE_VERTICAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_vertical.png");
     public static final CMediaArray UI_CONTEXT_MENU = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu.png", TL, TL);
+    public static final CMediaArray UI_CONTEXT_MENU_TOP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_top.png", TL, TL);
     public static final CMediaArray UI_CONTEXT_MENU_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell.png", TL, TL);
     public static final CMediaArray UI_CONTEXT_MENU_CELL_SELECTED = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell_selected.png", TL, TL);
     public static final CMediaArray UI_TEXTFIELD = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/textfield.png", TL, TL);
@@ -135,6 +136,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_TOOLTIP_LINE_HORIZONTAL,
             UI_TOOLTIP_LINE_VERTICAL,
             UI_CONTEXT_MENU,
+            UI_CONTEXT_MENU_TOP,
             UI_CONTEXT_MENU_CELL,
             UI_CONTEXT_MENU_CELL_SELECTED,
             UI_TEXTFIELD,
