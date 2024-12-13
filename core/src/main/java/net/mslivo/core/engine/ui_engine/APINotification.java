@@ -23,7 +23,7 @@ public final class APINotification {
     }
 
 
-    public NotificationAction DEFAULT_NOTIFICATION_ACTION = new NotificationAction() {};
+    public final NotificationAction DEFAULT_NOTIFICATION_ACTION = new NotificationAction() {};
 
     public Notification create(String text) {
         return create(text, DEFAULT_NOTIFICATION_ACTION, false, uiConfig.notification_defaultDisplayTime);

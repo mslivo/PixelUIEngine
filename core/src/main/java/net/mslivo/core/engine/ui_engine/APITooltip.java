@@ -30,7 +30,7 @@ public final class APITooltip {
         this.segment = new APITooltipSegment();
     }
 
-    private ToolTipAction DEFAULT_TOOLTIP_ACTION =  new ToolTipAction() {};
+    public final ToolTipAction DEFAULT_TOOLTIP_ACTION =  new ToolTipAction() {};
 
     public Tooltip create(String text) {
         return create(new TooltipSegment[]{

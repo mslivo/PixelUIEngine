@@ -532,7 +532,7 @@ public final class APIComponent {
 
     public final class APITabbar {
 
-        public TabBarAction DEFAULT_TABBAR_ACTION = new TabBarAction() {};
+        public final TabBarAction DEFAULT_TABBAR_ACTION = new TabBarAction() {};
 
         public final APITab tab;
 
@@ -696,7 +696,7 @@ public final class APIComponent {
 
         public final class APITab {
 
-            public TabAction DEFAULT_TAB_ACTION = new TabAction() {};
+            public final TabAction DEFAULT_TAB_ACTION = new TabAction() {};
 
 
             public Tab create(String title) {
@@ -804,7 +804,7 @@ public final class APIComponent {
         public APIGrid() {
         }
 
-        public GridAction DEFAULT_GRID_ACTION = new GridAction() {};
+        public final GridAction DEFAULT_GRID_ACTION = new GridAction() {};
 
         public Grid create(int x, int y, Object[][] items) {
             return create(x, y, items, DEFAULT_GRID_ACTION, false, false, false, false, false);
@@ -903,7 +903,7 @@ public final class APIComponent {
         APITextfield() {
         }
 
-        public TextFieldAction DEFAULT_TEXTFIELD_ACTION = new TextFieldAction() {};
+        public final TextFieldAction DEFAULT_TEXTFIELD_ACTION = new TextFieldAction() {};
 
         public Textfield create(int x, int y, int width) {
             return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32,
@@ -1007,7 +1007,7 @@ public final class APIComponent {
         }
 
 
-        public CanvasAction DEFAULT_CANVAS_ACTION = new CanvasAction() {};
+        public final CanvasAction DEFAULT_CANVAS_ACTION = new CanvasAction() {};
 
         public Canvas create(int x, int y, int width, int height) {
             return create(x, y, width, height, DEFAULT_CANVAS_ACTION, null);
@@ -1233,7 +1233,7 @@ public final class APIComponent {
         APIKnob() {
         }
 
-        public KnobAction DEFAULT_KNOB_ACTION = new KnobAction() {};
+        public final KnobAction DEFAULT_KNOB_ACTION = new KnobAction() {};
 
         public Knob create(int x, int y) {
             return create(x, y, DEFAULT_KNOB_ACTION, false, 0f);
@@ -1319,7 +1319,7 @@ public final class APIComponent {
         APIImage() {
         }
 
-        public ImageAction DEFAULT_IMAGE_ACTION = new ImageAction() {};
+        public final ImageAction DEFAULT_IMAGE_ACTION = new ImageAction() {};
 
         public Image create(int x, int y, CMediaSprite image) {
             return create(x, y, image, 0, false, false, DEFAULT_IMAGE_ACTION);
@@ -1378,7 +1378,7 @@ public final class APIComponent {
             this.item = new APIComboboxItem();
         }
 
-        public ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {};
+        public final ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {};
 
         public Combobox create(int x, int y, int width) {
             return create(x, y, width, null, DEFAULT_COMBOBOX_ACTION, false, null);
@@ -1493,7 +1493,7 @@ public final class APIComponent {
             APIComboboxItem() {
             }
 
-            public ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {};
+            public final ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {};
 
             public ComboboxItem create(String text) {
                 return create(text, null);
@@ -1543,14 +1543,14 @@ public final class APIComponent {
 
         public final APIScrollbarVertical scrollbarVertical;
 
-        public ScrollBarAction DEFAULT_WINDOW_ACTION = new ScrollBarAction() {};
+        public final ScrollBarAction DEFAULT_WINDOW_ACTION = new ScrollBarAction() {};
 
         APIScrollbar() {
             this.scrollbarHorizontal = new APIScrollbarHorizontal();
             this.scrollbarVertical = new APIScrollbarVertical();
         }
 
-        public ScrollBarAction DEFAULT_SCROLLBAR_ACTION = new ScrollBarAction() {};
+        public final ScrollBarAction DEFAULT_SCROLLBAR_ACTION = new ScrollBarAction() {};
 
 
         public final class APIScrollbarHorizontal {
@@ -1618,7 +1618,7 @@ public final class APIComponent {
         APIList() {
         }
 
-        public ListAction DEFAULT_LIST_ACTION =  new ListAction() {};
+        public final ListAction DEFAULT_LIST_ACTION =  new ListAction() {};
 
         public List create(int x, int y, int width, int height) {
             return create(x, y, width, height, null, DEFAULT_LIST_ACTION, false, false, false, false);
