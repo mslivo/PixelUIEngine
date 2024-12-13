@@ -43,6 +43,7 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_SEPARATOR_VERTICAL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/separator_vertical.png", TL, TL);
     public static final CMediaArray UI_TOOLTIP_CELL = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_cell.png", TL, TL);
     public static final CMediaArray UI_TOOLTIP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip.png", TL, TL);
+    public static final CMediaArray UI_TOOLTIP_TOP = MediaManager.create_CMediaArray(DIR_UI_GRAPHICS + "ui/tooltip_top.png", TL, TL);
     public static final CMediaImage UI_TOOLTIP_SEGMENT_BORDER = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_segment_border.png");
     public static final CMediaImage UI_TOOLTIP_LINE_HORIZONTAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_horizontal.png");
     public static final CMediaImage UI_TOOLTIP_LINE_VERTICAL = MediaManager.create_CMediaImage(DIR_UI_GRAPHICS + "ui/tooltip_line_vertical.png");
@@ -133,6 +134,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_TOOLTIP_CELL,
             UI_TOOLTIP_SEGMENT_BORDER,
             UI_TOOLTIP,
+            UI_TOOLTIP_TOP,
             UI_TOOLTIP_LINE_HORIZONTAL,
             UI_TOOLTIP_LINE_VERTICAL,
             UI_CONTEXT_MENU,

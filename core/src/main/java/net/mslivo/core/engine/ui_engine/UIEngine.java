@@ -2199,7 +2199,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(comboBox.width),
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, TS(comboBox.width),
                                     comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
                                     comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                         }
@@ -2358,7 +2358,17 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         }
                     }
+
+
                 }
+
+                // Top Border
+                for (int tx = 0; tx < tooltip_width; tx++) {
+                    render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
+                    // tooltip border
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_TOP, render_get3TilesCMediaIndex(tx, width_reference), tooltip_x + TS(tx), tooltip_y + TS(tooltip_height));
+                }
+
             }
 
 
@@ -2374,7 +2384,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
                         case RIGHT -> TS(tooltip_width) - text_width - 3;
                     };
-                    render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 1);
+                    render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 2);
                 }
                 case TooltipImageSegment imageSegment -> {
                     int image_width = mediaManager.spriteWidth(imageSegment.image);
@@ -2412,8 +2422,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             float r = canvasSegment.colorMap.r[icx][icy];
                             float g = canvasSegment.colorMap.g[icx][icy];
                             float b = canvasSegment.colorMap.b[icx][icy];
-                            int vx = canvas_x + icx + 1;
-                            int vy = tooltip_y + TS(iy) + icy + 1;
+                            int vx = canvas_x + icx;
+                            int vy = tooltip_y + TS(iy) + icy;
                             primitiveRenderer.setVertexColor(r, g, b, a);
                             primitiveRenderer.vertex(vx, vy);
                         }
@@ -2734,7 +2744,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 // Cell Content
                 if (comboBox.selectedItem != null) {
                     render_drawFont(comboBox.selectedItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox),
-                            comboBox.selectedItem.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(comboBox.width - 1),
+                            comboBox.selectedItem.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(comboBox.width - 1),
                             comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem),
                             comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                 }
@@ -3077,7 +3087,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (progressBar.progressText) {
                     String percentTxt = progressBar.progressText2Decimal ? UICommonUtils.progressBar_getProgressText2Decimal(progressBar.progress) : UICommonUtils.progressBar_getProgressText(progressBar.progress);
                     int xOffset = (TS(progressBar.width) / 2) - (render_textWidth(percentTxt) / 2);
-                    render_drawFont(percentTxt, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), progressBar.fontColor, componentAlpha, componentGrayScale, 0, 1);
+                    render_drawFont(percentTxt, UICommonUtils.component_getAbsoluteX(progressBar) + xOffset, UICommonUtils.component_getAbsoluteY(progressBar), progressBar.fontColor, componentAlpha, componentGrayScale, 0, 2);
                 }
             }
             case Checkbox checkBox -> {
