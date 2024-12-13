@@ -2306,11 +2306,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         int tooltip_y = switch (direction) {
             case RIGHT, LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
             case UP ->
-                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
             case DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height));
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
         };
 
 
