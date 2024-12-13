@@ -23,13 +23,10 @@ public final class APINotification {
     }
 
 
-    private NotificationAction defaultNotificationAction() {
-        return new NotificationAction() {
-        };
-    }
+    public NotificationAction DEFAULT_NOTIFICATION_ACTION = new NotificationAction() {};
 
     public Notification create(String text) {
-        return create(text, null, false, uiConfig.notification_defaultDisplayTime);
+        return create(text, DEFAULT_NOTIFICATION_ACTION, false, uiConfig.notification_defaultDisplayTime);
     }
 
     public Notification create(String text, NotificationAction notificationAction) {
@@ -47,7 +44,7 @@ public final class APINotification {
         notification.displayTime = Math.max(displayTime,0);
         notification.color = new Color(uiConfig.notification_defaultColor);
         notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
-        notification.notificationAction = notificationAction != null ? notificationAction : defaultNotificationAction();
+        notification.notificationAction = notificationAction;
         notification.timer = 0;
         int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
         if (textWidth > uiEngineState.resolutionWidth) {

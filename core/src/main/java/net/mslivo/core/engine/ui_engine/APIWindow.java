@@ -2,11 +2,9 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.media_manager.CMediaFont;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
@@ -29,17 +27,15 @@ public final class APIWindow {
         this.uiConfig = uiEngineState.config;
     }
 
-    private WindowAction defaultWindowAction() {
-        return new WindowAction() {
-        };
-    }
+    private WindowAction DEFAULT_WINDOW_ACTION = new WindowAction() {
+    };
 
     public Window create(int x, int y, int width, int height) {
-        return create(x, y, width, height, "", null, false, true, true, true);
+        return create(x, y, width, height, "", DEFAULT_WINDOW_ACTION, false, true, true, true);
     }
 
     public Window create(int x, int y, int width, int height, String title) {
-        return create(x, y, width, height, title,  null, false, true, true, true);
+        return create(x, y, width, height, title, DEFAULT_WINDOW_ACTION, false, true, true, true);
     }
 
     public Window create(int x, int y, int width, int height, String title, WindowAction windowAction) {
@@ -71,7 +67,7 @@ public final class APIWindow {
         window.fontColor = uiConfig.ui_font_defaultColor.cpy();
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
-        window.windowAction = windowAction != null ? windowAction : defaultWindowAction();
+        window.windowAction = windowAction;
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;
@@ -285,7 +281,7 @@ public final class APIWindow {
 
     public void setAlpha(Window window, float alpha) {
         if (window == null) return;
-        window.color.set(window.color.r,window.color.g,window.color.b, alpha);
+        window.color.set(window.color.r, window.color.g, window.color.b, alpha);
     }
 
     public void setAlwaysOnTop(Window window, boolean alwaysOnTop) {

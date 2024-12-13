@@ -30,10 +30,7 @@ public final class APITooltip {
         this.segment = new APITooltipSegment();
     }
 
-    private ToolTipAction defaultToolTipAction() {
-        return new ToolTipAction() {
-        };
-    }
+    private ToolTipAction DEFAULT_TOOLTIP_ACTION =  new ToolTipAction() {};
 
     public Tooltip create(String text) {
         return create(new TooltipSegment[]{
@@ -42,7 +39,7 @@ public final class APITooltip {
     }
 
     public Tooltip create(TooltipSegment[] segments) {
-        return create(segments, null, 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
+        return create(segments, DEFAULT_TOOLTIP_ACTION, 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
     }
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction) {
@@ -80,7 +77,7 @@ public final class APITooltip {
                 }
             }
         }
-        tooltip.toolTipAction = toolTipAction != null ? toolTipAction : defaultToolTipAction();
+        tooltip.toolTipAction = toolTipAction;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
     }

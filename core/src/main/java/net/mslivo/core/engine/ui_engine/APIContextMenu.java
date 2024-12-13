@@ -27,13 +27,10 @@ public final class APIContextMenu {
         this.item = new APIContextMenuItem();
     }
 
-    private ContextMenuAction defaultContextMenuAction() {
-        return new ContextMenuAction() {
-        };
-    }
+    public ContextMenuAction DEFAULT_CONTEXT_MENU_ACTION  = new ContextMenuAction() {};
 
     public Contextmenu create(ContextMenuItem[] contextMenuItems) {
-        return create(contextMenuItems, null);
+        return create(contextMenuItems, DEFAULT_CONTEXT_MENU_ACTION);
     }
 
     public Contextmenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
@@ -48,7 +45,7 @@ public final class APIContextMenu {
             }
         }
         contextMenu.color = new Color(uiConfig.contextMenu_defaultColor);
-        contextMenu.contextMenuAction = contextMenuAction != null ? contextMenuAction : defaultContextMenuAction();
+        contextMenu.contextMenuAction = contextMenuAction;
         return contextMenu;
     }
 
@@ -108,13 +105,10 @@ public final class APIContextMenu {
         APIContextMenuItem() {
         }
 
-        private ContextMenuItemAction defaultContextMenuItemAction() {
-            return new ContextMenuItemAction() {
-            };
-        }
+        public ContextMenuItemAction DEFAULT_CONTEXT_MENU_ITEM_ACTION = new ContextMenuItemAction() {};
 
         public ContextMenuItem create(String text) {
-            return create(text, defaultContextMenuItemAction());
+            return create(text, DEFAULT_CONTEXT_MENU_ITEM_ACTION);
         }
 
         public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {

@@ -2,8 +2,8 @@ package net.mslivo.core.engine.ui_engine;
 
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 
@@ -22,19 +22,14 @@ public final class APIHotkey {
         this.mediaManager = mediaManager;
     }
 
-    private HotKeyAction defaultHotKeyAction(){
-      return new HotKeyAction() {
-          @Override
-          public void onPress() {
-          }
-      };
-    }
+    public HotKeyAction DEFAULT_HOTKEY_ACTION = new HotKeyAction() {
+    };
 
     public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
         HotKey hotKey = new HotKey();
         hotKey.pressed = false;
         hotKey.keyCodes = keyCodes != null ? Arrays.copyOf(keyCodes, keyCodes.length) : new int[]{};
-        hotKey.hotKeyAction = hotKeyAction != null ? hotKeyAction : defaultHotKeyAction();
+        hotKey.hotKeyAction = DEFAULT_HOTKEY_ACTION;
         hotKey.name = "";
         hotKey.data = null;
         return hotKey;

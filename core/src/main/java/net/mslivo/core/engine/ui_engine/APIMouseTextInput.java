@@ -22,20 +22,17 @@ public final class APIMouseTextInput {
         this.uiConfig = uiEngineState.config;
     }
 
-    private MouseTextInputAction defaultMouseTextInputAction() {
-        return new MouseTextInputAction() {
-        };
-    }
+    public MouseTextInputAction DEFAULT_MOUSE_TEXTINPUT_ACTION =  new MouseTextInputAction() {};
 
     public MouseTextInput create(int x, int y) {
-        return create(x, y, null,
+        return create(x, y, DEFAULT_MOUSE_TEXTINPUT_ACTION,
                 null,
                 uiConfig.mouseTextInput_defaultLowerCaseCharacters,
                 uiConfig.mouseTextInput_defaultUpperCaseCharacters);
     }
 
-    public MouseTextInput create(int x, int y, MouseTextInputAction onConfirm) {
-        return create(x, y, onConfirm,
+    public MouseTextInput create(int x, int y, MouseTextInputAction mouseTextInputAction) {
+        return create(x, y, mouseTextInputAction,
                 null,
                 uiConfig.mouseTextInput_defaultLowerCaseCharacters,
                 uiConfig.mouseTextInput_defaultUpperCaseCharacters);
@@ -59,7 +56,7 @@ public final class APIMouseTextInput {
         mouseTextInput.fontColor = uiConfig.ui_font_defaultColor.cpy();
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
-        mouseTextInput.mouseTextInputAction = mouseTextInputAction != null ? mouseTextInputAction : defaultMouseTextInputAction();
+        mouseTextInput.mouseTextInputAction = mouseTextInputAction;
         mouseTextInput.upperCase = false;
         mouseTextInput.selectedIndex = 0;
         mouseTextInput.enterCharacterQueue = new IntArray();
