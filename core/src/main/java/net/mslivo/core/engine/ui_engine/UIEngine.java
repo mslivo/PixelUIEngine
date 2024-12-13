@@ -2020,18 +2020,18 @@ public final class UIEngine<T extends UIEngineAdapter> {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont,textInputAlpha, mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont, textInputAlpha, mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont,textInputAlpha, mouseTextInput.upperCase, false);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont, textInputAlpha, mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
-        render_mouseTextInputCharacter(chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, color1, colorFont,textInputAlpha, mouseTextInput.upperCase, uiEngineState.mTextInputMouse1Pressed);
+        render_mouseTextInputCharacter(chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, color1, colorFont, textInputAlpha, mouseTextInput.upperCase, uiEngineState.mTextInputMouse1Pressed);
 
         // Selection
         render_setColor(spriteRenderer, color2, textInputAlpha, false);
@@ -2048,7 +2048,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         switch (c) {
             case '\n', '\t', '\b' -> {
-                render_setColor(spriteRenderer, colorFont, colorFont.a*color1.a, false);
+                render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a, false);
                 CMediaArray specialCharacterSprite = switch (c) {
                     case '\n' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
                     case '\t' ->
@@ -2152,6 +2152,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return 4;
     }
 
+    private int render_getContextMenuCMediaIndex(int x, int width, boolean top) {
+        if (x == 0) return top ? 0 : 3;
+        if (x == width - 1) return top ? 2 : 5;
+        return top ? 1 : 4;
+    }
+
+
     private float componentAlpha(Component component) {
         return (component.addedToWindow != null ? (component.color.a * component.addedToWindow.color.a) : component.color.a);
     }
@@ -2221,7 +2228,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             for (int iy = 0; iy < height; iy++) {
                 ContextMenuItem contextMenuItem = contextMenu.items.get(iy);
                 for (int ix = 0; ix < width; ix++) {
-                    int index = render_get9TilesCMediaIndex(ix, iy, width, height);//x==0 ? 0 : (x == (width-1)) ? 2 : 1;
+                    int index = render_getContextMenuCMediaIndex(ix, width, false);
                     boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, contextMenu.x, contextMenu.y - TS() - TS(iy), TS(uiEngineState.displayedContextMenuWidth), TS());
                     CMediaArray contextMenuCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_CELL;
 
@@ -2235,10 +2242,18 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, index, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS());
 
                     // Cell Content
-                    render_drawFont(contextMenuItem.text, contextMenu.x, contextMenu.y - TS(iy) - TS(), contextMenuItem.fontColor, contextMenuAlpha, false, 2, 1, TS(width),
+                    render_drawFont(contextMenuItem.text, contextMenu.x, contextMenu.y - TS(iy) - TS(), contextMenuItem.fontColor, contextMenuAlpha, false, 2, 2, TS(width),
                             contextMenuItem.contextMenuItemAction.icon(), contextMenuItem.contextMenuItemAction.iconIndex(), contextMenuItem.contextMenuItemAction.iconColor(),
                             contextMenuItem.contextMenuItemAction.iconFlipX(), contextMenuItem.contextMenuItemAction.iconFlipY());
 
+                }
+            }
+
+            // Top
+            if(!contextMenu.items.isEmpty()) {
+                for (int ix = 0; ix < width; ix++) {
+                    int index = render_getContextMenuCMediaIndex(ix, width, true);
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU, index, contextMenu.x + TS(ix), contextMenu.y);
                 }
             }
 
@@ -2255,7 +2270,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (tooltip.segments.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
-        final float lineAlpha = tooltip.color_line.a*uiEngineState.tooltip_fadePct;
+        final float lineAlpha = tooltip.color_line.a * uiEngineState.tooltip_fadePct;
         final ArrayList<TooltipSegment> segments = tooltip.segments;
 
         // Determine Dimensions
@@ -2382,7 +2397,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int height = TS(canvasSegment.height);
                     spriteRenderer.end();
                     primitiveRenderer.begin();
-                    render_setColor(primitiveRenderer,canvasSegment.contentColor, segmentAlpha, false);
+                    render_setColor(primitiveRenderer, canvasSegment.contentColor, segmentAlpha, false);
                     int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
                         case LEFT -> 0;
                         case CENTER ->
@@ -2740,7 +2755,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 int height = TS(canvas.height);
                 spriteRenderer.end();
                 primitiveRenderer.begin(GL32.GL_POINTS);
-                render_setColor(primitiveRenderer,Color.GRAY, componentAlpha, componentGrayScale);
+                render_setColor(primitiveRenderer, Color.GRAY, componentAlpha, componentGrayScale);
                 for (int icx = 0; icx < width; icx++) {
                     for (int icy = 0; icy < height; icy++) {
                         float a = canvas.colorMap.a[icx][icy];
