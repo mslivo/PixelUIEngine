@@ -2374,6 +2374,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             // Content
 
+            spriteRenderer.setColorReset();
+
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
                     // Text
