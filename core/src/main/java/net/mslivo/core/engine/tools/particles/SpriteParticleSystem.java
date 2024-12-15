@@ -30,21 +30,24 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
             if (!particle.visible) continue;
             switch (particle) {
                 case ImageParticle<T> imageParticle -> {
+                    CMediaImage cMediaImage = (CMediaImage) imageParticle.sprite;
                     spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
-                    spriteRenderer.drawCMediaImage(imageParticle.sprite, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
-                            mediaManager.imageWidth(imageParticle.sprite), mediaManager.imageHeight(imageParticle.sprite),
+                    spriteRenderer.drawCMediaImage(cMediaImage, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
+                            mediaManager.imageWidth(cMediaImage), mediaManager.imageHeight(cMediaImage),
                             imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
                 }
                 case ArrayParticle<T> arrayParticle -> {
+                    CMediaArray cMediaArray = (CMediaArray) arrayParticle.sprite;
                     spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
-                    spriteRenderer.drawCMediaArray(arrayParticle.sprite, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
-                            mediaManager.arrayWidth(arrayParticle.sprite), mediaManager.arrayHeight(arrayParticle.sprite),
+                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
+                            mediaManager.arrayWidth(cMediaArray), mediaManager.arrayHeight(cMediaArray),
                             arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
                 }
                 case AnimationParticle<T> animationParticle -> {
+                    CMediaAnimation cMediaAnimation = (CMediaAnimation) animationParticle.sprite;
                     spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
-                    spriteRenderer.drawCMediaAnimation(animationParticle.sprite, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
-                            mediaManager.animationWidth(animationParticle.sprite), mediaManager.animationHeight(animationParticle.sprite),
+                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
+                            mediaManager.animationWidth(cMediaAnimation), mediaManager.animationHeight(cMediaAnimation),
                             animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
                 }
                 case TextParticle<T> textParticle -> {
