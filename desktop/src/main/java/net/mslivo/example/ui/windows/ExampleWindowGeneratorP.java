@@ -107,7 +107,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
 
         ArrayList<Component> tabBarComponents = api.composites.tabBar.createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
-                0, null, true, window.height - 4, false);
+                0, api.component.tabbar.DEFAULT_TABBAR_ACTION, true, window.height - 4, false);
 
         api.window.addComponents(window, tabBarComponents.toArray(new Component[]{}));
 
@@ -510,7 +510,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         api.component.setToolTip(imageButton4, api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, true),
+                        api.toolTip.segment.text.create("color[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
                         api.toolTip.segment.text.create("1", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
