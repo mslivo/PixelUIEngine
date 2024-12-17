@@ -16,6 +16,9 @@ import net.mslivo.core.engine.media_manager.CMedia;
 import net.mslivo.core.engine.media_manager.CMediaFontSymbol;
 import net.mslivo.core.engine.media_manager.MediaManager;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -23,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
@@ -101,7 +105,7 @@ public class Tools {
                 parallelTaskList.poll().join();
         }
 
-        public static void exceptionToFile(Exception e) {
+        public static void exceptionToErrorLogFile(Exception e) {
             try (PrintWriter pw = new PrintWriter(new FileWriter(ERROR_LOG_FILE.toString(), true))) {
                 pw.write("Exception \"" + (e.getClass().getSimpleName()) + "\" occured" + System.lineSeparator());
                 e.printStackTrace(pw);
@@ -110,6 +114,29 @@ public class Tools {
             }
         }
 
+        public static void exceptionToDialog(Exception e){
+            String stackTrace;
+            try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+                try(PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)){
+                    e.printStackTrace(printWriter);
+                    printWriter.flush();
+                    stackTrace = byteArrayOutputStream.toString();
+                }
+            } catch (IOException ex) {
+                stackTrace = e.toString();
+            }
+            StringBuilder shownStackTrace = new StringBuilder(stackTrace);
+            if(shownStackTrace.length() > 512){
+                shownStackTrace.setLength(512);
+                shownStackTrace.append(System.lineSeparator()).append("...");
+            }
+            shownStackTrace.append(System.lineSeparator()).append("Press OK to copy to Clipboard");
+
+            int option = JOptionPane.showConfirmDialog(null, shownStackTrace.toString(), "Exception", JOptionPane.PLAIN_MESSAGE);
+            if(option == JOptionPane.OK_OPTION){
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(stackTrace),null);
+            }
+        }
         public static void setTargetUpdates(int updatesPerSecond) {
             App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
             timeStep = (1f / (float) App.maxUpdatesPerSecond);
@@ -155,7 +182,8 @@ public class Tools {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {
                 e.printStackTrace();
-                Tools.App.exceptionToFile(e);
+                Tools.App.exceptionToErrorLogFile(e);
+                Tools.App.exceptionToDialog(e);
             }
         }
     }

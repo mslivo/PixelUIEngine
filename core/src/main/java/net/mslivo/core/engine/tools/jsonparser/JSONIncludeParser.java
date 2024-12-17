@@ -101,7 +101,6 @@ public class JSONIncludeParser {
         // Read Base File
         ArrayList<String> lines = getFileContent(basePath, fileName, false, false, inputFileMode);
 
-
         // Parse includes
         IntArray removeIndexes = new IntArray();
         for (int i = 0; i < lines.size(); i++) {
