@@ -318,20 +318,21 @@ public class Tools {
                 Files.createDirectories(file);
                 return true;
             } catch (IOException e) {
+                e.printStackTrace();
                 return false;
             }
         }
 
 
-        public static Object readObjectFromFile(Path file) throws Exception {
+        public static Object readObjectFromFile(Path file) {
             return readObjectFromFile(file, false, null);
         }
 
-        public static Object readObjectFromFile(Path file, boolean zipped) throws Exception {
+        public static Object readObjectFromFile(Path file, boolean zipped) {
             return readObjectFromFile(file, zipped, null);
         }
 
-        public static Object readObjectFromFile(Path file, boolean zipped, HashMap<String, String> classReplacements) throws Exception {
+        public static Object readObjectFromFile(Path file, boolean zipped, HashMap<String, String> classReplacements)  {
             try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
                 if (zipped) {
                     try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
@@ -341,7 +342,6 @@ public class Tools {
                                 Object readObject = objectInputStream.readObject();
                                 return readObject;
                             }
-
                         }
                     }
                 } else {
@@ -350,35 +350,42 @@ public class Tools {
                         return readObject;
                     }
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+                return null;
             }
             return null;
         }
 
-        public static void writeObjectToFile(Path file, Object data) throws Exception {
-            writeObjectToFile(file, data, false);
+        public static boolean writeObjectToFile(Path file, Object data)  {
+            return writeObjectToFile(file, data, false);
         }
 
-        public static void writeObjectToFile(Path file, Object data, boolean zipped) throws Exception {
-            Files.createDirectories(file.getParent());
-
-            try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
-                if (zipped) {
-                    ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
-                    ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
-                    zipOutputStream.putNextEntry(zipEntry);
-                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(zipOutputStream)) {
-                        objectOutputStream.writeObject(data);
-                        objectOutputStream.flush();
+        public static boolean writeObjectToFile(Path file, Object data, boolean zipped)  {
+            try {
+                Files.createDirectories(file.getParent());
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
+                    if (zipped) {
+                        ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+                        ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
+                        zipOutputStream.putNextEntry(zipEntry);
+                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(zipOutputStream)) {
+                            objectOutputStream.writeObject(data);
+                            objectOutputStream.flush();
+                        }
+                        zipOutputStream.close();
+                    } else {
+                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+                            objectOutputStream.writeObject(data);
+                            objectOutputStream.flush();
+                        }
                     }
-                    zipOutputStream.close();
-                } else {
-                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-                        objectOutputStream.writeObject(data);
-                        objectOutputStream.flush();
-                    }
+                    return true;
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
             }
-
         }
 
         public static boolean writeTextToFile(Path file, String text)  {
@@ -405,6 +412,7 @@ public class Tools {
                     }
                 }
             }catch (Exception e) {
+                e.printStackTrace();
                 return false;
             }
             return true;
@@ -437,6 +445,7 @@ public class Tools {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 return null;
             }
             return null;

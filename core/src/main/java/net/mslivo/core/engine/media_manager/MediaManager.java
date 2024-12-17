@@ -11,7 +11,8 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectMap;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
@@ -30,11 +31,11 @@ import java.util.regex.Pattern;
 public final class MediaManager {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int FONT_CUSTOM_SYMBOL_OFFSET = 512;
-    private static final String ERROR_ALREADY_LOADED_OTHER = "CMedia File \"%s\": Already loaded in another MediaManager";
     private static final String ERROR_FILE_NOT_FOUND = "CMedia File \"%s\": Does not exist";
     private static final String ERROR_SPLIT_FRAMES = "Error splitting frames for: \"%s\": Negative frameCount = %d";
     private static final String ERROR_READ_FONT = "Error reading font file \"%s\"";
     private static final String ERROR_READ_FONT_FILE_DESCRIPTOR = "Error reading font file \"%s\": file= descriptor not found";
+    private static final String ERROR_SYMBOL_ID_DUPLICATE = "Symbol id \"%d\" is already defined in font";
     private static final String PACKED_FONT_NAME = "%s_%d.packed";
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
@@ -46,12 +47,12 @@ public final class MediaManager {
     };
     private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0" + System.lineSeparator();
     private boolean loaded = false;
-    private HashMap<CMediaSoundEffect,Sound> medias_sounds = null;
-    private HashMap<CMediaMusic,Music> medias_music = null;
-    private HashMap<CMediaImage, TextureRegion> medias_images = null;
-    private HashMap<CMediaFont,BitmapFont> medias_fonts = null;
-    private HashMap<CMediaArray,TextureRegion[]> medias_arrays = null;
-    private HashMap<CMediaAnimation,ExtendedAnimation> medias_animations = null;
+    private ObjectMap<CMediaSoundEffect,Sound> medias_sounds = null;
+    private ObjectMap<CMediaMusic,Music> medias_music = null;
+    private ObjectMap<CMediaImage, TextureRegion> medias_images = null;
+    private ObjectMap<CMediaFont,BitmapFont> medias_fonts = null;
+    private ObjectMap<CMediaArray,TextureRegion[]> medias_arrays = null;
+    private ObjectMap<CMediaAnimation,ExtendedAnimation> medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -147,13 +148,20 @@ public final class MediaManager {
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
         Pixmap[] symbolPixmaps = new Pixmap[symbols.length];
+        IntSet uniqueSymbolIds = new IntSet();
         for (int i = 0; i < symbols.length; i++) {
-            symbolPixmaps[i] = createTexturePixmap(Tools.File.findResource(symbols[i].file));
+            if(!uniqueSymbolIds.contains(symbols[i].id)) {
+                symbolPixmaps[i] = createTexturePixmap(Tools.File.findResource(symbols[i].file));
+                uniqueSymbolIds.add(symbols[i].id);
+            }else{
+                throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, symbols[i].id));
+            }
         }
 
         int symbolAreaHeight = 0;
         int symbolHeightMax = 0;
         int xCurrent = 0;
+
         for (int i = 0; i < symbolPixmaps.length; i++) {
             Pixmap symbolPixmap = symbolPixmaps[i];
             symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
@@ -267,12 +275,12 @@ public final class MediaManager {
 
             stepsMax++;
         }
-        medias_images = new HashMap<>();
-        medias_arrays = new HashMap<>();
-        medias_animations = new HashMap<>();
-        medias_fonts = new HashMap<>();
-        medias_sounds = new HashMap<>();
-        medias_music = new HashMap<>();
+        medias_images = new ObjectMap<>();
+        medias_arrays = new ObjectMap<>();
+        medias_animations = new ObjectMap<>();
+        medias_fonts = new ObjectMap<>();
+        medias_sounds = new ObjectMap<>();
+        medias_music = new ObjectMap<>();
 
         // Load Sprite Data Into Pixmap Packer
         for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
@@ -429,9 +437,9 @@ public final class MediaManager {
         textureAtlas = null;
 
         // Dispose and null
-        medias_sounds.keySet().forEach(cMediaSoundEffect -> medias_sounds.get(cMediaSoundEffect).dispose());
-        medias_music.keySet().forEach(cMediaMusic -> medias_music.get(cMediaMusic).dispose());
-        medias_fonts.keySet().forEach(cMediaFont -> medias_fonts.get(cMediaFont).dispose());
+        medias_sounds.values().forEach(sound -> sound.dispose());
+        medias_music.values().forEach(music -> music.dispose());
+        medias_fonts.values().forEach(bitmapFont -> bitmapFont.dispose());
 
         this.medias_images = null;
         this.medias_arrays = null;
