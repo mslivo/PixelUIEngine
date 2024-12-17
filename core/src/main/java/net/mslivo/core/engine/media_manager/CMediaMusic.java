@@ -12,5 +12,4 @@ public final class CMediaMusic extends CMediaSound implements Serializable {
         super(filename);
     }
 
-
 }

@@ -1,5 +1,7 @@
 package net.mslivo.core.engine.media_manager;
 
+import com.badlogic.gdx.math.Interpolation;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -10,7 +12,10 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
     public int frameLength;
 
     public CMediaArray(){
+    }
 
+    public CMediaArray(String filename, int regionWidth, int regionHeight) {
+        this(filename, regionWidth, regionHeight, 0, Integer.MAX_VALUE);
     }
 
     public CMediaArray(String filename, int regionWidth, int regionHeight, int frameOffset, int frameLength) {

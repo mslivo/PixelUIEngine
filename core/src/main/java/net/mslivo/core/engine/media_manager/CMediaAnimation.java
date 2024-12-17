@@ -3,7 +3,6 @@ package net.mslivo.core.engine.media_manager;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public final class CMediaAnimation extends CMediaSprite implements Serializable {
 
@@ -17,7 +16,15 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
     public CMediaAnimation() {
     }
 
-    CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
+    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
+        this(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP);
+    }
+
+    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
+        this(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP);
+    }
+
+    public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
         super(filename);
         this.regionWidth = regionWidth;
         this.regionHeight = regionHeight;

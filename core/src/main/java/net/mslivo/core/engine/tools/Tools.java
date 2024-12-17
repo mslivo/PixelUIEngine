@@ -350,18 +350,17 @@ public class Tools {
                         return readObject;
                     }
                 }
-            }catch (Exception e){
-                e.printStackTrace();
                 return null;
+            }catch (Exception e){
+                throw new RuntimeException(e);
             }
-            return null;
         }
 
-        public static boolean writeObjectToFile(Path file, Object data)  {
-            return writeObjectToFile(file, data, false);
+        public static void writeObjectToFile(Path file, Object data)  {
+            writeObjectToFile(file, data, false);
         }
 
-        public static boolean writeObjectToFile(Path file, Object data, boolean zipped)  {
+        public static void writeObjectToFile(Path file, Object data, boolean zipped)  {
             try {
                 Files.createDirectories(file.getParent());
                 try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
@@ -380,19 +379,17 @@ public class Tools {
                             objectOutputStream.flush();
                         }
                     }
-                    return true;
                 }
             }catch (Exception e){
-                e.printStackTrace();
-                return false;
+                throw new RuntimeException(e);
             }
         }
 
-        public static boolean writeTextToFile(Path file, String text)  {
-            return writeTextToFile(file, text, false);
+        public static void writeTextToFile(Path file, String text)  {
+            writeTextToFile(file, text, false);
         }
 
-        public static boolean writeTextToFile(Path file, String text, boolean zipped)  {
+        public static void writeTextToFile(Path file, String text, boolean zipped)  {
             try {
                 Files.createDirectories(file.getParent());
                 try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
@@ -412,10 +409,9 @@ public class Tools {
                     }
                 }
             }catch (Exception e) {
-                e.printStackTrace();
-                return false;
+                throw new RuntimeException(e);
             }
-            return true;
+
         }
 
         public static String readTextFromFile(Path file, boolean zipped) {

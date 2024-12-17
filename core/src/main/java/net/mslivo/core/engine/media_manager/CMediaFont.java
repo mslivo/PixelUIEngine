@@ -19,6 +19,18 @@ public final class CMediaFont extends CMedia implements Serializable {
 
     }
 
+    public CMediaFont(String file, int offset_x, int offset_y) {
+        this(file, offset_x, offset_y, true, null, Color.CLEAR, false, false);
+    }
+
+    public CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
+        this(file, offset_x, offset_y, markupEnabled, null, Color.CLEAR, false, false);
+    }
+
+    public CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols) {
+        this(file, offset_x, offset_y, markupEnabled, symbols, Color.CLEAR, false, false);
+    }
+
     public CMediaFont(String filename, int offset_x, int offset_y, boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
         super(filename);
         this.offset_x = offset_x;
