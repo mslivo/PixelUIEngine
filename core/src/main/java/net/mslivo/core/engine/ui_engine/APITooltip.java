@@ -11,6 +11,7 @@ import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
+import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
@@ -77,11 +78,17 @@ public final class APITooltip {
                 }
             }
         }
+        tooltip.updateActions = new ArrayList<>();
         tooltip.toolTipAction = toolTipAction;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
     }
 
+    public void addUpdateAction(Tooltip tooltip, UpdateAction updateAction){
+        if(tooltip == null || updateAction == null)
+            return;
+        tooltip.updateActions.add(updateAction);
+    }
 
     public void addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;

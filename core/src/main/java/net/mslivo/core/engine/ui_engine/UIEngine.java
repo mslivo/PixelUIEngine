@@ -181,7 +181,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.hotKeys = new ArrayList<>();
         newUIEngineState.appViewPorts = new ArrayList<>();
         newUIEngineState.singleUpdateActions = new ArrayList<>();
-        newUIEngineState.singleUpdateActionsRemoveQ = new ArrayDeque<>();
+        newUIEngineState.singleUpdateActionsRemoveQueue = new ArrayDeque<>();
         // ----- Temp GUI Variables
         newUIEngineState.draggedWindow = null;
         newUIEngineState.draggedWindow_offset = new GridPoint2();
@@ -1637,15 +1637,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
+        // Tooltip
+        if(uiEngineState.tooltip != null){
+            for(int i=0;i<uiEngineState.tooltip.updateActions.size();i++){
+                actions_executeUpdateAction(uiEngineState.tooltip.updateActions.get(i), currentTimeMillis);
+            }
+        }
+
         // Engine SingleUpdateActions
         for (int i = 0; i < uiEngineState.singleUpdateActions.size(); i++) {
             UpdateAction updateAction = uiEngineState.singleUpdateActions.get(i);
             if (this.actions_executeUpdateAction(updateAction, currentTimeMillis)) {
-                uiEngineState.singleUpdateActionsRemoveQ.push(updateAction);
+                uiEngineState.singleUpdateActionsRemoveQueue.push(updateAction);
             }
         }
         UpdateAction removeUpdateAction;
-        while ((removeUpdateAction = uiEngineState.singleUpdateActionsRemoveQ.pollFirst()) != null) {
+        while ((removeUpdateAction = uiEngineState.singleUpdateActionsRemoveQueue.pollFirst()) != null) {
             uiEngineState.singleUpdateActions.remove(removeUpdateAction);
         }
     }

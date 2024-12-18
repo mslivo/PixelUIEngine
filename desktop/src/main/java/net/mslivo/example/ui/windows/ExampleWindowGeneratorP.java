@@ -497,18 +497,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,8,3);
 
-        api.window.addUpdateAction(window, new UpdateAction(0) {
-            @Override
-            public void onUpdate() {
-                for (int i = 0; i < 20; i++)
-                api.toolTip.segment.canvas.point(canvasSegment,
-                        MathUtils.random(1, canvasSegment.colorMap.width),MathUtils.random(1, canvasSegment.colorMap.height),
-                        MathUtils.random(1f),MathUtils.random(1f),MathUtils.random(1f),1f
-                        );
-            }
-        });
 
-        api.component.setToolTip(imageButton4, api.toolTip.create(
+        Tooltip tooltip = api.toolTip.create(
                 new TooltipSegment[]{
                         api.toolTip.segment.text.create("color[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
@@ -526,7 +516,20 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         api.toolTip.segment.canvas.clear(canvasSegment,Color.CLEAR);
                     }
                 }, 0, Color.RED, Color.BLUE, 5, DIRECTION.RIGHT
-        ));
+        );
+
+        api.component.setToolTip(imageButton4, tooltip);
+
+        api.toolTip.addUpdateAction(tooltip, new UpdateAction(0) {
+            @Override
+            public void onUpdate() {
+                for (int i = 0; i < 20; i++)
+                    api.toolTip.segment.canvas.point(canvasSegment,
+                            MathUtils.random(1, canvasSegment.colorMap.width),MathUtils.random(1, canvasSegment.colorMap.height),
+                            MathUtils.random(1f),MathUtils.random(1f),MathUtils.random(1f),1f
+                    );
+            }
+        });
 
 
         ArrayList<Component> border = api.composites.image.createBorder(10, 4, 4, 4);

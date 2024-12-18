@@ -83,7 +83,7 @@ public final class UIEngineState {
     public ArrayList<HotKey> hotKeys;
     public ArrayList<AppViewport> appViewPorts;
     public ArrayList<UpdateAction> singleUpdateActions;
-    public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQ;
+    public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQueue;
 
     /* #################### UI: Actively used UI References #################### */
     public Window draggedWindow;
