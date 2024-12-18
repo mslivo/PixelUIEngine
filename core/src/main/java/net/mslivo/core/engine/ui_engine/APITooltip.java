@@ -31,7 +31,8 @@ public final class APITooltip {
         this.segment = new APITooltipSegment();
     }
 
-    public final ToolTipAction DEFAULT_TOOLTIP_ACTION =  new ToolTipAction() {};
+    public final ToolTipAction DEFAULT_TOOLTIP_ACTION = new ToolTipAction() {
+    };
 
     public Tooltip create(String text) {
         return create(new TooltipSegment[]{
@@ -84,8 +85,8 @@ public final class APITooltip {
         return tooltip;
     }
 
-    public void addUpdateAction(Tooltip tooltip, UpdateAction updateAction){
-        if(tooltip == null || updateAction == null)
+    public void addUpdateAction(Tooltip tooltip, UpdateAction updateAction) {
+        if (tooltip == null || updateAction == null)
             return;
         tooltip.updateActions.add(updateAction);
     }
@@ -343,6 +344,19 @@ public final class APITooltip {
             public Color getColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
                 if (tooltipCanvasSegment == null) return null;
                 return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x, y);
+            }
+
+            public boolean isColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, float r, float g, float b, float a) {
+                if (tooltipCanvasSegment == null)
+                    return false;
+                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y) == r &&
+                        UICommonUtils.colorMap_g(tooltipCanvasSegment.colorMap, x, y) == g &&
+                        UICommonUtils.colorMap_b(tooltipCanvasSegment.colorMap, x, y) == b &&
+                        UICommonUtils.colorMap_a(tooltipCanvasSegment.colorMap, x, y) == a;
+            }
+
+            public boolean isColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, Color color) {
+                return isColor(tooltipCanvasSegment, x, y, color.r, color.g, color.b, color.a);
             }
 
             public float getR(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
