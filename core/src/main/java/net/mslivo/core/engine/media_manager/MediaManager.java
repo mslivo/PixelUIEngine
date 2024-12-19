@@ -181,7 +181,7 @@ public final class MediaManager {
                     int currentY = 0;
                     for (int i2 = 0; i2 < arraySymbol.frameOffset; i2++) {
                         currentX += arraySymbol.regionWidth;
-                        if (currentX >= symbolPixmap.getWidth()) {
+                        if (currentX+arraySymbol.regionWidth > symbolPixmap.getWidth()) {
                             currentX = 0;
                             currentY += arraySymbol.regionHeight;
                         }
@@ -196,7 +196,7 @@ public final class MediaManager {
                             throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, arraySymbol.file, symbolID));
                         }
                         currentX += arraySymbol.regionWidth;
-                        if (currentX >= symbolPixmap.getWidth()) {
+                        if ((currentX+arraySymbol.regionWidth) > symbolPixmap.getWidth()) {
                             currentX = 0;
                             currentY += arraySymbol.regionHeight;
                         }
