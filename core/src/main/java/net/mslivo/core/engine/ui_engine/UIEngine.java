@@ -2349,15 +2349,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                     // Background
                     if (!segment.clear) {
+                        render_setColor(spriteRenderer, segment.cellColor, segmentAlpha, false);
                         for (int tx = 0; tx < tooltip_width; tx++) {
-                            render_setColor(spriteRenderer, segment.cellColor, segmentAlpha, false);
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_CELL, render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         }
                     }
 
                     // Border
+                    render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
                     for (int tx = 0; tx < tooltip_width; tx++) {
-                        render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
                         // tooltip border
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
                         // segmentborder
@@ -2370,8 +2370,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
 
                 // Top Border
+                render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
                 for (int tx = 0; tx < tooltip_width; tx++) {
-                    render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
                     // tooltip border
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_TOP, render_get3TilesCMediaIndex(tx, width_reference), tooltip_x + TS(tx), tooltip_y + TS(tooltip_height));
                 }
@@ -2380,7 +2380,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
             // Content
-
             spriteRenderer.setColorReset();
 
             switch (segment) {

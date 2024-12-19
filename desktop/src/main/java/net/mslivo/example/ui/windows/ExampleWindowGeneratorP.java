@@ -500,9 +500,9 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Tooltip tooltip = api.toolTip.create(
                 new TooltipSegment[]{
-                        api.toolTip.segment.text.create("color[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, true, true),
+                        api.toolTip.segment.text.create("color[#FF0000]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
+                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
                         api.toolTip.segment.text.create("1", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("2", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
                         api.toolTip.segment.text.create("3", Color.WHITE,Color.GRAY, SEGMENT_ALIGNMENT.CENTER, false, false),
