@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -35,7 +36,8 @@ public final class MediaManager {
     private static final String ERROR_SPLIT_FRAMES = "Error splitting frames for: \"%s\": Negative frameCount = %d";
     private static final String ERROR_READ_FONT = "Error reading font file \"%s\"";
     private static final String ERROR_READ_FONT_FILE_DESCRIPTOR = "Error reading font file \"%s\": file= descriptor not found";
-    private static final String ERROR_SYMBOL_ID_DUPLICATE = "Symbol id \"%d\" is already defined in font";
+    private static final String ERROR_SYMBOL_ID_DUPLICATE = "Symbol \"%s\" id \"%d\" is already defined in font";
+    private static final String ERROR_SYMBOL_NOT_ENOUGH_SPACE = "SymbolArray \"%s\" more symbols defined than available in texture";
     private static final String PACKED_FONT_NAME = "%s_%d.packed";
     private static final GlyphLayout glyphLayout = new GlyphLayout();
     private static final int DEFAULT_PAGE_WIDTH = 4096;
@@ -47,12 +49,12 @@ public final class MediaManager {
     };
     private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0" + System.lineSeparator();
     private boolean loaded = false;
-    private ObjectMap<CMediaSoundEffect,Sound> medias_sounds = null;
-    private ObjectMap<CMediaMusic,Music> medias_music = null;
+    private ObjectMap<CMediaSoundEffect, Sound> medias_sounds = null;
+    private ObjectMap<CMediaMusic, Music> medias_music = null;
     private ObjectMap<CMediaImage, TextureRegion> medias_images = null;
-    private ObjectMap<CMediaFont,BitmapFont> medias_fonts = null;
-    private ObjectMap<CMediaArray,TextureRegion[]> medias_arrays = null;
-    private ObjectMap<CMediaAnimation,ExtendedAnimation> medias_animations = null;
+    private ObjectMap<CMediaFont, BitmapFont> medias_fonts = null;
+    private ObjectMap<CMediaArray, TextureRegion[]> medias_arrays = null;
+    private ObjectMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -144,76 +146,136 @@ public final class MediaManager {
     }
 
 
-    private CreateFontResult createFontAddSymbols(Pixmap pixmap, CMediaFontSymbol[] symbols) {
+    private CreateFontResult createFontAddSymbols(Pixmap resultPixMap, CMediaFontSymbol[] symbols) {
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
-        Pixmap[] symbolPixmaps = new Pixmap[symbols.length];
+        ObjectMap<CMediaFontSymbol, Pixmap[]> symbolToPixMap = new ObjectMap<>();
         IntSet uniqueSymbolIds = new IntSet();
+
         for (int i = 0; i < symbols.length; i++) {
-            if(!uniqueSymbolIds.contains(symbols[i].id)) {
-                symbolPixmaps[i] = createTexturePixmap(Tools.File.findResource(symbols[i].file));
-                uniqueSymbolIds.add(symbols[i].id);
-            }else{
-                throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, symbols[i].id));
+            Pixmap symbolPixmap = createTexturePixmap(Tools.File.findResource(symbols[i].file));
+            Pixmap[] symbolPixmapResults;
+            switch (symbols[i]) {
+                case CMediaFontSingleSymbol singleSymbol -> {
+                    if (!uniqueSymbolIds.contains(singleSymbol.id)) {
+                        symbolPixmapResults = new Pixmap[]{symbolPixmap};
+                        uniqueSymbolIds.add(singleSymbol.id);
+                    } else {
+                        throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, singleSymbol.file, singleSymbol.id));
+                    }
+                }
+                case CMediaFontArraySymbol arraySymbol -> {
+                    int symbolsX = MathUtils.floor(symbolPixmap.getWidth() / (float) arraySymbol.regionWidth);
+                    int symbolsY = MathUtils.floor(symbolPixmap.getHeight() / (float) arraySymbol.regionHeight);
+                    int maxSymbolsInPixMap = symbolsX * symbolsY;
+                    int symbolsMax = Math.min(arraySymbol.ids.length, arraySymbol.frameLength);
+
+                    if (symbolsMax > maxSymbolsInPixMap) {
+                        throw new RuntimeException(String.format(ERROR_SYMBOL_NOT_ENOUGH_SPACE, arraySymbol.file));
+                    }
+
+                    symbolPixmapResults = new Pixmap[symbolsMax];
+
+                    // Skip offset
+                    int currentX = 0;
+                    int currentY = 0;
+                    for (int i2 = 0; i2 < arraySymbol.frameOffset; i2++) {
+                        currentX += arraySymbol.regionWidth;
+                        if (currentX >= symbolPixmap.getWidth()) {
+                            currentX = 0;
+                            currentY += arraySymbol.regionHeight;
+                        }
+                    }
+
+                    for (int i2 = 0; i2 < symbolsMax; i2++) {
+                        int symbolID = arraySymbol.ids[i2];
+                        if (!uniqueSymbolIds.contains(symbolID)) {
+                            symbolPixmapResults[i2] = copyPixmap(symbolPixmap,arraySymbol.regionWidth, arraySymbol.regionHeight, currentX, currentY,arraySymbol.regionWidth, arraySymbol.regionHeight);
+                            uniqueSymbolIds.add(symbolID);
+                        } else {
+                            throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, arraySymbol.file, symbolID));
+                        }
+                        currentX += arraySymbol.regionWidth;
+                        if (currentX >= symbolPixmap.getWidth()) {
+                            currentX = 0;
+                            currentY += arraySymbol.regionHeight;
+                        }
+                    }
+                }
             }
+            symbolToPixMap.put(symbols[i], symbolPixmapResults);
         }
 
+        // Extend Pixmap at bottom to create symbol Area
         int symbolAreaHeight = 0;
         int symbolHeightMax = 0;
         int xCurrent = 0;
-
-        for (int i = 0; i < symbolPixmaps.length; i++) {
-            Pixmap symbolPixmap = symbolPixmaps[i];
-            symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
-            if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
-                symbolAreaHeight += symbolHeightMax;
-                symbolHeightMax = 0;
-                xCurrent = 0;
-            } else {
-                xCurrent += symbolPixmap.getWidth();
+        for (int i = 0; i < symbols.length; i++) {
+            Pixmap[] symbolPixmaps = symbolToPixMap.get(symbols[i]);
+            for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
+                Pixmap symbolPixmap = symbolPixmaps[i2];
+                symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+                if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
+                    symbolAreaHeight += symbolHeightMax;
+                    symbolHeightMax = 0;
+                    xCurrent = 0;
+                } else {
+                    xCurrent += symbolPixmap.getWidth();
+                }
             }
         }
         symbolAreaHeight += symbolHeightMax;
+        int resultPixmapWidth = resultPixMap.getWidth();
+        int originalHeight = resultPixMap.getHeight();
+        int reultPixMapHeight = originalHeight + symbolAreaHeight;
+        resultPixMap = copyPixmap(resultPixMap, resultPixmapWidth, reultPixMapHeight, 0, 0, resultPixMap.getWidth(), resultPixMap.getHeight());
 
-        // Create Symbol Area
-        int newWidth = pixmap.getWidth();
-        int originalHeight = pixmap.getHeight();
-        int newHeight = originalHeight + symbolAreaHeight;
-        Pixmap newPixmap = new Pixmap(newWidth, newHeight, pixmap.getFormat());
-        newPixmap.setBlending(Pixmap.Blending.None);
-        newPixmap.setColor(0, 0, 0, 0);
-        newPixmap.fill();
-        newPixmap.drawPixmap(pixmap, 0, 0);
-        pixmap = newPixmap;
 
         // copy symbols
         xCurrent = 0;
         int yCurrent = originalHeight;
-        for (int i = 0; i < symbolPixmaps.length; i++) {
-            Pixmap symbolPixmap = symbolPixmaps[i];
-            symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
-            if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
-                yCurrent += symbolHeightMax;
-                symbolHeightMax = 0;
-                xCurrent = 0;
-            } else {
-                newPixmap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
-                fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbols[i].id,
-                        xCurrent, yCurrent, symbolPixmap.getWidth(),
-                        symbolPixmap.getHeight(), -1,
-                        12 - symbolPixmap.getHeight(),
-                        symbolPixmap.getWidth() - 1));
+        for (int i = 0; i < symbols.length; i++) {
+            Pixmap[] symbolPixmaps = symbolToPixMap.get(symbols[i]);
+            for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
+                Pixmap symbolPixmap = symbolPixmaps[i2];
+                symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+                if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
+                    yCurrent += symbolHeightMax;
+                    symbolHeightMax = 0;
+                    xCurrent = 0;
+                } else {
+                    resultPixMap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
+                    int symbolId = switch (symbols[i]) {
+                        case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
+                        case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
+                    };
+                    fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
+                            xCurrent, yCurrent, symbolPixmap.getWidth(),
+                            symbolPixmap.getHeight(), -1,
+                            12 - symbolPixmap.getHeight(),
+                            symbolPixmap.getWidth() - 1));
 
-                xCurrent += symbolPixmap.getWidth();
+                    xCurrent += symbolPixmap.getWidth();
+                }
             }
         }
 
         // Dispose Symbol Pixmaps
-        for (int i = 0; i < symbolPixmaps.length; i++)
-            symbolPixmaps[i].dispose();
+        symbolToPixMap.values().forEach(pixmaps -> {
+            for (int i = 0; i < pixmaps.length; i++)
+                pixmaps[i].dispose();
+        });
 
+        return new CreateFontResult(resultPixMap, fntFileData.toString());
+    }
 
-        return new CreateFontResult(pixmap, fntFileData.toString());
+    private Pixmap copyPixmap(Pixmap originalPixmap, int newWidth, int newHeight, int srcX, int sryY, int srcWidth, int srcHeight) {
+        Pixmap result = new Pixmap(newWidth, newHeight, originalPixmap.getFormat());
+        result.setBlending(Pixmap.Blending.None);
+        result.setColor(0, 0, 0, 0);
+        result.fill();
+        result.drawPixmap(originalPixmap, 0, 0, srcX, sryY, srcWidth, srcHeight);
+        return result;
     }
 
     private CreateFontResult createFont(FileHandle textureFileHandle, Color outlineColor, boolean outlineOnly, boolean outlineSymbols, CMediaFontSymbol[] symbols) {
@@ -244,7 +306,7 @@ public final class MediaManager {
     }
 
     private Pixmap createTexturePixmap(FileHandle textureFileHandle) {
-        TextureData textureData = TextureData.Factory.loadFromFile(textureFileHandle, null, false);
+        TextureData textureData = TextureData.Factory.loadFromFile(textureFileHandle, Pixmap.Format.RGBA8888, false);
         textureData.prepare();
         return textureData.consumePixmap();
     }
@@ -331,7 +393,7 @@ public final class MediaManager {
                     medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
                 }
                 case CMediaArray cMediaArray -> {
-                    medias_arrays.put(cMediaArray,splitFrames(cMediaArray.file, cMediaArray.regionWidth, cMediaArray.regionHeight,
+                    medias_arrays.put(cMediaArray, splitFrames(cMediaArray.file, cMediaArray.regionWidth, cMediaArray.regionHeight,
                             cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
                 }
                 case CMediaAnimation cMediaAnimation -> {
@@ -353,7 +415,7 @@ public final class MediaManager {
             );
             bitmapFont.setColor(Color.GRAY);
             bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
-            medias_fonts.put(cMediaFont,bitmapFont);
+            medias_fonts.put(cMediaFont, bitmapFont);
         }
 
         // 6. Fill CMedia Arrays with Sound Data
@@ -361,10 +423,10 @@ public final class MediaManager {
             CMediaSound soundMedia = soundCMediaLoadStack.get(i);
             switch (soundMedia) {
                 case CMediaSoundEffect cMediaSoundEffect -> {
-                    medias_sounds.put(cMediaSoundEffect,Gdx.audio.newSound(Tools.File.findResource(cMediaSoundEffect.file)));
+                    medias_sounds.put(cMediaSoundEffect, Gdx.audio.newSound(Tools.File.findResource(cMediaSoundEffect.file)));
                 }
                 case CMediaMusic cMediaMusic -> {
-                    medias_music.put(cMediaMusic,Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file)));
+                    medias_music.put(cMediaMusic, Gdx.audio.newMusic(Tools.File.findResource(soundMedia.file)));
                 }
             }
             loadedMediaList.add(soundMedia);
@@ -458,8 +520,7 @@ public final class MediaManager {
     public TextureRegion sprite(CMediaSprite cMediaSprite, int arrayIndex, float animationTimer) {
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage);
-            case CMediaAnimation cMediaAnimation ->
-                    medias_animations.get(cMediaAnimation).getKeyFrame(animationTimer);
+            case CMediaAnimation cMediaAnimation -> medias_animations.get(cMediaAnimation).getKeyFrame(animationTimer);
             case CMediaArray cMediaArray -> medias_arrays.get(cMediaArray)[arrayIndex];
         };
     }

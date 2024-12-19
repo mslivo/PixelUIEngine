@@ -12,9 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
-import net.mslivo.core.engine.media_manager.CMedia;
-import net.mslivo.core.engine.media_manager.CMediaFontSymbol;
-import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.media_manager.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -252,12 +250,20 @@ public class Tools {
             return String.format("%.2f%%", percentDecimal * 100f);
         }
 
-        public static String fontSymbol(CMediaFontSymbol cMediaFontSymbol, boolean neutralColor) {
+        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol, boolean neutralColor) {
             return fontSymbol(cMediaFontSymbol.id, neutralColor);
         }
 
-        public static String fontSymbol(CMediaFontSymbol cMediaFontSymbol) {
+        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol) {
             return fontSymbol(cMediaFontSymbol.id, true);
+        }
+
+        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, boolean neutralColor, int arrayIndex) {
+            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], neutralColor);
+        }
+
+        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, int arrayIndex) {
+            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], true);
         }
 
         public static String fontSymbol(int id) {
