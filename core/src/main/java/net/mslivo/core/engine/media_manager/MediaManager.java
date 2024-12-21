@@ -181,7 +181,7 @@ public final class MediaManager {
                     int currentY = 0;
                     for (int i2 = 0; i2 < arraySymbol.frameOffset; i2++) {
                         currentX += arraySymbol.regionWidth;
-                        if (currentX+arraySymbol.regionWidth > symbolPixmap.getWidth()) {
+                        if (currentX + arraySymbol.regionWidth > symbolPixmap.getWidth()) {
                             currentX = 0;
                             currentY += arraySymbol.regionHeight;
                         }
@@ -190,13 +190,13 @@ public final class MediaManager {
                     for (int i2 = 0; i2 < symbolsMax; i2++) {
                         int symbolID = arraySymbol.ids[i2];
                         if (!uniqueSymbolIds.contains(symbolID)) {
-                            symbolPixmapResults[i2] = copyPixmap(symbolPixmap,arraySymbol.regionWidth, arraySymbol.regionHeight, currentX, currentY,arraySymbol.regionWidth, arraySymbol.regionHeight);
+                            symbolPixmapResults[i2] = copyPixmap(symbolPixmap, arraySymbol.regionWidth, arraySymbol.regionHeight, currentX, currentY, arraySymbol.regionWidth, arraySymbol.regionHeight);
                             uniqueSymbolIds.add(symbolID);
                         } else {
                             throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, arraySymbol.file, symbolID));
                         }
                         currentX += arraySymbol.regionWidth;
-                        if ((currentX+arraySymbol.regionWidth) > symbolPixmap.getWidth()) {
+                        if ((currentX + arraySymbol.regionWidth) > symbolPixmap.getWidth()) {
                             currentX = 0;
                             currentY += arraySymbol.regionHeight;
                         }
@@ -214,13 +214,13 @@ public final class MediaManager {
             Pixmap[] symbolPixmaps = symbolToPixMap.get(symbols[i]);
             for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
                 Pixmap symbolPixmap = symbolPixmaps[i2];
+
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+                xCurrent += symbolPixmap.getWidth();
                 if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
                     symbolAreaHeight += symbolHeightMax;
                     symbolHeightMax = 0;
                     xCurrent = 0;
-                } else {
-                    xCurrent += symbolPixmap.getWidth();
                 }
             }
         }
@@ -238,25 +238,27 @@ public final class MediaManager {
             Pixmap[] symbolPixmaps = symbolToPixMap.get(symbols[i]);
             for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
                 Pixmap symbolPixmap = symbolPixmaps[i2];
+
+                resultPixMap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
+                int symbolId = switch (symbols[i]) {
+                    case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
+                    case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
+                };
+                fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
+                        xCurrent, yCurrent, symbolPixmap.getWidth(),
+                        symbolPixmap.getHeight(), -1,
+                        12 - symbolPixmap.getHeight(),
+                        symbolPixmap.getWidth() - 1));
+
+
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+                xCurrent += symbolPixmap.getWidth();
                 if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
                     yCurrent += symbolHeightMax;
                     symbolHeightMax = 0;
                     xCurrent = 0;
-                } else {
-                    resultPixMap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
-                    int symbolId = switch (symbols[i]) {
-                        case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
-                        case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
-                    };
-                    fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
-                            xCurrent, yCurrent, symbolPixmap.getWidth(),
-                            symbolPixmap.getHeight(), -1,
-                            12 - symbolPixmap.getHeight(),
-                            symbolPixmap.getWidth() - 1));
-
-                    xCurrent += symbolPixmap.getWidth();
                 }
+
             }
         }
 
