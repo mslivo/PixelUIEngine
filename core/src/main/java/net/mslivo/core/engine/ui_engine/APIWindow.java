@@ -27,7 +27,7 @@ public final class APIWindow {
         this.uiConfig = uiEngineState.config;
     }
 
-    private WindowAction DEFAULT_WINDOW_ACTION = new WindowAction() {
+    public final WindowAction DEFAULT_WINDOW_ACTION = new WindowAction() {
     };
 
     public Window create(int x, int y, int width, int height) {
