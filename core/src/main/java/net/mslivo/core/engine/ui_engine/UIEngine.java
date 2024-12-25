@@ -2191,7 +2191,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         widthPx = Math.max(widthPx, mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text));
 
 
-                    int width = MathUtils.ceil((widthPx+2)/uiEngineState.tileSize.TSF);
+                    int width = MathUtils.ceil((widthPx+4)/uiEngineState.tileSize.TSF);
                     int height = comboBox.items.size();
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
