@@ -1141,13 +1141,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                     UICommonUtils.comboBox_close(uiEngineState, comboBox);
                                 } else {
                                     // Clicked on Item
-                                    for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
+                                    for (int i = 0; i < comboBox.items.size(); i++) {
                                         if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
                                                 UICommonUtils.component_getAbsoluteX(comboBox),
                                                 UICommonUtils.component_getAbsoluteY(comboBox) - TS(i) - TS(),
                                                 TS(comboBox.width),
                                                 TS())) {
-                                            uiEngineState.pressedComboBoxItem = comboBox.comboBoxItems.get(i);
+                                            uiEngineState.pressedComboBoxItem = comboBox.items.get(i);
                                         }
                                     }
                                 }
@@ -1638,8 +1638,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Tooltip
-        if(uiEngineState.tooltip != null){
-            for(int i=0;i<uiEngineState.tooltip.updateActions.size();i++){
+        if (uiEngineState.tooltip != null) {
+            for (int i = 0; i < uiEngineState.tooltip.updateActions.size(); i++) {
                 actions_executeUpdateAction(uiEngineState.tooltip.updateActions.get(i), currentTimeMillis);
             }
         }
@@ -2160,7 +2160,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private int render_get3TilesCMediaIndex(int x, int width) {
-        if (x == 0 ) return 0;
+        if (x == 0) return 0;
         if (x == width - 1) return 2;
         return 1;
     }
@@ -2186,32 +2186,43 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Combobox comboBox -> {
                 // Menu
                 if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
-                    int width = comboBox.width;
-                    int height = comboBox.comboBoxItems.size();
+                    int widthPx = TS(comboBox.width);
+                    for (int i = 0; i < comboBox.items.size(); i++)
+                        widthPx = Math.max(widthPx, mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text));
+
+
+                    int width = MathUtils.ceil((widthPx+2)/uiEngineState.tileSize.TSF);
+                    int height = comboBox.items.size();
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
-                        ComboboxItem comboBoxItem = comboBox.comboBoxItems.get(iy);
+                        ComboboxItem comboBoxItem = comboBox.items.get(iy);
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get9TilesCMediaIndex(ix, iy, width, height);
-                            boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), TS(comboBox.width), TS());
+                            boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), widthPx, TS());
                             CMediaArray comboBoxCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL;
 
                             // Cell
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
-                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
+                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1);
                             spriteRenderer.loadState();
 
                             // Cell - Underline
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1);
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, TS(comboBox.width),
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() -1, comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
                                     comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
                                     comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                         }
                     }
-
+                    // Top
+                    if (!comboBox.items.isEmpty()) {
+                        for (int ix = 0; ix < width; ix++) {
+                            int index = render_get3TilesCMediaIndex(ix, width);
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox)-1);
+                        }
+                    }
 
                 }
             }
@@ -2257,7 +2268,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
             // Top
-            if(!contextMenu.items.isEmpty()) {
+            if (!contextMenu.items.isEmpty()) {
                 for (int ix = 0; ix < width; ix++) {
                     int index = render_get3TilesCMediaIndex(ix, width);
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_CONTEXT_MENU_TOP, index, contextMenu.x + TS(ix), contextMenu.y);
@@ -2313,11 +2324,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         int tooltip_y = switch (direction) {
             case RIGHT, LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
+                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
             case UP ->
-                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
+                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
             case DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height)-1);
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
         };
 
 

@@ -332,7 +332,7 @@ final class UICommonUtils {
 
         // Combobox Open Menu collision
         if (uiEngineState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox), UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.comboBoxItems.size())), uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.comboBoxItems.size()))) {
+            if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox), UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size())), uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size()))) {
                 return uiEngineState.openComboBox;
             }
         }
@@ -766,14 +766,14 @@ final class UICommonUtils {
     static void comboBox_addItem(Combobox comboBox, ComboboxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != null) return;
         comboBoxItem.addedToComboBox = comboBox;
-        comboBox.comboBoxItems.add(comboBoxItem);
+        comboBox.items.add(comboBoxItem);
     }
 
     static void comboBox_removeItem(Combobox comboBox, ComboboxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != comboBox) return;
         if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
-        comboBox.comboBoxItems.remove(comboBoxItem);
+        comboBox.items.remove(comboBoxItem);
     }
 
     static void canvas_addCanvasImage(Canvas canvas, CanvasImage canvasImage) {

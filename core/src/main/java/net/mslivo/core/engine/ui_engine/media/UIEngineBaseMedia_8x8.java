@@ -25,6 +25,7 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaImage UI_LIST_CELL_SELECTED = new CMediaImage(DIR_UI_GRAPHICS + "ui/list_cell_selected.png");
     public static final CMediaArray UI_LIST_DRAG = new CMediaArray(DIR_UI_GRAPHICS + "ui/list_drag.png", TL, TL * 2);
     public static final CMediaArray UI_COMBOBOX = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox.png", TL, TL);
+    public static final CMediaArray UI_COMBOBOX_TOP = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_top.png", TL, TL);
     public static final CMediaArray UI_COMBOBOX_OPEN = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_open.png", TL, TL);
     public static final CMediaArray UI_COMBOBOX_LIST = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list.png", TL, TL);
     public static final CMediaArray UI_COMBOBOX_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_cell.png", TL, TL);
@@ -115,6 +116,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_LIST_CELL_SELECTED,
             UI_LIST_DRAG,
             UI_COMBOBOX,
+            UI_COMBOBOX_TOP,
             UI_TAB_BORDERS,
             UI_BORDERS,
             UI_TAB,

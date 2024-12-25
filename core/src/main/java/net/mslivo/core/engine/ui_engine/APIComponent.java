@@ -1398,11 +1398,11 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, UICommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
             comboBox.useIcons = useIcons;
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
-            comboBox.comboBoxItems = new ArrayList<>();
+            comboBox.items = new ArrayList<>();
             if (combobBoxItems != null) {
                 for (int i = 0; i < combobBoxItems.length; i++) {
                     if (combobBoxItems[i].addedToComboBox == null) {
-                        comboBox.comboBoxItems.add(combobBoxItems[i]);
+                        comboBox.items.add(combobBoxItems[i]);
                         combobBoxItems[i].addedToComboBox = comboBox;
                     }
                 }
@@ -1443,7 +1443,7 @@ public final class APIComponent {
 
         public void removeAllComboBoxItems(Combobox comboBox) {
             if (comboBox == null) return;
-            removeComboBoxItems(comboBox, comboBox.comboBoxItems.toArray(new ComboboxItem[]{}));
+            removeComboBoxItems(comboBox, comboBox.items.toArray(new ComboboxItem[]{}));
         }
 
         public boolean isItemSelected(Combobox comboBox, ComboboxItem comboBoxItem) {
@@ -1472,9 +1472,9 @@ public final class APIComponent {
 
         public void setSelectedItemByText(Combobox comboBox, String text) {
             if (comboBox == null || text == null) return;
-            for (int i = 0; i < comboBox.comboBoxItems.size(); i++) {
-                if (comboBox.comboBoxItems.get(i).text.equals(text)) {
-                    UICommonUtils.comboBox_selectItem(uiEngineState, comboBox.comboBoxItems.get(i));
+            for (int i = 0; i < comboBox.items.size(); i++) {
+                if (comboBox.items.get(i).text.equals(text)) {
+                    UICommonUtils.comboBox_selectItem(uiEngineState, comboBox.items.get(i));
                     return;
                 }
             }
