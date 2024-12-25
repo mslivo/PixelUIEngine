@@ -1493,14 +1493,14 @@ public final class APIComponent {
             public final ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {};
 
             public ComboboxItem create(String text) {
-                return create(text, null);
+                return create(text, DEFAULT_COMBOBOX_ITEM_ACTION);
             }
 
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
-                comboBoxItem.comboBoxItemAction = comboBoxItemAction;
+                comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
                 comboBoxItem.name = "";
                 comboBoxItem.data = null;
                 return comboBoxItem;
