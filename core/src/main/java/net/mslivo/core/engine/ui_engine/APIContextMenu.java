@@ -45,7 +45,7 @@ public final class APIContextMenu {
             }
         }
         contextMenu.color = new Color(uiConfig.contextMenu_defaultColor);
-        contextMenu.contextMenuAction = contextMenuAction;
+        contextMenu.contextMenuAction = contextMenuAction != null ? contextMenuAction : DEFAULT_CONTEXT_MENU_ACTION;
         return contextMenu;
     }
 

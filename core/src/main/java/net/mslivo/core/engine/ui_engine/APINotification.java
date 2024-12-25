@@ -44,7 +44,7 @@ public final class APINotification {
         notification.displayTime = Math.max(displayTime,0);
         notification.color = new Color(uiConfig.notification_defaultColor);
         notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
-        notification.notificationAction = notificationAction;
+        notification.notificationAction = notificationAction != null ? notificationAction : DEFAULT_NOTIFICATION_ACTION;
         notification.timer = 0;
         int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
         if (textWidth > uiEngineState.resolutionWidth) {

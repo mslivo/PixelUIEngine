@@ -67,7 +67,7 @@ public final class APIWindow {
         window.fontColor = uiConfig.ui_font_defaultColor.cpy();
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
-        window.windowAction = windowAction;
+        window.windowAction = windowAction != null ? windowAction : DEFAULT_WINDOW_ACTION;
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;

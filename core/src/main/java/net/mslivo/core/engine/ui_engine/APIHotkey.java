@@ -29,7 +29,7 @@ public final class APIHotkey {
         HotKey hotKey = new HotKey();
         hotKey.pressed = false;
         hotKey.keyCodes = keyCodes != null ? Arrays.copyOf(keyCodes, keyCodes.length) : new int[]{};
-        hotKey.hotKeyAction = DEFAULT_HOTKEY_ACTION;
+        hotKey.hotKeyAction = hotKeyAction != null ? hotKeyAction : DEFAULT_HOTKEY_ACTION;
         hotKey.name = "";
         hotKey.data = null;
         return hotKey;

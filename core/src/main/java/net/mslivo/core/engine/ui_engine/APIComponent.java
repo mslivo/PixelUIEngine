@@ -98,13 +98,10 @@ public final class APIComponent {
 
         }
 
-        public AppViewPortAction defaultAppViewPortAction() {
-            return new AppViewPortAction() {
-            };
-        }
+        public final AppViewPortAction DEFAULT_APPVIEWPORT_ACTION = new AppViewPortAction() {};
 
         public AppViewport create(int x, int y, int width, int height) {
-            return create(x, y, width, height, defaultAppViewPortAction(), 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, DEFAULT_APPVIEWPORT_ACTION, 0, 0, 1f, uiConfig.component_appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction) {
@@ -136,7 +133,7 @@ public final class APIComponent {
             appViewPort.camera.zoom = Math.max(camZoom, 0f);
             appViewPort.camera.update();
             appViewPort.updateTime = updateTime;
-            appViewPort.appViewPortAction = appViewPortAction;
+            appViewPort.appViewPortAction = appViewPortAction != null ? appViewPortAction : DEFAULT_APPVIEWPORT_ACTION;
             return appViewPort;
         }
 
@@ -483,7 +480,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
-            checkBox.checkBoxAction = checkBoxAction;
+            checkBox.checkBoxAction = checkBoxAction != null ? checkBoxAction : DEFAULT_CHECKBOX_ACTION;
             checkBox.fontColor = uiConfig.ui_font_defaultColor.cpy();
             checkBox.checked = checked;
             return checkBox;
@@ -563,7 +560,7 @@ public final class APIComponent {
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
             Tabbar tabBar = new Tabbar();
             setComponentCommonInitValuesInternal(tabBar, x, y, width, (bigIconMode ? 2 : 1));
-            tabBar.tabBarAction = tabBarAction;
+            tabBar.tabBarAction = tabBarAction != null ? tabBarAction : DEFAULT_TABBAR_ACTION;
             tabBar.border = border;
             tabBar.borderHeight = Math.max(borderHeight, 0);
             tabBar.tabOffset = Math.max(tabOffset, 0);
@@ -714,7 +711,7 @@ public final class APIComponent {
             public Tab create(String title, Component[] components, TabAction tabAction, int width) {
                 Tab tab = new Tab();
                 tab.title = Tools.Text.validString(title);
-                tab.tabAction = tabAction;
+                tab.tabAction = tabAction != null ? tabAction : DEFAULT_TAB_ACTION;
                 tab.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
@@ -842,7 +839,7 @@ public final class APIComponent {
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
-            grid.gridAction = gridAction;
+            grid.gridAction = gridAction != null ? gridAction : DEFAULT_GRID_ACTION;
             grid.dragEnabled = dragEnabled;
             grid.dragInEnabled = dragInEnabled;
             grid.dragOutEnabled = dragOutEnabled;
@@ -936,7 +933,7 @@ public final class APIComponent {
                 textField.allowedCharacters.add(allowedCharacters[i]);
             textField.offset = 0;
             textField.content = Tools.Text.validString(content);
-            textField.textFieldAction = textFieldAction;
+            textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
             textField.markerPosition = textField.content.length();
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
@@ -1029,7 +1026,7 @@ public final class APIComponent {
             canvas.colorMap.g = new float[widthPx][heightPx];
             canvas.colorMap.b = new float[widthPx][heightPx];
             canvas.colorMap.a = new float[widthPx][heightPx];
-            canvas.canvasAction = canvasAction;
+            canvas.canvasAction = canvasAction != null ? canvasAction : DEFAULT_CANVAS_ACTION;
             canvas.canvasImages = new ArrayList<>();
             if (canvasImages != null) {
                 for (int i = 0; i < canvasImages.length; i++) {
@@ -1252,7 +1249,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
-            knob.knobAction = knobAction;
+            knob.knobAction = knobAction != null ? knobAction : DEFAULT_KNOB_ACTION;
             return knob;
         }
 
@@ -1342,7 +1339,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
-            imageC.imageAction = imageAction;
+            imageC.imageAction = imageAction != null ? imageAction : DEFAULT_IMAGE_ACTION;
             imageC.flipX = flipX;
             imageC.flipY = flipY;
             return imageC;
@@ -1400,7 +1397,7 @@ public final class APIComponent {
             Combobox comboBox = new Combobox();
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, UICommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
             comboBox.useIcons = useIcons;
-            comboBox.comboBoxAction = comboBoxAction;
+            comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
             comboBox.comboBoxItems = new ArrayList<>();
             if (combobBoxItems != null) {
                 for (int i = 0; i < combobBoxItems.length; i++) {
@@ -1569,7 +1566,7 @@ public final class APIComponent {
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarHorizontal scrollBarHorizontal = new ScrollbarHorizontal();
                 setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
-                scrollBarHorizontal.scrollBarAction = scrollBarAction;
+                scrollBarHorizontal.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarHorizontal;
             }
@@ -1584,7 +1581,7 @@ public final class APIComponent {
             }
 
             public ScrollbarVertical create(int x, int y, int length) {
-                return create(x, y, length, DEFAULT_WINDOW_ACTION, 0f);
+                return create(x, y, length, DEFAULT_SCROLLBAR_ACTION, 0f);
             }
 
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction) {
@@ -1594,7 +1591,7 @@ public final class APIComponent {
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarVertical scrollBarVertical = new ScrollbarVertical();
                 setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
-                scrollBarVertical.scrollBarAction = scrollBarAction;
+                scrollBarVertical.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarVertical;
             }
@@ -1651,7 +1648,7 @@ public final class APIComponent {
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
-            list.listAction = listAction;
+            list.listAction = listAction != null ? listAction : DEFAULT_LIST_ACTION;
             list.multiSelect = multiSelect;
             list.scrolled = 0f;
             list.dragEnabled = dragEnabled;

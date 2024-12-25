@@ -56,7 +56,7 @@ public final class APIMouseTextInput {
         mouseTextInput.fontColor = uiConfig.ui_font_defaultColor.cpy();
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
-        mouseTextInput.mouseTextInputAction = mouseTextInputAction;
+        mouseTextInput.mouseTextInputAction = mouseTextInputAction != null ? mouseTextInputAction : DEFAULT_MOUSE_TEXTINPUT_ACTION;
         mouseTextInput.upperCase = false;
         mouseTextInput.selectedIndex = 0;
         mouseTextInput.enterCharacterQueue = new IntArray();

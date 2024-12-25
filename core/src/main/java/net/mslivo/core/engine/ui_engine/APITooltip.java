@@ -80,7 +80,7 @@ public final class APITooltip {
             }
         }
         tooltip.updateActions = new ArrayList<>();
-        tooltip.toolTipAction = toolTipAction;
+        tooltip.toolTipAction = toolTipAction != null ? toolTipAction : DEFAULT_TOOLTIP_ACTION;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
     }
