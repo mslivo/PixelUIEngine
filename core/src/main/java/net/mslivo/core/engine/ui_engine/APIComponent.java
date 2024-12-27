@@ -1451,6 +1451,11 @@ public final class APIComponent {
             return comboBox.selectedItem != null ? comboBox.selectedItem == comboBoxItem : false;
         }
 
+        public boolean isAnyItemSelected(Combobox comboBox) {
+            if (comboBox == null) return false;
+            return comboBox.selectedItem != null;
+        }
+
         public void setSelectedItem(ComboboxItem selectItem) {
             if (selectItem == null) return;
             UICommonUtils.comboBox_selectItem(uiEngineState, selectItem);
