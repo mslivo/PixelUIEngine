@@ -231,9 +231,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Textfield number = api.composites.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
 
-        ArrayList<ComboboxItem> list = new ArrayList(Arrays.asList("One", "Two", "Three444444444444"));
 
-        ComboboxItem comboboxItem = api.component.comboBox.item.create("One");
+        ComboboxItem comboboxItem = api.component.comboBox.item.create("Uniquenes");
 
 
         ComboboxItem comboboxItem2 = api.component.comboBox.item.create("2", new ComboBoxItemAction() {
