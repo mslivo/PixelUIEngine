@@ -841,19 +841,19 @@ public class Tools {
         }
 
         public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw > Ax && By + Bh > Ay && Ax + Aw > Bx && Ay + Ah > By;
+            return Bx + Bw >= Ax && By + Bh >= Ay && Ax + Aw >= Bx && Ay + Ah >= By;
         }
 
         public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
-            return Bx + Bw > Ax && By + Bh > Ay && Ax + Aw > Bx && Ay + Ah > By;
+            return Bx + Bw >= Ax && By + Bh >= Ay && Ax + Aw >= Bx && Ay + Ah >= By;
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-            return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX+1) >= Bx && (pointY+1) >= By;
         }
 
         public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
-            return rectsCollide(pointX, pointY, 1, 1, Bx, By, Bw, Bh);
+            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX + 1) >= Bx && (pointY + 1) >= By;
         }
 
         public static boolean circlesCollide(float x1, float y1, float r1, float x2, float y2, float r2) {
