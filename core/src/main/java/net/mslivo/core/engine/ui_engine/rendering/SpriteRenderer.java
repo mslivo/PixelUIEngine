@@ -1541,24 +1541,18 @@ public class SpriteRenderer implements Batch {
     // ----- CMediaFont -----
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text) {
-        if (cMediaFont == null || text == null) return;
-        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
-        fontCache.clear();
-        fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
-        fontCache.setAlphas(this.getAlpha());
-        fontCache.draw(this);
-    }
-
-    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
-        if (cMediaFont == null) return;
-        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
-        fontCache.clear();
-        fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
-        fontCache.setAlphas(this.getAlpha());
-        fontCache.draw(this);
+        this.drawCMediaFont(cMediaFont,x,y,text,false, false,0,this.getAlpha());
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY) {
+        this.drawCMediaFont(cMediaFont,x,y,text,centerX, centerY,0,this.getAlpha());
+    }
+
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY, int maxWidth) {
+        this.drawCMediaFont(cMediaFont,x,y,text,centerX, centerY,maxWidth,this.getAlpha());
+    }
+
+    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY, int maxWidth, float alpha) {
         if (cMediaFont == null) return;
         int xOffset = cMediaFont.offset_x;
         int yOffset = cMediaFont.offset_y;
@@ -1566,27 +1560,14 @@ public class SpriteRenderer implements Batch {
             xOffset -= MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f);
         if (centerY)
             yOffset -= MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f);
-
         BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
-        fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), 0, Align.left, false, null);
-        fontCache.draw(this, this.getAlpha());
+        fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, maxWidth > 0 ? "" : null);
+        fontCache.setAlphas(alpha);
+        fontCache.draw(this);
     }
 
-    public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth, boolean centerX, boolean centerY) {
-        if (cMediaFont == null) return;
-        int xOffset = cMediaFont.offset_x;
-        int yOffset = cMediaFont.offset_y;
-        if (centerX)
-            xOffset -= MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f);
-        if (centerY)
-            yOffset -= MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f);
 
-        BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
-        fontCache.clear();
-        fontCache.addText(text, (x + xOffset), (y + yOffset), 0, text.length(), maxWidth, Align.left, false, "");
-        fontCache.draw(this, this.getAlpha());
-    }
 
     // ####### Getter / Setters #######
 
