@@ -154,7 +154,7 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
         tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
-        tooltip_FadeInSpeed = 0.01f;
+        tooltip_FadeInSpeed = 0.2f;
         tooltip_FadeOutSpeed = 0.2f;
         tooltip_FadeInDelay = 20;
         // ##### MouseTextInput Default Values #####
