@@ -1545,7 +1545,8 @@ public class SpriteRenderer implements Batch {
         BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), 0, Align.left, false, null);
-        fontCache.draw(this, this.getAlpha());
+        fontCache.setAlphas(this.getAlpha());
+        fontCache.draw(this);
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, int maxWidth) {
@@ -1553,7 +1554,8 @@ public class SpriteRenderer implements Batch {
         BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
         fontCache.clear();
         fontCache.addText(text, (x + cMediaFont.offset_x), (y + cMediaFont.offset_y), 0, text.length(), maxWidth, Align.left, false, "");
-        fontCache.draw(this, this.getAlpha());
+        fontCache.setAlphas(this.getAlpha());
+        fontCache.draw(this);
     }
 
     public void drawCMediaFont(CMediaFont cMediaFont, float x, float y, String text, boolean centerX, boolean centerY) {

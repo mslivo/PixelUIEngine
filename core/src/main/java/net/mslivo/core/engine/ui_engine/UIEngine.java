@@ -2403,6 +2403,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
                         case RIGHT -> TS(tooltip_width) - text_width - 3;
                     };
+
                     render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 2);
                 }
                 case TooltipImageSegment imageSegment -> {
@@ -3193,7 +3194,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_drawIcon(icon, x, y, iconColor, alpha, iconGrayScale, iconIndex, false, iconFlipX, iconFlipY);
         }
 
-        font.setColor(color.r, color.g, color.b, alpha);
+        spriteRenderer.saveState();
+        spriteRenderer.setColor(Color.GRAY,alpha);
+        font.setColor(color.r, color.g, color.b, 1f);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text);
         } else {
@@ -3201,6 +3204,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,
                     maxWidth);
         }
+        spriteRenderer.loadState();
     }
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, Color color, float iconAlpha, boolean iconGrayscale, int arrayIndex, boolean bigMode, boolean flipX, boolean flipY) {
