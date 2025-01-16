@@ -15,4 +15,6 @@ public class Tooltip extends UpdateActionSupport {
     public Color color_line;
     public int lineLength;
     public DIRECTION direction;
+    public String name;
+    public Object data;
 }

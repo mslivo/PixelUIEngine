@@ -12,6 +12,7 @@ import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
+import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
@@ -66,6 +67,8 @@ public final class APITooltip {
 
     public Tooltip create(TooltipSegment[] segments, ToolTipAction toolTipAction, int minWidth, Color borderColor, Color lineColor, int lineLength, DIRECTION direction) {
         Tooltip tooltip = new Tooltip();
+        tooltip.name = "";
+        tooltip.data = null;
         tooltip.segments = new ArrayList<>();
         tooltip.color_border = new Color(borderColor);
         tooltip.color_line = new Color(lineColor);
@@ -83,6 +86,16 @@ public final class APITooltip {
         tooltip.toolTipAction = toolTipAction != null ? toolTipAction : DEFAULT_TOOLTIP_ACTION;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
+    }
+
+    public void setName(Tooltip tooltip, String name) {
+        if (tooltip == null) return;
+        tooltip.name = Tools.Text.validString(name);
+    }
+
+    public void setCustomData(Tooltip tooltip, Object customData) {
+        if (tooltip == null) return;
+        tooltip.data = customData;
     }
 
     public void addUpdateAction(Tooltip tooltip, UpdateAction updateAction) {
