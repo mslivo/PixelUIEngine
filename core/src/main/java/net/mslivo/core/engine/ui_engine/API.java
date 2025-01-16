@@ -395,6 +395,10 @@ public final class API {
         return uiEngineState.appToolTip != null;
     }
 
+    public Tooltip appToolTip() {
+        return uiEngineState.appToolTip;
+    }
+
     public VIEWPORT_MODE viewportMode() {
         return uiEngineState.viewportMode;
     }
