@@ -391,12 +391,16 @@ public final class API {
         uiEngineState.appToolTip = toolTip;
     }
 
-    public boolean isAppToolTipDisplayed() {
+    public boolean isAnyAppToolTipDisplayed() {
         return uiEngineState.appToolTip != null;
     }
 
     public Tooltip appToolTip() {
         return uiEngineState.appToolTip;
+    }
+
+    public boolean isAppToolTipDisplayed(String name){
+        return uiEngineState.appToolTip != null && uiEngineState.appToolTip.name.equals(name);
     }
 
     public VIEWPORT_MODE viewportMode() {
