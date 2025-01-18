@@ -2080,7 +2080,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.cursor != null) {
             int center_x = mediaManager.spriteWidth(uiEngineState.cursor) / 2;
             int center_y = mediaManager.spriteHeight(uiEngineState.cursor) / 2;
-            spriteRenderer.drawCMediaSprite(uiEngineState.cursor, 0, UICommonUtils.ui_getAnimationTimer(uiEngineState),
+            spriteRenderer.drawCMediaSprite(uiEngineState.cursor, uiEngineState.cursorArrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
                     (uiEngineState.mouse_ui.x - center_x), (uiEngineState.mouse_ui.y - center_y));
         }
         spriteRenderer.setTweakAndColorReset();
