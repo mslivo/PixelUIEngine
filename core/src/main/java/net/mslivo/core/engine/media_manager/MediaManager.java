@@ -36,6 +36,7 @@ public final class MediaManager {
     private static final String ERROR_SPLIT_FRAMES = "Error splitting frames for: \"%s\": Negative frameCount = %d";
     private static final String ERROR_READ_FONT = "Error reading font file \"%s\"";
     private static final String ERROR_READ_FONT_FILE_DESCRIPTOR = "Error reading font file \"%s\": file= descriptor not found";
+    private static final String ERROR_READ_FONT_BASE_DECRIPTOR = "Error reading font file \"%s\": base= descriptor not found";
     private static final String ERROR_SYMBOL_ID_DUPLICATE = "Symbol \"%s\" id \"%d\" is already defined in font";
     private static final String ERROR_SYMBOL_NOT_ENOUGH_SPACE = "SymbolArray \"%s\" more symbols defined than available in texture";
     private static final String PACKED_FONT_NAME = "%s_%d.packed";
@@ -43,6 +44,7 @@ public final class MediaManager {
     private static final int DEFAULT_PAGE_WIDTH = 4096;
     private static final int DEFAULT_PAGE_HEIGHT = 4096;
     private static final Pattern FNT_FILE_PATTERN = Pattern.compile("file=\"([^\"]+)\"");
+    private static final Pattern FNT_LINEHEIGHT_PATTERN = Pattern.compile("lineHeight=([0-9]+)");
     private static final GridPoint2[] PIXEL_DIRECTIONS = new GridPoint2[]{
             new GridPoint2(-1, 0), new GridPoint2(-1, 1), new GridPoint2(0, 1), new GridPoint2(1, 1),
             new GridPoint2(1, 0), new GridPoint2(1, -1), new GridPoint2(0, -1), new GridPoint2(-1, -1)
@@ -99,7 +101,7 @@ public final class MediaManager {
     }
 
 
-    private Pixmap createFontModifyPixmapAddOutline(Pixmap pixmap, Color outlineColor, boolean outlineOnly) {
+    private Pixmap modifyPixmapAddOutline(Pixmap pixmap, Color outlineColor, boolean outlineOnly) {
         pixmap.setBlending(Pixmap.Blending.None);
         // detect outline
         final ArrayDeque<GridPoint2> outLinePoints = new ArrayDeque<>();
@@ -130,7 +132,7 @@ public final class MediaManager {
         }
 
         // create outline
-        if(outlineColor.a > 0f){
+        if (outlineColor.a > 0f) {
             final int outlineColorRGBA8888 = Color.rgba8888(outlineColor);
             while (!outLinePoints.isEmpty()) {
                 GridPoint2 outlinePixel = outLinePoints.poll();
@@ -148,7 +150,27 @@ public final class MediaManager {
     }
 
 
-    private CreateFontResult createFontAddSymbols(Pixmap resultPixMap, CMediaFontSymbol[] symbols) {
+
+
+    private Pixmap copyPixmap(Pixmap originalPixmap, int newWidth, int newHeight, int srcX, int sryY, int srcWidth, int srcHeight) {
+        Pixmap result = new Pixmap(newWidth, newHeight, originalPixmap.getFormat());
+        result.setBlending(Pixmap.Blending.None);
+        result.setColor(0, 0, 0, 0);
+        result.fill();
+        result.drawPixmap(originalPixmap, 0, 0, srcX, sryY, srcWidth, srcHeight);
+        return result;
+    }
+
+    private CreateFontResult createFont(BitMapFontInformation bitMapFontInformation, Color outlineColor, boolean outlineOnly, boolean outlineSymbols, CMediaFontSymbol[] symbols) {
+        final boolean OUTLINE = outlineColor.a > 0f;
+
+        // Load Original Texture
+        Pixmap pixmap = createTexturePixmap(bitMapFontInformation.textureFileHandle);
+
+        if (OUTLINE && !outlineSymbols) {  // outline before adding symbols
+            modifyPixmapAddOutline(pixmap, outlineColor, outlineOnly);
+        }
+
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
         ObjectMap<CMediaFontSymbol, Pixmap[]> symbolToPixMap = new ObjectMap<>();
@@ -219,7 +241,7 @@ public final class MediaManager {
 
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
                 xCurrent += symbolPixmap.getWidth();
-                if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
+                if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
                     symbolAreaHeight += symbolHeightMax;
                     symbolHeightMax = 0;
                     xCurrent = 0;
@@ -227,10 +249,10 @@ public final class MediaManager {
             }
         }
         symbolAreaHeight += symbolHeightMax;
-        int resultPixmapWidth = resultPixMap.getWidth();
-        int originalHeight = resultPixMap.getHeight();
+        int resultPixmapWidth = pixmap.getWidth();
+        int originalHeight = pixmap.getHeight();
         int reultPixMapHeight = originalHeight + symbolAreaHeight;
-        resultPixMap = copyPixmap(resultPixMap, resultPixmapWidth, reultPixMapHeight, 0, 0, resultPixMap.getWidth(), resultPixMap.getHeight());
+        pixmap = copyPixmap(pixmap, resultPixmapWidth, reultPixMapHeight, 0, 0, pixmap.getWidth(), pixmap.getHeight());
 
 
         // copy symbols
@@ -242,7 +264,7 @@ public final class MediaManager {
             for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
                 Pixmap symbolPixmap = symbolPixmaps[i2];
 
-                resultPixMap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
+                pixmap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
                 int symbolId = switch (symbols[i]) {
                     case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
                     case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
@@ -250,13 +272,13 @@ public final class MediaManager {
                 fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
                         xCurrent, yCurrent, symbolPixmap.getWidth(),
                         symbolPixmap.getHeight(), -1,
-                        12 - symbolPixmap.getHeight(),
+                        ((bitMapFontInformation.lineHeight-1)-symbolPixmap.getHeight())-symbols[i].yoffset,
                         symbolPixmap.getWidth() - 1));
 
 
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
                 xCurrent += symbolPixmap.getWidth();
-                if ((xCurrent + symbolPixmap.getWidth()) >= resultPixMap.getWidth()) {
+                if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
                     yCurrent += symbolHeightMax;
                     symbolHeightMax = 0;
                     xCurrent = 0;
@@ -265,44 +287,18 @@ public final class MediaManager {
             }
         }
 
+        // outline everything
+        if (OUTLINE && outlineSymbols) {
+            modifyPixmapAddOutline(pixmap, outlineColor, outlineOnly);
+        }
+
         // Dispose Symbol Pixmaps
         symbolToPixMap.values().forEach(pixmaps -> {
             for (int i = 0; i < pixmaps.length; i++)
                 pixmaps[i].dispose();
         });
 
-        return new CreateFontResult(resultPixMap, fntFileData.toString());
-    }
-
-    private Pixmap copyPixmap(Pixmap originalPixmap, int newWidth, int newHeight, int srcX, int sryY, int srcWidth, int srcHeight) {
-        Pixmap result = new Pixmap(newWidth, newHeight, originalPixmap.getFormat());
-        result.setBlending(Pixmap.Blending.None);
-        result.setColor(0, 0, 0, 0);
-        result.fill();
-        result.drawPixmap(originalPixmap, 0, 0, srcX, sryY, srcWidth, srcHeight);
-        return result;
-    }
-
-    private CreateFontResult createFont(FileHandle textureFileHandle, Color outlineColor, boolean outlineOnly, boolean outlineSymbols, CMediaFontSymbol[] symbols) {
-        CreateFontResult result = new CreateFontResult(createTexturePixmap(textureFileHandle), "");
-
-        boolean outLine = outlineColor.a > 0f;
-
-        if (symbols.length > 0) {
-            if (outLine && !outlineSymbols) {
-                createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
-                // outline before adding symbols
-            }
-
-            result = createFontAddSymbols(result.pixmap, symbols);
-        }
-
-        if (outLine && outlineSymbols) {
-            // outline everything
-            createFontModifyPixmapAddOutline(result.pixmap, outlineColor, outlineOnly);
-        }
-
-        return result;
+        return new CreateFontResult(pixmap, fntFileData.toString());
     }
 
 
@@ -370,7 +366,7 @@ public final class MediaManager {
         for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
             CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
 
-            FileHandle textureFileHandle = getBitmapFontTextureHandle(Tools.File.findResource(cMediaFont.file));
+            BitMapFontInformation textureFileHandle = extractBitmapFontInformation(Tools.File.findResource(cMediaFont.file));
             String packedFontTextureName = String.format(PACKED_FONT_NAME, cMediaFont.file, fontCount);
             CreateFontResult fontResult = createFont(textureFileHandle, cMediaFont.outlineColor, cMediaFont.outlineOnly, cMediaFont.outlineSymbols, cMediaFont.symbols);
 
@@ -448,21 +444,40 @@ public final class MediaManager {
         return true;
     }
 
-    private FileHandle getBitmapFontTextureHandle(FileHandle fontFileHandle) {
+
+    private BitMapFontInformation extractBitmapFontInformation(FileHandle fontFileHandle) {
+        boolean fileFound = false, baseFound = false;
+        FileHandle textureHandle = null;
+        int lineHeight = 0;
         try (BufferedReader bufferedReader = fontFileHandle.reader(1024, Charset.defaultCharset().name())) {
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
-
-                Matcher matcher = FNT_FILE_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    return Tools.File.findResource(fontFileHandle.parent() + "/" + matcher.group(1));
+            Matcher matcher;
+            while ((line = bufferedReader.readLine()) != null && (!fileFound || !baseFound)) {
+                if (!fileFound) {
+                    matcher = FNT_FILE_PATTERN.matcher(line);
+                    if (matcher.find()) {
+                        textureHandle = Tools.File.findResource(fontFileHandle.parent() + "/" + matcher.group(1));
+                        fileFound = true;
+                    }
+                }
+                if (!baseFound) {
+                    matcher = FNT_LINEHEIGHT_PATTERN.matcher(line);
+                    if (matcher.find()) {
+                        lineHeight = Integer.parseInt(matcher.group(1));
+                        baseFound = true;
+                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(ERROR_READ_FONT, e);
         }
 
-        throw new RuntimeException(ERROR_READ_FONT_FILE_DESCRIPTOR);
+        if (!fileFound)
+            throw new RuntimeException(ERROR_READ_FONT_FILE_DESCRIPTOR);
+        if (!baseFound)
+            throw new RuntimeException(ERROR_READ_FONT_BASE_DECRIPTOR);
+
+        return new BitMapFontInformation(textureHandle, lineHeight);
     }
 
     private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,
@@ -619,6 +634,16 @@ public final class MediaManager {
 
     public boolean isLoaded() {
         return loaded;
+    }
+
+    private class BitMapFontInformation {
+        public final FileHandle textureFileHandle;
+        public final int lineHeight;
+
+        public BitMapFontInformation(FileHandle textureFileHandle,int lineHeight) {
+            this.textureFileHandle = textureFileHandle;
+            this.lineHeight = lineHeight;
+        }
     }
 
     private class CreateFontResult {

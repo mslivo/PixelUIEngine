@@ -94,7 +94,12 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 5,true);
+    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", 0, 0,true,new CMediaFontSymbol[]{
+            //new CMediaFontSingleSymbol(1, DIR_UI_GRAPHICS+"/test.png",0),
+            //new CMediaFontSingleSymbol(2, DIR_UI_GRAPHICS+"/test2.png",0),
+            //new CMediaFontSingleSymbol(3, DIR_UI_GRAPHICS+"/test3.png",0)
+
+    });
 
     // Misc
     public static final CMediaImage UI_PIXEL = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");

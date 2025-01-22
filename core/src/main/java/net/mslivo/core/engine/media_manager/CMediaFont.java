@@ -42,8 +42,8 @@ public final class CMediaFont extends CMedia implements Serializable {
             this.symbols = new CMediaFontSymbol[symbols.length];
             for (int i = 0; i < symbols.length; i++) {
                 this.symbols[i] = switch (symbols[i]){
-                    case CMediaFontSingleSymbol cMediaFontSingleSymbol-> new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id,cMediaFontSingleSymbol.file);
-                    case CMediaFontArraySymbol cMediaFontArraySymbol -> new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file,
+                    case CMediaFontSingleSymbol cMediaFontSingleSymbol-> new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id,cMediaFontSingleSymbol.file, cMediaFontSingleSymbol.yoffset);
+                    case CMediaFontArraySymbol cMediaFontArraySymbol -> new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file,cMediaFontArraySymbol.yoffset,
                             cMediaFontArraySymbol.regionWidth, cMediaFontArraySymbol.regionHeight, cMediaFontArraySymbol.frameOffset, cMediaFontArraySymbol.frameLength);
                 };
             }

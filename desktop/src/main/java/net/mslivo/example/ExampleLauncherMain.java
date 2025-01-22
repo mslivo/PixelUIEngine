@@ -2,6 +2,7 @@ package net.mslivo.example;
 
 
 
+import com.badlogic.gdx.Gdx;
 import net.mslivo.core.engine.tools.Tools;
 
 import javax.swing.*;
@@ -9,6 +10,7 @@ import javax.swing.*;
 public class ExampleLauncherMain {
 
     public static void main(String[] args) {
+
 
         Tools.App.launch(
                 new ExampleMain(),
