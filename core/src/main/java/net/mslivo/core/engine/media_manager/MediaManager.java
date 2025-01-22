@@ -130,17 +130,19 @@ public final class MediaManager {
         }
 
         // create outline
-        final int outlineColorRGBA8888 = Color.rgba8888(outlineColor);
-        while (!outLinePoints.isEmpty()) {
-            GridPoint2 outlinePixel = outLinePoints.poll();
-            pixmap.drawPixel(outlinePixel.x, outlinePixel.y, outlineColorRGBA8888);
-        }
-        // remove
-        final int clearColorRGBA8888 = Color.rgba8888(Color.CLEAR);
+        if(outlineColor.a > 0f){
+            final int outlineColorRGBA8888 = Color.rgba8888(outlineColor);
+            while (!outLinePoints.isEmpty()) {
+                GridPoint2 outlinePixel = outLinePoints.poll();
+                pixmap.drawPixel(outlinePixel.x, outlinePixel.y, outlineColorRGBA8888);
+            }
+            // remove
+            final int clearColorRGBA8888 = Color.rgba8888(Color.CLEAR);
 
-        while (!removePoints.isEmpty()) {
-            GridPoint2 removePixel = removePoints.poll();
-            pixmap.drawPixel(removePixel.x, removePixel.y, clearColorRGBA8888);
+            while (!removePoints.isEmpty()) {
+                GridPoint2 removePixel = removePoints.poll();
+                pixmap.drawPixel(removePixel.x, removePixel.y, clearColorRGBA8888);
+            }
         }
         return pixmap;
     }
@@ -600,7 +602,8 @@ public final class MediaManager {
 
     public int fontTextWidth(CMediaFont font, String text) {
         glyphLayout.setText(font(font), text);
-        return (int) glyphLayout.width;
+        int width = (int) glyphLayout.width;
+        return width;
     }
 
     public int fontTextHeight(CMediaFont font, String text) {
