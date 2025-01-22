@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public final class CMediaFont extends CMedia implements Serializable {
-    public int offset_x;
-    public int offset_y;
     public boolean markupEnabled;
     public Color outlineColor;
     public boolean outlineOnly;
@@ -19,22 +17,20 @@ public final class CMediaFont extends CMedia implements Serializable {
 
     }
 
-    public CMediaFont(String file, int offset_x, int offset_y) {
-        this(file, offset_x, offset_y, true, null, Color.CLEAR, false, false);
+    public CMediaFont(String file) {
+        this(file, true, null, Color.CLEAR, false, false);
     }
 
-    public CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled) {
-        this(file, offset_x, offset_y, markupEnabled, null, Color.CLEAR, false, false);
+    public CMediaFont(String file,  boolean markupEnabled) {
+        this(file, markupEnabled, null, Color.CLEAR, false, false);
     }
 
-    public CMediaFont(String file, int offset_x, int offset_y, boolean markupEnabled, CMediaFontSymbol[] symbols) {
-        this(file, offset_x, offset_y, markupEnabled, symbols, Color.CLEAR, false, false);
+    public CMediaFont(String file, boolean markupEnabled, CMediaFontSymbol[] symbols) {
+        this(file, markupEnabled, symbols, Color.CLEAR, false, false);
     }
 
-    public CMediaFont(String filename, int offset_x, int offset_y, boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
+    public CMediaFont(String filename,  boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
         super(filename);
-        this.offset_x = offset_x;
-        this.offset_y = offset_y;
         this.markupEnabled = markupEnabled;
 
         this.outlineSymbols = outlineSymbols;
@@ -61,16 +57,14 @@ public final class CMediaFont extends CMedia implements Serializable {
         if (!super.equals(o)) return false;
 
         CMediaFont that = (CMediaFont) o;
-        return offset_x == that.offset_x && offset_y == that.offset_y && markupEnabled == that.markupEnabled && outlineOnly == that.outlineOnly && outlineSymbols == that.outlineSymbols && outlineColor.equals(that.outlineColor) && Arrays.equals(symbols, that.symbols);
+        return markupEnabled == that.markupEnabled && outlineOnly == that.outlineOnly && outlineSymbols == that.outlineSymbols && Objects.equals(outlineColor, that.outlineColor) && Arrays.equals(symbols, that.symbols);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + offset_x;
-        result = 31 * result + offset_y;
         result = 31 * result + Boolean.hashCode(markupEnabled);
-        result = 31 * result + outlineColor.hashCode();
+        result = 31 * result + Objects.hashCode(outlineColor);
         result = 31 * result + Boolean.hashCode(outlineOnly);
         result = 31 * result + Boolean.hashCode(outlineSymbols);
         result = 31 * result + Arrays.hashCode(symbols);

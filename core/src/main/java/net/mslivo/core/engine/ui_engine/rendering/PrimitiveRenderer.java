@@ -339,7 +339,7 @@ public class PrimitiveRenderer {
         this.vertexData.dispose();
     }
 
-    public void vertex(float x, float y) {
+    public void vertex(final float x,final float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
@@ -358,7 +358,7 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
     }
 
-    public void vertex(float x1, float y1, float x2, float y2) {
+    public void vertex(final float x1,final float y1,final float x2,final float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
@@ -392,7 +392,7 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
     }
 
-    public void vertex(float x1, float y1, float x2, float y2, float x3, float y3) {
+    public void vertex(final float x1,final float y1,final float x2,final float y2,final float x3,final float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
@@ -444,12 +444,12 @@ public class PrimitiveRenderer {
         return drawing;
     }
 
-    private float[] createVerticesArray(int size) {
+    private float[] createVerticesArray(final int size) {
         float[] newVertices = new float[size * VERTEX_SIZE];
         return newVertices;
     }
 
-    private VertexData createVertexData(int size) {
+    private VertexData createVertexData(final int size) {
         VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
@@ -458,7 +458,7 @@ public class PrimitiveRenderer {
         return vertexData;
     }
 
-    private float rgbPacked(float red, float green, float blue, float alpha) {
+    private float rgbPacked(final float red,final float green,final float blue,final float alpha) {
         return Float.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
@@ -467,11 +467,11 @@ public class PrimitiveRenderer {
         return primitiveType;
     }
 
-    public void setBlendFunction(int srcFunc, int dstFunc) {
+    public void setBlendFunction(int srcFunc,final int dstFunc) {
         setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
     }
 
-    public void setBlendFunctionSeparate(int srcFuncColor, int dstFuncColor, int srcFuncAlpha, int dstFuncAlpha) {
+    public void setBlendFunctionSeparate(int srcFuncColor,final int dstFuncColor,final int srcFuncAlpha,final int dstFuncAlpha) {
         if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
             return;
 
@@ -524,11 +524,11 @@ public class PrimitiveRenderer {
         this.color = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
-    public void setColor(Color color, float alpha) {
+    public void setColor(Color color,final float alpha) {
         this.color = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
-    public void setColor(float l, float a, float b, float alpha) {
+    public void setColor(final float l,final float a,final float b,final float alpha) {
         this.color = colorPackedRGBA(l, a, b, alpha);
     }
 
@@ -571,11 +571,11 @@ public class PrimitiveRenderer {
         this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
-    public void setVertexColor(Color color, float alpha) {
+    public void setVertexColor(Color color,final float alpha) {
         this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
-    public void setVertexColor(float r, float g, float b, float alpha) {
+    public void setVertexColor(final float r,final float g,final float b,final float alpha) {
         this.vertexColor = colorPackedRGBA(r, g, b, alpha);
     }
 
@@ -614,7 +614,7 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(float L, float A, float B) {
+    public void setTweak(final float L,final float A,final float B) {
         tweak = colorPackedRGB(L, A, B);
     }
 
@@ -622,21 +622,21 @@ public class PrimitiveRenderer {
         this.tweak = tweak;
     }
 
-    public void setTweakL(float L) {
+    public void setTweakL(final float L) {
         int c = NumberUtils.floatToIntColor(tweak);
         float B = ((c & 0x00ff0000) >>> 16) / 255f;
         float A = ((c & 0x0000ff00) >>> 8) / 255f;
         tweak = colorPackedRGB(L, A, B);
     }
 
-    public void setTweakA(float A) {
+    public void setTweakA(final float A) {
         int c = NumberUtils.floatToIntColor(tweak);
         float B = ((c & 0x00ff0000) >>> 16) / 255f;
         float L = ((c & 0x000000ff)) / 255f;
         tweak = colorPackedRGB(L, A, B);
     }
 
-    public void setTweakB(float B) {
+    public void setTweakB(final float B) {
         int c = NumberUtils.floatToIntColor(tweak);
         float A = ((c & 0x0000ff00) >>> 8) / 255f;
         float L = ((c & 0x000000ff)) / 255f;
@@ -710,22 +710,22 @@ public class PrimitiveRenderer {
         setBlendFunctionSeparate(this.backup_blend[RGB_SRC], this.backup_blend[RGB_DST], this.backup_blend[ALPHA_SRC], this.backup_blend[ALPHA_DST]);
     }
 
-    public void setColorResetValues(float r, float g, float b, float a) {
+    public void setColorResetValues(final float r,final float g,final float b,final float a) {
         this.reset_color = colorPackedRGBA(r, g, b, a);
         this.setColorReset();
     }
 
-    public void setVertexColorResetValues(float r, float g, float b, float a) {
+    public void setVertexColorResetValues(final float r,final float g,final float b,final float a) {
         this.reset_vertexColor = colorPackedRGBA(r, g, b, a);
         this.setVertexColorReset();
     }
 
-    public void setTweakResetValues(float l, float a, float b) {
+    public void setTweakResetValues(final float l,final float a,final float b) {
         this.reset_tweak = colorPackedRGB(l, a, b);
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(int blend_rgb_src, int blend_rgb_dst, int blend_alpha_src, int blend_alpha_blend) {
+    public void setBlendFunctionSeparateResetValues(int blend_rgb_src,final int blend_rgb_dst,final int blend_alpha_src,final int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -733,7 +733,7 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    public void setBlendFunctionResetValues(int blend_src, int blend_dst) {
+    public void setBlendFunctionResetValues(int blend_src,final int blend_dst) {
         this.reset_blend[RGB_SRC] = blend_src;
         this.reset_blend[RGB_DST] = blend_dst;
         this.reset_blend[ALPHA_SRC] = blend_src;
@@ -741,12 +741,12 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    private static float colorPackedRGBA(float red, float green, float blue, float alpha) {
+    private static float colorPackedRGBA(final float red,final float green,final float blue,final float alpha) {
         return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
-    private static float colorPackedRGB(float red, float green, float blue) {
+    private static float colorPackedRGB(final float red,final float green,final float blue) {
         return NumberUtils.intBitsToFloat(((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
