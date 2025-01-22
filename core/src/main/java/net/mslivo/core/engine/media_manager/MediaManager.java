@@ -286,7 +286,7 @@ public final class MediaManager {
     private CreateFontResult createFont(FileHandle textureFileHandle, Color outlineColor, boolean outlineOnly, boolean outlineSymbols, CMediaFontSymbol[] symbols) {
         CreateFontResult result = new CreateFontResult(createTexturePixmap(textureFileHandle), "");
 
-        boolean outLine = !outlineColor.equals(Color.CLEAR);
+        boolean outLine = outlineColor.a > 0f;
 
         if (symbols.length > 0) {
             if (outLine && !outlineSymbols) {
