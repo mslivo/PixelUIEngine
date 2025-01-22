@@ -233,6 +233,7 @@ public final class MediaManager {
 
         // copy symbols
         xCurrent = 0;
+        symbolHeightMax = 0;
         int yCurrent = originalHeight;
         for (int i = 0; i < symbols.length; i++) {
             Pixmap[] symbolPixmaps = symbolToPixMap.get(symbols[i]);
