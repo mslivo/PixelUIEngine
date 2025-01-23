@@ -12,6 +12,6 @@ public class ExampleLauncherMain {
                 new ExampleMain(),
                 ExampleMainConstants.APP_TITLE,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH,
-                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, null, 0, false);
+                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, null, 60, false);
     }
 }

@@ -12,6 +12,9 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+
+		<!-- GDX -->
+
 		<dependency>
 			<groupId>com.badlogicgames.gdx</groupId>
 			<artifactId>gdx</artifactId>
@@ -21,6 +24,14 @@
 			<artifactId>gdx-backend-lwjgl3</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx-platform</artifactId>
+			<classifier>natives-desktop</classifier>
+		</dependency>
+
+		<!-- GDX Controller support -->
+
+		<dependency>
 			<groupId>com.badlogicgames.gdx-controllers</groupId>
 			<artifactId>gdx-controllers-core</artifactId>
 		</dependency>
@@ -28,15 +39,9 @@
 			<groupId>com.badlogicgames.gdx-controllers</groupId>
 			<artifactId>gdx-controllers-desktop</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.badlogicgames.gdx</groupId>
-			<artifactId>gdx-platform</artifactId>
-			<classifier>natives-desktop</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.badlogicgames.gdx</groupId>
-			<artifactId>gdx-lwjgl3-angle</artifactId>
-		</dependency>
+
+
+
 	</dependencies>
 
 	<build>

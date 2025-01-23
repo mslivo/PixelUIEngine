@@ -8,10 +8,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import net.mslivo.core.engine.media_manager.*;
 
 import javax.swing.*;
@@ -174,7 +172,10 @@ public class Tools {
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
 
+
             if (iconPath != null) config.setWindowIcon(iconPath);
+
+
             try {
                 new Lwjgl3Application(applicationAdapter, config);
             } catch (Exception e) {

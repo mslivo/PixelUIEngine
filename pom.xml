@@ -16,16 +16,13 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- GDX Core dependencies -->
+			<!-- GDX -->
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx</artifactId>
 				<version>${gdx.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
-			<!-- GDX Desktop-Specific dependencies -->
-
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-backend-lwjgl3</artifactId>
@@ -38,13 +35,6 @@
 				<artifactId>gdx-platform</artifactId>
 				<version>${gdx.version}</version>
 				<classifier>natives-desktop</classifier>
-				<scope>compile</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx-lwjgl3-angle</artifactId>
-				<version>${gdx.version}</version>
 				<scope>compile</scope>
 			</dependency>
 
@@ -62,6 +52,8 @@
 				<version>${gdx-controllers.version}</version>
 				<scope>compile</scope>
 			</dependency>
+
+
 		</dependencies>
 	</dependencyManagement>
 
