@@ -160,11 +160,9 @@ public class Tools {
 
         public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, String iconPath, int fps, boolean vSync) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-            config.setResizable(true);
-            boolean linux32Bit = UIUtils.isLinux && !SharedLibraryLoader.is64Bit;
-
             config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
 
+            config.setResizable(true);
             config.setWindowedMode(resolutionWidth, resolutionHeight);
             config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
             config.setTitle(appTile);
@@ -175,6 +173,7 @@ public class Tools {
             config.useVsync(vSync);
             config.setWindowPosition(-1, -1);
             config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+
             if (iconPath != null) config.setWindowIcon(iconPath);
             try {
                 new Lwjgl3Application(applicationAdapter, config);
