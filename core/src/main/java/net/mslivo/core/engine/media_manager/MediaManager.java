@@ -51,12 +51,12 @@ public final class MediaManager {
     };
     private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0" + System.lineSeparator();
     private boolean loaded = false;
-    private ObjectMap<CMediaSoundEffect, Sound> medias_sounds = null;
-    private ObjectMap<CMediaMusic, Music> medias_music = null;
-    private ObjectMap<CMediaImage, TextureRegion> medias_images = null;
-    private ObjectMap<CMediaFont, BitmapFont> medias_fonts = null;
-    private ObjectMap<CMediaArray, TextureRegion[]> medias_arrays = null;
-    private ObjectMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
+    private HashMap<CMediaSoundEffect, Sound> medias_sounds = null;
+    private HashMap<CMediaMusic, Music> medias_music = null;
+    private HashMap<CMediaImage, TextureRegion> medias_images = null;
+    private HashMap<CMediaFont, BitmapFont> medias_fonts = null;
+    private HashMap<CMediaArray, TextureRegion[]> medias_arrays = null;
+    private HashMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
     private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
     private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
     private TextureAtlas textureAtlas = null;
@@ -338,12 +338,12 @@ public final class MediaManager {
 
             stepsMax++;
         }
-        medias_images = new ObjectMap<>();
-        medias_arrays = new ObjectMap<>();
-        medias_animations = new ObjectMap<>();
-        medias_fonts = new ObjectMap<>();
-        medias_sounds = new ObjectMap<>();
-        medias_music = new ObjectMap<>();
+        medias_images = new HashMap<>();
+        medias_arrays = new HashMap<>();
+        medias_animations = new HashMap<>();
+        medias_fonts = new HashMap<>();
+        medias_sounds = new HashMap<>();
+        medias_music = new HashMap<>();
 
         // Load Sprite Data Into Pixmap Packer
         for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {

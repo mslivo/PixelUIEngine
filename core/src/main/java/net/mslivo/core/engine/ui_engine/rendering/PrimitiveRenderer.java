@@ -164,11 +164,11 @@ public class PrimitiveRenderer {
         this(SIZE_MAX, false);
     }
 
-    public PrimitiveRenderer(int size) {
+    public PrimitiveRenderer(final int size) {
         this(size, false);
     }
 
-    public PrimitiveRenderer(int size, boolean flushWarning) {
+    public PrimitiveRenderer(final int size, final boolean flushWarning) {
         if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than "+SIZE_MAX+" vertexes: " + size);
 
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
@@ -725,7 +725,7 @@ public class PrimitiveRenderer {
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(int blend_rgb_src,final int blend_rgb_dst,final int blend_alpha_src,final int blend_alpha_blend) {
+    public void setBlendFunctionSeparateResetValues(final int blend_rgb_src,final int blend_rgb_dst,final int blend_alpha_src,final int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -733,7 +733,7 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    public void setBlendFunctionResetValues(int blend_src,final int blend_dst) {
+    public void setBlendFunctionResetValues(final int blend_src,final int blend_dst) {
         this.reset_blend[RGB_SRC] = blend_src;
         this.reset_blend[RGB_DST] = blend_dst;
         this.reset_blend[ALPHA_SRC] = blend_src;

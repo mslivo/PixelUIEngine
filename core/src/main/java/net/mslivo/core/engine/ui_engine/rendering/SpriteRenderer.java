@@ -533,7 +533,7 @@ public class SpriteRenderer implements Batch {
     public void draw(final Texture texture, final float x, final float y, final int srcX, final int srcY, final int srcWidth, final int srcHeight) {
         if (!drawing) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
 
-        float[] vertices = this.vertices;
+        final float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -588,7 +588,7 @@ public class SpriteRenderer implements Batch {
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final float u, final float v, final float u2, final float v2) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
-        float[] vertices = this.vertices;
+        final float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -700,7 +700,8 @@ public class SpriteRenderer implements Batch {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         count = (count / 5) * 6;
-        int verticesLength = vertices.length;
+        final int verticesLength = vertices.length;
+
         int remainingVertices = verticesLength;
         if (texture != lastTexture)
             switchTexture(texture);
@@ -778,16 +779,15 @@ public class SpriteRenderer implements Batch {
     }
 
     @Override
-    public void draw(TextureRegion region, final float x, final float y) {
+    public void draw(final TextureRegion region, final float x, final float y) {
         draw(region, x, y, region.getRegionWidth(), region.getRegionHeight());
     }
 
     @Override
-    public void draw(TextureRegion region, final float x, final float y, final float width, final float height) {
+    public void draw(final TextureRegion region, final float x, final float y, final float width, final float height) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
-        float[] vertices = this.vertices;
-
+        final float[] vertices = this.vertices;
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
@@ -839,7 +839,7 @@ public class SpriteRenderer implements Batch {
     }
 
     @Override
-    public void draw(TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
+    public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
@@ -968,7 +968,7 @@ public class SpriteRenderer implements Batch {
     }
 
     @Override
-    public void draw(TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
+    public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation, boolean clockwise) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
@@ -1114,7 +1114,7 @@ public class SpriteRenderer implements Batch {
     }
 
     @Override
-    public void draw(TextureRegion region, final float width, final float height, Affine2 transform) {
+    public void draw(final TextureRegion region, final float width, final float height, Affine2 transform) {
         if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
 
         float[] vertices = this.vertices;
@@ -1438,7 +1438,7 @@ public class SpriteRenderer implements Batch {
 
     public void drawCMediaArray(final CMediaArray cMediaArray, final int index, final float x, final float y) {
         final TextureRegion region = mediaManager.array(cMediaArray, index);
-        this.draw(region, x, y);
+        this.draw(region, x, y, region.getRegionWidth(), region.getRegionHeight());
     }
 
     public void drawCMediaArray(final CMediaArray cMediaArray, final int index, final float x, final float y, final float width, final float height) {

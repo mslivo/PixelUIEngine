@@ -1,7 +1,6 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;

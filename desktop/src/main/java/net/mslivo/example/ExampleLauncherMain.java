@@ -1,11 +1,7 @@
 package net.mslivo.example;
 
 
-
-import com.badlogic.gdx.Gdx;
 import net.mslivo.core.engine.tools.Tools;
-
-import javax.swing.*;
 
 public class ExampleLauncherMain {
 
@@ -16,6 +12,6 @@ public class ExampleLauncherMain {
                 new ExampleMain(),
                 ExampleMainConstants.APP_TITLE,
                 ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH,
-                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, null,60, false);
+                ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT, null, 0, false);
     }
 }
