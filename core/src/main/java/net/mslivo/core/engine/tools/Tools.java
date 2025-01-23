@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.tools;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
+import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import net.mslivo.core.engine.media_manager.*;
 
 import javax.swing.*;
@@ -156,34 +158,70 @@ public class Tools {
             return timeBetweenUpdates;
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, String appTile, int resolutionWidth, int resolutionHeight, String iconPath, int fps, boolean vSync) {
-            Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-            config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
-
-            config.setResizable(true);
-            config.setWindowedMode(resolutionWidth, resolutionHeight);
-            config.setWindowSizeLimits(resolutionWidth, resolutionHeight, -1, -1);
-            config.setTitle(appTile);
-            config.setDecorated(true);
-            config.setMaximized(true);
-            config.setForegroundFPS(fps);
-            config.setIdleFPS(fps);
-            config.useVsync(vSync);
-            config.setWindowPosition(-1, -1);
-            config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
-
-
-            if (iconPath != null) config.setWindowIcon(iconPath);
-
-
-            try {
-                new Lwjgl3Application(applicationAdapter, config);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Tools.App.exceptionToErrorLogFile(e);
-                Tools.App.exceptionToDialog(e);
+        public static void launch(ApplicationAdapter applicationAdapter, PixelUILaunchConfig launchConfiguration) {
+            // Determine glEmulation
+            String osName = System.getProperty("os.name").toLowerCase();
+            PixelUILaunchConfig.GLEmulation glEmulation;
+            if(osName.contains("win")){
+                glEmulation = launchConfiguration.windowsGLEmulation;
+            }else if(osName.contains("nix") || osName.contains("nux") || osName.contains("aix")){
+                glEmulation = launchConfiguration.linuxGLEmulation;
+            }else if(osName.contains("mac")){
+                glEmulation = launchConfiguration.macOSGLEmulation;
+            }else{
+                throw new RuntimeException("Operating System \""+osName+"\n not supported");
             }
+
+            switch (glEmulation){
+                case GL32_OPENGL -> {
+                    Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+                    config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
+                    config.setResizable(true);
+                    config.setWindowedMode(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight);
+                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight, -1, -1);
+                    config.setTitle(launchConfiguration.appTile);
+                    config.setDecorated(true);
+                    config.setMaximized(true);
+                    config.setForegroundFPS(launchConfiguration.fps);
+                    config.setIdleFPS(launchConfiguration.fps);
+                    config.useVsync(launchConfiguration.vSync);
+                    config.setWindowPosition(-1, -1);
+                    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+                    if (launchConfiguration.iconPath != null) config.setWindowIcon(launchConfiguration.iconPath);
+                    try {
+                        new Lwjgl3Application(applicationAdapter, config);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Tools.App.exceptionToErrorLogFile(e);
+                        Tools.App.exceptionToDialog(e);
+                    }
+                }
+                case GL32_VULKAN -> {
+                    com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration config = new com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration();
+                    config.setOpenGLEmulation(com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES32, 3, 2);
+                    config.setResizable(true);
+                    config.setWindowedMode(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight);
+                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight, -1, -1);
+                    config.setTitle(launchConfiguration.appTile);
+                    config.setDecorated(true);
+                    config.setMaximized(true);
+                    config.setForegroundFPS(launchConfiguration.fps);
+                    config.setIdleFPS(launchConfiguration.fps);
+                    config.useVsync(launchConfiguration.vSync);
+                    config.setWindowPosition(-1, -1);
+                    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
+                    if (launchConfiguration.iconPath != null) config.setWindowIcon(launchConfiguration.iconPath);
+                    try {
+                        new Lwjgl3VulkanApplication(applicationAdapter, config);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Tools.App.exceptionToErrorLogFile(e);
+                        Tools.App.exceptionToDialog(e);
+                    }
+                }
+            };
         }
+
     }
 
 

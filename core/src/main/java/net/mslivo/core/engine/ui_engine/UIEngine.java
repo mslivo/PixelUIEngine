@@ -2190,7 +2190,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     for (int i = 0; i < comboBox.items.size(); i++)
                         widthPx = Math.max(widthPx, mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text));
 
-                    int width = MathUtils.ceil((widthPx+2)/uiEngineState.tileSize.TSF);
+                    int width = MathUtils.ceil((widthPx + 2) / uiEngineState.tileSize.TSF);
                     int height = comboBox.items.size();
 
                     /* Menu */
@@ -2211,7 +2211,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1);
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() -1, comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1, comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
                                     comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
                                     comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
                         }
@@ -2220,7 +2220,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     if (!comboBox.items.isEmpty()) {
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get3TilesCMediaIndex(ix, width);
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox)-1);
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - 1);
                         }
                     }
 
@@ -3194,9 +3194,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_drawIcon(icon, x, y, iconColor, alpha, iconGrayScale, iconIndex, false, iconFlipX, iconFlipY);
         }
 
-        font.setColor(color.r,color.g,color.b, 1f);
+        font.setColor(color.r, color.g, color.b, 1f);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
-            spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text,false, false, 0, alpha);
+            spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, false, false, 0, alpha);
         } else {
             if (withIcon) maxWidth -= TS();
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, false, false, maxWidth, alpha);

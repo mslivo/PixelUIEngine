@@ -121,7 +121,7 @@ public class SpriteRenderer implements Batch {
             
             void main() {
                 // Pixelation
-                MED vec2 texCoords = v_texCoords;
+                HIGH vec2 texCoords = v_texCoords;
             
                 // Calculate pixelation factor
                 MED float pixelSize = 2.0 + floor(v_tweak.w * 14.0);

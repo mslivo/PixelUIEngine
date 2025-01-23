@@ -29,7 +29,6 @@
 				<version>${gdx.version}</version>
 				<scope>compile</scope>
 			</dependency>
-
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-platform</artifactId>
@@ -54,6 +53,14 @@
 			</dependency>
 
 
+			<!-- Vulkan -->
+
+			<dependency>
+				<groupId>com.github.Dgzt</groupId>
+				<artifactId>gdx-lwjgl3-angle-vulkan</artifactId>
+				<version>1.2.0</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -66,6 +73,10 @@
 		<repository>
 			<id>gdx-releases</id>
 			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 

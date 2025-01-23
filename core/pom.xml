@@ -40,6 +40,12 @@
 			<artifactId>gdx-controllers-desktop</artifactId>
 		</dependency>
 
+		<!-- Vulkan -->
+
+		<dependency>
+			<groupId>com.github.Dgzt</groupId>
+			<artifactId>gdx-lwjgl3-angle-vulkan</artifactId>
+		</dependency>
 
 
 	</dependencies>
