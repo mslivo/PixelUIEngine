@@ -1,39 +1,33 @@
 package net.mslivo.core.engine.media_manager;
 
-import com.badlogic.gdx.graphics.Color;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
 public final class CMediaFont extends CMedia implements Serializable {
     public boolean markupEnabled;
-    public Color outlineColor;
-    public boolean outlineOnly;
-    public boolean outlineSymbols;
+    public CMediaFontOutline outline;
     public CMediaFontSymbol[] symbols;
 
     public CMediaFont(){
-
     }
 
     public CMediaFont(String file) {
-        this(file, true, null, Color.CLEAR, false, false);
+        this(file, true, null, null);
     }
 
     public CMediaFont(String file,  boolean markupEnabled) {
-        this(file, markupEnabled, null, Color.CLEAR, false, false);
+        this(file, markupEnabled, null, null);
     }
 
     public CMediaFont(String file, boolean markupEnabled, CMediaFontSymbol[] symbols) {
-        this(file, markupEnabled, symbols, Color.CLEAR, false, false);
+        this(file, markupEnabled, symbols, null);
     }
 
-    public CMediaFont(String filename,  boolean markupEnabled,CMediaFontSymbol[] symbols, Color outlineColor, boolean outlineOnly,boolean outlineSymbols) {
+    public CMediaFont(String filename,  boolean markupEnabled,CMediaFontSymbol[] symbols, CMediaFontOutline outline) {
         super(filename);
         this.markupEnabled = markupEnabled;
 
-        this.outlineSymbols = outlineSymbols;
         if(symbols != null) {
             this.symbols = new CMediaFontSymbol[symbols.length];
             for (int i = 0; i < symbols.length; i++) {
@@ -47,8 +41,11 @@ public final class CMediaFont extends CMedia implements Serializable {
             this.symbols = new CMediaFontSymbol[0];
         }
 
-        this.outlineColor = outlineColor != null ? outlineColor.cpy() : Color.CLEAR.cpy();
-        this.outlineOnly = outlineOnly;
+        if(outline != null){
+            this.outline = new CMediaFontOutline(outline.color,outline.directions,outline.withSymbols,outline.outlineOnly);
+        }else{
+            this.outline = null;
+        }
     }
 
     @Override
@@ -57,16 +54,14 @@ public final class CMediaFont extends CMedia implements Serializable {
         if (!super.equals(o)) return false;
 
         CMediaFont that = (CMediaFont) o;
-        return markupEnabled == that.markupEnabled && outlineOnly == that.outlineOnly && outlineSymbols == that.outlineSymbols && Objects.equals(outlineColor, that.outlineColor) && Arrays.equals(symbols, that.symbols);
+        return markupEnabled == that.markupEnabled && Objects.equals(outline, that.outline) && Arrays.equals(symbols, that.symbols);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + Boolean.hashCode(markupEnabled);
-        result = 31 * result + Objects.hashCode(outlineColor);
-        result = 31 * result + Boolean.hashCode(outlineOnly);
-        result = 31 * result + Boolean.hashCode(outlineSymbols);
+        result = 31 * result + Objects.hashCode(outline);
         result = 31 * result + Arrays.hashCode(symbols);
         return result;
     }

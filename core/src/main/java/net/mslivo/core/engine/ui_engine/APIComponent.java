@@ -445,7 +445,7 @@ public final class APIComponent {
         }
 
         private void setButtonCommonInitValuesInternal(Button button, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
-            button.buttonAction = buttonAction;
+            button.buttonAction = buttonAction != null ? buttonAction : DEFAULT_BUTTON_ACTION;
             button.mode = buttonMode;
             button.contentOffset_x = 0;
             button.contentOffset_y = 0;

@@ -24,6 +24,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
+import javax.swing.plaf.basic.BasicMenuBarUI;
+
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private static final boolean IM_PERFORMANCE_TEST = false;
@@ -63,7 +65,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.primitiveRenderer = new PrimitiveRenderer();
 
         api.config.window.setDefaultEnforceScreenBounds(false);
-
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
@@ -98,7 +99,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }));
         api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8x8.UI_CURSOR_ARROW));
 
-        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT);
 
         api.config.input.setHardwareMouseEnabled(true);
 
@@ -114,6 +114,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.config.input.setGamePadMouseStickRightEnabled(true);
         api.config.input.setGamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
         api.config.input.setGamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
+
+        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT);
 
 
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {

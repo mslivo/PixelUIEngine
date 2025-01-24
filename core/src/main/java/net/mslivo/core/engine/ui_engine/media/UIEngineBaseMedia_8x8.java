@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.ui_engine.media;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import net.mslivo.core.engine.media_manager.*;
 
 /**
@@ -10,7 +9,7 @@ import net.mslivo.core.engine.media_manager.*;
 public class UIEngineBaseMedia_8x8 {
     private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui_8x8/";
     private static final int TL = 8;
-    private static final int TL2 = TL*2;
+    private static final int TL2 = TL * 2;
 
     // UI Elements
     public static final CMediaArray UI_WINDOW = new CMediaArray(DIR_UI_GRAPHICS + "ui/window.png", TL, TL);
@@ -60,10 +59,10 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_GRID_DRAGGED = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged.png", TL, TL);
     public static final CMediaArray UI_GRID_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell.png", TL, TL);
     public static final CMediaArray UI_GRID_CELL_SELECTED = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_selected.png", TL, TL);
-    public static final CMediaArray UI_GRID_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_x2.png",  TL2,TL2);
-    public static final CMediaArray UI_GRID_DRAGGED_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged_x2.png",  TL2,TL2);
-    public static final CMediaArray UI_GRID_CELL_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_x2.png",  TL2,TL2);
-    public static final CMediaArray UI_GRID_CELL_SELECTED_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_selected_x2.png", TL2,TL2);
+    public static final CMediaArray UI_GRID_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_x2.png", TL2, TL2);
+    public static final CMediaArray UI_GRID_DRAGGED_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged_x2.png", TL2, TL2);
+    public static final CMediaArray UI_GRID_CELL_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_x2.png", TL2, TL2);
+    public static final CMediaArray UI_GRID_CELL_SELECTED_X2 = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell_selected_x2.png", TL2, TL2);
     public static final CMediaArray UI_PROGRESSBAR = new CMediaArray(DIR_UI_GRAPHICS + "ui/progressbar.png", TL, TL);
     public static final CMediaArray UI_PROGRESSBAR_BAR = new CMediaArray(DIR_UI_GRAPHICS + "ui/progressbar_bar.png", TL, TL);
     public static final CMediaImage UI_NOTIFICATION_BAR = new CMediaImage(DIR_UI_GRAPHICS + "ui/notification_bar.png");
@@ -94,12 +93,8 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt",true,new CMediaFontSymbol[]{
-            //new CMediaFontSingleSymbol(1, DIR_UI_GRAPHICS+"/test.png",0),
-            //new CMediaFontSingleSymbol(2, DIR_UI_GRAPHICS+"/test2.png",0),
-            //new CMediaFontSingleSymbol(3, DIR_UI_GRAPHICS+"/test3.png",0)
-
-    });
+    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true);
+    public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt", true);
 
     // Misc
     public static final CMediaImage UI_PIXEL = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
@@ -154,7 +149,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_TEXTFIELD_CARET,
             UI_GRID,
             UI_GRID_DRAGGED,
-            UI_GRID_CELL,UI_GRID_CELL_SELECTED,
+            UI_GRID_CELL, UI_GRID_CELL_SELECTED,
             UI_GRID_X2,
             UI_GRID_DRAGGED_X2,
             UI_GRID_CELL_X2,
@@ -184,6 +179,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_MOUSETEXTINPUT_DELETE,
             UI_MOUSETEXTINPUT_SELECTED,
             UI_FONT,
+            UI_FONT_SMALL,
             UI_PIXEL,
             UI_ICON_BACK,
             UI_ICON_FORWARD
