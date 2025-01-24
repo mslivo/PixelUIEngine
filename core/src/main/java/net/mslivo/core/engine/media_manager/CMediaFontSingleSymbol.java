@@ -6,6 +6,10 @@ public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
     public CMediaFontSingleSymbol() {
     }
 
+    public CMediaFontSingleSymbol(int id, String file) {
+        this(id, file,0);
+    }
+
     public CMediaFontSingleSymbol(int id, String file, int yoffset) {
         super(file, yoffset);
         this.id = id;

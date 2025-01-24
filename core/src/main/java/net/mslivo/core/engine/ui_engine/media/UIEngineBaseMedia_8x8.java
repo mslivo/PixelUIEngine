@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine.media;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.*;
+import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
@@ -93,7 +94,7 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true);
+    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true, null);
     public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt", true);
 
     // Misc

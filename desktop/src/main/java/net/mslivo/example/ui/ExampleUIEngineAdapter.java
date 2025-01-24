@@ -277,7 +277,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.begin();
 
         spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
-        mediaManager.font(UIEngineBaseMedia_8x8.UI_FONT).setColor(new Color(0.5f,0.5f,0.5f,0.5f));
+        mediaManager.font(UIEngineBaseMedia_8x8.UI_FONT).setColor(new Color(0.5f,1f,0.5f,1f));
+        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,310,"SYMBOL: "+Tools.Text.fontSymbol(1));
         spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,300,"Text[#ff00ff]Text2");
         spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,290,"Text[#00ffff]Text2");
         spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,280,"Text[#ff00ff]Text2");
