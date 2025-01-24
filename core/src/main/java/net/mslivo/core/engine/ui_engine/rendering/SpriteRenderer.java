@@ -715,16 +715,13 @@ public class SpriteRenderer implements Batch {
         int copyCount = Math.min(remainingVertices, count);
         final float tweak = this.tweak;
 
-        ////old way, breaks when libGDX code expects SPRITE_SIZE to be 20
-        //System.arraycopy(spriteVertices, offset, vertices, idx, copyCount);
-        ////new way, thanks mgsx
         for (int s = offset, v = idx, i = 0; i < copyCount; i += 6) {
             vertices[v++] = spriteVertices[s++];
             vertices[v++] = spriteVertices[s++];
             vertices[v++] = spriteVertices[s++];
             vertices[v++] = spriteVertices[s++];
             vertices[v++] = spriteVertices[s++];
-            vertices[v++] = tweak;
+            vertices[v++] = this.tweak;
         }
         idx += copyCount;
         count -= copyCount;
@@ -732,9 +729,6 @@ public class SpriteRenderer implements Batch {
             offset += (copyCount / 6) * 5;
             flush();
             copyCount = Math.min(verticesLength, count);
-            ////old way, breaks when libGDX code expects SPRITE_SIZE to be 20
-            //System.arraycopy(spriteVertices, offset, vertices, 0, copyCount);
-            ////new way, thanks mgsx
             for (int s = offset, v = 0, i = 0; i < copyCount; i += 6) {
                 vertices[v++] = spriteVertices[s++];
                 vertices[v++] = spriteVertices[s++];
@@ -1541,25 +1535,37 @@ public class SpriteRenderer implements Batch {
     // ----- CMediaFont -----
 
     public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text) {
-        this.drawCMediaFont(cMediaFont, x, y, text, false, false, 0, this.getAlpha());
+        this.drawCMediaFont(cMediaFont, x, y, text, false, false, 0);
     }
 
     public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final boolean centerX, final boolean centerY) {
-        this.drawCMediaFont(cMediaFont, x, y, text, centerX, centerY, 0, this.getAlpha());
+        this.drawCMediaFont(cMediaFont, x, y, text, centerX, centerY, 0);
     }
 
     public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final boolean centerX, final boolean centerY, final int maxWidth) {
-        this.drawCMediaFont(cMediaFont, x, y, text, centerX, centerY, maxWidth, this.getAlpha());
-    }
-
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final boolean centerX, final boolean centerY, final int maxWidth, final float alpha) {
         if (cMediaFont == null) return;
         final float x_draw = centerX ? (x - MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f)) : x;
         final float y_draw = centerY ? (y - MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f)) : y;
         final BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
+
         fontCache.clear();
         fontCache.addText(text, x_draw, y_draw, 0, text.length(), maxWidth, Align.left, false, maxWidth > 0 ? "" : null);
-        fontCache.setAlphas(alpha);
+
+        // Multiply by Batch Color
+        Color.abgr8888ToColor(this.tempColor, this.color);
+        final float batch_r = this.tempColor.r * 2f; // 0.5 = default -> x 2
+        final float batch_g = this.tempColor.g * 2f;
+        final float batch_b = this.tempColor.b * 2f;
+        final float batch_a = this.tempColor.a;
+
+        float[] fontVertices = fontCache.getVertices();
+        for (int idx = 2; idx < fontVertices.length; idx+=5) {
+            float fontColor = fontVertices[idx];
+            Color.abgr8888ToColor(this.tempColor, fontColor);
+            tempColor.mul(batch_r,batch_g,batch_b,batch_a);
+            fontVertices[idx] = colorPackedRGBA(tempColor.r,tempColor.g,tempColor.b,tempColor.a);
+        }
+
         fontCache.draw(this);
     }
 
@@ -1753,7 +1759,7 @@ public class SpriteRenderer implements Batch {
         this.setBlendFunctionReset();
     }
 
-    private static final float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
+    private static float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
         return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
