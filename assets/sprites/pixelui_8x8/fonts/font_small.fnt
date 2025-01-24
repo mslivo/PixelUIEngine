@@ -53,7 +53,7 @@ char id=117     x=130   y=19   width=5    height=6     xoffset=-1   yoffset=1   
 char id=118     x=137   y=19   width=5    height=6     xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
 char id=119     x=144   y=19   width=7    height=6     xoffset=-1   yoffset=1    xadvance=6    page=0    chnl=0 
 char id=120     x=154   y=19   width=5    height=6     xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
-char id=121     x=161   y=18   width=5    height=6     xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
+char id=121     x=161   y=18   width=5    height=6     xoffset=-1   yoffset=0    xadvance=4    page=0    chnl=0 
 char id=122     x=168   y=19   width=5    height=6     xoffset=-1   yoffset=1    xadvance=4    page=0    chnl=0 
 
 char id=48      x=0     y=30    width=5    height=7    xoffset=-1   yoffset=0    xadvance=4    page=0    chnl=0 
