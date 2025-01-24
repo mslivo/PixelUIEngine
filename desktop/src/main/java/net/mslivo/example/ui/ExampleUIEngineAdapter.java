@@ -115,7 +115,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.config.input.setGamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
         api.config.input.setGamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
 
-        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT);
+        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT_SMALL);
 
 
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {
