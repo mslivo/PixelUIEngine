@@ -149,7 +149,7 @@ public final class UIConfig implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
         notification_max = 20;
-        notification_defaultDisplayTime = 120;
+        notification_defaultDisplayTime = 90;
         notification_defaultColor = DEFAULT_COlOR.cpy();
         notification_fadeoutTime = 12;
         notification_scrollSpeed = 1;
