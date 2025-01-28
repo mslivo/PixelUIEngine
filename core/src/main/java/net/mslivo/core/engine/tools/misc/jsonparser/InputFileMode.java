@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.jsonparser;
+package net.mslivo.core.engine.tools.misc.jsonparser;
 
 public enum InputFileMode {
     CLASSPATH,EXTERNAL

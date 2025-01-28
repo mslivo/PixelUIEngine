@@ -1,7 +1,6 @@
-package net.mslivo.core.engine.tools.cli;
+package net.mslivo.core.engine.tools.misc.cli;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;

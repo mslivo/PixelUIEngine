@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.cli;
+package net.mslivo.core.engine.tools.misc.cli;
 
 
 /**
