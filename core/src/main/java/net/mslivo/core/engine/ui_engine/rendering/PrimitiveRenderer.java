@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -118,21 +119,22 @@ public class PrimitiveRenderer {
             """;
 
 
-    public static final int SIZE_MAX = 65534;
+    private static final int VERTEX_SIZE = 5;
+    public static final int SIZE_DEFAULT = 65534;
+    public static final int SIZE_MAX = Integer.MAX_VALUE/VERTEX_SIZE/20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
     private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
-    private static final int VERTEX_SIZE = 5;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
-    private static final short PRIMITIVE_RESTART = -1;
+    private static final int PRIMITIVE_RESTART = -1;
 
     private final Color tempColor;
     private int primitiveType;
     private ShaderProgram shader;
     private VertexData vertexData;
-    private IndexData indexData;
+    private IntegerIndexBufferObject indexData;
     private float[] vertices;
     private int idx;
     private int u_projTrans;
@@ -161,7 +163,7 @@ public class PrimitiveRenderer {
     private boolean flushWarning;
 
     public PrimitiveRenderer() {
-        this(SIZE_MAX, false);
+        this(SIZE_DEFAULT, false);
     }
 
     public PrimitiveRenderer(final int size) {
@@ -226,23 +228,18 @@ public class PrimitiveRenderer {
         System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes+1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
-    private IndexBufferObject createIndexData(int size) {
-        int len = size;
-        short[] indices = new short[len];
+    private IntegerIndexBufferObject createIndexData(int size) {
+        int[] indices = new int[size];
 
-        for (int i = 0; i < size;i++) {
-            indices[i] = intToUnsignedShort(i);
-        }
+        for (int i = 0; i < size; i++)
+            indices[i] = i;
 
-        IndexBufferObject indexBufferObject = new IndexBufferObject(true, size);
+        IntegerIndexBufferObject indexBufferObject = new IntegerIndexBufferObject(true, size);
         indexBufferObject.setIndices(indices, 0, indices.length);
 
         return indexBufferObject;
     }
 
-    public static short intToUnsignedShort(int value) {
-        return (short) (value & 0xFFFF);
-    }
 
     public void begin(int primitiveType) {
         if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
@@ -273,10 +270,10 @@ public class PrimitiveRenderer {
 
         // Reset indices
         if(!indexResets.isEmpty()){
-            ShortBuffer shortBuffer = indexData.getBuffer(true);
+            IntBuffer intBuffer = indexData.getBuffer(true);
             for(int i=0;i<indexResets.size;i++) {
                 int resetIndex = indexResets.get(i);
-                shortBuffer.put(resetIndex,intToUnsignedShort(resetIndex));
+                intBuffer.put(resetIndex,resetIndex);
             }
             indexResets.clear();
         }
@@ -295,9 +292,9 @@ public class PrimitiveRenderer {
         final int currentIndex = idx/VERTEX_SIZE;
         final int maxIndex = size/VERTEX_SIZE;
 
-        ShortBuffer shortBuffer = indexData.getBuffer(true);
-        shortBuffer.limit(maxIndex);
-        shortBuffer.put(currentIndex,PRIMITIVE_RESTART);
+        IntBuffer intBuffer = indexData.getBuffer(true);
+        intBuffer.limit(maxIndex);
+        intBuffer.put(currentIndex,PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
 
@@ -325,12 +322,12 @@ public class PrimitiveRenderer {
         this.vertexData.setVertices(vertices, 0, idx);
         this.vertexData.bind(this.shader);
 
-        ShortBuffer indexBuffer = indexData.getBuffer(true);
+        IntBuffer indexBuffer = indexData.getBuffer(true);
         indexBuffer.position(0);
         indexBuffer.limit(count);
         indexData.bind();
 
-        Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL20.GL_UNSIGNED_SHORT, 0);
+        Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
         idx = 0;
     }
 

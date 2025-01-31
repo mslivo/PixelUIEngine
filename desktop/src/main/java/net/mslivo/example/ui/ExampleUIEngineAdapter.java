@@ -62,7 +62,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
         this.spriteRenderer = new SpriteRenderer(mediaManager);
-        this.primitiveRenderer = new PrimitiveRenderer();
+        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT,true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -273,6 +273,21 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.end();
 
+        // Primitive perfromance test
+        primitiveRenderer.begin(GL32.GL_POINTS);
+        long time = System.nanoTime();
+        int vertexCount = 0;
+        for(int i=0;i<100;i++) {
+            for (int ix = 0; ix < 64; ix++) {
+                for (int iy = 0; iy < 64; iy++) {
+                    primitiveRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
+                    primitiveRenderer.vertex(200 + ix, 200 + iy);
+                    vertexCount++;
+                }
+            }
+        }
+        System.out.println(((System.nanoTime()-time)/1000)+"ns");
+        primitiveRenderer.end();
 
         spriteRenderer.begin();
 
