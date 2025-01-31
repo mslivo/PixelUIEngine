@@ -61,8 +61,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager);
-        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT,true);
+        this.spriteRenderer = new SpriteRenderer(mediaManager,null,SpriteRenderer.SIZE_MAX,true);
+        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT*3,true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -275,9 +275,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         // Primitive perfromance test
         primitiveRenderer.begin(GL32.GL_POINTS);
-        long time = System.nanoTime();
+
         int vertexCount = 0;
-        for(int i=0;i<100;i++) {
+        for(int i=0;i<20;i++) {
             for (int ix = 0; ix < 64; ix++) {
                 for (int iy = 0; iy < 64; iy++) {
                     primitiveRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
@@ -286,7 +286,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 }
             }
         }
-        System.out.println(((System.nanoTime()-time)/1000)+"ns");
+
         primitiveRenderer.end();
 
         spriteRenderer.begin();
@@ -301,6 +301,29 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.setAllReset();
         spriteRenderer.end();
+
+
+
+        long time = System.nanoTime();
+        spriteRenderer.begin();
+        for(int i=0;i<5;i++) {
+            for (int ix = 0; ix < 64; ix++) {
+                for (int iy = 0; iy < 64; iy++) {
+                    spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
+                    spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,300+ix,200+iy);
+                }
+            }
+        }
+
+        spriteRenderer.setColor(1f,1f,1f, 1f);
+        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,400,200,10,10);
+
+        spriteRenderer.setAllReset();
+        spriteRenderer.end();
+
+        System.out.println(((System.nanoTime()-time)/1000)+"ns");
+
+
     }
 
     @Override

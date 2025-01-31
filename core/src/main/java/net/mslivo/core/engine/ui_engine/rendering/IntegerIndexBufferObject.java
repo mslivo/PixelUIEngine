@@ -44,7 +44,7 @@ public class IntegerIndexBufferObject {
             maxIndices = 1; // avoid allocating a zero-sized buffer because of bug in Android's ART < Android 5.0
         }
 
-        byteBuffer = BufferUtils.newUnsafeByteBuffer(maxIndices * 4);
+        byteBuffer = BufferUtils.newUnsafeByteBuffer(maxIndices * Integer.BYTES);
         isDirect = true;
 
         buffer = byteBuffer.asIntBuffer();
@@ -93,7 +93,7 @@ public class IntegerIndexBufferObject {
      *
      * @param indices the vertex data
      * @param offset  the offset to start copying the data from
-     * @param count   the number of shorts to copy
+     * @param count   the number of ints to copy
      */
     public void setIndices(int[] indices, int offset, int count) {
         isDirty = true;
@@ -125,10 +125,10 @@ public class IntegerIndexBufferObject {
         }
     }
 
-    public void updateIndices(int targetOffset, short[] indices, int offset, int count) {
+    public void updateIndices(int targetOffset, int[] indices, int offset, int count) {
         isDirty = true;
         final int pos = byteBuffer.position();
-        ((Buffer) byteBuffer).position(targetOffset * 4);
+        ((Buffer) byteBuffer).position(targetOffset * Integer.BYTES);
         BufferUtils.copy(indices, offset, byteBuffer, count);
         ((Buffer) byteBuffer).position(pos);
         ((Buffer) buffer).position(0);
@@ -162,7 +162,7 @@ public class IntegerIndexBufferObject {
 
         Gdx.gl32.glBindBuffer(GL32.GL_ELEMENT_ARRAY_BUFFER, bufferHandle);
         if (isDirty) {
-            ((Buffer) byteBuffer).limit(buffer.limit() * 4);
+            ((Buffer) byteBuffer).limit(buffer.limit() * Integer.BYTES);
             Gdx.gl32.glBufferData(GL32.GL_ELEMENT_ARRAY_BUFFER, byteBuffer.limit(), byteBuffer, usage);
             isDirty = false;
         }
