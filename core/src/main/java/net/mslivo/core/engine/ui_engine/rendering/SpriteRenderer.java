@@ -143,6 +143,7 @@ public class SpriteRenderer implements Batch {
             }
             """;
 
+    public static final int SIZE_DEFAULT = 16383;
     public static final int SIZE_MAX = 16383;
 
     private static final String ERROR_END_BEGIN = "SpriteRenderer.end must be called before begin.";
@@ -191,15 +192,15 @@ public class SpriteRenderer implements Batch {
     private final int[] reset_blend;
 
     public SpriteRenderer() {
-        this(null, null, SIZE_MAX, false);
+        this(null, null, SIZE_DEFAULT, false);
     }
 
     public SpriteRenderer(MediaManager mediaManager) {
-        this(mediaManager, null, SIZE_MAX, false);
+        this(mediaManager, null, SIZE_DEFAULT, false);
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
-        this(mediaManager, shader, SIZE_MAX, false);
+        this(mediaManager, shader, SIZE_DEFAULT, false);
     }
 
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, final int size) {

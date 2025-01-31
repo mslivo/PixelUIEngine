@@ -120,8 +120,8 @@ public class PrimitiveRenderer {
 
 
     private static final int VERTEX_SIZE = 5;
-    public static final int SIZE_DEFAULT = 65534;
     public static final int SIZE_MAX = Integer.MAX_VALUE/VERTEX_SIZE/20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
+    public static final int SIZE_DEFAULT = 65534;
     private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";

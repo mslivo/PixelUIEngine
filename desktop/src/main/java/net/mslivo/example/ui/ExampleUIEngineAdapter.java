@@ -61,7 +61,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager,null,SpriteRenderer.SIZE_MAX,true);
+        this.spriteRenderer = new SpriteRenderer(mediaManager,null,SpriteRenderer.SIZE_DEFAULT,true);
         this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT*3,true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
@@ -306,7 +306,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         long time = System.nanoTime();
         spriteRenderer.begin();
-        for(int i=0;i<5;i++) {
+        for(int i=0;i<2;i++) {
             for (int ix = 0; ix < 64; ix++) {
                 for (int iy = 0; iy < 64; iy++) {
                     spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
