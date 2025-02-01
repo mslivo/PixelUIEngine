@@ -290,10 +290,9 @@ public class PrimitiveRenderer {
         // Insert Restart Index
 
         final int currentIndex = idx/VERTEX_SIZE;
-        final int maxIndex = size/VERTEX_SIZE;
 
         IntBuffer intBuffer = indexData.getBuffer(true);
-        intBuffer.limit(maxIndex);
+        intBuffer.limit(this.size);
         intBuffer.put(currentIndex,PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex

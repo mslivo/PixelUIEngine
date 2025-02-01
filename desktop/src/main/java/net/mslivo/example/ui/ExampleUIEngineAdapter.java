@@ -284,6 +284,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                     primitiveRenderer.vertex(200 + ix, 200 + iy);
                     vertexCount++;
                 }
+                primitiveRenderer.primitiveRestart();
             }
         }
 
