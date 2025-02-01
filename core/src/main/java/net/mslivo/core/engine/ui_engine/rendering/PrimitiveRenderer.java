@@ -1,16 +1,19 @@
 package net.mslivo.core.engine.ui_engine.rendering;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.glutils.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL32;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
+import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public class PrimitiveRenderer {
@@ -120,7 +123,7 @@ public class PrimitiveRenderer {
 
 
     private static final int VERTEX_SIZE = 5;
-    public static final int SIZE_MAX = Integer.MAX_VALUE/VERTEX_SIZE/20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
+    public static final int SIZE_MAX = Integer.MAX_VALUE / VERTEX_SIZE / 20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
     public static final int SIZE_DEFAULT = 65534;
     private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
@@ -130,20 +133,21 @@ public class PrimitiveRenderer {
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
 
+    private final VertexData vertexData;
+    private final IntegerIndexBufferObject indexData;
+    private final float[] vertices;
+    private final IntArray indexResets;
+
     private final Color tempColor;
     private int primitiveType;
+    private final int size;
+
     private ShaderProgram shader;
-    private VertexData vertexData;
-    private IntegerIndexBufferObject indexData;
-    private float[] vertices;
     private int idx;
     private int u_projTrans;
     private boolean drawing;
     private int renderCalls;
     private int totalRenderCalls;
-    private int size;
-    private IntArray indexResets;
-
     private int intermediateFlushes;
     private final Matrix4 projectionMatrix;
     private float color;
@@ -171,7 +175,8 @@ public class PrimitiveRenderer {
     }
 
     public PrimitiveRenderer(final int size, final boolean flushWarning) {
-        if (size > SIZE_MAX) throw new IllegalArgumentException("Can't have more than "+SIZE_MAX+" vertexes: " + size);
+        if (size > SIZE_MAX)
+            throw new IllegalArgumentException("Can't have more than " + SIZE_MAX + " vertexes: " + size);
 
         this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
@@ -205,9 +210,9 @@ public class PrimitiveRenderer {
         this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
     }
 
-    public void setProjectionMatrix(Matrix4 projection) {
+    public void setProjectionMatrix(final Matrix4 projection) {
         if (Arrays.equals(projectionMatrix.val, projection.val)) return;
-        if (drawing) flush();
+        if (drawing) flush(false);
         this.projectionMatrix.set(projection);
         if (drawing) setupMatrices();
     }
@@ -224,12 +229,12 @@ public class PrimitiveRenderer {
         begin(GL32.GL_POINTS);
     }
 
-    private void printFlushWarning(){
-        System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes+1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
+    private void printFlushWarning() {
+        System.err.println(String.format(FLUSH_WARNING, (this.intermediateFlushes + 1), this.vertices.length, Thread.currentThread().getStackTrace()[2].toString()));
     }
 
-    private IntegerIndexBufferObject createIndexData(int size) {
-        int[] indices = new int[size];
+    private IntegerIndexBufferObject createIndexData(final int size) {
+        final int[] indices = new int[size];
 
         for (int i = 0; i < size; i++)
             indices[i] = i;
@@ -260,7 +265,7 @@ public class PrimitiveRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-        if (idx > 0) flush();
+        if (idx > 0) flush(true);
         Gdx.gl.glDepthMask(true);
         if (flushWarning && this.intermediateFlushes > 0) {
             printFlushWarning();
@@ -268,32 +273,24 @@ public class PrimitiveRenderer {
         this.intermediateFlushes = 0;
         this.drawing = false;
 
-        // Reset indices
-        if(!indexResets.isEmpty()){
-            IntBuffer intBuffer = indexData.getBuffer(true);
-            for(int i=0;i<indexResets.size;i++) {
-                int resetIndex = indexResets.get(i);
-                intBuffer.put(resetIndex,resetIndex);
-            }
-            indexResets.clear();
-        }
+
     }
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         // Insert Restart Index
 
-        final int currentIndex = idx/VERTEX_SIZE;
+        final int currentIndex = idx / VERTEX_SIZE;
 
         IntBuffer intBuffer = indexData.getBuffer(true);
         intBuffer.limit(this.size);
-        intBuffer.put(currentIndex,PRIMITIVE_RESTART);
+        intBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
 
@@ -302,47 +299,53 @@ public class PrimitiveRenderer {
         vertices[idx + 2] = 0f;
         vertices[idx + 3] = 0f;
         vertices[idx + 4] = 0f;
-        idx+=VERTEX_SIZE;
+        idx += VERTEX_SIZE;
 
         this.indexResets.add(currentIndex);
 
     }
 
 
-
-    private void flush() {
+    private void flush(final boolean resetPrimitiveRestarts) {
         if (idx == 0) return;
 
         renderCalls++;
         totalRenderCalls++;
 
-        int count = idx/VERTEX_SIZE;
+        final int count = idx / VERTEX_SIZE;
 
         this.vertexData.setVertices(vertices, 0, idx);
         this.vertexData.bind(this.shader);
 
-        IntBuffer indexBuffer = indexData.getBuffer(true);
+        final IntBuffer indexBuffer = indexData.getBuffer(true);
         indexBuffer.position(0);
         indexBuffer.limit(count);
         indexData.bind();
 
         Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
         idx = 0;
-    }
 
+        if (resetPrimitiveRestarts) {
+            for (int i = indexResets.size-1; i >=0 ; i--) {
+                final int resetIndex = indexResets.items[i];
+                indexBuffer.put(resetIndex, resetIndex);
+                indexResets.removeIndex(i);
+            }
+        }
+    }
 
     public void dispose() {
         this.vertexData.dispose();
     }
 
-    public void vertex(final float x,final float y) {
+    public void vertex(final float x, final float y) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
 
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x + 0.5f);
@@ -354,14 +357,13 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
     }
 
-    public void vertex(final float x1,final float y1,final float x2,final float y2) {
+    public void vertex(final float x1, final float y1, final float x2, final float y2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
-
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x1 + 0.5f);
@@ -373,10 +375,9 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
 
         // Vertex 2
-
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x2 + 0.5f);
@@ -388,13 +389,13 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
     }
 
-    public void vertex(final float x1,final float y1,final float x2,final float y2,final float x3,final float y3) {
+    public void vertex(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
 
         // Vertex 1
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x1 + 0.5f);
@@ -406,10 +407,9 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
 
         // Vertex 2
-
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x2 + 0.5f);
@@ -421,10 +421,9 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
 
         // Vertex 3
-
-        if(idx == vertices.length) {
+        if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush();
+            flush(false);
         }
 
         vertices[idx] = (x3 + 0.5f);
@@ -441,12 +440,12 @@ public class PrimitiveRenderer {
     }
 
     private float[] createVerticesArray(final int size) {
-        float[] newVertices = new float[size * VERTEX_SIZE];
+        final float[] newVertices = new float[size * VERTEX_SIZE];
         return newVertices;
     }
 
     private VertexData createVertexData(final int size) {
-        VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
+        final VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
@@ -454,7 +453,7 @@ public class PrimitiveRenderer {
         return vertexData;
     }
 
-    private float rgbPacked(final float red,final float green,final float blue,final float alpha) {
+    private float rgbPacked(final float red, final float green, final float blue, final float alpha) {
         return Float.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
@@ -463,11 +462,11 @@ public class PrimitiveRenderer {
         return primitiveType;
     }
 
-    public void setBlendFunction(int srcFunc,final int dstFunc) {
+    public void setBlendFunction(int srcFunc, final int dstFunc) {
         setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
     }
 
-    public void setBlendFunctionSeparate(int srcFuncColor,final int dstFuncColor,final int srcFuncAlpha,final int dstFuncAlpha) {
+    public void setBlendFunctionSeparate(int srcFuncColor, final int dstFuncColor, final int srcFuncAlpha, final int dstFuncAlpha) {
         if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
             return;
 
@@ -476,7 +475,7 @@ public class PrimitiveRenderer {
         this.blend[ALPHA_SRC] = srcFuncAlpha;
         this.blend[ALPHA_DST] = dstFuncAlpha;
         if (drawing) {
-            flush();
+            flush(false);
             Gdx.gl.glBlendFuncSeparate(blend[RGB_SRC], blend[RGB_DST], blend[ALPHA_SRC], blend[ALPHA_DST]);
         }
     }
@@ -499,7 +498,7 @@ public class PrimitiveRenderer {
 
     public void setShader(ShaderProgram shader) {
         if (drawing) {
-            flush();
+            flush(false);
         }
         this.shader = shader;
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
@@ -520,11 +519,11 @@ public class PrimitiveRenderer {
         this.color = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
-    public void setColor(Color color,final float alpha) {
+    public void setColor(Color color, final float alpha) {
         this.color = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
-    public void setColor(final float l,final float a,final float b,final float alpha) {
+    public void setColor(final float l, final float a, final float b, final float alpha) {
         this.color = colorPackedRGBA(l, a, b, alpha);
     }
 
@@ -567,11 +566,11 @@ public class PrimitiveRenderer {
         this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, color.a);
     }
 
-    public void setVertexColor(Color color,final float alpha) {
+    public void setVertexColor(Color color, final float alpha) {
         this.vertexColor = colorPackedRGBA(color.r, color.g, color.b, alpha);
     }
 
-    public void setVertexColor(final float r,final float g,final float b,final float alpha) {
+    public void setVertexColor(final float r, final float g, final float b, final float alpha) {
         this.vertexColor = colorPackedRGBA(r, g, b, alpha);
     }
 
@@ -610,7 +609,7 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(final float L,final float A,final float B) {
+    public void setTweak(final float L, final float A, final float B) {
         tweak = colorPackedRGB(L, A, B);
     }
 
@@ -706,22 +705,22 @@ public class PrimitiveRenderer {
         setBlendFunctionSeparate(this.backup_blend[RGB_SRC], this.backup_blend[RGB_DST], this.backup_blend[ALPHA_SRC], this.backup_blend[ALPHA_DST]);
     }
 
-    public void setColorResetValues(final float r,final float g,final float b,final float a) {
+    public void setColorResetValues(final float r, final float g, final float b, final float a) {
         this.reset_color = colorPackedRGBA(r, g, b, a);
         this.setColorReset();
     }
 
-    public void setVertexColorResetValues(final float r,final float g,final float b,final float a) {
+    public void setVertexColorResetValues(final float r, final float g, final float b, final float a) {
         this.reset_vertexColor = colorPackedRGBA(r, g, b, a);
         this.setVertexColorReset();
     }
 
-    public void setTweakResetValues(final float l,final float a,final float b) {
+    public void setTweakResetValues(final float l, final float a, final float b) {
         this.reset_tweak = colorPackedRGB(l, a, b);
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(final int blend_rgb_src,final int blend_rgb_dst,final int blend_alpha_src,final int blend_alpha_blend) {
+    public void setBlendFunctionSeparateResetValues(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -729,7 +728,7 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    public void setBlendFunctionResetValues(final int blend_src,final int blend_dst) {
+    public void setBlendFunctionResetValues(final int blend_src, final int blend_dst) {
         this.reset_blend[RGB_SRC] = blend_src;
         this.reset_blend[RGB_DST] = blend_dst;
         this.reset_blend[ALPHA_SRC] = blend_src;
@@ -737,12 +736,12 @@ public class PrimitiveRenderer {
         this.setBlendFunctionReset();
     }
 
-    private static float colorPackedRGBA(final float red,final float green,final float blue,final float alpha) {
+    private static float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
         return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
-    private static float colorPackedRGB(final float red,final float green,final float blue) {
+    private static float colorPackedRGB(final float red, final float green, final float blue) {
         return NumberUtils.intBitsToFloat(((int) (blue * 255) << 16 & 0xFF0000)
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
