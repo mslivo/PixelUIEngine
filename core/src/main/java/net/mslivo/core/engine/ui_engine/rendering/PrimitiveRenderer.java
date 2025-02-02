@@ -212,7 +212,7 @@ public class PrimitiveRenderer {
 
     public void setProjectionMatrix(final Matrix4 projection) {
         if (Arrays.equals(projectionMatrix.val, projection.val)) return;
-        if (drawing) flush(false);
+        if (drawing) flush();
         this.projectionMatrix.set(projection);
         if (drawing) setupMatrices();
     }
@@ -265,7 +265,7 @@ public class PrimitiveRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-        if (idx > 0) flush(true);
+        if (idx > 0) flush();
         Gdx.gl.glDepthMask(true);
         if (flushWarning && this.intermediateFlushes > 0) {
             printFlushWarning();
@@ -281,7 +281,7 @@ public class PrimitiveRenderer {
 
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         // Insert Restart Index
@@ -306,7 +306,7 @@ public class PrimitiveRenderer {
     }
 
 
-    private void flush(final boolean resetPrimitiveRestarts) {
+    private void flush() {
         if (idx == 0) return;
 
         renderCalls++;
@@ -325,13 +325,13 @@ public class PrimitiveRenderer {
         Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
         idx = 0;
 
-        if (resetPrimitiveRestarts) {
-            for (int i = indexResets.size-1; i >=0 ; i--) {
-                final int resetIndex = indexResets.items[i];
-                indexBuffer.put(resetIndex, resetIndex);
-                indexResets.removeIndex(i);
-            }
+
+        for (int i = indexResets.size - 1; i >= 0; i--) {
+            final int resetIndex = indexResets.items[i];
+            indexBuffer.put(resetIndex, resetIndex);
+            indexResets.removeIndex(i);
         }
+
     }
 
     public void dispose() {
@@ -345,7 +345,7 @@ public class PrimitiveRenderer {
 
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x + 0.5f);
@@ -363,7 +363,7 @@ public class PrimitiveRenderer {
         // Vertex 1
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x1 + 0.5f);
@@ -377,7 +377,7 @@ public class PrimitiveRenderer {
         // Vertex 2
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x2 + 0.5f);
@@ -395,7 +395,7 @@ public class PrimitiveRenderer {
         // Vertex 1
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x1 + 0.5f);
@@ -409,7 +409,7 @@ public class PrimitiveRenderer {
         // Vertex 2
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x2 + 0.5f);
@@ -423,7 +423,7 @@ public class PrimitiveRenderer {
         // Vertex 3
         if (idx == vertices.length) {
             this.intermediateFlushes++;
-            flush(false);
+            flush();
         }
 
         vertices[idx] = (x3 + 0.5f);
@@ -475,7 +475,7 @@ public class PrimitiveRenderer {
         this.blend[ALPHA_SRC] = srcFuncAlpha;
         this.blend[ALPHA_DST] = dstFuncAlpha;
         if (drawing) {
-            flush(false);
+            flush();
             Gdx.gl.glBlendFuncSeparate(blend[RGB_SRC], blend[RGB_DST], blend[ALPHA_SRC], blend[ALPHA_DST]);
         }
     }
@@ -498,7 +498,7 @@ public class PrimitiveRenderer {
 
     public void setShader(ShaderProgram shader) {
         if (drawing) {
-            flush(false);
+            flush();
         }
         this.shader = shader;
         this.u_projTrans = shader.getUniformLocation("u_projTrans");
