@@ -160,6 +160,11 @@ public final class APIWindow {
         if (includeWindow) setColor(window, color);
     }
 
+    public Window createFromGenerator(WindowGeneratorP0 windowGenerator) {
+        if (windowGenerator == null) return null;
+        return windowGenerator.createWindow(api);
+    }
+
     public <P1> Window createFromGenerator(WindowGeneratorP1<P1> windowGenerator, P1 p1) {
         if (windowGenerator == null) return null;
         return windowGenerator.createWindow(api, p1);
