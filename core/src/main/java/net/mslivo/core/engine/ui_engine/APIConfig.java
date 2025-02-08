@@ -444,6 +444,14 @@ public final class APIConfig {
             public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
                 uiConfig.notification_tooltip_defaultDisplayTime = notifications_defaultDisplayTime;
             }
+
+            public int getFadeoutTime() {
+                return uiConfig.notification_tooltip_fadeoutTime;
+            }
+
+            public void setFadeoutTime(int notifications_fadeoutTime) {
+                uiConfig.notification_tooltip_fadeoutTime = Math.max(notifications_fadeoutTime,0);
+            }
         }
 
     }
@@ -478,11 +486,11 @@ public final class APIConfig {
         }
 
         public float getFadeOutSpeed() {
-            return uiConfig.tooltip_FadeOutSpeed;
+            return uiConfig.tooltip_FadeoutSpeed;
         }
 
-        public void setFadeOutSpeed(float fadeOutSpeed) {
-            uiConfig.tooltip_FadeOutSpeed = fadeOutSpeed;
+        public void setFadeOutSpeed(float fadeoutSpeed) {
+            uiConfig.tooltip_FadeoutSpeed = fadeoutSpeed;
         }
     }
 

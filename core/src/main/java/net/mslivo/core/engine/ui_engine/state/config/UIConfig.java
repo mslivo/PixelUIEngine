@@ -63,11 +63,11 @@ public final class UIConfig implements Serializable, Cloneable {
     public Color notification_top_defaultColor;
     public int notification_top_foldTime;
     public int notification_tooltip_defaultDisplayTime;
-
+    public int notification_tooltip_fadeoutTime;
     public Color tooltip_defaultCellColor;
     public float tooltip_FadeInSpeed;
     public int tooltip_FadeInDelay;
-    public float tooltip_FadeOutSpeed;
+    public float tooltip_FadeoutSpeed;
     public char[] component_textFieldDefaultAllowedCharacters;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
@@ -153,10 +153,11 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_top_defaultDisplayTime = 70;
         notification_top_defaultColor = DEFAULT_COlOR.cpy();
         notification_top_foldTime = 12;
-        notification_tooltip_defaultDisplayTime = 120;
+        notification_tooltip_defaultDisplayTime = 70;
+        notification_tooltip_fadeoutTime = 12;
         tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
         tooltip_FadeInSpeed = 0.2f;
-        tooltip_FadeOutSpeed = 0.2f;
+        tooltip_FadeoutSpeed = 0.2f;
         tooltip_FadeInDelay = 20;
         // ##### MouseTextInput Default Values #####
         mouseTextInput_defaultLowerCaseCharacters = new char[]{

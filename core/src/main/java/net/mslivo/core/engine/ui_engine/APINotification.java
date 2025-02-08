@@ -3,6 +3,7 @@ package net.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.ui_engine.constants.TOOLTIP_NOTIFICATION_STATE;
 import net.mslivo.core.engine.ui_engine.constants.TOP_NOTIFICATION_STATE;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -50,7 +51,7 @@ public final class APINotification {
             notification.color = new Color(uiConfig.notification_top_defaultColor);
             notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
             notification.topNotificationAction = topNotificationAction != null ? topNotificationAction : DEFAULT_NOTIFICATION_ACTION;
-            notification.displayTimer = 0;
+            notification.timer = 0;
             int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
             if (textWidth > uiEngineState.resolutionWidth) {
                 int tooMuch = (textWidth - uiEngineState.resolutionWidth);
@@ -112,7 +113,8 @@ public final class APINotification {
             tooltipNotification.y = y;
             tooltipNotification.tooltip = tooltip;
             tooltipNotification.displayTime = displayTime;
-            tooltipNotification.displayTimer = 0;
+            tooltipNotification.timer = 0;
+            tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.INIT;
             return tooltipNotification;
         }
 
@@ -128,8 +130,6 @@ public final class APINotification {
                 return;
             tooltipNotification.tooltip = tooltip;
         }
-
-
 
     }
 

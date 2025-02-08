@@ -213,7 +213,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 });
 
                 api.addNotification(notification);
-                api.addNotification(api.notification.tooltip.create(32,32,null));
+                api.addNotification(api.notification.tooltip.create(32,32,api.toolTip.create("abc")));
             }
         });
 

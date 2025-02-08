@@ -1756,7 +1756,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         } else {
             if (uiEngineState.fadeOutTooltip != null) {
                 if (uiEngineState.tooltip_fadePct > 0f) {
-                    uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip_FadeOutSpeed, 0f, 1f);
+                    uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip_FadeoutSpeed, 0f, 1f);
                 } else {
                     uiEngineState.fadeOutTooltip = null;
                 }
@@ -1771,35 +1771,36 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             switch (notification.state) {
                 case INIT_SCROLL -> {
-                    notification.displayTimer = 0;
+                    notification.timer = 0;
                     notification.state = TOP_NOTIFICATION_STATE.SCROLL;
                 }
                 case INIT_DISPLAY -> {
-                    notification.displayTimer = 0;
+                    notification.timer = 0;
                     notification.state = TOP_NOTIFICATION_STATE.DISPLAY;
                 }
                 case SCROLL -> {
-                    notification.displayTimer++;
-                    if (notification.displayTimer > 30) {
+                    notification.timer++;
+                    if (notification.timer > 30) {
                         notification.scroll += 1;
                         if (notification.scroll >= notification.scrollMax) {
-                            notification.displayTimer = 0;
                             notification.state = TOP_NOTIFICATION_STATE.DISPLAY;
+                            notification.timer = 0;
+                        }else{
+                            notification.timer = 30;
                         }
-                        notification.displayTimer = 30;
                     }
                 }
                 case DISPLAY -> {
-                    notification.displayTimer++;
-                    if (notification.displayTimer > notification.displayTime) {
-                        notification.displayTimer = 0;
+                    notification.timer++;
+                    if (notification.timer > notification.displayTime) {
                         notification.state = TOP_NOTIFICATION_STATE.FOLD;
+                        notification.timer = 0;
                     }
                 }
                 case FOLD -> {
-                    notification.displayTimer++;
-                    if (notification.displayTimer > uiEngineState.config.notification_top_foldTime) {
-                        notification.displayTimer = 0;
+                    notification.timer++;
+                    if (notification.timer > uiEngineState.config.notification_top_foldTime) {
+                        notification.timer = 0;
                         notification.state = TOP_NOTIFICATION_STATE.FINISHED;
                         UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
                     }
@@ -1811,9 +1812,27 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (!uiEngineState.tooltipNotifications.isEmpty()) {
             for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
                 TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
-                tooltipNotification.displayTimer++;
-                if(tooltipNotification.displayTimer > tooltipNotification.displayTime){
-                    UICommonUtils.notification_removeFromScreen(uiEngineState, tooltipNotification);
+                switch (tooltipNotification.state){
+                    case INIT -> {
+                        tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.DISPLAY;
+                    }
+                    case DISPLAY -> {
+                        tooltipNotification.timer++;
+                        if(tooltipNotification.timer > tooltipNotification.displayTime){
+                            tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.FADE;
+                            tooltipNotification.timer = 0;
+                        }
+                    }
+                    case FADE -> {
+                        tooltipNotification.timer++;
+                        if(tooltipNotification.timer > api.config.notification.tooltip.getFadeoutTime()){
+                            UICommonUtils.notification_removeFromScreen(uiEngineState, tooltipNotification);
+                            tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.FINISHED;
+                            tooltipNotification.timer = 0;
+                        }
+                    }
+                    case FINISHED -> {
+                    }
                 }
             }
         }
@@ -2536,10 +2555,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
         for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
             TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
 
-            float fade = 1f-(tooltipNotification.displayTimer/(float)tooltipNotification.displayTime);
+            switch (tooltipNotification.state){
+                case INIT -> {}
+                case DISPLAY,FADE -> {
+
+                }
+            }
+
+            float alpha = 1f;
+            if(tooltipNotification.state == TOOLTIP_NOTIFICATION_STATE.FADE){
+                alpha = (1f-(tooltipNotification.timer /(float)api.config.notification.tooltip.getFadeoutTime()));
+            }
 
             if(tooltipNotification.tooltip != null) {
-                render_drawTooltip(tooltipNotification.x, tooltipNotification.y, tooltipNotification.tooltip, fade);
+                render_drawTooltip(tooltipNotification.x, tooltipNotification.y, tooltipNotification.tooltip, alpha);
             }
         }
 
@@ -2559,7 +2588,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             final float notificationAlpha = topNotification.color.a;
 
             if (topNotification.state == TOP_NOTIFICATION_STATE.FOLD) {
-                float fadeoutProgress = (topNotification.displayTimer / (float) uiEngineState.config.notification_top_foldTime);
+                float fadeoutProgress = (topNotification.timer / (float) uiEngineState.config.notification_top_foldTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             spriteRenderer.saveState();
