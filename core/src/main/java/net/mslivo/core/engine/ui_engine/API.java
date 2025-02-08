@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine;
 
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -13,6 +13,8 @@ import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 import java.util.ArrayList;
@@ -75,13 +77,17 @@ public final class API {
 
     /* #################### Notifications #################### */
 
-    public ArrayList<Notification> notifications() {
-        return new ArrayList<>(uiEngineState.notifications);
+    public ArrayList<TopNotification> topNotifications() {
+        return new ArrayList<>(uiEngineState.topNotifications);
+    }
+
+    public ArrayList<TooltipNotification> tooltipNotifications() {
+        return new ArrayList<>(uiEngineState.tooltipNotifications);
     }
 
     public void addNotification(Notification notification) {
         if (notification == null) return;
-        UICommonUtils.notification_addToScreen(uiEngineState, notification, uiConfig.notification_max);
+        UICommonUtils.notification_addToScreen(uiEngineState, notification, uiConfig.notification_top_max);
     }
 
     public void addNotifications(Notification[] notifications) {
@@ -100,14 +106,17 @@ public final class API {
     }
 
     public void removeAllNotifications() {
-        removeNotifications(uiEngineState.notifications.toArray(new Notification[]{}));
+        removeNotifications(uiEngineState.topNotifications.toArray(new Notification[]{}));
+        removeNotifications(uiEngineState.tooltipNotifications.toArray(new Notification[]{}));
     }
 
     public ArrayList<Notification> findNotificationsByName(String name) {
         if (name == null) return new ArrayList<>();
         ArrayList<Notification> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.notifications.size(); i++)
-            if (name.equals(uiEngineState.notifications.get(i).name)) result.add(uiEngineState.notifications.get(i));
+        for (int i = 0; i < uiEngineState.topNotifications.size(); i++)
+            if (name.equals(uiEngineState.topNotifications.get(i).name)) result.add(uiEngineState.topNotifications.get(i));
+        for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++)
+            if (name.equals(uiEngineState.tooltipNotifications.get(i).name)) result.add(uiEngineState.tooltipNotifications.get(i));
         return result;
     }
 

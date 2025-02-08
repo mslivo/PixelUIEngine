@@ -399,45 +399,53 @@ public final class APIConfig {
         APINotificationsConfig(){
         }
 
-        public int getMax() {
-            return uiConfig.notification_max;
+        public final APINotificationsTopConfig top = new APINotificationsTopConfig();
+        public final APINotificationsTooltipConfig tooltip = new APINotificationsTooltipConfig();
+
+        public final class APINotificationsTopConfig {
+            public int getMax() {
+                return uiConfig.notification_top_max;
+            }
+
+            public void setMax(int notifications_max) {
+                uiConfig.notification_top_max = notifications_max;
+            }
+
+            public int getDefaultDisplayTime() {
+                return uiConfig.notification_top_defaultDisplayTime;
+            }
+
+            public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
+                uiConfig.notification_top_defaultDisplayTime = notifications_defaultDisplayTime;
+            }
+
+            public Color getDefaultColor() {
+                return uiConfig.notification_top_defaultColor.cpy();
+            }
+
+            public void setDefaultColor(Color notifications_defaultColor) {
+                uiConfig.notification_top_defaultColor = notifications_defaultColor.cpy();
+            }
+
+            public int getFoldTime() {
+                return uiConfig.notification_top_foldTime;
+            }
+
+            public void setFoldTime(int notifications_fadeoutTime) {
+                uiConfig.notification_top_foldTime = Math.max(notifications_fadeoutTime,0);
+            }
         }
 
-        public void setMax(int notifications_max) {
-            uiConfig.notification_max = notifications_max;
+        public final class APINotificationsTooltipConfig {
+            public int getDefaultDisplayTime() {
+                return uiConfig.notification_tooltip_defaultDisplayTime;
+            }
+
+            public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
+                uiConfig.notification_tooltip_defaultDisplayTime = notifications_defaultDisplayTime;
+            }
         }
 
-        public int getDefaultDisplayTime() {
-            return uiConfig.notification_defaultDisplayTime;
-        }
-
-        public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
-            uiConfig.notification_defaultDisplayTime = notifications_defaultDisplayTime;
-        }
-
-        public Color getDefaultColor() {
-            return uiConfig.notification_defaultColor.cpy();
-        }
-
-        public void setDefaultColor(Color notifications_defaultColor) {
-            uiConfig.notification_defaultColor = notifications_defaultColor.cpy();
-        }
-
-        public int getFadeoutTime() {
-            return uiConfig.notification_fadeoutTime;
-        }
-
-        public void setFadeoutTime(int notifications_fadeoutTime) {
-            uiConfig.notification_fadeoutTime = Math.max(notifications_fadeoutTime,0);
-        }
-
-        public float getScrollSpeed() {
-            return uiConfig.notification_scrollSpeed;
-        }
-
-        public void setScrollSpeed(float notifications_scrollSpeed) {
-            uiConfig.notification_scrollSpeed = notifications_scrollSpeed;
-        }
     }
 
     public final class APITooltipConfig {

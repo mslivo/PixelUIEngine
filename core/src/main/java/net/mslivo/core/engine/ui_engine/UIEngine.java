@@ -52,7 +52,8 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayDeque;
@@ -177,7 +178,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedTextField = null;
         newUIEngineState.pressedTextFieldMouseX = 0;
         newUIEngineState.focusedTextField = null;
-        newUIEngineState.notifications = new ArrayList<>();
+        newUIEngineState.topNotifications = new ArrayList<>();
+        newUIEngineState.tooltipNotifications = new ArrayList<>();
         newUIEngineState.hotKeys = new ArrayList<>();
         newUIEngineState.appViewPorts = new ArrayList<>();
         newUIEngineState.singleUpdateActions = new ArrayList<>();
@@ -1764,44 +1766,54 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
     private void updateUI_notifications() {
-        if (uiEngineState.notifications.size() > 0) {
-            Notification notification = uiEngineState.notifications.getFirst();
+        if (!uiEngineState.topNotifications.isEmpty()) {
+            TopNotification notification = uiEngineState.topNotifications.getFirst();
+
             switch (notification.state) {
                 case INIT_SCROLL -> {
-                    notification.timer = 0;
-                    notification.state = STATE_NOTIFICATION.SCROLL;
+                    notification.displayTimer = 0;
+                    notification.state = TOP_NOTIFICATION_STATE.SCROLL;
                 }
                 case INIT_DISPLAY -> {
-                    notification.timer = 0;
-                    notification.state = STATE_NOTIFICATION.DISPLAY;
+                    notification.displayTimer = 0;
+                    notification.state = TOP_NOTIFICATION_STATE.DISPLAY;
                 }
                 case SCROLL -> {
-                    notification.timer++;
-                    if (notification.timer > 30) {
-                        notification.scroll += MathUtils.round(uiEngineState.config.notification_scrollSpeed);
+                    notification.displayTimer++;
+                    if (notification.displayTimer > 30) {
+                        notification.scroll += 1;
                         if (notification.scroll >= notification.scrollMax) {
-                            notification.timer = 0;
-                            notification.state = STATE_NOTIFICATION.DISPLAY;
+                            notification.displayTimer = 0;
+                            notification.state = TOP_NOTIFICATION_STATE.DISPLAY;
                         }
-                        notification.timer = 30;
+                        notification.displayTimer = 30;
                     }
                 }
                 case DISPLAY -> {
-                    notification.timer++;
-                    if (notification.timer > notification.displayTime) {
-                        notification.timer = 0;
-                        notification.state = STATE_NOTIFICATION.FADEOUT;
+                    notification.displayTimer++;
+                    if (notification.displayTimer > notification.displayTime) {
+                        notification.displayTimer = 0;
+                        notification.state = TOP_NOTIFICATION_STATE.FOLD;
                     }
                 }
-                case FADEOUT -> {
-                    notification.timer++;
-                    if (notification.timer > uiEngineState.config.notification_fadeoutTime) {
-                        notification.timer = 0;
-                        notification.state = STATE_NOTIFICATION.FINISHED;
+                case FOLD -> {
+                    notification.displayTimer++;
+                    if (notification.displayTimer > uiEngineState.config.notification_top_foldTime) {
+                        notification.displayTimer = 0;
+                        notification.state = TOP_NOTIFICATION_STATE.FINISHED;
                         UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
                     }
                 }
                 case FINISHED -> {
+                }
+            }
+        }
+        if (!uiEngineState.tooltipNotifications.isEmpty()) {
+            for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
+                TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
+                tooltipNotification.displayTimer++;
+                if(tooltipNotification.displayTimer > tooltipNotification.displayTime){
+                    UICommonUtils.notification_removeFromScreen(uiEngineState, tooltipNotification);
                 }
             }
         }
@@ -1840,7 +1852,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private CommonActions actions_getUIObjectCommonActions(Object uiObject) {
         return switch (uiObject) {
             case Window window -> window.windowAction;
-            case Notification notification -> notification.notificationAction;
+            case TopNotification notification -> notification.topNotificationAction;
             case Button button -> button.buttonAction;
             case Combobox comboBox -> comboBox.comboBoxAction;
             case AppViewport appViewPort -> appViewPort.appViewPortAction;
@@ -1959,13 +1971,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // Notifications
-        render_drawNotifications();
+        render_drawTooltipNotifications();
+        render_drawTopNotifications();
 
         // Context Menu
         render_drawContextMenu();
 
         // Tooltip
-        render_drawTooltip();
+        render_drawCursorTooltip();
 
         // OnScreenTextInput
         render_mouseTextInput();
@@ -2282,25 +2295,176 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.setTweakAndColorReset();
     }
 
-    private void render_drawTooltip() {
+    private int tooltipWidth(Tooltip tooltip){
+        int width = tooltip.minWidth;
+        for (int is = 0; is < tooltip.segments.size(); is++) {
+            TooltipSegment segment = tooltip.segments.get(is);
+            width = Math.max(width, segment.width);
+        }
+        return width;
+    }
+
+    private int tooltipHeight(Tooltip tooltip){
+        int height = 0;
+        for (int is = 0; is < tooltip.segments.size(); is++) {
+            TooltipSegment segment = tooltip.segments.get(is);
+            if (!segment.merge)
+                height += segment.height;
+        }
+        return height;
+    }
+
+    private void render_drawTooltip(int x, int y, Tooltip tooltip , float alpha) {
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+
+        // Determine Dimensions
+        final int tooltip_width = tooltipWidth(tooltip);
+        if (tooltip_width == 0) return;
+        final int tooltip_height = tooltipHeight(tooltip);
+        if (tooltip_height == 0) return;
+
+
+        // Draw tooltip
+        int iy = tooltip_height;
+        for (int is = 0; is < tooltip.segments.size(); is++) {
+            TooltipSegment segment = tooltip.segments.get(is);
+            final float segmentAlpha = segment.cellColor.a * alpha;
+            final float borderAlpha = tooltip.color_border.a * alpha;
+            final float contentAlpha = segment.contentColor.a * alpha;
+
+            // Segment Background
+            if (!segment.merge) {
+                iy -= segment.height;
+                int width_reference = tooltip_width;
+                int height_reference = tooltip_height;
+                for (int ty = 0; ty < segment.height; ty++) {
+                    int y_combined = iy + ty;
+                    boolean drawBottomborder = false;
+
+                    if (ty == 0) {
+                        if (segment.border) {
+                            drawBottomborder = y_combined != 0;
+                        } else {
+                            int isPlus1 = is + 1;
+                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(isPlus1).border;
+                        }
+                    }
+
+                    // Background
+                    if (!segment.clear) {
+                        render_setColor(spriteRenderer, segment.cellColor, segmentAlpha, false);
+                        for (int tx = 0; tx < tooltip_width; tx++) {
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_CELL, render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference), x + TS(tx), y + TS(y_combined));
+                        }
+                    }
+
+                    // Border
+                    render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
+                    for (int tx = 0; tx < tooltip_width; tx++) {
+                        // tooltip border
+                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height), x + TS(tx), y + TS(y_combined));
+                        // segmentborder
+                        if (drawBottomborder) {
+                            spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, x + TS(tx), y + TS(y_combined));
+                        }
+                    }
+
+
+                }
+
+                // Top Border
+                render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
+                for (int tx = 0; tx < tooltip_width; tx++) {
+                    // tooltip border
+                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_TOP, render_get3TilesCMediaIndex(tx, width_reference), x + TS(tx), y + TS(tooltip_height));
+                }
+
+            }
+
+
+            // Content
+            spriteRenderer.setColorReset();
+
+            switch (segment) {
+                case TooltipTextSegment textSegment -> {
+                    // Text
+                    int text_width = render_textWidth(textSegment.text);
+                    int text_y = y + TS(iy);
+                    int text_x = x + switch (textSegment.alignment) {
+                        case LEFT -> 1;
+                        case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
+                        case RIGHT -> TS(tooltip_width) - text_width - 3;
+                    };
+
+                    render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 2);
+                }
+                case TooltipImageSegment imageSegment -> {
+                    int image_width = mediaManager.spriteWidth(imageSegment.image);
+                    int image_height = mediaManager.spriteHeight(imageSegment.image);
+                    int image_y = y + TS(iy) + MathUtils.round((TS(segment.height) - image_height) / 2f);
+                    int image_x = x + switch (imageSegment.alignment) {
+                        case LEFT -> 2;
+                        case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
+                        case RIGHT -> TS(tooltip_width) - image_width - 2;
+                    };
+                    render_setColor(spriteRenderer, imageSegment.contentColor, contentAlpha, false);
+                    int width = mediaManager.spriteWidth(imageSegment.image);
+                    int height = mediaManager.spriteHeight(imageSegment.image);
+                    spriteRenderer.drawCMediaSprite(imageSegment.image, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), image_x, image_y,
+                            width, height, 0, 0, width, height, imageSegment.flipX, imageSegment.flipY
+                    );
+                }
+                case TooltipCanvasSegment canvasSegment -> {
+                    int width = TS(canvasSegment.width);
+                    int height = TS(canvasSegment.height);
+                    spriteRenderer.end();
+                    primitiveRenderer.begin();
+                    render_setColor(primitiveRenderer, canvasSegment.contentColor, segmentAlpha, false);
+                    int canvas_x = x + switch (canvasSegment.alignment) {
+                        case LEFT -> 0;
+                        case CENTER ->
+                                MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(TS(canvasSegment.width) / 2f);
+                        case RIGHT -> TS(tooltip_width) - TS(canvasSegment.width);
+                    };
+
+                    for (int icx = 0; icx < width; icx++) {
+                        for (int icy = 0; icy < height; icy++) {
+                            float a = canvasSegment.colorMap.a[icx][icy];
+                            if (a == 0) continue;
+                            float r = canvasSegment.colorMap.r[icx][icy];
+                            float g = canvasSegment.colorMap.g[icx][icy];
+                            float b = canvasSegment.colorMap.b[icx][icy];
+                            int vx = canvas_x + icx;
+                            int vy = y + TS(iy) + icy;
+                            primitiveRenderer.setVertexColor(r, g, b, a);
+                            primitiveRenderer.vertex(vx, vy);
+                        }
+                    }
+                    primitiveRenderer.end();
+                    spriteRenderer.begin();
+
+                }
+                case null, default -> {
+                }
+            }
+        }
+
+        spriteRenderer.setTweakAndColorReset();
+        primitiveRenderer.setTweakAndColorReset();
+    }
+
+    private void render_drawCursorTooltip() {
         final Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
         if (tooltip == null) return;
         if (tooltip.segments.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float lineAlpha = tooltip.color_line.a * uiEngineState.tooltip_fadePct;
-        final ArrayList<TooltipSegment> segments = tooltip.segments;
+        final int tooltip_width = tooltipWidth(tooltip);
+        if (tooltip_width == 0) return;
+        final int tooltip_height = tooltipHeight(tooltip);
+        if (tooltip_height == 0) return;
 
-        // Determine Dimensions
-        int tooltip_width = tooltip.minWidth;
-        int tooltip_height = 0;
-        for (int is = 0; is < segments.size(); is++) {
-            TooltipSegment segment = segments.get(is);
-            tooltip_width = Math.max(tooltip_width, segment.width);
-            if (!segment.merge) tooltip_height += segment.height;
-        }
-        if (tooltip_width == 0 || tooltip_height == 0) return;
-        // Determine Position
 
         final int lineLengthAbs = TS(tooltip.lineLength);
         final DIRECTION direction = switch (tooltip.direction) {
@@ -2331,131 +2495,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
         };
 
+        // Draw Tooltip
+        render_drawTooltip(tooltip_x, tooltip_y, tooltip, uiEngineState.tooltip_fadePct);
 
-        // Draw tooltip
-        int iy = tooltip_height;
-        for (int is = 0; is < tooltip.segments.size(); is++) {
-            TooltipSegment segment = segments.get(is);
-            final float segmentAlpha = segment.cellColor.a * uiEngineState.tooltip_fadePct;
-            final float borderAlpha = tooltip.color_border.a * uiEngineState.tooltip_fadePct;
-            final float contentAlpha = segment.contentColor.a * uiEngineState.tooltip_fadePct;
-
-            // Segment Background
-            if (!segment.merge) {
-                iy -= segment.height;
-                int width_reference = tooltip_width;
-                int height_reference = tooltip_height;
-                for (int ty = 0; ty < segment.height; ty++) {
-                    int y_combined = iy + ty;
-                    boolean drawBottomborder = false;
-
-                    if (ty == 0) {
-                        if (segment.border) {
-                            drawBottomborder = y_combined != 0;
-                        } else {
-                            int isPlus1 = is + 1;
-                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(isPlus1).border;
-                        }
-                    }
-
-                    // Background
-                    if (!segment.clear) {
-                        render_setColor(spriteRenderer, segment.cellColor, segmentAlpha, false);
-                        for (int tx = 0; tx < tooltip_width; tx++) {
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_CELL, render_get16TilesCMediaIndex(tx, y_combined, width_reference, height_reference), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
-                        }
-                    }
-
-                    // Border
-                    render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
-                    for (int tx = 0; tx < tooltip_width; tx++) {
-                        // tooltip border
-                        spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP, render_get16TilesCMediaIndex(tx, y_combined, width_reference, tooltip_height), tooltip_x + TS(tx), tooltip_y + TS(y_combined));
-                        // segmentborder
-                        if (drawBottomborder) {
-                            spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_SEGMENT_BORDER, tooltip_x + TS(tx), tooltip_y + TS(y_combined));
-                        }
-                    }
-
-
-                }
-
-                // Top Border
-                render_setColor(spriteRenderer, tooltip.color_border, borderAlpha, false);
-                for (int tx = 0; tx < tooltip_width; tx++) {
-                    // tooltip border
-                    spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_TOOLTIP_TOP, render_get3TilesCMediaIndex(tx, width_reference), tooltip_x + TS(tx), tooltip_y + TS(tooltip_height));
-                }
-
-            }
-
-
-            // Content
-            spriteRenderer.setColorReset();
-
-            switch (segment) {
-                case TooltipTextSegment textSegment -> {
-                    // Text
-                    int text_width = render_textWidth(textSegment.text);
-                    int text_y = tooltip_y + TS(iy);
-                    int text_x = tooltip_x + switch (textSegment.alignment) {
-                        case LEFT -> 1;
-                        case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(text_width / 2f);
-                        case RIGHT -> TS(tooltip_width) - text_width - 3;
-                    };
-
-                    render_drawFont(textSegment.text, text_x, text_y, textSegment.contentColor, contentAlpha, false, 1, 2);
-                }
-                case TooltipImageSegment imageSegment -> {
-                    int image_width = mediaManager.spriteWidth(imageSegment.image);
-                    int image_height = mediaManager.spriteHeight(imageSegment.image);
-                    int image_y = tooltip_y + TS(iy) + MathUtils.round((TS(segment.height) - image_height) / 2f);
-                    int image_x = tooltip_x + switch (imageSegment.alignment) {
-                        case LEFT -> 2;
-                        case CENTER -> MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(image_width / 2f);
-                        case RIGHT -> TS(tooltip_width) - image_width - 2;
-                    };
-                    render_setColor(spriteRenderer, imageSegment.contentColor, contentAlpha, false);
-                    int width = mediaManager.spriteWidth(imageSegment.image);
-                    int height = mediaManager.spriteHeight(imageSegment.image);
-                    spriteRenderer.drawCMediaSprite(imageSegment.image, imageSegment.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState), image_x, image_y,
-                            width, height, 0, 0, width, height, imageSegment.flipX, imageSegment.flipY
-                    );
-                }
-                case TooltipCanvasSegment canvasSegment -> {
-                    int width = TS(canvasSegment.width);
-                    int height = TS(canvasSegment.height);
-                    spriteRenderer.end();
-                    primitiveRenderer.begin();
-                    render_setColor(primitiveRenderer, canvasSegment.contentColor, segmentAlpha, false);
-                    int canvas_x = tooltip_x + switch (canvasSegment.alignment) {
-                        case LEFT -> 0;
-                        case CENTER ->
-                                MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(TS(canvasSegment.width) / 2f);
-                        case RIGHT -> TS(tooltip_width) - TS(canvasSegment.width);
-                    };
-
-                    for (int icx = 0; icx < width; icx++) {
-                        for (int icy = 0; icy < height; icy++) {
-                            float a = canvasSegment.colorMap.a[icx][icy];
-                            if (a == 0) continue;
-                            float r = canvasSegment.colorMap.r[icx][icy];
-                            float g = canvasSegment.colorMap.g[icx][icy];
-                            float b = canvasSegment.colorMap.b[icx][icy];
-                            int vx = canvas_x + icx;
-                            int vy = tooltip_y + TS(iy) + icy;
-                            primitiveRenderer.setVertexColor(r, g, b, a);
-                            primitiveRenderer.vertex(vx, vy);
-                        }
-                    }
-                    primitiveRenderer.end();
-                    spriteRenderer.begin();
-
-                }
-                case null, default -> {
-                }
-            }
-        }
 
         // Draw line
         render_setColor(spriteRenderer, tooltip.color_line, lineAlpha, false);
@@ -2485,39 +2527,55 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y + yOffset);
             }
         }
-
-        spriteRenderer.setTweakAndColorReset();
-        primitiveRenderer.setTweakAndColorReset();
     }
 
-    private void render_drawNotifications() {
-        if (uiEngineState.notifications.size() == 0) return;
+    private void render_drawTooltipNotifications() {
+        if (uiEngineState.tooltipNotifications.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
 
+        for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
+            TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
+
+            float fade = 1f-(tooltipNotification.displayTimer/(float)tooltipNotification.displayTime);
+
+            if(tooltipNotification.tooltip != null) {
+                render_drawTooltip(tooltipNotification.x, tooltipNotification.y, tooltipNotification.tooltip, fade);
+            }
+        }
+
+
+        spriteRenderer.setTweakAndColorReset();
+    }
+
+    private void render_drawTopNotifications() {
+        if (uiEngineState.topNotifications.isEmpty()) return;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+
+        final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
         int y = 0;
         int yOffsetSlideFade = 0;
-        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
-            final Notification notification = uiEngineState.notifications.get(i);
-            final float notificationAlpha = notification.color.a;
+        for (int i = 0; i < uiEngineState.topNotifications.size(); i++) {
+            TopNotification topNotification = uiEngineState.topNotifications.get(i);
+            final float notificationAlpha = topNotification.color.a;
 
-            if (notification.state == STATE_NOTIFICATION.FADEOUT) {
-                float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification_fadeoutTime);
+            if (topNotification.state == TOP_NOTIFICATION_STATE.FOLD) {
+                float fadeoutProgress = (topNotification.displayTimer / (float) uiEngineState.config.notification_top_foldTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             spriteRenderer.saveState();
-            render_setColor(spriteRenderer, notification.color, notificationAlpha, false);
+            render_setColor(spriteRenderer, topNotification.color, notificationAlpha, false);
             for (int ix = 0; ix < width; ix++) {
                 spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_NOTIFICATION_BAR, TS(ix), uiEngineState.resolutionHeight - TS() - TS(y) + yOffsetSlideFade);
             }
             spriteRenderer.loadState();
-            int xOffset = (TS(width) / 2) - (render_textWidth(notification.text) / 2) - notification.scroll;
-            render_drawFont(notification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, notification.fontColor, notificationAlpha, false);
+            int xOffset = (TS(width) / 2) - (render_textWidth(topNotification.text) / 2) - topNotification.scroll;
+            render_drawFont(topNotification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, topNotification.fontColor, notificationAlpha, false);
             y = y + 1;
-
         }
 
         spriteRenderer.setTweakAndColorReset();
+
+
     }
 
     private void render_drawWindow(Window window, boolean modals) {
@@ -3195,7 +3253,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         spriteRenderer.saveState();
-        spriteRenderer.setColor(Color.GRAY,alpha);
+        spriteRenderer.setColor(Color.GRAY, alpha);
         font.setColor(color.r, color.g, color.b, 1f);
         if (maxWidth == FONT_MAXWIDTH_NONE) {
             spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, false, false, 0);
@@ -3236,7 +3294,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.hotKeys.clear();
         uiEngineState.singleUpdateActions.clear();
         uiEngineState.screenComponents.clear();
-        uiEngineState.notifications.clear();
+        uiEngineState.topNotifications.clear();
         uiEngineState.appViewPorts.clear();
         uiEngineState.spriteRenderer_ui.dispose();
 

@@ -50,6 +50,8 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayList;
@@ -311,8 +313,8 @@ final class UICommonUtils {
 
     static Object component_getUIObjectAtPosition(UIEngineState uiEngineState, int x, int y) {
         // Notification Collision
-        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
-            Notification notification = uiEngineState.notifications.get(i);
+        for (int i = 0; i < uiEngineState.topNotifications.size(); i++) {
+            TopNotification notification = uiEngineState.topNotifications.get(i);
             if (!notification.clickAble) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
                     0, uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(i + 1),
@@ -426,16 +428,32 @@ final class UICommonUtils {
     static void notification_addToScreen(UIEngineState uiEngineState, Notification notification, int notificationsMax) {
         if (notification.addedToScreen) return;
         notification.addedToScreen = true;
-        uiEngineState.notifications.add(notification);
-        // Remove first if too many
-        if (uiEngineState.notifications.size() > notificationsMax)
-            notification_removeFromScreen(uiEngineState, uiEngineState.notifications.getFirst());
+
+        switch (notification){
+            case TopNotification topNotification -> {
+                uiEngineState.topNotifications.add(topNotification);
+                // Remove first if too many
+                if (uiEngineState.topNotifications.size() > notificationsMax)
+                    notification_removeFromScreen(uiEngineState, uiEngineState.topNotifications.getFirst());
+            }
+            case TooltipNotification tooltipNotification->{
+                uiEngineState.tooltipNotifications.add(tooltipNotification);
+            }
+        }
+
     }
 
     static void notification_removeFromScreen(UIEngineState uiEngineState, Notification notification) {
         if (!notification.addedToScreen) return;
         notification.addedToScreen = false;
-        uiEngineState.notifications.remove(notification);
+        switch (notification){
+            case TopNotification topNotification -> {
+                uiEngineState.topNotifications.remove(topNotification);
+            }
+            case TooltipNotification tooltipNotification->{
+                uiEngineState.tooltipNotifications.remove(tooltipNotification);
+            }
+        }
     }
 
     static boolean contextMenu_openAtMousePosition(UIEngineState uiEngineState, MediaManager mediaManager, Contextmenu contextMenu) {

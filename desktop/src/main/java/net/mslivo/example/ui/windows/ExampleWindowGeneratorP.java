@@ -7,7 +7,6 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaArray;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
-import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
@@ -38,7 +37,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipCanvasSegment;
@@ -201,10 +200,10 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.component.button.setButtonAction(notiBtn, new ButtonAction() {
             @Override
             public void onRelease() {
-                Notification notification = api.notification.create(textField.content);
-                api.notification.setColor(notification, new Color(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f));
+                TopNotification notification = api.notification.top.create(textField.content);
+                api.notification.top.setColor(notification, new Color(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f));
 
-                api.notification.setNotificationAction(notification, new NotificationAction() {
+                api.notification.top.setNotificationAction(notification, new TopNotificationAction() {
                     @Override
                     public void onMouseDoubleClick(int button) {
                         if (button == Input.Buttons.LEFT) {
@@ -214,6 +213,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 });
 
                 api.addNotification(notification);
+                api.addNotification(api.notification.tooltip.create(32,32,null));
             }
         });
 
@@ -229,7 +229,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         });
 
-        Textfield number = api.composites.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
+        Textfield number = api.composites.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.top.create("Input: " + integer)));
 
 
         ComboboxItem comboboxItem = api.component.comboBox.item.create("Uniquenes");
@@ -374,7 +374,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         TextButton textBtn3 = api.component.button.textButton.create(3, 7, 5, 1, "Text 2", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composites.modal.createTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notification.create(s))));
+                api.addWindowAsModal(api.composites.modal.createTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notification.top.create(s))));
             }
         });
 
@@ -387,20 +387,20 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                                 api.contextMenu.item.create("Item 1y", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
-                                        api.addNotification(api.notification.create("1"));
+                                        api.addNotification(api.notification.top.create("1"));
                                     }
                                 }),
                                 api.contextMenu.item.create("Item 2 ---", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
-                                        api.addNotification(api.notification.create("2"));
+                                        api.addNotification(api.notification.top.create("2"));
 
                                     }
                                 }),
                                 api.contextMenu.item.create("Item 3 -----", new ContextMenuItemAction() {
                                     @Override
                                     public void onSelect() {
-                                        api.addNotification(api.notification.create("3"));
+                                        api.addNotification(api.notification.top.create("3"));
                                         api.setAppToolTip(null);
                                         api.removeAllWindows();
                                     }
@@ -645,7 +645,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem));
+                api.addNotification(api.notification.top.create("Selected: " + listItem));
                 return true;
             }
 
@@ -704,7 +704,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem,null, true));
+                api.addNotification(api.notification.top.create("Selected: " + listItem,null, true));
                 return true;
             }
 
@@ -767,7 +767,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem));
+                api.addNotification(api.notification.top.create("Selected: " + listItem));
                 return true;
             }
 
@@ -820,7 +820,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem));
+                api.addNotification(api.notification.top.create("Selected: " + listItem));
                 return true;
             }
 
@@ -874,7 +874,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             @Override
             public void onDragIntoApp(ListItem listItem, int from_x, int from_y , int to_x, int to_y) {
                 invItems3[from_x][from_y] = null;
-                api.addNotification(api.notification.create(listItem.text + " " + to_x + "," + to_y));
+                api.addNotification(api.notification.top.create(listItem.text + " " + to_x + "," + to_y));
             }
 
             @Override
