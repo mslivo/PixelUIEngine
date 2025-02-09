@@ -265,6 +265,11 @@ public final class API {
         UICommonUtils.component_addToScreen(component, uiEngineState);
     }
 
+    public void moveScreenComponentToTop(Component component){
+        if (component == null) return;
+        UICommonUtils.component_screenMoveToTop(component, uiEngineState);
+    }
+
     public void addScreenComponents(Component[] components) {
         if (components == null) return;
         for (int i = 0; i < components.length; i++) addScreenComponent(components[i]);

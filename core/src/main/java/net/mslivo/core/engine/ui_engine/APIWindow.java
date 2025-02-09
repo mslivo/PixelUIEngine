@@ -200,6 +200,11 @@ public final class APIWindow {
         for (int i = 0; i < components.length; i++) addComponent(window, components[i]);
     }
 
+    public void moveComponentToTop(Component component){
+        if (component == null) return;
+        UICommonUtils.component_windowMoveToTop(component, uiEngineState);
+    }
+
     public void removeComponent(Window window, Component component) {
         if (window == null || component == null) return;
         UICommonUtils.component_removeFromWindow(component, window, uiEngineState);

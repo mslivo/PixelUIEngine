@@ -692,6 +692,28 @@ final class UICommonUtils {
         uiEngineState.screenComponents.add(component);
     }
 
+    static void component_screenMoveToTop(Component component, UIEngineState uiEngineState){
+        for(int i=0;i<uiEngineState.screenComponents.size();i++){
+            if(uiEngineState.screenComponents.get(i) == component){
+                uiEngineState.screenComponents.remove(component);
+                uiEngineState.screenComponents.add(component);
+            }
+        }
+    }
+
+    static void component_windowMoveToTop(Component component, UIEngineState uiEngineState){
+        if(component.addedToWindow == null)
+            return;
+        Window window = component.addedToWindow;
+        for(int i=0;i<window.components.size();i++){
+            if(window.components.get(i) == component){
+                window.components.remove(component);
+                window.components.add(component);
+            }
+        }
+    }
+
+
     static void component_removeFromScreen(Component component, UIEngineState uiEngineState) {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
