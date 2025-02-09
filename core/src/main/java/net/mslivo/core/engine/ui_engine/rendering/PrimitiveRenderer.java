@@ -165,6 +165,7 @@ public class PrimitiveRenderer {
     private float reset_vertexColor;
     private int[] reset_blend;
     private boolean flushWarning;
+    private boolean restartInserted;
 
     public PrimitiveRenderer() {
         this(SIZE_DEFAULT, false);
@@ -199,6 +200,7 @@ public class PrimitiveRenderer {
         this.reset_vertexColor = colorPackedRGBA(1f, 1f, 1f, 1f);
         this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
+        this.restartInserted = false;
         this.color = reset_color;
         this.vertexColor = reset_vertexColor;
         this.tweak = reset_tweak;
@@ -278,7 +280,8 @@ public class PrimitiveRenderer {
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-
+        if(this.restartInserted)
+            return;
         if (idx == vertices.length) {
             this.intermediateFlushes++;
             flush();
@@ -302,7 +305,7 @@ public class PrimitiveRenderer {
         idx += VERTEX_SIZE;
 
         this.indexResets.add(currentIndex);
-
+        this.restartInserted = true;
     }
 
 
@@ -355,6 +358,7 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
+        this.restartInserted = false;
     }
 
     public void vertex(final float x1, final float y1, final float x2, final float y2) {
@@ -387,6 +391,7 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
+        this.restartInserted = false;
     }
 
     public void vertex(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
@@ -433,6 +438,7 @@ public class PrimitiveRenderer {
         vertices[idx + 4] = tweak;
 
         idx += VERTEX_SIZE;
+        this.restartInserted = false;
     }
 
     public boolean isDrawing() {
