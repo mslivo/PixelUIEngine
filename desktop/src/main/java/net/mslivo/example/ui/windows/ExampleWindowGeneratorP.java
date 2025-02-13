@@ -376,6 +376,11 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             public void onRelease() {
                 api.addWindowAsModal(api.composites.modal.createTextInputModal("Enter Text", "Please Enter some Text", "", s -> api.addNotification(api.notification.top.create(s))));
             }
+
+            @Override
+            public CMediaSprite icon() {
+                return ExampleBaseMedia.ICON_EXAMPLE_1;
+            }
         });
 
         TextButton textBtn4 = api.component.button.textButton.create(3, 9, 6, 2, "Text 1", new ButtonAction() {
