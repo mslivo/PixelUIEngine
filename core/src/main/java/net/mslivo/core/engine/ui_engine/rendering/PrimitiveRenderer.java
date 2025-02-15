@@ -26,12 +26,10 @@ public class PrimitiveRenderer {
             attribute vec4 $COLOR_ATTRIBUTE;
             attribute vec4 $VERTEXCOLOR_ATTRIBUTE;
             attribute vec4 $TWEAK_ATTRIBUTE;
-            
             uniform mat4 u_projTrans;
-            
             varying vec4 fragColor;
-            
             const float eps = 1.0e-10;
+            const float float_correction = 0.0019607842; // float precision correction
             
             vec4 rgb2hsl(vec4 c)
             {
@@ -54,18 +52,24 @@ public class PrimitiveRenderer {
             void main() {
                 gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
                 gl_PointSize = 1.0;
+           
+                vec4 v_color = $COLOR_ATTRIBUTE;
+                v_color.rgb += float_correction;
+                
+                vec4 v_tweak = $TWEAK_ATTRIBUTE;
+                v_tweak.xyz += float_correction;
             
                 // Color Tint
-                vec4 color = $VERTEXCOLOR_ATTRIBUTE;
-                color.rgb = clamp(color.rgb*(1.0+(($COLOR_ATTRIBUTE.rgb-0.5)*2.0)),0.0,1.0);
-                color.a *= $COLOR_ATTRIBUTE.a;
+                vec4 vertexColor = $VERTEXCOLOR_ATTRIBUTE;
+                vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                vertexColor.a *= v_color.a;
             
                 // Apply HSL Tweaks
-                vec4 hsl = rgb2hsl(color);
-                hsl.xyz = clamp(hsl.xyz+($TWEAK_ATTRIBUTE.xyz-0.5)*2.0,0.0,1.0);
-                color = hsl2rgb(hsl);
+                vec4 hsl = rgb2hsl(vertexColor);
+                hsl.xyz = clamp(hsl.xyz+(v_tweak.xyz-0.5)*2.0,0.0,1.0);
+                vertexColor = hsl2rgb(hsl);
 
-                fragColor = color;
+                fragColor = vertexColor;
             }
             """
             .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)

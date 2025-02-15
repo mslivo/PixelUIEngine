@@ -19,18 +19,15 @@ public interface UIEngineAdapter {
         spriteRenderer.begin();
 
         if(grayScale){
-            spriteRenderer.setColor(0.4f,0.4f,0.4f,1);
-            spriteRenderer.setTweak(0.5f,0f,0f,0.0f);
+            spriteRenderer.setTweak(0.5f,0f,0.45f,0.0f);
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.setTweakAndColorReset();
-
-            spriteRenderer.draw(texture_uiModal, 0, 0, resolutionWidth, resolutionHeight);
         }else{
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
-            spriteRenderer.draw(texture_uiModal, 0, 0, resolutionWidth, resolutionHeight);
         }
+        spriteRenderer.draw(texture_uiModal, 0, 0, resolutionWidth, resolutionHeight);
 
         spriteRenderer.end();
         spriteRenderer.setAllReset();

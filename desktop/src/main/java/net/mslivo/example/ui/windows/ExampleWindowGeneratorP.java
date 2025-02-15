@@ -220,6 +220,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         Progressbar progressBar = api.component.progressbar.create(18, 3, 8, 0, true, true);
 
+        api.component.setColor2(progressBar,Color.BLUE);
         api.component.progressbar.setFontColor(progressBar, Color.WHITE);
 
         ScrollbarHorizontal pgScrollbar = api.component.scrollbar.scrollbarHorizontal.create(18, 5, 8, new ScrollBarAction() {

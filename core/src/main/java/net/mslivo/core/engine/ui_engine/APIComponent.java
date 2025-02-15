@@ -1821,6 +1821,15 @@ public final class APIComponent {
         UICommonUtils.component_setSize(uiEngineState, component, width, height);
     }
 
+    public void setWidth(Component component, int width) {
+        if (component == null) return;
+        setSize(component, width, component.height);
+    }
+    public void setHeight(Component component, int height) {
+        if (component == null) return;
+        setSize(component, component.width, height);
+    }
+
     public void setDimensionsGrid(Component component, int x, int y, int width, int height) {
         if (component == null) return;
         setPositionGrid(component, x, y);

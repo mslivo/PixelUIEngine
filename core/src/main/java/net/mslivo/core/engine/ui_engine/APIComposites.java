@@ -39,6 +39,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.awt.*;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -131,7 +132,8 @@ public final class APIComposites {
             ArrayList<Object[][]> pages = new ArrayList<>();
             Grid grid = api.component.grid.create(x, y + 1, null, null, false, false, false, false, doubleSized);
             ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
-            Text pageText = api.component.text.create(x, y, width, "");
+
+            Text pageText = api.component.text.create(x, y, 2, "");
             ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x,y, width, height);
@@ -310,6 +312,7 @@ public final class APIComposites {
             int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
             api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, pageGrid.y);
             api.component.text.setText(pageGrid.text, pageString);
+            api.component.setWidth(pageGrid.text, textWidthTiles);
             return;
         }
     }

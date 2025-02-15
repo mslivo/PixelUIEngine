@@ -2663,25 +2663,31 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
-        if (grayScale) {
-            float avg = ((color.r + color.g + color.b) / 3f) * 0.5f;
-            primitiveRenderer.setColor(avg, avg, avg, alpha);
-            primitiveRenderer.setTweak(0.5f, 0f, 0.5f);
-        } else {
-            primitiveRenderer.setColor(color, alpha);
-            primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f);
+        float saturation, lightness;
+        if(grayScale){
+            saturation = 0f;
+            lightness = 0.45f;
+        }else{
+            saturation = 0.5f;
+            lightness = 0.5f;
         }
+
+        primitiveRenderer.setColor(color, alpha);
+        primitiveRenderer.setTweak(0.5f, saturation, lightness);
     }
 
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
-        if (grayScale) {
-            float avg = ((color.r + color.g + color.b) / 3f) * 0.5f;
-            spriteRenderer.setColor(avg, avg, avg, alpha);
-            spriteRenderer.setTweak(0.5f, 0f, 0.5f, 0.0f);
-        } else {
-            spriteRenderer.setColor(color, alpha);
-            spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
+        float saturation, lightness;
+        if(grayScale){
+            saturation = 0f;
+            lightness = 0.45f;
+        }else{
+            saturation = 0.5f;
+            lightness = 0.5f;
         }
+
+        spriteRenderer.setColor(color, alpha);
+        spriteRenderer.setTweak(0.5f, saturation, lightness, 0.0f);
     }
 
 

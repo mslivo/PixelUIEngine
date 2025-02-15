@@ -11,24 +11,25 @@ import net.mslivo.core.engine.tools.particles.ParticleUpdater;
 import net.mslivo.core.engine.tools.particles.PrimitiveParticleSystem;
 import net.mslivo.core.engine.tools.particles.SpriteParticleSystem;
 import net.mslivo.core.engine.tools.particles.particles.Particle;
-import net.mslivo.core.engine.ui_engine.*;
+import net.mslivo.core.engine.ui_engine.API;
+import net.mslivo.core.engine.ui_engine.APIInput;
+import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
+import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
-import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
-import javax.swing.plaf.basic.BasicMenuBarUI;
-
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = false;
+    private static final boolean IM_PERFORMANCE_TEST = true;
+    private static final boolean SPRITE_PERFORMANCE_TEST = false;
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
@@ -37,7 +38,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private PrimitiveRenderer primitiveRenderer;
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
-    public static class ParticleDataInner{
+
+    public static class ParticleDataInner {
         int randomData = 0;
 
         public ParticleDataInner() {
@@ -61,8 +63,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager,null,SpriteRenderer.SIZE_DEFAULT,true);
-        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT*3,true);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, null, SpriteRenderer.SIZE_DEFAULT, true);
+        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT * 3, true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -72,7 +74,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 api.addWindow(api.window.createFromGenerator(new ExampleWindowGeneratorP(), "Example Window", mediaManager));
             }
 
-        },  BUTTON_MODE.DEFAULT);
+        }, BUTTON_MODE.DEFAULT);
 
         api.component.button.centerContent(createExampleWindowButton);
         api.addScreenComponent(createExampleWindowButton);
@@ -121,16 +123,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composites.modal.createMessageModal("test",new String[]{"test"}, null));
+                api.addWindowAsModal(api.composites.modal.createMessageModal("test", new String[]{"test"}, null));
             }
         }));
 
         ParticleUpdater<ParticleDataInner> particleUpdater = new ParticleUpdater<>() {
             @Override
             public boolean updateParticle(Particle<ParticleDataInner> particle) {
-                particle.x += MathUtils.random(-1,1);
+                particle.x += MathUtils.random(-1, 1);
                 particle.y--;
-                return particle.y >= 0 ? true :false;
+                return particle.y >= 0 ? true : false;
             }
 
             @Override
@@ -155,12 +157,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         }
 
-        if(Tools.Calc.randomChance(30)){
-            spriteParticleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight());
-            primitiveParticleSystem.addPrimitiveParticle(GL32.GL_LINES,MathUtils.random(0,api.resolutionWidth()), api.resolutionHeight(),
-                    MathUtils.random(0f,1f),MathUtils.random(0f,1f),MathUtils.random(0f,1f),1f,
-                    MathUtils.random(-5,5),10,
-                    MathUtils.random(0f,1f),MathUtils.random(0f,1f),MathUtils.random(0f,1f),1f
+        if (Tools.Calc.randomChance(30)) {
+            spriteParticleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight());
+            primitiveParticleSystem.addPrimitiveParticle(GL32.GL_LINES, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight(),
+                    MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f,
+                    MathUtils.random(-5, 5), 10,
+                    MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
 
             );
         }
@@ -180,11 +182,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.begin();
 
-        spriteRenderer.setColor(0.5f,0.5f,0.5f,1.0f);
-        spriteRenderer.setTweak(0.5f,0.5f,0.5f,0.0f);
+        spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
+        spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
-                spriteRenderer.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,animation_timer,
+                spriteRenderer.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND, animation_timer,
                         x, y);
             }
         }
@@ -208,7 +210,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 }
             }
             primitiveRenderer.end();
-            System.out.println(VERTEXES+" Vertexes: "+((System.nanoTime()-time)/1000)+"ns");
+            System.out.println(VERTEXES + " Vertexes: " + ((System.nanoTime() - time) / 1000) + "ns");
         }
 
 
@@ -219,47 +221,46 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.begin(GL32.GL_POINTS);
         primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.vertex(50,50);
-        primitiveRenderer.vertex(51,50);
-        primitiveRenderer.vertex(52,50);
-        primitiveRenderer.vertex(53,50);
-        primitiveRenderer.vertex(54,50);
+        primitiveRenderer.vertex(50, 50);
+        primitiveRenderer.vertex(51, 50);
+        primitiveRenderer.vertex(52, 50);
+        primitiveRenderer.vertex(53, 50);
+        primitiveRenderer.vertex(54, 50);
         primitiveRenderer.end();
-
 
 
         primitiveRenderer.begin(GL32.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
-        primitiveRenderer.vertex(55,60);
+        primitiveRenderer.vertex(55, 60);
         primitiveRenderer.end();
 
 
         primitiveRenderer.begin(GL32.GL_TRIANGLES);
         primitiveRenderer.setVertexColor(Color.GREEN);
         primitiveRenderer.vertex(50, 70);
-        primitiveRenderer.vertex(55,80);
-        primitiveRenderer.vertex(60,70);
+        primitiveRenderer.vertex(55, 80);
+        primitiveRenderer.vertex(60, 70);
 
-        primitiveRenderer.vertex(50+15, 70);
-        primitiveRenderer.vertex(55+15,80);
-        primitiveRenderer.vertex(60+15,70);
+        primitiveRenderer.vertex(50 + 15, 70);
+        primitiveRenderer.vertex(55 + 15, 80);
+        primitiveRenderer.vertex(60 + 15, 70);
         primitiveRenderer.end();
 
         primitiveRenderer.begin(GL32.GL_LINE_STRIP);
         primitiveRenderer.setVertexColor(Color.RED);
 
-        primitiveRenderer.vertex(100,140);
-        primitiveRenderer.vertex(120,140);
-        primitiveRenderer.vertex(110,160);
-        primitiveRenderer.vertex(110,170);
+        primitiveRenderer.vertex(100, 140);
+        primitiveRenderer.vertex(120, 140);
+        primitiveRenderer.vertex(110, 160);
+        primitiveRenderer.vertex(110, 170);
 
         primitiveRenderer.primitiveRestart();
 
         primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.vertex(100,100);
-        primitiveRenderer.vertex(130,120);
-        primitiveRenderer.vertex(150,120);
+        primitiveRenderer.vertex(100, 100);
+        primitiveRenderer.vertex(130, 120);
+        primitiveRenderer.vertex(150, 120);
 
 
         primitiveRenderer.end();
@@ -267,7 +268,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.begin();
 
-        spriteParticleSystem.render(mediaManager,spriteRenderer);
+        spriteParticleSystem.render(mediaManager, spriteRenderer);
 
         spriteRenderer.end();
 
@@ -281,7 +282,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.begin(GL32.GL_POINTS);
 
         int vertexCount = 0;
-        for(int i=0;i<20;i++) {
+        for (int i = 0; i < 20; i++) {
             for (int ix = 0; ix < 64; ix++) {
                 for (int iy = 0; iy < 64; iy++) {
                     primitiveRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
@@ -294,43 +295,43 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.end();
 
+
         spriteRenderer.begin();
 
-        spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
-        mediaManager.font(UIEngineBaseMedia_8x8.UI_FONT).setColor(new Color(0.5f,1f,0.5f,1f));
-        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,310,"SYMBOL: "+Tools.Text.fontSymbol(1));
-        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,300,"Text[#ff00ff]Text2");
-        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,290,"Text[#00ffff]Text2");
-        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT,4,280,"Text[#ff00ff]Text2");
+        spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
+        mediaManager.font(UIEngineBaseMedia_8x8.UI_FONT).setColor(new Color(0.5f, 1f, 0.5f, 1f));
+        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT, 4, 310, "SYMBOL: " + Tools.Text.fontSymbol(1));
+        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT, 4, 300, "Text[#ff00ff]Text2");
+        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT, 4, 290, "Text[#00ffff]Text2");
+        spriteRenderer.drawCMediaFont(UIEngineBaseMedia_8x8.UI_FONT, 4, 280, "Text[#ff00ff]Text2");
 
 
         spriteRenderer.setAllReset();
         spriteRenderer.end();
 
 
+        if (SPRITE_PERFORMANCE_TEST) {
 
-        /*
-        long time = System.nanoTime();
-        spriteRenderer.begin();
-        for(int i=0;i<2;i++) {
-            for (int ix = 0; ix < 64; ix++) {
-                for (int iy = 0; iy < 64; iy++) {
-                    spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
-                    spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,300+ix,200+iy);
+            long time = System.nanoTime();
+            spriteRenderer.begin();
+            for (int i = 0; i < 2; i++) {
+                for (int ix = 0; ix < 64; ix++) {
+                    for (int iy = 0; iy < 64; iy++) {
+                        spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
+                        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 300 + ix, 200 + iy);
+                    }
                 }
             }
+
+            spriteRenderer.setColor(1f, 1f, 1f, 1f);
+            spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 400, 200, 10, 10);
+
+            spriteRenderer.setAllReset();
+            spriteRenderer.end();
+
+            System.out.println(((System.nanoTime() - time) / 1000) + "ns");
+
         }
-
-        spriteRenderer.setColor(1f,1f,1f, 1f);
-        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,400,200,10,10);
-
-        spriteRenderer.setAllReset();
-        spriteRenderer.end();
-
-        System.out.println(((System.nanoTime()-time)/1000)+"ns");
-
-         */
-
 
     }
 

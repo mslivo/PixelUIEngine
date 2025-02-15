@@ -26,6 +26,17 @@ public class SpriteRenderer implements Batch {
     private static final String TWEAK_ATTRIBUTE = "a_tweak";
 
     private static final String VERTEX_SHADER = """
+            #ifdef GL_ES
+                #define LOW lowp
+                #define MED mediump
+                #define HIGH highp
+                precision mediump float;
+            #else
+                #define MED
+                #define LOW
+                #define HIGH
+            #endif
+            
             attribute vec4 $POSITION_ATTRIBUTE;
             attribute vec4 $COLOR_ATTRIBUTE;
             attribute vec2 $TEXCOORD_ATTRIBUTE;
@@ -34,15 +45,19 @@ public class SpriteRenderer implements Batch {
             varying vec4 v_color;
             varying vec4 v_tweak;
             varying vec2 v_texCoords;
+            const float float_correction = 0.0019607842; // float precision correction
+  
             
             void main()
             {
                // Tint Color
                v_color = $COLOR_ATTRIBUTE;
+               v_color.rgb += float_correction;
                v_color.a = v_color.a * (255.0/254.0);
                
                // Tweak Color
                v_tweak = $TWEAK_ATTRIBUTE;
+               v_tweak.rgb += float_correction;
             
                // Position & TextCoord
                v_texCoords = $TEXCOORD_ATTRIBUTE;
@@ -69,8 +84,8 @@ public class SpriteRenderer implements Batch {
             varying vec4 v_color;
             varying vec4 v_tweak;
             
-            uniform MED sampler2D u_texture;
-            uniform MED vec2 u_textureSize;
+            uniform sampler2D u_texture;
+            uniform vec2 u_textureSize;
             
             const float eps = 1.0e-10;
             
@@ -97,13 +112,14 @@ public class SpriteRenderer implements Batch {
                 HIGH vec2 texCoords = v_texCoords;
             
                 // Pixelation
-                MED float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
+                float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
                 texCoords = texCoords * u_textureSize;
                 texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                 texCoords = texCoords / u_textureSize;
                 
                 // Color Tint
                 vec4 color = texture2D( u_texture, texCoords );
+                
                 color.rgb = clamp(color.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
                 color.a *= v_color.a;
                 
