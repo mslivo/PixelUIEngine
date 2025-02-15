@@ -38,27 +38,24 @@ public class PrimitiveRenderer {
                 return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
             }
             
-            vec3 rgb2hsl( in vec3 c ){
-              float h = 0.0;
+            vec3 rgb2hsl( in vec3 rgb ){
+               float h = 0.0;
             	float s = 0.0;
             	float l = 0.0;
-            	float r = c.r;
-            	float g = c.g;
-            	float b = c.b;
-            	float cMin = min( r, min( g, b ) );
-            	float cMax = max( r, max( g, b ) );
+    
+            	float cMin = min( rgb.r, min( rgb.g, rgb.b ) );
+            	float cMax = max( rgb.r, max( rgb.g, rgb.b ) );
             
             	l = ( cMax + cMin ) / 2.0;
             	if ( cMax > cMin ) {
             		float cDelta = cMax - cMin;
-                    //s = l < .05 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) ); Original
             		s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
-            		if ( r == cMax ) {
-            			h = ( g - b ) / cDelta;
-            		} else if ( g == cMax ) {
-            			h = 2.0 + ( b - r ) / cDelta;
+            		if ( rgb.r == cMax ) {
+            			h = ( rgb.g - rgb.b ) / cDelta;
+            		} else if ( rgb.g == cMax ) {
+            			h = 2.0 + ( rgb.b - rgb.r ) / cDelta;
             		} else {
-            			h = 4.0 + ( r - g ) / cDelta;
+            			h = 4.0 + ( rgb.r - rgb.g ) / cDelta;
             		}
             		if ( h < 0.0) {
             			h += 6.0;
@@ -67,7 +64,7 @@ public class PrimitiveRenderer {
             	}
             	return vec3( h, s, l );
             }
-            
+         
             void main() {
                 gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
                 gl_PointSize = 1.0;

@@ -106,7 +106,6 @@ public class SpriteRenderer implements Batch {
             	l = ( cMax + cMin ) / 2.0;
             	if ( cMax > cMin ) {
             		float cDelta = cMax - cMin;
-                    //s = l < .05 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) ); Original
             		s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
             		if ( rgb.r == cMax ) {
             			h = ( rgb.g - rgb.b ) / cDelta;
