@@ -31,22 +31,41 @@ public class PrimitiveRenderer {
             const float eps = 1.0e-10;
             const float float_correction = 0.0019607842; // float precision correction
             
-            vec4 rgb2hsl(vec4 c)
+            
+            vec3 hsl2rgb( in vec3 c )
             {
-                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                float d = q.x - min(q.w, q.y);
-                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
+                vec3 rgb = clamp( abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
+                return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
             }
             
-            vec4 hsl2rgb(vec4 c)
-            {
-                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
+            vec3 rgb2hsl( in vec3 c ){
+              float h = 0.0;
+            	float s = 0.0;
+            	float l = 0.0;
+            	float r = c.r;
+            	float g = c.g;
+            	float b = c.b;
+            	float cMin = min( r, min( g, b ) );
+            	float cMax = max( r, max( g, b ) );
+            
+            	l = ( cMax + cMin ) / 2.0;
+            	if ( cMax > cMin ) {
+            		float cDelta = cMax - cMin;
+                    //s = l < .05 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) ); Original
+            		s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
+            		if ( r == cMax ) {
+            			h = ( g - b ) / cDelta;
+            		} else if ( g == cMax ) {
+            			h = 2.0 + ( b - r ) / cDelta;
+            		} else {
+            			h = 4.0 + ( r - g ) / cDelta;
+            		}
+            		if ( h < 0.0) {
+            			h += 6.0;
+            		}
+            		h = h / 6.0;
+            	}
+            	return vec3( h, s, l );
             }
             
             void main() {
@@ -65,9 +84,13 @@ public class PrimitiveRenderer {
                 vertexColor.a *= v_color.a;
             
                 // Apply HSL Tweaks
-                vec4 hsl = rgb2hsl(vertexColor);
-                hsl.xyz = clamp(hsl.xyz+(v_tweak.xyz-0.5)*2.0,0.0,1.0);
-                vertexColor = hsl2rgb(hsl);
+                vec3 hsl = rgb2hsl(vertexColor.rgb);
+
+                hsl.x = mod(hsl.x + ((v_tweak.x-0.5)*2.0), 1.0);
+                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
+                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
+                
+                vertexColor.rgb = hsl2rgb(hsl.xyz);
 
                 fragColor = vertexColor;
             }
