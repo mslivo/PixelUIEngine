@@ -34,30 +34,19 @@ public class SpriteRenderer implements Batch {
             varying vec4 v_color;
             varying vec4 v_tweak;
             varying vec2 v_texCoords;
-            const vec3 forward = vec3(1.0 / 3.0);
-            
-            vec3 rgbToLabColor(vec3 start) {
-               vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *
-                          pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616)
-                          * (start.rgb * start.rgb), forward);
-               lab.x = pow(lab.x, 1.48);
-               lab.yz = lab.yz * 0.5 + 0.5;
-               return lab;
-            }
             
             void main()
             {
                // Tint Color
                v_color = $COLOR_ATTRIBUTE;
-               v_color.w = v_color.w * (255.0/254.0);
-               v_color.rgb = rgbToLabColor(v_color.rgb);
-            
+               v_color.a = v_color.a * (255.0/254.0);
+               
                // Tweak Color
                v_tweak = $TWEAK_ATTRIBUTE;
             
                // Position & TextCoord
-               gl_Position =  u_projTrans * $POSITION_ATTRIBUTE;
                v_texCoords = $TEXCOORD_ATTRIBUTE;
+               gl_Position =  u_projTrans * $POSITION_ATTRIBUTE;
             }
             """
             .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
@@ -76,8 +65,6 @@ public class SpriteRenderer implements Batch {
                 #define HIGH
             #endif
             
-            
-            
             varying vec2 v_texCoords;
             varying vec4 v_color;
             varying vec4 v_tweak;
@@ -85,61 +72,47 @@ public class SpriteRenderer implements Batch {
             uniform MED sampler2D u_texture;
             uniform MED vec2 u_textureSize;
             
-            const vec3 forward = vec3(1.0 / 3.0);
-            const float twoThird = 2.0 / 3.0;
+            const float eps = 1.0e-10;
             
-            const mat3 rgb2xyz = mat3(
-                0.4121656120, 0.2118591070, 0.0883097947,
-                0.5362752080, 0.6807189584, 0.2818474174,
-                0.0514575653, 0.1074065790, 0.6302613616
-            );
-            
-            const mat3 xyz2lab = mat3(
-                0.2104542553, 1.9779984951, 0.0259040371,
-                0.7936177850, -2.4285922050, 0.7827717662,
-                -0.0040720468, 0.4505937099, -0.8086757660
-            );
-            
-            const mat3 lab2rgbMat1 = mat3(
-                1.0, 1.0, 1.0,
-                0.3963377774, -0.1055613458, -0.0894841775,
-                0.2158037573, -0.0638541728, -1.2914855480
-            );
-            
-            const mat3 lab2rgbMat2 = mat3(
-                4.0767245293, -1.2681437731, -0.0041119885,
-                -3.3072168827, 2.6093323231, -0.7034763098,
-                0.2307590544, -0.3411344290, 1.7068625689
-            );
-            
-            vec3 rgbToLabFragment(vec3 start) {
-                vec3 xyz = rgb2xyz * (start.rgb * start.rgb);
-                vec3 lab = xyz2lab * pow(xyz, forward);
-                lab.x = (pow(lab.x, 1.51) - 0.5) * 2.0;
-                return lab;
+            vec4 rgb2hsl(vec4 c)
+            {
+                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
+                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+                float d = q.x - min(q.w, q.y);
+                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
+                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
             }
             
+            vec4 hsl2rgb(vec4 c)
+            {
+                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
+                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
+                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
+            }
+         
             void main() {
                 // Pixelation
                 HIGH vec2 texCoords = v_texCoords;
             
-                // Calculate pixelation factor
+                // Pixelation
                 MED float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
-            
                 texCoords = texCoords * u_textureSize;
                 texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                 texCoords = texCoords / u_textureSize;
-            
-                // OkLab Tweaks
-                MED vec4 tgt = texture2D(u_texture, texCoords);
-                MED vec3 lab = rgbToLabFragment(tgt.xyz);
-                lab.x = pow(clamp(lab.x * v_tweak.x + v_color.x, 0.0, 1.0), twoThird);
-                lab.yz = clamp((lab.yz * v_tweak.yz + v_color.yz - 0.5) * 2.0, -1.0, 1.0);
-                lab = lab2rgbMat1 * lab;
-                // back to RGB
-                MED vec3 rgb = sqrt(clamp(lab2rgbMat2 * (lab * lab * lab), 0.0, 1.0));
-            
-                gl_FragColor = vec4(rgb, v_color.a * tgt.a);
+                
+                // Color Tint
+                vec4 color = texture2D( u_texture, texCoords );
+                color.rgb = clamp(color.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                color.a *= v_color.a;
+                
+                // Apply HSL Tweaks
+                vec4 hsl = rgb2hsl(color);
+                hsl.xyz = clamp(hsl.xyz+(v_tweak.xyz-0.5)*2.0,0.0,1.0);
+                color = hsl2rgb(hsl);
+                
+                gl_FragColor = color;
             }
             """;
 
@@ -1627,36 +1600,36 @@ public class SpriteRenderer implements Batch {
 
     // ----- Tweak -----
 
-    public void setTweak(final float L, final float A, final float B, final float pixelation) {
-        tweak = colorPackedRGBA(L, A, B, pixelation);
+    public void setTweak(final float H, final float S, final float L, final float pixelation) {
+        tweak = colorPackedRGBA(H, S, L, pixelation);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
+    public void setTweakH(final float H) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
+        float S = ((c & 0x00ff0000) >>> 16) / 255f;
+        float L = ((c & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGBA(H, S, L, pixelation);
+    }
+
+    public void setTweakS(final float S) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
+        float H = ((c & 0x00ff0000) >>> 16) / 255f;
+        float L = ((c & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(H, S, L, pixelation);
+    }
+
     public void setTweakL(final float L) {
         int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
-        float B = ((c & 0x00ff0000) >>> 16) / 255f;
-        float A = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGBA(L, A, B, Contrast);
-    }
-
-    public void setTweakA(final float A) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
-        float B = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(L, A, B, Contrast);
-    }
-
-    public void setTweakB(final float B) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float Contrast = ((c & 0xff000000) >>> 24) / 255f;
-        float A = ((c & 0x0000ff00) >>> 8) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(L, A, B, Contrast);
+        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
+        float H = ((c & 0x0000ff00) >>> 8) / 255f;
+        float S = ((c & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(H, S, L, pixelation);
     }
 
     public void setTweakPixelation(final float pixelation) {
@@ -1667,17 +1640,17 @@ public class SpriteRenderer implements Batch {
         tweak = colorPackedRGBA(r, g, b, pixelation);
     }
 
-    public float getTweakL() {
+    public float getTweakH() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakA() {
+    public float getTweakS() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakB() {
+    public float getTweakL() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }

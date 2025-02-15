@@ -2664,9 +2664,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
         if (grayScale) {
-            float avg = ((color.r + color.g + color.b) / 3f) * 0.8f;
+            float avg = ((color.r + color.g + color.b) / 3f) * 0.5f;
             primitiveRenderer.setColor(avg, avg, avg, alpha);
-            primitiveRenderer.setTweak(0.5f, 0f, 0f);
+            primitiveRenderer.setTweak(0.5f, 0f, 0.5f);
         } else {
             primitiveRenderer.setColor(color, alpha);
             primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f);
@@ -2675,9 +2675,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
         if (grayScale) {
-            float avg = ((color.r + color.g + color.b) / 3f) * 0.8f;
+            float avg = ((color.r + color.g + color.b) / 3f) * 0.5f;
             spriteRenderer.setColor(avg, avg, avg, alpha);
-            spriteRenderer.setTweak(0.5f, 0f, 0f, 0.0f);
+            spriteRenderer.setTweak(0.5f, 0f, 0.5f, 0.0f);
         } else {
             spriteRenderer.setColor(color, alpha);
             spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);

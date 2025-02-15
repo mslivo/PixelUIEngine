@@ -180,6 +180,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.begin();
 
+        spriteRenderer.setColor(0.5f,0.5f,0.5f,1.0f);
+        spriteRenderer.setTweak(0.5f,0.5f,0.5f,0.0f);
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
                 spriteRenderer.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND,animation_timer,
@@ -191,9 +193,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.setColorReset();
         if (IM_PERFORMANCE_TEST) {
+
             primitiveRenderer.setProjectionMatrix(camera.combined);
-            long time = System.currentTimeMillis();
+            long time = System.nanoTime();
             final int VERTEXES = 10000;
+
             primitiveRenderer.begin();
             for (int i = 0; i < VERTEXES; i++) {
                 for (int ix = 0; ix < 10; ix++) {
@@ -204,7 +208,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
                 }
             }
             primitiveRenderer.end();
-            System.out.println(VERTEXES+" Vertexes: "+(System.currentTimeMillis()-time)+"ms");
+            System.out.println(VERTEXES+" Vertexes: "+((System.nanoTime()-time)/1000)+"ns");
         }
 
 
@@ -305,6 +309,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
 
+        /*
         long time = System.nanoTime();
         spriteRenderer.begin();
         for(int i=0;i<2;i++) {
@@ -323,6 +328,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.end();
 
         System.out.println(((System.nanoTime()-time)/1000)+"ns");
+
+         */
 
 
     }

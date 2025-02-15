@@ -31,70 +31,41 @@ public class PrimitiveRenderer {
             
             varying vec4 fragColor;
             
-            const vec3 forward = vec3(1.0 / 3.0);
-            const float twoThird = 2.0 / 3.0;
+            const float eps = 1.0e-10;
             
-            const mat3 rgbToLabMatrix = mat3(
-                +0.2104542553, +1.9779984951, +0.0259040371,
-                +0.7936177850, -2.4285922050, +0.7827717662,
-                -0.0040720468, +0.4505937099, -0.8086757660
-            );
-            
-            const mat3 rgbToXyzMatrix = mat3(
-                0.4121656120, 0.2118591070, 0.0883097947,
-                0.5362752080, 0.6807189584, 0.2818474174,
-                0.0514575653, 0.1074065790, 0.6302613616
-            );
-            
-            const mat3 labToRgbMatrix = mat3(
-                1.0, 1.0, 1.0,
-                +0.3963377774, -0.1055613458, -0.0894841775,
-                +0.2158037573, -0.0638541728, -1.2914855480
-            );
-            
-            const mat3 xyzToRgbMatrix = mat3(
-                +4.0767245293, -1.2681437731, -0.0041119885,
-                -3.3072168827, +2.6093323231, -0.7034763098,
-                +0.2307590544, -0.3411344290, +1.7068625689
-            );
-            
-            vec3 rgbToLabColor(vec3 color) {
-                vec3 xyz = rgbToXyzMatrix * (color * color);
-                vec3 lab = rgbToLabMatrix * pow(xyz, forward);
-                lab.x = pow(lab.x, 1.48);
-                lab.yz = lab.yz * 0.5 + 0.5;
-                return lab;
+            vec4 rgb2hsl(vec4 c)
+            {
+                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
+                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+                float d = q.x - min(q.w, q.y);
+                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
+                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
             }
             
-            vec3 rgbToLabFragment(vec3 color) {
-                vec3 xyz = rgbToXyzMatrix * (color * color);
-                vec3 lab = rgbToLabMatrix * pow(xyz, forward);
-                lab.x = (pow(lab.x, 1.51) - 0.5) * 2.0;
-                return lab;
+            vec4 hsl2rgb(vec4 c)
+            {
+                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
+                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
+                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
             }
             
             void main() {
+                gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
                 gl_PointSize = 1.0;
             
-                // Tint Color
-                vec4 v_color = $COLOR_ATTRIBUTE;
-                v_color.w *= 255.0 / 254.0;
-                v_color.rgb = rgbToLabColor(v_color.rgb);
+                // Color Tint
+                vec4 color = $VERTEXCOLOR_ATTRIBUTE;
+                color.rgb = clamp(color.rgb*(1.0+(($COLOR_ATTRIBUTE.rgb-0.5)*2.0)),0.0,1.0);
+                color.a *= $COLOR_ATTRIBUTE.a;
             
-                // Position
-            
-                gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
-            
-                // Draw
-                vec3 tgtLab = rgbToLabFragment($VERTEXCOLOR_ATTRIBUTE.rgb);
-                vec3 tweak = $TWEAK_ATTRIBUTE.rgb;
-                vec3 color = v_color.rgb;
-            
-                tgtLab.x = pow(clamp(tgtLab.x * $TWEAK_ATTRIBUTE.x + color.x, 0.0, 1.0), twoThird);
-                tgtLab.yz = clamp((tgtLab.yz * tweak.yz + color.yz - 0.5) * 2.0, -1.0, 1.0);
-                vec3 lab = labToRgbMatrix * tgtLab;
-            
-                fragColor = vec4(sqrt(clamp(xyzToRgbMatrix * (lab * lab * lab), 0.0, 1.0)), v_color.a * $VERTEXCOLOR_ATTRIBUTE.a);
+                // Apply HSL Tweaks
+                vec4 hsl = rgb2hsl(color);
+                hsl.xyz = clamp(hsl.xyz+($TWEAK_ATTRIBUTE.xyz-0.5)*2.0,0.0,1.0);
+                color = hsl2rgb(hsl);
+
+                fragColor = color;
             }
             """
             .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
@@ -615,46 +586,46 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(final float L, final float A, final float B) {
-        tweak = colorPackedRGB(L, A, B);
+    public void setTweak(final float H, final float S, final float L) {
+        tweak = colorPackedRGB(H, S, L);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
+    public void setTweakH(final float H) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float S = ((c & 0x00ff0000) >>> 16) / 255f;
+        float L = ((c & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGB(H, S, L);
+    }
+
+    public void setTweakS(final float S) {
+        int c = NumberUtils.floatToIntColor(tweak);
+        float H = ((c & 0x00ff0000) >>> 16) / 255f;
+        float L = ((c & 0x000000ff)) / 255f;
+        tweak = colorPackedRGB(H, S, L);
+    }
+
     public void setTweakL(final float L) {
         int c = NumberUtils.floatToIntColor(tweak);
-        float B = ((c & 0x00ff0000) >>> 16) / 255f;
-        float A = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGB(L, A, B);
+        float H = ((c & 0x0000ff00) >>> 8) / 255f;
+        float S = ((c & 0x000000ff)) / 255f;
+        tweak = colorPackedRGB(H, S, L);
     }
 
-    public void setTweakA(final float A) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float B = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGB(L, A, B);
-    }
-
-    public void setTweakB(final float B) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float A = ((c & 0x0000ff00) >>> 8) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGB(L, A, B);
-    }
-
-    public float getTweakL() {
+    public float getTweakH() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakA() {
+    public float getTweakS() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakB() {
+    public float getTweakL() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
@@ -721,8 +692,8 @@ public class PrimitiveRenderer {
         this.setVertexColorReset();
     }
 
-    public void setTweakResetValues(final float l, final float a, final float b) {
-        this.reset_tweak = colorPackedRGB(l, a, b);
+    public void setTweakResetValues(final float h, final float s, final float l) {
+        this.reset_tweak = colorPackedRGB(h, s, l);
         this.setTweakReset();
     }
 
