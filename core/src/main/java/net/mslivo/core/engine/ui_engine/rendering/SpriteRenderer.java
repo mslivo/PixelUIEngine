@@ -1544,7 +1544,7 @@ public class SpriteRenderer implements Batch {
 
         // Multiply by Batch Color
         Color.abgr8888ToColor(this.tempColor, this.color);
-        final float batch_r = this.tempColor.r * 2f; // 0.5 = default -> x 2
+        final float batch_r = this.tempColor.r * 2f; // 0.5 = default -> x 2 = 1f for multiplication
         final float batch_g = this.tempColor.g * 2f;
         final float batch_b = this.tempColor.b * 2f;
         final float batch_a = this.tempColor.a;
