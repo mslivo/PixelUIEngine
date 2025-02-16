@@ -78,7 +78,7 @@ public class PrimitiveRenderer {
                 // Apply HSL Tweaks
                 vec4 hsl = rgb2hsl(vertexColor);
 
-                hsl.x = mod(hsl.x + ((v_tweak.x-0.5)*2.0), 1.0);
+                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
                 hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
                 hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
                 
