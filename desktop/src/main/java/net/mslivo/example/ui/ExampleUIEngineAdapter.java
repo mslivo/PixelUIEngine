@@ -336,6 +336,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.begin();
         spriteRenderer.setAllReset();
+        spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
         spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
         spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,100,100,128,128);
         spriteRenderer.end();

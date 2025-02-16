@@ -45,19 +45,18 @@ public class SpriteRenderer implements Batch {
             varying vec4 v_color;
             varying vec4 v_tweak;
             varying vec2 v_texCoords;
-            const float float_correction = 0.0019607842; // float precision correction
-  
+            const HIGH float float_correction = 0.0019607842; // float precision correction
             
             void main()
             {
                // Tint Color
                v_color = $COLOR_ATTRIBUTE;
-               v_color.rgb += float_correction;
+               v_color.rgb = min(v_color.rgb+float_correction,1.0);
                v_color.a = v_color.a * (255.0/254.0);
   
                // Tweak Color
                v_tweak = $TWEAK_ATTRIBUTE;
-               v_tweak.rgb += float_correction;
+               v_tweak.rgb = min(v_tweak.rgb+float_correction,1.0);
             
                // Position & TextCoord
                v_texCoords = $TEXCOORD_ATTRIBUTE;
@@ -87,40 +86,26 @@ public class SpriteRenderer implements Batch {
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
             
-            const float eps = 1.0e-10;
+            const HIGH float eps = 1.0e-10;
             
-            vec3 rgb2hsl(vec3 rgb) {
-                float cMin = min(rgb.r, min(rgb.g, rgb.b));
-                float cMax = max(rgb.r, max(rgb.g, rgb.b));
-                float delta = cMax - cMin;
-            
-                float h = 0.0;
-                float s = 0.0;
-                float l = (cMax + cMin) * 0.5;
-            
-                if (delta > 0.0) {
-                    s = delta / (1.0 - abs(2.0 * l - 1.0));
-            
-                    if (cMax == rgb.r) {
-                        h = mod((rgb.g - rgb.b) / delta, 6.0);
-                    } else if (cMax == rgb.g) {
-                        h = (rgb.b - rgb.r) / delta + 2.0;
-                    } else {
-                        h = (rgb.r - rgb.g) / delta + 4.0;
-                    }
-                    h /= 6.0;
-                    if (h < 0.0) h += 1.0;
-                }
-            
-                return vec3(h, s, l);
-            }
-            
-            vec3 hsl2rgb( in vec3 hsl )
+            vec4 rgb2hsl(vec4 c)
             {
-                vec3 rgb = clamp( abs(mod(hsl.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
-                return hsl.z + hsl.y * (rgb-0.5)*(1.0-abs(2.0*hsl.z-1.0));
+                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
+                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+                float d = q.x - min(q.w, q.y);
+                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
+                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
             }
-         
+            
+            vec4 hsl2rgb(vec4 c)
+            {
+                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
+                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
+                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
+            }
+            
             void main() {
                 // Pixelation
                 HIGH vec2 texCoords = v_texCoords;
@@ -130,7 +115,7 @@ public class SpriteRenderer implements Batch {
                 texCoords = texCoords * u_textureSize;
                 texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                 texCoords = texCoords / u_textureSize;
-                
+            
                 // Color Tint
                 vec4 color = texture2D( u_texture, texCoords );
                 
@@ -138,13 +123,11 @@ public class SpriteRenderer implements Batch {
                 color.a *= v_color.a;
                 
                 // Apply HSL Tweaks
-                vec3 hsl = rgb2hsl(color.rgb);
-                //
-                hsl.x = mod(hsl.x + ((v_tweak.x-0.5)*2.0), 1.0);
+                vec4 hsl = rgb2hsl(color);
+                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
                 hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
                 hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                //
-                color.rgb = hsl2rgb(hsl.xyz);
+                color = hsl2rgb(hsl);
                 
                 gl_FragColor = color;
             }
