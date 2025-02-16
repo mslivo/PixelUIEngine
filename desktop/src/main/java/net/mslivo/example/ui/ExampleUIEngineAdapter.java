@@ -28,7 +28,7 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = true;
+    private static final boolean IM_PERFORMANCE_TEST = false;
     private static final boolean SPRITE_PERFORMANCE_TEST = false;
     private API api;
     private MediaManager mediaManager;
@@ -333,6 +333,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         }
 
+
+        spriteRenderer.begin();
+        spriteRenderer.setAllReset();
+        spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
+        spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,100,100,128,128);
+        spriteRenderer.end();
     }
 
     @Override

@@ -24,10 +24,6 @@ public interface UIEngineAdapter {
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.setTweakAndColorReset();
         }else{
-
-            spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
-            spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
-
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
         }

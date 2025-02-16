@@ -54,7 +54,7 @@ public class SpriteRenderer implements Batch {
                v_color = $COLOR_ATTRIBUTE;
                v_color.rgb += float_correction;
                v_color.a = v_color.a * (255.0/254.0);
-               
+  
                // Tweak Color
                v_tweak = $TWEAK_ATTRIBUTE;
                v_tweak.rgb += float_correction;
@@ -89,37 +89,50 @@ public class SpriteRenderer implements Batch {
             
             const float eps = 1.0e-10;
             
-            vec3 hsl2rgb( in vec3 hsl )
-            {
-                vec3 rgb = clamp( abs(mod(hsl.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
-                return hsl.z + hsl.y * (rgb-0.5)*(1.0-abs(2.0*hsl.z-1.0));
+            vec3 rgb2hsl(vec3 rgb) {
+                float cMin = min(rgb.r, min(rgb.g, rgb.b));
+                float cMax = max(rgb.r, max(rgb.g, rgb.b));
+                float delta = cMax - cMin;
+            
+                float h = 0.0;
+                float s = 0.0;
+                float l = (cMax + cMin) * 0.5;
+            
+                if (delta > 0.0) {
+                    s = delta / (1.0 - abs(2.0 * l - 1.0));
+            
+                    if (cMax == rgb.r) {
+                        h = mod((rgb.g - rgb.b) / delta, 6.0);
+                    } else if (cMax == rgb.g) {
+                        h = (rgb.b - rgb.r) / delta + 2.0;
+                    } else {
+                        h = (rgb.r - rgb.g) / delta + 4.0;
+                    }
+                    h /= 6.0;
+                    if (h < 0.0) h += 1.0;
+                }
+            
+                return vec3(h, s, l);
             }
             
-            vec3 rgb2hsl( in vec3 rgb ){
-               float h = 0.0;
-            	float s = 0.0;
-            	float l = 0.0;
-    
-            	float cMin = min( rgb.r, min( rgb.g, rgb.b ) );
-            	float cMax = max( rgb.r, max( rgb.g, rgb.b ) );
+            vec3 hsl2rgb(vec3 hsl) {
+                float h = hsl.x * 6.0;
+                float s = hsl.y;
+                float l = hsl.z;
             
-            	l = ( cMax + cMin ) / 2.0;
-            	if ( cMax > cMin ) {
-            		float cDelta = cMax - cMin;
-            		s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
-            		if ( rgb.r == cMax ) {
-            			h = ( rgb.g - rgb.b ) / cDelta;
-            		} else if ( rgb.g == cMax ) {
-            			h = 2.0 + ( rgb.b - rgb.r ) / cDelta;
-            		} else {
-            			h = 4.0 + ( rgb.r - rgb.g ) / cDelta;
-            		}
-            		if ( h < 0.0) {
-            			h += 6.0;
-            		}
-            		h = h / 6.0;
-            	}
-            	return vec3( h, s, l );
+                float c = (1.0 - abs(2.0 * l - 1.0)) * s;
+                float x = c * (1.0 - abs(mod(h, 2.0) - 1.0));
+                float m = l - 0.5 * c;
+            
+                vec3 rgb;
+                if (h < 1.0) rgb = vec3(c, x, 0.0);
+                else if (h < 2.0) rgb = vec3(x, c, 0.0);
+                else if (h < 3.0) rgb = vec3(0.0, c, x);
+                else if (h < 4.0) rgb = vec3(0.0, x, c);
+                else if (h < 5.0) rgb = vec3(x, 0.0, c);
+                else rgb = vec3(c, 0.0, x);
+            
+                return rgb + vec3(m);
             }
          
             void main() {
@@ -140,11 +153,11 @@ public class SpriteRenderer implements Batch {
                 
                 // Apply HSL Tweaks
                 vec3 hsl = rgb2hsl(color.rgb);
-                
+                //
                 hsl.x = mod(hsl.x + ((v_tweak.x-0.5)*2.0), 1.0);
                 hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
                 hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                
+                //
                 color.rgb = hsl2rgb(hsl.xyz);
                 
                 gl_FragColor = color;
