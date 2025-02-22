@@ -68,13 +68,16 @@ public final class MediaManager {
 
     public boolean prepareCMedia(CMedia cMedia) {
         if (loaded) return false;
+        if(cMedia == null)
+            return false;
         loadMediaList.add(cMedia);
         return true;
     }
 
     public boolean prepareCMedia(CMedia[] cMedias) {
         if (loaded) return false;
-        for (int i = 0; i < cMedias.length; i++) loadMediaList.add(cMedias[i]);
+        for (int i = 0; i < cMedias.length; i++)
+            prepareCMedia(cMedias[i]);
         return true;
     }
 
