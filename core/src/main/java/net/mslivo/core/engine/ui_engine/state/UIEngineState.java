@@ -2,7 +2,6 @@ package net.mslivo.core.engine.ui_engine.state;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -65,13 +64,15 @@ public final class UIEngineState {
     public SpriteRenderer spriteRenderer_ui;
     public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
-    public NestedFrameBuffer frameBuffer_uiComponent;
-    public NestedFrameBuffer frameBuffer_uiModal;
+    public NestedFrameBuffer frameBufferComponent_ui;
+    public NestedFrameBuffer frameBufferModal_ui;
+
+    /* #################### Graphics: Composite #################### */
+    public NestedFrameBuffer frameBuffer_composite;
+    public int upscaleFactor_composite;
+    public NestedFrameBuffer frameBufferUpScaled_composite;
 
     /* #################### Graphics: Screen #################### */
-    public int upscaleFactor_screen;
-    public Texture.TextureFilter textureFilter_screen;
-    public NestedFrameBuffer frameBuffer_screen;
     public Viewport viewport_screen;
 
     /* #################### UI: Added Elements #################### */

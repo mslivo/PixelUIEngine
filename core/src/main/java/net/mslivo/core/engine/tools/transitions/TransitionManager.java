@@ -124,7 +124,7 @@ public class TransitionManager {
         this.spriteRenderer_screen.setProjectionMatrix(this.camera_screen.combined);
         this.spriteRenderer_screen.begin();
         if (uiEngine != null) {
-            this.spriteRenderer_screen.draw(uiEngine.getFrameBufferScreen().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
+            this.spriteRenderer_screen.draw(uiEngine.getFrameBufferComposite().getFlippedTextureRegion(), 0, 0, this.resolutionWidth, this.resolutionHeight);
         } else {
             Gdx.gl.glClearColor(0f, 0f, 0f, 1);
             Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);

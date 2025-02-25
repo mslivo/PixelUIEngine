@@ -1375,39 +1375,34 @@ final class UICommonUtils {
         camera_setPosition(appViewPort.camera, x, y);
     }
 
-    static int viewport_determineUpscaleFactor(VIEWPORT_MODE viewPortMode, int internalResolutionWidth, int internalResolutionHeight) {
-        switch (viewPortMode) {
-            case PIXEL_PERFECT -> {
-                return 1;
-            }
-            case FIT, STRETCH -> {
-                int upSampling = 1;
-                int testWidth = Gdx.graphics.getDisplayMode().width;
-                int testHeight = Gdx.graphics.getDisplayMode().height;
-                while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
-                    upSampling++;
-                }
-                return upSampling;
-            }
-
-            default -> throw new IllegalStateException("Unexpected value: " + viewPortMode);
+    static int viewport_determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
+        int upSampling = 1;
+        int testWidth = Gdx.graphics.getDisplayMode().width;
+        int testHeight = Gdx.graphics.getDisplayMode().height;
+        while ((internalResolutionWidth * upSampling) < testWidth && (internalResolutionHeight * upSampling) < testHeight) {
+            upSampling++;
         }
+        return upSampling;
     }
 
-    static void viewport_changeViewPortMode(UIEngineState uiEngineState, VIEWPORT_MODE viewPortMode) {
-        if (viewPortMode == null || viewPortMode == uiEngineState.viewportMode) return;
-        uiEngineState.upscaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(viewPortMode, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-        uiEngineState.textureFilter_screen = UICommonUtils.viewport_determineUpscaleTextureFilter(viewPortMode);
-        // frameBuffer_upScale
-        uiEngineState.frameBuffer_screen.dispose();
-        uiEngineState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth * uiEngineState.upscaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upscaleFactor_screen, false);
-        uiEngineState.frameBuffer_screen.getColorBufferTexture().setFilter(uiEngineState.textureFilter_screen, uiEngineState.textureFilter_screen);
+    static void viewport_changeViewPortMode(UIEngineState uiEngineState, VIEWPORT_MODE viewportMode) {
+        if (viewportMode == null || viewportMode == uiEngineState.viewportMode) return;
+
+        if(uiEngineState.viewportMode.upscale && !viewportMode.upscale){
+            uiEngineState.upscaleFactor_composite = 1;
+            uiEngineState.frameBufferUpScaled_composite.dispose();
+            uiEngineState.frameBufferUpScaled_composite = null;
+        }
+        if(!uiEngineState.viewportMode.upscale && viewportMode.upscale){
+            uiEngineState.upscaleFactor_composite = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+            uiEngineState.frameBufferUpScaled_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth*uiEngineState.upscaleFactor_composite, uiEngineState.resolutionHeight*uiEngineState.upscaleFactor_composite, false);
+        }
+
         // viewport_screen
-        uiEngineState.viewport_screen = UICommonUtils.viewport_createViewport(viewPortMode, uiEngineState.camera_ui, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+        uiEngineState.viewport_screen = UICommonUtils.viewport_createViewport(viewportMode, uiEngineState.camera_ui, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
         uiEngineState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         // viewportMode
-        uiEngineState.viewportMode = viewPortMode;
-
+        uiEngineState.viewportMode = viewportMode;
     }
 
 
@@ -1417,13 +1412,6 @@ final class UICommonUtils {
             case PIXEL_PERFECT ->
                     new PixelPerfectViewport(internalResolutionWidth, internalResolutionHeight, camera_screen, 1);
             case STRETCH -> new StretchViewport(internalResolutionWidth, internalResolutionHeight, camera_screen);
-        };
-    }
-
-    static Texture.TextureFilter viewport_determineUpscaleTextureFilter(VIEWPORT_MODE viewportMode) {
-        return switch (viewportMode) {
-            case PIXEL_PERFECT -> Texture.TextureFilter.Nearest;
-            case FIT, STRETCH -> Texture.TextureFilter.Linear;
         };
     }
 

@@ -140,19 +140,21 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.update();
-        newUIEngineState.frameBuffer_uiComponent = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
-        newUIEngineState.frameBuffer_uiComponent.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        newUIEngineState.frameBuffer_uiModal = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
-        newUIEngineState.frameBuffer_uiModal.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        // ----- UpScaler
-        newUIEngineState.upscaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.viewportMode, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.textureFilter_screen = UICommonUtils.viewport_determineUpscaleTextureFilter(newUIEngineState.viewportMode);
-        newUIEngineState.frameBuffer_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth * newUIEngineState.upscaleFactor_screen, newUIEngineState.resolutionHeight * newUIEngineState.upscaleFactor_screen, false);
-        newUIEngineState.frameBuffer_screen.getColorBufferTexture().setFilter(newUIEngineState.textureFilter_screen, newUIEngineState.textureFilter_screen);
+        newUIEngineState.frameBufferComponent_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBufferComponent_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        newUIEngineState.frameBufferModal_ui = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBufferModal_ui.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        // ----- Composite
+        newUIEngineState.frameBuffer_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
+        newUIEngineState.frameBuffer_composite.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (viewportMode.upscale) {
+            newUIEngineState.upscaleFactor_composite = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
+            newUIEngineState.frameBufferUpScaled_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth * newUIEngineState.upscaleFactor_composite, newUIEngineState.resolutionHeight * newUIEngineState.upscaleFactor_composite, false);
+            newUIEngineState.frameBufferUpScaled_composite.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        }
         // ----- Screen
         newUIEngineState.viewport_screen = UICommonUtils.viewport_createViewport(newUIEngineState.viewportMode, newUIEngineState.camera_ui, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-
         // -----  GUI
         newUIEngineState.windows = new ArrayList<>();
         newUIEngineState.screenComponents = new ArrayList<>();
@@ -1785,7 +1787,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         if (notification.scroll >= notification.scrollMax) {
                             notification.state = TOP_NOTIFICATION_STATE.DISPLAY;
                             notification.timer = 0;
-                        }else{
+                        } else {
                             notification.timer = 30;
                         }
                     }
@@ -1810,22 +1812,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
         if (!uiEngineState.tooltipNotifications.isEmpty()) {
-            for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
+            for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++) {
                 TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
-                switch (tooltipNotification.state){
+                switch (tooltipNotification.state) {
                     case INIT -> {
                         tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.DISPLAY;
                     }
                     case DISPLAY -> {
                         tooltipNotification.timer++;
-                        if(tooltipNotification.timer > tooltipNotification.displayTime){
+                        if (tooltipNotification.timer > tooltipNotification.displayTime) {
                             tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.FADE;
                             tooltipNotification.timer = 0;
                         }
                     }
                     case FADE -> {
                         tooltipNotification.timer++;
-                        if(tooltipNotification.timer > api.config.notification.tooltip.getFadeoutTime()){
+                        if (tooltipNotification.timer > api.config.notification.tooltip.getFadeoutTime()) {
                             UICommonUtils.notification_removeFromScreen(uiEngineState, tooltipNotification);
                             tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.FINISHED;
                             tooltipNotification.timer = 0;
@@ -1905,8 +1907,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
     public void render(boolean drawToScreen) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
-        // Draw App
-        {
+
+        { // Draw App Layer
             // Draw Main FrameBuffer
             uiEngineState.frameBuffer_app.begin();
             this.uiAdapter.render(uiEngineState.camera_app, null);
@@ -1918,40 +1920,57 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-        { // Draw GUI
-            uiEngineState.frameBuffer_uiComponent.begin();
+        { // Draw GUI Layer
+            uiEngineState.frameBufferComponent_ui.begin();
             render_glClear();
             this.renderUIComponentLayer();
-            uiEngineState.frameBuffer_uiComponent.end();
+            uiEngineState.frameBufferComponent_ui.end();
 
-            uiEngineState.frameBuffer_uiModal.begin();
+            uiEngineState.frameBufferModal_ui.begin();
             render_glClear();
             this.renderUIModalLayer();
-            uiEngineState.frameBuffer_uiModal.end();
+            uiEngineState.frameBufferModal_ui.end();
         }
 
-        { // Draw to Screen Buffer, Combine GUI+App Buffer and Upscale
-            uiEngineState.frameBuffer_screen.begin();
-            render_glClear();
+        { // Draw Composite Image
+            uiEngineState.frameBuffer_composite.begin();
+
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
                     uiEngineState.frameBuffer_app.getFlippedTextureRegion(),
-                    uiEngineState.frameBuffer_uiComponent.getFlippedTextureRegion(), uiEngineState.frameBuffer_uiModal.getFlippedTextureRegion(),
+                    uiEngineState.frameBufferComponent_ui.getFlippedTextureRegion(), uiEngineState.frameBufferModal_ui.getFlippedTextureRegion(),
                     uiEngineState.resolutionWidth, uiEngineState.resolutionHeight,
                     UICommonUtils.window_isModalOpen(uiEngineState)
             );
-            uiEngineState.frameBuffer_screen.end();
+
+            uiEngineState.frameBuffer_composite.end();
         }
 
         {
-            // Draw to Screen
+            // Draw Composite Image to Screen
             if (drawToScreen) {
-                uiEngineState.viewport_screen.apply();
+                spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
                 spriteRenderer.begin();
+
+                if (uiEngineState.viewportMode.upscale) {
+                    // Upscale Composite
+                    uiEngineState.frameBufferUpScaled_composite.begin();
+                    render_glClear();
+                    spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    spriteRenderer.flush();
+                    uiEngineState.frameBufferUpScaled_composite.end();
+                }
+
                 render_glClear();
-                spriteRenderer.draw(uiEngineState.frameBuffer_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                uiEngineState.viewport_screen.apply();
+                spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+
+                switch (uiEngineState.viewportMode) {
+                    case STRETCH, FIT -> spriteRenderer.draw(uiEngineState.frameBufferUpScaled_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    case PIXEL_PERFECT -> spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                }
+
                 spriteRenderer.end();
-                spriteRenderer.setTweakReset();
             }
         }
 
@@ -2314,7 +2333,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.setTweakAndColorReset();
     }
 
-    private int tooltipWidth(Tooltip tooltip){
+    private int tooltipWidth(Tooltip tooltip) {
         int width = tooltip.minWidth;
         for (int is = 0; is < tooltip.segments.size(); is++) {
             TooltipSegment segment = tooltip.segments.get(is);
@@ -2323,7 +2342,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return width;
     }
 
-    private int tooltipHeight(Tooltip tooltip){
+    private int tooltipHeight(Tooltip tooltip) {
         int height = 0;
         for (int is = 0; is < tooltip.segments.size(); is++) {
             TooltipSegment segment = tooltip.segments.get(is);
@@ -2333,7 +2352,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return height;
     }
 
-    private void render_drawTooltip(int x, int y, Tooltip tooltip , float alpha) {
+    private void render_drawTooltip(int x, int y, Tooltip tooltip, float alpha) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
@@ -2552,22 +2571,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.tooltipNotifications.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
-        for(int i=0;i<uiEngineState.tooltipNotifications.size();i++){
+        for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++) {
             TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
 
-            switch (tooltipNotification.state){
-                case INIT -> {}
-                case DISPLAY,FADE -> {
+            switch (tooltipNotification.state) {
+                case INIT -> {
+                }
+                case DISPLAY, FADE -> {
 
                 }
             }
 
             float alpha = 1f;
-            if(tooltipNotification.state == TOOLTIP_NOTIFICATION_STATE.FADE){
-                alpha = (1f-(tooltipNotification.timer /(float)api.config.notification.tooltip.getFadeoutTime()));
+            if (tooltipNotification.state == TOOLTIP_NOTIFICATION_STATE.FADE) {
+                alpha = (1f - (tooltipNotification.timer / (float) api.config.notification.tooltip.getFadeoutTime()));
             }
 
-            if(tooltipNotification.tooltip != null) {
+            if (tooltipNotification.tooltip != null) {
                 render_drawTooltip(tooltipNotification.x, tooltipNotification.y, tooltipNotification.tooltip, alpha);
             }
         }
@@ -2664,10 +2684,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
-        if(grayScale){
+        if (grayScale) {
             saturation = 0f;
             lightness = 0.45f;
-        }else{
+        } else {
             saturation = 0.5f;
             lightness = 0.5f;
         }
@@ -2678,10 +2698,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
-        if(grayScale){
+        if (grayScale) {
             saturation = 0f;
             lightness = 0.45f;
-        }else{
+        } else {
             saturation = 0.5f;
             lightness = 0.5f;
         }
@@ -3336,8 +3356,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Textures
         uiEngineState.frameBuffer_app.dispose();
-        uiEngineState.frameBuffer_uiComponent.dispose();
-        uiEngineState.frameBuffer_screen.dispose();
+        uiEngineState.frameBufferComponent_ui.dispose();
+        uiEngineState.frameBuffer_composite.dispose();
+        if (uiEngineState.frameBufferUpScaled_composite != null)
+            uiEngineState.frameBufferUpScaled_composite.dispose();
 
     }
 
@@ -3373,17 +3395,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return uiEngineState.gamePadSupport;
     }
 
-    public NestedFrameBuffer getFrameBufferScreen() {
-        return uiEngineState.frameBuffer_screen;
+    public NestedFrameBuffer getFrameBufferComposite() {
+        return uiEngineState.frameBuffer_composite;
     }
 
     public NestedFrameBuffer getFrameBufferApp() {
         return uiEngineState.frameBuffer_app;
     }
 
-    public NestedFrameBuffer getFrameBufferUI() {
-        return uiEngineState.frameBuffer_uiComponent;
+    public NestedFrameBuffer getFrameBufferUIComponent() {
+        return uiEngineState.frameBufferComponent_ui;
     }
+
+
+    public NestedFrameBuffer getFrameBufferUIModal() {
+        return uiEngineState.frameBufferModal_ui;
+    }
+
 
     private int TS(int size) {
         return uiEngineState.tileSize.TL(size);
