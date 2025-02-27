@@ -9,119 +9,33 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
+import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShaders;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
 
 public class PrimitiveRenderer {
+    public static final String POSITION_ATTRIBUTE = "a_position";
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
+    public static final String PROJTRANS_UNIFORM = "u_projTrans";
 
-    private static final String TWEAK_ATTRIBUTE = "a_tweak";
-    private static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
-
-    private static final String VERTEX_SHADER = """
-           #ifdef GL_ES
-               #define LOW lowp
-               #define MED mediump
-               #define HIGH highp
-               precision mediump float;
-           #else
-               #define MED
-               #define LOW
-               #define HIGH
-           #endif
-           
-            attribute vec4 $POSITION_ATTRIBUTE;
-            attribute vec4 $COLOR_ATTRIBUTE;
-            attribute vec4 $VERTEXCOLOR_ATTRIBUTE;
-            attribute vec4 $TWEAK_ATTRIBUTE;
-            uniform mat4 u_projTrans;
-            varying vec4 fragColor;
-            const HIGH float eps = 1.0e-10;
-            const HIGH float float_correction = 0.0019607842; // float precision correction
-
-             vec4 rgb2hsl(vec4 c)
-            {
-                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                float d = q.x - min(q.w, q.y);
-                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-            }
-            
-            vec4 hsl2rgb(vec4 c)
-            {
-                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
-            }
-         
-            void main() {
-                gl_Position = u_projTrans * $POSITION_ATTRIBUTE;
-                gl_PointSize = 1.0;
-           
-                vec4 v_color = $COLOR_ATTRIBUTE;
-                v_color.rgb = min(v_color.rgb+float_correction,1.0);
-
-                vec4 v_tweak = $TWEAK_ATTRIBUTE;
-                v_tweak.xyz = min(v_tweak.xyz+float_correction,1.0);
-            
-                // Color Tint
-                vec4 vertexColor = $VERTEXCOLOR_ATTRIBUTE;
-                vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
-                vertexColor.a *= v_color.a;
-            
-                // Apply HSL Tweaks
-                vec4 hsl = rgb2hsl(vertexColor);
-
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                
-                vertexColor = hsl2rgb(hsl);
-
-                fragColor = vertexColor;
-            }
-            """
-            .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
-            .replace("$COLOR_ATTRIBUTE", ShaderProgram.COLOR_ATTRIBUTE)
-            .replace("$VERTEXCOLOR_ATTRIBUTE", VERTEX_COLOR_ATTRIBUTE)
-            .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
-
-    private static final String FRAGMENT_SHADER = """
-                #ifdef GL_ES
-                    #define LOW lowp
-                    #define MED mediump
-                    #define HIGH highp
-                    precision mediump float;
-                #else
-                    #define MED
-                    #define LOW
-                    #define HIGH
-                #endif
-            
-                varying vec4 fragColor;
-            
-                void main() {
-                   gl_FragColor = fragColor;
-                }
-            """;
 
 
     private static final int VERTEX_SIZE = 5;
     public static final int SIZE_MAX = Integer.MAX_VALUE / VERTEX_SIZE / 20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
     public static final int SIZE_DEFAULT = 65534;
-    private static final String COLOR_ATTRIBUTE = "a_color";
     private static final String ERROR_END_BEGIN = "PrimitiveRenderer.end must be called before begin.";
     private static final String ERROR_BEGIN_END = "PrimitiveRenderer.begin must be called before end.";
     private static final String ERROR_BEGIN_DRAW = "PrimitiveRenderer.begin must be called before drawing.";
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
+    private static final PrimitiveShader DEFAULT_SHADER = PrimitiveShaders.defaultShader;
 
     private final VertexData vertexData;
     private final IntegerIndexBufferObject indexData;
@@ -133,6 +47,7 @@ public class PrimitiveRenderer {
     private final int size;
 
     private ShaderProgram shader;
+    private ShaderProgram defaultShader;
     private int idx;
     private int u_projTrans;
     private boolean drawing;
@@ -168,10 +83,6 @@ public class PrimitiveRenderer {
     public PrimitiveRenderer(final int size, final boolean flushWarning) {
         if (size > SIZE_MAX)
             throw new IllegalArgumentException("Can't have more than " + SIZE_MAX + " vertexes: " + size);
-
-        this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-        if (!shader.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + shader.getLog());
-        this.u_projTrans = shader.getUniformLocation("u_projTrans");
         this.size = size;
         this.drawing = false;
         this.primitiveType = GL32.GL_NONE;
@@ -200,6 +111,16 @@ public class PrimitiveRenderer {
         this.backup_vertexColor = this.vertexColor;
         this.backup_tweak = this.tweak;
         this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
+        setShader(shader);
+    }
+
+    private ShaderProgram getDefaultShader() {
+        if (this.defaultShader == null) {
+            this.defaultShader = new ShaderProgram(DEFAULT_SHADER.vertexShaderSource, DEFAULT_SHADER.fragmentShaderSource);
+            if (!this.defaultShader.isCompiled())
+                throw new RuntimeException("Error compiling shader: " + this.defaultShader.getLog());
+        }
+        return this.defaultShader;
     }
 
     public void setProjectionMatrix(final Matrix4 projection) {
@@ -329,6 +250,8 @@ public class PrimitiveRenderer {
 
     public void dispose() {
         this.vertexData.dispose();
+        if (this.shader == getDefaultShader())
+            this.shader.dispose();
     }
 
     public void vertex(final float x, final float y) {
@@ -442,7 +365,7 @@ public class PrimitiveRenderer {
 
     private VertexData createVertexData(final int size) {
         final VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
-                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
@@ -493,11 +416,15 @@ public class PrimitiveRenderer {
     }
 
     public void setShader(ShaderProgram shader) {
+        ShaderProgram nextShader = shader != null ? shader : getDefaultShader();
+        if (this.shader == nextShader)
+            return;
+
         if (drawing) {
             flush();
         }
-        this.shader = shader;
-        this.u_projTrans = shader.getUniformLocation("u_projTrans");
+        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
+        this.shader = nextShader;
         this.shader.bind();
     }
 
@@ -605,48 +532,64 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(final float H, final float S, final float L) {
-        tweak = colorPackedRGB(H, S, L);
+    public void setTweak(final float h, final float s, final float l, final float c) {
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
-    public void setTweakH(final float H) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float S = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGB(H, S, L);
+    public void setTweakHue(final float h) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float s = ((color & 0x00ff0000) >>> 16) / 255f;
+        float l = ((color & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakS(final float S) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float H = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGB(H, S, L);
+    public void setTweakSaturation(final float s) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float h = ((color & 0x00ff0000) >>> 16) / 255f;
+        float l = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakL(final float L) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float H = ((c & 0x0000ff00) >>> 8) / 255f;
-        float S = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGB(H, S, L);
+    public void setTweakLightness(final float l) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float h = ((color & 0x0000ff00) >>> 8) / 255f;
+        float s = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public float getTweakH() {
+    public void setTweakCustom(final float c) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float l = ((color & 0x00ff0000) >>> 16) / 255f;
+        float s = ((color & 0x0000ff00) >>> 8) / 255f;
+        float h = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
+    }
+
+    public float getTweakHue() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakS() {
+    public float getTweakSaturation() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakL() {
+    public float getTweakBrigthness() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
+    }
+
+    public float getTweakCustom() {
+        int c = NumberUtils.floatToIntColor(this.tweak);
+        return ((c & 0xff000000) >>> 24) / 255f;
     }
 
     public float getPackedTweak() {
@@ -711,8 +654,8 @@ public class PrimitiveRenderer {
         this.setVertexColorReset();
     }
 
-    public void setTweakResetValues(final float h, final float s, final float l) {
-        this.reset_tweak = colorPackedRGB(h, s, l);
+    public void setTweakResetValues(final float h, final float s, final float l, final float c) {
+        this.reset_tweak = colorPackedRGBA(h, s, l, c);
         this.setTweakReset();
     }
 

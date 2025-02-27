@@ -3,6 +3,8 @@ package net.mslivo.core.engine.tools.transitions;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 
+import javax.swing.*;
+
 public abstract class Transition {
 
     public final TRANSITION_SPEED transitionSpeed;
@@ -19,7 +21,7 @@ public abstract class Transition {
 
     public abstract TRANSITION_RENDER_MODE getRenderMode();
 
-    public abstract void init(int screenWidth, int screenHeight);
+    public abstract void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight);
 
     public abstract boolean update();
 
@@ -27,6 +29,6 @@ public abstract class Transition {
 
     public abstract void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to);
 
-    public abstract void shutdown();
+    public abstract void finished(SpriteRenderer spriteRenderer);
 
 }

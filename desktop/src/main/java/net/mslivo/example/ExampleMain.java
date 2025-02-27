@@ -4,10 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
-import net.mslivo.core.engine.tools.transitions.transitions.FadeTransition;
 import net.mslivo.core.engine.tools.transitions.transitions.PixelateTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 

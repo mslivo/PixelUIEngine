@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.tools.transitions.transitions;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
@@ -33,8 +32,9 @@ public class FallInTransition extends Transition {
         return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
+
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.yTo = screenHeight;
         this.ySpeed = 0f;
         this.screenHeight = screenHeight;
@@ -69,7 +69,7 @@ public class FallInTransition extends Transition {
     }
 
     @Override
-    public void shutdown() {
+    public void finished(SpriteRenderer spriteRenderer) {
 
     }
 

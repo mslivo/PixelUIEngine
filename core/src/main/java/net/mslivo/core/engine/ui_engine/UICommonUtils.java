@@ -1389,13 +1389,14 @@ final class UICommonUtils {
         if (viewportMode == null || viewportMode == uiEngineState.viewportMode) return;
 
         if(uiEngineState.viewportMode.upscale && !viewportMode.upscale){
-            uiEngineState.upscaleFactor_composite = 1;
-            uiEngineState.frameBufferUpScaled_composite.dispose();
-            uiEngineState.frameBufferUpScaled_composite = null;
+            uiEngineState.upScaleFactor_screen = 1;
+            uiEngineState.frameBuffer_upScaled_screen.dispose();
+            uiEngineState.frameBuffer_upScaled_screen = null;
         }
         if(!uiEngineState.viewportMode.upscale && viewportMode.upscale){
-            uiEngineState.upscaleFactor_composite = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-            uiEngineState.frameBufferUpScaled_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth*uiEngineState.upscaleFactor_composite, uiEngineState.resolutionHeight*uiEngineState.upscaleFactor_composite, false);
+            uiEngineState.upScaleFactor_screen = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+            uiEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth*uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight*uiEngineState.upScaleFactor_screen, false);
+            uiEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
 
         // viewport_screen

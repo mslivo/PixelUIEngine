@@ -78,7 +78,7 @@ public class TransitionManager {
         this.transitionRenderMode = this.transition.getRenderMode();
         if (this.transitionRenderMode == null)
             this.transitionRenderMode = TRANSITION_RENDER_MODE.FROM_FIRST;
-        this.transition.init(this.resolutionWidth, this.resolutionHeight);
+        this.transition.init(this.spriteRenderer_screen, this.resolutionWidth, this.resolutionHeight);
         this.finished = false;
 
 
@@ -191,7 +191,7 @@ public class TransitionManager {
         if (this.finished) return;
         this.frameBuffer_from.dispose();
         this.frameBuffer_to.dispose();
-        this.transition.shutdown();
+        this.transition.finished(spriteRenderer_screen);
         this.transition = null;
         this.camera_screen = null;
         this.finished = true;

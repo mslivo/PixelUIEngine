@@ -69,14 +69,13 @@ public final class UIEngineState {
 
     /* #################### Graphics: Composite #################### */
     public NestedFrameBuffer frameBuffer_composite;
-    public int upscaleFactor_composite;
-    public NestedFrameBuffer frameBufferUpScaled_composite;
 
     /* #################### Graphics: Screen #################### */
+    public int upScaleFactor_screen;
+    public NestedFrameBuffer frameBuffer_upScaled_screen;
     public Viewport viewport_screen;
 
     /* #################### UI: Added Elements #################### */
-
     public ArrayList<Window> windows;
     public ArrayList<Component> screenComponents;
     public Window modalWindow;

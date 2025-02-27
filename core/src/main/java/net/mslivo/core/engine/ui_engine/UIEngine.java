@@ -147,14 +147,16 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // ----- Composite
         newUIEngineState.frameBuffer_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, false);
         newUIEngineState.frameBuffer_composite.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        if (viewportMode.upscale) {
-            newUIEngineState.upscaleFactor_composite = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-            newUIEngineState.frameBufferUpScaled_composite = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth * newUIEngineState.upscaleFactor_composite, newUIEngineState.resolutionHeight * newUIEngineState.upscaleFactor_composite, false);
-            newUIEngineState.frameBufferUpScaled_composite.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        }
+
         // ----- Screen
         newUIEngineState.viewport_screen = UICommonUtils.viewport_createViewport(newUIEngineState.viewportMode, newUIEngineState.camera_ui, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        if (viewportMode.upscale) {
+            newUIEngineState.upScaleFactor_screen = UICommonUtils.viewport_determineUpscaleFactor(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
+            newUIEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, newUIEngineState.resolutionWidth * newUIEngineState.upScaleFactor_screen, newUIEngineState.resolutionHeight * newUIEngineState.upScaleFactor_screen, false);
+            newUIEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        }
+
         // -----  GUI
         newUIEngineState.windows = new ArrayList<>();
         newUIEngineState.screenComponents = new ArrayList<>();
@@ -1954,11 +1956,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                 if (uiEngineState.viewportMode.upscale) {
                     // Upscale Composite
-                    uiEngineState.frameBufferUpScaled_composite.begin();
+                    uiEngineState.frameBuffer_upScaled_screen.begin();
                     render_glClear();
                     spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                     spriteRenderer.flush();
-                    uiEngineState.frameBufferUpScaled_composite.end();
+                    uiEngineState.frameBuffer_upScaled_screen.end();
                 }
 
                 render_glClear();
@@ -1966,7 +1968,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
 
                 switch (uiEngineState.viewportMode) {
-                    case STRETCH, FIT -> spriteRenderer.draw(uiEngineState.frameBufferUpScaled_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    case STRETCH, FIT -> spriteRenderer.draw(uiEngineState.frameBuffer_upScaled_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                     case PIXEL_PERFECT -> spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 }
 
@@ -2693,7 +2695,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         primitiveRenderer.setColor(color, alpha);
-        primitiveRenderer.setTweak(0.5f, saturation, lightness);
+        primitiveRenderer.setTweak(0.5f, saturation, lightness,0f);
     }
 
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
@@ -3358,8 +3360,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.frameBuffer_app.dispose();
         uiEngineState.frameBufferComponent_ui.dispose();
         uiEngineState.frameBuffer_composite.dispose();
-        if (uiEngineState.frameBufferUpScaled_composite != null)
-            uiEngineState.frameBufferUpScaled_composite.dispose();
+        if (uiEngineState.frameBuffer_upScaled_screen != null)
+            uiEngineState.frameBuffer_upScaled_screen.dispose();
 
     }
 

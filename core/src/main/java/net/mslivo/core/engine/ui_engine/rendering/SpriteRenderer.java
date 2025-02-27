@@ -9,10 +9,11 @@ import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.*;
+import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
+import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShaders;
 
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -23,115 +24,13 @@ import java.util.Arrays;
  */
 public class SpriteRenderer implements Batch {
 
-    private static final String TWEAK_ATTRIBUTE = "a_tweak";
-
-    private static final String VERTEX_SHADER = """
-            #ifdef GL_ES
-                #define LOW lowp
-                #define MED mediump
-                #define HIGH highp
-                precision mediump float;
-            #else
-                #define MED
-                #define LOW
-                #define HIGH
-            #endif
-            
-            attribute vec4 $POSITION_ATTRIBUTE;
-            attribute vec4 $COLOR_ATTRIBUTE;
-            attribute vec2 $TEXCOORD_ATTRIBUTE;
-            attribute vec4 $TWEAK_ATTRIBUTE;
-            uniform mat4 u_projTrans;
-            varying vec4 v_color;
-            varying vec4 v_tweak;
-            varying vec2 v_texCoords;
-            const HIGH float float_correction = 0.0019607842; // float precision correction
-            
-            void main()
-            {
-               // Tint Color
-               v_color = $COLOR_ATTRIBUTE;
-               v_color.rgb = min(v_color.rgb+float_correction,1.0);
-               v_color.a = v_color.a * (255.0/254.0);
-  
-               // Tweak Color
-               v_tweak = $TWEAK_ATTRIBUTE;
-               v_tweak.rgb = min(v_tweak.rgb+float_correction,1.0);
-            
-               // Position & TextCoord
-               v_texCoords = $TEXCOORD_ATTRIBUTE;
-               gl_Position =  u_projTrans * $POSITION_ATTRIBUTE;
-            }
-            """
-            .replace("$POSITION_ATTRIBUTE", ShaderProgram.POSITION_ATTRIBUTE)
-            .replace("$COLOR_ATTRIBUTE", ShaderProgram.COLOR_ATTRIBUTE)
-            .replace("$TEXCOORD_ATTRIBUTE", ShaderProgram.TEXCOORD_ATTRIBUTE + "0")
-            .replace("$TWEAK_ATTRIBUTE", TWEAK_ATTRIBUTE);
-    private static final String FRAGMENT_SHADER = """
-            #ifdef GL_ES
-                #define LOW lowp
-                #define MED mediump
-                #define HIGH highp
-                precision mediump float;
-            #else
-                #define MED
-                #define LOW
-                #define HIGH
-            #endif
-            
-            varying vec2 v_texCoords;
-            varying vec4 v_color;
-            varying vec4 v_tweak;
-            
-            uniform sampler2D u_texture;
-            uniform vec2 u_textureSize;
-            
-            const HIGH float eps = 1.0e-10;
-            
-            vec4 rgb2hsl(vec4 c)
-            {
-                const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                float d = q.x - min(q.w, q.y);
-                float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-            }
-            
-            vec4 hsl2rgb(vec4 c)
-            {
-                const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.x + K.xyz) * 6.0 - K.www);
-                float v = (c.z + c.y * min(c.z, 1.0 - c.z));
-                return vec4(v * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), 2.0 * (1.0 - c.z / (v + eps))), c.w);
-            }
-            
-            void main() {
-                // Pixelation
-                HIGH vec2 texCoords = v_texCoords;
-            
-                // Pixelation
-                float pixelSize = 2.0 + floor(v_tweak.w * 14.0);
-                texCoords = texCoords * u_textureSize;
-                texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
-                texCoords = texCoords / u_textureSize;
-            
-                // Color Tint
-                vec4 color = texture2D( u_texture, texCoords );
-                
-                color.rgb = clamp(color.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
-                color.a *= v_color.a;
-                
-                // Apply HSL Tweaks
-                vec4 hsl = rgb2hsl(color);
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                color = hsl2rgb(hsl);
-                
-                gl_FragColor = color;
-            }
-            """;
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String POSITION_ATTRIBUTE = "a_position";
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
+    public static final String TEXTURE_UNIFORM = "u_texture";
+    public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
+    public static final String PROJTRANS_UNIFORM = "u_projTrans";
 
     public static final int SIZE_DEFAULT = 16383;
     public static final int SIZE_MAX = 16383;
@@ -143,8 +42,8 @@ public class SpriteRenderer implements Batch {
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
+    private static final SpriteShader DEFAULT_SHADER = SpriteShaders.defaultShader;
 
-    private int size;
     private final Color tempColor;
     private VertexData vertexData;
     private IndexData indexData;
@@ -158,12 +57,12 @@ public class SpriteRenderer implements Batch {
     private final Matrix4 transformMatrix;
     private final Matrix4 combinedMatrix;
     private ShaderProgram shader;
-    private boolean defaultShader;
+    private ShaderProgram defaultShader;
+
     private MediaManager mediaManager;
     private int u_projTrans;
     private int u_texture;
     private int u_textureSize;
-    private Vector2 textureSizeD4Vector;
     private int renderCalls;
     private int totalRenderCalls;
     private int maxSpritesInBatch;
@@ -197,24 +96,19 @@ public class SpriteRenderer implements Batch {
         this(mediaManager, shader, size, false);
     }
 
+    private ShaderProgram getDefaultShader() {
+        if (this.defaultShader == null) {
+            this.defaultShader = new ShaderProgram(DEFAULT_SHADER.vertexShaderSource, DEFAULT_SHADER.fragmentShaderSource);
+            if (!this.defaultShader.isCompiled())
+                throw new RuntimeException("Error compiling shader: " + this.defaultShader.getLog());
+        }
+        return this.defaultShader;
+    }
+
     public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, final int size, boolean flushWarning) {
         if (size > SIZE_MAX)
             throw new IllegalArgumentException("Can't have more than " + SIZE_MAX + " sprites per batch: " + size);
-        if (shader == null) {
-            this.shader = new ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-            if (!this.shader.isCompiled())
-                throw new IllegalArgumentException("Error compiling shader: " + this.shader.getLog());
-            defaultShader = true;
-        } else {
-            this.shader = shader;
-        }
-
-        this.size = size;
         this.flushWarning = flushWarning;
-        this.u_projTrans = this.shader.getUniformLocation("u_projTrans");
-        this.u_texture = this.shader.getUniformLocation("u_texture");
-        this.u_textureSize = this.shader.getUniformLocation("u_textureSize");
-        this.textureSizeD4Vector = new Vector2(0, 0);
         this.drawing = false;
         this.idx = 0;
         this.intermediateFlushes = 0;
@@ -241,6 +135,7 @@ public class SpriteRenderer implements Batch {
         this.backup_tweak = this.tweak;
         this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
         this.mediaManager = mediaManager;
+        setShader(shader); // null = default shader
     }
 
     private IndexBufferObject createIndexData(int size) {
@@ -274,9 +169,9 @@ public class SpriteRenderer implements Batch {
 
     private VertexData createVertexData(int size) {
         return new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
-                new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"),
+                new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, TEXCOORD_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
     }
 
@@ -1244,7 +1139,8 @@ public class SpriteRenderer implements Batch {
     public void dispose() {
         vertexData.dispose();
         indexData.dispose();
-        if (defaultShader && shader != null) shader.dispose();
+        if (this.shader == getDefaultShader())
+            this.shader.dispose();
     }
 
     @Override
@@ -1284,18 +1180,22 @@ public class SpriteRenderer implements Batch {
         invTexWidth = 1.0f / texture.getWidth();
         invTexHeight = 1.0f / texture.getHeight();
 
-        this.textureSizeD4Vector.set(texture.getWidth(), texture.getHeight());
-        shader.setUniformf(this.u_textureSize, this.textureSizeD4Vector);
+        shader.setUniformf(this.u_textureSize, texture.getWidth(), texture.getHeight());
     }
 
     @Override
     public void setShader(ShaderProgram shader) {
+        ShaderProgram nextShader = shader != null ? shader : getDefaultShader();
+        if (this.shader == nextShader)
+            return;
+
         if (drawing) {
             flush();
         }
-        this.shader = shader;
-        this.u_projTrans = shader.getUniformLocation("u_projTrans");
-        this.u_texture = shader.getUniformLocation("u_texture");
+        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
+        this.u_texture = nextShader.getUniformLocation(TEXTURE_UNIFORM);
+        this.u_textureSize = nextShader.getUniformLocation(TEXTURE_SIZE_UNIFORM);
+        this.shader = nextShader;
         this.shader.bind();
     }
 
@@ -1550,11 +1450,11 @@ public class SpriteRenderer implements Batch {
         final float batch_a = this.tempColor.a;
 
         float[] fontVertices = fontCache.getVertices();
-        for (int idx = 2; idx < fontVertices.length; idx+=5) {
+        for (int idx = 2; idx < fontVertices.length; idx += 5) {
             float fontColor = fontVertices[idx];
             Color.abgr8888ToColor(this.tempColor, fontColor);
-            tempColor.mul(batch_r,batch_g,batch_b,batch_a);
-            fontVertices[idx] = colorPackedRGBA(tempColor.r,tempColor.g,tempColor.b,tempColor.a);
+            tempColor.mul(batch_r, batch_g, batch_b, batch_a);
+            fontVertices[idx] = colorPackedRGBA(tempColor.r, tempColor.g, tempColor.b, tempColor.a);
         }
 
         fontCache.draw(this);
@@ -1617,62 +1517,62 @@ public class SpriteRenderer implements Batch {
 
     // ----- Tweak -----
 
-    public void setTweak(final float H, final float S, final float L, final float pixelation) {
-        tweak = colorPackedRGBA(H, S, L, pixelation);
+    public void setTweak(final float h, final float s, final float l, final float c) {
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
-    public void setTweakH(final float H) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
-        float S = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGBA(H, S, L, pixelation);
+    public void setTweakHue(final float h) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float s = ((color & 0x00ff0000) >>> 16) / 255f;
+        float l = ((color & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakS(final float S) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
-        float H = ((c & 0x00ff0000) >>> 16) / 255f;
-        float L = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(H, S, L, pixelation);
+    public void setTweakSaturation(final float s) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float h = ((color & 0x00ff0000) >>> 16) / 255f;
+        float l = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakL(final float L) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float pixelation = ((c & 0xff000000) >>> 24) / 255f;
-        float H = ((c & 0x0000ff00) >>> 8) / 255f;
-        float S = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(H, S, L, pixelation);
+    public void setTweakLightness(final float l) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float c = ((color & 0xff000000) >>> 24) / 255f;
+        float h = ((color & 0x0000ff00) >>> 8) / 255f;
+        float s = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakPixelation(final float pixelation) {
-        int c = NumberUtils.floatToIntColor(tweak);
-        float b = ((c & 0x00ff0000) >>> 16) / 255f;
-        float g = ((c & 0x0000ff00) >>> 8) / 255f;
-        float r = ((c & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(r, g, b, pixelation);
+    public void setTweakCustom(final float c) {
+        int color = NumberUtils.floatToIntColor(tweak);
+        float l = ((color & 0x00ff0000) >>> 16) / 255f;
+        float s = ((color & 0x0000ff00) >>> 8) / 255f;
+        float h = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public float getTweakH() {
+    public float getTweakHue() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakS() {
+    public float getTweakSaturation() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakL() {
+    public float getTweakBrigthness() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getTweakPixelation() {
+    public float getTweakCustom() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0xff000000) >>> 24) / 255f;
     }
@@ -1729,8 +1629,8 @@ public class SpriteRenderer implements Batch {
         this.setColorReset();
     }
 
-    public void setTweakResetValues(final float l, final float a, final float b, final float pixelation) {
-        this.reset_tweak = colorPackedRGBA(l, a, b, pixelation);
+    public void setTweakResetValues(final float h, final float s, final float l, final float c) {
+        this.reset_tweak = colorPackedRGBA(h, s, l, c);
         this.setTweakReset();
     }
 

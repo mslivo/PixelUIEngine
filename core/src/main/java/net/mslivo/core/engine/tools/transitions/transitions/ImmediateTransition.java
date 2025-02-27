@@ -18,7 +18,7 @@ public class ImmediateTransition extends Transition {
     }
 
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer,int screenWidth, int screenHeight) {
 
     }
 
@@ -36,7 +36,7 @@ public class ImmediateTransition extends Transition {
     }
 
     @Override
-    public void shutdown() {
+    public void finished(SpriteRenderer spriteRenderer) {
 
     }
 

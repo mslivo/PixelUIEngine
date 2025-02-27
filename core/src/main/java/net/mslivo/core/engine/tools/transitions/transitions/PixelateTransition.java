@@ -1,10 +1,12 @@
 package net.mslivo.core.engine.tools.transitions.transitions;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShaders;
 
 public class PixelateTransition extends Transition {
     private float fadeOut;
@@ -23,10 +25,13 @@ public class PixelateTransition extends Transition {
         return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
+    private ShaderProgram pixelationShader = new ShaderProgram(SpriteShaders.pixelationShader.vertexShaderSource,SpriteShaders.pixelationShader.fragmentShaderSource);
+
     @Override
-    public void init(int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
+        spriteRenderer.setShader(pixelationShader);
     }
 
     @Override
@@ -65,8 +70,8 @@ public class PixelateTransition extends Transition {
     }
 
     @Override
-    public void shutdown() {
-
+    public void finished(SpriteRenderer spriteRenderer) {
+        spriteRenderer.setShader(null);
     }
 
 }

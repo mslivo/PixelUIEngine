@@ -258,6 +258,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.primitiveRestart();
 
         primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.setColor(0.5f,0.5f,0.5f,1f);
+        primitiveRenderer.setTweak(0.5f,0.5f,0.5f,0f);
         primitiveRenderer.vertex(100, 100);
         primitiveRenderer.vertex(130, 120);
         primitiveRenderer.vertex(150, 120);
@@ -326,6 +328,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             spriteRenderer.setColor(1f, 1f, 1f, 1f);
             spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 400, 200, 10, 10);
 
+
             spriteRenderer.setAllReset();
             spriteRenderer.end();
 
@@ -338,7 +341,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.setAllReset();
         spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
         spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
-        spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,100,100,128,128);
+        spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,300,100);
         spriteRenderer.end();
     }
 
