@@ -2,7 +2,7 @@ package net.mslivo.core.engine.ui_engine.rendering.shader;
 
 public non-sealed class SpriteShaders extends Shaders {
 
-    public static final SpriteShader defaultShader = new SpriteShader(null, null, null, null, null);
+    public static final SpriteShader defaultShader = new SpriteShader(null, null, null, null, null, true,true);
 
     public static final SpriteShader pixelationShader = new SpriteShader(
             null, null,
@@ -14,7 +14,9 @@ public non-sealed class SpriteShaders extends Shaders {
                     texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.w));
                     texCoords = texCoords / u_textureSize;
                     """,
-            null
+            null,
+            true,
+            true
     );
 
 
@@ -40,6 +42,7 @@ public non-sealed class SpriteShaders extends Shaders {
                     
                     fragColor = mix(fragColor,colorBlur,v_tweak.w);
                     """
+            ,true,true
     );
 
 

@@ -3,6 +3,19 @@ package net.mslivo.core.engine.ui_engine.rendering.shader;
 import net.mslivo.core.engine.tools.Tools;
 
 public final class PrimitiveShader extends ShaderCommon{
+
+    private static final String VERTEX_HSL_CODE = """
+            vec4 hsl = rgb2hsl(vertexColor);
+                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
+                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
+                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
+                vertexColor = hsl2rgb(hsl);
+            """;
+
+    private static final String VERTEX_COLOR_CODE = """
+            vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+            """;
+
     private static final String VERTEX_SHADER_TEMPLATE = """
            #ifdef GL_ES
                #define LOW lowp
@@ -23,7 +36,7 @@ public final class PrimitiveShader extends ShaderCommon{
             varying vec4 fragColorVar;
             const HIGH float float_correction = 0.0019607842; // float precision correction
          
-            """+HSL_FUNCTIONS+"""
+            $HSL_FUNCTIONS
             
             $VERTEX_DECLARATIONS
          
@@ -37,14 +50,10 @@ public final class PrimitiveShader extends ShaderCommon{
                 
                 // Get Color & Apply Mult.
                 vec4 vertexColor = a_vertexColor;
-                vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                $VERTEX_COLOR_CODE
                     
                 // HSL Tweaks
-                vec4 hsl = rgb2hsl(vertexColor);
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                vertexColor = hsl2rgb(hsl);
+                $VERTEX_HSL_CODE
                 
                 // Custom Code
                 $VERTEX_MAIN_VERTEXCOLOR
@@ -86,11 +95,14 @@ public final class PrimitiveShader extends ShaderCommon{
     public final String vertexShaderSource;
     public final String fragmentShaderSource;
 
-    public PrimitiveShader(String vertexDeclarations, String vertexMainVertexColor, String fragmentDeclarations, String fragmentMainFragColor) {
+    public PrimitiveShader(String vertexDeclarations, String vertexMainVertexColor, String fragmentDeclarations, String fragmentMainFragColor, boolean hslEnabled, boolean colorEnabled ) {
 
         this.vertexShaderSource = VERTEX_SHADER_TEMPLATE
                 .replace("$VERTEX_DECLARATIONS", Tools.Text.validString(vertexDeclarations))
-                .replace("$VERTEX_MAIN_VERTEXCOLOR", Tools.Text.validString(vertexMainVertexColor));
+                .replace("$VERTEX_MAIN_VERTEXCOLOR", Tools.Text.validString(vertexMainVertexColor))
+                .replace("$VERTEX_COLOR_CODE", colorEnabled ? VERTEX_COLOR_CODE : "")
+                .replace("$HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
+                .replace("$VERTEX_HSL_CODE", hslEnabled ? VERTEX_HSL_CODE : "");
 
         this.fragmentShaderSource = FRAGMENT_SHADER_TEMPLATE
                 .replace("$FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))

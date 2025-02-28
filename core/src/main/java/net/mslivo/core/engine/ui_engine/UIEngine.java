@@ -1937,6 +1937,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         { // Draw Composite Image
             uiEngineState.frameBuffer_composite.begin();
 
+
             this.uiAdapter.renderComposite(uiEngineState.camera_ui,
                     spriteRenderer,
                     uiEngineState.frameBuffer_app.getFlippedTextureRegion(),

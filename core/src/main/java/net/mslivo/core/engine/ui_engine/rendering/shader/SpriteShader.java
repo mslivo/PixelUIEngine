@@ -4,6 +4,18 @@ import net.mslivo.core.engine.tools.Tools;
 
 public final class SpriteShader extends ShaderCommon{
 
+    private static final String HSL_FRAGMENT_CODE = """
+                vec4 hsl = rgb2hsl(fragColor);
+                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
+                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
+                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
+                fragColor = hsl2rgb(hsl);
+            """;
+
+    private static final String COLOR_FRAGMENT_CODE = """
+                fragColor.rgb = clamp(fragColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+            """;
+
     private static final String VERTEX_SHADER_TEMPLATE = """
                     #ifdef GL_ES
                         #define LOW lowp
@@ -64,7 +76,7 @@ public final class SpriteShader extends ShaderCommon{
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
             
-            """+HSL_FUNCTIONS+"""
+            $HSL_FUNCTIONS
             
             $FRAGMENT_DECLARATIONS
             
@@ -77,14 +89,11 @@ public final class SpriteShader extends ShaderCommon{
             
                 // Get Color & Apply Mult.
                 vec4 fragColor = texture2D( u_texture, texCoords);
-                fragColor.rgb = clamp(fragColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                
+                $FRAGMENT_COLOR
                 
                 // HSL Tweaks
-                vec4 hsl = rgb2hsl(fragColor);
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-                fragColor = hsl2rgb(hsl);
+                $FRAGMENT_HSL
                 
                 // Custom Code
                 $FRAGMENT_MAIN_FRAGCOLOR
@@ -98,7 +107,7 @@ public final class SpriteShader extends ShaderCommon{
     public final String vertexShaderSource;
     public final String fragmentShaderSource;
 
-    public SpriteShader(String vertexDeclarations, String vertexMain, String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor) {
+    public SpriteShader(String vertexDeclarations, String vertexMain, String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean hslEnabled, boolean colorEnabled) {
 
         this.vertexShaderSource = VERTEX_SHADER_TEMPLATE
                 .replace("$VERTEX_DECLARATIONS", Tools.Text.validString(vertexDeclarations))
@@ -107,7 +116,11 @@ public final class SpriteShader extends ShaderCommon{
         this.fragmentShaderSource = FRAGMENT_SHADER_TEMPLATE
                 .replace("$FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))
                 .replace("$FRAGMENT_MAIN_TEXCOORDS", Tools.Text.validString(fragmentMainTexCoords))
-                .replace("$FRAGMENT_MAIN_FRAGCOLOR", Tools.Text.validString(fragmentMainFragColor));
+                .replace("$FRAGMENT_MAIN_FRAGCOLOR", Tools.Text.validString(fragmentMainFragColor))
+                .replace("$FRAGMENT_COLOR", colorEnabled ? COLOR_FRAGMENT_CODE : "")
+                .replace("$HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
+                .replace("$FRAGMENT_HSL", hslEnabled ? HSL_FRAGMENT_CODE : "");
+
 
     }
 }
