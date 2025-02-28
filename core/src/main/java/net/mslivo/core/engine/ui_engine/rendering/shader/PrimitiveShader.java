@@ -14,6 +14,7 @@ public final class PrimitiveShader extends ShaderCommon{
 
     private static final String VERTEX_COLOR_CODE = """
             vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+            vertexColor.a *= v_color.a;
             """;
 
     private static final String VERTEX_SHADER_TEMPLATE = """
@@ -50,16 +51,17 @@ public final class PrimitiveShader extends ShaderCommon{
                 
                 // Get Color & Apply Mult.
                 vec4 vertexColor = a_vertexColor;
+                
+                // Custom Code
+                $VERTEX_MAIN_CUSTOM_VERTEXCOLOR
+              
+                // Color Mult
                 $VERTEX_COLOR_CODE
                     
                 // HSL Tweaks
                 $VERTEX_HSL_CODE
-                
-                // Custom Code
-                $VERTEX_MAIN_VERTEXCOLOR
               
-                // Apply Alpha & Finish
-                vertexColor.a *= v_color.a;
+                // Done
                 gl_PointSize = 1.0;
                 gl_Position = u_projTrans * a_position;
                 fragColorVar = vertexColor;
@@ -99,7 +101,7 @@ public final class PrimitiveShader extends ShaderCommon{
 
         this.vertexShaderSource = VERTEX_SHADER_TEMPLATE
                 .replace("$VERTEX_DECLARATIONS", Tools.Text.validString(vertexDeclarations))
-                .replace("$VERTEX_MAIN_VERTEXCOLOR", Tools.Text.validString(vertexMainVertexColor))
+                .replace("$VERTEX_MAIN_CUSTOM_VERTEXCOLOR", Tools.Text.validString(vertexMainVertexColor))
                 .replace("$VERTEX_COLOR_CODE", colorEnabled ? VERTEX_COLOR_CODE : "")
                 .replace("$HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
                 .replace("$VERTEX_HSL_CODE", hslEnabled ? VERTEX_HSL_CODE : "");

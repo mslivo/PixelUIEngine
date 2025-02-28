@@ -14,6 +14,7 @@ public final class SpriteShader extends ShaderCommon{
 
     private static final String COLOR_FRAGMENT_CODE = """
                 fragColor.rgb = clamp(fragColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                fragColor.a *= v_color.a;
             """;
 
     private static final String VERTEX_SHADER_TEMPLATE = """
@@ -85,21 +86,22 @@ public final class SpriteShader extends ShaderCommon{
                 HIGH vec2 texCoords = v_texCoords;
             
                 // Modify texCoords
-                $FRAGMENT_MAIN_TEXCOORDS
+                $FRAGMENT_MAIN_CUSTOM_TEXCOORDS
             
-                // Get Color & Apply Mult.
+                // Get Fragment
                 vec4 fragColor = texture2D( u_texture, texCoords);
                 
+                // Custom Code
+                $FRAGMENT_MAIN_CUSTOM_FRAGCOLOR
+                
+                // Color Mult
                 $FRAGMENT_COLOR
                 
                 // HSL Tweaks
                 $FRAGMENT_HSL
-                
-                // Custom Code
-                $FRAGMENT_MAIN_FRAGCOLOR
             
-                // Apply Alpha and Finish
-                fragColor.a *= v_color.a;
+                // Done
+                
                 gl_FragColor = fragColor;
             }
             """;
@@ -115,8 +117,8 @@ public final class SpriteShader extends ShaderCommon{
 
         this.fragmentShaderSource = FRAGMENT_SHADER_TEMPLATE
                 .replace("$FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))
-                .replace("$FRAGMENT_MAIN_TEXCOORDS", Tools.Text.validString(fragmentMainTexCoords))
-                .replace("$FRAGMENT_MAIN_FRAGCOLOR", Tools.Text.validString(fragmentMainFragColor))
+                .replace("$FRAGMENT_MAIN_CUSTOM_TEXCOORDS", Tools.Text.validString(fragmentMainTexCoords))
+                .replace("$FRAGMENT_MAIN_CUSTOM_FRAGCOLOR", Tools.Text.validString(fragmentMainFragColor))
                 .replace("$FRAGMENT_COLOR", colorEnabled ? COLOR_FRAGMENT_CODE : "")
                 .replace("$HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
                 .replace("$FRAGMENT_HSL", hslEnabled ? HSL_FRAGMENT_CODE : "");
