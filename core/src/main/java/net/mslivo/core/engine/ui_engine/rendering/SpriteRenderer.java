@@ -1189,14 +1189,17 @@ public class SpriteRenderer implements Batch {
         if (this.shader == nextShader)
             return;
 
-        if (drawing) {
-            flush();
-        }
+        this.shader = nextShader;
         this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
         this.u_texture = nextShader.getUniformLocation(TEXTURE_UNIFORM);
         this.u_textureSize = nextShader.getUniformLocation(TEXTURE_SIZE_UNIFORM);
-        this.shader = nextShader;
-        this.shader.bind();
+
+        if (drawing) {
+            flush();
+            this.shader.bind();
+            setupMatrices();
+        }
+
     }
 
     @Override

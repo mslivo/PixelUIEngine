@@ -419,13 +419,15 @@ public class PrimitiveRenderer {
         ShaderProgram nextShader = shader != null ? shader : getDefaultShader();
         if (this.shader == nextShader)
             return;
+        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
+        this.shader = nextShader;
+
 
         if (drawing) {
             flush();
+            this.shader.bind();
+            setupMatrices();
         }
-        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
-        this.shader = nextShader;
-        this.shader.bind();
     }
 
     public ShaderProgram getShader() {

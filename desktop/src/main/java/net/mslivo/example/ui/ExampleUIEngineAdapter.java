@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -19,6 +21,7 @@ import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShaders;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
@@ -326,24 +329,31 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
 
             spriteRenderer.setColor(1f, 1f, 1f, 1f);
+
             spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 400, 200, 10, 10);
 
 
             spriteRenderer.setAllReset();
             spriteRenderer.end();
 
+
             System.out.println(((System.nanoTime() - time) / 1000) + "ns");
 
         }
 
-
         spriteRenderer.begin();
+
+
         spriteRenderer.setAllReset();
+
         spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
         spriteRenderer.setTweak(0.5f,0.5f,0.5f,0f);
+
         spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,300,100);
         spriteRenderer.end();
+
     }
+
 
     @Override
     public void shutdown() {
