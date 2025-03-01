@@ -16,16 +16,24 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
     public CMediaAnimation() {
     }
 
-    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed) {
-        this(file, tileWidth, tileHeight, animation_speed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP);
+    public CMediaAnimation(String file, int tileWidth, int tileHeight) {
+        this(file, tileWidth, tileHeight, 0.1f, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
+    }
+
+    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animationSpeed) {
+        this(file, tileWidth, tileHeight, animationSpeed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
     public CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
-        this(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP);
+        this(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
     public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
-        super(filename);
+        this(filename, regionWidth,regionHeight,animationSpeed,frameOffset,frameLength,playMode, true);
+    }
+
+    public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode, boolean useAtlas) {
+        super(filename, useAtlas);
         this.regionWidth = regionWidth;
         this.regionHeight = regionHeight;
         this.animationSpeed = animationSpeed;

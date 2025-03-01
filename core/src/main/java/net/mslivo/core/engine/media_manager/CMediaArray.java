@@ -15,11 +15,15 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
     }
 
     public CMediaArray(String file, int tileWidth, int tileHeight) {
-        this(file, tileWidth, tileHeight, 0, Integer.MAX_VALUE);
+        this(file, tileWidth, tileHeight, 0, Integer.MAX_VALUE, true);
     }
 
     public CMediaArray(String file, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
-        super(file);
+        this(file,regionWidth, regionHeight, frameOffset, frameLength, true);
+    }
+
+    public CMediaArray(String file, int regionWidth, int regionHeight, int frameOffset, int frameLength, boolean useAtlas) {
+        super(file, useAtlas);
         this.regionWidth = regionWidth;
         this.regionHeight = regionHeight;
         this.frameOffset = frameOffset;

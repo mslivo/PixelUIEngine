@@ -76,7 +76,7 @@ public final class SpriteShader extends ShaderCommon{
             
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
-            
+                        
             $HSL_FUNCTIONS
             
             $FRAGMENT_DECLARATIONS

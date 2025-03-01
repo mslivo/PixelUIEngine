@@ -9,7 +9,11 @@ public final class CMediaImage extends CMediaSprite implements Serializable {
     }
 
     public CMediaImage(String filename) {
-        super(filename);
+        this(filename, true);
+    }
+
+    public CMediaImage(String filename, boolean useAtlas) {
+        super(filename, useAtlas);
     }
 
 }

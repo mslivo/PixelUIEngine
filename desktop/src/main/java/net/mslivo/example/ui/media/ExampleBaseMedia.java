@@ -16,7 +16,7 @@ public class ExampleBaseMedia {
     public static final CMediaImage ICON_EXAMPLE_WINDOW = new CMediaImage(DIR_EXAMPLE_GRAPHICS + "example_icon_window.png");
     public static final CMediaAnimation EXAMPLE_ANIMATION_2 = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png",  8*8,  8*8, 0.1f);
     public static final CMediaAnimation EXAMPLE_ANIMATION_3 = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png",  8*8,  8*8, 0.01f);
-    public static final CMediaImage EXAMPLE_TEST = new CMediaImage(DIR_EXAMPLE_GRAPHICS + "test.png");
+    public static final CMediaImage EXAMPLE_TEST = new CMediaImage(DIR_EXAMPLE_GRAPHICS + "test.png", false);
 
     public static final CMediaAnimation EXAMPLE_ANIMATION = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation.png", 16, 8, 0.1f);
     public static final CMediaAnimation BACKGROUND = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 16, 16, 0.2f);

@@ -8,42 +8,49 @@ public final class CMediaFont extends CMedia implements Serializable {
     public boolean markupEnabled;
     public CMediaFontOutline outline;
     public CMediaFontSymbol[] symbols;
+    public boolean useAtlas;
 
-    public CMediaFont(){
+    public CMediaFont() {
     }
 
     public CMediaFont(String file) {
         this(file, true, null, null);
     }
 
-    public CMediaFont(String file,  boolean markupEnabled) {
+    public CMediaFont(String file, boolean markupEnabled) {
         this(file, markupEnabled, null, null);
     }
 
     public CMediaFont(String file, boolean markupEnabled, CMediaFontSymbol[] symbols) {
-        this(file, markupEnabled, symbols, null);
+        this(file, markupEnabled, symbols, null, true);
     }
 
-    public CMediaFont(String filename,  boolean markupEnabled,CMediaFontSymbol[] symbols, CMediaFontOutline outline) {
+    public CMediaFont(String filename, boolean markupEnabled, CMediaFontSymbol[] symbols, CMediaFontOutline outline) {
+        this(filename, markupEnabled, symbols, outline, true);
+    }
+
+    public CMediaFont(String filename, boolean markupEnabled, CMediaFontSymbol[] symbols, CMediaFontOutline outline, boolean useAtlas) {
         super(filename);
         this.markupEnabled = markupEnabled;
-
-        if(symbols != null) {
+        this.useAtlas = useAtlas;
+        if (symbols != null) {
             this.symbols = new CMediaFontSymbol[symbols.length];
             for (int i = 0; i < symbols.length; i++) {
-                this.symbols[i] = switch (symbols[i]){
-                    case CMediaFontSingleSymbol cMediaFontSingleSymbol-> new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id,cMediaFontSingleSymbol.file, cMediaFontSingleSymbol.yoffset);
-                    case CMediaFontArraySymbol cMediaFontArraySymbol -> new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file,cMediaFontArraySymbol.yoffset,
-                            cMediaFontArraySymbol.regionWidth, cMediaFontArraySymbol.regionHeight, cMediaFontArraySymbol.frameOffset, cMediaFontArraySymbol.frameLength);
+                this.symbols[i] = switch (symbols[i]) {
+                    case CMediaFontSingleSymbol cMediaFontSingleSymbol ->
+                            new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id, cMediaFontSingleSymbol.file, cMediaFontSingleSymbol.yoffset);
+                    case CMediaFontArraySymbol cMediaFontArraySymbol ->
+                            new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file, cMediaFontArraySymbol.yoffset,
+                                    cMediaFontArraySymbol.regionWidth, cMediaFontArraySymbol.regionHeight, cMediaFontArraySymbol.frameOffset, cMediaFontArraySymbol.frameLength);
                 };
             }
-        }else{
+        } else {
             this.symbols = new CMediaFontSymbol[0];
         }
 
-        if(outline != null){
-            this.outline = new CMediaFontOutline(outline.color,outline.directions,outline.withSymbols,outline.outlineOnly);
-        }else{
+        if (outline != null) {
+            this.outline = new CMediaFontOutline(outline.color, outline.directions, outline.withSymbols, outline.outlineOnly);
+        } else {
             this.outline = null;
         }
     }

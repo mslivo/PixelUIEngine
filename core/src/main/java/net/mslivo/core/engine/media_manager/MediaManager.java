@@ -68,7 +68,7 @@ public final class MediaManager {
 
     public boolean prepareCMedia(CMedia cMedia) {
         if (loaded) return false;
-        if(cMedia == null)
+        if (cMedia == null)
             return false;
         loadMediaList.add(cMedia);
         return true;
@@ -327,8 +327,9 @@ public final class MediaManager {
         ArrayList<CMediaFont> fontCMediaLoadStack = new ArrayList<>();
         ArrayList<CMediaSprite> spriteCMediaLoadStack = new ArrayList<>();
         ArrayList<CMediaSound> soundCMediaLoadStack = new ArrayList<>();
-        HashMap<CMediaFont, String> createFontFNTFileData = new HashMap<>();
-        HashMap<CMediaFont, String> createFontFNTPackedName = new HashMap<>();
+        HashMap<CMediaFont, String> createFontFontFile = new HashMap<>();
+        HashMap<CMediaFont, String> createFontAtlasPackedName = new HashMap<>();
+        HashMap<CMediaFont, Texture> createFontFontTexture = new HashMap<>();
         int step = 0;
         int stepsMax = 0;
 
@@ -357,13 +358,14 @@ public final class MediaManager {
         // Load Sprite Data Into Pixmap Packer
         for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
             CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
-
-            FileHandle textureFileHandle = Tools.File.findResource(cMediaSprite.file);
-            String packedTextureName = cMediaSprite.file;
-            if (pixmapPacker.getRect(packedTextureName) == null) {
-                Pixmap pixmap = createTexturePixmap(textureFileHandle);
-                pixmapPacker.pack(packedTextureName, pixmap);
-                pixmap.dispose();
+            if (cMediaSprite.useAtlas) {
+                FileHandle textureFileHandle = Tools.File.findResource(cMediaSprite.file);
+                String packedTextureName = cMediaSprite.file;
+                if (pixmapPacker.getRect(packedTextureName) == null) {
+                    Pixmap pixmap = createTexturePixmap(textureFileHandle);
+                    pixmapPacker.pack(packedTextureName, pixmap);
+                    pixmap.dispose();
+                }
             }
 
             step++;
@@ -379,10 +381,18 @@ public final class MediaManager {
             String packedFontTextureName = String.format(PACKED_FONT_NAME, cMediaFont.file, fontCount);
             CreateFontResult fontResult = createFont(textureFileHandle, cMediaFont.symbols, cMediaFont.outline);
 
-            // pack
-            createFontFNTFileData.put(cMediaFont, fontResult.fontFileData);
-            createFontFNTPackedName.put(cMediaFont, packedFontTextureName);
-            pixmapPacker.pack(packedFontTextureName, fontResult.pixmap);
+
+            createFontFontFile.put(cMediaFont, fontResult.fontFileData);
+
+            if(cMediaFont.useAtlas) {
+                // pack
+                pixmapPacker.pack(packedFontTextureName, fontResult.pixmap);
+                createFontAtlasPackedName.put(cMediaFont, packedFontTextureName);
+            }else{
+                // load
+                createFontFontTexture.put(cMediaFont, new Texture(fontResult.pixmap));
+            }
+
             fontResult.pixmap.dispose();
             fontCount++;
             step++;
@@ -397,32 +407,57 @@ public final class MediaManager {
         // Fill Sprite CMedia Arrays with TextureAtlas Data
         for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
             CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
-            switch (cMediaSprite) {
-                case CMediaImage cMediaImage -> {
 
-                    medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
+                switch (cMediaSprite) {
+                    case CMediaImage cMediaImage -> {
+                        if(cMediaImage.useAtlas){
+                            medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
+
+                        }else{
+                            medias_images.put(cMediaImage, new TextureRegion(new Texture(Tools.File.findResource(cMediaImage.file))));
+                        }
+                    }
+                    case CMediaArray cMediaArray -> {
+                        if(cMediaArray.useAtlas) {
+                            medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                                    cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
+                        }else{
+                            medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                                    cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
+                        }
+                    }
+                    case CMediaAnimation cMediaAnimation -> {
+                        if(cMediaAnimation.useAtlas){
+                            medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                                    splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                    cMediaAnimation.playMode
+                            ));
+                        }else{
+                            medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                                    splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                    cMediaAnimation.playMode
+                            ));
+                        }
+
+                    }
                 }
-                case CMediaArray cMediaArray -> {
-                    medias_arrays.put(cMediaArray, splitFrames(cMediaArray.file, cMediaArray.regionWidth, cMediaArray.regionHeight,
-                            cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
-                }
-                case CMediaAnimation cMediaAnimation -> {
-                    medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                            splitFrames(cMediaAnimation.file, cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
-                            cMediaAnimation.playMode
-                    ));
-                }
-            }
             loadedMediaList.add(cMediaSprite);
         }
-        // Fill Font CMedia Arrays with TextureAtlas Data
 
+        // Fill Font CMedia Arrays with TextureAtlas Data
         for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
             CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
+            TextureRegion fontTextureRegion;
+            if(cMediaFont.useAtlas){
+                fontTextureRegion = new TextureRegion(textureAtlas.findRegion(createFontAtlasPackedName.get(cMediaFont)));
+            }else{
+                fontTextureRegion = new TextureRegion(createFontFontTexture.get(cMediaFont));
+            }
+
             BitmapFont bitmapFont = new BitmapFont(
-                    new FontFileHandle(Tools.File.findResource(cMediaFont.file), createFontFNTFileData.get(cMediaFont)),
-                    new TextureRegion(textureAtlas.findRegion(createFontFNTPackedName.get(cMediaFont)))
-            );
+                    new FontFileHandle(Tools.File.findResource(cMediaFont.file), createFontFontFile.get(cMediaFont)),
+                    fontTextureRegion);
+
             bitmapFont.setColor(Color.GRAY);
             bitmapFont.getData().markupEnabled = cMediaFont.markupEnabled;
             medias_fonts.put(cMediaFont, bitmapFont);
@@ -447,8 +482,8 @@ public final class MediaManager {
 
         // 7. Clean up & Finish
         spriteCMediaLoadStack.clear();
-        createFontFNTFileData.clear();
-        createFontFNTPackedName.clear();
+        createFontFontFile.clear();
+        createFontAtlasPackedName.clear();
         this.loaded = true;
         return true;
     }
@@ -489,9 +524,8 @@ public final class MediaManager {
         return new BitMapFontInformation(textureHandle, lineHeight);
     }
 
-    private Array<TextureRegion> splitFrames(String file, int tile_width, int tile_height, int frameOffset,
+    private Array<TextureRegion> splitFrames(CMediaSprite cMediaSprite, TextureRegion textureRegion, int tile_width, int tile_height, int frameOffset,
                                              int frameLength) {
-        TextureRegion textureRegion = textureAtlas.findRegion(file);
         int width = (textureRegion.getRegionWidth() / tile_width);
         int height = (textureRegion.getRegionHeight() / tile_height);
         int maxFrames = Math.clamp(width * height, 0, frameLength);
@@ -499,7 +533,7 @@ public final class MediaManager {
         int frameCount = maxFrames - frameOffset;
         if (frameCount == 0) return new Array<>();
         if (frameCount < 0)
-            throw new RuntimeException(String.format(ERROR_SPLIT_FRAMES, file, frameCount));
+            throw new RuntimeException(String.format(ERROR_SPLIT_FRAMES, cMediaSprite.file, frameCount));
 
 
         TextureRegion[][] tmp = textureRegion.split(tile_width, tile_height);
