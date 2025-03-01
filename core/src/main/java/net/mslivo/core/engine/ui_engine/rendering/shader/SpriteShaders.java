@@ -1,5 +1,7 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
+import net.mslivo.core.engine.tools.Tools;
+
 public non-sealed class SpriteShaders extends Shaders {
 
     public static final SpriteShader defaultShader = new SpriteShader(null, null, null, null, null, true,true);
@@ -20,30 +22,7 @@ public non-sealed class SpriteShaders extends Shaders {
     );
 
 
-    public static final SpriteShader blurShader = new SpriteShader(
-            null,
-            null,
-            null,
-            null,
-            """                
-                    // Blur
-                    vec2 texelSize = 1.0/u_textureSize;
-                    
-                    vec4 colorBlur = fragColor * 0.2;
-                    colorBlur += texture2D(u_texture, texCoords + vec2(texelSize.x, 0.0)) * 0.125;
-                    colorBlur += texture2D(u_texture, texCoords - vec2(texelSize.x, 0.0)) * 0.125;
-                    colorBlur += texture2D(u_texture, texCoords + vec2(0.0, texelSize.y)) * 0.125;
-                    colorBlur += texture2D(u_texture, texCoords - vec2(0.0, texelSize.y)) * 0.125;
-                    
-                    colorBlur += texture2D(u_texture, texCoords + vec2(texelSize.x, texelSize.y)) * 0.075;
-                    colorBlur += texture2D(u_texture, texCoords - vec2(texelSize.x, texelSize.y)) * 0.075;
-                    colorBlur += texture2D(u_texture, texCoords + vec2(texelSize.x, -texelSize.y)) * 0.075;
-                    colorBlur += texture2D(u_texture, texCoords - vec2(texelSize.x, -texelSize.y)) * 0.075;
-                    
-                    fragColor = mix(fragColor,colorBlur,v_tweak.w);
-                    """
-            ,true,true
-    );
+    public static final SpriteShader blurShader = new SpriteShader(Tools.File.findResource("shaders/sprite/blur.shader"));
 
     public static final SpriteShader vignetteBlurShader = new SpriteShader(null,null,
             """
@@ -72,7 +51,6 @@ public non-sealed class SpriteShaders extends Shaders {
                      vec4 blurred = blur(texCoords);
                   
                      fragColor = mix(original, blurred, vignette * v_tweak.w);
-                       
                    """,true,true);
 
 
