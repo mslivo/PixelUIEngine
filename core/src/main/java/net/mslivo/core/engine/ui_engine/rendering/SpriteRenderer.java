@@ -42,7 +42,7 @@ public class SpriteRenderer implements Batch {
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
-    private static final SpriteShader DEFAULT_SHADER = new SpriteShader(Tools.File.findResource("shaders/sprite_default.shader"));
+    private static final SpriteShader DEFAULT_SHADER = new SpriteShader(Tools.File.findResource("shaders/sprite_default.glsl"));
 
     private final Color tempColor;
     private VertexData vertexData;

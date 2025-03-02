@@ -355,7 +355,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
     }
 
-    private SpriteShader spriteShader = new SpriteShader(Tools.File.findResource("shaders/sprite_blur.shader"));
+    private SpriteShader spriteShader = new SpriteShader(Tools.File.findResource("shaders/sprite_blur.glsl"));
     private ShaderProgram shaderProgram = new ShaderProgram(spriteShader.vertexShaderSource, spriteShader.fragmentShaderSource);
 
     @Override
