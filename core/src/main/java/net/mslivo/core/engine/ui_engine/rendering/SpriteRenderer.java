@@ -12,8 +12,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.mslivo.core.engine.media_manager.*;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
-import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShaders;
 
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class SpriteRenderer implements Batch {
     private static final int SPRITE_SIZE = 24;
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
-    private static final SpriteShader DEFAULT_SHADER = SpriteShaders.defaultShader;
+    private static final SpriteShader DEFAULT_SHADER = new SpriteShader(Tools.File.findResource("shaders/sprite_default.shader"));
 
     private final Color tempColor;
     private VertexData vertexData;

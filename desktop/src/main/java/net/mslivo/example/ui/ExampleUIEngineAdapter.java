@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -21,7 +20,7 @@ import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShaders;
+import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
@@ -261,8 +260,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.primitiveRestart();
 
         primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.setColor(0.5f,0.5f,0.5f,1f);
-        primitiveRenderer.setTweak(0.5f,0.5f,0.5f,0f);
+        primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
+        primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f, 0f);
         primitiveRenderer.vertex(100, 100);
         primitiveRenderer.vertex(130, 120);
         primitiveRenderer.vertex(150, 120);
@@ -346,17 +345,18 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.setAllReset();
 
-        spriteRenderer.setColor(0.5f,0.5f,0.5f,1f);
+        spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
         spriteRenderer.setShader(shaderProgram);
-        spriteRenderer.setTweak(0.5f,0.5f,0.5f,1f);
+        spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 1f);
 
-        spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST,300,100);
+        spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST, 300, 100);
         spriteRenderer.setShader(null);
         spriteRenderer.end();
 
     }
 
-    private ShaderProgram shaderProgram = new ShaderProgram(SpriteShaders.vignetteBlurShader.vertexShaderSource,SpriteShaders.vignetteBlurShader.fragmentShaderSource);
+    private SpriteShader spriteShader = new SpriteShader(Tools.File.findResource("shaders/sprite_blur.shader"));
+    private ShaderProgram shaderProgram = new ShaderProgram(spriteShader.vertexShaderSource, spriteShader.fragmentShaderSource);
 
     @Override
     public void shutdown() {

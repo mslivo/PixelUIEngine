@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
-import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShaders;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -25,7 +25,6 @@ public class PrimitiveRenderer {
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
 
 
-
     private static final int VERTEX_SIZE = 5;
     public static final int SIZE_MAX = Integer.MAX_VALUE / VERTEX_SIZE / 20; // / VERTEX_SIZE / VERTEX_ATTRIBUTES LENGTH
     public static final int SIZE_DEFAULT = 65534;
@@ -35,7 +34,7 @@ public class PrimitiveRenderer {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
-    private static final PrimitiveShader DEFAULT_SHADER = PrimitiveShaders.defaultShader;
+    private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader(Tools.File.findResource("shaders/primitive_default.shader"));
 
     private final VertexData vertexData;
     private final IntegerIndexBufferObject indexData;
@@ -191,7 +190,7 @@ public class PrimitiveRenderer {
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_DRAW);
-        if(this.restartInserted)
+        if (this.restartInserted)
             return;
         if (idx == vertices.length) {
             this.intermediateFlushes++;

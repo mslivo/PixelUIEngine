@@ -60,13 +60,15 @@ public final class SpriteShader extends ShaderCommon {
                        v_color = a_color;
                        v_tweak = a_tweak;
                        v_texCoords = a_texCoord;
-                       
+            
+                       // Custom Code
+                       #VERTEX_MAIN
+            
                        #COLOR_VERTEX_CODE
             
                        #HSL_VERTEX_CODE
             
-                       // Custom Code
-                       #VERTEX_MAIN
+            
             
                        gl_Position = u_projTrans * a_position;
                     }
@@ -96,18 +98,9 @@ public final class SpriteShader extends ShaderCommon {
             #FRAGMENT_DECLARATIONS
             
             void main() {
-                // Get texCoords
-                HIGH vec2 texCoords = v_texCoords;
-            
-                // Modify texCoords
-                #FRAGMENT_MAIN_TEXCOORDS
-            
-                // Get Fragment
-                vec4 fragColor = texture2D( u_texture, texCoords);
             
                 // Custom Code
-            
-                #FRAGMENT_MAIN_FRAGCOLOR
+                #FRAGMENT_MAIN
             
                 // Color Mult
                 #FRAGMENT_COLOR
@@ -123,55 +116,12 @@ public final class SpriteShader extends ShaderCommon {
     public final String vertexShaderSource;
     public final String fragmentShaderSource;
 
-    public SpriteShader(FileHandle fromFile) {
-        BufferedReader reader = fromFile.reader(1024);
-        String line;
-        StringBuilder[] builders = new StringBuilder[5];
-        for (int i = 0; i < builders.length; i++) builders[i] = new StringBuilder();
-
-        int builderIndex = 0;
-        boolean hslEnabled = true;
-        boolean colorEnabled = true;
-        try {
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isBlank())
-                    continue;
-
-                if (line.equals("#VERTEX_DECLARATIONS")) {
-                    builderIndex = 0;
-                } else if (line.equals("#VERTEX_MAIN")) {
-                    builderIndex = 1;
-                } else if (line.equals("#FRAGMENT_DECLARATIONS")) {
-                    builderIndex = 2;
-                } else if (line.equals("#FRAGMENT_MAIN_TEXCOORDS")) {
-                    builderIndex = 3;
-                } else if (line.equals("#FRAGMENT_MAIN_FRAGCOLOR")) {
-                    builderIndex = 4;
-                } else if (line.startsWith("#") && line.contains("HSL_ENABLED") && line.contains("COLOR_ENABLED")) {
-                    String[] words = line.split(" ");
-                    if(words.length == 4) {
-                        hslEnabled = words[1].equals("true");
-                        colorEnabled = words[3].equals("true");
-                    }
-                } else {
-                    builders[builderIndex].append(line).append(System.lineSeparator());
-                }
-
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        this.vertexShaderSource = createVertexShader(builders[0].toString(),builders[1].toString(), colorEnabled, hslEnabled);
-
-        this.fragmentShaderSource = createFragmentShader(builders[2].toString(),builders[3].toString(),builders[4].toString(), colorEnabled, hslEnabled);
+    public SpriteShader(FileHandle shaderFile) {
+        ParseShaderResult parseShaderResult = parseShader(shaderFile);
+        this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
+        this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
     }
 
-    public SpriteShader(String vertexDeclarations, String vertexMain, String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean hslEnabled, boolean colorEnabled) {
-        this.vertexShaderSource = createVertexShader(vertexDeclarations, vertexMain, colorEnabled, hslEnabled);
-        this.fragmentShaderSource = createFragmentShader(fragmentDeclarations, fragmentMainTexCoords, fragmentMainFragColor, colorEnabled, hslEnabled);
-    }
 
     private String createVertexShader(String vertexDeclarations, String vertexMain, boolean colorEnabled, boolean hslEnabled) {
         return VERTEX_SHADER_TEMPLATE
@@ -181,11 +131,10 @@ public final class SpriteShader extends ShaderCommon {
                 .replace("#HSL_VERTEX_CODE", hslEnabled ? HSL_VERTEX_CODE : "");
     }
 
-    private String createFragmentShader(String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean colorEnabled, boolean hslEnabled ) {
+    private String createFragmentShader(String fragmentDeclarations, String fragmentMain, boolean colorEnabled, boolean hslEnabled) {
         return FRAGMENT_SHADER_TEMPLATE
                 .replace("#FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))
-                .replace("#FRAGMENT_MAIN_TEXCOORDS", Tools.Text.validString(fragmentMainTexCoords))
-                .replace("#FRAGMENT_MAIN_FRAGCOLOR", Tools.Text.validString(fragmentMainFragColor))
+                .replace("#FRAGMENT_MAIN", Tools.Text.validString(fragmentMain))
                 .replace("#FRAGMENT_COLOR", colorEnabled ? COLOR_FRAGMENT_CODE : "")
                 .replace("#HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
                 .replace("#FRAGMENT_HSL", hslEnabled ? HSL_FRAGMENT_CODE : "");
