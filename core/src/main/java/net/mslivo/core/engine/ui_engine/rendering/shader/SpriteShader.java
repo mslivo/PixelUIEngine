@@ -16,6 +16,15 @@ public final class SpriteShader extends ShaderCommon {
                 fragColor = hsl2rgb(hsl);
             """;
 
+    private static final String HSL_VERTEX_CODE = """
+                v_tweak.xyz = min(v_tweak.xyz+FLOAT_CORRECTION,1.0); // HSL 0.5 float precision correction
+            """;
+
+    private static final String COLOR_VERTEX_CODE = """
+                v_color.rgb = min(v_color.rgb+FLOAT_CORRECTION,1.0); // RGB 0.5 float precision correction
+                v_color.a = v_color.a * (255.0/254.0);
+            """;
+
     private static final String COLOR_FRAGMENT_CODE = """
                 fragColor.rgb = clamp(fragColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
                 fragColor.a *= v_color.a;
@@ -41,7 +50,7 @@ public final class SpriteShader extends ShaderCommon {
                     varying vec4 v_color;
                     varying vec4 v_tweak;
                     varying vec2 v_texCoords;
-                    const HIGH float float_correction = 0.0019607842;
+                    const HIGH float FLOAT_CORRECTION = 0.0019607842;
             
                     #VERTEX_DECLARATIONS
             
@@ -49,11 +58,12 @@ public final class SpriteShader extends ShaderCommon {
                     {
                        // Get Attributes
                        v_color = a_color;
-                       v_color.rgb = min(v_color.rgb+float_correction,1.0); // RGB 0.5 float precision correction
-                       v_color.a = v_color.a * (255.0/254.0);
                        v_tweak = a_tweak;
                        v_texCoords = a_texCoord;
-                       v_tweak.xyz = min(v_tweak.xyz+float_correction,1.0); // HSL 0.5 float precision correction
+                       
+                       #COLOR_VERTEX_CODE
+            
+                       #HSL_VERTEX_CODE
             
                        // Custom Code
                        #VERTEX_MAIN
@@ -106,7 +116,6 @@ public final class SpriteShader extends ShaderCommon {
                 #FRAGMENT_HSL
             
                 // Done
-            
                 gl_FragColor = fragColor;
             }
             """;
@@ -154,23 +163,25 @@ public final class SpriteShader extends ShaderCommon {
             throw new RuntimeException(e);
         }
 
-        this.vertexShaderSource = createVertexShader(builders[0].toString(),builders[1].toString());
+        this.vertexShaderSource = createVertexShader(builders[0].toString(),builders[1].toString(), colorEnabled, hslEnabled);
 
-        this.fragmentShaderSource = createFragmentShader(builders[2].toString(),builders[3].toString(),builders[4].toString(), hslEnabled, colorEnabled);
+        this.fragmentShaderSource = createFragmentShader(builders[2].toString(),builders[3].toString(),builders[4].toString(), colorEnabled, hslEnabled);
     }
 
     public SpriteShader(String vertexDeclarations, String vertexMain, String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean hslEnabled, boolean colorEnabled) {
-        this.vertexShaderSource = createVertexShader(vertexDeclarations, vertexMain);
-        this.fragmentShaderSource = createFragmentShader(fragmentDeclarations, fragmentMainTexCoords, fragmentMainFragColor, hslEnabled, hslEnabled);
+        this.vertexShaderSource = createVertexShader(vertexDeclarations, vertexMain, colorEnabled, hslEnabled);
+        this.fragmentShaderSource = createFragmentShader(fragmentDeclarations, fragmentMainTexCoords, fragmentMainFragColor, colorEnabled, hslEnabled);
     }
 
-    private String createVertexShader(String vertexDeclarations, String vertexMain) {
+    private String createVertexShader(String vertexDeclarations, String vertexMain, boolean colorEnabled, boolean hslEnabled) {
         return VERTEX_SHADER_TEMPLATE
                 .replace("#VERTEX_DECLARATIONS", Tools.Text.validString(vertexDeclarations))
-                .replace("#VERTEX_MAIN", Tools.Text.validString(vertexMain));
+                .replace("#VERTEX_MAIN", Tools.Text.validString(vertexMain))
+                .replace("#COLOR_VERTEX_CODE", colorEnabled ? COLOR_VERTEX_CODE : "")
+                .replace("#HSL_VERTEX_CODE", hslEnabled ? HSL_VERTEX_CODE : "");
     }
 
-    private String createFragmentShader(String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean hslEnabled, boolean colorEnabled) {
+    private String createFragmentShader(String fragmentDeclarations, String fragmentMainTexCoords, String fragmentMainFragColor, boolean colorEnabled, boolean hslEnabled ) {
         return FRAGMENT_SHADER_TEMPLATE
                 .replace("#FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))
                 .replace("#FRAGMENT_MAIN_TEXCOORDS", Tools.Text.validString(fragmentMainTexCoords))

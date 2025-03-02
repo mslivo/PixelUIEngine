@@ -22,7 +22,7 @@ public non-sealed class SpriteShaders extends Shaders {
     );
 
 
-    public static final SpriteShader blurShader = new SpriteShader(Tools.File.findResource("shaders/sprite/blur.shader"));
+    public static final SpriteShader blurShader = new SpriteShader(Tools.File.findResource("shaders/blur.sprite.pshader"));
 
     public static final SpriteShader vignetteBlurShader = new SpriteShader(null,null,
             """
