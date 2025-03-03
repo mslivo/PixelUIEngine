@@ -1,11 +1,6 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
-import com.badlogic.gdx.files.FileHandle;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 public class ShaderCommon {
 
@@ -32,7 +27,8 @@ public class ShaderCommon {
             """;
 
 
-    protected record ParseShaderResult(String vertexDeclarations, String vertexMain, String fragmentDeclarations, String fragmentMain,boolean colorEnabled, boolean hslEnabled){
+    protected record ParseShaderResult(String vertexDeclarations, String vertexMain, String fragmentDeclarations,
+                                       String fragmentMain, boolean colorEnabled, boolean hslEnabled) {
 
     }
 
@@ -44,12 +40,13 @@ public class ShaderCommon {
         FRAGMENT_MAIN(3);
 
         public final int index;
-        BUILDER_INDEX(int index){
+
+        BUILDER_INDEX(int index) {
             this.index = index;
         }
     }
 
-    protected ParseShaderResult parseShader(String shaderSource){
+    protected ParseShaderResult parseShader(String shaderSource) {
 
         StringBuilder[] builders = new StringBuilder[4];
         for (int i = 0; i < builders.length; i++) builders[i] = new StringBuilder();
@@ -60,12 +57,12 @@ public class ShaderCommon {
         int openBrackets = 0;
         List<String> lines = shaderSource.lines().toList();
 
-        for(int i=0;i<lines.size();i++){
+        for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
 
             if (line.isBlank())
                 continue;
-            String lineCleaned = line.trim().replace(" ","");
+            String lineCleaned = line.trim().replace(" ", "");
 
             if (lineCleaned.startsWith("#") && lineCleaned.contains("HSL_ENABLED") && lineCleaned.contains("COLOR_ENABLED")) {
                 hslEnabled = lineCleaned.contains("HSL_ENABLEDtrue");
@@ -80,7 +77,7 @@ public class ShaderCommon {
                 builderIndex = BUILDER_INDEX.VERTEX_MAIN;
                 continue;
             }
-            if(builderIndex == BUILDER_INDEX.VERTEX_MAIN && lineCleaned.equals("}")) {
+            if (builderIndex == BUILDER_INDEX.VERTEX_MAIN && lineCleaned.equals("}")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
@@ -92,27 +89,30 @@ public class ShaderCommon {
                 builderIndex = BUILDER_INDEX.FRAGMENT_MAIN;
                 continue;
             }
-            if(builderIndex == BUILDER_INDEX.FRAGMENT_MAIN) {
-                if(lineCleaned.endsWith("{")) {
-                    openBrackets++;
-                }if(lineCleaned.equals("}")){
-                    if (openBrackets > 0) {
-                        openBrackets--;
-                    } else {
-                        builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
-                        continue;
+            if (builderIndex == BUILDER_INDEX.FRAGMENT_MAIN) {
+                if (!lineCleaned.startsWith("//")) {
+                    if (lineCleaned.endsWith("{")) {
+                        openBrackets++;
+                    }
+                    if (lineCleaned.startsWith("}")) {
+                        if (openBrackets > 0) {
+                            openBrackets--;
+                        } else {
+                            builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
+                            continue;
+                        }
                     }
                 }
             }
 
-            if(builderIndex != BUILDER_INDEX.NONE)
+            if (builderIndex != BUILDER_INDEX.NONE)
                 builders[builderIndex.index].append(line).append(System.lineSeparator());
         }
 
 
         return new ParseShaderResult(
-                builders[BUILDER_INDEX.VERTEX_DECLARATIONS.index].toString(),builders[BUILDER_INDEX.VERTEX_MAIN.index].toString(),
-                builders[BUILDER_INDEX.FRAGMENT_DECLARATIONS.index].toString(),builders[BUILDER_INDEX.FRAGMENT_MAIN.index].toString(), colorEnabled,hslEnabled
+                builders[BUILDER_INDEX.VERTEX_DECLARATIONS.index].toString(), builders[BUILDER_INDEX.VERTEX_MAIN.index].toString(),
+                builders[BUILDER_INDEX.FRAGMENT_DECLARATIONS.index].toString(), builders[BUILDER_INDEX.FRAGMENT_MAIN.index].toString(), colorEnabled, hslEnabled
         );
 
     }
