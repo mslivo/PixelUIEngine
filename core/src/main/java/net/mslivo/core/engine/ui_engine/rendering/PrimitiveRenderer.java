@@ -34,7 +34,14 @@ public class PrimitiveRenderer {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
-    private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader(Tools.File.findResource("shaders/primitive_default.glsl"));
+    private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
+            #HSL_ENABLED true COLOR_ENABLED true
+            #VERTEX
+            #FRAGMENT
+            void main(){
+            	 vec4 fragColor = v_fragColor;
+            }
+            """);
 
     private final VertexData vertexData;
     private final IntegerIndexBufferObject indexData;

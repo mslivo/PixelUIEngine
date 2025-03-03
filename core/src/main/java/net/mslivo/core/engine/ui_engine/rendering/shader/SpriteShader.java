@@ -117,7 +117,11 @@ public final class SpriteShader extends ShaderCommon {
     public final String fragmentShaderSource;
 
     public SpriteShader(FileHandle shaderFile) {
-        ParseShaderResult parseShaderResult = parseShader(shaderFile);
+        this(shaderFile.readString());
+   }
+
+    public SpriteShader(String shader) {
+        ParseShaderResult parseShaderResult = parseShader(shader);
         this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
         this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
     }

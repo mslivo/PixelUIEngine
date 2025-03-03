@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
 public class ShaderCommon {
 
@@ -34,67 +35,67 @@ public class ShaderCommon {
 
     }
 
-    protected ParseShaderResult parseShader(FileHandle fileHandle){
-        BufferedReader reader = fileHandle.reader(1024);
-        String line;
+    protected ParseShaderResult parseShader(String shaderSource){
+
         StringBuilder[] builders = new StringBuilder[4];
         for (int i = 0; i < builders.length; i++) builders[i] = new StringBuilder();
 
         int builderIndex = 0;
         boolean hslEnabled = true;
         boolean colorEnabled = true;
-        try {
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isBlank())
-                    continue;
-                String lineNoSpace = line.replace(" ","");
 
-                if (line.startsWith("#") && line.contains("HSL_ENABLED") && line.contains("COLOR_ENABLED")) {
-                    String[] words = line.split(" ");
-                    if (words.length == 4) {
-                        if (words[0].equals("HSL_ENABLED")) {
-                            hslEnabled = words[1].equals("true");
-                        } else if (words[0].equals("COLOR_ENABLED")) {
-                            colorEnabled = words[1].equals("true");
-                        }
-                        if (words[2].equals("HSL_ENABLED")) {
-                            hslEnabled = words[3].equals("true");
-                        } else if (words[2].equals("COLOR_ENABLED")) {
-                            colorEnabled = words[3].equals("true");
-                        }
-                        continue;
+        List<String> lines = shaderSource.lines().toList();
+
+        for(int i=0;i<lines.size();i++){
+            String line = lines.get(i);
+
+            line = line.trim();
+            if (line.isBlank())
+                continue;
+            String lineNoSpace = line.replace(" ","");
+
+            if (line.startsWith("#") && line.contains("HSL_ENABLED") && line.contains("COLOR_ENABLED")) {
+                String[] words = line.split(" ");
+                if (words.length == 4) {
+                    if (words[0].equals("HSL_ENABLED")) {
+                        hslEnabled = words[1].equals("true");
+                    } else if (words[0].equals("COLOR_ENABLED")) {
+                        colorEnabled = words[1].equals("true");
                     }
-                }
-                if (line.equals("#VERTEX")) {
-                    builderIndex = 0;
+                    if (words[2].equals("HSL_ENABLED")) {
+                        hslEnabled = words[3].equals("true");
+                    } else if (words[2].equals("COLOR_ENABLED")) {
+                        colorEnabled = words[3].equals("true");
+                    }
                     continue;
                 }
-                if (builderIndex == 0 && lineNoSpace.equals("voidmain(){")) {
-                    builderIndex = 1;
-                    continue;
-                }
-                if(builderIndex == 1 && lineNoSpace.equals("}")) {
-                    builderIndex = 0;
-                    continue;
-                }
-                if (line.equals("#FRAGMENT")) {
-                    builderIndex = 2;
-                    continue;
-                }
-                if (builderIndex == 2 && lineNoSpace.equals("voidmain(){")) {
-                    builderIndex = 3;
-                    continue;
-                }
-                if(builderIndex == 3 && lineNoSpace.equals("}")) {
-                    builderIndex = 2;
-                    continue;
-                }
-
-                builders[builderIndex].append(line).append(System.lineSeparator());
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (line.equals("#VERTEX")) {
+                builderIndex = 0;
+                continue;
+            }
+            if (builderIndex == 0 && lineNoSpace.equals("voidmain(){")) {
+                builderIndex = 1;
+                continue;
+            }
+            if(builderIndex == 1 && lineNoSpace.equals("}")) {
+                builderIndex = 0;
+                continue;
+            }
+            if (line.equals("#FRAGMENT")) {
+                builderIndex = 2;
+                continue;
+            }
+            if (builderIndex == 2 && lineNoSpace.equals("voidmain(){")) {
+                builderIndex = 3;
+                continue;
+            }
+            if(builderIndex == 3 && lineNoSpace.equals("}")) {
+                builderIndex = 2;
+                continue;
+            }
+
+            builders[builderIndex].append(line).append(System.lineSeparator());
         }
 
 
@@ -103,4 +104,5 @@ public class ShaderCommon {
         );
 
     }
+
 }

@@ -98,9 +98,11 @@ public final class PrimitiveShader extends ShaderCommon {
     public final String fragmentShaderSource;
 
     public PrimitiveShader(FileHandle shaderFile) {
+        this(shaderFile.readString());
+    }
 
-        ParseShaderResult parseShaderResult = parseShader(shaderFile);
-
+    public PrimitiveShader(String shader) {
+        ParseShaderResult parseShaderResult = parseShader(shader);
         this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
         this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain());
     }
