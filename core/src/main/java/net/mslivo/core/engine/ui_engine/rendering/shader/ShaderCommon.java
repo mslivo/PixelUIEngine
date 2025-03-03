@@ -35,15 +35,28 @@ public class ShaderCommon {
 
     }
 
+    protected enum BUILDER_INDEX {
+        NONE(-1),
+        VERTEX_DECLARATIONS(0),
+        VERTEX_MAIN(1),
+        FRAGMENT_DECLARATIONS(2),
+        FRAGMENT_MAIN(3);
+
+        public final int index;
+        BUILDER_INDEX(int index){
+            this.index = index;
+        }
+    }
+
     protected ParseShaderResult parseShader(String shaderSource){
 
         StringBuilder[] builders = new StringBuilder[4];
         for (int i = 0; i < builders.length; i++) builders[i] = new StringBuilder();
 
-        int builderIndex = 0;
+        BUILDER_INDEX builderIndex = BUILDER_INDEX.NONE;
         boolean hslEnabled = true;
         boolean colorEnabled = true;
-
+        int openBrackets = 0;
         List<String> lines = shaderSource.lines().toList();
 
         for(int i=0;i<lines.size();i++){
@@ -71,36 +84,46 @@ public class ShaderCommon {
                 }
             }
             if (line.equals("#VERTEX")) {
-                builderIndex = 0;
+                builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == 0 && lineNoSpace.equals("voidmain(){")) {
-                builderIndex = 1;
+            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineNoSpace.equals("voidmain(){")) {
+                builderIndex = BUILDER_INDEX.VERTEX_MAIN;
                 continue;
             }
-            if(builderIndex == 1 && lineNoSpace.equals("}")) {
-                builderIndex = 0;
+            if(builderIndex == BUILDER_INDEX.VERTEX_MAIN && lineNoSpace.equals("}")) {
+                builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
             if (line.equals("#FRAGMENT")) {
-                builderIndex = 2;
+                builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == 2 && lineNoSpace.equals("voidmain(){")) {
-                builderIndex = 3;
+            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineNoSpace.equals("voidmain(){")) {
+                builderIndex = BUILDER_INDEX.FRAGMENT_MAIN;
                 continue;
             }
-            if(builderIndex == 3 && lineNoSpace.equals("}")) {
-                builderIndex = 2;
-                continue;
+            if(builderIndex == BUILDER_INDEX.FRAGMENT_MAIN) {
+                if(lineNoSpace.endsWith("{")) {
+                    openBrackets++;
+                }if(lineNoSpace.equals("}")){
+                    if (openBrackets > 0) {
+                        openBrackets--;
+                    } else {
+                        builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
+                        continue;
+                    }
+                }
             }
 
-            builders[builderIndex].append(line).append(System.lineSeparator());
+            if(builderIndex != BUILDER_INDEX.NONE)
+                builders[builderIndex.index].append(line).append(System.lineSeparator());
         }
 
 
         return new ParseShaderResult(
-                builders[0].toString(),builders[1].toString(),builders[2].toString(),builders[3].toString(), colorEnabled,hslEnabled
+                builders[BUILDER_INDEX.VERTEX_DECLARATIONS.index].toString(),builders[BUILDER_INDEX.VERTEX_MAIN.index].toString(),
+                builders[BUILDER_INDEX.FRAGMENT_DECLARATIONS.index].toString(),builders[BUILDER_INDEX.FRAGMENT_MAIN.index].toString(), colorEnabled,hslEnabled
         );
 
     }
