@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class ShaderCommon {
 
@@ -62,51 +63,39 @@ public class ShaderCommon {
         for(int i=0;i<lines.size();i++){
             String line = lines.get(i);
 
-            line = line.trim();
             if (line.isBlank())
                 continue;
-            String lineNoSpace = line.replace(" ","");
+            String lineCleaned = line.trim().replace(" ","");
 
-            if (line.startsWith("#") && line.contains("HSL_ENABLED") && line.contains("COLOR_ENABLED")) {
-                String[] words = line.split(" ");
-                if (words.length == 4) {
-                    if (words[0].equals("HSL_ENABLED")) {
-                        hslEnabled = words[1].equals("true");
-                    } else if (words[0].equals("COLOR_ENABLED")) {
-                        colorEnabled = words[1].equals("true");
-                    }
-                    if (words[2].equals("HSL_ENABLED")) {
-                        hslEnabled = words[3].equals("true");
-                    } else if (words[2].equals("COLOR_ENABLED")) {
-                        colorEnabled = words[3].equals("true");
-                    }
-                    continue;
-                }
+            if (lineCleaned.startsWith("#") && lineCleaned.contains("HSL_ENABLED") && lineCleaned.contains("COLOR_ENABLED")) {
+                hslEnabled = lineCleaned.contains("HSL_ENABLEDtrue");
+                colorEnabled = lineCleaned.contains("COLOR_ENABLEDtrue");
+                continue;
             }
-            if (line.equals("#VERTEX")) {
+            if (lineCleaned.equals("#VERTEX")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineNoSpace.equals("voidmain(){")) {
+            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.equals("voidmain(){")) {
                 builderIndex = BUILDER_INDEX.VERTEX_MAIN;
                 continue;
             }
-            if(builderIndex == BUILDER_INDEX.VERTEX_MAIN && lineNoSpace.equals("}")) {
+            if(builderIndex == BUILDER_INDEX.VERTEX_MAIN && lineCleaned.equals("}")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if (line.equals("#FRAGMENT")) {
+            if (lineCleaned.equals("#FRAGMENT")) {
                 builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineNoSpace.equals("voidmain(){")) {
+            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.equals("voidmain(){")) {
                 builderIndex = BUILDER_INDEX.FRAGMENT_MAIN;
                 continue;
             }
             if(builderIndex == BUILDER_INDEX.FRAGMENT_MAIN) {
-                if(lineNoSpace.endsWith("{")) {
+                if(lineCleaned.endsWith("{")) {
                     openBrackets++;
-                }if(lineNoSpace.equals("}")){
+                }if(lineCleaned.equals("}")){
                     if (openBrackets > 0) {
                         openBrackets--;
                     } else {
