@@ -1,10 +1,15 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+
 import java.util.List;
 
 public class ShaderCommon {
 
-    protected static String HSL_FUNCTIONS = """
+    protected String vertexShaderSource;
+    protected String fragmentShaderSource;
+
+    protected static final String HSL_FUNCTIONS = """
             const HIGH float eps = 1.0e-10;
             
             vec4 rgb2hsl(vec4 c)
@@ -26,6 +31,16 @@ public class ShaderCommon {
             }
             """;
 
+    public ShaderCommon() {
+    }
+
+    public String fragmentShaderSource() {
+        return fragmentShaderSource;
+    }
+
+    public String vertexShaderSource() {
+        return vertexShaderSource;
+    }
 
     protected record ParseShaderResult(String vertexDeclarations, String vertexMain, String fragmentDeclarations,
                                        String fragmentMain, boolean colorEnabled, boolean hslEnabled) {
@@ -44,6 +59,13 @@ public class ShaderCommon {
         BUILDER_INDEX(int index) {
             this.index = index;
         }
+    }
+
+    public ShaderProgram compile(){
+        ShaderProgram shaderProgram = new ShaderProgram(vertexShaderSource, fragmentShaderSource);
+        if(!shaderProgram.isCompiled())
+            throw new RuntimeException(shaderProgram.getLog());
+        return shaderProgram;
     }
 
     protected ParseShaderResult parseShader(String shaderSource) {

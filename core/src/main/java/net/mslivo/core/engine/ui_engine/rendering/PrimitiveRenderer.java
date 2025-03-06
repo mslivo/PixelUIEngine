@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.NumberUtils;
-import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 
 import java.nio.IntBuffer;
@@ -55,7 +54,7 @@ public class PrimitiveRenderer {
     private ShaderProgram shader;
     private ShaderProgram defaultShader;
     private int idx;
-    private int u_projTrans;
+    private int u_projTransLocation;
     private boolean drawing;
     private int renderCalls;
     private int totalRenderCalls;
@@ -120,12 +119,9 @@ public class PrimitiveRenderer {
         setShader(shader);
     }
 
-    private ShaderProgram getDefaultShader() {
-        if (this.defaultShader == null) {
-            this.defaultShader = new ShaderProgram(DEFAULT_SHADER.vertexShaderSource, DEFAULT_SHADER.fragmentShaderSource);
-            if (!this.defaultShader.isCompiled())
-                throw new RuntimeException("Error compiling shader: " + this.defaultShader.getLog());
-        }
+    private ShaderProgram defaultShader() {
+        if (this.defaultShader == null)
+            this.defaultShader = DEFAULT_SHADER.compile();
         return this.defaultShader;
     }
 
@@ -137,7 +133,7 @@ public class PrimitiveRenderer {
     }
 
     protected void setupMatrices() {
-        shader.setUniformMatrix(u_projTrans, this.projectionMatrix);
+        shader.setUniformMatrix(u_projTransLocation, this.projectionMatrix);
     }
 
     public Matrix4 getProjectionMatrix() {
@@ -256,7 +252,7 @@ public class PrimitiveRenderer {
 
     public void dispose() {
         this.vertexData.dispose();
-        if (this.shader == getDefaultShader())
+        if (this.shader == defaultShader())
             this.shader.dispose();
     }
 
@@ -422,10 +418,10 @@ public class PrimitiveRenderer {
     }
 
     public void setShader(ShaderProgram shader) {
-        ShaderProgram nextShader = shader != null ? shader : getDefaultShader();
+        ShaderProgram nextShader = shader != null ? shader : defaultShader();
         if (this.shader == nextShader)
             return;
-        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
+        this.u_projTransLocation = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
         this.shader = nextShader;
 
 

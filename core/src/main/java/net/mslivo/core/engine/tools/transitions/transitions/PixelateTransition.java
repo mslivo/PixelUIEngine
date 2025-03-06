@@ -26,8 +26,7 @@ public class PixelateTransition extends Transition {
         return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
-    private SpriteShader pixelationSpriteShader = new SpriteShader(Tools.File.findResource("shaders/sprite_pixelation.shader"));
-    private ShaderProgram pixelationShader = new ShaderProgram(pixelationSpriteShader.vertexShaderSource, pixelationSpriteShader.fragmentShaderSource);
+    private ShaderProgram pixelationShader = new SpriteShader(Tools.File.findResource("shaders/sprite_pixelation.shader")).compile();
 
     @Override
     public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {

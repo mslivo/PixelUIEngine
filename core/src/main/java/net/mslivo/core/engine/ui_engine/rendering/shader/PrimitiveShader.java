@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.mslivo.core.engine.tools.Tools;
 
 public final class PrimitiveShader extends ShaderCommon {
@@ -93,15 +94,19 @@ public final class PrimitiveShader extends ShaderCommon {
                 }
             """;
 
-
-    public final String vertexShaderSource;
-    public final String fragmentShaderSource;
-
     public PrimitiveShader(FileHandle shaderFile) {
         this(shaderFile.readString());
     }
 
+    public ShaderProgram compileShader(){
+        ShaderProgram shaderProgram = new ShaderProgram(vertexShaderSource(), fragmentShaderSource());
+        if(!shaderProgram.isCompiled())
+            throw new RuntimeException(shaderProgram.getLog());
+        return shaderProgram;
+    }
+
     public PrimitiveShader(String shader) {
+        super();
         ParseShaderResult parseShaderResult = parseShader(shader);
         this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
         this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain());

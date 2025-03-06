@@ -1,10 +1,8 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.mslivo.core.engine.tools.Tools;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 
 public final class SpriteShader extends ShaderCommon {
 
@@ -65,11 +63,9 @@ public final class SpriteShader extends ShaderCommon {
                        #VERTEX_MAIN
             
                        #COLOR_VERTEX_CODE
-            
+                       
                        #HSL_VERTEX_CODE
-            
-            
-            
+                       
                        gl_Position = u_projTrans * a_position;
                     }
             """;
@@ -113,14 +109,15 @@ public final class SpriteShader extends ShaderCommon {
             }
             """;
 
-    public final String vertexShaderSource;
-    public final String fragmentShaderSource;
 
     public SpriteShader(FileHandle shaderFile) {
         this(shaderFile.readString());
-   }
+    }
+
+
 
     public SpriteShader(String shader) {
+        super();
         ParseShaderResult parseShaderResult = parseShader(shader);
         this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
         this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());

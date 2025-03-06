@@ -11,12 +11,13 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import net.mslivo.core.engine.media_manager.*;
-import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 
 import java.nio.ShortBuffer;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A substitute for {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that adds better coloring.
@@ -28,6 +29,7 @@ public class SpriteRenderer implements Batch {
     public static final String POSITION_ATTRIBUTE = "a_position";
     public static final String COLOR_ATTRIBUTE = "a_color";
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
+
     public static final String TEXTURE_UNIFORM = "u_texture";
     public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
@@ -67,9 +69,6 @@ public class SpriteRenderer implements Batch {
     private ShaderProgram defaultShader;
 
     private MediaManager mediaManager;
-    private int u_projTrans;
-    private int u_texture;
-    private int u_textureSize;
     private int renderCalls;
     private int totalRenderCalls;
     private int maxSpritesInBatch;
@@ -82,10 +81,14 @@ public class SpriteRenderer implements Batch {
     private float backup_tweak;
     private float backup_color;
     private int[] backup_blend;
+    private int nextSamplerTextureUnit;
 
     private float reset_tweak;
     private float reset_color;
     private final int[] reset_blend;
+
+    private final HashMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
+
 
     public SpriteRenderer() {
         this(null, null, SIZE_DEFAULT, false);
@@ -103,12 +106,9 @@ public class SpriteRenderer implements Batch {
         this(mediaManager, shader, size, false);
     }
 
-    private ShaderProgram getDefaultShader() {
-        if (this.defaultShader == null) {
-            this.defaultShader = new ShaderProgram(DEFAULT_SHADER.vertexShaderSource, DEFAULT_SHADER.fragmentShaderSource);
-            if (!this.defaultShader.isCompiled())
-                throw new RuntimeException("Error compiling shader: " + this.defaultShader.getLog());
-        }
+    private ShaderProgram defaultShader() {
+        if (this.defaultShader == null)
+            this.defaultShader = DEFAULT_SHADER.compile();
         return this.defaultShader;
     }
 
@@ -141,6 +141,9 @@ public class SpriteRenderer implements Batch {
         this.backup_color = this.color;
         this.backup_tweak = this.tweak;
         this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
+        this.nextSamplerTextureUnit = 1;
+        this.uniformLocationCache = new HashMap<>();
+
         this.mediaManager = mediaManager;
         setShader(shader); // null = default shader
     }
@@ -207,6 +210,7 @@ public class SpriteRenderer implements Batch {
             printFlushWarning();
         }
         this.intermediateFlushes = 0;
+        this.nextSamplerTextureUnit = 1;
         drawing = false;
     }
 
@@ -1091,7 +1095,6 @@ public class SpriteRenderer implements Batch {
         idx = 0;
     }
 
-
     @Override
     public void disableBlending() {
         throw new RuntimeException("not supported");
@@ -1146,7 +1149,7 @@ public class SpriteRenderer implements Batch {
     public void dispose() {
         vertexData.dispose();
         indexData.dispose();
-        if (this.shader == getDefaultShader())
+        if (this.shader == defaultShader())
             this.shader.dispose();
     }
 
@@ -1177,8 +1180,8 @@ public class SpriteRenderer implements Batch {
 
     protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
-        shader.setUniformMatrix(u_projTrans, combinedMatrix);
-        shader.setUniformi(u_texture, 0);
+        shader.setUniformMatrix(uniformLocation(PROJTRANS_UNIFORM), combinedMatrix);
+        shader.setUniformi(uniformLocation(TEXTURE_UNIFORM), 0);
     }
 
     protected void switchTexture(final Texture texture) {
@@ -1186,28 +1189,9 @@ public class SpriteRenderer implements Batch {
         lastTexture = texture;
         invTexWidth = 1.0f / texture.getWidth();
         invTexHeight = 1.0f / texture.getHeight();
-
-        shader.setUniformf(this.u_textureSize, texture.getWidth(), texture.getHeight());
+        shader.setUniformf(uniformLocation(TEXTURE_SIZE_UNIFORM), texture.getWidth(), texture.getHeight());
     }
 
-    @Override
-    public void setShader(ShaderProgram shader) {
-        ShaderProgram nextShader = shader != null ? shader : getDefaultShader();
-        if (this.shader == nextShader)
-            return;
-
-        this.shader = nextShader;
-        this.u_projTrans = nextShader.getUniformLocation(PROJTRANS_UNIFORM);
-        this.u_texture = nextShader.getUniformLocation(TEXTURE_UNIFORM);
-        this.u_textureSize = nextShader.getUniformLocation(TEXTURE_SIZE_UNIFORM);
-
-        if (drawing) {
-            flush();
-            this.shader.bind();
-            setupMatrices();
-        }
-
-    }
 
     @Override
     public ShaderProgram getShader() {
@@ -1221,6 +1205,52 @@ public class SpriteRenderer implements Batch {
 
     public boolean isDrawing() {
         return drawing;
+    }
+
+    @Override
+    public void setShader(ShaderProgram shader) {
+        ShaderProgram nextShader = shader != null ? shader : defaultShader();
+        if (this.shader == nextShader)
+            return;
+
+        this.shader = nextShader;
+
+        this.nextSamplerTextureUnit = 1;
+        if (drawing) {
+            flush();
+            this.shader.bind();
+            setupMatrices();
+        }
+    }
+
+
+    public void bindTextureToUniform(Texture texture, String uniform) {
+        bindTextureToUniform(texture, uniform, null);
+    }
+
+    public void bindTextureToUniform(Texture texture, String uniform, String sizeUniform) {
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + this.nextSamplerTextureUnit);
+        texture.bind();
+        this.shader.setUniformi(uniformLocation(uniform), this.nextSamplerTextureUnit);
+        if (sizeUniform != null) {
+            this.shader.setUniformf(uniformLocation(sizeUniform), texture.getWidth(), texture.getHeight());
+        }
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+        this.nextSamplerTextureUnit++;
+    }
+
+    private int uniformLocation(String uniform) {
+        ObjectIntMap uniformMap = uniformLocationCache.get(this.shader);
+        if (uniformMap == null) {
+            uniformMap = new ObjectIntMap<>();
+            uniformLocationCache.put(this.shader, uniformMap);
+        }
+        int location = uniformMap.get(uniform, -1);
+        if (location == -1) {
+            location = this.shader.getUniformLocation(uniform);
+            uniformMap.put(uniform, location);
+        }
+        return location;
     }
 
     // ####### MediaManager Draw Methods #######
