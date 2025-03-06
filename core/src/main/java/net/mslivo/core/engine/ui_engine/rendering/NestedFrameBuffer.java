@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine.rendering;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -66,6 +67,12 @@ public class NestedFrameBuffer extends FrameBuffer {
         return this.getViewPortCache;
     }
 
+
+    public void begin(boolean glClear){
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        this.begin();
+    }
 
     @Override
     public void begin() {
