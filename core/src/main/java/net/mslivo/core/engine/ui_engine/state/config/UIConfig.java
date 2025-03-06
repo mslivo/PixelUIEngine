@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public final class UIConfig implements Serializable, Cloneable {
 
-    private static final Color DEFAULT_COlOR = Color.valueOf("E5E5E5");
+    private static final Color DEFAULT_COlOR = Color.valueOf("CECECE");
     private static final Color DEFAULT_COlOR_BRIGHT = Color.valueOf("FFFFFF");
     private static final Color DEFAULT_COLOR_FONT = Color.valueOf("000000");
 

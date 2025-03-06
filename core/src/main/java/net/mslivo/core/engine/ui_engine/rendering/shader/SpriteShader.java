@@ -8,23 +8,22 @@ public final class SpriteShader extends ShaderCommon {
 
     private static final String HSL_FRAGMENT_CODE = """
                 vec4 hsl = rgb2hsl(fragColor);
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
+                hsl.x = fract(hsl.x * 1.0+((v_tweak.x-0.5)*2.0));
+                hsl.y = max(hsl.y * 1.0+((v_tweak.y-0.5)*2.0),0.0);
+                hsl.z = clamp(hsl.z * 1.0+((v_tweak.z-0.5)*2.0),0.0,1.0);
                 fragColor = hsl2rgb(hsl);
             """;
 
-    private static final String HSL_VERTEX_CODE = """
-                v_tweak.xyz = min(v_tweak.xyz+FLOAT_CORRECTION,1.0); // HSL 0.5 float precision correction
+    private static final String HSL_VERTEX_CODE = """                
+                v_tweak = v_tweak * FLOAT_CORRECTION;
             """;
 
-    private static final String COLOR_VERTEX_CODE = """
-                v_color.rgb = min(v_color.rgb+FLOAT_CORRECTION,1.0); // RGB 0.5 float precision correction
-                v_color.a = v_color.a * (255.0/254.0);
+    private static final String COLOR_VERTEX_CODE = """                
+                v_color = v_color * FLOAT_CORRECTION;
             """;
 
     private static final String COLOR_FRAGMENT_CODE = """
-                fragColor.rgb = clamp(fragColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+                fragColor.rgb = clamp(fragColor.rgb+(v_color.rgb-0.5),0.0,1.0);
                 fragColor.a *= v_color.a;
             """;
 
@@ -48,7 +47,7 @@ public final class SpriteShader extends ShaderCommon {
                     varying vec4 v_color;
                     varying vec4 v_tweak;
                     varying vec2 v_texCoords;
-                    const HIGH float FLOAT_CORRECTION = 0.0019607842;
+                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
             

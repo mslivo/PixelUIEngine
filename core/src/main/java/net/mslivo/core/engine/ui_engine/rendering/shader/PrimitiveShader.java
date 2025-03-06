@@ -7,20 +7,19 @@ import net.mslivo.core.engine.tools.Tools;
 public final class PrimitiveShader extends ShaderCommon {
 
     private static final String VERTEX_HSL_CODE = """
-            v_tweak.xyz = min(v_tweak.xyz+FLOAT_CORRECTION,1.0);
+                v_tweak.xyz *= FLOAT_CORRECTION;
             
-            vec4 hsl = rgb2hsl(vertexColor);
-                hsl.x = fract(hsl.x + ((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y + ((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
+                vec4 hsl = rgb2hsl(vertexColor);
+                hsl.x = fract(hsl.x * 1.0+((v_tweak.x-0.5)*2.0));
+                hsl.y = max(hsl.y * 1.0+((v_tweak.y-0.5)*2.0),0.0);
+                hsl.z = clamp(hsl.z * 1.0+((v_tweak.z-0.5)*2.0),0.0,1.0);
                 vertexColor = hsl2rgb(hsl);
             """;
 
     private static final String VERTEX_COLOR_CODE = """
-            v_color.rgb = min(v_color.rgb+FLOAT_CORRECTION,1.0); // RGB 0.5 float precision correction
-            v_color.a = v_color.a * (255.0/254.0);
+            v_color *= FLOAT_CORRECTION;
             
-            vertexColor.rgb = clamp(vertexColor.rgb*(1.0+((v_color.rgb-0.5)*2.0)),0.0,1.0);
+            vertexColor.rgb = clamp(vertexColor.rgb+(v_color.rgb-0.5),0.0,1.0);
             vertexColor.a *= v_color.a;
             """;
 
@@ -42,7 +41,7 @@ public final class PrimitiveShader extends ShaderCommon {
                     attribute vec4 a_tweak;
                     uniform mat4 u_projTrans;
                     varying vec4 v_fragColor;
-                    const HIGH float FLOAT_CORRECTION = 0.0019607842;
+                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #HSL_FUNCTIONS
             
