@@ -68,10 +68,10 @@ public class NestedFrameBuffer extends FrameBuffer {
     }
 
 
-    public void begin(boolean glClear){
+    public void beginGlClear(){
+        this.begin();
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        this.begin();
     }
 
     @Override
