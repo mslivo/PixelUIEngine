@@ -46,7 +46,7 @@ public final class SpriteShader extends ShaderCommon {
                     uniform mat4 u_projTrans;
                     varying vec4 v_color;
                     varying vec4 v_tweak;
-                    varying vec2 v_texCoords;
+                    varying HIGH vec2 v_texCoords;
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
@@ -83,7 +83,7 @@ public final class SpriteShader extends ShaderCommon {
             
             varying vec4 v_color;
             varying vec4 v_tweak;
-            varying vec2 v_texCoords;
+            varying HIGH vec2 v_texCoords;
             
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
