@@ -7,18 +7,14 @@ import net.mslivo.core.engine.tools.Tools;
 public final class PrimitiveShader extends ShaderCommon {
 
     private static final String VERTEX_HSL_CODE = """
-                v_tweak.xyz *= FLOAT_CORRECTION;
-            
                 vec4 hsl = rgb2hsl(vertexColor);
-                hsl.x = fract(hsl.x * 1.0+((v_tweak.x-0.5)*2.0));
-                hsl.y = max(hsl.y * 1.0+((v_tweak.y-0.5)*2.0),0.0);
-                hsl.z = clamp(hsl.z * 1.0+((v_tweak.z-0.5)*2.0),0.0,1.0);
+                hsl.x = fract(hsl.x * (1.0+(v_tweak.x-0.5)));
+                hsl.y = hsl.y * (1.0+((v_tweak.y-0.5)*2.0));
+                hsl.z = clamp(hsl.z * (1.0+((v_tweak.z-0.5)*2.0)),0.0,1.0);
                 vertexColor = hsl2rgb(hsl);
             """;
 
     private static final String VERTEX_COLOR_CODE = """
-            v_color *= FLOAT_CORRECTION;
-            
             vertexColor.rgb = clamp(vertexColor.rgb+(v_color.rgb-0.5),0.0,1.0);
             vertexColor.a *= v_color.a;
             """;
@@ -49,8 +45,8 @@ public final class PrimitiveShader extends ShaderCommon {
             
                     void main() {
                         // Get Attributes
-                        vec4 v_color = a_color;
-                        vec4 v_tweak = a_tweak;
+                        vec4 v_color = (a_color*FLOAT_CORRECTION);
+                        vec4 v_tweak = (a_tweak*FLOAT_CORRECTION);
                         vec4 vertexColor = a_vertexColor;
             
                         // Custom Code

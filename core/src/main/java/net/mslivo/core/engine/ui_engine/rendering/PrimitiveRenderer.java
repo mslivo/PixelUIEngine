@@ -544,7 +544,7 @@ public class PrimitiveRenderer {
         this.tweak = tweak;
     }
 
-    public void setTweakHue(final float h) {
+    public void setTweakH(final float h) {
         int color = NumberUtils.floatToIntColor(tweak);
         float c = ((color & 0xff000000) >>> 24) / 255f;
         float s = ((color & 0x00ff0000) >>> 16) / 255f;
@@ -552,7 +552,7 @@ public class PrimitiveRenderer {
         tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakSaturation(final float s) {
+    public void setTweakS(final float s) {
         int color = NumberUtils.floatToIntColor(tweak);
         float c = ((color & 0xff000000) >>> 24) / 255f;
         float h = ((color & 0x00ff0000) >>> 16) / 255f;
@@ -560,7 +560,7 @@ public class PrimitiveRenderer {
         tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakLightness(final float l) {
+    public void setTweakL(final float l) {
         int color = NumberUtils.floatToIntColor(tweak);
         float c = ((color & 0xff000000) >>> 24) / 255f;
         float h = ((color & 0x0000ff00) >>> 8) / 255f;
@@ -568,7 +568,7 @@ public class PrimitiveRenderer {
         tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public void setTweakCustom(final float c) {
+    public void setTweakC(final float c) {
         int color = NumberUtils.floatToIntColor(tweak);
         float l = ((color & 0x00ff0000) >>> 16) / 255f;
         float s = ((color & 0x0000ff00) >>> 8) / 255f;
@@ -576,22 +576,22 @@ public class PrimitiveRenderer {
         tweak = colorPackedRGBA(h, s, l, c);
     }
 
-    public float getTweakHue() {
+    public float getTweakH() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakSaturation() {
+    public float getTweakS() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakBrigthness() {
+    public float getTweakL() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getTweakCustom() {
+    public float getTweakC() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0xff000000) >>> 24) / 255f;
     }
