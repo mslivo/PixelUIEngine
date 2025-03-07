@@ -17,7 +17,6 @@ vec4 blur(vec2 uv) {
 
 void main(){
 	
-	// Blend original and blurred image based on vignette
 	vec4 original = texture2D(u_texture, v_texCoords);
 	vec4 blurred = blur(v_texCoords);
 
