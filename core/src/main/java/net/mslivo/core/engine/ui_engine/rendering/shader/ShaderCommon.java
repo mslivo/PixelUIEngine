@@ -8,6 +8,8 @@ public class ShaderCommon {
 
     protected String vertexShaderSource;
     protected String fragmentShaderSource;
+    protected boolean hslEnabled;
+    protected boolean colorEnabled;
 
     protected static final String HSL_FUNCTIONS = """
             const HIGH float eps = 1.0e-10;
@@ -42,6 +44,14 @@ public class ShaderCommon {
         return vertexShaderSource;
     }
 
+    public boolean colorEnabled() {
+        return colorEnabled;
+    }
+
+    public boolean hslEnabled() {
+        return hslEnabled;
+    }
+
     protected record ParseShaderResult(String vertexDeclarations, String vertexMain, String fragmentDeclarations,
                                        String fragmentMain, boolean colorEnabled, boolean hslEnabled) {
 
@@ -74,8 +84,8 @@ public class ShaderCommon {
         for (int i = 0; i < builders.length; i++) builders[i] = new StringBuilder();
 
         BUILDER_INDEX builderIndex = BUILDER_INDEX.NONE;
-        boolean hslEnabled = true;
-        boolean colorEnabled = true;
+        this.hslEnabled = false;
+        this.colorEnabled = false;
         int openBrackets = 0;
         List<String> lines = shaderSource.lines().toList();
 
@@ -87,8 +97,8 @@ public class ShaderCommon {
             String lineCleaned = line.trim().replace(" ", "");
 
             if (lineCleaned.startsWith("#") && lineCleaned.contains("HSL_ENABLED") && lineCleaned.contains("COLOR_ENABLED")) {
-                hslEnabled = lineCleaned.contains("HSL_ENABLEDtrue");
-                colorEnabled = lineCleaned.contains("COLOR_ENABLEDtrue");
+                this.hslEnabled = lineCleaned.contains("HSL_ENABLEDtrue");
+                this.colorEnabled = lineCleaned.contains("COLOR_ENABLEDtrue");
                 continue;
             }
             if (lineCleaned.equals("#VERTEX")) {
