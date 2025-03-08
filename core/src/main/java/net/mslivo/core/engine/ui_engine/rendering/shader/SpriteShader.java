@@ -42,7 +42,7 @@ public final class SpriteShader extends ShaderCommon {
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
-            
+
                     void main()
                     {
                        // Get Attributes

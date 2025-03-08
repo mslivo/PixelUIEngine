@@ -1,6 +1,8 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 
 import java.util.List;
 
@@ -73,8 +75,48 @@ public class ShaderCommon {
 
     public ShaderProgram compile(){
         ShaderProgram shaderProgram = new ShaderProgram(vertexShaderSource, fragmentShaderSource);
-        if(!shaderProgram.isCompiled())
+        if(!shaderProgram.isCompiled()) {
+            String log = shaderProgram.getLog();
+            String[] lines = log.lines().toList().toArray(new String[]{});
+
+            String shaderSource = null;
+            if(lines[0].toLowerCase().contains("vertex shader")){
+                shaderSource = this.vertexShaderSource;
+                System.out.println("Vertex shader:");
+            }else if(lines[0].toLowerCase().contains("fragment shader")){
+                shaderSource = this.fragmentShaderSource;
+                System.out.println("Fragment shader:");
+            }
+
+            IntArray lineNumbers = new IntArray();
+            Array lineErrors = new Array();
+            for(int i=0;i<lines.length;i++){
+                String[] lineSplit = lines[i].split(":");
+                if(lineSplit[0].toLowerCase().equals("error") && lineSplit.length >= 5){
+                    lineNumbers.add(Integer.valueOf(lineSplit[2])-1);
+                    lineErrors.add(lineSplit[3]+" "+lineSplit[4]);
+                }
+            }
+
+
+            if(shaderSource != null){
+                lines = shaderSource.lines().toList().toArray(new String[]{});
+                for(int i=0;i<lines.length;i++){
+                    String line = (i+1)+":"+lines[i];
+
+                    int errorIndex = lineNumbers.indexOf(i);
+                    if(errorIndex != -1){
+                        line += " !!! ERROR !!! -> "+lineErrors.get(errorIndex);
+                    }
+
+                    System.out.println(line);
+                }
+
+            }
+
+
             throw new RuntimeException(shaderProgram.getLog());
+        }
         return shaderProgram;
     }
 
