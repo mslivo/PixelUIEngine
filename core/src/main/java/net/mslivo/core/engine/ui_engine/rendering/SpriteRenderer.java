@@ -1224,9 +1224,13 @@ public class SpriteRenderer implements Batch {
     }
 
     public void bindCMediaImageToUniform(CMediaImage cMediaImage, String uniform) {
+        bindCMediaImageToUniform(cMediaImage, uniform, null);
+    }
+
+    public void bindCMediaImageToUniform(CMediaImage cMediaImage, String uniform, String sizeUniform) {
         if(cMediaImage.useAtlas)
             throw new RuntimeException("Binded textues should not be TextureAtlas");
-        bindTextureToUniform(mediaManager.image(cMediaImage).getTexture(), uniform, null);
+        bindTextureToUniform(mediaManager.image(cMediaImage).getTexture(), uniform, sizeUniform);
     }
 
     public void bindTextureToUniform(Texture texture, String uniform) {
