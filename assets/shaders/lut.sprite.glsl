@@ -5,7 +5,7 @@
 uniform sampler2D u_lut;
 uniform vec2 u_lutSize;
 
-vec4 applyLUT(vec3 color) {
+vec3 applyLUT(vec3 color) {
 	float lutSize = u_lutSize.y;
     float sliceSize = 1.0 / lutSize;
 	float slicePixelSize = sliceSize / lutSize;
@@ -19,8 +19,8 @@ vec4 applyLUT(vec3 color) {
 	float s0 = xOffset + (zSlice0 * sliceSize);
 	float s1 = xOffset + (zSlice1 * sliceSize);
 
-	vec4 slice0Color = texture2D(u_lut, vec2(s0, yRange));
-	vec4 slice1Color = texture2D(u_lut, vec2(s1, yRange));
+	vec3 slice0Color = texture2D(u_lut, vec2(s0, yRange)).rgb;
+	vec3 slice1Color = texture2D(u_lut, vec2(s1, yRange)).rgb;
 
 	float zOffset = mod(color.z * width, 1.0);
 
@@ -30,7 +30,8 @@ vec4 applyLUT(vec3 color) {
 void main(){
 
     vec4 color = texture2D(u_texture, v_texCoords);
+    vec4 lutColor = vec4(applyLUT(color.rgb),color.a);
 
-    vec4 fragColor = mix(color,applyLUT(color.rgb),v_tweak.w);
+    vec4 fragColor = mix(color,lutColor,v_tweak.w);
 
 }
