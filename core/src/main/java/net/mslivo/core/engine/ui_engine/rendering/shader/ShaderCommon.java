@@ -3,6 +3,7 @@ package net.mslivo.core.engine.ui_engine.rendering.shader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import net.mslivo.core.engine.tools.Tools;
 
 import java.util.List;
 
@@ -106,7 +107,8 @@ public class ShaderCommon {
 
                     int errorIndex = lineNumbers.indexOf(i);
                     if(errorIndex != -1){
-                        line += " !!! ERROR !!! -> "+lineErrors.get(errorIndex);
+                        line += Tools.Text.Colors.RED+" !!! ERROR !!! -> "+lineErrors.get(errorIndex)+Tools.Text.Colors.RESET;
+
                     }
 
                     System.out.println(line);
