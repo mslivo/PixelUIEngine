@@ -28,7 +28,7 @@ vec3 applyLUT(vec3 color) {
 
 void main(){
 
-    vec4 color = texture2D(u_texture, v_texCoords);
+    vec4 color = colorMod(texture2D(u_texture, v_texCoords),v_color);
     vec4 lutColor = vec4(applyLUT(color.rgb),color.a);
 
     vec4 fragColor = mix(color,lutColor,v_tweak.w);

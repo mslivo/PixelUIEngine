@@ -12,6 +12,8 @@ public class ShaderCommon {
     protected String vertexShaderSource;
     protected String fragmentShaderSource;
 
+
+
     public ShaderCommon() {
     }
 

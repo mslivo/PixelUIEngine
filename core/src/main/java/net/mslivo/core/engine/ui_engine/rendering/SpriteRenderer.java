@@ -48,7 +48,7 @@ public class SpriteRenderer implements Batch {
             #VERTEX
             #FRAGMENT
             void main(){
-            	vec4 fragColor = colorMod(texture2D(u_texture, v_texCoords));
+            	vec4 fragColor = colorMod(texture2D(u_texture, v_texCoords),v_color);
             }
             """);
 

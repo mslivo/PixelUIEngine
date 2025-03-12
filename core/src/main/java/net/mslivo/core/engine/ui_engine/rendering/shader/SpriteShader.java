@@ -64,9 +64,9 @@ public final class SpriteShader extends ShaderCommon {
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
             
-            vec4 colorMod(vec4 color){
-                color.rgb = clamp(color.rgb+(v_color.rgb-0.5),0.0,1.0);
-                color.a *= v_color.a;
+            vec4 colorMod(vec4 color, vec4 modColor){
+                color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
+                color.a *= modColor.a;
                 return color;
             }
             
