@@ -154,6 +154,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
 
         // Shape
         Shape oval = api.component.shape.create(11, 3, 4, 4, SHAPE_TYPE.OVAL);
+        api.component.setDisabled(oval, true);
         api.component.setColor(oval, Color.GREEN);
 
         Shape rect = api.component.shape.create(11, 8, 2, 2, SHAPE_TYPE.RECT);

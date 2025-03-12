@@ -34,11 +34,13 @@ public class PrimitiveRenderer {
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
-            #HSL_ENABLED true COLOR_ENABLED true
             #VERTEX
+            void main(){
+            	 v_vertexColor = colorMod(v_vertexColor, v_color);
+            }
             #FRAGMENT
             void main(){
-            	 vec4 fragColor = v_fragColor;
+            	 vec4 fragColor = v_vertexColor;
             }
             """);
 
@@ -78,14 +80,18 @@ public class PrimitiveRenderer {
     private boolean restartInserted;
 
     public PrimitiveRenderer() {
-        this(SIZE_DEFAULT, false);
+        this(null, SIZE_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final int size) {
-        this(size, false);
+    public PrimitiveRenderer(final ShaderProgram defaultShader) {
+        this(defaultShader, SIZE_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final int size, final boolean flushWarning) {
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size) {
+        this(defaultShader, size, false);
+    }
+
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size, final boolean flushWarning) {
         if (size > SIZE_MAX)
             throw new IllegalArgumentException("Can't have more than " + SIZE_MAX + " vertexes: " + size);
         this.size = size;
@@ -116,7 +122,9 @@ public class PrimitiveRenderer {
         this.backup_vertexColor = this.vertexColor;
         this.backup_tweak = this.tweak;
         this.backup_blend = new int[]{this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]};
-        setShader(shader);
+        this.defaultShader = defaultShader;
+
+        setShader(defaultShader());
     }
 
     private ShaderProgram defaultShader() {
@@ -536,73 +544,64 @@ public class PrimitiveRenderer {
 
     // ----- Tweak -----
 
-    public void setTweak(final float h, final float s, final float l, final float c) {
-        tweak = colorPackedRGBA(h, s, l, c);
+    public void setTweak(final float t1, final float t2, final float t3, final float t4) {
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
-    public void setTweakH(final float h) {
+    public void setTweak1(final float t1) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float s = ((color & 0x00ff0000) >>> 16) / 255f;
-        float l = ((color & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t2 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t3 = ((color & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakS(final float s) {
+    public void setTweak2(final float t2) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float h = ((color & 0x00ff0000) >>> 16) / 255f;
-        float l = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t1 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t3 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakL(final float l) {
+    public void setTweak3(final float t3) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float h = ((color & 0x0000ff00) >>> 8) / 255f;
-        float s = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t1 = ((color & 0x0000ff00) >>> 8) / 255f;
+        float t2 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakC(final float c) {
+    public void setTweak4(final float t4) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float l = ((color & 0x00ff0000) >>> 16) / 255f;
-        float s = ((color & 0x0000ff00) >>> 8) / 255f;
-        float h = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t3 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t2 = ((color & 0x0000ff00) >>> 8) / 255f;
+        float t1 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public float getTweakH() {
+    public float getTweak1() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakS() {
+    public float getTweak2() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakL() {
+    public float getTweak3() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getTweakC() {
+    public float getTweak4() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0xff000000) >>> 24) / 255f;
-    }
-
-    public float getPackedTweak() {
-        return this.tweak;
-    }
-
-    public Color getTweak() {
-        Color.abgr8888ToColor(tempColor, tweak);
-        return tempColor;
     }
 
     // ---- RESET & STATE ----

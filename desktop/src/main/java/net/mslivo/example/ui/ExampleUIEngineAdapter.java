@@ -20,6 +20,7 @@ import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
@@ -65,8 +66,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager, null, SpriteRenderer.SIZE_DEFAULT, true);
-        this.primitiveRenderer = new PrimitiveRenderer(PrimitiveRenderer.SIZE_DEFAULT * 3, true);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.SIZE_DEFAULT, true);
+        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.SIZE_DEFAULT * 3, true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -222,12 +223,15 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         // Primitive Drawing Test
 
         primitiveRenderer.begin(GL32.GL_POINTS);
+
         primitiveRenderer.setVertexColor(Color.BLUE);
+
         primitiveRenderer.vertex(50, 50);
         primitiveRenderer.vertex(51, 50);
         primitiveRenderer.vertex(52, 50);
         primitiveRenderer.vertex(53, 50);
         primitiveRenderer.vertex(54, 50);
+
         primitiveRenderer.end();
 
 
@@ -239,15 +243,18 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         primitiveRenderer.begin(GL32.GL_TRIANGLES);
-        primitiveRenderer.setVertexColor(Color.GREEN);
+        primitiveRenderer.setColor(Color.GRAY);
+        primitiveRenderer.setTweak2(0f);
+        primitiveRenderer.setVertexColor(Color.YELLOW);
         primitiveRenderer.vertex(50, 70);
         primitiveRenderer.vertex(55, 80);
         primitiveRenderer.vertex(60, 70);
-
+        primitiveRenderer.setTweakReset();
         primitiveRenderer.vertex(50 + 15, 70);
         primitiveRenderer.vertex(55 + 15, 80);
         primitiveRenderer.vertex(60 + 15, 70);
         primitiveRenderer.end();
+
 
         primitiveRenderer.begin(GL32.GL_LINE_STRIP);
         primitiveRenderer.setVertexColor(Color.RED);
@@ -261,7 +268,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.setVertexColor(Color.BLUE);
         primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
-        primitiveRenderer.setTweak(0.5f, 0.5f, 0.5f, 0f);
         primitiveRenderer.vertex(100, 100);
         primitiveRenderer.vertex(130, 120);
         primitiveRenderer.vertex(150, 120);
@@ -341,7 +347,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         }
 
         spriteRenderer.begin();
-
+        spriteRenderer.setShader(null);
 
         spriteRenderer.setAllReset();
 
@@ -351,11 +357,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST, 300, 100);
         //spriteRenderer.setShader(null);
+
+        spriteRenderer.setShader(null);
         spriteRenderer.end();
 
     }
 
-    private ShaderProgram shaderProgram =new SpriteShader(Tools.File.findResource("shaders/blur.sprite.glsl")).compile();
 
     @Override
     public void shutdown() {

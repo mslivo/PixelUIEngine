@@ -6,18 +6,7 @@ import net.mslivo.core.engine.tools.Tools;
 
 public final class PrimitiveShader extends ShaderCommon {
 
-    private static final String VERTEX_HSL_CODE = """
-                vec4 hsl = rgb2hsl(vertexColor);
-                hsl.x = fract(hsl.x * (1.0+(v_tweak.x-0.5)));
-                hsl.y = hsl.y * (1.0+((v_tweak.y-0.5)*2.0));
-                hsl.z = clamp(hsl.z * (1.0+((v_tweak.z-0.5)*2.0)),0.0,1.0);
-                vertexColor = hsl2rgb(hsl);
-            """;
-
-    private static final String VERTEX_COLOR_CODE = """
-            vertexColor.rgb = clamp(vertexColor.rgb+(v_color.rgb-0.5),0.0,1.0);
-            vertexColor.a *= v_color.a;
-            """;
+    private static final String EXTENSION = ".primitive.glsl";
 
     private static final String VERTEX_SHADER_TEMPLATE = """
                    #ifdef GL_ES
@@ -36,10 +25,14 @@ public final class PrimitiveShader extends ShaderCommon {
                     attribute vec4 a_vertexColor;
                     attribute vec4 a_tweak;
                     uniform mat4 u_projTrans;
-                    varying vec4 v_fragColor;
+                    varying vec4 v_vertexColor;
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
-                    #HSL_FUNCTIONS
+                    vec4 colorMod(vec4 color, vec4 modColor){
+                        color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
+                        color.a *= modColor.a;
+                        return color;
+                    }
             
                     #VERTEX_DECLARATIONS
             
@@ -47,21 +40,14 @@ public final class PrimitiveShader extends ShaderCommon {
                         // Get Attributes
                         vec4 v_color = (a_color*FLOAT_CORRECTION);
                         vec4 v_tweak = (a_tweak*FLOAT_CORRECTION);
-                        vec4 vertexColor = a_vertexColor;
-            
+                        v_vertexColor = a_vertexColor;
+                        
                         // Custom Code
                         #VERTEX_MAIN
-            
-                        // Color Mult
-                        #VERTEX_COLOR_CODE
-            
-                        // HSL Tweaks
-                        #VERTEX_HSL_CODE
             
                         // Done
                         gl_PointSize = 1.0;
                         gl_Position = u_projTrans * a_position;
-                        v_fragColor = vertexColor;
                     }
             """;
 
@@ -77,7 +63,7 @@ public final class PrimitiveShader extends ShaderCommon {
                     #define HIGH
                 #endif
             
-                varying vec4 v_fragColor;
+                varying vec4 v_vertexColor;
             
                 #FRAGMENT_DECLARATIONS
             
@@ -90,30 +76,26 @@ public final class PrimitiveShader extends ShaderCommon {
             """;
 
     public PrimitiveShader(FileHandle shaderFile) {
-        this(shaderFile.readString());
+        this(validateFile(shaderFile).readString());
     }
 
-    public ShaderProgram compileShader(){
-        ShaderProgram shaderProgram = new ShaderProgram(vertexShaderSource(), fragmentShaderSource());
-        if(!shaderProgram.isCompiled())
-            throw new RuntimeException(shaderProgram.getLog());
-        return shaderProgram;
+    private static FileHandle validateFile(FileHandle fileHandle){
+        if(!fileHandle.file().getName().endsWith(EXTENSION))
+            throw new RuntimeException("Primitive Shader file is not of type *"+EXTENSION);
+        return fileHandle;
     }
 
     public PrimitiveShader(String shader) {
         super();
         ParseShaderResult parseShaderResult = parseShader(shader);
-        this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain(), parseShaderResult.colorEnabled(), parseShaderResult.hslEnabled());
+        this.vertexShaderSource = createVertexShader(parseShaderResult.vertexDeclarations(), parseShaderResult.vertexMain());
         this.fragmentShaderSource = createFragmentShader(parseShaderResult.fragmentDeclarations(), parseShaderResult.fragmentMain());
     }
 
-    private String createVertexShader(String vertexDeclarations, String vertexMainVertexColor, boolean colorEnabled, boolean hslEnabled) {
+    private String createVertexShader(String vertexDeclarations, String vertexMainVertexColor) {
         return VERTEX_SHADER_TEMPLATE
                 .replace("#VERTEX_DECLARATIONS", Tools.Text.validString(vertexDeclarations))
-                .replace("#VERTEX_MAIN", Tools.Text.validString(vertexMainVertexColor))
-                .replace("#VERTEX_COLOR_CODE", colorEnabled ? VERTEX_COLOR_CODE : "")
-                .replace("#HSL_FUNCTIONS", hslEnabled ? HSL_FUNCTIONS : "")
-                .replace("#VERTEX_HSL_CODE", hslEnabled ? VERTEX_HSL_CODE : "");
+                .replace("#VERTEX_MAIN", Tools.Text.validString(vertexMainVertexColor));
     }
 
     private String createFragmentShader(String fragmentDeclarations, String fragmentMain) {

@@ -45,11 +45,10 @@ public class SpriteRenderer implements Batch {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
-            #HSL_ENABLED true COLOR_ENABLED true
             #VERTEX
             #FRAGMENT
             void main(){
-            	vec4 fragColor = texture2D( u_texture, v_texCoords);
+            	vec4 fragColor = colorMod(texture2D(u_texture, v_texCoords));
             }
             """);
 
@@ -89,20 +88,19 @@ public class SpriteRenderer implements Batch {
 
     private final HashMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
 
-
     public SpriteRenderer() {
         this(null, null, SIZE_DEFAULT, false);
     }
 
-    public SpriteRenderer(MediaManager mediaManager) {
+    public SpriteRenderer(final MediaManager mediaManager) {
         this(mediaManager, null, SIZE_DEFAULT, false);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader) {
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram shader) {
         this(mediaManager, shader, SIZE_DEFAULT, false);
     }
 
-    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, final int size) {
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram shader, final int size) {
         this(mediaManager, shader, size, false);
     }
 
@@ -112,7 +110,7 @@ public class SpriteRenderer implements Batch {
         return this.defaultShader;
     }
 
-    public SpriteRenderer(MediaManager mediaManager, ShaderProgram shader, final int size, boolean flushWarning) {
+    public SpriteRenderer(final MediaManager mediaManager,final ShaderProgram defaultShader, final int size,final boolean flushWarning) {
         if (size > SIZE_MAX)
             throw new IllegalArgumentException("Can't have more than " + SIZE_MAX + " sprites per batch: " + size);
         this.flushWarning = flushWarning;
@@ -145,7 +143,9 @@ public class SpriteRenderer implements Batch {
         this.uniformLocationCache = new HashMap<>();
 
         this.mediaManager = mediaManager;
-        setShader(shader); // null = default shader
+        this.defaultShader = defaultShader;
+
+        setShader(defaultShader()); // null = default shader
     }
 
     private IndexBufferObject createIndexData(int size) {
@@ -1566,62 +1566,62 @@ public class SpriteRenderer implements Batch {
 
     // ----- Tweak -----
 
-    public void setTweak(final float h, final float s, final float l, final float c) {
-        tweak = colorPackedRGBA(h, s, l, c);
+    public void setTweak(final float t1, final float t2, final float t3, final float t4) {
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
     }
 
-    public void setTweakH(final float h) {
+    public void setTweak1(final float t1) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float s = ((color & 0x00ff0000) >>> 16) / 255f;
-        float l = ((color & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t2 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t3 = ((color & 0x0000ff00) >>> 8) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakS(final float s) {
+    public void setTweak2(final float t2) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float h = ((color & 0x00ff0000) >>> 16) / 255f;
-        float l = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t1 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t3 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakL(final float l) {
+    public void setTweak3(final float t3) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float c = ((color & 0xff000000) >>> 24) / 255f;
-        float h = ((color & 0x0000ff00) >>> 8) / 255f;
-        float s = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t4 = ((color & 0xff000000) >>> 24) / 255f;
+        float t1 = ((color & 0x0000ff00) >>> 8) / 255f;
+        float t2 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public void setTweakC(final float c) {
+    public void setTweak4(final float t4) {
         int color = NumberUtils.floatToIntColor(tweak);
-        float l = ((color & 0x00ff0000) >>> 16) / 255f;
-        float s = ((color & 0x0000ff00) >>> 8) / 255f;
-        float h = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(h, s, l, c);
+        float t3 = ((color & 0x00ff0000) >>> 16) / 255f;
+        float t2 = ((color & 0x0000ff00) >>> 8) / 255f;
+        float t1 = ((color & 0x000000ff)) / 255f;
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
-    public float getTweakH() {
+    public float getTweak1() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x000000ff)) / 255f;
     }
 
-    public float getTweakS() {
+    public float getTweak2() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x0000ff00) >>> 8) / 255f;
     }
 
-    public float getTweakL() {
+    public float getTweak3() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0x00ff0000) >>> 16) / 255f;
     }
 
-    public float getTweakC() {
+    public float getTweak4() {
         int c = NumberUtils.floatToIntColor(this.tweak);
         return ((c & 0xff000000) >>> 24) / 255f;
     }

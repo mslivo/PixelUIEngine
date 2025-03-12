@@ -1,4 +1,3 @@
-#HSL_ENABLED true COLOR_ENABLED true
 #VERTEX
 #FRAGMENT
 vec4 blur(vec2 uv) {
@@ -16,13 +15,9 @@ vec4 blur(vec2 uv) {
 }
 
 void main(){
-	vec2 uv = v_texCoords * 2.0 - 1.0;  // Map UV to range [-1, 1]
-	float dist = length(uv);  // Distance from center
-	float vignette = smoothstep(0.6, 1.2, dist); // Adjust for a smooth transition
-	
-	// Blend original and blurred image based on vignette
-	vec4 original = texture2D(u_texture, v_texCoords);
-	vec4 blurred = blur(v_texCoords);
 
-	vec4 fragColor = mix(original, blurred, vignette * v_tweak.w);
+vec4 original = texture2D(u_texture, v_texCoords);
+vec4 blurred = blur(v_texCoords);
+
+vec4 fragColor = mix(original, blurred, v_tweak.x);
 }
