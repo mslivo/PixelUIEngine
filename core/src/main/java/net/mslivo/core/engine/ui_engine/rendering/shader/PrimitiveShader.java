@@ -40,13 +40,12 @@ public final class PrimitiveShader extends ShaderCommon {
                         v_color = (a_color*FLOAT_CORRECTION);
                         v_tweak = (a_tweak*FLOAT_CORRECTION);
                         v_vertexColor = a_vertexColor;
-                        vec4 v_position = a_position;
-
+                        
                         // Custom Code
                         #VERTEX_MAIN
             
                         // Done
-                        gl_Position = u_projTrans * v_position;
+                        gl_Position = u_projTrans * a_position;
                     }
             """;
 
