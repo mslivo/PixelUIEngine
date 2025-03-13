@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ShaderCommon {
 
-    protected final static String FLOAT_PRECISION = """
+    protected final static String FLOAT_DECLARATIONS = """
                    #ifdef GL_ES
                        #define LOW lowp
                        #define MED mediump
@@ -23,6 +23,7 @@ public class ShaderCommon {
                        #define HIGH
                    #endif
                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
+                   
             """;
 
     protected String vertexShaderSource;

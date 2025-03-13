@@ -1,15 +1,13 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.mslivo.core.engine.tools.Tools;
 
 public final class PrimitiveShader extends ShaderCommon {
 
     private static final String EXTENSION = ".primitive.glsl";
 
-    private static final String VERTEX_SHADER_TEMPLATE = """
-                    #FLOAT_PRECISION
+    private static final String VERTEX_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""
             
                     attribute vec4 a_position;
                     attribute vec4 a_color;
@@ -38,10 +36,9 @@ public final class PrimitiveShader extends ShaderCommon {
                         // Custom Code
                         #VERTEX_MAIN
                     }
-            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);
+            """;
 
-    private static final String FRAGMENT_SHADER_TEMPLATE = """
-                #FLOAT_PRECISION
+    private static final String FRAGMENT_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""
             
                 varying vec4 v_color;
                 varying vec4 v_tweak;
@@ -54,7 +51,7 @@ public final class PrimitiveShader extends ShaderCommon {
                    #FRAGMENT_MAIN
                    
                 }
-            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);
+            """;
 
     public PrimitiveShader(FileHandle shaderFile) {
         this(validateFile(shaderFile).readString());

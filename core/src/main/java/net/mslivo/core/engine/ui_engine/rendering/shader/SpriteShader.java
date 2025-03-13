@@ -7,9 +7,8 @@ public final class SpriteShader extends ShaderCommon {
 
     private static final String EXTENSION = ".sprite.glsl";
 
-    private static final String VERTEX_SHADER_TEMPLATE = """
-                    #FLOAT_PRECISION
-            
+    private static final String VERTEX_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""
+                                
                     attribute vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
@@ -34,10 +33,9 @@ public final class SpriteShader extends ShaderCommon {
                        // Custom Code
                        #VERTEX_MAIN
                     }
-            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);;
+            """;
 
-    private static final String FRAGMENT_SHADER_TEMPLATE = """
-            #FLOAT_PRECISION
+    private static final String FRAGMENT_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""
             
             varying vec4 v_color;
             varying vec4 v_tweak;
@@ -54,7 +52,7 @@ public final class SpriteShader extends ShaderCommon {
                 #FRAGMENT_MAIN
                 
             }
-            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);;
+            """;;
 
 
     public SpriteShader(FileHandle shaderFile) {
