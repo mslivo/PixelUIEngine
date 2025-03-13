@@ -244,10 +244,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         primitiveRenderer.begin(GL32.GL_TRIANGLES);
         primitiveRenderer.setColor(Color.GRAY);
-        primitiveRenderer.setTweak2(0f);
         primitiveRenderer.setVertexColor(Color.YELLOW);
         primitiveRenderer.vertex(50, 70);
+        primitiveRenderer.setVertexColor(Color.BLUE);
         primitiveRenderer.vertex(55, 80);
+        primitiveRenderer.setVertexColor(Color.GREEN);
         primitiveRenderer.vertex(60, 70);
         primitiveRenderer.setTweakReset();
         primitiveRenderer.vertex(50 + 15, 70);
