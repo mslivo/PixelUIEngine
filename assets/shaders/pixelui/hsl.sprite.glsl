@@ -9,6 +9,6 @@ void main(){
     hsl.x = fract(hsl.x + (v_tweak.x-0.5));
     hsl.y = clamp(hsl.y + ((v_tweak.y-0.5)*2.0),0.0,1.0);
     hsl.z = clamp(hsl.z + ((v_tweak.z-0.5)*2.0),0.0,1.0);
-    vec4 fragColor = hsl2rgb(hsl);
+    gl_FragColor = hsl2rgb(hsl);
 
 }

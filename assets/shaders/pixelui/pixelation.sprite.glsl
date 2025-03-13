@@ -8,6 +8,6 @@ void main(){
 	texCoords = texCoords * u_textureSize;
     texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.x));
     texCoords = texCoords / u_textureSize;
-	vec4 fragColor = colorTintAdd(texture2D( u_texture, texCoords),v_color);
+	gl_FragColor = colorTintAdd(texture2D( u_texture, texCoords),v_color);
 	
 }

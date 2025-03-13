@@ -48,7 +48,7 @@ public class SpriteRenderer implements Batch {
             VERTEX:
             FRAGMENT:import colorTintAdd
             void main(){
-            	vec4 fragColor = colorTintAdd(texture2D(u_texture, v_texCoord),v_color);
+            	gl_FragColor = colorTintAdd(texture2D(u_texture, v_texCoord),v_color);
             }
             """);
 

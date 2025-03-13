@@ -8,29 +8,19 @@ public final class SpriteShader extends ShaderCommon {
     private static final String EXTENSION = ".sprite.glsl";
 
     private static final String VERTEX_SHADER_TEMPLATE = """
-                    #ifdef GL_ES
-                        #define LOW lowp
-                        #define MED mediump
-                        #define HIGH highp
-                        precision mediump float;
-                    #else
-                        #define MED
-                        #define LOW
-                        #define HIGH
-                    #endif
+                    #FLOAT_PRECISION
             
                     attribute vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
                     attribute vec2 a_texCoord;
-                    
+
                     varying vec4 v_color;
                     varying vec4 v_tweak;
                     varying HIGH vec2 v_texCoord;
-                    
+
                     uniform mat4 u_projTrans;
-                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
-            
+                    
                     #VERTEX_DECLARATIONS
 
                     void main()
@@ -39,25 +29,15 @@ public final class SpriteShader extends ShaderCommon {
                        v_color = (a_color * FLOAT_CORRECTION);
                        v_tweak = (a_tweak * FLOAT_CORRECTION);
                        v_texCoord = a_texCoord;
-                                              
+                       gl_Position = u_projTrans * a_position;
+                       
                        // Custom Code
                        #VERTEX_MAIN
-
-                       gl_Position = u_projTrans * a_position;
                     }
-            """;
+            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);;
 
     private static final String FRAGMENT_SHADER_TEMPLATE = """
-            #ifdef GL_ES
-                #define LOW lowp
-                #define MED mediump
-                #define HIGH highp
-                precision mediump float;
-            #else
-                #define MED
-                #define LOW
-                #define HIGH
-            #endif
+            #FLOAT_PRECISION
             
             varying vec4 v_color;
             varying vec4 v_tweak;
@@ -72,11 +52,9 @@ public final class SpriteShader extends ShaderCommon {
             
                 // Custom Code
                 #FRAGMENT_MAIN
-            
-                // Done
-                gl_FragColor = fragColor;
+                
             }
-            """;
+            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);;
 
 
     public SpriteShader(FileHandle shaderFile) {

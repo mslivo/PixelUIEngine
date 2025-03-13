@@ -40,7 +40,7 @@ public class PrimitiveRenderer {
             }
             FRAGMENT:
             void main(){
-            	 vec4 fragColor = v_vertexColor;
+            	 gl_FragColor = v_vertexColor;
             }
             """);
 

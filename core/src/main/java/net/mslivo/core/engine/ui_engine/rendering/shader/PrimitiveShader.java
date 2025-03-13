@@ -9,16 +9,7 @@ public final class PrimitiveShader extends ShaderCommon {
     private static final String EXTENSION = ".primitive.glsl";
 
     private static final String VERTEX_SHADER_TEMPLATE = """
-                   #ifdef GL_ES
-                       #define LOW lowp
-                       #define MED mediump
-                       #define HIGH highp
-                       precision mediump float;
-                   #else
-                       #define MED
-                       #define LOW
-                       #define HIGH
-                   #endif
+                    #FLOAT_PRECISION
             
                     attribute vec4 a_position;
                     attribute vec4 a_color;
@@ -30,36 +21,27 @@ public final class PrimitiveShader extends ShaderCommon {
                     varying vec4 v_vertexColor;
                     
                     uniform mat4 u_projTrans;
-                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
             
                     void main() {
-                        // Get Attributes
                         gl_PointSize = 1.0;
+     
+                        // Get Attributes
                         v_color = (a_color*FLOAT_CORRECTION);
                         v_tweak = (a_tweak*FLOAT_CORRECTION);
                         v_vertexColor = a_vertexColor;
                         
+                        
+                        gl_Position = u_projTrans * a_position;
+                        
                         // Custom Code
                         #VERTEX_MAIN
-            
-                        // Done
-                        gl_Position = u_projTrans * a_position;
                     }
-            """;
+            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);
 
     private static final String FRAGMENT_SHADER_TEMPLATE = """
-                #ifdef GL_ES
-                    #define LOW lowp
-                    #define MED mediump
-                    #define HIGH highp
-                    precision mediump float;
-                #else
-                    #define MED
-                    #define LOW
-                    #define HIGH
-                #endif
+                #FLOAT_PRECISION
             
                 varying vec4 v_color;
                 varying vec4 v_tweak;
@@ -70,10 +52,9 @@ public final class PrimitiveShader extends ShaderCommon {
                 void main() {
             
                    #FRAGMENT_MAIN
-            
-                   gl_FragColor = fragColor;
+                   
                 }
-            """;
+            """.replace("#FLOAT_PRECISION", FLOAT_PRECISION);
 
     public PrimitiveShader(FileHandle shaderFile) {
         this(validateFile(shaderFile).readString());
