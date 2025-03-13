@@ -358,6 +358,7 @@ public final class MediaManager {
         // Load Sprite Data Into Pixmap Packer
         for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
             CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
+
             if (cMediaSprite.useAtlas) {
                 FileHandle textureFileHandle = Tools.File.findResource(cMediaSprite.file);
                 String packedTextureName = cMediaSprite.file;

@@ -16,7 +16,7 @@ public class ExampleLauncherMain {
                         PixelUILaunchConfig.GLEmulation.GL32_VULKAN,
                         PixelUILaunchConfig.GLEmulation.GL32_VULKAN,
                         PixelUILaunchConfig.GLEmulation.GL32_OPENGL,
-                        60, false
+                        0, false
                 )
                 );
     }

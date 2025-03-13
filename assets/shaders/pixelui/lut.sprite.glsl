@@ -6,7 +6,7 @@ uniform vec2 u_lutSize;
 
 void main(){
 
-    vec4 color = colorTintAdd(texture2D(u_texture, v_texCoords),v_color);
+    vec4 color = colorTintAdd(texture2D(u_texture, v_texCoord),v_color);
     vec4 lutColor = vec4(lut(color.rgb,u_lut, u_lutSize),color.a);
 
     vec4 fragColor = mix(color,lutColor,v_tweak.w);

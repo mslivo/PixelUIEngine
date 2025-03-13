@@ -21,12 +21,14 @@ public final class SpriteShader extends ShaderCommon {
             
                     attribute vec4 a_position;
                     attribute vec4 a_color;
-                    attribute vec2 a_texCoord;
                     attribute vec4 a_tweak;
-                    uniform mat4 u_projTrans;
+                    attribute vec2 a_texCoord;
+                    
                     varying vec4 v_color;
                     varying vec4 v_tweak;
-                    varying HIGH vec2 v_texCoords;
+                    varying HIGH vec2 v_texCoord;
+                    
+                    uniform mat4 u_projTrans;
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
@@ -36,12 +38,13 @@ public final class SpriteShader extends ShaderCommon {
                        // Get Attributes
                        v_color = (a_color * FLOAT_CORRECTION);
                        v_tweak = (a_tweak * FLOAT_CORRECTION);
-                       v_texCoords = a_texCoord;
-            
+                       v_texCoord = a_texCoord;
+                       vec4 v_position = a_position;
+                       
                        // Custom Code
                        #VERTEX_MAIN
 
-                       gl_Position = u_projTrans * a_position;
+                       gl_Position = u_projTrans * v_position;
                     }
             """;
 
@@ -59,7 +62,7 @@ public final class SpriteShader extends ShaderCommon {
             
             varying vec4 v_color;
             varying vec4 v_tweak;
-            varying HIGH vec2 v_texCoords;
+            varying HIGH vec2 v_texCoord;
             
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;

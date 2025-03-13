@@ -22,26 +22,31 @@ public final class PrimitiveShader extends ShaderCommon {
             
                     attribute vec4 a_position;
                     attribute vec4 a_color;
-                    attribute vec4 a_vertexColor;
                     attribute vec4 a_tweak;
-                    uniform mat4 u_projTrans;
+                    attribute vec4 a_vertexColor;
+                    
+                    varying vec4 v_color;
+                    varying vec4 v_tweak;
                     varying vec4 v_vertexColor;
+                    
+                    uniform mat4 u_projTrans;
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
                     #VERTEX_DECLARATIONS
             
                     void main() {
                         // Get Attributes
-                        vec4 v_color = (a_color*FLOAT_CORRECTION);
-                        vec4 v_tweak = (a_tweak*FLOAT_CORRECTION);
+                        gl_PointSize = 1.0;
+                        v_color = (a_color*FLOAT_CORRECTION);
+                        v_tweak = (a_tweak*FLOAT_CORRECTION);
                         v_vertexColor = a_vertexColor;
+                        vec4 v_position = a_position;
 
                         // Custom Code
                         #VERTEX_MAIN
             
                         // Done
-                        gl_PointSize = 1.0;
-                        gl_Position = u_projTrans * a_position;
+                        gl_Position = u_projTrans * v_position;
                     }
             """;
 
@@ -57,6 +62,8 @@ public final class PrimitiveShader extends ShaderCommon {
                     #define HIGH
                 #endif
             
+                varying vec4 v_color;
+                varying vec4 v_tweak;
                 varying vec4 v_vertexColor;
             
                 #FRAGMENT_DECLARATIONS
