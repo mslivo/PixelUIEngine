@@ -46,9 +46,9 @@ public class SpriteRenderer implements Batch {
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
             VERTEX:
-            FRAGMENT:import colorModAdd
+            FRAGMENT:import colorTintAdd
             void main(){
-            	vec4 fragColor = colorModAdd(texture2D(u_texture, v_texCoords),v_color);
+            	vec4 fragColor = colorTintAdd(texture2D(u_texture, v_texCoords),v_color);
             }
             """);
 

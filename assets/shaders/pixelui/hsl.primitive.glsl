@@ -1,8 +1,8 @@
-VERTEX:import colorModAdd rgb2hsl hsl2rgb
+VERTEX:import colorTintAdd rgb2hsl hsl2rgb
 
 void main(){
 
-    v_vertexColor = colorModAdd(v_vertexColor, v_color);
+    v_vertexColor = colorTintAdd(v_vertexColor, v_color);
 
     vec4 hsl = rgb2hsl(v_vertexColor);
     hsl.x = fract(hsl.x + (v_tweak.x-0.5));
