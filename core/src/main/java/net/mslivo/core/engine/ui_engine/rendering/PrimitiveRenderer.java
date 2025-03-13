@@ -34,11 +34,11 @@ public class PrimitiveRenderer {
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
-            #VERTEX
+            VERTEX:import colorModAdd
             void main(){
-            	 v_vertexColor = colorMod(v_vertexColor, v_color);
+            	 v_vertexColor = colorModAdd(v_vertexColor, v_color);
             }
-            #FRAGMENT
+            FRAGMENT:
             void main(){
             	 vec4 fragColor = v_vertexColor;
             }

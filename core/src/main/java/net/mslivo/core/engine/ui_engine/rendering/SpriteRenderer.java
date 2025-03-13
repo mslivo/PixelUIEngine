@@ -45,10 +45,10 @@ public class SpriteRenderer implements Batch {
     private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
-            #VERTEX
-            #FRAGMENT
+            VERTEX:
+            FRAGMENT:import colorModAdd
             void main(){
-            	vec4 fragColor = colorMod(texture2D(u_texture, v_texCoords),v_color);
+            	vec4 fragColor = colorModAdd(texture2D(u_texture, v_texCoords),v_color);
             }
             """);
 

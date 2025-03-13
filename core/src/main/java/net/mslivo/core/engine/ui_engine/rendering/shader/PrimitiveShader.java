@@ -28,12 +28,6 @@ public final class PrimitiveShader extends ShaderCommon {
                     varying vec4 v_vertexColor;
                     const HIGH float FLOAT_CORRECTION = (255.0/254.0);
             
-                    vec4 colorMod(vec4 color, vec4 modColor){
-                        color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
-                        color.a *= modColor.a;
-                        return color;
-                    }
-            
                     #VERTEX_DECLARATIONS
             
                     void main() {
@@ -41,7 +35,7 @@ public final class PrimitiveShader extends ShaderCommon {
                         vec4 v_color = (a_color*FLOAT_CORRECTION);
                         vec4 v_tweak = (a_tweak*FLOAT_CORRECTION);
                         v_vertexColor = a_vertexColor;
-                        
+
                         // Custom Code
                         #VERTEX_MAIN
             

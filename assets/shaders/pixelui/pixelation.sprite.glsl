@@ -1,5 +1,6 @@
-#VERTEX
-#FRAGMENT
+VERTEX:
+FRAGMENT:import colorModAdd
+
 void main(){
 
 	HIGH vec2 texCoords = v_texCoords;
@@ -7,6 +8,6 @@ void main(){
 	texCoords = texCoords * u_textureSize;
     texCoords = mix(texCoords, floor((texCoords / pixelSize) + 0.5) * pixelSize, step(0.001, v_tweak.x));
     texCoords = texCoords / u_textureSize;
-	vec4 fragColor = colorMod(texture2D( u_texture, texCoords),v_color);
+	vec4 fragColor = colorModAdd(texture2D( u_texture, texCoords),v_color);
 	
 }

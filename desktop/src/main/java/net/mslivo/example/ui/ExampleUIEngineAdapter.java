@@ -66,8 +66,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.SIZE_DEFAULT, true);
-        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.SIZE_DEFAULT * 3, true);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, null, SpriteRenderer.SIZE_DEFAULT, true);
+        this.primitiveRenderer = new PrimitiveRenderer( null, PrimitiveRenderer.SIZE_DEFAULT * 3, true);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -186,7 +186,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.begin();
 
         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
-        spriteRenderer.setTweak(0.5f, 0.5f, 0.5f, 0.0f);
+        spriteRenderer.setTweak(0f, 0.5f, 0.5f, 0.0f);
         for (int x = 0; x < api.resolutionWidth(); x += 16) {
             for (int y = 0; y < api.resolutionHeight(); y += 16) {
                 spriteRenderer.drawCMediaAnimation(ExampleBaseMedia.BACKGROUND, animation_timer,
@@ -350,19 +350,20 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         spriteRenderer.setAllReset();
-        spriteRenderer.setShader(null);
+        spriteRenderer.setShader(shaderProgram);
         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
         //spriteRenderer.setShader(shaderProgram);
         spriteRenderer.setTweak(0.5f,0.5f, 0.5f, 0f);
 
         spriteRenderer.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST, 300, 100);
-        //spriteRenderer.setShader(null);
+        spriteRenderer.setShader(null);
 
 
         spriteRenderer.end();
 
     }
 
+    private ShaderProgram shaderProgram = new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile();
 
     @Override
     public void shutdown() {
