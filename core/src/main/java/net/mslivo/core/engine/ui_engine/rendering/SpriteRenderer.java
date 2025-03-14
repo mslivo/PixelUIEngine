@@ -130,7 +130,7 @@ public class SpriteRenderer implements Batch {
 
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
-        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
         this.color = reset_color;
         this.tweak = reset_tweak;
@@ -1683,7 +1683,7 @@ public class SpriteRenderer implements Batch {
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
+    public void setBlendFunctionResetValuesSeparate(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;
@@ -1697,6 +1697,15 @@ public class SpriteRenderer implements Batch {
         this.reset_blend[ALPHA_SRC] = blend_src;
         this.reset_blend[ALPHA_DST] = blend_dst;
         this.setBlendFunctionReset();
+    }
+
+    public void setBlendFunctionLayer() {
+        this.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+    }
+
+    public void setBlendFunctionComposite() {
+        this.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private static float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {

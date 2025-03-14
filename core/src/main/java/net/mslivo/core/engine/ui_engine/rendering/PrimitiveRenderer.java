@@ -110,7 +110,7 @@ public class PrimitiveRenderer {
         this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
         this.reset_vertexColor = colorPackedRGBA(1f, 1f, 1f, 1f);
-        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA};
+        this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
         this.restartInserted = false;
         this.color = reset_color;
@@ -662,7 +662,7 @@ public class PrimitiveRenderer {
         this.setTweakReset();
     }
 
-    public void setBlendFunctionSeparateResetValues(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
+    public void setBlendFunctionResetValuesSeparate(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
         this.reset_blend[RGB_SRC] = blend_rgb_src;
         this.reset_blend[RGB_DST] = blend_rgb_dst;
         this.reset_blend[ALPHA_SRC] = blend_alpha_src;

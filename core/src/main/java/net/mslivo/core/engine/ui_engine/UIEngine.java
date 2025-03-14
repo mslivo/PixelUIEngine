@@ -134,10 +134,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager,new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
-        newUIEngineState.spriteRenderer_ui.setBlendFunctionSeparateResetValues(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
-
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile());
-        newUIEngineState.primitiveRenderer_ui.setBlendFunctionSeparateResetValues(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -1911,10 +1908,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
     public void render(boolean drawToScreen) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
-
         { // Draw App Layer
             // Draw Main FrameBuffer
-            uiEngineState.frameBuffer_app.begin();
+            uiEngineState.frameBuffer_app.beginGlClear();
             this.uiAdapter.render(uiEngineState.camera_app, null);
             uiEngineState.frameBuffer_app.end();
             // Draw UI AppViewport FrameBuffers
@@ -1923,15 +1919,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
-
         { // Draw GUI Layer
-            uiEngineState.frameBufferComponent_ui.begin();
-            render_glClear();
+            uiEngineState.frameBufferComponent_ui.beginGlClear();
             this.renderUIComponentLayer();
             uiEngineState.frameBufferComponent_ui.end();
 
-            uiEngineState.frameBufferModal_ui.begin();
-            render_glClear();
+            uiEngineState.frameBufferModal_ui.beginGlClear();
             this.renderUIModalLayer();
             uiEngineState.frameBufferModal_ui.end();
         }
@@ -2004,6 +1997,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+        spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
 
@@ -2041,6 +2035,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+        spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
 

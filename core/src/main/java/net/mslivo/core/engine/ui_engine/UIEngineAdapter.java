@@ -15,7 +15,7 @@ public interface UIEngineAdapter {
     default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_uiComponent,TextureRegion texture_uiModal,
                                  int resolutionWidth, int resolutionHeight, boolean grayScale) {
         spriteRenderer.setProjectionMatrix(camera.combined);
-        spriteRenderer.setBlendFunction(GL32.GL_ONE,GL32.GL_ONE_MINUS_SRC_ALPHA);
+        spriteRenderer.setBlendFunctionComposite();
         spriteRenderer.begin();
 
         if(grayScale){
