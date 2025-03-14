@@ -1,10 +1,7 @@
 package net.mslivo.core.engine.ui_engine.rendering;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL32;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.graphics.glutils.VertexData;
@@ -393,6 +390,14 @@ public class PrimitiveRenderer {
 
     public void setBlendFunction(int srcFunc, final int dstFunc) {
         setBlendFunctionSeparate(srcFunc, dstFunc, srcFunc, dstFunc);
+    }
+
+    public void setBlendFunctionLayer() {
+        this.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public void setBlendFunctionComposite() {
+        this.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setBlendFunctionSeparate(int srcFuncColor, final int dstFuncColor, final int srcFuncAlpha, final int dstFuncAlpha) {
