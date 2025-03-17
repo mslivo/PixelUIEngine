@@ -1378,25 +1378,20 @@ public final class APIComponent {
         public final ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {};
 
         public Combobox create(int x, int y, int width) {
-            return create(x, y, width, null, DEFAULT_COMBOBOX_ACTION, false, null);
+            return create(x, y, width, null, DEFAULT_COMBOBOX_ACTION,  null);
         }
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems) {
-            return create(x, y, width, combobBoxItems, DEFAULT_COMBOBOX_ACTION, false, null);
+            return create(x, y, width, combobBoxItems, DEFAULT_COMBOBOX_ACTION,  null);
         }
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
-            return create(x, y, width, combobBoxItems, comboBoxAction, false, null);
+            return create(x, y, width, combobBoxItems, comboBoxAction,  null);
         }
 
-        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons) {
-            return create(x, y, width, combobBoxItems, comboBoxAction, useIcons, null);
-        }
-
-        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, boolean useIcons, ComboboxItem selectedItem) {
+        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, UICommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
-            comboBox.useIcons = useIcons;
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
             comboBox.items = new ArrayList<>();
             if (combobBoxItems != null) {
@@ -1414,11 +1409,6 @@ public final class APIComponent {
         public void setComboBoxAction(Combobox comboBox, ComboBoxAction comboBoxAction) {
             if (comboBox == null) return;
             comboBox.comboBoxAction = comboBoxAction;
-        }
-
-        public void setUseIcons(Combobox comboBox, boolean useIcons) {
-            if (comboBox == null) return;
-            comboBox.useIcons = useIcons;
         }
 
         public void addComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {

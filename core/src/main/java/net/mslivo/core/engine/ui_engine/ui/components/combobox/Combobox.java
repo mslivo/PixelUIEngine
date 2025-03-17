@@ -9,5 +9,4 @@ public class Combobox extends Component {
     public ArrayList<ComboboxItem> items;
     public ComboBoxAction comboBoxAction;
     public ComboboxItem selectedItem;
-    public boolean useIcons;
 }

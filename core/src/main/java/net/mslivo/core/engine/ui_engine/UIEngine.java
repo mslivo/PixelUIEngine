@@ -2263,8 +2263,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
                             // Cell Content
                             render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1, comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
-                                    comboBox.comboBoxAction.icon(comboBoxItem), comboBox.comboBoxAction.iconIndex(comboBoxItem), comboBox.comboBoxAction.iconColor(comboBoxItem),
-                                    comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
+                                    comboBoxItem.comboBoxItemAction.icon(), comboBoxItem.comboBoxItemAction.iconIndex(), comboBoxItem.comboBoxItemAction.iconColor(),
+                                    comboBoxItem.comboBoxItemAction.iconFlipX(), comboBoxItem.comboBoxItemAction.iconFlipY());
                         }
                     }
                     // Top
@@ -2878,8 +2878,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (comboBox.selectedItem != null) {
                     render_drawFont(comboBox.selectedItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox),
                             comboBox.selectedItem.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(comboBox.width - 1),
-                            comboBox.comboBoxAction.icon(comboBox.selectedItem), comboBox.comboBoxAction.iconIndex(comboBox.selectedItem), comboBox.comboBoxAction.iconColor(comboBox.selectedItem),
-                            comboBox.comboBoxAction.iconFlipX(), comboBox.comboBoxAction.iconFlipY());
+                            comboBox.selectedItem.comboBoxItemAction.icon(), comboBox.selectedItem.comboBoxItemAction.iconIndex(), comboBox.selectedItem.comboBoxItemAction.iconColor(),
+                            comboBox.selectedItem.comboBoxItemAction.iconFlipX(), comboBox.selectedItem.comboBoxItemAction.iconFlipY());
                 }
             }
             case Knob knob -> {
