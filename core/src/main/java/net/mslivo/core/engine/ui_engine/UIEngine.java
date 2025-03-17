@@ -2238,9 +2238,12 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 // Menu
                 if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
                     int widthPx = TS(comboBox.width);
-                    for (int i = 0; i < comboBox.items.size(); i++)
-                        widthPx = Math.max(widthPx, mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text));
-
+                    for (int i = 0; i < comboBox.items.size(); i++) {
+                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text);
+                        if(comboBox.items.get(i).comboBoxItemAction.icon() != null)
+                            itemWidth += api.TS();
+                        widthPx = Math.max(widthPx,itemWidth);
+                    }
                     int width = MathUtils.ceil((widthPx + 2) / uiEngineState.tileSize.TSF);
                     int height = comboBox.items.size();
 
