@@ -362,7 +362,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         Tab tabTextButton = api.component.tabbar.tab.create("Buttons 1");
 
 
-        TextButton textBtn1 = api.component.button.textButton.create(3, 3, 1, 2, "Toggle", new ButtonAction() {
+        TextButton textBtn1 = api.component.button.textButton.create(3, 3, 3, 2, "Toggle", new ButtonAction() {
             @Override
             public void onToggle(boolean value) {
 

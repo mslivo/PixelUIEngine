@@ -1,8 +1,6 @@
 package net.mslivo.core.engine.ui_engine.media;
 
-import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.*;
-import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
@@ -100,7 +98,7 @@ public class UIEngineBaseMedia_8x8 {
     // Misc
     public static final CMediaImage UI_PIXEL = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
     public static final CMediaImage UI_PIXEL_TRANSPARENT = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel_transparent.png");
-    public static final CMediaImage UI_COLOR_SELECTOR = new CMediaImage(DIR_UI_GRAPHICS + "misc/colors.png");
+    public static final CMediaImage UI_COLOR_PICKER = new CMediaImage(DIR_UI_GRAPHICS + "misc/color_picker_colors.png");
     public static final CMediaImage UI_COLOR_SELECTOR_OVERLAY = new CMediaImage(DIR_UI_GRAPHICS + "misc/colors_overlay.png");
 
 
@@ -171,7 +169,7 @@ public class UIEngineBaseMedia_8x8 {
             UI_ICON_EXTEND,
             UI_ICON_KEY_DELETE,
             UI_ICON_KEY_CASE,
-            UI_COLOR_SELECTOR,
+            UI_COLOR_PICKER,
             UI_COLOR_SELECTOR_OVERLAY,
             UI_MOUSETEXTINPUT_BUTTON,
             UI_MOUSETEXTINPUT_CONFIRM,

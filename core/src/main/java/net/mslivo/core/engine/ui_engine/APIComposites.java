@@ -39,7 +39,6 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.awt.*;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -687,7 +686,7 @@ public final class APIComposites {
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_SELECTOR);
+            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_PICKER);
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
