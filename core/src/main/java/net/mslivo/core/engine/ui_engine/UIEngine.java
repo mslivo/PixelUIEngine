@@ -2178,8 +2178,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private int render_get16TilesCMediaIndex(int x, int y, int width, int height) {
         if (width == 1 && height == 1) return 3;
         if (width == 1) {
-            if (y == 0) return 7;
-            if (y == height - 1) return 15;
+            if (y == 0) return 15;
+            if (y == height - 1) return 7;
             return 11;
         } else if (height == 1) {
             if (x == 0) return 12;
@@ -2735,7 +2735,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
                         render_drawFont(textButton.text, UICommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, UICommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset,
-                                textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(button.width),
+                                textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, -1,
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
                                 textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
                     }
