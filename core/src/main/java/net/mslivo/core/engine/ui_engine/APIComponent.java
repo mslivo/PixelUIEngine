@@ -1768,7 +1768,7 @@ public final class APIComponent {
 
     public void setDisabled(Component[] components, boolean disabled) {
         if (components == null) return;
-        for (int i = 0; i < components.length; i++) setDisabled(components, disabled);
+        for (int i = 0; i < components.length; i++) setDisabled(components[i], disabled);
     }
 
     public void addUpdateAction(Component component, UpdateAction updateAction) {
