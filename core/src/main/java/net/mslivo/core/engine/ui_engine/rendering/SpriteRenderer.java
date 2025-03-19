@@ -128,7 +128,7 @@ public class SpriteRenderer implements Batch {
         this.vertices = createVerticesArray(size);
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        this.reset_tweak = colorPackedRGBA(0.5f, 0.5f, 0.5f, 0.0f);
+        this.reset_tweak = colorPackedRGBA(0f, 0f, 0f, 0.0f);
         this.reset_color = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
         this.reset_blend = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
 
@@ -1572,38 +1572,6 @@ public class SpriteRenderer implements Batch {
 
     public void setPackedTweak(final float tweak) {
         this.tweak = tweak;
-    }
-
-    public void setTweak1(final float t1) {
-        int color = NumberUtils.floatToIntColor(tweak);
-        float t4 = ((color & 0xff000000) >>> 24) / 255f;
-        float t2 = ((color & 0x00ff0000) >>> 16) / 255f;
-        float t3 = ((color & 0x0000ff00) >>> 8) / 255f;
-        tweak = colorPackedRGBA(t1, t2, t3, t4);
-    }
-
-    public void setTweak2(final float t2) {
-        int color = NumberUtils.floatToIntColor(tweak);
-        float t4 = ((color & 0xff000000) >>> 24) / 255f;
-        float t1 = ((color & 0x00ff0000) >>> 16) / 255f;
-        float t3 = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(t1, t2, t3, t4);
-    }
-
-    public void setTweak3(final float t3) {
-        int color = NumberUtils.floatToIntColor(tweak);
-        float t4 = ((color & 0xff000000) >>> 24) / 255f;
-        float t1 = ((color & 0x0000ff00) >>> 8) / 255f;
-        float t2 = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(t1, t2, t3, t4);
-    }
-
-    public void setTweak4(final float t4) {
-        int color = NumberUtils.floatToIntColor(tweak);
-        float t3 = ((color & 0x00ff0000) >>> 16) / 255f;
-        float t2 = ((color & 0x0000ff00) >>> 8) / 255f;
-        float t1 = ((color & 0x000000ff)) / 255f;
-        tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
 
     public float getTweak1() {

@@ -67,7 +67,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
         this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.SIZE_DEFAULT, true);
+        this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.SIZE_DEFAULT * 3, true);
+        this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button

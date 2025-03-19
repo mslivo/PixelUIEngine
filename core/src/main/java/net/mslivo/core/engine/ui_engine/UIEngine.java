@@ -134,7 +134,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager,new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
+        newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile());
+        newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
