@@ -29,46 +29,6 @@ public class ShaderCommon {
     protected String vertexShaderSource;
     protected String fragmentShaderSource;
 
-    private static final HashMap<String, String> functions = new HashMap<>();
-    static {
-        functions.put("colorModAdd", """
-                    vec4 colorModAdd(vec4 color, vec4 modColor){
-                        color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
-                        color.a *= modColor.a;
-                        return color;
-                    }
-                """);
-        functions.put("colorModMul", """
-                    vec4 colorModMul(vec4 color, vec4 modColor){
-                        color.rgb = clamp(color.rgb*((modColor.rgb-0.5)*2.0),0.0,1.0);
-                        color.a *= modColor.a;
-                        return color;
-                    }
-                """);
-        functions.put("rgb2hsl", """
-                vec4 rgb2hsl(vec4 c)
-                {
-                    const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                    vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                    float d = q.x - min(q.w, q.y);
-                    float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                    return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-                }
-                """);
-        functions.put("hsl2rgb", """
-                vec4 hsl2rgb(vec4 c)
-                {
-                    const vec4 J = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-                    vec4 p = mix(vec4(c.bg, J.wz), vec4(c.gb, J.xy), step(c.b, c.g));
-                    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-                    float d = q.x - min(q.w, q.y);
-                    float l = q.x * (1.0 - 0.5 * d / (q.x + eps));
-                    return vec4(abs(q.z + (q.w - q.y) / (6.0 * d + eps)), (q.x - l) / (min(l, 1.0 - l) + eps), l, c.a);
-                }
-                """);
-    }
-
     public ShaderCommon() {
     }
 
@@ -99,27 +59,6 @@ public class ShaderCommon {
         }
     }
 
-    private String parseImports(String line){
-        StringBuilder result = new StringBuilder();
-        line = line.substring(line.indexOf(":")+1);
-        if(line.isBlank())
-            return result.toString();
-        String[] imports = line.split(" ");
-        if(imports.length < 2 || !imports[0].equals("import"))
-            return result.toString();
-
-        for(int i=1;i<imports.length;i++){
-            String importFunction = imports[i].trim();
-            FileHandle file = Tools.File.findResource("shaders/pixelui/functions/"+importFunction+".function.glsl");
-            if(!file.exists())
-                throw new RuntimeException("Shader import function "+importFunction+" does not exist");
-
-            result.append(file.readString()).append(System.lineSeparator());
-        }
-
-        return result.toString();
-    }
-
     protected ParseShaderResult parseShader(String shaderSource) {
 
         StringBuilder[] builders = new StringBuilder[4];
@@ -138,7 +77,6 @@ public class ShaderCommon {
 
             if (lineCleaned.startsWith("VERTEX:")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
-                builders[builderIndex.index].append(parseImports(lineCleaned));
                 continue;
             }
             if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.startsWith("void main(){")) {
@@ -151,7 +89,6 @@ public class ShaderCommon {
             }
             if (lineCleaned.startsWith("FRAGMENT:")) {
                 builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
-                builders[builderIndex.index].append(parseImports(lineCleaned));
                 continue;
             }
             if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.startsWith("void main(){")) {

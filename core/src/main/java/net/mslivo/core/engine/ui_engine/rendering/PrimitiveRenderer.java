@@ -31,7 +31,14 @@ public class PrimitiveRenderer {
     private static final String FLUSH_WARNING = "%d intermediate flushes detected | vertices.length=%d | %s";
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
-            VERTEX:import colorTintAdd
+            VERTEX:
+            
+            vec4 colorTintAdd(vec4 color, vec4 modColor){
+                 color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
+                 color.a *= modColor.a;
+                 return color;
+            }
+            
             void main(){
             	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
             }
@@ -245,7 +252,6 @@ public class PrimitiveRenderer {
 
         Gdx.gl32.glDrawElements(primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
         idx = 0;
-
 
         for (int i = indexResets.size - 1; i >= 0; i--) {
             final int resetIndex = indexResets.items[i];
