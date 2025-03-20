@@ -42,7 +42,6 @@ public class ShaderCommon {
 
     protected record ParseShaderResult(String vertexDeclarations, String vertexMain, String fragmentDeclarations,
                                        String fragmentMain) {
-
     }
 
     protected enum BUILDER_INDEX {

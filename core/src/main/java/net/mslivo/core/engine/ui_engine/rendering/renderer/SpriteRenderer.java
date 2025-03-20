@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.*;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
+import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Align;
@@ -13,7 +15,7 @@ import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 
-public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
+public class SpriteRenderer extends BasicColorTweakRenderer implements Batch {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
@@ -22,10 +24,9 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int VERTEXES_INDICES_RATIO = 4;
-    private static final int SPRITE_SIZE = VERTEX_SIZE*4;
+    private static final int SPRITE_SIZE = VERTEX_SIZE * 4;
 
-    public static final int SIZE_DEFAULT = 65532;
-    public static final int SIZE_MAX = Integer.MAX_VALUE-3;
+    public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
 
     private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
             VERTEX:
@@ -53,24 +54,24 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     }
 
     public SpriteRenderer() {
-        this(null, null, SIZE_DEFAULT, false);
+        this(null, null, MAX_VERTEXES_DEFAULT, false);
     }
 
     public SpriteRenderer(final MediaManager mediaManager) {
-        this(mediaManager, null, SIZE_DEFAULT, false);
+        this(mediaManager, null, MAX_VERTEXES_DEFAULT, false);
     }
 
 
     public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader) {
-        this(mediaManager, defaultShader, SIZE_DEFAULT, false);
+        this(mediaManager, defaultShader, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size) {
-        this(mediaManager,defaultShader,size, false);
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes) {
+        this(mediaManager, defaultShader, maxVertexes, false);
     }
-    
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
-        super(size, defaultShader, printRenderCalls);
+
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+        super(maxVertexes, defaultShader, printRenderCalls);
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;
@@ -108,7 +109,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void begin() {
-        this.setPrimitiveType(GL32.GL_TRIANGLES);
+        super.setPrimitiveType(GL32.GL_TRIANGLES);
         super.begin();
     }
 
@@ -134,17 +135,16 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
         return VERTEXES_INDICES_RATIO;
     }
 
-
     @Override
     public void draw(final Texture texture, final float x, final float y, final float originX, final float originY, final float width, final float height, final float scaleX,
                      final float scaleY, final float rotation, final int srcX, final int srcY, final int srcWidth, final int srcHeight, final boolean flipX, final boolean flipY) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (!isVertexesAvailable()) {
+        else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -277,13 +277,13 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     @Override
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final int srcX, final int srcY, final int srcWidth,
                      final int srcHeight, final boolean flipX, final boolean flipY) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (!isVertexesAvailable()) {
+        else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -349,7 +349,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (!isVertexesAvailable()) {
+        else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -397,13 +397,13 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final float u, final float v, final float u2, final float v2) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         final float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (!isVertexesAvailable()) {
+        else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -452,13 +452,13 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void draw(final Texture texture, final float x, final float y, final float width, final float height) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
-        else if (!isVertexesAvailable()) {
+        else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -506,7 +506,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void draw(final Texture texture, final float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         count = (count / 5) * 6;
         final int verticesLength = vertices.length;
@@ -553,7 +553,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
 
     public void drawExactly(final Texture texture, final float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         int verticesLength = vertices.length;
         int remainingVertices = verticesLength;
@@ -588,13 +588,13 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void draw(final TextureRegion region, final float x, final float y, final float width, final float height) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         final float[] vertices = this.vertices;
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (!isVertexesAvailable()) {
+        } else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -643,14 +643,14 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     @Override
     public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (!isVertexesAvailable()) {
+        } else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -771,14 +771,14 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     @Override
     public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation, boolean clockwise) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (!isVertexesAvailable()) {
+        } else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -915,14 +915,14 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     @Override
     public void draw(final TextureRegion region, final float width, final float height, Affine2 transform) {
-        if (!drawing) throw new IllegalStateException("SpriteRenderer.begin must be called before draw.");
+        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
-        } else if (!isVertexesAvailable()) {
+        } else if (isVertexLimitReached()) {
             flush();
         }
 
@@ -976,7 +976,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     }
 
-    @SuppressWarnings("RedundantCast") // These casts are absolutely not redundant! Java 9 changed Buffer ABI.
     @Override
     public void flush() {
         if (idx == 0) return;
@@ -994,10 +993,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
         throw new RuntimeException("not supported");
     }
 
-    @Override
-    protected void onSetupMatrices() {
-    }
-
     protected void switchTexture(final Texture texture) {
         flush();
         lastTexture = texture;
@@ -1006,7 +1001,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
         shader.setUniformi(uniformLocation(TEXTURE_UNIFORM), 0);
         shader.setUniformf(uniformLocation(TEXTURE_SIZE_UNIFORM), texture.getWidth(), texture.getHeight());
     }
-    
+
     @Override
     public ShaderProgram getShader() {
         return this.shader;
@@ -1032,7 +1027,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
     }
 
     public void bindCMediaImageToUniform(CMediaImage cMediaImage, String uniform, String sizeUniform) {
-        if(cMediaImage.useAtlas)
+        if (cMediaImage.useAtlas)
             throw new RuntimeException("Texures used as samplers should not be in a TextureAtlas");
         bindTextureToUniform(mediaManager.image(cMediaImage).getTexture(), uniform, sizeUniform);
     }

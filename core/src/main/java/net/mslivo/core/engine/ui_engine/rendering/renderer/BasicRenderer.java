@@ -23,7 +23,7 @@ public abstract class BasicRenderer {
     protected static final String ERROR_END_BEGIN = ".end() must be called before begin.";
     protected static final String ERROR_BEGIN_END = ".begin() must be called before end.";
 
-    protected final int size, sizeMax;
+    protected final int maxVertexes, sizeMax;
     protected final int vertexSize;
     protected final int indicesSize;
     protected final int vertexIndicesRatio;
@@ -49,16 +49,16 @@ public abstract class BasicRenderer {
 
     protected int primitiveType;
 
-    public BasicRenderer(final int size, final ShaderProgram defaultShader, boolean printRenderCalls) {
-        this.size = size;
+    public BasicRenderer(final int maxVertexes, final ShaderProgram defaultShader, boolean printRenderCalls) {
+        this.maxVertexes = maxVertexes;
         this.printRenderCalls = printRenderCalls;
         this.vertexSize = getVertexSize();
         this.indicesSize = getIndicesSize();
         this.vertexIndicesRatio = getVertexIndicesRatio();
         this.sizeMax = Integer.MAX_VALUE / (this.vertexSize * 4);
-        if (size > this.sizeMax)
-            throw new IllegalArgumentException("size " + size + " bigger than mix allowed size " + this.sizeMax);
-        if (size % this.vertexIndicesRatio != 0)
+        if (maxVertexes > this.sizeMax)
+            throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + this.sizeMax);
+        if (maxVertexes % this.vertexIndicesRatio != 0)
             throw new IllegalArgumentException("size is not multiple of ratio " + vertexIndicesRatio);
 
 
@@ -67,9 +67,9 @@ public abstract class BasicRenderer {
         this.combinedMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        this.vertexData = createVertexData(this.size);
-        this.indexData = createIndexData(this.size);
-        this.vertices = createVerticesArray(this.size);
+        this.vertexData = createVertexData(this.maxVertexes);
+        this.indexData = createIndexData(this.maxVertexes);
+        this.vertices = createVerticesArray(this.maxVertexes);
 
         this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
         this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
@@ -89,7 +89,7 @@ public abstract class BasicRenderer {
         Gdx.gl.glDepthMask(false);
 
         this.shader.bind();
-        setupMatrices();
+        this.setupMatrices();
 
         Gdx.gl.glEnable(GL32.GL_BLEND);
         Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
@@ -105,11 +105,6 @@ public abstract class BasicRenderer {
         if (printRenderCalls)
             System.out.println("renderFlushes: " + this.renderCalls);
     }
-
-    protected boolean isVertexesAvailable() {
-        return idx < vertices.length;
-    }
-
 
     private ShaderProgram defaultShader() {
         if (this.defaultShader == null)
@@ -135,12 +130,6 @@ public abstract class BasicRenderer {
         return this.shader;
     }
 
-    protected void setupMatrices() {
-        combinedMatrix.set(projectionMatrix).mul(transformMatrix);
-        shader.setUniformMatrix(uniformLocation(PROJTRANS_UNIFORM), combinedMatrix);
-        this.onSetupMatrices();
-    }
-
     public void flush() {
         if (idx == 0) return;
 
@@ -158,7 +147,6 @@ public abstract class BasicRenderer {
         indexBuffer.limit(indicesCount);
         indexData.bind();
 
-
         // Draw
         Gdx.gl32.glDrawElements(this.primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
 
@@ -166,27 +154,11 @@ public abstract class BasicRenderer {
         this.renderCalls++;
     }
 
-    private float[] createVerticesArray(int size) {
-        return new float[size * this.vertexSize];
-    }
 
     public int getRenderCalls() {
         return renderCalls;
     }
 
-    protected int uniformLocation(String uniform) {
-        ObjectIntMap uniformMap = uniformLocationCache.get(this.shader);
-        if (uniformMap == null) {
-            uniformMap = new ObjectIntMap<>();
-            uniformLocationCache.put(this.shader, uniformMap);
-        }
-        int location = uniformMap.get(uniform, -1);
-        if (location == -1) {
-            location = this.shader.getUniformLocation(uniform);
-            uniformMap.put(uniform, location);
-        }
-        return location;
-    }
 
     public Matrix4 getProjectionMatrix() {
         return projectionMatrix;
@@ -244,11 +216,11 @@ public abstract class BasicRenderer {
     }
 
     public void setBlendFunctionLayer() {
-        this.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        this.setBlendFunctionSeparate(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setBlendFunctionComposite() {
-        this.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        this.setBlendFunction(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void setBlendFunctionReset() {
@@ -297,28 +269,45 @@ public abstract class BasicRenderer {
         return blend[ALPHA_DST];
     }
 
-    protected float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
-        return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
-                | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
-    }
-
     public void saveState() {
         System.arraycopy(this.blend, 0, this.blend_reset, 0, 4);
-        this.onSaveState();
     }
 
     public void loadState() {
         setBlendFunctionSeparate(this.blend_save[RGB_SRC], this.blend_save[RGB_DST], this.blend_save[ALPHA_SRC], this.blend_save[ALPHA_DST]);
-        this.onLoadState();
     }
 
     public boolean isDrawing() {
         return drawing;
     }
 
-    protected abstract void onSaveState();
+    protected void setupMatrices() {
+        combinedMatrix.set(projectionMatrix).mul(transformMatrix);
+        shader.setUniformMatrix(uniformLocation(PROJTRANS_UNIFORM), combinedMatrix);
+    }
 
-    protected abstract void onLoadState();
+    protected float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
+        return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
+                | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
+    }
+
+    protected boolean isVertexLimitReached() {
+        return idx >= vertices.length;
+    }
+
+    protected int uniformLocation(String uniform) {
+        ObjectIntMap uniformMap = uniformLocationCache.get(this.shader);
+        if (uniformMap == null) {
+            uniformMap = new ObjectIntMap<>();
+            uniformLocationCache.put(this.shader, uniformMap);
+        }
+        int location = uniformMap.get(uniform, -1);
+        if (location == -1) {
+            location = this.shader.getUniformLocation(uniform);
+            uniformMap.put(uniform, location);
+        }
+        return location;
+    }
 
     protected abstract int getVertexSize();
 
@@ -330,9 +319,9 @@ public abstract class BasicRenderer {
 
     protected abstract VertexData createVertexData(int size);
 
-
     protected abstract ShaderProgram provideDefaultShader();
 
-    protected abstract void onSetupMatrices();
-
+    private float[] createVerticesArray(int size) {
+        return new float[size * this.vertexSize];
+    }
 }

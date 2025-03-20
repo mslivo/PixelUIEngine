@@ -22,8 +22,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     private static final int INDICES_SIZE = 1;
     private static final int VERTEXES_INDICES_RATIO = 1;
 
-    public static final int SIZE_DEFAULT = 65534;
-    public static final int SIZE_MAX = Integer.MAX_VALUE;
+    public static final int MAX_VERTEXES_DEFAULT = 65534;
 
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
@@ -52,15 +51,15 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     private float vertexColor_save;
 
     public PrimitiveRenderer(final ShaderProgram defaultShader) {
-        this(defaultShader, SIZE_DEFAULT, false);
+        this(defaultShader, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size) {
-        this(defaultShader, size,false);
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes) {
+        this(defaultShader, maxVertexes,false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
-        super(size, defaultShader, printRenderCalls);
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+        super(maxVertexes, defaultShader, printRenderCalls);
         this.indexResets = new IntArray();
         this.restartInsertedLast = false;
         this.vertexColor_reset = colorPackedRGBA(1f, 1f, 1f, 1f);
@@ -114,7 +113,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (this.restartInsertedLast)
             return;
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
@@ -123,7 +122,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         final int currentIndex = idx / vertexSize;
 
         IntBuffer intBuffer = indexData.getBuffer(true);
-        intBuffer.limit(this.size);
+        intBuffer.limit(this.maxVertexes);
         intBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
@@ -159,15 +158,15 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x + 0.5f);
         vertices[idx + 1] = (y + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
@@ -177,28 +176,28 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
 
         // Vertex 2
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x2 + 0.5f);
         vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
@@ -208,41 +207,41 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x1 + 0.5f);
         vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
 
         // Vertex 2
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x2 + 0.5f);
         vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
 
         // Vertex 3
-        if (!isVertexesAvailable()) {
+        if (isVertexLimitReached()) {
             flush();
         }
 
         vertices[idx] = (x3 + 0.5f);
         vertices[idx + 1] = (y3 + 0.5f);
-        vertices[idx + 2] = vertexColor;
-        vertices[idx + 3] = color;
-        vertices[idx + 4] = tweak;
+        vertices[idx + 2] = this.vertexColor;
+        vertices[idx + 3] = super.color;
+        vertices[idx + 4] = super.tweak;
 
         idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
@@ -251,11 +250,6 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     @Override
     protected ShaderProgram provideDefaultShader() {
         return DEFAULT_SHADER.compile();
-    }
-
-    @Override
-    protected void onSetupMatrices() {
-
     }
 
     @Override
@@ -294,12 +288,15 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     }
 
     @Override
-    protected void onSaveState() {
+    public void saveState() {
+        super.saveState();
         this.vertexColor_save = this.vertexColor;
     }
 
     @Override
-    protected void onLoadState() {
+    public void loadState() {
+        super.loadState();
         this.vertexColor = this.vertexColor_save;
     }
+
 }

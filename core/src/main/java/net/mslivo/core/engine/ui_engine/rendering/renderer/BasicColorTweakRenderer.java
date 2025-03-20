@@ -15,8 +15,8 @@ public abstract class BasicColorTweakRenderer extends BasicRenderer {
     protected float color_save;
     protected float color_reset;
 
-    public BasicColorTweakRenderer(final int size, final ShaderProgram defaultShader, final boolean printRenderCalls) {
-        super(size, defaultShader, printRenderCalls);
+    public BasicColorTweakRenderer(final int maxVertexes, final ShaderProgram defaultShader, final boolean printRenderCalls) {
+        super(maxVertexes, defaultShader, printRenderCalls);
 
         this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0.0f);
         this.tweak_save = tweak_reset;
@@ -28,14 +28,15 @@ public abstract class BasicColorTweakRenderer extends BasicRenderer {
     }
 
     @Override
-    protected void onSaveState() {
+    public void saveState() {
+        super.saveState();
         this.color_save = this.color;
         this.tweak_save = this.tweak;
     }
 
 
-    @Override
-    protected void onLoadState() {
+    public void loadState() {
+        super.loadState();
         setPackedColor(this.color_save);
         setPackedTweak(this.tweak_save);
     }

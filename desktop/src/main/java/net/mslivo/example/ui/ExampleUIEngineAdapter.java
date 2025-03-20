@@ -31,7 +31,7 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = false;
+    private static final boolean IM_PERFORMANCE_TEST = true;
     private static final boolean SPRITE_PERFORMANCE_TEST = false;
     private API api;
     private MediaManager mediaManager;
@@ -66,9 +66,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.SIZE_DEFAULT);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.MAX_VERTEXES_DEFAULT);
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
-        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.SIZE_DEFAULT * 3);
+        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
         this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
@@ -203,19 +203,19 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
             primitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.nanoTime();
-            final int VERTEXES = 10000;
+            final int VERTEXES = 50;
 
             primitiveRenderer.begin();
             for (int i = 0; i < VERTEXES; i++) {
-                for (int ix = 0; ix < 10; ix++) {
-                    for (int iy = 0; iy < 10; iy++) {
-                        primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 0.5f);
-                        primitiveRenderer.vertex(100 + ix, 100 + iy);
+                for (int ix = 0; ix < 64; ix++) {
+                    for (int iy = 0; iy < 64; iy++) {
+                        primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 1f);
+                        primitiveRenderer.vertex(100 + ix, 200 + iy);
                     }
                 }
             }
             primitiveRenderer.end();
-            System.out.println(VERTEXES + " Vertexes: " + ((System.nanoTime() - time) / 1000) + "ns");
+            System.out.println((VERTEXES*(64*64)) + " Vertexes: " + ((System.nanoTime() - time) / 1000) + "ns");
         }
 
 
@@ -327,11 +327,14 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
             long time = System.nanoTime();
             spriteRenderer.begin();
-            for (int i = 0; i < 2; i++) {
+
+            int amount = 50;
+
+            for (int i = 0; i < amount; i++) {
                 for (int ix = 0; ix < 64; ix++) {
                     for (int iy = 0; iy < 64; iy++) {
                         spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
-                        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 300 + ix, 200 + iy);
+                        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_ICON_CLOSE, 200 + ix, 300 + iy);
                     }
                 }
             }
@@ -345,7 +348,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             spriteRenderer.end();
 
 
-            System.out.println(((System.nanoTime() - time) / 1000) + "ns");
+            System.out.println("sprites:"+(amount*(64*64))+", rendercalls:" +spriteRenderer.getRenderCalls()+" - time: "+((System.nanoTime() - time) / 1000) + "ns");
 
         }
 

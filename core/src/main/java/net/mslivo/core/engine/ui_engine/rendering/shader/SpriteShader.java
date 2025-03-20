@@ -8,7 +8,7 @@ public final class SpriteShader extends ShaderCommon {
     private static final String EXTENSION = ".sprite.glsl";
 
     private static final String VERTEX_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""
-                                
+                    
                     attribute vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
