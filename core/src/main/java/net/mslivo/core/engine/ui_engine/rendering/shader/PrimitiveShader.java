@@ -5,6 +5,7 @@ import net.mslivo.core.engine.tools.Tools;
 
 public final class PrimitiveShader extends ShaderCommon {
 
+
     private static final String EXTENSION = ".primitive.glsl";
 
     private static final String VERTEX_SHADER_TEMPLATE = FLOAT_DECLARATIONS +"""

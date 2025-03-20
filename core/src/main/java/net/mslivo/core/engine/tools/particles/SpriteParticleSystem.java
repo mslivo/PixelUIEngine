@@ -3,7 +3,7 @@ package net.mslivo.core.engine.tools.particles;
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.particles.particles.*;
-import net.mslivo.core.engine.ui_engine.rendering.SpriteRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
@@ -18,11 +18,11 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         this.spriteRendererBackupColor = new Color(Color.CLEAR);
     }
 
-    public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer) {
+    public void render(MediaManager mediaManager, SpriteBasicColorTweakRenderer spriteRenderer) {
         render(mediaManager, spriteRenderer, 0);
     }
 
-    public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer, float animation_timer) {
+    public void render(MediaManager mediaManager, SpriteBasicColorTweakRenderer spriteRenderer, float animation_timer) {
         if (super.numParticles == 0) return;
         this.spriteRendererBackupColor.set(spriteRenderer.getColor());
         for (int i = 0; i < particles.size(); i++) {

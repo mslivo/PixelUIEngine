@@ -2,7 +2,7 @@ package net.mslivo.core.engine.tools.particles;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.tools.particles.particles.PrimitiveParticle;
-import net.mslivo.core.engine.ui_engine.rendering.PrimitiveRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveBasicColorTweakRenderer;
 
 public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
@@ -18,7 +18,7 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         this.primitiveRendererBackupColor = new Color(Color.CLEAR);
     }
 
-    public void render(PrimitiveRenderer primitiveRenderer) {
+    public void render(PrimitiveBasicColorTweakRenderer primitiveRenderer) {
         if (super.numParticles == 0) return;
         this.primitiveRendererBackupColor.set(primitiveRenderer.getVertexColor());
         for (int i = 0; i < particles.size(); i++) {

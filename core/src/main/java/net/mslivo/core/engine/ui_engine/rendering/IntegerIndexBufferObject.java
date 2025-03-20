@@ -2,6 +2,8 @@ package net.mslivo.core.engine.ui_engine.rendering;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL32;
+import com.badlogic.gdx.graphics.glutils.IndexBufferObject;
+import com.badlogic.gdx.graphics.glutils.IndexData;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
