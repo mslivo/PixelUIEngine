@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public class ZoomOutTransition extends Transition {
     private float zoom, zoomAcc;
@@ -27,7 +27,7 @@ public class ZoomOutTransition extends Transition {
     }
 
     @Override
-    public void init(SpriteBasicColorTweakRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.zoom = 1f;
@@ -41,7 +41,7 @@ public class ZoomOutTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
         if(zoom > 0f) {
             spriteRenderer.draw(texture_from,
                     MathUtils.round(screenWidth * (1f - zoom) * 0.5f),
@@ -52,13 +52,13 @@ public class ZoomOutTransition extends Transition {
     }
 
     @Override
-    public void renderTo(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_to, 0, 0);
     }
 
     @Override
-    public void finished(SpriteBasicColorTweakRenderer spriteRenderer) {
+    public void finished(SpriteRenderer spriteRenderer) {
 
     }
 

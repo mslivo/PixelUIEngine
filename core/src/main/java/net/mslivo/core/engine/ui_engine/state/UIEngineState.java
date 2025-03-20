@@ -11,8 +11,8 @@ import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.constants.TILE_SIZE;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveBasicColorTweakRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputProcessor;
@@ -61,8 +61,8 @@ public final class UIEngineState {
     public NestedFrameBuffer frameBuffer_app;
 
     /* #################### Graphics: GUI #################### */
-    public SpriteBasicColorTweakRenderer spriteRenderer_ui;
-    public PrimitiveBasicColorTweakRenderer primitiveRenderer_ui;
+    public SpriteRenderer spriteRenderer_ui;
+    public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBufferComponent_ui;
     public NestedFrameBuffer frameBufferModal_ui;

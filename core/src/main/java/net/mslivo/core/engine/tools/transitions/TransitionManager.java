@@ -10,7 +10,7 @@ import net.mslivo.core.engine.ui_engine.UIEngine;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public class TransitionManager {
     private static final String ERROR_FROM_TO_NULL = "\"from\" and \"to\" are both null";
@@ -19,7 +19,7 @@ public class TransitionManager {
     private TextureRegion texture_from;
     private NestedFrameBuffer frameBuffer_to;
     private TextureRegion texture_to;
-    private SpriteBasicColorTweakRenderer spriteRenderer_screen;
+    private SpriteRenderer spriteRenderer_screen;
     private Viewport viewport_screen;
     private OrthographicCamera camera_screen;
     private Transition transition;
@@ -67,7 +67,7 @@ public class TransitionManager {
         this.camera_screen.setToOrtho(false);
         this.viewport_screen = createViewport(this.viewportMode, this.camera_screen, this.resolutionWidth, this.resolutionHeight);
 
-        this.spriteRenderer_screen = new SpriteBasicColorTweakRenderer();
+        this.spriteRenderer_screen = new SpriteRenderer();
         this.spriteRenderer_screen.setColor(Color.GRAY);
         this.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 

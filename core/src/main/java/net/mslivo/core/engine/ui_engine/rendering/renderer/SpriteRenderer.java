@@ -13,7 +13,7 @@ import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 
-public class SpriteBasicColorTweakRenderer extends BasicColorTweakRenderer implements Batch  {
+public class SpriteRenderer extends BasicColorTweakRenderer implements Batch  {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
@@ -52,24 +52,24 @@ public class SpriteBasicColorTweakRenderer extends BasicColorTweakRenderer imple
         return DEFAULT_SHADER.compile();
     }
 
-    public SpriteBasicColorTweakRenderer() {
+    public SpriteRenderer() {
         this(null, null, SIZE_DEFAULT, false);
     }
 
-    public SpriteBasicColorTweakRenderer(final MediaManager mediaManager) {
+    public SpriteRenderer(final MediaManager mediaManager) {
         this(mediaManager, null, SIZE_DEFAULT, false);
     }
 
 
-    public SpriteBasicColorTweakRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader) {
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader) {
         this(mediaManager, defaultShader, SIZE_DEFAULT, false);
     }
 
-    public SpriteBasicColorTweakRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size) {
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size) {
         this(mediaManager,defaultShader,size, false);
     }
     
-    public SpriteBasicColorTweakRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
         super(size, defaultShader, printRenderCalls);
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;

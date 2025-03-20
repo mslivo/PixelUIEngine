@@ -18,8 +18,8 @@ import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveBasicColorTweakRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
@@ -37,8 +37,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
-    private SpriteBasicColorTweakRenderer spriteRenderer;
-    private PrimitiveBasicColorTweakRenderer primitiveRenderer;
+    private SpriteRenderer spriteRenderer;
+    private PrimitiveRenderer primitiveRenderer;
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
 
@@ -66,9 +66,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRenderer = new SpriteBasicColorTweakRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteBasicColorTweakRenderer.SIZE_DEFAULT);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.SIZE_DEFAULT);
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
-        this.primitiveRenderer = new PrimitiveBasicColorTweakRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveBasicColorTweakRenderer.SIZE_DEFAULT * 3);
+        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.SIZE_DEFAULT * 3);
         this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         api.config.window.setDefaultEnforceScreenBounds(false);

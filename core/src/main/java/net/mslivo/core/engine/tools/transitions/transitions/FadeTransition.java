@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public class FadeTransition extends Transition {
     private float fadeOut;
@@ -24,7 +24,7 @@ public class FadeTransition extends Transition {
     }
 
     @Override
-    public void init(SpriteBasicColorTweakRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
     }
@@ -43,7 +43,7 @@ public class FadeTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
         if(this.fadeOut < 1f){
             float color = Math.clamp(0.5f-(fadeOut*0.5f),0f,1f);
             spriteRenderer.setTweak(color,0.5f,0.5f,0.0f);
@@ -54,7 +54,7 @@ public class FadeTransition extends Transition {
     }
 
     @Override
-    public void renderTo(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         if(this.fadeOut >= 1 && this.fadeIn <= 1f){
             float color = Math.clamp(fadeIn*0.5f,0f,1f);
             spriteRenderer.setTweak(color,0.5f,0.5f,0.0f);
@@ -67,7 +67,7 @@ public class FadeTransition extends Transition {
 
 
     @Override
-    public void finished(SpriteBasicColorTweakRenderer spriteRenderer) {
+    public void finished(SpriteRenderer spriteRenderer) {
 
     }
 

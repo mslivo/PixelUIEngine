@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public class FallInTransition extends Transition {
     private float yTo;
@@ -34,7 +34,7 @@ public class FallInTransition extends Transition {
 
 
     @Override
-    public void init(SpriteBasicColorTweakRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.yTo = screenHeight;
         this.ySpeed = 0f;
         this.screenHeight = screenHeight;
@@ -57,19 +57,19 @@ public class FallInTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_from, 0, 0);
     }
 
     @Override
-    public void renderTo(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_to, 0, MathUtils.round(yTo));
     }
 
     @Override
-    public void finished(SpriteBasicColorTweakRenderer spriteRenderer) {
+    public void finished(SpriteRenderer spriteRenderer) {
 
     }
 

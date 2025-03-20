@@ -17,8 +17,8 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveBasicColorTweakRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -133,9 +133,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
-        newUIEngineState.spriteRenderer_ui = new SpriteBasicColorTweakRenderer(this.mediaManager,new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
+        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager,new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
         newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
-        newUIEngineState.primitiveRenderer_ui = new PrimitiveBasicColorTweakRenderer(new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile());
+        newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile());
         newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -1908,7 +1908,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     public void render(boolean drawToScreen) {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         { // Draw App Layer
             // Draw Main FrameBuffer
@@ -1994,8 +1994,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void renderUIModalLayer() {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveBasicColorTweakRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
@@ -2032,8 +2032,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void renderUIComponentLayer() {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveBasicColorTweakRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
@@ -2067,7 +2067,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_mouseTextInput() {
         if (uiEngineState.openMouseTextInput == null) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
         final Color color1 = uiEngineState.openMouseTextInput.color;
         final Color color2 = uiEngineState.openMouseTextInput.color2;
@@ -2100,7 +2100,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_mouseTextInputCharacter(char c, int x, int y, Color color1, Color colorFont, float textInputAlpha, boolean upperCase, boolean pressed) {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final int pressedIndex = pressed ? 1 : 0;
 
         render_setColor(spriteRenderer, color1, textInputAlpha, false);
@@ -2128,7 +2128,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawCursor() {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.cursor != null) {
             int center_x = mediaManager.spriteWidth(uiEngineState.cursor) / 2;
@@ -2229,7 +2229,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawComponentTopLayer(Component component) {
         if (render_isComponentNotRendered(component)) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = componentGrayScale(component);
 
@@ -2289,7 +2289,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawContextMenu() {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.openContextMenu != null) {
 
@@ -2358,8 +2358,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawTooltip(int x, int y, Tooltip tooltip, float alpha) {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveBasicColorTweakRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         // Determine Dimensions
         final int tooltip_width = tooltipWidth(tooltip);
@@ -2501,7 +2501,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
         if (tooltip == null) return;
         if (tooltip.segments.isEmpty()) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float lineAlpha = tooltip.color_line.a * uiEngineState.tooltip_fadePct;
         final int tooltip_width = tooltipWidth(tooltip);
         if (tooltip_width == 0) return;
@@ -2574,7 +2574,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawTooltipNotifications() {
         if (uiEngineState.tooltipNotifications.isEmpty()) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++) {
             TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
@@ -2603,7 +2603,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawTopNotifications() {
         if (uiEngineState.topNotifications.isEmpty()) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
         int y = 0;
@@ -2642,7 +2642,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 return;
         }
 
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float windowAlpha = window.color.a;
 
         render_setColor(spriteRenderer, window.color, windowAlpha, false);
@@ -2687,7 +2687,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.setAllReset();
     }
 
-    private void render_setColor(PrimitiveBasicColorTweakRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
+    private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
         if (grayScale) {
             saturation = 0f;
@@ -2701,7 +2701,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         primitiveRenderer.setTweak(0.5f, saturation, lightness,0f);
     }
 
-    private void render_setColor(SpriteBasicColorTweakRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
+    private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
         if (grayScale) {
             saturation = 0f;
@@ -2718,8 +2718,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveBasicColorTweakRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = component.disabled;
 
@@ -3253,7 +3253,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawCursorDragAndDrop() {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.draggedGrid != null) {
             final Grid dragGrid = uiEngineState.draggedGrid;
@@ -3305,7 +3305,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY) {
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final BitmapFont font = mediaManager.font(uiEngineState.config.ui_font);
         final boolean withIcon = icon != null;
         if (withIcon) {
@@ -3327,7 +3327,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, Color color, float iconAlpha, boolean iconGrayscale, int arrayIndex, boolean bigMode, boolean flipX, boolean flipY) {
         if (icon == null) return;
-        final SpriteBasicColorTweakRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         spriteRenderer.saveState();
         render_setColor(spriteRenderer, color, iconAlpha, iconGrayscale);
         int scale = bigMode ? TS2() : TS();

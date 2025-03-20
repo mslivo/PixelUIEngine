@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.tools.transitions;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteBasicColorTweakRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public abstract class Transition {
 
@@ -19,14 +19,14 @@ public abstract class Transition {
 
     public abstract TRANSITION_RENDER_MODE getRenderMode();
 
-    public abstract void init(SpriteBasicColorTweakRenderer spriteRenderer, int screenWidth, int screenHeight);
+    public abstract void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight);
 
     public abstract boolean update();
 
-    public abstract void renderFrom(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_from);
+    public abstract void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from);
 
-    public abstract void renderTo(SpriteBasicColorTweakRenderer spriteRenderer, TextureRegion texture_to);
+    public abstract void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to);
 
-    public abstract void finished(SpriteBasicColorTweakRenderer spriteRenderer);
+    public abstract void finished(SpriteRenderer spriteRenderer);
 
 }

@@ -14,7 +14,7 @@ import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 
 import java.nio.IntBuffer;
 
-public class PrimitiveBasicColorTweakRenderer extends BasicColorTweakRenderer {
+public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
 
@@ -51,15 +51,15 @@ public class PrimitiveBasicColorTweakRenderer extends BasicColorTweakRenderer {
     private float vertexColor_reset;
     private float vertexColor_save;
 
-    public PrimitiveBasicColorTweakRenderer(final ShaderProgram defaultShader) {
+    public PrimitiveRenderer(final ShaderProgram defaultShader) {
         this(defaultShader, SIZE_DEFAULT, false);
     }
 
-    public PrimitiveBasicColorTweakRenderer(final ShaderProgram defaultShader, final int size) {
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size) {
         this(defaultShader, size,false);
     }
 
-    public PrimitiveBasicColorTweakRenderer(final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int size, final boolean printRenderCalls) {
         super(size, defaultShader, printRenderCalls);
         this.indexResets = new IntArray();
         this.restartInsertedLast = false;
