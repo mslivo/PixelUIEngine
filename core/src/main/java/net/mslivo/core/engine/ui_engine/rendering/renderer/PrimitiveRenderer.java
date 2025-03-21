@@ -292,7 +292,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     @Override
     public void loadState() {
         super.loadState();
-        this.vertexColor = this.vertexColor_save;
+        setPackedVertexColor(this.vertexColor_save);
     }
 
 }
