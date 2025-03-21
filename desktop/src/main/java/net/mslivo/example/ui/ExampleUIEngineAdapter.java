@@ -32,7 +32,7 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private static final boolean IM_PERFORMANCE_TEST = true;
-    private static final boolean SPRITE_PERFORMANCE_TEST = false;
+    private static final boolean SPRITE_PERFORMANCE_TEST = true;
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
@@ -325,16 +325,15 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         if (SPRITE_PERFORMANCE_TEST) {
 
-            long time = System.nanoTime();
+            long time = System.currentTimeMillis();
             spriteRenderer.begin();
+            spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
 
             int amount = 50;
-
             for (int i = 0; i < amount; i++) {
                 for (int ix = 0; ix < 64; ix++) {
                     for (int iy = 0; iy < 64; iy++) {
-                        spriteRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
-                        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_ICON_CLOSE, 200 + ix, 300 + iy);
+                        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL, 200, 300);
                     }
                 }
             }
@@ -348,7 +347,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             spriteRenderer.end();
 
 
-            System.out.println("sprites:"+(amount*(64*64))+", rendercalls:" +spriteRenderer.getRenderCalls()+" - time: "+((System.nanoTime() - time) / 1000) + "ns");
+            System.out.println("sprites:"+(amount*(64*64))+", rendercalls:" +spriteRenderer.getRenderCalls()+" - time: "+((System.currentTimeMillis()-time)) + "ms");
 
         }
 

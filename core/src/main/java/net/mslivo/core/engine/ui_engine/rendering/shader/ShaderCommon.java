@@ -29,6 +29,8 @@ public class ShaderCommon {
     protected String vertexShaderSource;
     protected String fragmentShaderSource;
 
+    private ShaderProgram compiledShader;
+
     public ShaderCommon() {
     }
 
@@ -123,9 +125,12 @@ public class ShaderCommon {
     }
 
     public ShaderProgram compile(){
-        ShaderProgram shaderProgram = new ShaderProgram(vertexShaderSource, fragmentShaderSource);
-        if(!shaderProgram.isCompiled()) {
-            String log = shaderProgram.getLog();
+        if(compiledShader != null)
+            return compiledShader;
+
+        this.compiledShader = new ShaderProgram(vertexShaderSource, fragmentShaderSource);
+        if(!this.compiledShader.isCompiled()) {
+            String log = this.compiledShader.getLog();
             String[] lines = log.lines().toList().toArray(new String[]{});
 
             String shaderSource = null;
@@ -165,9 +170,9 @@ public class ShaderCommon {
             }
 
 
-            throw new RuntimeException(shaderProgram.getLog());
+            throw new RuntimeException(this.compiledShader.getLog());
         }
-        return shaderProgram;
+        return this.compiledShader;
     }
 
 

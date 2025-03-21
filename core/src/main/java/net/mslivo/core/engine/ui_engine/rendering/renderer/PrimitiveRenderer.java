@@ -50,16 +50,16 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     private float vertexColor_reset;
     private float vertexColor_save;
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader) {
-        this(defaultShader, MAX_VERTEXES_DEFAULT, false);
+    public PrimitiveRenderer(final ShaderProgram shaderProgram) {
+        this(shaderProgram, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes) {
-        this(defaultShader, maxVertexes,false);
+    public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes) {
+        this(shaderProgram, maxVertexes,false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, defaultShader, printRenderCalls);
+    public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
+        super(maxVertexes, shaderProgram, printRenderCalls);
         this.indexResets = new IntArray();
         this.restartInsertedLast = false;
         this.vertexColor_reset = colorPackedRGBA(1f, 1f, 1f, 1f);
@@ -67,11 +67,15 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         this.vertexColor = vertexColor_reset;
     }
 
-
     public void begin() {
         begin(GL32.GL_POINTS);
     }
 
+    public void begin(int primitiveType) {
+        this.setPrimitiveType(primitiveType);
+        super.begin();
+        Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
+    }
 
     @Override
     protected int getVertexSize() {
@@ -100,14 +104,6 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
         return indexBufferObject;
     }
-
-
-    public void begin(int primitiveType) {
-        this.setPrimitiveType(primitiveType);
-        super.begin();
-        Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
-    }
-
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
