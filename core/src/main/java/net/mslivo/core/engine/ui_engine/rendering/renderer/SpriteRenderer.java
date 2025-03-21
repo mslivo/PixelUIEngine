@@ -1253,8 +1253,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
             fontVertices[idx] = colorPackedRGBA(tempColor.r, tempColor.g, tempColor.b, tempColor.a);
         }
 
-        this.draw(fontCache.getFont().getRegion().getTexture(), fontVertices, 0, fontVertices.length);
-
+        this.draw(fontCache.getFont().getRegion().getTexture(), fontVertices, 0, fontCache.getVertexCount(0));
     }
 
 }

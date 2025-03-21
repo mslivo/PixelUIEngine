@@ -7,7 +7,6 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
     private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
-    private final Color primitiveRendererBackupColor;
 
     public PrimitiveParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater) {
         this(dataClass, particleUpdater, Integer.MAX_VALUE);
@@ -15,12 +14,11 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
     public PrimitiveParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
         super(dataClass, particleUpdater, maxParticles);
-        this.primitiveRendererBackupColor = new Color(Color.CLEAR);
     }
 
     public void render(PrimitiveRenderer primitiveRenderer) {
         if (super.numParticles == 0) return;
-        this.primitiveRendererBackupColor.set(primitiveRenderer.getVertexColor());
+        primitiveRenderer.saveState();
         for (int i = 0; i < particles.size(); i++) {
             PrimitiveParticle<T> primitiveParticle = (PrimitiveParticle) particles.get(i);
             if (!primitiveParticle.visible) continue;
@@ -39,7 +37,7 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
                 primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
             }
         }
-        primitiveRenderer.setVertexColor(primitiveRendererBackupColor);
+        primitiveRenderer.loadState();
     }
 
 

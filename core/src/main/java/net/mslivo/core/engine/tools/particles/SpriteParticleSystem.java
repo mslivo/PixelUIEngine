@@ -7,15 +7,12 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
-    private final Color spriteRendererBackupColor;
-
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater) {
         this(dataClass, particleUpdater, Integer.MAX_VALUE);
     }
 
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
         super(dataClass, particleUpdater, maxParticles);
-        this.spriteRendererBackupColor = new Color(Color.CLEAR);
     }
 
     public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer) {
@@ -24,7 +21,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
     public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer, float animation_timer) {
         if (super.numParticles == 0) return;
-        this.spriteRendererBackupColor.set(spriteRenderer.getColor());
+        spriteRenderer.saveState();
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = (SpriteParticle) particles.get(i);
             if (!particle.visible) continue;
@@ -57,7 +54,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
             }
         }
 
-        spriteRenderer.setColor(spriteRendererBackupColor);
+        spriteRenderer.loadState();
     }
 
     public ImageParticle<T> addImageParticle(CMediaImage cMediaImage, float x, float y) {
