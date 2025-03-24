@@ -31,8 +31,8 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = true;
-    private static final boolean SPRITE_PERFORMANCE_TEST = true;
+    private static final boolean IM_PERFORMANCE_TEST = false;
+    private static final boolean SPRITE_PERFORMANCE_TEST = false;
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;

@@ -548,7 +548,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ArrayList<String> items = new ArrayList<>();
              for(int i=0;i<40;i++)
             items.add("Item "+i);
-        APIComposites.APICompositeGrid.PageAbleReadOnlyGrid pageGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, null);
+        APIComposites.APICompositeGrid.PageAbleReadOnlyGrid pageGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 5, items, null,false, true,false);
         api.composites.grid.pageableReadOnlyGridSetGridAction(pageGrid,new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
