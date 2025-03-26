@@ -546,15 +546,15 @@ public final class APIComponent {
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction) {
-            return create(x, y, width, tabs, selectedTab, DEFAULT_TABBAR_ACTION, false, 0, 0, false);
+            return create(x, y, width, tabs, selectedTab, tabBarAction, false, 0, 0, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight) {
-            return create(x, y, width, tabs, selectedTab, DEFAULT_TABBAR_ACTION, border, borderHeight, 0, false);
+            return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 0, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset) {
-            return create(x, y, width, tabs, selectedTab, DEFAULT_TABBAR_ACTION, border, borderHeight, tabOffset, false);
+            return create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, tabOffset, false);
         }
 
         public Tabbar create(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, int tabOffset, boolean bigIconMode) {
