@@ -73,11 +73,11 @@ public abstract class BasicRenderer {
         this.combinedMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        this.vertexBufferObject = createVertexData(this.sizeMaxVertexes);
+        this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
         this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
         this.vertexBuffer.limit(this.sizeMaxVertexFloats);
 
-        this.indexBufferObject = createIndexData(this.sizeMaxVertexes);
+        this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
         this.indexBuffer = this.indexBufferObject.getBuffer(true);
 
         this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
@@ -375,9 +375,9 @@ public abstract class BasicRenderer {
 
     protected abstract int getVertexIndicesRatio();
 
-    protected abstract IntegerIndexBufferObject createIndexData(int size);
+    protected abstract IntegerIndexBufferObject createIndexBufferObject(int size);
 
-    protected abstract VertexBufferObjectWithVAO createVertexData(int size);
+    protected abstract VertexBufferObjectWithVAO createVertexBufferObject(int size);
 
     protected abstract ShaderProgram provideDefaultShader();
 

@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
@@ -105,7 +104,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     }
 
     @Override
-    protected IntegerIndexBufferObject createIndexData(final int size) {
+    protected IntegerIndexBufferObject createIndexBufferObject(final int size) {
         final int[] indices = new int[size * INDICES_SIZE];
 
         for (int i = 0; i < size; i++)
@@ -246,8 +245,8 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
 
     @Override
-    protected VertexBufferObjectWithVAO createVertexData(final int size) {
-        return new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
+    protected VertexBufferObjectWithVAO createVertexBufferObject(final int size) {
+        return new VertexBufferObjectWithVAO( true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),

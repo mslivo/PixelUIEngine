@@ -76,7 +76,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
     }
 
     @Override
-    protected IntegerIndexBufferObject createIndexData(int size) {
+    protected IntegerIndexBufferObject createIndexBufferObject(int size) {
         int len = (size / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
         int j = 0;
         int[] indices = new int[len];
@@ -97,7 +97,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
 
 
     @Override
-    protected VertexBufferObjectWithVAO createVertexData(int size) {
+    protected VertexBufferObjectWithVAO createVertexBufferObject(int size) {
         return new VertexBufferObjectWithVAO(true, size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
