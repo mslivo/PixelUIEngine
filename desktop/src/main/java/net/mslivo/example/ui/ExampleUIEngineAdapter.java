@@ -31,8 +31,8 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
-    private static final boolean IM_PERFORMANCE_TEST = false;
-    private static final boolean SPRITE_PERFORMANCE_TEST = false;
+    private static final boolean IM_PERFORMANCE_TEST = false; // ~ 1000ms
+    private static final boolean SPRITE_PERFORMANCE_TEST = false; // ~10ms
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
@@ -237,6 +237,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
 
+
         primitiveRenderer.begin(GL32.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
@@ -265,7 +266,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(100, 140);
         primitiveRenderer.vertex(120, 140);
         primitiveRenderer.vertex(110, 160);
-        primitiveRenderer.vertex(110, 170);
+        primitiveRenderer.vertex(110, 180);
 
         primitiveRenderer.primitiveRestart();
 
@@ -279,34 +280,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.end();
 
 
+
         spriteRenderer.begin();
 
         spriteParticleSystem.render(mediaManager, spriteRenderer);
 
         spriteRenderer.end();
-
-        primitiveRenderer.begin();
-        primitiveParticleSystem.render(primitiveRenderer);
-
-
-        primitiveRenderer.end();
-
-        // Primitive perfromance test
-        primitiveRenderer.begin(GL32.GL_POINTS);
-
-        int vertexCount = 0;
-        for (int i = 0; i < 20; i++) {
-            for (int ix = 0; ix < 64; ix++) {
-                for (int iy = 0; iy < 64; iy++) {
-                    primitiveRenderer.setColor(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f);
-                    primitiveRenderer.vertex(200 + ix, 200 + iy);
-                    vertexCount++;
-                }
-                primitiveRenderer.primitiveRestart();
-            }
-        }
-
-        primitiveRenderer.end();
 
 
         spriteRenderer.begin();

@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
-import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class PrimitiveRenderer extends BasicColorTweakRenderer {
@@ -23,6 +23,8 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     private static final int VERTEXES_INDICES_RATIO = 1;
 
     public static final int MAX_VERTEXES_DEFAULT = 65534;
+
+    private static final float[] DUMMY_VERTEX = new float[]{0f, 0f, 0f, 0f, 0f};
 
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
@@ -50,12 +52,16 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
     private float vertexColor_reset;
     private float vertexColor_save;
 
+    public PrimitiveRenderer() {
+        this(null, MAX_VERTEXES_DEFAULT, false);
+    }
+
     public PrimitiveRenderer(final ShaderProgram shaderProgram) {
         this(shaderProgram, MAX_VERTEXES_DEFAULT, false);
     }
 
     public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes) {
-        this(shaderProgram, maxVertexes,false);
+        this(shaderProgram, maxVertexes, false);
     }
 
     public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
@@ -73,8 +79,14 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
     public void begin(int primitiveType) {
         this.setPrimitiveType(primitiveType);
-        super.begin();
         Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
+        super.begin();
+    }
+
+    @Override
+    public void end() {
+        super.end();
+        Gdx.gl.glDisable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
     }
 
     @Override
@@ -94,7 +106,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
     @Override
     protected IntegerIndexBufferObject createIndexData(final int size) {
-        final int[] indices = new int[size*INDICES_SIZE];
+        final int[] indices = new int[size * INDICES_SIZE];
 
         for (int i = 0; i < size; i++)
             indices[i] = i;
@@ -114,21 +126,13 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         }
 
         // Insert Restart Index
-
-        final int currentIndex = idx / vertexSize;
-
-        IntBuffer intBuffer = indexData.getBuffer(true);
-        intBuffer.limit(this.maxVertexes);
-        intBuffer.put(currentIndex, PRIMITIVE_RESTART);
+        final int currentIndex = vertexBufferPosition() / vertexSize;
+        IntBuffer indicesBuffer = getIndexBuffer().getBuffer(true);
+        indicesBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
-
-        vertices[idx] = 0f;
-        vertices[idx + 1] = 0f;
-        vertices[idx + 2] = 0f;
-        vertices[idx + 3] = 0f;
-        vertices[idx + 4] = 0f;
-        idx += VERTEX_SIZE;
+        FloatBuffer vertexBuffer = getVertexBuffer().getBuffer(true);
+        vertexBuffer.position(vertexBuffer.position()+VERTEX_SIZE);
 
         this.indexResets.add(currentIndex);
         this.restartInsertedLast = true;
@@ -136,14 +140,13 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
 
     public void flush() {
-        if (idx == 0) return;
+        if (vertexBuffer.position() == 0) return;
         super.flush();
 
         if (!indexResets.isEmpty()) {
-            final IntBuffer indexBuffer = indexData.getBuffer(true);
             for (int i = indexResets.size - 1; i >= 0; i--) {
                 final int resetIndex = indexResets.items[i];
-                indexBuffer.put(resetIndex, resetIndex);
+                getIndexBuffer().getBuffer(true).put(resetIndex, resetIndex);
                 indexResets.removeIndex(i);
             }
         }
@@ -158,13 +161,12 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
             flush();
         }
 
-        vertices[idx] = (x + 0.5f);
-        vertices[idx + 1] = (y + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
+        vertexBufferPush((x + 0.5f));
+        vertexBufferPush((y + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
-        idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
     }
 
@@ -176,26 +178,24 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
             flush();
         }
 
-        vertices[idx] = (x1 + 0.5f);
-        vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
+        vertexBufferPush((x1 + 0.5f));
+        vertexBufferPush((y1 + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
-        idx += VERTEX_SIZE;
 
         // Vertex 2
         if (isVertexLimitReached()) {
             flush();
         }
 
-        vertices[idx] = (x2 + 0.5f);
-        vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
+        vertexBufferPush((x2 + 0.5f));
+        vertexBufferPush((y2 + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
-        idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
     }
 
@@ -207,39 +207,35 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
             flush();
         }
 
-        vertices[idx] = (x1 + 0.5f);
-        vertices[idx + 1] = (y1 + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
+        vertexBufferPush((x1 + 0.5f));
+        vertexBufferPush((y1 + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
-        idx += VERTEX_SIZE;
 
         // Vertex 2
         if (isVertexLimitReached()) {
             flush();
         }
 
-        vertices[idx] = (x2 + 0.5f);
-        vertices[idx + 1] = (y2 + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
-
-        idx += VERTEX_SIZE;
+        vertexBufferPush((x2 + 0.5f));
+        vertexBufferPush((y2 + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
         // Vertex 3
         if (isVertexLimitReached()) {
             flush();
         }
 
-        vertices[idx] = (x3 + 0.5f);
-        vertices[idx + 1] = (y3 + 0.5f);
-        vertices[idx + 2] = this.vertexColor;
-        vertices[idx + 3] = super.color;
-        vertices[idx + 4] = super.tweak;
+        vertexBufferPush((x3 + 0.5f));
+        vertexBufferPush((y3 + 0.5f));
+        vertexBufferPush(this.vertexColor);
+        vertexBufferPush(super.color);
+        vertexBufferPush(super.tweak);
 
-        idx += VERTEX_SIZE;
         this.restartInsertedLast = false;
     }
 
@@ -248,14 +244,14 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         return DEFAULT_SHADER.compile();
     }
 
+
     @Override
-    protected VertexData createVertexData(final int size) {
-        final VertexData vertexData = new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
+    protected VertexBufferObjectWithVAO createVertexData(final int size) {
+        return new VertexBufferObjectWithVAO(true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
-        return vertexData;
     }
 
     public void setVertexColor(Color color) {

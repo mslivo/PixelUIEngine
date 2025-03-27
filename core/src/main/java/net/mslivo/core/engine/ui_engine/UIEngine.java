@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.GridPoint2;
@@ -133,10 +134,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
-        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager,new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
-        newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
+        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile());
+        newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
         newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile());
-        newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f,0.5f,0.5f,0f);
+        newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
 
         newUIEngineState.camera_ui = new OrthographicCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.camera_ui.setToOrtho(false, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -1902,7 +1903,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         return false;
     }
 
-
     public void render() {
         render(true);
     }
@@ -1966,8 +1966,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
 
                 switch (uiEngineState.viewportMode) {
-                    case STRETCH, FIT -> spriteRenderer.draw(uiEngineState.frameBuffer_upScaled_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-                    case PIXEL_PERFECT -> spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    case STRETCH, FIT ->
+                            spriteRenderer.draw(uiEngineState.frameBuffer_upScaled_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    case PIXEL_PERFECT ->
+                            spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
                 }
 
                 spriteRenderer.end();
@@ -2011,6 +2013,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Notifications
         render_drawTooltipNotifications();
+
         render_drawTopNotifications();
 
         // Context Menu
@@ -2047,6 +2050,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             render_drawComponent(component);
         }
 
+
         // Draw Screen Components Top Layer
         for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
             Component component = uiEngineState.screenComponents.get(i);
@@ -2057,7 +2061,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
         for (int i = 0; i < uiEngineState.windows.size(); i++) {
             Window window = uiEngineState.windows.get(i);
             render_drawWindow(window, false);
+
         }
+
 
         spriteRenderer.end();
 
@@ -2242,9 +2248,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int widthPx = TS(comboBox.width);
                     for (int i = 0; i < comboBox.items.size(); i++) {
                         int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text);
-                        if(comboBox.items.get(i).comboBoxItemAction.icon() != null)
+                        if (comboBox.items.get(i).comboBoxItemAction.icon() != null)
                             itemWidth += api.TS();
-                        widthPx = Math.max(widthPx,itemWidth);
+                        widthPx = Math.max(widthPx, itemWidth);
                     }
                     int width = MathUtils.ceil((widthPx + 2) / uiEngineState.tileSize.TSF);
                     int height = comboBox.items.size();
@@ -2658,12 +2664,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
+
         if (window.hasTitleBar) {
             render_drawFont(window.title, window.x, window.y + TS(window.height) - TS(),
                     window.fontColor, windowAlpha, false, 1, 1, TS(window.width - 1),
                     window.windowAction.icon(), window.windowAction.iconIndex(), window.windowAction.iconColor(),
                     window.windowAction.iconFlipX(), window.windowAction.iconFlipY());
         }
+
+
         // Draw Components
         for (int i = 0; i < window.components.size(); i++) {
             Component component = window.components.get(i);
@@ -2684,7 +2693,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (!window.folded) render_drawComponentTopLayer(component);
         }
 
+
         spriteRenderer.setAllReset();
+
     }
 
     private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
@@ -2698,7 +2709,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         primitiveRenderer.setColor(color, alpha);
-        primitiveRenderer.setTweak(0.5f, saturation, lightness,0f);
+        primitiveRenderer.setTweak(0.5f, saturation, lightness, 0f);
     }
 
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
@@ -2724,6 +2735,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final boolean componentGrayScale = component.disabled;
 
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
+
 
         switch (component) {
             case Button button -> {
@@ -2793,6 +2805,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 spriteRenderer.loadState();
             }
             case List list -> {
+
                 boolean itemsValid = (list.items != null && list.items.size() > 0);
                 int itemFrom = 0;
                 if (itemsValid) {
@@ -2802,6 +2815,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 boolean dragEnabled = false;
                 boolean dragValid = false;
                 int drag_x = -1, drag_y = -1;
+
                 if ((uiEngineState.draggedList != null || uiEngineState.draggedGrid != null) && list == uiEngineState.lastUIMouseHover) {
                     dragEnabled = true;
                     dragValid = UICommonUtils.list_canDragIntoList(uiEngineState, list);
@@ -2858,6 +2872,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_LIST_DRAG, render_getListDragCMediaIndex(ix, list.width), drag_x + TS(ix), drag_y);
                     }
                 }
+
+
             }
             case Combobox comboBox -> {
 
@@ -3249,7 +3265,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
 
+
         spriteRenderer.setAllReset();
+
     }
 
     private void render_drawCursorDragAndDrop() {

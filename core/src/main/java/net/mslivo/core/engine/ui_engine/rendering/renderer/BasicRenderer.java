@@ -2,15 +2,16 @@ package net.mslivo.core.engine.ui_engine.rendering.renderer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,21 +24,23 @@ public abstract class BasicRenderer {
     protected static final String ERROR_END_BEGIN = ".end() must be called before begin.";
     protected static final String ERROR_BEGIN_END = ".begin() must be called before end.";
 
-    protected final int maxVertexes, sizeMax;
     protected final int vertexSize;
+    protected final int sizeMaxVertexes;
+    protected final int sizeMaxVertexFloats;
     protected final int indicesSize;
     protected final int vertexIndicesRatio;
+    protected final int sizeMaxIndicesInts;
     protected final boolean printRenderCalls;
 
-    protected final VertexData vertexData;
-    protected final IntegerIndexBufferObject indexData;
-    protected final float[] vertices;
+    protected final FloatBuffer vertexBuffer;
+    protected final IntBuffer indexBuffer;
+    protected final VertexBufferObjectWithVAO vertexBufferObject;
+    protected final IntegerIndexBufferObject indexBufferObject;
 
     protected final Color tempColor;
     protected final Matrix4 projectionMatrix, transformMatrix, combinedMatrix;
     private final HashMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
 
-    protected int idx;
     protected boolean drawing;
     protected ShaderProgram shader;
     protected ShaderProgram defaultShader;
@@ -49,16 +52,19 @@ public abstract class BasicRenderer {
 
     protected int primitiveType;
 
-    public BasicRenderer(final int maxVertexes, final ShaderProgram defaultShader, boolean printRenderCalls) {
-        this.maxVertexes = maxVertexes;
-        this.printRenderCalls = printRenderCalls;
+
+    public BasicRenderer(final int sizeMaxVertexes, final ShaderProgram defaultShader, boolean printRenderCalls) {
         this.vertexSize = getVertexSize();
         this.indicesSize = getIndicesSize();
         this.vertexIndicesRatio = getVertexIndicesRatio();
-        this.sizeMax = Integer.MAX_VALUE / (this.vertexSize * 4);
-        if (maxVertexes > this.sizeMax)
-            throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + this.sizeMax);
-        if (maxVertexes % this.vertexIndicesRatio != 0)
+        this.sizeMaxVertexes = sizeMaxVertexes;
+        this.sizeMaxVertexFloats = this.sizeMaxVertexes * vertexSize;
+        this.sizeMaxIndicesInts = (this.sizeMaxVertexes / this.vertexIndicesRatio) * indicesSize;
+        this.printRenderCalls = printRenderCalls;
+        int vertexAbsoluteLimit = Integer.MAX_VALUE / (this.vertexSize * 4);
+        if (sizeMaxVertexes > vertexAbsoluteLimit)
+            throw new IllegalArgumentException("size " + sizeMaxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
+        if (sizeMaxVertexes % this.vertexIndicesRatio != 0)
             throw new IllegalArgumentException("size is not multiple of ratio " + vertexIndicesRatio);
 
 
@@ -67,9 +73,12 @@ public abstract class BasicRenderer {
         this.combinedMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        this.vertexData = createVertexData(this.maxVertexes);
-        this.indexData = createIndexData(this.maxVertexes);
-        this.vertices = createVerticesArray(this.maxVertexes);
+        this.vertexBufferObject = createVertexData(this.sizeMaxVertexes);
+        this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
+        this.vertexBuffer.limit(this.sizeMaxVertexFloats);
+
+        this.indexBufferObject = createIndexData(this.sizeMaxVertexes);
+        this.indexBuffer = this.indexBufferObject.getBuffer(true);
 
         this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
         this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
@@ -99,7 +108,7 @@ public abstract class BasicRenderer {
 
     public void end() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-        if (idx > 0) flush();
+        flush();
         Gdx.gl.glDepthMask(true);
         this.drawing = false;
         if (printRenderCalls)
@@ -130,35 +139,78 @@ public abstract class BasicRenderer {
         return this.shader;
     }
 
+
     public void flush() {
-        if (idx == 0) return;
+        final int vertexIndex = vertexBuffer.position();
+        if (vertexBuffer.position() == 0) return;
 
         // Bind Vertices
-        this.vertexData.setVertices(vertices, 0, idx);
-        this.vertexData.bind(this.shader);
-
+        this.vertexBuffer.position(0);
+        this.vertexBuffer.limit(vertexIndex);
+        this.vertexBufferObject.getBuffer(true); // Make Dirty
+        this.vertexBufferObject.bind(this.shader);
 
         // Bind Indices
-        final int verticesCount = (idx / this.vertexSize);
+        final int verticesCount = (vertexIndex / this.vertexSize);
         final int indicesCount = (verticesCount / this.vertexIndicesRatio) * this.indicesSize;
-        final IntBuffer indexBuffer = indexData.getBuffer(true);
 
-        indexBuffer.position(0);
-        indexBuffer.limit(indicesCount);
-        indexData.bind();
+        this.indexBuffer.position(0);
+        if(this.indexBuffer.limit() != indicesCount) {
+            this.indexBuffer.limit(indicesCount);
+            this.indexBufferObject.getBuffer(true); // Make Dirty
+        }
+        this.indexBufferObject.bind();
 
         // Draw
-        Gdx.gl32.glDrawElements(this.primitiveType, indexData.getNumIndices(), GL32.GL_UNSIGNED_INT, 0);
+        Gdx.gl32.glDrawElements(this.primitiveType, indicesCount, GL32.GL_UNSIGNED_INT, 0);
 
-        this.idx = 0;
+        // Reset Buffers
+        this.vertexBuffer.position(0);
+        this.vertexBuffer.limit(sizeMaxVertexFloats);
+        this.indexBuffer.limit(sizeMaxIndicesInts);
+
         this.renderCalls++;
     }
 
+    public int getSizeMaxIndicesInts() {
+        return sizeMaxIndicesInts;
+    }
+
+    public int vertexBufferPosition() {
+        return this.vertexBuffer.position();
+    }
+
+    public int vertexBufferLimit() {
+        return this.vertexBuffer.limit();
+    }
+
+    public void vertexBufferPush(float value) {
+        this.vertexBuffer.put(value);
+    }
+
+    public void vertexBufferPush(float[] values) {
+        this.vertexBuffer.put(values);
+    }
+
+    public void setIndexBufferObject() {
+        this.indexBufferObject.getBuffer(true);
+    }
+
+    public void vertexBufferPush(float[] values, int offset, int length) {
+        this.vertexBuffer.put(values, offset, length);
+    }
 
     public int getRenderCalls() {
         return renderCalls;
     }
 
+    public IntegerIndexBufferObject getIndexBuffer() {
+        return this.indexBufferObject;
+    }
+
+    public VertexData getVertexBuffer() {
+        return this.vertexBufferObject;
+    }
 
     public Matrix4 getProjectionMatrix() {
         return projectionMatrix;
@@ -166,6 +218,10 @@ public abstract class BasicRenderer {
 
     public Matrix4 getTransformMatrix() {
         return transformMatrix;
+    }
+
+    public int getSizeMaxVertexFloats() {
+        return sizeMaxVertexFloats;
     }
 
     protected void setPrimitiveType(int primitiveType) {
@@ -193,8 +249,8 @@ public abstract class BasicRenderer {
     }
 
     public void dispose() {
-        vertexData.dispose();
-        indexData.dispose();
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
         if (this.shader == defaultShader())
             this.shader.dispose();
     }
@@ -292,7 +348,11 @@ public abstract class BasicRenderer {
     }
 
     protected boolean isVertexLimitReached() {
-        return idx >= vertices.length;
+        return this.vertexBuffer.position() >= this.vertexBuffer.limit();
+    }
+
+    public int getSizeMaxVertexes() {
+        return sizeMaxVertexes;
     }
 
     protected int uniformLocation(String uniform) {
@@ -317,11 +377,8 @@ public abstract class BasicRenderer {
 
     protected abstract IntegerIndexBufferObject createIndexData(int size);
 
-    protected abstract VertexData createVertexData(int size);
+    protected abstract VertexBufferObjectWithVAO createVertexData(int size);
 
     protected abstract ShaderProgram provideDefaultShader();
 
-    private float[] createVerticesArray(int size) {
-        return new float[size * this.vertexSize];
-    }
 }

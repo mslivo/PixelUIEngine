@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
-import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Align;
@@ -98,7 +97,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
 
 
     @Override
-    protected VertexData createVertexData(int size) {
+    protected VertexBufferObjectWithVAO createVertexData(int size) {
         return new VertexBufferObjectWithVAO(true, size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
@@ -138,8 +137,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
                      final float scaleY, final float rotation, final int srcX, final int srcY, final int srcWidth, final int srcHeight, final boolean flipX, final boolean flipY) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        float[] vertices = this.vertices;
-
         if (texture != lastTexture)
             switchTexture(texture);
         else if (isVertexLimitReached()) {
@@ -240,43 +237,40 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x1);
+        vertexBufferPush(y1);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x2);
+        vertexBufferPush(y2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(x3);
+        vertexBufferPush(y3);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(x4);
+        vertexBufferPush(y4);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final int srcX, final int srcY, final int srcWidth,
                      final int srcHeight, final boolean flipX, final boolean flipY) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-
-        float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -306,42 +300,40 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
     public void draw(final Texture texture, final float x, final float y, final int srcX, final int srcY, final int srcWidth, final int srcHeight) {
         if (!drawing) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
 
-        final float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -359,42 +351,40 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final float u, final float v, final float u2, final float v2) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        final float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -408,35 +398,34 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
@@ -447,7 +436,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
     public void draw(final Texture texture, final float x, final float y, final float width, final float height) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        float[] vertices = this.vertices;
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -465,35 +453,34 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
@@ -501,13 +488,13 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         count = (count / 5) * 6;
-        final int verticesLength = vertices.length;
+        final int verticesLength = vertexBufferLimit();
 
         int remainingVertices = verticesLength;
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= idx;
+            remainingVertices -= vertexBufferPosition();
             if (remainingVertices == 0) {
                 flush();
                 remainingVertices = verticesLength;
@@ -516,29 +503,27 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         int copyCount = Math.min(remainingVertices, count);
         final float tweak = this.tweak;
 
-        for (int s = offset, v = idx, i = 0; i < copyCount; i += 6) {
-            vertices[v++] = spriteVertices[s++];
-            vertices[v++] = spriteVertices[s++];
-            vertices[v++] = spriteVertices[s++];
-            vertices[v++] = spriteVertices[s++];
-            vertices[v++] = spriteVertices[s++];
-            vertices[v++] = this.tweak;
+        for (int s = offset, i = 0; i < copyCount; i += 6) {
+            vertexBufferPush(spriteVertices[s++]);
+            vertexBufferPush(spriteVertices[s++]);
+            vertexBufferPush(spriteVertices[s++]);
+            vertexBufferPush(spriteVertices[s++]);
+            vertexBufferPush(spriteVertices[s++]);
+            vertexBufferPush(this.tweak);
         }
-        idx += copyCount;
         count -= copyCount;
         while (count > 0) {
             offset += (copyCount / 6) * 5;
             flush();
             copyCount = Math.min(verticesLength, count);
             for (int s = offset, v = 0, i = 0; i < copyCount; i += 6) {
-                vertices[v++] = spriteVertices[s++];
-                vertices[v++] = spriteVertices[s++];
-                vertices[v++] = spriteVertices[s++];
-                vertices[v++] = spriteVertices[s++];
-                vertices[v++] = spriteVertices[s++];
-                vertices[v++] = tweak;
+                vertexBufferPush(spriteVertices[s++]);
+                vertexBufferPush(spriteVertices[s++]);
+                vertexBufferPush(spriteVertices[s++]);
+                vertexBufferPush(spriteVertices[s++]);
+                vertexBufferPush(spriteVertices[s++]);
+                vertexBufferPush(tweak);
             }
-            idx += copyCount;
             count -= copyCount;
         }
     }
@@ -547,28 +532,25 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
     public void drawExactly(final Texture texture, final float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        int verticesLength = vertices.length;
-        int remainingVertices = verticesLength;
+        int remainingVertices = vertexBufferLimit();
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= idx;
+            remainingVertices -= vertexBufferPosition();
             if (remainingVertices == 0) {
                 flush();
-                remainingVertices = verticesLength;
+                remainingVertices = vertexBufferLimit();
             }
         }
         int copyCount = Math.min(remainingVertices, count);
 
-        System.arraycopy(spriteVertices, offset, vertices, idx, copyCount);
-        idx += copyCount;
+        vertexBufferPush(spriteVertices, offset, copyCount);
         count -= copyCount;
         while (count > 0) {
             offset += copyCount;
             flush();
-            copyCount = Math.min(verticesLength, count);
-            System.arraycopy(spriteVertices, offset, vertices, 0, copyCount);
-            idx += copyCount;
+            copyCount = Math.min(vertexBufferLimit(), count);
+            vertexBufferPush(spriteVertices, offset, copyCount);
             count -= copyCount;
         }
     }
@@ -580,7 +562,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
     public void draw(final TextureRegion region, final float x, final float y, final float width, final float height) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        final float[] vertices = this.vertices;
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
             switchTexture(texture);
@@ -598,35 +579,34 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x;
-        vertices[idx + 1] = y;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x;
-        vertices[idx + 7] = fy2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = fx2;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(fy2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = fx2;
-        vertices[idx + 19] = y;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(fx2);
+        vertexBufferPush(y);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
@@ -634,7 +614,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
                      float scaleX, final float scaleY, final float rotation) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
@@ -725,35 +704,34 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x1);
+        vertexBufferPush(y1);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x2);
+        vertexBufferPush(y2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(x3);
+        vertexBufferPush(y3);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(x4);
+        vertexBufferPush(y4);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
@@ -761,7 +739,6 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
                      float scaleX, final float scaleY, final float rotation, boolean clockwise) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
@@ -869,42 +846,39 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float tweak = this.tweak;
 
 
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u1;
-        vertices[idx + 4] = v1;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x1);
+        vertexBufferPush(y1);
+        vertexBufferPush(color);
+        vertexBufferPush(u1);
+        vertexBufferPush(v1);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u2;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x2);
+        vertexBufferPush(y2);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u3;
-        vertices[idx + 16] = v3;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(x3);
+        vertexBufferPush(y3);
+        vertexBufferPush(color);
+        vertexBufferPush(u3);
+        vertexBufferPush(v3);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u4;
-        vertices[idx + 22] = v4;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(x4);
+        vertexBufferPush(y4);
+        vertexBufferPush(color);
+        vertexBufferPush(u4);
+        vertexBufferPush(v4);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
     public void draw(final TextureRegion region, final float width, final float height, Affine2 transform) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-
-        float[] vertices = this.vertices;
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
@@ -925,47 +899,46 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
 
         float u = region.getU();
         float v = region.getV2();
-        float u2 = region.getV2();
+        float u2 = region.getU2();
         float v2 = region.getV();
 
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertices[idx] = x1;
-        vertices[idx + 1] = y1;
-        vertices[idx + 2] = color;
-        vertices[idx + 3] = u;
-        vertices[idx + 4] = v;
-        vertices[idx + 5] = tweak;
+        vertexBufferPush(x1);
+        vertexBufferPush(y1);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 6] = x2;
-        vertices[idx + 7] = y2;
-        vertices[idx + 8] = color;
-        vertices[idx + 9] = u;
-        vertices[idx + 10] = v2;
-        vertices[idx + 11] = tweak;
+        vertexBufferPush(x2);
+        vertexBufferPush(y2);
+        vertexBufferPush(color);
+        vertexBufferPush(u);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 12] = x3;
-        vertices[idx + 13] = y3;
-        vertices[idx + 14] = color;
-        vertices[idx + 15] = u2;
-        vertices[idx + 16] = v2;
-        vertices[idx + 17] = tweak;
+        vertexBufferPush(x3);
+        vertexBufferPush(y3);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v2);
+        vertexBufferPush(tweak);
 
-        vertices[idx + 18] = x4;
-        vertices[idx + 19] = y4;
-        vertices[idx + 20] = color;
-        vertices[idx + 21] = u2;
-        vertices[idx + 22] = v;
-        vertices[idx + 23] = tweak;
+        vertexBufferPush(x4);
+        vertexBufferPush(y4);
+        vertexBufferPush(color);
+        vertexBufferPush(u2);
+        vertexBufferPush(v);
+        vertexBufferPush(tweak);
 
-        idx += SPRITE_SIZE;
 
     }
 
     @Override
     public void flush() {
-        if (idx == 0) return;
+        if (vertexBufferPosition() == 0) return;
         lastTexture.bind();
         super.flush();
     }
@@ -1250,7 +1223,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
             float fontColor = fontVertices[idx];
             Color.abgr8888ToColor(this.tempColor, fontColor);
             tempColor.mul(batch_r, batch_g, batch_b, batch_a);
-            fontVertices[idx] = colorPackedRGBA(tempColor.r, tempColor.g, tempColor.b, tempColor.a);
+            fontVertices[idx] = (colorPackedRGBA(tempColor.r, tempColor.g, tempColor.b, tempColor.a));
         }
 
         this.draw(fontCache.getFont().getRegion().getTexture(), fontVertices, 0, fontCache.getVertexCount(0));
