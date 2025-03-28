@@ -26,11 +26,13 @@ public abstract class BasicRenderer {
 
     protected final int vertexSize;
     protected final int sizeMaxVertexes;
-    protected final int sizeMaxVertexFloats;
+    protected final int sizeMaxVertexesFloats;
     protected final int indicesSize;
     protected final int vertexIndicesRatio;
     protected final int sizeMaxIndicesInts;
     protected final boolean printRenderCalls;
+    protected final float[] vertices;
+    protected int idx;
 
     protected final FloatBuffer vertexBuffer;
     protected final IntBuffer indexBuffer;
@@ -58,7 +60,7 @@ public abstract class BasicRenderer {
         this.indicesSize = getIndicesSize();
         this.vertexIndicesRatio = getVertexIndicesRatio();
         this.sizeMaxVertexes = sizeMaxVertexes;
-        this.sizeMaxVertexFloats = this.sizeMaxVertexes * vertexSize;
+        this.sizeMaxVertexesFloats = this.sizeMaxVertexes * vertexSize;
         this.sizeMaxIndicesInts = (this.sizeMaxVertexes / this.vertexIndicesRatio) * indicesSize;
         this.printRenderCalls = printRenderCalls;
         int vertexAbsoluteLimit = Integer.MAX_VALUE / (this.vertexSize * 4);
@@ -75,7 +77,10 @@ public abstract class BasicRenderer {
 
         this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
         this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
-        this.vertexBuffer.limit(this.sizeMaxVertexFloats);
+        this.vertexBuffer.limit(this.sizeMaxVertexesFloats);
+
+        this.vertices = new float[this.sizeMaxVertexesFloats];
+        this.idx = 0;
 
         this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
         this.indexBuffer = this.indexBufferObject.getBuffer(true);
@@ -141,21 +146,18 @@ public abstract class BasicRenderer {
 
 
     public void flush() {
-        final int vertexIndex = vertexBuffer.position();
-        if (vertexBuffer.position() == 0) return;
+        if (idx == 0) return;
 
         // Bind Vertices
-        this.vertexBuffer.position(0);
-        this.vertexBuffer.limit(vertexIndex);
-        this.vertexBufferObject.getBuffer(true); // Make Dirty
+        this.vertexBufferObject.setVertices(vertices, 0, idx);
         this.vertexBufferObject.bind(this.shader);
 
         // Bind Indices
-        final int verticesCount = (vertexIndex / this.vertexSize);
+        final int verticesCount = (idx / this.vertexSize);
         final int indicesCount = (verticesCount / this.vertexIndicesRatio) * this.indicesSize;
 
         this.indexBuffer.position(0);
-        if(this.indexBuffer.limit() != indicesCount) {
+        if (this.indexBuffer.limit() != indicesCount) {
             this.indexBuffer.limit(indicesCount);
             this.indexBufferObject.getBuffer(true); // Make Dirty
         }
@@ -164,12 +166,17 @@ public abstract class BasicRenderer {
         // Draw
         Gdx.gl32.glDrawElements(this.primitiveType, indicesCount, GL32.GL_UNSIGNED_INT, 0);
 
-        // Reset Buffers
-        this.vertexBuffer.position(0);
-        this.vertexBuffer.limit(sizeMaxVertexFloats);
-        this.indexBuffer.limit(sizeMaxIndicesInts);
+        this.idx = 0;
 
         this.renderCalls++;
+    }
+
+    public int getSizeMaxVertexesFloats() {
+        return sizeMaxVertexesFloats;
+    }
+
+    public int getSizeMaxVertexes() {
+        return sizeMaxVertexes;
     }
 
     public int getSizeMaxIndicesInts() {
@@ -177,27 +184,7 @@ public abstract class BasicRenderer {
     }
 
     public int vertexBufferPosition() {
-        return this.vertexBuffer.position();
-    }
-
-    public int vertexBufferLimit() {
-        return this.vertexBuffer.limit();
-    }
-
-    public void vertexBufferPush(float value) {
-        this.vertexBuffer.put(value);
-    }
-
-    public void vertexBufferPush(float[] values) {
-        this.vertexBuffer.put(values);
-    }
-
-    public void setIndexBufferObject() {
-        this.indexBufferObject.getBuffer(true);
-    }
-
-    public void vertexBufferPush(float[] values, int offset, int length) {
-        this.vertexBuffer.put(values, offset, length);
+        return this.idx;
     }
 
     public int getRenderCalls() {
@@ -218,10 +205,6 @@ public abstract class BasicRenderer {
 
     public Matrix4 getTransformMatrix() {
         return transformMatrix;
-    }
-
-    public int getSizeMaxVertexFloats() {
-        return sizeMaxVertexFloats;
     }
 
     protected void setPrimitiveType(int primitiveType) {
@@ -347,26 +330,128 @@ public abstract class BasicRenderer {
                 | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
     }
 
-    protected boolean isVertexLimitReached() {
-        return this.vertexBuffer.position() >= this.vertexBuffer.limit();
-    }
-
-    public int getSizeMaxVertexes() {
-        return sizeMaxVertexes;
-    }
-
     protected int uniformLocation(String uniform) {
         ObjectIntMap uniformMap = uniformLocationCache.get(this.shader);
         if (uniformMap == null) {
             uniformMap = new ObjectIntMap<>();
             uniformLocationCache.put(this.shader, uniformMap);
         }
+
         int location = uniformMap.get(uniform, -1);
         if (location == -1) {
             location = this.shader.getUniformLocation(uniform);
             uniformMap.put(uniform, location);
         }
         return location;
+    }
+
+    protected boolean isVertexBufferLimitReached() {
+        return this.idx >= this.sizeMaxVertexesFloats;
+    }
+
+    protected boolean isAnyVertexesInBuffer() {
+        return this.idx != 0;
+    }
+
+    public void vertexPush(float value1) {
+        this.vertices[idx] = value1;
+        idx ++;
+    }
+
+    public void vertexPush(float value1,float value2) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        idx += 2;
+    }
+
+    public void vertexPush(float value1,float value2,float value3) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        idx += 3;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+4] = value4;
+        idx += 4;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        idx += 5;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        this.vertices[idx+5] = value6;
+        idx += 6;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        this.vertices[idx+5] = value6;
+        this.vertices[idx+6] = value7;
+        idx += 7;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        this.vertices[idx+5] = value6;
+        this.vertices[idx+6] = value7;
+        this.vertices[idx+7] = value8;
+        idx += 8;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8,float value9) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        this.vertices[idx+5] = value6;
+        this.vertices[idx+6] = value7;
+        this.vertices[idx+7] = value8;
+        this.vertices[idx+8] = value9;
+        idx += 9;
+    }
+
+    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8,float value9,float value10) {
+        this.vertices[idx] = value1;
+        this.vertices[idx+1] = value2;
+        this.vertices[idx+2] = value3;
+        this.vertices[idx+3] = value4;
+        this.vertices[idx+4] = value5;
+        this.vertices[idx+5] = value6;
+        this.vertices[idx+6] = value7;
+        this.vertices[idx+7] = value8;
+        this.vertices[idx+8] = value9;
+        this.vertices[idx+9] = value10;
+        idx += 10;
+    }
+
+
+    public void vertexPush(float[] value, int offset, int count) {
+        System.arraycopy(value, offset, this.vertices, idx, count);
+        idx += count;
     }
 
     protected abstract int getVertexSize();
