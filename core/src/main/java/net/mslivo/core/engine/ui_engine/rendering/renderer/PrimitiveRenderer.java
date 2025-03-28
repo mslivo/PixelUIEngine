@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class PrimitiveRenderer extends BasicColorTweakRenderer {
@@ -120,7 +119,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
         if (this.restartInsertedLast)
             return;
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
@@ -130,8 +129,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         indicesBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
-        FloatBuffer vertexBuffer = getVertexBuffer().getBuffer(true);
-        vertexBuffer.position(vertexBuffer.position()+VERTEX_SIZE);
+        vertexPush(DUMMY_VERTEX,0,VERTEX_SIZE);
 
         this.indexResets.add(currentIndex);
         this.restartInsertedLast = true;
@@ -139,7 +137,7 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
 
 
     public void flush() {
-        if (vertexBuffer.position() == 0) return;
+        if (!isAnyVertexesInBuffer()) return;
         super.flush();
 
         if (!indexResets.isEmpty()) {
@@ -156,15 +154,11 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x + 0.5f));
-        vertexBufferPush((y + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,super.color,super.tweak);
 
         this.restartInsertedLast = false;
     }
@@ -173,27 +167,19 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x1 + 0.5f));
-        vertexBufferPush((y1 + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,super.color,super.tweak);
 
 
         // Vertex 2
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x2 + 0.5f));
-        vertexBufferPush((y2 + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,super.color,super.tweak);
 
         this.restartInsertedLast = false;
     }
@@ -202,38 +188,26 @@ public class PrimitiveRenderer extends BasicColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x1 + 0.5f));
-        vertexBufferPush((y1 + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,super.color,super.tweak);
 
 
         // Vertex 2
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x2 + 0.5f));
-        vertexBufferPush((y2 + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,super.color,super.tweak);
 
         // Vertex 3
-        if (isVertexLimitReached()) {
+        if (isVertexBufferLimitReached()) {
             flush();
         }
 
-        vertexBufferPush((x3 + 0.5f));
-        vertexBufferPush((y3 + 0.5f));
-        vertexBufferPush(this.vertexColor);
-        vertexBufferPush(super.color);
-        vertexBufferPush(super.tweak);
+        vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor,super.color,super.tweak);
 
         this.restartInsertedLast = false;
     }
