@@ -237,34 +237,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1);
-        vertexPush(y1);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x2);
-        vertexPush(y2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x3);
-        vertexPush(y3);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x4);
-        vertexPush(y4);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
-
+        vertexPush(x1,y1,color,u,v,tweak);
+        vertexPush(x2,y2,color,u,v2,tweak);
+        vertexPush(x3,y3,color,u2,v2,tweak);
+        vertexPush(x4,y4,color,u2,v,tweak);
 
     }
 
@@ -300,33 +276,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x,y,color,u,v,tweak);
+        vertexPush(x,fy2,color,u,v2,tweak);
+        vertexPush(fx2,fy2,color,u2,v2,tweak);
+        vertexPush(fx2,y,color,u2,v,tweak);
 
 
     }
@@ -351,33 +304,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x,y,color,u,v,tweak);
+        vertexPush(x,fy2,color,u,v2,tweak);
+        vertexPush(fx2,fy2,color,u2,v2,tweak);
+        vertexPush(fx2,y,color,u2,v,tweak);
 
 
     }
@@ -398,33 +328,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x,y,color,u,v,tweak);
+        vertexPush(x,fy2,color,u,v2,tweak);
+        vertexPush(fx2,fy2,color,u2,v2,tweak);
+        vertexPush(fx2,y,color,u2,v,tweak);
 
 
     }
@@ -453,33 +360,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x,y,color,u,v,tweak);
+        vertexPush(x,fy2,color,u,v2,tweak);
+        vertexPush(fx2,fy2,color,u2,v2,tweak);
+        vertexPush(fx2,y,color,u2,v,tweak);
 
 
     }
@@ -504,12 +388,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float tweak = this.tweak;
 
         for (int s = offset, i = 0; i < copyCount; i += 6) {
-            vertexPush(spriteVertices[s++]);
-            vertexPush(spriteVertices[s++]);
-            vertexPush(spriteVertices[s++]);
-            vertexPush(spriteVertices[s++]);
-            vertexPush(spriteVertices[s++]);
-            vertexPush(this.tweak);
+            vertexPush(spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],this.tweak);
         }
         count -= copyCount;
         while (count > 0) {
@@ -517,12 +396,7 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
             flush();
             copyCount = Math.min(verticesLength, count);
             for (int s = offset, v = 0, i = 0; i < copyCount; i += 6) {
-                vertexPush(spriteVertices[s++]);
-                vertexPush(spriteVertices[s++]);
-                vertexPush(spriteVertices[s++]);
-                vertexPush(spriteVertices[s++]);
-                vertexPush(spriteVertices[s++]);
-                vertexPush(tweak);
+                vertexPush(spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],this.tweak);
             }
             count -= copyCount;
         }
@@ -579,34 +453,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(fy2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(fx2);
-        vertexPush(y);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
-
+        vertexPush(x,y,color,u,v,tweak);
+        vertexPush(x,fy2,color,u,v2,tweak);
+        vertexPush(fx2,fy2,color,u2,v2,tweak);
+        vertexPush(fx2,y,color,u2,v,tweak);
 
     }
 
@@ -704,33 +554,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1);
-        vertexPush(y1);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x2);
-        vertexPush(y2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x3);
-        vertexPush(y3);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x4);
-        vertexPush(y4);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x1,y1,color,u,v,tweak);
+        vertexPush(x2,y2,color,u,v2,tweak);
+        vertexPush(x3,y3,color,u2,v2,tweak);
+        vertexPush(x4,y4,color,u2,v,tweak);
 
 
     }
@@ -846,33 +673,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float tweak = this.tweak;
 
 
-        vertexPush(x1);
-        vertexPush(y1);
-        vertexPush(color);
-        vertexPush(u1);
-        vertexPush(v1);
-        vertexPush(tweak);
-
-        vertexPush(x2);
-        vertexPush(y2);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x3);
-        vertexPush(y3);
-        vertexPush(color);
-        vertexPush(u3);
-        vertexPush(v3);
-        vertexPush(tweak);
-
-        vertexPush(x4);
-        vertexPush(y4);
-        vertexPush(color);
-        vertexPush(u4);
-        vertexPush(v4);
-        vertexPush(tweak);
+        vertexPush(x1,y1,color,u1,v1,tweak);
+        vertexPush(x2,y2,color,u2,v2,tweak);
+        vertexPush(x3,y3,color,u3,v3,tweak);
+        vertexPush(x4,y4,color,u4,v4,tweak);
 
 
     }
@@ -905,33 +709,10 @@ public class SpriteRenderer extends BasicColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1);
-        vertexPush(y1);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v);
-        vertexPush(tweak);
-
-        vertexPush(x2);
-        vertexPush(y2);
-        vertexPush(color);
-        vertexPush(u);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x3);
-        vertexPush(y3);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v2);
-        vertexPush(tweak);
-
-        vertexPush(x4);
-        vertexPush(y4);
-        vertexPush(color);
-        vertexPush(u2);
-        vertexPush(v);
-        vertexPush(tweak);
+        vertexPush(x1,y1,color,u,v,tweak);
+        vertexPush(x2,y2,color,u,v2,tweak);
+        vertexPush(x3,y3,color,u2,v2,tweak);
+        vertexPush(x4,y4,color,u2,v,tweak);
 
 
     }
