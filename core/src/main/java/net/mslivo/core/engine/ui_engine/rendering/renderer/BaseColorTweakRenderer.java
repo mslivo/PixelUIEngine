@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine.rendering.renderer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-public abstract class BasicColorTweakRenderer extends BasicRenderer {
+public abstract class BaseColorTweakRenderer extends BaseRenderer {
     public static final String COLOR_ATTRIBUTE = "a_color";
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
 
@@ -15,7 +15,7 @@ public abstract class BasicColorTweakRenderer extends BasicRenderer {
     protected float color_save;
     protected float color_reset;
 
-    public BasicColorTweakRenderer(final int maxVertexes, final ShaderProgram defaultShader, final boolean printRenderCalls) {
+    public BaseColorTweakRenderer(final int maxVertexes, final ShaderProgram defaultShader, final boolean printRenderCalls) {
         super(maxVertexes, defaultShader, printRenderCalls);
 
         this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0.0f);

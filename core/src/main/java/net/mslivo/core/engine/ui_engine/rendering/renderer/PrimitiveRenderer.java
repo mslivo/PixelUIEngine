@@ -12,7 +12,7 @@ import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 
 import java.nio.IntBuffer;
 
-public class PrimitiveRenderer extends BasicColorTweakRenderer {
+public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
 

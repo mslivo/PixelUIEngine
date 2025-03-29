@@ -19,6 +19,7 @@ import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SimplePrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
@@ -32,13 +33,14 @@ import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
 public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private static final boolean IM_PERFORMANCE_TEST = true; // ~ 1000ms
-    private static final boolean SPRITE_PERFORMANCE_TEST = true; // ~10ms
+    private static final boolean SPRITE_PERFORMANCE_TEST = false; // ~10ms
     private API api;
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
     private SpriteRenderer spriteRenderer;
     private PrimitiveRenderer primitiveRenderer;
+    private SimplePrimitiveRenderer simplePrimitiveRenderer;
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
 
@@ -70,6 +72,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
         this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
+        this.simplePrimitiveRenderer = new SimplePrimitiveRenderer();
 
         api.config.window.setDefaultEnforceScreenBounds(false);
         // Example Wnd Button
@@ -199,22 +202,24 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.end();
 
         primitiveRenderer.setColorReset();
+
         if (IM_PERFORMANCE_TEST) {
 
-            primitiveRenderer.setProjectionMatrix(camera.combined);
+            simplePrimitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.nanoTime();
-            final int VERTEXES = 50;
+            final int VERTEXES = 250;
 
-            primitiveRenderer.begin();
+            simplePrimitiveRenderer.setBlendingEnabled(true);
+            simplePrimitiveRenderer.begin();
             for (int i = 0; i < VERTEXES; i++) {
                 for (int ix = 0; ix < 64; ix++) {
                     for (int iy = 0; iy < 64; iy++) {
-                        primitiveRenderer.setVertexColor(ix / 10f, iy / 10f, 1f, 1f);
-                        primitiveRenderer.vertex(100 + ix, 200 + iy);
+                        simplePrimitiveRenderer.setVertexColor(ix / 10f, iy / 5f, 1f, 0.1f);
+                        simplePrimitiveRenderer.vertex(100 + ix, 200 + iy);
                     }
                 }
             }
-            primitiveRenderer.end();
+            simplePrimitiveRenderer.end();
             System.out.println((VERTEXES*(64*64)) + " Vertexes: " + ((System.nanoTime() - time) / 1000) + "ns");
         }
 

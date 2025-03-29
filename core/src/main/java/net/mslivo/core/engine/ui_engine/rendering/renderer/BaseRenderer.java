@@ -16,7 +16,7 @@ import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public abstract class BasicRenderer {
+public abstract class BaseRenderer {
 
     public static final String POSITION_ATTRIBUTE = "a_position";
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
@@ -51,11 +51,12 @@ public abstract class BasicRenderer {
     protected int[] blend;
     private int[] blend_save;
     private int[] blend_reset;
+    private boolean blendingEnabled;
 
     protected int primitiveType;
 
 
-    public BasicRenderer(final int sizeMaxVertexes, final ShaderProgram defaultShader, boolean printRenderCalls) {
+    public BaseRenderer(final int sizeMaxVertexes, final ShaderProgram defaultShader, boolean printRenderCalls) {
         this.vertexSize = getVertexSize();
         this.indicesSize = getIndicesSize();
         this.vertexIndicesRatio = getVertexIndicesRatio();
@@ -94,6 +95,7 @@ public abstract class BasicRenderer {
         this.defaultShader = defaultShader;
 
         this.drawing = false;
+        this.blendingEnabled = true;
         setShader(defaultShader());
     }
 
@@ -105,8 +107,13 @@ public abstract class BasicRenderer {
         this.shader.bind();
         this.setupMatrices();
 
-        Gdx.gl.glEnable(GL32.GL_BLEND);
-        Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
 
         this.drawing = true;
     }
@@ -279,6 +286,14 @@ public abstract class BasicRenderer {
         }
     }
 
+    public boolean isBlendingEnabled() {
+        return this.blendingEnabled;
+    }
+
+    public void setBlendingEnabled(boolean enabled) {
+        this.blendingEnabled = enabled;
+    }
+
     public void setBlendFunctionSeparate(final int srcFuncColor, final int dstFuncColor, final int srcFuncAlpha, final int dstFuncAlpha) {
         if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
             return;
@@ -355,96 +370,96 @@ public abstract class BasicRenderer {
 
     public void vertexPush(float value1) {
         this.vertices[idx] = value1;
-        idx ++;
+        idx++;
     }
 
-    public void vertexPush(float value1,float value2) {
+    public void vertexPush(float value1, float value2) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
+        this.vertices[idx + 1] = value2;
         idx += 2;
     }
 
-    public void vertexPush(float value1,float value2,float value3) {
+    public void vertexPush(float value1, float value2, float value3) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
         idx += 3;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4) {
+    public void vertexPush(float value1, float value2, float value3, float value4) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+4] = value4;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 4] = value4;
         idx += 4;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
         idx += 5;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
-        this.vertices[idx+5] = value6;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
         idx += 6;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6, float value7) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
-        this.vertices[idx+5] = value6;
-        this.vertices[idx+6] = value7;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        this.vertices[idx + 6] = value7;
         idx += 7;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6, float value7, float value8) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
-        this.vertices[idx+5] = value6;
-        this.vertices[idx+6] = value7;
-        this.vertices[idx+7] = value8;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        this.vertices[idx + 6] = value7;
+        this.vertices[idx + 7] = value8;
         idx += 8;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8,float value9) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6, float value7, float value8, float value9) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
-        this.vertices[idx+5] = value6;
-        this.vertices[idx+6] = value7;
-        this.vertices[idx+7] = value8;
-        this.vertices[idx+8] = value9;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        this.vertices[idx + 6] = value7;
+        this.vertices[idx + 7] = value8;
+        this.vertices[idx + 8] = value9;
         idx += 9;
     }
 
-    public void vertexPush(float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8,float value9,float value10) {
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6, float value7, float value8, float value9, float value10) {
         this.vertices[idx] = value1;
-        this.vertices[idx+1] = value2;
-        this.vertices[idx+2] = value3;
-        this.vertices[idx+3] = value4;
-        this.vertices[idx+4] = value5;
-        this.vertices[idx+5] = value6;
-        this.vertices[idx+6] = value7;
-        this.vertices[idx+7] = value8;
-        this.vertices[idx+8] = value9;
-        this.vertices[idx+9] = value10;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        this.vertices[idx + 6] = value7;
+        this.vertices[idx + 7] = value8;
+        this.vertices[idx + 8] = value9;
+        this.vertices[idx + 9] = value10;
         idx += 10;
     }
 

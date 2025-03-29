@@ -13,7 +13,7 @@ import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 
-public class SpriteRenderer extends BasicColorTweakRenderer {
+public class SpriteRenderer extends BaseColorTweakRenderer {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
