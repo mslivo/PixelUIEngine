@@ -7,6 +7,7 @@ import net.mslivo.core.engine.tools.Tools;
 public class ExampleLauncherMain {
 
     public static void main(String[] args) {
+
         Tools.App.launch(
                 new ExampleMain(),
                 new PixelUILaunchConfig(
