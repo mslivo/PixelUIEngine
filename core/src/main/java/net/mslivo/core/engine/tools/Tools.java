@@ -824,6 +824,19 @@ public class Tools {
             return list.get(MathUtils.random(0, list.size() - 1));
         }
 
+        public static <T> T randomSelect(Set<T> set) {
+            if (set == null || set.isEmpty()) {
+                return null;
+            }
+            int index = MathUtils.random(0,set.size()-1);
+            Iterator<T> it = set.iterator();
+            for (int i = 0; i < index; i++)
+                it.next();
+
+            return it.next();
+        }
+
+
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
         public interface DoInRadiusFunction<O> {

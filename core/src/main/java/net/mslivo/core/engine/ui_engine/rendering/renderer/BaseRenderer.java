@@ -26,6 +26,7 @@ public abstract class BaseRenderer {
 
     protected final int vertexSize;
     protected final int sizeMaxVertexes;
+    protected final int sizeMaxIndices;
     protected final int sizeMaxVertexesFloats;
     protected final int indicesSize;
     protected final int vertexIndicesRatio;
@@ -62,7 +63,8 @@ public abstract class BaseRenderer {
         this.vertexIndicesRatio = getVertexIndicesRatio();
         this.sizeMaxVertexes = sizeMaxVertexes;
         this.sizeMaxVertexesFloats = this.sizeMaxVertexes * vertexSize;
-        this.sizeMaxIndicesInts = (this.sizeMaxVertexes / this.vertexIndicesRatio) * indicesSize;
+        this.sizeMaxIndices = (this.sizeMaxVertexes / this.vertexIndicesRatio);
+        this.sizeMaxIndicesInts = this.sizeMaxIndices * indicesSize;
         this.printRenderCalls = printRenderCalls;
         int vertexAbsoluteLimit = Integer.MAX_VALUE / (this.vertexSize * 4);
         if (sizeMaxVertexes > vertexAbsoluteLimit)
@@ -173,8 +175,9 @@ public abstract class BaseRenderer {
         // Draw
         Gdx.gl32.glDrawElements(this.primitiveType, indicesCount, GL32.GL_UNSIGNED_INT, 0);
 
+        // reset
+        this.indexBuffer.limit(this.sizeMaxIndices);
         this.idx = 0;
-
         this.renderCalls++;
     }
 
@@ -184,6 +187,10 @@ public abstract class BaseRenderer {
 
     public int getSizeMaxVertexes() {
         return sizeMaxVertexes;
+    }
+
+    public int getSizeMaxIndices() {
+        return sizeMaxIndices;
     }
 
     public int getSizeMaxIndicesInts() {
