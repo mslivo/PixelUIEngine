@@ -2528,20 +2528,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         int tooltip_x = switch (direction) {
             case RIGHT ->
-                    Math.clamp(uiEngineState.mouse_ui.x + lineLengthAbs, 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+                    Math.clamp(uiEngineState.mouse_ui.x + lineLengthAbs, 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
             case LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
             case UP, DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, uiEngineState.resolutionWidth - TS(tooltip_width));
+                    Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
         };
 
         int tooltip_y = switch (direction) {
             case RIGHT, LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
+                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
             case UP ->
-                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
+                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
             case DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, uiEngineState.resolutionHeight - TS(tooltip_height) - 1);
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
         };
 
         // Draw Tooltip
