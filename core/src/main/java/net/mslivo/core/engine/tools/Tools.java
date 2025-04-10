@@ -974,11 +974,11 @@ public class Tools {
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX + 1) >= Bx && (pointY + 1) >= By;
+            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX ) >= Bx && (pointY) >= By;
         }
 
         public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
-            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX + 1) >= Bx && (pointY + 1) >= By;
+            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX) >= Bx && (pointY) >= By;
         }
 
         public static boolean circlesCollide(float x1, float y1, float r1, float x2, float y2, float r2) {

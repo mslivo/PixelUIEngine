@@ -237,12 +237,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         ComboboxItem comboboxItem = api.component.comboBox.item.create("Uniquenes");
 
 
-        ComboboxItem comboboxItem2 = api.component.comboBox.item.create("2", new ComboBoxItemAction() {
-            @Override
-            public Color cellColor() {
-                return Color.RED;
-            }
-        });
+        ComboboxItem comboboxItem2 = api.component.comboBox.item.create("2");
 
 
         Combobox comboBox = api.component.comboBox.create(25, 7, 6, new ComboboxItem[]{

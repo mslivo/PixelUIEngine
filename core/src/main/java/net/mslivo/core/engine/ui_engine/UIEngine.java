@@ -2258,9 +2258,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
                         ComboboxItem comboBoxItem = comboBox.items.get(iy);
+                        boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), widthPx, TS());
+
+
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get9TilesCMediaIndex(ix, iy, width, height);
-                            boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), widthPx, TS());
                             CMediaArray comboBoxCellGraphic = selected ? UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL_SELECTED : UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST_CELL;
 
                             // Cell
