@@ -38,6 +38,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
@@ -2767,12 +2768,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
             case Image image -> {
                 if (image.image != null) {
-                    int width = mediaManager.spriteWidth(image.image);
-                    int height = mediaManager.spriteHeight(image.image);
+                    int width = api.TS(image.width);
+                    int height = api.TS(image.height);
                     spriteRenderer.drawCMediaSprite(image.image, image.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
                             UICommonUtils.component_getAbsoluteX(image), UICommonUtils.component_getAbsoluteY(image),
-                            width, height, 0, 0, width, height, image.flipX, image.flipY
+                            width, height, 0, 0, mediaManager.spriteWidth(image.image), mediaManager.spriteHeight(image.image),
+                            image.flipX, image.flipY
                     );
+                }
+            }
+            case FrameBufferViewport frameBufferViewport -> {
+                if(frameBufferViewport.frameBuffer != null){
+                    int width = api.TS(frameBufferViewport.width);
+                    int height = api.TS(frameBufferViewport.height);
+                    spriteRenderer.draw(frameBufferViewport.frameBuffer.getFlippedTextureRegion(),
+                            UICommonUtils.component_getAbsoluteX(frameBufferViewport), UICommonUtils.component_getAbsoluteY(frameBufferViewport),
+                            width,height
+                            );
                 }
             }
             case Text text -> {

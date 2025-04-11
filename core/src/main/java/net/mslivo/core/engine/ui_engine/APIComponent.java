@@ -29,6 +29,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
@@ -68,6 +69,7 @@ public final class APIComponent {
     public final APIProgressbar progressbar;
     public final APICheckbox checkbox;
     public final APIAppViewport appViewport;
+    public final APIFrameBufferViewport frameBufferViewport;
 
     APIComponent(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
         this.api = api;
@@ -89,6 +91,7 @@ public final class APIComponent {
         this.progressbar = new APIProgressbar();
         this.checkbox = new APICheckbox();
         this.appViewport = new APIAppViewport();
+        this.frameBufferViewport = new APIFrameBufferViewport();
     }
 
 
@@ -1331,6 +1334,42 @@ public final class APIComponent {
             if (text == null) return;
             text.fontColor.set(color);
         }
+
+    }
+
+    public final class APIFrameBufferViewport {
+
+        APIFrameBufferViewport() {
+        }
+
+        public final FrameBufferViewportAction DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION = new FrameBufferViewportAction() {
+        };
+
+
+        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer) {
+            return create(x,y,nestedFrameBuffer,DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION);
+        }
+
+        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction) {
+            FrameBufferViewport frameBufferViewport = new FrameBufferViewport();
+            int width = nestedFrameBuffer != null ? nestedFrameBuffer.getWidth() / api.TS() : 0;
+            int height = nestedFrameBuffer != null ? nestedFrameBuffer.getHeight() / api.TS() : 0;
+            setComponentCommonInitValuesInternal(frameBufferViewport, x, y, width, height, Color.GRAY, Color.GRAY);
+            frameBufferViewport.frameBuffer = nestedFrameBuffer;
+            frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction != null ? frameBufferViewportAction : DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION;
+            return frameBufferViewport;
+        }
+
+        public void setFrameBufferViewportAction(FrameBufferViewport frameBufferViewport, FrameBufferViewportAction frameBufferViewportAction) {
+            if (frameBufferViewport == null) return;
+            frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction;
+        }
+
+        public void setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
+            if (frameBufferViewport == null) return;
+            UICommonUtils.framebufferViewport_setFrameBuffer(uiEngineState, frameBufferViewport, nestedFrameBuffer);
+        }
+
 
     }
 

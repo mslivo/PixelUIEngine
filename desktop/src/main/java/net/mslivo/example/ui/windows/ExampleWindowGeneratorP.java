@@ -1,7 +1,11 @@
 package net.mslivo.example.ui.windows;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaArray;
@@ -10,6 +14,8 @@ import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
+import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
@@ -19,6 +25,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
@@ -447,9 +454,37 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         });
 
+        NestedFrameBuffer nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888,32,32);
+        FrameBufferViewport frameBufferViewport = api.component.frameBufferViewport.create(24,5,nestedFrameBuffer);
 
-        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas});
-        api.component.tabbar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas});
+        OrthographicCamera camera = new OrthographicCamera(32,32);
+        camera.setToOrtho(false,32,32);
+        camera.update();
+
+
+        SpriteRenderer spriteRenderer = new SpriteRenderer(mediaManager);
+        api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
+            float deg1 = 0f;
+            float deg2 = 0f;
+            @Override
+            public void onUpdate() {
+                nestedFrameBuffer.begin();
+                Gdx.gl.glClearColor(Math.abs(MathUtils.sin(deg1)), 1f-Math.abs(MathUtils.sin(deg2)), 0f, 1f);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                spriteRenderer.setProjectionMatrix(camera.combined);
+                spriteRenderer.begin();
+                spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,12+MathUtils.sin(deg1)*8f,12+MathUtils.cos(deg2)*8f);
+                deg1+= 0.05f;
+                deg2+= 0.08f;
+                spriteRenderer.end();
+                nestedFrameBuffer.end();
+
+            }
+        });
+
+
+        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas,frameBufferViewport});
+        api.component.tabbar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas,frameBufferViewport});
 
         // Image Buttons Tab
 

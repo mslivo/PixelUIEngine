@@ -32,6 +32,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
@@ -1295,10 +1296,23 @@ final class UICommonUtils {
         UICommonUtils.image_updateSize(uiEngineState, mediaManager, imageC);
     }
 
+
     static void image_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC) {
         imageC.width = imageC.image != null ? mediaManager.spriteWidth(imageC.image) / uiEngineState.tileSize.TS : 0;
         imageC.height = imageC.image != null ? mediaManager.spriteHeight(imageC.image) / uiEngineState.tileSize.TS : 0;
     }
+
+    static void framebufferViewport_setFrameBuffer(UIEngineState uiEngineState, FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
+        frameBufferViewport.frameBuffer = nestedFrameBuffer;
+        UICommonUtils.framebufferViewport_updateSize(uiEngineState, frameBufferViewport);
+    }
+
+    static void framebufferViewport_updateSize(UIEngineState uiEngineState, FrameBufferViewport frameBufferViewport) {
+        frameBufferViewport.width = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getWidth() / uiEngineState.tileSize.TS : 0;
+        frameBufferViewport.height = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getHeight()/ uiEngineState.tileSize.TS : 0;
+    }
+
+
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
         int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
