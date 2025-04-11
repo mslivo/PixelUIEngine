@@ -28,7 +28,7 @@ public final class PrimitiveShader extends ShaderCommon {
                         // Get Attributes
                         v_color = (a_color*FLOAT_CORRECTION);
                         v_tweak = (a_tweak*FLOAT_CORRECTION);
-                        v_vertexColor = a_vertexColor;
+                        v_vertexColor = (a_vertexColor*FLOAT_CORRECTION);
                         
                         
                         gl_Position = u_projTrans * a_position;

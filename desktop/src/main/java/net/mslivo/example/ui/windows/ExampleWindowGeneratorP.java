@@ -15,6 +15,7 @@ import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
+import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -49,6 +50,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
+import org.lwjgl.opengl.GL32;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -440,21 +442,30 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         camera2.update();
 
 
-        SpriteRenderer spriteRenderer2 = new SpriteRenderer(mediaManager);
+        PrimitiveRenderer primitiveRenderer = new PrimitiveRenderer();
         api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
             float deg1 = 0f;
             float deg2 = 0f;
             @Override
             public void onUpdate() {
-                nestedFrameBuffer.begin();
-                Gdx.gl.glClearColor(Math.abs(MathUtils.sin(deg1)), 1f-Math.abs(MathUtils.sin(deg2)), 0f, 1f);
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                spriteRenderer2.setProjectionMatrix(camera2.combined);
-                spriteRenderer2.begin();
-                spriteRenderer2.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,12+MathUtils.sin(deg1)*8f,12+MathUtils.cos(deg2)*8f);
-                deg1+= 0.05f;
-                deg2+= 0.08f;
-                spriteRenderer2.end();
+                nestedFrameBuffer.beginGlClear();
+                primitiveRenderer.setProjectionMatrix(camera2.combined);
+                primitiveRenderer.setBlendFunctionLayer();
+
+                primitiveRenderer.begin(GL32.GL_TRIANGLES);
+
+                primitiveRenderer.setColor(0.5f,0.5f,0.5f,1f);
+
+                primitiveRenderer.setVertexColor(1f,0f,0,1f);
+                primitiveRenderer.vertex(0,0,32,0,16,16);
+
+
+                primitiveRenderer.setVertexColor(0f,1f,0,1f);
+                primitiveRenderer.vertex(0,8,32,8,16,24);
+
+
+
+                primitiveRenderer.end();
                 nestedFrameBuffer.end();
 
             }
