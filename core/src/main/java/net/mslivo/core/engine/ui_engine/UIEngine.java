@@ -2,7 +2,6 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.GridPoint2;
@@ -33,8 +32,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
@@ -216,7 +213,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedListItem = null;
         newUIEngineState.pressedAppViewPort = null;
         newUIEngineState.tooltip_lastHoverObject = null;
-        newUIEngineState.pressedCanvas = null;
+        newUIEngineState.pressedFramebufferViewport = null;
         newUIEngineState.openComboBox = null;
         newUIEngineState.pressedComboBoxItem = null;
         newUIEngineState.pressedCheckBox = null;
@@ -1171,11 +1168,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             uiEngineState.pressedKnob = knob;
                             knob.knobAction.onPress();
                         }
-                        case Canvas canvas -> {
-                            canvas.canvasAction.onPress(
-                                    UICommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, canvas),
-                                    UICommonUtils.component_getRelativeMouseY(uiEngineState.mouse_ui.y, canvas));
-                            uiEngineState.pressedCanvas = canvas;
+                        case FrameBufferViewport frameBufferViewport -> {
+                            frameBufferViewport.frameBufferViewportAction.onPress(
+                                    UICommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, frameBufferViewport),
+                                    UICommonUtils.component_getRelativeMouseY(uiEngineState.mouse_ui.y, frameBufferViewport));
+                            uiEngineState.pressedFramebufferViewport = frameBufferViewport;
                         }
                         case AppViewport appViewPort -> {
                             appViewPort.appViewPortAction.onPress(
@@ -1289,10 +1286,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             if (processMouseUpPressed) {
                 switch (pressedUIObject) {
-                    case Canvas canvas -> {
-                        canvas.canvasAction.onRelease();
-                        UICommonUtils.resetPressedCanvasReference(uiEngineState);
-                    }
                     case ContextMenuItem contextMenuItem -> {
                         UICommonUtils.contextMenu_selectItem(uiEngineState, contextMenuItem);
                         UICommonUtils.contextMenu_close(uiEngineState, contextMenuItem.addedToContextMenu);
@@ -1336,7 +1329,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         UICommonUtils.resetPressedTextFieldReference(uiEngineState);
                     }
                     case AppViewport appViewPort -> {
-
                         appViewPort.appViewPortAction.onRelease();
                         UICommonUtils.resetPressedAppViewPortReference(uiEngineState);
                     }
@@ -1355,6 +1347,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     case Knob knob -> {
                         knob.knobAction.onRelease();
                         UICommonUtils.resetPressedKnobReference(uiEngineState);
+                    }
+                    case FrameBufferViewport frameBufferViewport -> {
+                        frameBufferViewport.frameBufferViewportAction.onRelease();
+                        UICommonUtils.resetPressedFrameviewPortReference(uiEngineState);
                     }
                     case Grid grid -> {
                         UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, grid);
@@ -1765,6 +1761,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (uiEngineState.tooltip_fadePct > 0f) {
                     uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip_FadeoutSpeed, 0f, 1f);
                 } else {
+                    uiEngineState.fadeOutTooltip.toolTipAction.onRemove();
                     uiEngineState.fadeOutTooltip = null;
                 }
             }
@@ -1885,7 +1882,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Image image -> image.imageAction;
             case Grid grid -> grid.gridAction;
             case List list -> list.listAction;
-            case Canvas canvas -> canvas.canvasAction;
+            case FrameBufferViewport frameBufferViewport -> frameBufferViewport.frameBufferViewportAction;
             case ScrollbarVertical scrollBarVertical -> scrollBarVertical.scrollBarAction;
             case ScrollbarHorizontal scrollBarHorizontal -> scrollBarHorizontal.scrollBarAction;
             case Tabbar tabBar -> tabBar.tabBarAction;
@@ -2467,34 +2464,25 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             width, height, 0, 0, width, height, imageSegment.flipX, imageSegment.flipY
                     );
                 }
-                case TooltipCanvasSegment canvasSegment -> {
-                    int width = TS(canvasSegment.width);
-                    int height = TS(canvasSegment.height);
-                    spriteRenderer.end();
-                    primitiveRenderer.begin();
-                    render_setColor(primitiveRenderer, canvasSegment.contentColor, segmentAlpha, false);
-                    int canvas_x = x + switch (canvasSegment.alignment) {
-                        case LEFT -> 0;
-                        case CENTER ->
-                                MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(TS(canvasSegment.width) / 2f);
-                        case RIGHT -> TS(tooltip_width) - TS(canvasSegment.width);
-                    };
+                case TooltipFramebufferViewportSegment framebufferViewportSegment -> {
+                    if (framebufferViewportSegment.frameBuffer != null) {
+                        int width = TS(framebufferViewportSegment.width);
+                        int height = TS(framebufferViewportSegment.height);
+                        int segment_x = x + switch (framebufferViewportSegment.alignment) {
+                            case LEFT -> 0;
+                            case CENTER ->
+                                    MathUtils.round(TS(tooltip_width) / 2f) - MathUtils.round(TS(framebufferViewportSegment.width) / 2f);
+                            case RIGHT -> TS(tooltip_width) - TS(framebufferViewportSegment.width);
+                        };
+                        int segment_y = y + TS(iy);
 
-                    for (int icx = 0; icx < width; icx++) {
-                        for (int icy = 0; icy < height; icy++) {
-                            float a = canvasSegment.colorMap.a[icx][icy];
-                            if (a == 0) continue;
-                            float r = canvasSegment.colorMap.r[icx][icy];
-                            float g = canvasSegment.colorMap.g[icx][icy];
-                            float b = canvasSegment.colorMap.b[icx][icy];
-                            int vx = canvas_x + icx;
-                            int vy = y + TS(iy) + icy;
-                            primitiveRenderer.setVertexColor(r, g, b, a);
-                            primitiveRenderer.vertex(vx, vy);
-                        }
+                        spriteRenderer.setColor(framebufferViewportSegment.contentColor);
+                        spriteRenderer.draw(framebufferViewportSegment.frameBuffer.getFlippedTextureRegion(),
+                                segment_x, segment_y,
+                                width, height
+                        );
+                        spriteRenderer.setColorReset();
                     }
-                    primitiveRenderer.end();
-                    spriteRenderer.begin();
 
                 }
                 case null, default -> {
@@ -2531,20 +2519,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         int tooltip_x = switch (direction) {
             case RIGHT ->
-                    Math.clamp(uiEngineState.mouse_ui.x + lineLengthAbs, 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
+                    Math.clamp(uiEngineState.mouse_ui.x + lineLengthAbs, 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width), 0));
             case LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
+                    Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width), 0));
             case UP, DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width),0));
+                    Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width), 0));
         };
 
         int tooltip_y = switch (direction) {
             case RIGHT, LEFT ->
-                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
+                    Math.clamp(uiEngineState.mouse_ui.y - (TS(tooltip_height) / 2), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1, 0));
             case UP ->
-                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
+                    Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1, 0));
             case DOWN ->
-                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1,0));
+                    Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1, 0));
         };
 
         // Draw Tooltip
@@ -2667,7 +2655,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
 
-
         if (window.hasTitleBar) {
             render_drawFont(window.title, window.x, window.y + TS(window.height) - TS(),
                     window.fontColor, windowAlpha, false, 1, 1, TS(window.width - 1),
@@ -2778,13 +2765,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             }
             case FrameBufferViewport frameBufferViewport -> {
-                if(frameBufferViewport.frameBuffer != null){
+                if (frameBufferViewport.frameBuffer != null) {
                     int width = api.TS(frameBufferViewport.width);
                     int height = api.TS(frameBufferViewport.height);
                     spriteRenderer.draw(frameBufferViewport.frameBuffer.getFlippedTextureRegion(),
                             UICommonUtils.component_getAbsoluteX(frameBufferViewport), UICommonUtils.component_getAbsoluteY(frameBufferViewport),
-                            width,height
-                            );
+                            width, height
+                    );
                 }
             }
             case Text text -> {
@@ -2926,51 +2913,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 } else {
                     int index = MathUtils.round(knob.turned * 25);
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB, index, UICommonUtils.component_getAbsoluteX(knob), UICommonUtils.component_getAbsoluteY(knob));
-                }
-            }
-            case Canvas canvas -> {
-                int width = TS(canvas.width);
-                int height = TS(canvas.height);
-                spriteRenderer.end();
-                primitiveRenderer.begin(GL32.GL_POINTS);
-                render_setColor(primitiveRenderer, Color.GRAY, componentAlpha, componentGrayScale);
-                for (int icx = 0; icx < width; icx++) {
-                    for (int icy = 0; icy < height; icy++) {
-                        float a = canvas.colorMap.a[icx][icy];
-                        if (a == 0f) continue;
-                        float r = canvas.colorMap.r[icx][icy];
-                        float g = canvas.colorMap.g[icx][icy];
-                        float b = canvas.colorMap.b[icx][icy];
-
-                        primitiveRenderer.setVertexColor(r, g, b, a);
-                        primitiveRenderer.vertex(UICommonUtils.component_getAbsoluteX(canvas) + icx, UICommonUtils.component_getAbsoluteY(canvas) + icy);
-                    }
-                }
-                primitiveRenderer.setAllReset();
-                primitiveRenderer.end();
-                spriteRenderer.begin();
-
-                for (int i = (canvas.canvasImages.size() - 1); i >= 0; i--) {
-                    CanvasImage canvasImage = canvas.canvasImages.get(i);
-                    if (canvasImage.fadeOut) {
-                        canvasImage.color.a = Math.clamp(canvasImage.color.a - canvasImage.fadeOutSpeed, 0f, 1f);
-                        if (canvasImage.color.a <= 0) {
-                            canvas.canvasImages.remove(i);
-                            continue;
-                        }
-                    }
-                    if (UICommonUtils.canvas_isImageInsideCanvas(uiEngineState, canvas, canvasImage.x, canvasImage.y)) {
-                        spriteRenderer.saveState();
-                        render_setColor(spriteRenderer, canvasImage.color, componentAlpha, componentGrayScale);
-                        int imageWidthOffset = mediaManager.spriteWidth(canvasImage.image) / 2;
-                        int imageHeightOffset = mediaManager.spriteHeight(canvasImage.image) / 2;
-                        spriteRenderer.drawCMediaSprite(canvasImage.image,
-                                canvasImage.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
-                                UICommonUtils.component_getAbsoluteX(canvas) + canvasImage.x - imageWidthOffset,
-                                UICommonUtils.component_getAbsoluteY(canvas) + canvasImage.y - imageHeightOffset);
-                        spriteRenderer.loadState();
-                    }
-
                 }
             }
             case Textfield textField -> {

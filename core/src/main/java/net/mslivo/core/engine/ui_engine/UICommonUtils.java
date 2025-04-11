@@ -18,7 +18,6 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
-import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.rendering.PixelPerfectViewport;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -27,8 +26,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
@@ -53,7 +50,10 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -283,9 +283,6 @@ final class UICommonUtils {
         if (component instanceof AppViewport appViewPort) {
             appViewPort_resizeCameraTextureAndFrameBuffer(uiEngineState, appViewPort);
         }
-        if (component instanceof Canvas canvas) {
-            colorMap_resize(canvas.colorMap, uiEngineState.tileSize.TL(width), uiEngineState.tileSize.TL(height));
-        }
     }
 
     static int component_getParentWindowX(Component component) {
@@ -364,7 +361,7 @@ final class UICommonUtils {
         }
 
         // Screen component collision
-        for (int isc = uiEngineState.screenComponents.size()-1; isc>= 0; isc--) {
+        for (int isc = uiEngineState.screenComponents.size() - 1; isc >= 0; isc--) {
             Component screenComponent = uiEngineState.screenComponents.get(isc);
             if (component_isComponentAtPosition(uiEngineState, x, y, screenComponent)) return screenComponent;
         }
@@ -430,14 +427,14 @@ final class UICommonUtils {
         if (notification.addedToScreen) return;
         notification.addedToScreen = true;
 
-        switch (notification){
+        switch (notification) {
             case TopNotification topNotification -> {
                 uiEngineState.topNotifications.add(topNotification);
                 // Remove first if too many
                 if (uiEngineState.topNotifications.size() > notificationsMax)
                     notification_removeFromScreen(uiEngineState, uiEngineState.topNotifications.getFirst());
             }
-            case TooltipNotification tooltipNotification->{
+            case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.add(tooltipNotification);
             }
         }
@@ -447,11 +444,11 @@ final class UICommonUtils {
     static void notification_removeFromScreen(UIEngineState uiEngineState, Notification notification) {
         if (!notification.addedToScreen) return;
         notification.addedToScreen = false;
-        switch (notification){
+        switch (notification) {
             case TopNotification topNotification -> {
                 uiEngineState.topNotifications.remove(topNotification);
             }
-            case TooltipNotification tooltipNotification->{
+            case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.remove(tooltipNotification);
             }
         }
@@ -693,21 +690,21 @@ final class UICommonUtils {
         uiEngineState.screenComponents.add(component);
     }
 
-    static void component_screenMoveToTop(Component component, UIEngineState uiEngineState){
-        for(int i=0;i<uiEngineState.screenComponents.size();i++){
-            if(uiEngineState.screenComponents.get(i) == component){
+    static void component_screenMoveToTop(Component component, UIEngineState uiEngineState) {
+        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
+            if (uiEngineState.screenComponents.get(i) == component) {
                 uiEngineState.screenComponents.remove(component);
                 uiEngineState.screenComponents.add(component);
             }
         }
     }
 
-    static void component_windowMoveToTop(Component component, UIEngineState uiEngineState){
-        if(component.addedToWindow == null)
+    static void component_windowMoveToTop(Component component, UIEngineState uiEngineState) {
+        if (component.addedToWindow == null)
             return;
         Window window = component.addedToWindow;
-        for(int i=0;i<window.components.size();i++){
-            if(window.components.get(i) == component){
+        for (int i = 0; i < window.components.size(); i++) {
+            if (window.components.get(i) == component) {
                 window.components.remove(component);
                 window.components.add(component);
             }
@@ -817,118 +814,6 @@ final class UICommonUtils {
         comboBox.items.remove(comboBoxItem);
     }
 
-    static void canvas_addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
-        if (canvasImage.addedToCanvas != null) return;
-        canvasImage.addedToCanvas = canvas;
-        canvas.canvasImages.add(canvasImage);
-    }
-
-
-    static boolean canvas_isImageInsideCanvas(UIEngineState uiEngineState, Canvas canvas, int x, int y) {
-        return x >= 0 && x <= uiEngineState.tileSize.TL(canvas.width) && y >= 0 && y <= uiEngineState.tileSize.TL(canvas.height);
-    }
-
-
-    static void colorMap_clear(ColorMap colorMap, float r, float g, float b, float a) {
-        for (int ix = 0; ix < colorMap.width; ix++) {
-            for (int iy = 0; iy < colorMap.height; iy++) {
-                colorMap.r[ix][iy] = r;
-                colorMap.g[ix][iy] = g;
-                colorMap.b[ix][iy] = b;
-                colorMap.a[ix][iy] = a;
-            }
-        }
-    }
-
-    static void colorMap_resize(ColorMap colorMap, int width, int height) {
-        int copyWidth = Math.max(width, colorMap.width);
-        int copyHeight = Math.max(height, colorMap.height);
-        float[][] r = new float[width][height];
-        float[][] g = new float[width][height];
-        float[][] b = new float[width][height];
-        float[][] a = new float[width][height];
-
-        for (int ix = 0; ix < copyWidth; ix++) {
-            for (int iy = 0; iy < copyHeight; iy++) {
-                r[ix][iy] = colorMap.r[ix][iy];
-                g[ix][iy] = colorMap.g[ix][iy];
-                b[ix][iy] = colorMap.b[ix][iy];
-                a[ix][iy] = colorMap.a[ix][iy];
-            }
-        }
-
-        colorMap.width = width;
-        colorMap.height = height;
-        colorMap.r = r;
-        colorMap.g = g;
-        colorMap.b = b;
-        colorMap.a = a;
-
-        return;
-    }
-
-    static void colorMap_set(ColorMap colorMap, int x, int y, float r, float g, float b, float a) {
-        if (!colorMap_inBounds(colorMap, x, y)) return;
-        colorMap.r[x][y] = r;
-        colorMap.g[x][y] = g;
-        colorMap.b[x][y] = b;
-        colorMap.a[x][y] = a;
-    }
-
-    static float colorMap_r(ColorMap colorMap, int x, int y) {
-        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
-        return colorMap.r[x][y];
-    }
-
-    static float colorMap_g(ColorMap colorMap, int x, int y) {
-        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
-        return colorMap.g[x][y];
-    }
-
-    static float colorMap_b(ColorMap colorMap, int x, int y) {
-        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
-        return colorMap.b[x][y];
-    }
-
-    static float colorMap_a(ColorMap colorMap, int x, int y) {
-        if (!colorMap_inBounds(colorMap, x, y)) return 0f;
-        return colorMap.a[x][y];
-    }
-
-    static Color colorMap_getPointAsColor(ColorMap colorMap, int x, int y) {
-        if (!colorMap_inBounds(colorMap, x, y)) return null;
-        return new Color(
-                colorMap.r[x][y],
-                colorMap.g[x][y],
-                colorMap.b[x][y],
-                colorMap.a[x][y]
-        );
-    }
-
-    static void colorMap_copy(ColorMap colorMapFrom, ColorMap colorMapTo) {
-        int width = Math.min(colorMapFrom.width, colorMapTo.width);
-        int height = Math.min(colorMapFrom.height, colorMapTo.height);
-        for (int ix = 0; ix < width; ix++) {
-            for (int iy = 0; iy < height; iy++) {
-                colorMapTo.r[ix][iy] = colorMapFrom.r[ix][iy];
-                colorMapTo.g[ix][iy] = colorMapFrom.g[ix][iy];
-                colorMapTo.b[ix][iy] = colorMapFrom.b[ix][iy];
-                colorMapTo.a[ix][iy] = colorMapFrom.a[ix][iy];
-            }
-        }
-    }
-
-    static boolean colorMap_inBounds(ColorMap colorMap, int x, int y) {
-        return x >= 0 && x < colorMap.width && y >= 0 && y < colorMap.height;
-    }
-
-
-    static void canvas_removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
-        if (canvasImage.addedToCanvas != canvas) return;
-        canvasImage.addedToCanvas = null;
-        canvas.canvasImages.remove(canvasImage);
-    }
-
     static void tooltip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
         tooltipImageSegment.image = image;
         if (tooltipImageSegment.image != null) {
@@ -961,9 +846,6 @@ final class UICommonUtils {
     static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height) {
         tooltipSegment.width = Math.max(width, 0);
         tooltipSegment.height = Math.max(height, 0);
-        if (tooltipSegment instanceof TooltipCanvasSegment tooltipCanvasSegment) {
-            UICommonUtils.colorMap_resize(tooltipCanvasSegment.colorMap, uiEngineState.tileSize.TL(width), uiEngineState.tileSize.TL(height));
-        }
     }
 
     static boolean comboBox_isOpen(UIEngineState uiEngineState, Combobox comboBox) {
@@ -1309,9 +1191,8 @@ final class UICommonUtils {
 
     static void framebufferViewport_updateSize(UIEngineState uiEngineState, FrameBufferViewport frameBufferViewport) {
         frameBufferViewport.width = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getWidth() / uiEngineState.tileSize.TS : 0;
-        frameBufferViewport.height = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getHeight()/ uiEngineState.tileSize.TS : 0;
+        frameBufferViewport.height = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getHeight() / uiEngineState.tileSize.TS : 0;
     }
-
 
 
     static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
@@ -1402,14 +1283,14 @@ final class UICommonUtils {
     static void viewport_changeViewPortMode(UIEngineState uiEngineState, VIEWPORT_MODE viewportMode) {
         if (viewportMode == null || viewportMode == uiEngineState.viewportMode) return;
 
-        if(uiEngineState.viewportMode.upscale && !viewportMode.upscale){
+        if (uiEngineState.viewportMode.upscale && !viewportMode.upscale) {
             uiEngineState.upScaleFactor_screen = 1;
             uiEngineState.frameBuffer_upScaled_screen.dispose();
             uiEngineState.frameBuffer_upScaled_screen = null;
         }
-        if(!uiEngineState.viewportMode.upscale && viewportMode.upscale){
+        if (!uiEngineState.viewportMode.upscale && viewportMode.upscale) {
             uiEngineState.upScaleFactor_screen = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-            uiEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth*uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight*uiEngineState.upScaleFactor_screen, false);
+            uiEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth * uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upScaleFactor_screen, false);
             uiEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
 
@@ -1458,7 +1339,7 @@ final class UICommonUtils {
         if (uiEngineState.pressedScrollBarHorizontal == component)
             resetPressedScrollBarHorizontalReference(uiEngineState);
         if (uiEngineState.pressedKnob == component) resetPressedKnobReference(uiEngineState);
-        if (uiEngineState.pressedCanvas == component) resetPressedCanvasReference(uiEngineState);
+        if (uiEngineState.pressedFramebufferViewport == component) resetPressedFrameviewPortReference(uiEngineState);
         if (uiEngineState.pressedAppViewPort == component) resetPressedAppViewPortReference(uiEngineState);
         if (uiEngineState.pressedTextField == component) resetPressedTextFieldReference(uiEngineState);
         if (uiEngineState.focusedTextField == component) resetFocusedTextFieldReference(uiEngineState);
@@ -1481,7 +1362,7 @@ final class UICommonUtils {
         resetPressedScrollBarVerticalReference(uiEngineState);
         resetPressedScrollBarHorizontalReference(uiEngineState);
         resetPressedKnobReference(uiEngineState);
-        resetPressedCanvasReference(uiEngineState);
+        resetPressedFrameviewPortReference(uiEngineState);
         resetPressedAppViewPortReference(uiEngineState);
         resetPressedTextFieldReference(uiEngineState);
         resetFocusedTextFieldReference(uiEngineState);
@@ -1513,8 +1394,8 @@ final class UICommonUtils {
         uiEngineState.pressedAppViewPort = null;
     }
 
-    static void resetPressedCanvasReference(UIEngineState uiEngineState) {
-        uiEngineState.pressedCanvas = null;
+    static void resetPressedFrameviewPortReference(UIEngineState uiEngineState) {
+        uiEngineState.pressedFramebufferViewport = null;
     }
 
     static void resetPressedKnobReference(UIEngineState uiEngineState) {
@@ -1592,7 +1473,7 @@ final class UICommonUtils {
         if (uiEngineState.pressedScrollBarHorizontal != null) return uiEngineState.pressedScrollBarHorizontal;
         if (uiEngineState.pressedScrollBarVertical != null) return uiEngineState.pressedScrollBarVertical;
         if (uiEngineState.pressedKnob != null) return uiEngineState.pressedKnob;
-        if (uiEngineState.pressedCanvas != null) return uiEngineState.pressedCanvas;
+        if (uiEngineState.pressedFramebufferViewport != null) return uiEngineState.pressedFramebufferViewport;
         if (uiEngineState.pressedTextField != null) return uiEngineState.pressedTextField;
         if (uiEngineState.pressedAppViewPort != null) return uiEngineState.pressedAppViewPort;
         if (uiEngineState.pressedGrid != null) return uiEngineState.pressedGrid;
@@ -1603,14 +1484,14 @@ final class UICommonUtils {
         return null;
     }
 
-    static Color color_darker(Color color){
+    static Color color_darker(Color color) {
         float amount = 0.7f;
-        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
+        return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
     }
 
-    static Color color_brigther(Color color){
+    static Color color_brigther(Color color) {
         float amount = 1.3f;
-        return new Color(color.r*amount,color.g*amount,color.b*amount,color.a);
+        return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
     }
 
 

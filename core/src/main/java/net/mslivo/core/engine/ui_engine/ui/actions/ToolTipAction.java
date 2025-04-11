@@ -8,4 +8,7 @@ public interface ToolTipAction {
     default void onUpdate() {
     }
 
+    default void onRemove(){
+    }
+
 }

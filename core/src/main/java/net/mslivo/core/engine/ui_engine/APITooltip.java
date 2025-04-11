@@ -7,7 +7,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
 import net.mslivo.core.engine.ui_engine.constants.SEGMENT_ALIGNMENT;
-import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
+import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
@@ -131,12 +131,12 @@ public final class APITooltip {
     public final class APITooltipSegment {
         public final APITooltipTextSegment text;
         public final APITooltipImageSegment image;
-        public final APITooltipCanvasSegment canvas;
+        public final APITooltipFrameBufferSegment framebuffer;
 
         APITooltipSegment() {
             text = new APITooltipTextSegment();
             image = new APITooltipImageSegment();
-            canvas = new APITooltipCanvasSegment();
+            framebuffer = new APITooltipFrameBufferSegment();
         }
 
         public void setColor(TooltipSegment tooltipSegment, Color color) {
@@ -281,114 +281,49 @@ public final class APITooltip {
 
         }
 
-        public final class APITooltipCanvasSegment {
+        public final class APITooltipFrameBufferSegment {
 
-            APITooltipCanvasSegment() {
+            APITooltipFrameBufferSegment() {
             }
 
 
-            public TooltipCanvasSegment create() {
-                return create(uiConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer) {
+                return create(nestedFrameBuffer, uiConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
-            public TooltipCanvasSegment create(SEGMENT_ALIGNMENT alignment) {
-                return create(uiConfig.tooltip_defaultCellColor, Color.GRAY, alignment, 1, 1, false, false, false);
-
-            }
-
-            public TooltipCanvasSegment create(Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment) {
-                return create(cellColor, contentColor, alignment, 1, 1, false, false, false);
-            }
-
-            public TooltipCanvasSegment create(Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height) {
-                return create(cellColor, contentColor, alignment, width, height, false, false, false);
-            }
-
-            public TooltipCanvasSegment create(Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
-                return create(cellColor, contentColor, alignment, width, height, merge, false, false);
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, SEGMENT_ALIGNMENT alignment) {
+                return create(nestedFrameBuffer, uiConfig.tooltip_defaultCellColor, Color.GRAY, alignment, 1, 1, false, false, false);
 
             }
 
-            public TooltipCanvasSegment create(Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
-                return create(cellColor, contentColor, alignment, width, height, merge, border, false);
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment) {
+                return create(nestedFrameBuffer, cellColor, contentColor, alignment, 1, 1, false, false, false);
             }
 
-            public TooltipCanvasSegment create(Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
-                TooltipCanvasSegment tooltipCanvasSegment = new TooltipCanvasSegment();
-                setSegmentValues(tooltipCanvasSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
-                tooltipCanvasSegment.colorMap = new ColorMap();
-                int widthPx = api.TS(width);
-                int heightPx = api.TS(height);
-                tooltipCanvasSegment.colorMap.width = widthPx;
-                tooltipCanvasSegment.colorMap.height = heightPx;
-                tooltipCanvasSegment.colorMap.r = new float[widthPx][heightPx];
-                tooltipCanvasSegment.colorMap.g = new float[widthPx][heightPx];
-                tooltipCanvasSegment.colorMap.b = new float[widthPx][heightPx];
-                tooltipCanvasSegment.colorMap.a = new float[widthPx][heightPx];
-                return tooltipCanvasSegment;
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height) {
+                return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, false, false, false);
             }
 
-            /* Draw Functions */
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
+                return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, merge, false, false);
 
-            public void point(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, float r, float g, float b, float a) {
-                if (tooltipCanvasSegment == null) return;
-                UICommonUtils.colorMap_set(tooltipCanvasSegment.colorMap, x, y, r, g, b, a);
             }
 
-            public void point(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, Color color) {
-                point(tooltipCanvasSegment, x, y, color.r, color.g, color.b, color.a);
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
+                return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, merge, border, false);
             }
 
-            public void clear(TooltipCanvasSegment tooltipCanvasSegment, float r, float g, float b, float a) {
-                if (tooltipCanvasSegment == null) return;
-                UICommonUtils.colorMap_clear(tooltipCanvasSegment.colorMap, r, g, b, a);
+            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
+                TooltipFramebufferViewportSegment tooltipFramebufferViewportSegment = new TooltipFramebufferViewportSegment();
+                setSegmentValues(tooltipFramebufferViewportSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
+                tooltipFramebufferViewportSegment.frameBuffer = nestedFrameBuffer;
+                return tooltipFramebufferViewportSegment;
             }
 
-            public void clear(TooltipCanvasSegment tooltipCanvasSegment, Color color) {
-                clear(tooltipCanvasSegment, color.r, color.g, color.b, color.a);
-            }
-
-            public void copy(TooltipCanvasSegment tooltipCanvasSegment, ColorMap colorMap) {
-                if (tooltipCanvasSegment == null) return;
-                UICommonUtils.colorMap_copy(colorMap, tooltipCanvasSegment.colorMap);
-            }
-
-            public Color getColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
-                if (tooltipCanvasSegment == null) return null;
-                return UICommonUtils.colorMap_getPointAsColor(tooltipCanvasSegment.colorMap, x, y);
-            }
-
-            public boolean isColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, float r, float g, float b, float a) {
-                if (tooltipCanvasSegment == null)
-                    return false;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y) == r &&
-                        UICommonUtils.colorMap_g(tooltipCanvasSegment.colorMap, x, y) == g &&
-                        UICommonUtils.colorMap_b(tooltipCanvasSegment.colorMap, x, y) == b &&
-                        UICommonUtils.colorMap_a(tooltipCanvasSegment.colorMap, x, y) == a;
-            }
-
-            public boolean isColor(TooltipCanvasSegment tooltipCanvasSegment, int x, int y, Color color) {
-                return isColor(tooltipCanvasSegment, x, y, color.r, color.g, color.b, color.a);
-            }
-
-            public float getR(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
-                if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_r(tooltipCanvasSegment.colorMap, x, y);
-            }
-
-            public float getG(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
-                if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_g(tooltipCanvasSegment.colorMap, x, y);
-            }
-
-            public float getB(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
-                if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_b(tooltipCanvasSegment.colorMap, x, y);
-            }
-
-            public float getA(TooltipCanvasSegment tooltipCanvasSegment, int x, int y) {
-                if (tooltipCanvasSegment == null) return 0f;
-                return UICommonUtils.colorMap_a(tooltipCanvasSegment.colorMap, x, y);
+            public void setFrameBuffer(TooltipFramebufferViewportSegment tooltipFramebufferViewportSegment, NestedFrameBuffer nestedFrameBuffer) {
+                if (tooltipFramebufferViewportSegment == null)
+                    return;
+                tooltipFramebufferViewportSegment.frameBuffer = nestedFrameBuffer;
             }
 
         }

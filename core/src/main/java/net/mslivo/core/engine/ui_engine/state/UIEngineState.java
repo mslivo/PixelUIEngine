@@ -20,10 +20,10 @@ import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
+import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
@@ -94,6 +94,7 @@ public final class UIEngineState {
     public Button pressedButton;
     public ScrollbarVertical pressedScrollBarVertical;
     public ScrollbarHorizontal pressedScrollBarHorizontal;
+    public FrameBufferViewport pressedFramebufferViewport;
     public Tooltip tooltip;
     public Tooltip fadeOutTooltip;
     public float tooltip_fadePct;
@@ -102,7 +103,6 @@ public final class UIEngineState {
     public Tooltip appToolTip;
     public Object tooltip_lastHoverObject;
     public Knob pressedKnob;
-    public Canvas pressedCanvas;
     public AppViewport pressedAppViewPort;
     public Textfield pressedTextField;
     public int pressedTextFieldMouseX;

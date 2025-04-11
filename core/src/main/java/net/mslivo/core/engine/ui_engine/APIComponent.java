@@ -14,7 +14,6 @@ import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.CHECKBOX_STYLE;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_ROTATION;
 import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
-import net.mslivo.core.engine.ui_engine.rendering.ColorMap;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -24,8 +23,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
 import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
@@ -61,7 +58,6 @@ public final class APIComponent {
     public final APIScrollbar scrollbar;
     public final APIList list;
     public final APITextfield textfield;
-    public final APICanvas canvas;
     public final APIKnob knob;
     public final APIText text;
     public final APIImage image;
@@ -83,7 +79,6 @@ public final class APIComponent {
         this.scrollbar = new APIScrollbar();
         this.list = new APIList();
         this.textfield = new APITextfield();
-        this.canvas = new APICanvas();
         this.knob = new APIKnob();
         this.text = new APIText();
         this.image = new APIImage();
@@ -1017,237 +1012,6 @@ public final class APIComponent {
             if (textField == null) return false;
             return textField.contentValid;
         }
-    }
-
-    public final class APICanvas {
-
-        public final APICanvasImage canvasImage;
-
-        APICanvas() {
-            this.canvasImage = new APICanvasImage();
-        }
-
-
-        public final CanvasAction DEFAULT_CANVAS_ACTION = new CanvasAction() {
-        };
-
-        public Canvas create(int x, int y, int width, int height) {
-            return create(x, y, width, height, DEFAULT_CANVAS_ACTION, null);
-        }
-
-        public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction) {
-            return create(x, y, width, height, canvasAction, null);
-        }
-
-        public Canvas create(int x, int y, int width, int height, CanvasAction canvasAction, CanvasImage[] canvasImages) {
-            Canvas canvas = new Canvas();
-            setComponentCommonInitValuesInternal(canvas, x, y, width, height, Color.GRAY, Color.GRAY);
-            canvas.colorMap = new ColorMap();
-            int widthPx = api.TS(width);
-            int heightPx = api.TS(height);
-            canvas.colorMap.width = widthPx;
-            canvas.colorMap.height = heightPx;
-            canvas.colorMap.r = new float[widthPx][heightPx];
-            canvas.colorMap.g = new float[widthPx][heightPx];
-            canvas.colorMap.b = new float[widthPx][heightPx];
-            canvas.colorMap.a = new float[widthPx][heightPx];
-            canvas.canvasAction = canvasAction != null ? canvasAction : DEFAULT_CANVAS_ACTION;
-            canvas.canvasImages = new ArrayList<>();
-            if (canvasImages != null) {
-                for (int i = 0; i < canvasImages.length; i++) {
-                    if (canvasImages[i].addedToCanvas == null) {
-                        canvas.canvasImages.add(canvasImages[i]);
-                        canvasImages[i].addedToCanvas = canvas;
-                    }
-                }
-            }
-
-            return canvas;
-        }
-
-        public void setCanvasAction(Canvas canvas, CanvasAction canvasAction) {
-            if (canvas == null) return;
-            canvas.canvasAction = canvasAction;
-        }
-
-        public boolean isPointInBounds(Canvas canvas, int x, int y) {
-            if (canvas == null) return false;
-            return UICommonUtils.colorMap_inBounds(canvas.colorMap, x, y);
-        }
-
-        public void addCanvasImage(Canvas canvas, CanvasImage canvasImage) {
-            if (canvas == null || canvasImage == null) return;
-            UICommonUtils.canvas_addCanvasImage(canvas, canvasImage);
-        }
-
-        public void addCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
-            if (canvas == null || canvasImages == null) return;
-            for (int i = 0; i < canvasImages.length; i++) addCanvasImage(canvas, canvasImages[i]);
-        }
-
-        public void removeCanvasImage(Canvas canvas, CanvasImage canvasImage) {
-            if (canvas == null || canvasImage == null) return;
-            UICommonUtils.canvas_removeCanvasImage(canvas, canvasImage);
-        }
-
-        public void removeCanvasImages(Canvas canvas, CanvasImage[] canvasImages) {
-            if (canvas == null || canvasImages == null) return;
-            for (int i = 0; i < canvasImages.length; i++) removeCanvasImage(canvas, canvasImages[i]);
-        }
-
-        public void removeAllCanvasImages(Canvas canvas) {
-            if (canvas == null) return;
-            removeCanvasImages(canvas, canvas.canvasImages.toArray(new CanvasImage[]{}));
-        }
-
-        public ArrayList<CanvasImage> findMapOverlaysByName(Canvas canvas, String name) {
-            if (canvas == null || name == null) return new ArrayList<>();
-            ArrayList<CanvasImage> result = new ArrayList<>();
-            for (int i = 0; i < canvas.canvasImages.size(); i++)
-                if (name.equals(canvas.canvasImages.get(i).name)) result.add(canvas.canvasImages.get(i));
-            return result;
-        }
-
-        public CanvasImage findMapOverlayByName(Canvas canvas, String name) {
-            if (canvas == null || name == null) return null;
-            ArrayList<CanvasImage> result = findMapOverlaysByName(canvas, name);
-            return result.size() > 0 ? result.getFirst() : null;
-        }
-
-        /* Draw Functions */
-
-        public void point(Canvas canvas, int x, int y, float r, float g, float b, float a) {
-            if (canvas == null) return;
-            UICommonUtils.colorMap_set(canvas.colorMap, x, y, r, g, b, a);
-        }
-
-        public void point(Canvas canvas, int x, int y, Color color) {
-            point(canvas, x, y, color.r, color.g, color.b, color.a);
-        }
-
-        public void clear(Canvas canvas, float r, float g, float b, float a) {
-            if (canvas == null) return;
-            UICommonUtils.colorMap_clear(canvas.colorMap, r, g, b, a);
-        }
-
-        public void clear(Canvas canvas, Color color) {
-            clear(canvas, color.r, color.g, color.b, color.a);
-        }
-
-        public void copy(Canvas canvas, ColorMap colorMap) {
-            if (canvas == null) return;
-            UICommonUtils.colorMap_copy(colorMap, canvas.colorMap);
-        }
-
-        public Color getPoint(Canvas canvas, int x, int y) {
-            if (canvas == null) return null;
-            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x, y);
-        }
-
-        public Color getColor(Canvas canvas, int x, int y) {
-            if (canvas == null) return null;
-            return UICommonUtils.colorMap_getPointAsColor(canvas.colorMap, x, y);
-        }
-
-        public float getR(Canvas canvas, int x, int y) {
-            if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_r(canvas.colorMap, x, y);
-        }
-
-        public float getG(Canvas canvas, int x, int y) {
-            if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_g(canvas.colorMap, x, y);
-        }
-
-        public float getB(Canvas canvas, int x, int y) {
-            if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_b(canvas.colorMap, x, y);
-        }
-
-        public float getA(Canvas canvas, int x, int y) {
-            if (canvas == null) return 0f;
-            return UICommonUtils.colorMap_a(canvas.colorMap, x, y);
-        }
-
-        public final class APICanvasImage {
-
-            APICanvasImage() {
-            }
-
-            public CanvasImage create(CMediaSprite image, int x, int y) {
-                return create(image, x, y, 0, false, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
-            }
-
-            public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex) {
-                return create(image, x, y, arrayIndex, false, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
-            }
-
-            public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut) {
-                return create(image, x, y, arrayIndex, fadeOut, uiConfig.component_mapOverlayDefaultFadeoutSpeed);
-            }
-
-            public CanvasImage create(CMediaSprite image, int x, int y, int arrayIndex, boolean fadeOut, float fadeOutSpeed) {
-                CanvasImage canvasImage = new CanvasImage();
-                canvasImage.image = image;
-                canvasImage.x = x;
-                canvasImage.y = y;
-                canvasImage.fadeOut = fadeOut;
-                canvasImage.fadeOutSpeed = Math.max(fadeOutSpeed, 0);
-                canvasImage.color = new Color(Color.GRAY);
-                canvasImage.arrayIndex = Math.max(arrayIndex, 0);
-                canvasImage.name = Tools.Text.validString("");
-                canvasImage.data = null;
-                canvasImage.addedToCanvas = null;
-                return canvasImage;
-            }
-
-            public void setFadeOut(CanvasImage canvasImage, boolean fadeOut) {
-                if (canvasImage == null) return;
-                canvasImage.fadeOut = fadeOut;
-            }
-
-            public void setFadeOutTime(CanvasImage canvasImage, float fadeoutSpeed) {
-                if (canvasImage == null) return;
-                canvasImage.fadeOutSpeed = Math.max(fadeoutSpeed, 0);
-            }
-
-            public void setPosition(CanvasImage canvasImage, int x, int y) {
-                if (canvasImage == null) return;
-                canvasImage.x = x;
-                canvasImage.y = y;
-            }
-
-            public void move(CanvasImage canvasImage, int x, int y) {
-                if (canvasImage == null) return;
-                setPosition(canvasImage, canvasImage.x + x, canvasImage.y + y);
-            }
-
-            public void setImage(CanvasImage canvasImage, CMediaSprite image) {
-                if (canvasImage == null) return;
-                canvasImage.image = image;
-            }
-
-            public void setColor(CanvasImage canvasImage, Color color) {
-                if (canvasImage == null) return;
-                canvasImage.color.set(color);
-            }
-
-            public void setArrayIndex(CanvasImage canvasImage, int arrayIndex) {
-                if (canvasImage == null) return;
-                canvasImage.arrayIndex = Math.max(arrayIndex, 0);
-            }
-
-            public void setName(CanvasImage canvasImage, String name) {
-                if (canvasImage == null) return;
-                canvasImage.name = Tools.Text.validString(name);
-            }
-
-            public void setData(CanvasImage canvasImage, Object data) {
-                if (canvasImage == null) return;
-                canvasImage.data = data;
-            }
-        }
-
     }
 
     public final class APIKnob {

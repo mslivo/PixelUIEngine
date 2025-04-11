@@ -1,12 +1,7 @@
 package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.BooleanArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.LongArray;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
@@ -22,8 +17,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
 import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.CanvasImage;
 import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
 import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
@@ -63,7 +56,6 @@ public final class APIComposites {
     public final APICompositeHotkey hotkey;
     public final APICompositeCheckbox checkBox;
     public final APICompositeModal modal;
-    public final APICompositeCanvas canvas;
     public final APICompositeButton button;
     public final APICompositeTextfield textfield;
     public final APICompositeTabbar tabBar;
@@ -79,7 +71,6 @@ public final class APIComposites {
         this.hotkey = new APICompositeHotkey();
         this.checkBox = new APICompositeCheckbox();
         this.modal = new APICompositeModal();
-        this.canvas = new APICompositeCanvas();
         this.button = new APICompositeButton();
         this.textfield = new APICompositeTextfield();
         this.tabBar = new APICompositeTabbar();
@@ -108,7 +99,7 @@ public final class APIComposites {
             public final boolean displayPagesOf;
             public final boolean doubleSized;
 
-            public PageAbleReadOnlyGrid(Grid grid, ImageButton backButton, ImageButton forwardButton, Text text, ArrayList items, ArrayList<Object[][]> pages, int x, int y, int width, int height,boolean doubleSized, boolean placeButtonsTop, boolean displayPagesOf) {
+            public PageAbleReadOnlyGrid(Grid grid, ImageButton backButton, ImageButton forwardButton, Text text, ArrayList items, ArrayList<Object[][]> pages, int x, int y, int width, int height, boolean doubleSized, boolean placeButtonsTop, boolean displayPagesOf) {
                 this.backButton = backButton;
                 this.forwardButton = forwardButton;
                 this.grid = grid;
@@ -313,14 +304,14 @@ public final class APIComposites {
         private void pageableGridUpdateButtonsText(APICompositeGrid.PageAbleReadOnlyGrid pageGrid) {
             String pageString, pageStringMax;
 
-            if(pageGrid.displayPagesOf) {
+            if (pageGrid.displayPagesOf) {
                 pageStringMax = String.format(PAGE_TEXT_PAGE_OF, pageGrid.pages.size(), pageGrid.pages.size());
                 pageString = String.format(PAGE_TEXT_PAGE_OF, pageGrid.currentPage.get() + 1, pageGrid.pages.size());
-            }else{
+            } else {
                 pageStringMax = String.format(PAGE_TEXT_PAGE, pageGrid.pages.size());
                 pageString = String.format(PAGE_TEXT_PAGE, pageGrid.currentPage.get() + 1);
             }
-            int yPosition = pageGrid.placeButtonsTop ? (pageGrid.y+pageGrid.height-1) : pageGrid.y;
+            int yPosition = pageGrid.placeButtonsTop ? (pageGrid.y + pageGrid.height - 1) : pageGrid.y;
 
             api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, yPosition);
             api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, yPosition);
@@ -701,6 +692,8 @@ public final class APIComposites {
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
 
+            throw new RuntimeException("todo");
+            /*
             TextureRegion colorTexture = mediaManager.image(colors);
 
             final int colorTextureWidthTiles = colorTexture.getRegionWidth() / 8;
@@ -799,7 +792,9 @@ public final class APIComposites {
             api.component.move(colorCanvas, api.TS_HALF(), api.TS_HALF());
             api.window.addComponents(modal, componentl);
 
+
             return modal;
+             */
         }
 
         public Window createTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
@@ -1087,11 +1082,13 @@ public final class APIComposites {
 
     }
 
+    /*
     public final class APICompositeCanvas {
         APICompositeCanvas() {
         }
 
         public GraphInfo drawGraph(Canvas canvas, int itemCount, int steps, int stepSize, Color colorBackGround, DrawGraphFunctions drawGraphFunctions, int[] hiAndLowValueReference, boolean drawBackGroundLines) {
+
             int mapWidth = canvas.width * api.TS();
             int mapHeight = canvas.height * api.TS();
             int[] indexAtPosition = new int[mapWidth];
@@ -1225,6 +1222,8 @@ public final class APIComposites {
             long getValueAtIndex(int index);
         }
     }
+
+     */
 
     public final class APICompositeButton {
         APICompositeButton() {

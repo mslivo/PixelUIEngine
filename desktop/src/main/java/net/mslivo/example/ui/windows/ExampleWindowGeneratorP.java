@@ -30,7 +30,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
 import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
 import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
 import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.components.canvas.Canvas;
 import net.mslivo.core.engine.ui_engine.ui.components.progressbar.Progressbar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.Scrollbar;
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarHorizontal;
@@ -47,7 +46,7 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipCanvasSegment;
+import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
@@ -434,35 +433,14 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
             }
         });
 
-        Canvas canvas = api.component.canvas.create(18, 5, 5, 5);
-        api.component.canvas.setCanvasAction(canvas, new CanvasAction() {
-            @Override
-            public void onPress(int x, int y) {
-                api.component.canvas.clear(canvas, Color.WHITE.cpy());
-            }
-        });
-        api.component.addUpdateAction(canvas, new UpdateAction() {
-            @Override
-            public void onUpdate() {
-                for (int i = 0; i < 20; i++)
-                    api.component.canvas.point(canvas,
-                            MathUtils.random(0, canvas.width * api.TS()),
-                            MathUtils.random(0, canvas.height * api.TS()),
-                            MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
-                    );
-
-            }
-        });
-
         NestedFrameBuffer nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888,32,32);
         FrameBufferViewport frameBufferViewport = api.component.frameBufferViewport.create(24,5,nestedFrameBuffer);
+        OrthographicCamera camera2 = new OrthographicCamera(32,32);
+        camera2.setToOrtho(false,32,32);
+        camera2.update();
 
-        OrthographicCamera camera = new OrthographicCamera(32,32);
-        camera.setToOrtho(false,32,32);
-        camera.update();
 
-
-        SpriteRenderer spriteRenderer = new SpriteRenderer(mediaManager);
+        SpriteRenderer spriteRenderer2 = new SpriteRenderer(mediaManager);
         api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
             float deg1 = 0f;
             float deg2 = 0f;
@@ -471,20 +449,20 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                 nestedFrameBuffer.begin();
                 Gdx.gl.glClearColor(Math.abs(MathUtils.sin(deg1)), 1f-Math.abs(MathUtils.sin(deg2)), 0f, 1f);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                spriteRenderer.setProjectionMatrix(camera.combined);
-                spriteRenderer.begin();
-                spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,12+MathUtils.sin(deg1)*8f,12+MathUtils.cos(deg2)*8f);
+                spriteRenderer2.setProjectionMatrix(camera2.combined);
+                spriteRenderer2.begin();
+                spriteRenderer2.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,12+MathUtils.sin(deg1)*8f,12+MathUtils.cos(deg2)*8f);
                 deg1+= 0.05f;
                 deg2+= 0.08f;
-                spriteRenderer.end();
+                spriteRenderer2.end();
                 nestedFrameBuffer.end();
 
             }
         });
 
 
-        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas,frameBufferViewport});
-        api.component.tabbar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, canvas,frameBufferViewport});
+        api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, frameBufferViewport});
+        api.component.tabbar.tab.addTabComponents(tabTextButton, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, frameBufferViewport});
 
         // Image Buttons Tab
 
@@ -531,8 +509,16 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         });
 
 
-        TooltipCanvasSegment canvasSegment = api.toolTip.segment.canvas.create(Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,8,3);
+        int segment_w = 8;
+        int segment_h = 3;
 
+        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888,api.TS(segment_w),api.TS(segment_h));
+        OrthographicCamera tt_camera = new OrthographicCamera(api.TS(segment_w),api.TS(segment_h));
+        tt_camera.setToOrtho(false,api.TS(segment_w),api.TS(segment_h));
+        tt_camera.update();
+
+        TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer,Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,segment_w,segment_h);
+        SpriteRenderer tt_spriteRenderer = new SpriteRenderer(mediaManager);
 
         Tooltip tooltip = api.toolTip.create(
                 new TooltipSegment[]{
@@ -545,13 +531,29 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.RIGHT, false, true),
                         api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0,true, false, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
                         api.toolTip.segment.text.create("555555", Color.WHITE,Color.PURPLE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        canvasSegment,
+                        frameBufferSegment,
                 }, new ToolTipAction() {
                     @Override
                     public void onDisplay() {
-                        api.toolTip.segment.canvas.clear(canvasSegment,Color.CLEAR);
+                    }
+
+                    @Override
+                    public void onUpdate() {
+                        tt_nestedFrameBuffer.begin();
+                        Gdx.gl.glClearColor(0f, 1f, 0f, 1f);
+                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                        tt_spriteRenderer.setProjectionMatrix(tt_camera.combined);
+                        tt_spriteRenderer.begin();
+                        tt_spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,8,8);
+                        tt_spriteRenderer.end();
+                        tt_nestedFrameBuffer.end();
+                    }
+
+                    @Override
+                    public void onRemove() {
                     }
                 }, 0, Color.RED, Color.BLUE, 5, DIRECTION.RIGHT
+
         );
 
         api.component.setToolTip(imageButton4, tooltip);
@@ -559,11 +561,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         api.toolTip.addUpdateAction(tooltip, new UpdateAction(0) {
             @Override
             public void onUpdate() {
-                for (int i = 0; i < 20; i++)
-                    api.toolTip.segment.canvas.point(canvasSegment,
-                            MathUtils.random(1, canvasSegment.colorMap.width),MathUtils.random(1, canvasSegment.colorMap.height),
-                            MathUtils.random(1f),MathUtils.random(1f),MathUtils.random(1f),1f
-                    );
+
             }
         });
 
