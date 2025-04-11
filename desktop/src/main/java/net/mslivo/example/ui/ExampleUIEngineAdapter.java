@@ -38,6 +38,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private float animation_timer;
     private boolean resetPressed;
     private SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRendererDefault;
     private PrimitiveRenderer primitiveRenderer;
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
@@ -66,6 +67,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
+        this.spriteRendererDefault = new SpriteRenderer(mediaManager);
         this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.MAX_VERTEXES_DEFAULT);
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
@@ -346,6 +348,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         spriteRenderer.end();
+
+        this.spriteRendererDefault.begin();
+
+        this.spriteRendererDefault.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST, 300, 200);
+        this.spriteRendererDefault.end();
 
     }
 
