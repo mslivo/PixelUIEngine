@@ -15,7 +15,6 @@ import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
@@ -50,7 +49,6 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
-import org.lwjgl.opengl.GL32;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -522,50 +520,48 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaM
         TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer,Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,segment_w,segment_h);
         SpriteRenderer tt_spriteRenderer = new SpriteRenderer(mediaManager);
 
-        Tooltip tooltip = api.toolTip.create(
-                new TooltipSegment[]{
-                        api.toolTip.segment.text.create("color[#FF00FF00]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
-                        api.toolTip.segment.text.create("1", Color.WHITE,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("2", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("3", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0,true, false, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
-                        api.toolTip.segment.text.create("555555", Color.WHITE,Color.PURPLE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                        frameBufferSegment,
-                }, new ToolTipAction() {
-                    @Override
-                    public void onDisplay() {
-                    }
 
-                    @Override
-                    public void onUpdate() {
-                        tt_nestedFrameBuffer.begin();
-                        Gdx.gl.glClearColor(0f, 1f, 0f, 1f);
-                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                        tt_spriteRenderer.setProjectionMatrix(tt_camera.combined);
-                        tt_spriteRenderer.begin();
-                        tt_spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,8,8);
-                        tt_spriteRenderer.end();
-                        tt_nestedFrameBuffer.end();
-                    }
-
-                    @Override
-                    public void onRemove() {
-                    }
-                }, 0, Color.RED, Color.BLUE, 5, DIRECTION.RIGHT
-
-        );
-
-        api.component.setToolTip(imageButton4, tooltip);
-
-        api.toolTip.addUpdateAction(tooltip, new UpdateAction(0) {
+        api.component.button.setButtonAction(imageButton4, new ButtonAction() {
             @Override
-            public void onUpdate() {
+            public Tooltip onShowTooltip() {
+                return api.toolTip.create(
+                        new TooltipSegment[]{
+                                api.toolTip.segment.text.create("color[#FF00FF00]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
+                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
+                                api.toolTip.segment.text.create("1", Color.WHITE,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("2", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("3", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                                api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0,true, false, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
+                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.PURPLE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                                frameBufferSegment,
+                        }, new ToolTipAction() {
+                            @Override
+                            public void onDisplay() {
+                            }
 
+                            @Override
+                            public void onUpdate() {
+                                tt_nestedFrameBuffer.begin();
+                                Gdx.gl.glClearColor(0f, 1f, 0f, 1f);
+                                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                                tt_spriteRenderer.setProjectionMatrix(tt_camera.combined);
+                                tt_spriteRenderer.begin();
+                                tt_spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,8,8);
+                                tt_spriteRenderer.end();
+                                tt_nestedFrameBuffer.end();
+                            }
+
+                            @Override
+                            public void onRemove() {
+                            }
+                        }, 0, Color.RED, Color.BLUE, 5, DIRECTION.RIGHT
+
+                );
             }
         });
+
 
 
         ArrayList<Component> border = api.composites.image.createBorder(10, 4, 4, 4);

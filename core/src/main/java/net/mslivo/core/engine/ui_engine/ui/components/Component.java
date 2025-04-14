@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 public abstract class Component extends UpdateActionSupport {
     public int x, y, width, height;
-    public Tooltip toolTip;
     public boolean updateToolTip;
     public Color color;
     public Color color2;

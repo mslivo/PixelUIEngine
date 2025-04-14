@@ -1720,7 +1720,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
                 } else {
                     // take component tooltip
-                    uiEngineState.tooltip = hoverComponent.toolTip;
+                    uiEngineState.tooltip = actions_getUIObjectCommonActions(hoverComponent).onShowTooltip();
                     uiEngineState.tooltip_lastHoverObject = hoverComponent;
                 }
             }
@@ -1877,6 +1877,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Window window -> window.windowAction;
             case TopNotification notification -> notification.topNotificationAction;
             case Button button -> button.buttonAction;
+            case Checkbox checkbox -> checkbox.checkBoxAction;
             case Combobox comboBox -> comboBox.comboBoxAction;
             case AppViewport appViewPort -> appViewPort.appViewPortAction;
             case Image image -> image.imageAction;

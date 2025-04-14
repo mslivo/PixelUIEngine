@@ -40,7 +40,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -373,7 +372,7 @@ public final class APIComponent {
             public void setImage(ImageButton imageButton, CMediaSprite image, boolean centerContent) {
                 if (imageButton == null) return;
                 imageButton.image = image;
-                if(centerContent)
+                if (centerContent)
                     centerContent(imageButton);
             }
 
@@ -1111,7 +1110,7 @@ public final class APIComponent {
 
 
         public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer) {
-            return create(x,y,nestedFrameBuffer,DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION);
+            return create(x, y, nestedFrameBuffer, DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION);
         }
 
         public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction) {
@@ -1546,11 +1545,6 @@ public final class APIComponent {
 
     }
 
-    public void setToolTip(Component component, Tooltip tooltip) {
-        if (component == null) return;
-        component.toolTip = tooltip;
-    }
-
     public void setPosition(Component component, int x, int y) {
         if (component == null) return;
         component.x = x;
@@ -1767,7 +1761,6 @@ public final class APIComponent {
         component.updateToolTip = false;
         component.addedToTab = null;
         component.addedToWindow = null;
-        component.toolTip = null;
         component.addedToScreen = false;
     }
 
