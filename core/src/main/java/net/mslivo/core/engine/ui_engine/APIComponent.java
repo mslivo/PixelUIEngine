@@ -1738,7 +1738,7 @@ public final class APIComponent {
 
     public void forceToolTipUpdate(Component component) {
         if (component == null) return;
-        component.updateToolTip = true;
+        uiEngineState.updateTooltipComponent = component;
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
@@ -1758,7 +1758,6 @@ public final class APIComponent {
         component.data = null;
         component.name = "";
         component.visible = true;
-        component.updateToolTip = false;
         component.addedToTab = null;
         component.addedToWindow = null;
         component.addedToScreen = false;
