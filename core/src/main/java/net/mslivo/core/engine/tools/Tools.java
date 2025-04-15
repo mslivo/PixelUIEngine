@@ -25,8 +25,8 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
@@ -223,7 +223,7 @@ public class Tools {
                     }
                 }
             }
-            ;
+
         }
 
     }
@@ -828,7 +828,7 @@ public class Tools {
             if (set == null || set.isEmpty()) {
                 return null;
             }
-            int index = MathUtils.random(0,set.size()-1);
+            int index = MathUtils.random(0, set.size() - 1);
             Iterator<T> it = set.iterator();
             for (int i = 0; i < index; i++)
                 it.next();
@@ -836,6 +836,30 @@ public class Tools {
             return it.next();
         }
 
+        public static float exponentialDecay( float curve, int value){
+            return 1f - (float)Math.exp(-curve * value);
+        }
+
+
+        public static class IntValueWatcher {
+
+            public int value = 0;
+            private boolean initialized;
+
+            public IntValueWatcher() {
+                super();
+            }
+
+            public boolean valueChanged(int currentValue) {
+                if (!initialized || this.value != currentValue) {
+                    this.value = currentValue;
+                    this.initialized = true;
+                    return true;
+                }
+                return false;
+            }
+
+        }
 
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
@@ -974,7 +998,7 @@ public class Tools {
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX ) >= Bx && (pointY) >= By;
+            return Bx + Bw >= pointX && By + Bh >= pointY && (pointX) >= Bx && (pointY) >= By;
         }
 
         public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
