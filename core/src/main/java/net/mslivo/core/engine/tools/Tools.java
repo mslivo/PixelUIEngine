@@ -840,26 +840,19 @@ public class Tools {
             return 1f - (float)Math.exp(-curve * value);
         }
 
-
-        public static class IntValueWatcher {
-
-            public int value = 0;
-            private boolean initialized;
-
-            public IntValueWatcher() {
-                super();
-            }
-
-            public boolean valueChanged(int currentValue) {
-                if (!initialized || this.value != currentValue) {
-                    this.value = currentValue;
-                    this.initialized = true;
-                    return true;
-                }
-                return false;
-            }
-
+        public static int randomCountHits(float baseChance){
+            return randomCountHits(baseChance,0.5f);
         }
+
+        public static int randomCountHits(float baseChance, float chanceReduce){
+            int hits = 0;
+            while (Tools.Calc.randomChance(baseChance)){
+                hits++;
+                baseChance *= chanceReduce;
+            }
+            return hits;
+        }
+
 
         private static final IntMap<LongArray> doInRadiusCache = new IntMap<>();
 
@@ -1020,6 +1013,30 @@ public class Tools {
         public static boolean circleCollideFast(int x1, int y1, int r1, int x2, int y2, int r2) {
             return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
         }
+
+    }
+
+    public static class Misc {
+
+        public static class IntValueWatcher {
+            public int value = 0;
+            private boolean initialized;
+
+            public IntValueWatcher() {
+                super();
+            }
+
+            public boolean hasValueChanged(int currentValue) {
+                if (!initialized || this.value != currentValue) {
+                    this.value = currentValue;
+                    this.initialized = true;
+                    return true;
+                }
+                return false;
+            }
+
+        }
+
 
     }
 
