@@ -805,6 +805,10 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
+        public static float pctOfRange(float[] range, float pct){
+            return range[0]+((range[1]-range[0])*pct);
+        }
+
         public static boolean randomChance(long oneIn) {
             if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
