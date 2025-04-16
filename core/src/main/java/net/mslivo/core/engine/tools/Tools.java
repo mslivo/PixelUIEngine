@@ -841,7 +841,7 @@ public class Tools {
         }
 
         public static int randomCountHits(float baseChance){
-            return randomCountHits(baseChance,0.5f);
+            return randomCountHits(baseChance,1f);
         }
 
         public static int randomCountHits(float baseChance, float chanceReduce){
