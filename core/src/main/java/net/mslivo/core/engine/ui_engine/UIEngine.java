@@ -1890,6 +1890,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Tabbar tabBar -> tabBar.tabBarAction;
             case Text text -> text.textAction;
             case Textfield textField -> textField.textFieldAction;
+            case Progressbar progressbar -> progressbar.progressBarAction;
             case null, default -> null;
         };
     }

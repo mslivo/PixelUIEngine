@@ -204,25 +204,29 @@ public final class APIComponent {
 
         }
 
+        public final ProgressBarAction DEFAULT_PROGRESSBAR_ACTION = new ProgressBarAction() {
+        };
+
         public Progressbar create(int x, int y, int width) {
-            return create(x, y, width, 0f, true, false);
+            return create(x, y, width, 0f, false, false, DEFAULT_PROGRESSBAR_ACTION);
         }
 
         public Progressbar create(int x, int y, int width, float progress) {
-            return create(x, y, width, progress, true, false);
-        }
-
-        public Progressbar create(int x, int y, int width, float progress, boolean progressText) {
-            return create(x, y, width, progress, progressText, false);
+            return create(x, y, width, progress, false, false, DEFAULT_PROGRESSBAR_ACTION);
         }
 
         public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal) {
+            return create(x, y, width, progress, progressText, progressText2Decimal, DEFAULT_PROGRESSBAR_ACTION);
+        }
+
+        public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, ProgressBarAction progressBarAction) {
             Progressbar progressBar = new Progressbar();
             setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
             progressBar.fontColor = uiConfig.ui_font_defaultColor.cpy();
+            progressBar.progressBarAction = progressBarAction;
             return progressBar;
         }
 
@@ -244,6 +248,12 @@ public final class APIComponent {
         public void setProgressText2Decimal(Progressbar progressBar, boolean progressText2Decimal) {
             if (progressBar == null) return;
             progressBar.progressText2Decimal = progressText2Decimal;
+        }
+
+        public void setProgressBarAction(Progressbar progressBar, ProgressBarAction progressBarAction){
+            if(progressBar == null)
+                return;
+            progressBar.progressBarAction = progressBarAction;
         }
 
     }
