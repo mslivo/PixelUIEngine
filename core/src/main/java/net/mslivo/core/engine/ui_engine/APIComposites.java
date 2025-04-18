@@ -93,7 +93,7 @@ public final class APIComposites {
             public final ArrayList items;
             public final ArrayList<Object[][]> pages;
             public final AtomicInteger currentPage;
-            public final int width, height, gridHeight;
+            public final int width, height;
             public final int x, y;
             public final boolean placeButtonsTop;
             public final boolean displayPagesOf;
@@ -114,7 +114,6 @@ public final class APIComposites {
                 };
                 this.width = width;
                 this.height = height;
-                this.gridHeight = height - 1;
                 this.x = x;
                 this.y = y;
                 this.currentPage = new AtomicInteger();
@@ -125,14 +124,21 @@ public final class APIComposites {
             return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false, false, true);
         }
 
+        private int pageAbleReadOnlyGridControlsY(int y, int height, boolean placeButtonTop, boolean doubleSized){
+            return (y + (placeButtonTop ? ((height)*(doubleSized ? 2 : 1)) : 0));
+        }
+
+
         public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean doubleSized, boolean placeButtonTop, boolean displayPagesOf) {
 
             ArrayList<Object[][]> pages = new ArrayList<>();
             Grid grid = api.component.grid.create(x, y + (placeButtonTop ? 0 : 1), null, null, false, false, false, false, doubleSized);
-            ImageButton backButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
 
-            Text pageText = api.component.text.create(x, placeButtonTop ? height : y, 2, "");
-            ImageButton forwardButton = api.component.button.imageButton.create(0, 0, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
+            int y_controls = pageAbleReadOnlyGridControlsY(y,height,placeButtonTop, doubleSized);
+
+            ImageButton backButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
+            Text pageText = api.component.text.create(x, y_controls, 2, "");
+            ImageButton forwardButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x, y, width, height, doubleSized, placeButtonTop, displayPagesOf);
 
@@ -270,19 +276,19 @@ public final class APIComposites {
         }
 
         private void pageableGridUpdatePages(PageAbleReadOnlyGrid pageGrid) {
-            int pageSize = pageGrid.width * pageGrid.gridHeight;
+            int pageSize = pageGrid.width * pageGrid.height;
             int pagesCount = MathUtils.floor(pageGrid.items.size() / (float) pageSize);
             if (pageGrid.items.size() % pageSize > 0 || pageGrid.items.size() == 0) pagesCount++;
 
             pageGrid.pages.clear();
             for (int i = 0; i < pagesCount; i++) {
-                Object[][] page = new Object[pageGrid.width][pageGrid.gridHeight];
+                Object[][] page = new Object[pageGrid.width][pageGrid.height];
                 pageGrid.pages.add(page);
             }
 
             int pageIndex = 0;
             int ix = 0;
-            int iy = pageGrid.gridHeight - 1;
+            int iy = pageGrid.height - 1;
             for (int i = 0; i < pageGrid.items.size(); i++) {
                 Object[][] page = pageGrid.pages.get(pageIndex);
                 page[ix][iy] = pageGrid.items.get(i);
@@ -291,7 +297,7 @@ public final class APIComposites {
                     ix = 0;
                     iy--;
                     if (iy < 0) {
-                        iy = pageGrid.gridHeight - 1;
+                        iy = pageGrid.height - 1;
                         pageIndex++;
                     }
                 }
@@ -311,12 +317,13 @@ public final class APIComposites {
                 pageStringMax = String.format(PAGE_TEXT_PAGE, pageGrid.pages.size());
                 pageString = String.format(PAGE_TEXT_PAGE, pageGrid.currentPage.get() + 1);
             }
-            int yPosition = pageGrid.placeButtonsTop ? (pageGrid.y + pageGrid.height - 1) : pageGrid.y;
 
-            api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, yPosition);
-            api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, yPosition);
+            int y_controls = pageAbleReadOnlyGridControlsY(pageGrid.y,pageGrid.height,pageGrid.placeButtonsTop, pageGrid.doubleSized);
+
+            api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, y_controls);
+            api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, y_controls);
             int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
-            api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, yPosition);
+            api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, y_controls);
             api.component.text.setText(pageGrid.text, pageString);
             api.component.setWidth(pageGrid.text, textWidthTiles);
             return;
