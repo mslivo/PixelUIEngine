@@ -248,13 +248,14 @@ public final class MediaManager {
             for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
                 Pixmap symbolPixmap = symbolPixmaps[i2];
 
-                symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
-                xCurrent += symbolPixmap.getWidth();
-                if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
+                if ((xCurrent + symbolPixmap.getWidth()) > pixmap.getWidth()) {
                     symbolAreaHeight += symbolHeightMax;
                     symbolHeightMax = 0;
                     xCurrent = 0;
                 }
+
+                symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
+                xCurrent += symbolPixmap.getWidth();
             }
         }
         symbolAreaHeight += symbolHeightMax;
@@ -273,26 +274,27 @@ public final class MediaManager {
             for (int i2 = 0; i2 < symbolPixmaps.length; i2++) {
                 Pixmap symbolPixmap = symbolPixmaps[i2];
 
+                if ((xCurrent + symbolPixmap.getWidth()) > pixmap.getWidth()) {
+                    yCurrent += symbolHeightMax;
+                    symbolHeightMax = 0;
+                    xCurrent = 0;
+                }
+
                 pixmap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
+
                 int symbolId = switch (symbols[i]) {
                     case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
                     case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
                 };
+
                 fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
                         xCurrent, yCurrent, symbolPixmap.getWidth(),
                         symbolPixmap.getHeight(), -1,
                         ((bitMapFontInformation.lineHeight - 1) - symbolPixmap.getHeight()) - symbols[i].yoffset,
                         symbolPixmap.getWidth() - 1));
 
-
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
                 xCurrent += symbolPixmap.getWidth();
-                if ((xCurrent + symbolPixmap.getWidth()) >= pixmap.getWidth()) {
-                    yCurrent += symbolHeightMax;
-                    symbolHeightMax = 0;
-                    xCurrent = 0;
-                }
-
             }
         }
 
