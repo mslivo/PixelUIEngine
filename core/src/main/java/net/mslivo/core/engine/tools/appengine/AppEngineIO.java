@@ -3,7 +3,7 @@ package net.mslivo.core.engine.tools.appengine;
 public class AppEngineIO {
 
     public enum PARAMETER_TYPE {
-        OBJECT, INTEGER, FLOAT, BOOLEAN
+        OBJECT, INTEGER, LONG, FLOAT, DOUBLE, BOOLEAN
     }
 
     public static final int PARAMETERS_MAX = 16;
@@ -17,6 +17,8 @@ public class AppEngineIO {
     int readIndex, writeIndex;
     final Object[] objectStack;
     final int[] intStack;
+    final long[] longStack;
+    final double[] doubleStack;
     final float[] floatStack;
     final boolean[] booleanStack;
 
@@ -25,7 +27,9 @@ public class AppEngineIO {
     AppEngineIO() {
         this.objectStack = new Object[PARAMETERS_MAX];
         this.intStack = new int[PARAMETERS_MAX];
+        this.longStack = new long[PARAMETERS_MAX];
         this.floatStack = new float[PARAMETERS_MAX];
+        this.doubleStack = new double[PARAMETERS_MAX];
         this.booleanStack = new boolean[PARAMETERS_MAX];
         this.parameterTypes = new PARAMETER_TYPE[PARAMETERS_MAX];
     }
@@ -89,6 +93,63 @@ public class AppEngineIO {
         return this;
     }
 
+    public AppEngineIO pushLong(long parameter) {
+        if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
+        longStack[writeIndex] = parameter;
+        parameterTypes[writeIndex] = PARAMETER_TYPE.INTEGER;
+        writeIndex++;
+        return this;
+    }
+
+    public AppEngineIO pushLong(long parameter1, long parameter2) {
+        pushLong(parameter1);
+        pushLong(parameter2);
+        return this;
+    }
+
+    public AppEngineIO pushLong(long parameter1, long parameter2, long parameter3) {
+        pushLong(parameter1);
+        pushLong(parameter2);
+        pushLong(parameter3);
+        return this;
+    }
+
+    public AppEngineIO pushLong(long parameter1, long parameter2, long parameter3, long parameter4) {
+        pushLong(parameter1);
+        pushLong(parameter2);
+        pushLong(parameter3);
+        pushLong(parameter4);
+        return this;
+    }
+
+    public AppEngineIO pushDouble(double parameter) {
+        if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
+        doubleStack[writeIndex] = parameter;
+        parameterTypes[writeIndex] = PARAMETER_TYPE.INTEGER;
+        writeIndex++;
+        return this;
+    }
+
+    public AppEngineIO pushDouble(double parameter1, double parameter2) {
+        pushDouble(parameter1);
+        pushDouble(parameter2);
+        return this;
+    }
+
+    public AppEngineIO pushDouble(double parameter1, double parameter2, double parameter3) {
+        pushDouble(parameter1);
+        pushDouble(parameter2);
+        pushDouble(parameter3);
+        return this;
+    }
+
+    public AppEngineIO pushDouble(double parameter1, double parameter2, double parameter3, double parameter4) {
+        pushDouble(parameter1);
+        pushDouble(parameter2);
+        pushDouble(parameter3);
+        pushDouble(parameter4);
+        return this;
+    }
 
     public AppEngineIO pushInt(int parameter) {
         if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
@@ -155,6 +216,8 @@ public class AppEngineIO {
             case INTEGER -> intStack[readIndex++];
             case FLOAT -> floatStack[readIndex++];
             case BOOLEAN -> booleanStack[readIndex++];
+            case LONG -> longStack[readIndex++];
+            case DOUBLE -> doubleStack[readIndex++];
         };
     }
 
@@ -168,14 +231,24 @@ public class AppEngineIO {
         return intStack[readIndex++];
     }
 
+    public long pollLong() {
+        checkPoll();
+        return longStack[readIndex++];
+    }
+
     public float pollFloat() {
         checkPoll();
         return floatStack[readIndex++];
     }
 
+    public double pollDouble() {
+        checkPoll();
+        return doubleStack[readIndex++];
+    }
+
     public void skipPolls(int polls) {
-        polls = Math.max(polls,0);
-        for(int i=0;i<polls;i++) {
+        polls = Math.max(polls, 0);
+        for (int i = 0; i < polls; i++) {
             checkPoll();
             readIndex++;
         }
