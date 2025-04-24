@@ -13,6 +13,20 @@ public final class CMediaFont extends CMedia implements Serializable {
     public CMediaFont() {
     }
 
+    public CMediaFont(CMediaFont other) {
+        super(other);
+        this.markupEnabled = other.markupEnabled;
+        this.outline = new CMediaFontOutline(other.outline);
+        this.symbols = new CMediaFontSymbol[other.symbols.length];
+        for (int i = 0; i < this.symbols.length; i++)
+            this.symbols[i] = switch (this.symbols[i]) {
+                case CMediaFontArraySymbol cMediaFontArraySymbol -> new CMediaFontArraySymbol(cMediaFontArraySymbol);
+                case CMediaFontSingleSymbol cMediaFontSingleSymbol ->
+                        new CMediaFontSingleSymbol(cMediaFontSingleSymbol);
+            };
+        this.useAtlas = other.useAtlas;
+    }
+
     public CMediaFont(String file) {
         this(file, true, null, null);
     }
@@ -38,9 +52,9 @@ public final class CMediaFont extends CMedia implements Serializable {
             for (int i = 0; i < symbols.length; i++) {
                 this.symbols[i] = switch (symbols[i]) {
                     case CMediaFontSingleSymbol cMediaFontSingleSymbol ->
-                            new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id, cMediaFontSingleSymbol.file, cMediaFontSingleSymbol.yoffset);
+                            new CMediaFontSingleSymbol(cMediaFontSingleSymbol.id, cMediaFontSingleSymbol.file, cMediaFontSingleSymbol.y_offset);
                     case CMediaFontArraySymbol cMediaFontArraySymbol ->
-                            new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file, cMediaFontArraySymbol.yoffset,
+                            new CMediaFontArraySymbol(cMediaFontArraySymbol.ids, cMediaFontArraySymbol.file, cMediaFontArraySymbol.y_offset,
                                     cMediaFontArraySymbol.regionWidth, cMediaFontArraySymbol.regionHeight, cMediaFontArraySymbol.frameOffset, cMediaFontArraySymbol.frameLength);
                 };
             }

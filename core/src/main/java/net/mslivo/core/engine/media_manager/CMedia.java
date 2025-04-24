@@ -13,6 +13,10 @@ public abstract sealed class CMedia implements Serializable permits CMediaFont, 
         this.file = file;
     }
 
+    public CMedia(CMedia other) {
+        this.file = other.file;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

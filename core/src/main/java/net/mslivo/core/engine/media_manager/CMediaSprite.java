@@ -8,6 +8,11 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         super();
     }
 
+    public CMediaSprite(CMediaSprite other) {
+        super(other);
+        this.useAtlas = other.useAtlas;
+    }
+
     public boolean useAtlas;
 
     public CMediaSprite(String filename, boolean useAtlas) {
@@ -15,4 +20,11 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         this.useAtlas = useAtlas;
     }
 
+    public static CMediaSprite copyOf(CMediaSprite cMediaSprite){
+        return switch (cMediaSprite){
+            case CMediaAnimation cMediaAnimation -> new CMediaAnimation(cMediaAnimation);
+            case CMediaArray cMediaArray -> new CMediaArray(cMediaArray);
+            case CMediaImage cMediaImage -> new CMediaImage(cMediaImage);
+        };
+    }
 }

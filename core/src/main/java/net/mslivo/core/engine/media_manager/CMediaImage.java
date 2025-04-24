@@ -8,6 +8,10 @@ public final class CMediaImage extends CMediaSprite implements Serializable {
     public CMediaImage(){
     }
 
+    public CMediaImage(CMediaImage other) {
+        super(other);
+    }
+
     public CMediaImage(String filename) {
         this(filename, true);
     }

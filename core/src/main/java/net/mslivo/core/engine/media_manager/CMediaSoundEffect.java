@@ -8,6 +8,10 @@ public final class CMediaSoundEffect extends CMediaSound implements Serializable
     public CMediaSoundEffect(){
     }
 
+    public CMediaSoundEffect(CMediaSoundEffect other) {
+        super(other);
+    }
+
     public CMediaSoundEffect(String filename) {
         super(filename);
     }

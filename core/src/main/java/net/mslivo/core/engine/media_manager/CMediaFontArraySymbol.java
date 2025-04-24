@@ -12,6 +12,17 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
     public CMediaFontArraySymbol() {
     }
 
+    public CMediaFontArraySymbol(CMediaFontArraySymbol other) {
+        super(other);
+        this.ids = new int[other.ids.length];
+        for(int i=0;i<this.ids.length;i++)
+            this.ids[i] = other.ids[i];
+        this.regionWidth = other.regionWidth;
+        this.regionHeight = other.regionHeight;
+        this.frameOffset = other.frameOffset;
+        this.frameLength = other.frameLength;
+    }
+
     public CMediaFontArraySymbol(int[] ids, String file, int yoffset, int regionWidth, int regionHeight) {
         this(ids, file, yoffset,regionWidth,regionHeight, 0, Integer.MAX_VALUE);
     }

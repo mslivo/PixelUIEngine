@@ -21,11 +21,22 @@ public final class ExtendedAnimation {
         NORMAL, REVERSED, LOOP, LOOP_REVERSED, LOOP_PINGPONG, LOOP_RANDOM,
     }
 
+    public ExtendedAnimation(ExtendedAnimation other) {
+        this.keyFrames = new TextureRegion[other.keyFrames.length];
+        for (int i = 0; i < this.keyFrames.length; i++)
+            this.keyFrames[i] = new TextureRegion(other.keyFrames[i]);
+        this.animationDuration = other.animationDuration;
+        this.animationSpeed = other.animationSpeed;
+        this.stateTimeOffset = other.stateTimeOffset;
+        this.lastFrameNumber = other.lastFrameNumber;
+        this.lastStateTime = other.lastStateTime;
+        this.playMode = other.playMode;
+    }
+
     public ExtendedAnimation(float animationSpeed, TextureRegion[] keyFrames, PlayMode playMode) {
         this.keyFrames = new TextureRegion[keyFrames.length];
         for (int i = 0; i < keyFrames.length; i++)
-            this.keyFrames[i] = keyFrames[i];
-
+            this.keyFrames[i] = new TextureRegion(keyFrames[i]);
         this.playMode = playMode;
         this.animationSpeed = animationSpeed;
         this.animationDuration = this.keyFrames.length * animationSpeed;
@@ -41,14 +52,6 @@ public final class ExtendedAnimation {
         this.animationSpeed = animationSpeed;
         this.animationDuration = this.keyFrames.length * animationSpeed;
         this.stateTimeOffset = 0;
-    }
-
-    public ExtendedAnimation cpy(){
-        ExtendedAnimation animation = new ExtendedAnimation(this.animationSpeed, this.keyFrames, this.playMode);
-        animation.stateTimeOffset = this.stateTimeOffset;
-        animation.lastStateTime = this.lastStateTime;
-        animation.lastFrameNumber = this.lastFrameNumber;
-        return animation;
     }
 
     public TextureRegion getKeyFrame(float stateTime) {

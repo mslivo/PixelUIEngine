@@ -8,6 +8,10 @@ public final class CMediaMusic extends CMediaSound implements Serializable {
     public CMediaMusic() {
     }
 
+    public CMediaMusic(CMediaMusic other) {
+        super(other);
+    }
+
     public CMediaMusic(String filename) {
         super(filename);
     }
