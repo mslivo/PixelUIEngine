@@ -12,12 +12,12 @@ public interface UIEngineAdapter {
     void render(OrthographicCamera camera, AppViewport appViewPort);
 
     default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_uiComponent, TextureRegion texture_uiModal,
-                                 int resolutionWidth, int resolutionHeight, boolean grayScale) {
+                                 int resolutionWidth, int resolutionHeight, boolean modalLayerDisabled) {
         spriteRenderer.setProjectionMatrix(camera.combined);
         spriteRenderer.setBlendFunctionComposite();
         spriteRenderer.begin();
 
-        if(grayScale){
+        if(modalLayerDisabled){
             spriteRenderer.setTweak(0.5f,0f,0.45f,0.0f);
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
