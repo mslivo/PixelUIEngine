@@ -18,4 +18,5 @@ public final class CMediaSoundEffect extends CMediaSound implements Serializable
         return copy;
     }
 
+
 }

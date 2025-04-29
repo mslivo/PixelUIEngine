@@ -17,5 +17,4 @@ public final class CMediaMusic extends CMediaSound implements Serializable {
         return copy;
     }
 
-
 }

@@ -1,9 +1,6 @@
 package net.mslivo.core.engine.media_manager;
 
-import com.badlogic.gdx.math.Interpolation;
-
 import java.io.Serializable;
-import java.util.Objects;
 
 public final class CMediaArray extends CMediaSprite implements Serializable {
     public int regionWidth;
@@ -11,7 +8,7 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
     public int frameOffset;
     public int frameLength;
 
-    public CMediaArray(){
+    public CMediaArray() {
     }
 
     public CMediaArray(String file, int tileWidth, int tileHeight) {
@@ -19,7 +16,7 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
     }
 
     public CMediaArray(String file, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
-        this(file,regionWidth, regionHeight, frameOffset, frameLength, true);
+        this(file, regionWidth, regionHeight, frameOffset, frameLength, true);
     }
 
     public CMediaArray(String file, int regionWidth, int regionHeight, int frameOffset, int frameLength, boolean useAtlas) {
@@ -30,7 +27,7 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
         this.frameLength = frameLength;
     }
 
-    public CMediaArray copy(){
+    public CMediaArray copy() {
         CMediaArray copy = new CMediaArray();
         copy.copyFields(this);
         copy.regionWidth = this.regionWidth;

@@ -29,4 +29,20 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         this.useAtlas = copyFrom.useAtlas;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+
+        CMediaSprite that = (CMediaSprite) object;
+        return useAtlas == that.useAtlas;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Boolean.hashCode(useAtlas);
+        return result;
+    }
+
 }

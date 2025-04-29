@@ -29,7 +29,7 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
     }
 
     public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
-        this(filename, regionWidth,regionHeight,animationSpeed,frameOffset,frameLength,playMode, true);
+        this(filename, regionWidth, regionHeight, animationSpeed, frameOffset, frameLength, playMode, true);
     }
 
     public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode, boolean useAtlas) {
@@ -42,7 +42,7 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.playMode = playMode;
     }
 
-    public CMediaAnimation copy(){
+    public CMediaAnimation copy() {
         CMediaAnimation copy = new CMediaAnimation();
         copy.copyFields(this);
         copy.regionWidth = this.regionWidth;
