@@ -14,19 +14,22 @@ public class CMediaFontOutline {
     public CMediaFontOutline(){
     }
 
-    public CMediaFontOutline(CMediaFontOutline other) {
-        this.color = new Color(other.color);
-        this.directions = other.directions;
-        this.withSymbols = other.withSymbols;
-        this.outlineOnly = other.outlineOnly;
-    }
-
     public CMediaFontOutline(Color color, int directions, boolean withSymbols, boolean outlineOnly) {
         this.color = new Color(color);
         this.directions = directions;
         this.withSymbols = withSymbols;
         this.outlineOnly = outlineOnly;
     }
+
+    public CMediaFontOutline copy(){
+        CMediaFontOutline copy = new CMediaFontOutline();
+        copy.color = new Color(this.color);
+        copy.directions = this.directions;
+        copy.withSymbols = this.withSymbols;
+        copy.outlineOnly = this.outlineOnly;
+        return copy;
+    }
+
 
     @Override
     public boolean equals(Object o) {

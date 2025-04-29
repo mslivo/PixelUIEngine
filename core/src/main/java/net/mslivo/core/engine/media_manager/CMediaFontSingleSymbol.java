@@ -6,11 +6,6 @@ public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
     public CMediaFontSingleSymbol() {
     }
 
-    public CMediaFontSingleSymbol(CMediaFontSingleSymbol other) {
-        super(other);
-        this.id = other.id;
-    }
-
     public CMediaFontSingleSymbol(int id, String file) {
         this(id, file,0);
     }
@@ -18,6 +13,13 @@ public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
     public CMediaFontSingleSymbol(int id, String file, int yoffset) {
         super(file, yoffset);
         this.id = id;
+    }
+
+    public CMediaFontSingleSymbol copy(){
+        CMediaFontSingleSymbol copy = new CMediaFontSingleSymbol();
+        copy.copyFields(this);
+        copy.id = this.id;
+        return copy;
     }
 
     @Override

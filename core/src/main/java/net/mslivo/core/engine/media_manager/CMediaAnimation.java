@@ -16,15 +16,6 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
     public CMediaAnimation() {
     }
 
-    public CMediaAnimation(CMediaAnimation other) {
-        this.regionWidth = other.regionWidth;
-        this.regionHeight = other.regionHeight;
-        this.animationSpeed = other.animationSpeed;
-        this.frameOffset = other.frameOffset;
-        this.frameLength = other.frameLength;
-        this.playMode = other.playMode;
-    }
-
     public CMediaAnimation(String file, int tileWidth, int tileHeight) {
         this(file, tileWidth, tileHeight, 0.1f, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
     }
@@ -49,6 +40,18 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.frameOffset = frameOffset;
         this.frameLength = frameLength;
         this.playMode = playMode;
+    }
+
+    public CMediaAnimation copy(){
+        CMediaAnimation copy = new CMediaAnimation();
+        copy.copyFields(this);
+        copy.regionWidth = this.regionWidth;
+        copy.regionHeight = this.regionHeight;
+        copy.animationSpeed = this.animationSpeed;
+        copy.frameOffset = this.frameOffset;
+        copy.frameLength = this.frameLength;
+        copy.playMode = this.playMode;
+        return copy;
     }
 
     @Override

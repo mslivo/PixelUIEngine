@@ -12,17 +12,6 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
     public CMediaFontArraySymbol() {
     }
 
-    public CMediaFontArraySymbol(CMediaFontArraySymbol other) {
-        super(other);
-        this.ids = new int[other.ids.length];
-        for(int i=0;i<this.ids.length;i++)
-            this.ids[i] = other.ids[i];
-        this.regionWidth = other.regionWidth;
-        this.regionHeight = other.regionHeight;
-        this.frameOffset = other.frameOffset;
-        this.frameLength = other.frameLength;
-    }
-
     public CMediaFontArraySymbol(int[] ids, String file, int yoffset, int regionWidth, int regionHeight) {
         this(ids, file, yoffset,regionWidth,regionHeight, 0, Integer.MAX_VALUE);
     }
@@ -41,6 +30,18 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
         this.frameLength = frameLength;
     }
 
+    public CMediaFontArraySymbol copy(){
+        CMediaFontArraySymbol copy = new CMediaFontArraySymbol();
+        copy.copyFields(this);
+        copy.ids = new int[this.ids.length];
+        for(int i=0;i<this.ids.length;i++)
+            copy.ids[i] = this.ids[i];
+        copy.regionWidth = this.regionWidth;
+        copy.regionHeight = this.regionHeight;
+        copy.frameOffset = this.frameOffset;
+        copy.frameLength = this.frameLength;
+        return copy;
+    }
 
     @Override
     public boolean equals(Object o) {

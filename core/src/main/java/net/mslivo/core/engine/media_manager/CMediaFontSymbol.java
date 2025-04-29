@@ -10,14 +10,22 @@ public sealed abstract class CMediaFontSymbol implements Serializable permits CM
     public CMediaFontSymbol(){
     }
 
-    public CMediaFontSymbol(CMediaFontSymbol other) {
-        this.file = other.file;
-        this.y_offset = other.y_offset;
-    }
-
     public CMediaFontSymbol(String file, int y_offset) {
         this.file = file;
         this.y_offset = y_offset;
+    }
+
+    public CMediaFontSymbol copy(){
+        CMediaFontSymbol copy = switch (this){
+            case CMediaFontArraySymbol cMediaFontArraySymbol -> cMediaFontArraySymbol.copy();
+            case CMediaFontSingleSymbol cMediaFontSingleSymbol -> cMediaFontSingleSymbol.copy();
+        };
+        return copy;
+    }
+
+    protected void copyFields(CMediaFontSymbol copyFrom){
+        this.file = copyFrom.file;
+        this.y_offset = copyFrom.y_offset;
     }
 
     @Override

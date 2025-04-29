@@ -13,8 +13,18 @@ public abstract sealed class CMedia implements Serializable permits CMediaFont, 
         this.file = file;
     }
 
-    public CMedia(CMedia other) {
-        this.file = other.file;
+
+    protected void copyFields(CMedia copyFrom){
+        this.file = copyFrom.file;
+    }
+
+    public CMedia copy(){
+        CMedia copy= switch (this){
+            case CMediaFont cMediaFont -> cMediaFont.copy();
+            case CMediaSound cMediaSound -> cMediaSound.copy();
+            case CMediaSprite cMediaSprite -> cMediaSprite.copy();
+        };
+        return copy;
     }
 
     @Override
