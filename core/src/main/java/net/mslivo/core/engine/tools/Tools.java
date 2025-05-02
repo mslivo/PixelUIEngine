@@ -1023,15 +1023,25 @@ public class Tools {
     public static class Misc {
 
         public static class IntValueWatcher {
-            public int value = 0;
+            private int value = 0;
+            private int difference;
             private boolean initialized;
 
             public IntValueWatcher() {
                 super();
             }
 
+            public int value(){
+                return value;
+            }
+
+            public int delta(){
+                return difference;
+            }
+
             public boolean hasValueChanged(int currentValue) {
                 if (!initialized || this.value != currentValue) {
+                    this.difference = currentValue-this.value;
                     this.value = currentValue;
                     this.initialized = true;
                     return true;
