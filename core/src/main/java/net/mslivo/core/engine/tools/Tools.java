@@ -1035,14 +1035,18 @@ public class Tools {
                 return value;
             }
 
+            public void setValue(int value){
+                this.difference = value-this.value;
+                this.value = value;
+            }
+
             public int delta(){
                 return difference;
             }
 
             public boolean hasValueChanged(int currentValue) {
                 if (!initialized || this.value != currentValue) {
-                    this.difference = currentValue-this.value;
-                    this.value = currentValue;
+                    this.setValue(currentValue);
                     this.initialized = true;
                     return true;
                 }
