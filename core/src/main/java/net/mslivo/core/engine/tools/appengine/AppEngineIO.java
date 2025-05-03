@@ -187,6 +187,9 @@ public class AppEngineIO {
     }
 
 
+    public Object poll() {
+        return poll(Object.class);
+    }
 
     public <T> T poll(Class<T> type) {
         checkPoll();
