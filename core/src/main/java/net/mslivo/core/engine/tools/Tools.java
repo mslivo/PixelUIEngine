@@ -675,7 +675,7 @@ public class Tools {
             return sum;
         }
 
-        private float normalizeDegree(float degree) {
+        public static float normalizeDegree(float degree) {
             degree = degree % MathUtils.PI2;
             if (degree < 0) degree += MathUtils.PI2;
             return degree;
