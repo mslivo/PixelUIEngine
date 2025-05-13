@@ -72,15 +72,13 @@ public class ShaderCommon {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
 
-            if (line.isBlank())
-                continue;
-            String lineCleaned = line.trim().replaceAll("\\s+"," ");
+            String lineCleaned = line.trim().replace(" ","");
 
-            if (lineCleaned.startsWith("VERTEX:")) {
+            if (lineCleaned.startsWith("BEGINVERTEX")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.startsWith("void main(){")) {
+            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.startsWith("voidmain(){")) {
                 builderIndex = BUILDER_INDEX.VERTEX_MAIN;
                 continue;
             }
@@ -88,12 +86,20 @@ public class ShaderCommon {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if (lineCleaned.startsWith("FRAGMENT:")) {
+            if(builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.equals("ENDVERTEX")){
+                builderIndex = BUILDER_INDEX.NONE;
+                continue;
+            }
+            if (lineCleaned.startsWith("BEGINFRAGMENT")) {
                 builderIndex = BUILDER_INDEX.FRAGMENT_DECLARATIONS;
                 continue;
             }
-            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.startsWith("void main(){")) {
+            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.startsWith("voidmain(){")) {
                 builderIndex = BUILDER_INDEX.FRAGMENT_MAIN;
+                continue;
+            }
+            if(builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.equals("ENDFRAGMENT")){
+                builderIndex = BUILDER_INDEX.NONE;
                 continue;
             }
             if (builderIndex == BUILDER_INDEX.FRAGMENT_MAIN) {

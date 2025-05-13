@@ -27,9 +27,14 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
 
     private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
-            VERTEX:
-            FRAGMENT:
+            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec2 v_texCoord
             
+            BEGIN VERTEX
+            END VERTEX
+            
+            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec2 v_texCoord, sampler2D u_texture, vec2 u_textureSize
+            
+            BEGIN FRAGMENT
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
                  color.a *= modColor.a;
@@ -39,6 +44,8 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             void main(){
             	gl_FragColor = colorTintAdd(texture2D(u_texture, v_texCoord),v_color);
             }
+            
+            END FRAGMENT
             """);
 
     private Texture lastTexture;

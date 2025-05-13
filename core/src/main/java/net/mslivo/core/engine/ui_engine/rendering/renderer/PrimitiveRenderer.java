@@ -26,7 +26,9 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
     private static final int PRIMITIVE_RESTART = -1;
     private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
-            VERTEX:
+            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+            
+            BEGIN VERTEX
             
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
@@ -37,10 +39,16 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
             void main(){
             	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
             }
-            FRAGMENT:
+            
+            END VERTEX
+            
+            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+            
+            BEGIN FRAGMENT
             void main(){
             	 gl_FragColor = v_vertexColor;
             }
+            END FRAGMENT
             """);
 
 
