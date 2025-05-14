@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,6 +16,7 @@ import net.mslivo.core.engine.media_manager.CMedia;
 import net.mslivo.core.engine.media_manager.CMediaFontArraySymbol;
 import net.mslivo.core.engine.media_manager.CMediaFontSingleSymbol;
 import net.mslivo.core.engine.media_manager.MediaManager;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -362,31 +364,32 @@ public class Tools {
             return String.format("%.2f%%", percentDecimal * 100f);
         }
 
-        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol, boolean neutralColor) {
-            return fontSymbol(cMediaFontSymbol.id, neutralColor);
+        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol, Color color) {
+            return fontSymbol(cMediaFontSymbol.id, color);
+
         }
 
         public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol) {
-            return fontSymbol(cMediaFontSymbol.id, true);
+            return fontSymbol(cMediaFontSymbol.id, Color.GRAY);
         }
 
-        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, boolean neutralColor, int arrayIndex) {
-            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], neutralColor);
+        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, Color color, int arrayIndex) {
+            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], color);
         }
 
         public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, int arrayIndex) {
-            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], true);
+            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], Color.GRAY);
         }
 
         public static String fontSymbol(int id) {
-            return fontSymbol(id, true);
+            return fontSymbol(id, Color.GRAY);
         }
 
-        public static String fontSymbol(int id, boolean neutralColor) {
+        public static String fontSymbol(int id, com.badlogic.gdx.graphics.Color color) {
             String symbol = Character.toString((char) (MediaManager.FONT_CUSTOM_SYMBOL_OFFSET + id));
-            if (neutralColor) {
+            if (color != null) {
                 builder.setLength(0);
-                builder.append("[#7F7F7F]").append(symbol).append("[]");
+                builder.append("[#").append(color).append("]").append(symbol).append("[]");
                 return builder.toString();
             } else {
                 return symbol;
