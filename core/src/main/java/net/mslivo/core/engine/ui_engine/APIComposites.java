@@ -259,7 +259,7 @@ public final class APIComposites {
             if (item == null) {
                 api.component.grid.setSelectedItem(pageGrid.grid, null);
             }else {
-                for (int i = 0; i < pageGrid.items.size(); i++) {
+                for (int i = 0; i < pageGrid.pages.size(); i++) {
                     Object[][] array = pageGrid.pages.get(i);
                     for (int ix = 0; ix < array.length; ix++) {
                         for (int iy = 0; iy < array[0].length; iy++) {
