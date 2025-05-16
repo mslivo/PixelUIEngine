@@ -313,7 +313,7 @@ final class UICommonUtils {
         // Notification Collision
         for (int i = 0; i < uiEngineState.topNotifications.size(); i++) {
             TopNotification notification = uiEngineState.topNotifications.get(i);
-            if (!notification.clickAble) continue;
+            if (!notification.uiInteractionEnabled) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
                     0, uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(i + 1),
                     uiEngineState.resolutionWidth, uiEngineState.tileSize.TS)) {
@@ -338,10 +338,9 @@ final class UICommonUtils {
         }
 
         // Window / WindowComponent collision
-        windowLoop:
         for (int i = uiEngineState.windows.size() - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
             Window window = uiEngineState.windows.get(i);
-            if (!window.visible) continue windowLoop;
+            if (!window.visible) continue;
 
             int wndX = window.x;
             int wndY = window.y + (window.folded ? uiEngineState.tileSize.TL(window.height - 1) : 0);
@@ -369,8 +368,7 @@ final class UICommonUtils {
     }
 
     static boolean component_isComponentAtPosition(UIEngineState uiEngineState, int x, int y, Component component) {
-        if (!component.visible) return false;
-        if (component.disabled) return false;
+        if (!component.visible || component.disabled) return false;
         if (UICommonUtils.component_isHiddenByTab(component)) return false;
 
         if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(component), UICommonUtils.component_getAbsoluteY(component), uiEngineState.tileSize.TL(component.width), uiEngineState.tileSize.TL(component.height))) {

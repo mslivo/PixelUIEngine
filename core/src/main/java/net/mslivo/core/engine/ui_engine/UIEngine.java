@@ -2231,7 +2231,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private boolean componentGrayScale(Component component) {
-        return component.disabled;
+        return component.disabled && component.disabledGrayScale;
     }
 
     private void render_drawComponentTopLayer(Component component) {
@@ -2725,7 +2725,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
-        final boolean componentGrayScale = component.disabled;
+        final boolean componentGrayScale = componentGrayScale(component);
 
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
 

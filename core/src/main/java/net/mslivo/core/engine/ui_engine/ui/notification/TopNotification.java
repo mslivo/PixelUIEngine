@@ -7,7 +7,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.TopNotificationAction;
 public final class TopNotification extends Notification {
     public String text;
     public TOP_NOTIFICATION_STATE state;
-    public boolean clickAble;
+    public boolean uiInteractionEnabled;
     public Color color;
     public Color fontColor;
     public int scroll;

@@ -124,8 +124,8 @@ public final class APIComposites {
             return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false, false, true);
         }
 
-        private int pageAbleReadOnlyGridControlsY(int y, int height, boolean placeButtonTop, boolean doubleSized){
-            return (y + (placeButtonTop ? ((height)*(doubleSized ? 2 : 1)) : 0));
+        private int pageAbleReadOnlyGridControlsY(int y, int height, boolean placeButtonTop, boolean doubleSized) {
+            return (y + (placeButtonTop ? ((height) * (doubleSized ? 2 : 1)) : 0));
         }
 
 
@@ -134,7 +134,7 @@ public final class APIComposites {
             ArrayList<Object[][]> pages = new ArrayList<>();
             Grid grid = api.component.grid.create(x, y + (placeButtonTop ? 0 : 1), null, null, false, false, false, false, doubleSized);
 
-            int y_controls = pageAbleReadOnlyGridControlsY(y,height,placeButtonTop, doubleSized);
+            int y_controls = pageAbleReadOnlyGridControlsY(y, height, placeButtonTop, doubleSized);
 
             ImageButton backButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
             Text pageText = api.component.text.create(x, y_controls, 2, "");
@@ -258,7 +258,7 @@ public final class APIComposites {
         public void pageAbleGridSetSelectedItem(APICompositeGrid.PageAbleReadOnlyGrid pageGrid, Object item) {
             if (item == null) {
                 api.component.grid.setSelectedItem(pageGrid.grid, null);
-            }else {
+            } else {
                 for (int i = 0; i < pageGrid.pages.size(); i++) {
                     Object[][] array = pageGrid.pages.get(i);
                     for (int ix = 0; ix < array.length; ix++) {
@@ -319,7 +319,7 @@ public final class APIComposites {
                 pageString = String.format(PAGE_TEXT_PAGE, pageGrid.currentPage.get() + 1);
             }
 
-            int y_controls = pageAbleReadOnlyGridControlsY(pageGrid.y,pageGrid.height,pageGrid.placeButtonsTop, pageGrid.doubleSized);
+            int y_controls = pageAbleReadOnlyGridControlsY(pageGrid.y, pageGrid.height, pageGrid.placeButtonsTop, pageGrid.doubleSized);
 
             api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, y_controls);
             api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, y_controls);
@@ -1267,7 +1267,20 @@ public final class APIComposites {
             for (int i = 0; i < buttons.length; i++) {
                 Button button = buttons[i];
                 api.component.button.setButtonMode(button, BUTTON_MODE.TOGGLE);
+
+                final ButtonAction previousAction = button.buttonAction;
+
                 api.component.button.setButtonAction(button, new ButtonAction() {
+                    @Override
+                    public void onPress() {
+                        previousAction.onPress();
+                    }
+
+                    @Override
+                    public void onRelease() {
+                        previousAction.onRelease();
+                    }
+
                     @Override
                     public void onToggle(boolean value) {
                         if (value) {
@@ -1283,7 +1296,53 @@ public final class APIComposites {
                             toggleFunction.accept(button, true);
                         }
                     }
+
+                    @Override
+                    public void onMouseClick(int mButton) {
+                        previousAction.onMouseClick(mButton);
+                    }
+
+                    @Override
+                    public void onMouseDoubleClick(int mButton) {
+                        previousAction.onMouseDoubleClick(mButton);
+                    }
+
+                    @Override
+                    public void onMouseScroll(float scrolled) {
+                        previousAction.onMouseScroll(scrolled);
+                    }
+
+                    @Override
+                    public Tooltip onShowTooltip() {
+                        return previousAction.onShowTooltip();
+                    }
+
+                    @Override
+                    public CMediaSprite icon() {
+                        return previousAction.icon();
+                    }
+
+                    @Override
+                    public int iconIndex() {
+                        return previousAction.iconIndex();
+                    }
+
+                    @Override
+                    public Color iconColor() {
+                        return previousAction.iconColor();
+                    }
+
+                    @Override
+                    public boolean iconFlipX() {
+                        return previousAction.iconFlipX();
+                    }
+
+                    @Override
+                    public boolean iconFlipY() {
+                        return previousAction.iconFlipY();
+                    }
                 });
+
                 if (i == toggledButtonIndex) {
                     api.component.button.setToggleDisabled(button, true);
                 }

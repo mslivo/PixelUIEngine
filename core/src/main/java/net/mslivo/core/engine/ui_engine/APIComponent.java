@@ -1606,6 +1606,8 @@ public final class APIComponent {
         for (int i = 0; i < components.length; i++) setDisabled(components[i], disabled);
     }
 
+
+
     public void addUpdateAction(Component component, UpdateAction updateAction) {
         if (component == null || updateAction == null) return;
         component.updateActions.add(updateAction);
@@ -1751,9 +1753,21 @@ public final class APIComponent {
         uiEngineState.updateTooltipComponent = component;
     }
 
+    public void setDisabledGrayScale(Component component, boolean disabledGrayScale){
+        if (component == null) return;
+        component.disabledGrayScale = disabledGrayScale;
+    }
+
+    public void setDisabledGrayScale(Component[] components, boolean disabledGrayScale){
+        if (components == null) return;
+        for (int i = 0; i < components.length; i++) setDisabled(components[i], disabledGrayScale);
+    }
+
+
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
         setComponentCommonInitValuesInternal(component, x, y, width, height, uiConfig.component_defaultColor, uiConfig.component_defaultColor);
     }
+
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
         // Align to grid per default
@@ -1763,11 +1777,12 @@ public final class APIComponent {
         component.height = height;
         component.color = color1.cpy();
         component.color2 = color2.cpy();
-        component.disabled = false;
         component.updateActions = new ArrayList<>();
         component.data = null;
         component.name = "";
+        component.disabled = false;
         component.visible = true;
+        component.disabledGrayScale = true;
         component.addedToTab = null;
         component.addedToWindow = null;
         component.addedToScreen = false;

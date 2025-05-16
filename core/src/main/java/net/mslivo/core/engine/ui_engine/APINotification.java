@@ -39,14 +39,14 @@ public final class APINotification {
             return create(text, topNotificationAction, false, uiConfig.notification_top_defaultDisplayTime);
         }
 
-        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean clickAble) {
-            return create(text, topNotificationAction,clickAble, uiConfig.notification_top_defaultDisplayTime);
+        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean uiInteractionEnabled) {
+            return create(text, topNotificationAction,uiInteractionEnabled, uiConfig.notification_top_defaultDisplayTime);
         }
 
-        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean clickAble, int displayTime) {
+        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean uiInteractionEnabled, int displayTime) {
             TopNotification notification = new TopNotification();
             notification.text = Tools.Text.validString(text);
-            notification.clickAble = clickAble;
+            notification.uiInteractionEnabled = uiInteractionEnabled;
             notification.displayTime = Math.max(displayTime,0);
             notification.color = new Color(uiConfig.notification_top_defaultColor);
             notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
