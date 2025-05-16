@@ -613,7 +613,7 @@ public final class APIComposites {
             Text hlText = api.component.text.create(x, y, 0, text);
             api.component.text.setTextAction(hlText, new TextAction() {
                 @Override
-                public void onMouseClick(int button) {
+                public void onMousePress(int button) {
                     onClick.accept(button);
                 }
             });
@@ -1298,8 +1298,8 @@ public final class APIComposites {
                     }
 
                     @Override
-                    public void onMouseClick(int mButton) {
-                        previousAction.onMouseClick(mButton);
+                    public void onMousePress(int mButton) {
+                        previousAction.onMousePress(mButton);
                     }
 
                     @Override

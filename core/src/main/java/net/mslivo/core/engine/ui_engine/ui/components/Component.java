@@ -15,7 +15,6 @@ public abstract class Component extends UpdateActionSupport {
     public Color color2;
     public boolean disabled;
     public boolean visible;
-    public boolean disabledGrayScale;
     public Tab addedToTab;
     public String name;
     public Object data;

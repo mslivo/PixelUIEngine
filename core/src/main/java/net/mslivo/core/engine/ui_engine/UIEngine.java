@@ -1266,7 +1266,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 // Execute Common Actions
                 for (int ib = 0; ib < uiEngineState.inputEvents.mouseDownButtons.size; ib++) {
                     int mouseDownButton = uiEngineState.inputEvents.mouseDownButtons.get(ib);
-                    actions_executeOnMouseClickCommonAction(lastUIMouseHover, mouseDownButton);
+                    actions_executeOnMousePressCommonAction(lastUIMouseHover, mouseDownButton);
                 }
 
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, lastUIMouseHover);
@@ -1489,6 +1489,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 UICommonUtils.setMouseInteractedUIObject(uiEngineState, draggedUIObject);
             }
 
+            // Execute Common Actions
+            for (int ib = 0; ib < uiEngineState.inputEvents.mouseUpButtons.size; ib++) {
+                int mouseDownButton = uiEngineState.inputEvents.mouseUpButtons.get(ib);
+                actions_executeOnMouseReleaseCommonAction(lastUIMouseHover, mouseDownButton);
+            }
         }
         // ------ MOUSE DRAGGED ------
         if (uiEngineState.inputEvents.mouseDragged) {
@@ -1844,16 +1849,25 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
 
-    private void actions_executeOnMouseClickCommonAction(Object uiObject, int button) {
+    private void actions_executeOnMousePressCommonAction(Object uiObject, int button) {
         if (uiObject == null) return;
         CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
-        if (commonActions != null) commonActions.onMouseClick(button);
+        if (commonActions != null) commonActions.onMousePress(button);
         if (uiObject instanceof Component component) {
             // Execute for parent window too
-            actions_executeOnMouseClickCommonAction(component.addedToWindow, button);
+            actions_executeOnMousePressCommonAction(component.addedToWindow, button);
         }
     }
 
+    private void actions_executeOnMouseReleaseCommonAction(Object uiObject, int button) {
+        if (uiObject == null) return;
+        CommonActions commonActions = actions_getUIObjectCommonActions(uiObject);
+        if (commonActions != null) commonActions.onMouseRelease(button);
+        if (uiObject instanceof Component component) {
+            // Execute for parent window too
+            actions_executeOnMousePressCommonAction(component.addedToWindow, button);
+        }
+    }
 
     private void actions_executeOnMouseDoubleClickCommonAction(Object uiObject, int button) {
         if (uiObject == null) return;
@@ -2231,7 +2245,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private boolean componentGrayScale(Component component) {
-        return component.disabled && component.disabledGrayScale;
+        return component.disabled;
     }
 
     private void render_drawComponentTopLayer(Component component) {

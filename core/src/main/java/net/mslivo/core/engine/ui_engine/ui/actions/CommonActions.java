@@ -4,7 +4,10 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 public interface CommonActions {
 
-    default void onMouseClick(int button) {
+    default void onMousePress(int button) {
+    }
+
+    default void onMouseRelease(int button) {
     }
 
     default void onMouseDoubleClick(int button) {

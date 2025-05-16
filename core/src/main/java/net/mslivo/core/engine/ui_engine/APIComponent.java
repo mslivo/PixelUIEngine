@@ -1753,17 +1753,6 @@ public final class APIComponent {
         uiEngineState.updateTooltipComponent = component;
     }
 
-    public void setDisabledGrayScale(Component component, boolean disabledGrayScale){
-        if (component == null) return;
-        component.disabledGrayScale = disabledGrayScale;
-    }
-
-    public void setDisabledGrayScale(Component[] components, boolean disabledGrayScale){
-        if (components == null) return;
-        for (int i = 0; i < components.length; i++) setDisabled(components[i], disabledGrayScale);
-    }
-
-
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
         setComponentCommonInitValuesInternal(component, x, y, width, height, uiConfig.component_defaultColor, uiConfig.component_defaultColor);
     }
@@ -1782,7 +1771,6 @@ public final class APIComponent {
         component.name = "";
         component.disabled = false;
         component.visible = true;
-        component.disabledGrayScale = true;
         component.addedToTab = null;
         component.addedToWindow = null;
         component.addedToScreen = false;
