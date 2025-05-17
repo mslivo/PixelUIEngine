@@ -291,7 +291,8 @@ public final class MediaManager {
                         xCurrent, yCurrent, symbolPixmap.getWidth(),
                         symbolPixmap.getHeight(), -1,
                         ((bitMapFontInformation.lineHeight - 1) - symbolPixmap.getHeight()) - symbols[i].y_offset,
-                        symbolPixmap.getWidth() - 1));
+                        (symbolPixmap.getWidth() - 1) + symbols[i].x_advance
+                ));
 
                 symbolHeightMax = Math.max(symbolHeightMax, symbolPixmap.getHeight());
                 xCurrent += symbolPixmap.getWidth();
