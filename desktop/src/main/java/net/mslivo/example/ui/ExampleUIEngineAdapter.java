@@ -334,6 +334,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         }
 
+
         spriteRenderer.begin();
 
 
@@ -349,10 +350,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.end();
 
-        this.spriteRendererDefault.begin();
-
-        this.spriteRendererDefault.drawCMediaImage(ExampleBaseMedia.EXAMPLE_TEST, 300, 200);
-        this.spriteRendererDefault.end();
 
     }
 

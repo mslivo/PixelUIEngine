@@ -263,15 +263,23 @@ public final class APIComponent {
         APIShape() {
         }
 
+        public final ShapeAction DEFAULT_SHAPE_ACTION = new ShapeAction() {
+        };
+
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType) {
-            return create(x, y, width, height, shapeType, SHAPE_ROTATION.DEGREE_0);
+            return create(x, y, width, height, shapeType, SHAPE_ROTATION.DEGREE_0, DEFAULT_SHAPE_ACTION);
         }
 
         public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation) {
+            return create(x, y, width, height, shapeType, shapeRotation, DEFAULT_SHAPE_ACTION);
+        }
+
+        public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation, ShapeAction shapeAction) {
             Shape shape = new Shape();
             setComponentCommonInitValuesInternal(shape, x, y, width, height, Color.GRAY, Color.GRAY);
             shape.shapeType = shapeType;
             shape.shapeRotation = shapeRotation;
+            shape.shapeAction = shapeAction;
             return shape;
         }
 

@@ -1905,6 +1905,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Text text -> text.textAction;
             case Textfield textField -> textField.textFieldAction;
             case Progressbar progressbar -> progressbar.progressBarAction;
+            case Shape shape -> shape.shapeAction;
+            case Knob knob -> knob.knobAction;
             case null, default -> null;
         };
     }
@@ -2003,7 +2005,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (render_isComponentNotRendered(appViewPort)) return;
         if (System.currentTimeMillis() - appViewPort.updateTimer > appViewPort.updateTime) {
             // draw to frambuffer
-            appViewPort.frameBuffer.begin();
+            appViewPort.frameBuffer.beginGlClear();
             this.uiAdapter.render(appViewPort.camera, appViewPort);
             appViewPort.frameBuffer.end();
             appViewPort.updateTimer = System.currentTimeMillis();
