@@ -417,6 +417,10 @@ public final class API {
         return uiEngineState.appToolTip != null && uiEngineState.appToolTip.name.equals(name);
     }
 
+    public boolean isAppToolTipDisplayed(){
+        return uiEngineState.appToolTip != null;
+    }
+
     public VIEWPORT_MODE viewportMode() {
         return uiEngineState.viewportMode;
     }
