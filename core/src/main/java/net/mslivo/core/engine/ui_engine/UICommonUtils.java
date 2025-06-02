@@ -56,6 +56,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 
 final class UICommonUtils {
@@ -174,24 +175,26 @@ final class UICommonUtils {
 
     static void window_bringToFront(UIEngineState uiEngineState, Window window) {
         if (uiEngineState.windows.size() == 1) return;
-        if (window.alwaysOnTop) {
-            if (uiEngineState.windows.getLast() != window) {
-                uiEngineState.windows.remove(window);
-                uiEngineState.windows.add(window);
-            }
-        } else {
-            int index = uiEngineState.windows.size() - 1;
-            searchIndex:
-            while (index > 0) {
-                if (!uiEngineState.windows.get(index).alwaysOnTop) {
-                    break searchIndex;
+
+        int currentIndex = uiEngineState.windows.indexOf(window);
+
+        int targetIndex = 0;
+        if(window.alwaysOnTop){
+            targetIndex = uiEngineState.windows.size()-1;
+        }else{
+            for (int i = (uiEngineState.windows.size()-1); i >= 0; i--) {
+                if(i != currentIndex && !uiEngineState.windows.get(i).alwaysOnTop){
+                    targetIndex = i;
+                    break;
                 }
-                index = index - 1;
             }
-            uiEngineState.windows.remove(window);
-            uiEngineState.windows.add(index, window);
         }
+
+        if(currentIndex != targetIndex)
+            Collections.swap(uiEngineState.windows,currentIndex,targetIndex);
+
     }
+
 
 
     static void window_setPosition(UIEngineState uiEngineState, Window window, int x, int y) {
@@ -241,6 +244,7 @@ final class UICommonUtils {
         uiEngineState.windows.add(window);
         window.windowAction.onAdd();
         window_enforceScreenBounds(uiEngineState, window);
+        window_bringToFront(uiEngineState,window);
     }
 
     static boolean window_close(UIEngineState uiEngineState, Window window) {

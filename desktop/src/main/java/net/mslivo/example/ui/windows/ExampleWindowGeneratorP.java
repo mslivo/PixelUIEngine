@@ -11,6 +11,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaArray;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
+import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
 import net.mslivo.core.engine.ui_engine.constants.*;
@@ -41,6 +42,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP1;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
@@ -55,21 +57,25 @@ import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class ExampleWindowGeneratorP implements WindowGeneratorP2<String, MediaManager> {
+public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> {
 
     private MediaManager mediaManager;
 
     @Override
-    public Window createWindow(API api, String title, MediaManager mediaManager) {
+    public Window createWindow(API api, MediaManager mediaManager) {
         this.mediaManager = mediaManager;
 
         /* Window */
-        Window window = api.window.create(0, 0, 40, 18, title, new WindowAction() {
+        boolean aot = Tools.Calc.randomChance();
+        Window window = api.window.create(0, 0, 40, 18, "Example Window "+(aot ? "AOT" : ""), new WindowAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_WINDOW;
             }
         });
+
+        if(aot)
+            api.window.setAlwaysOnTop(window,aot);
 
         api.window.addComponent(window, api.composites.button.createWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
