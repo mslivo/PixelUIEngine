@@ -107,16 +107,26 @@ public class Tools {
                 parallelTaskList.poll().join();
         }
 
-        public static void exceptionToErrorLogFile(Exception e) {
+        public static void handleException(Exception e) {
             try (PrintWriter pw = new PrintWriter(new FileWriter(ERROR_LOG_FILE.toString(), true))) {
                 pw.write("Exception \"" + (e.getClass().getSimpleName()) + "\" occured" + System.lineSeparator());
                 e.printStackTrace(pw);
+                e.printStackTrace();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
-        public static void exceptionToDialog(Exception e) {
+        public static void handleError(String error) {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(ERROR_LOG_FILE.toString(), true))) {
+                pw.write(error + System.lineSeparator());
+                System.err.println(error);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public static void showExceptionDialog(Exception e) {
             String stackTrace;
             try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
@@ -197,8 +207,8 @@ public class Tools {
                         new Lwjgl3Application(applicationAdapter, config);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Tools.App.exceptionToErrorLogFile(e);
-                        Tools.App.exceptionToDialog(e);
+                        Tools.App.handleException(e);
+                        Tools.App.showExceptionDialog(e);
                     }
                 }
                 case GL32_VULKAN -> {
@@ -220,8 +230,8 @@ public class Tools {
                         new Lwjgl3VulkanApplication(applicationAdapter, config);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Tools.App.exceptionToErrorLogFile(e);
-                        Tools.App.exceptionToDialog(e);
+                        Tools.App.handleException(e);
+                        Tools.App.showExceptionDialog(e);
                     }
                 }
             }
