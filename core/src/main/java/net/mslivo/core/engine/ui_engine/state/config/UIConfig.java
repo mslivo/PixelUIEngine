@@ -147,7 +147,8 @@ public final class UIConfig implements Serializable, Cloneable {
                 'M', 'N', 'O', 'P', 'Q', 'R',
                 'S', 'T', 'U', 'V', 'W',
                 'X', 'Y', 'Z',
-                '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
+                '!', '?', '.', '+', '-', '=', '&', '%', '*', '$',
+                ' '
         };
         notification_top_max = 20;
         notification_top_defaultDisplayTime = 70;
