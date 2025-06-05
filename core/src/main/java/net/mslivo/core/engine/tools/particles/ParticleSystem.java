@@ -164,6 +164,7 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         if(!canAddParticle())
             return null;
         EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
+        addParticleToSystem(particle);
         return particle;
     }
 
