@@ -1,19 +1,31 @@
 package net.mslivo.core.engine.tools.particles;
 
-import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.particles.particles.*;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
+    public interface RenderHook{
+        void renderBeforeParticle(SpriteParticle particle, SpriteRenderer spriteRenderer);
+        void renderAfterParticle(SpriteParticle particle, SpriteRenderer spriteRenderer);
+    }
+
+    private RenderHook renderHook;
+
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater) {
         this(dataClass, particleUpdater, Integer.MAX_VALUE);
     }
 
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
-        super(dataClass, particleUpdater, maxParticles);
+        this(dataClass,particleUpdater, maxParticles, null);
     }
+
+    public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook renderHook) {
+        super(dataClass, particleUpdater, maxParticles);
+        this.renderHook = renderHook;
+    }
+
 
     public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer) {
         render(mediaManager, spriteRenderer, 0);
@@ -25,6 +37,9 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = (SpriteParticle) particles.get(i);
             if (!particle.visible) continue;
+            if(renderHook != null) {
+                renderHook.renderBeforeParticle(particle, spriteRenderer);
+            }
             switch (particle) {
                 case ImageParticle<T> imageParticle -> {
                     CMediaImage cMediaImage = (CMediaImage) imageParticle.sprite;
@@ -51,7 +66,11 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
                     spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
                     spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
                 }
+                case null, default -> {
+                }
             }
+            if(renderHook != null)
+                renderHook.renderAfterParticle(particle, spriteRenderer);
         }
 
         spriteRenderer.loadState();
@@ -214,4 +233,13 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         textureBasedParticle.scaleY = scaleY;
         textureBasedParticle.rotation = rotation;
     }
+
+    public RenderHook getRenderHook() {
+        return renderHook;
+    }
+
+    public void setRenderHook(RenderHook renderHook) {
+        this.renderHook = renderHook;
+    }
+
 }
