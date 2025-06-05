@@ -9,10 +9,10 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
     private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
 
-    public interface RenderHook {
-        void renderBeforeParticle(Particle particle, PrimitiveRenderer primitiveRenderer);
+    public interface RenderHook<T> {
+        void renderBeforeParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer);
 
-        void renderAfterParticle(Particle particle, PrimitiveRenderer primitiveRenderer);
+        void renderAfterParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer);
     }
 
     private RenderHook renderHook;

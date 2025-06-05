@@ -6,10 +6,10 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
-    public interface RenderHook {
-        void renderBeforeParticle(Particle particle, SpriteRenderer spriteRenderer);
+    public interface RenderHook<T> {
+        void renderBeforeParticle(Particle<T> particle, SpriteRenderer spriteRenderer);
 
-        void renderAfterParticle(Particle particle, SpriteRenderer spriteRenderer);
+        void renderAfterParticle(Particle<T> particle, SpriteRenderer spriteRenderer);
     }
 
     private RenderHook renderHook;
