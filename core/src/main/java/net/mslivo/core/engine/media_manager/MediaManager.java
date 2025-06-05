@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -661,15 +662,24 @@ public final class MediaManager {
         return medias_fonts.get(cMediaFont);
     }
 
-    public int fontTextWidth(CMediaFont cMediaFont, String text) {
-        glyphLayout.setText(font(cMediaFont), text);
-        int width = (int) glyphLayout.width;
-        return width;
+    public int fontTextWidth(final CMediaFont cMediaFont,final  String text) {
+        return fontTextWidth(cMediaFont,text,0,text.length());
     }
 
-    public int fontTextHeight(CMediaFont cMediaFont, String text) {
-        glyphLayout.setText(font(cMediaFont), text);
-        return (int) glyphLayout.height;
+    public int fontTextWidth(final CMediaFont cMediaFont,final  String text, final int start,final  int end) {
+        final BitmapFont font = font(cMediaFont);
+        glyphLayout.setText(font, text, start,end, font.getColor(), 0, Align.left, false, null);
+        return MathUtils.round(glyphLayout.width);
+    }
+
+    public int fontTextHeight(final CMediaFont cMediaFont, final String text) {
+        return fontTextHeight(cMediaFont,text,0,text.length());
+    }
+
+    public int fontTextHeight(final CMediaFont cMediaFont, final String text,final int start,final  int end) {
+        final BitmapFont font = font(cMediaFont);
+        glyphLayout.setText(font(cMediaFont), text,start,end, font.getColor(), 0, Align.left, false, null);
+        return MathUtils.round(glyphLayout.height);
     }
 
     /* ---- Shutdown ---- */
