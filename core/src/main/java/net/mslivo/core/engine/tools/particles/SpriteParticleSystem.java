@@ -182,21 +182,6 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         return particle;
     }
 
-    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible){
-        if(!canAddParticle())
-            return null;
-        EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
-        return particle;
-    }
-
-    private EmptyParticle<T> getNextEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible) {
-        EmptyParticle<T> particle = (EmptyParticle<T>) getParticleFromPool(EmptyParticle.class);
-        if (particle == null)
-            particle = new EmptyParticle<>();
-        super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
-        return particle;
-    }
-
     private ImageParticle<T> getNextImageParticle(CMediaImage sprite, float x, float y, float r, float g, float b, float a, float origin_x, float origin_y, float scaleX, float scaleY, float rotation, boolean visible) {
 
         ImageParticle<T> particle = (ImageParticle<T>) getParticleFromPool(ImageParticle.class);

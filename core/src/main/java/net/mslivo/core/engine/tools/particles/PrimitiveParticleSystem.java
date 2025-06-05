@@ -92,20 +92,7 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         return particle;
     }
 
-    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible){
-        if(!canAddParticle())
-            return null;
-        EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
-        return particle;
-    }
 
-    private EmptyParticle<T> getNextEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible) {
-        EmptyParticle<T> particle = (EmptyParticle<T>) getParticleFromPool(EmptyParticle.class);
-        if (particle == null)
-            particle = new EmptyParticle<>();
-        super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
-        return particle;
-    }
 
     public PrimitiveParticle<T> addPrimitiveParticle(int primitiveType,
                                                      float x1, float y1, float r1, float g1, float b1, float a1,

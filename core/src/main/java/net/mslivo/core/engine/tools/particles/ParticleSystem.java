@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.tools.particles;
 
 import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.core.engine.tools.particles.particles.EmptyParticle;
 import net.mslivo.core.engine.tools.particles.particles.Particle;
 
 import java.lang.reflect.Modifier;
@@ -149,6 +150,29 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
 
     public ArrayList<Particle<T>> getParticles() {
         return particles;
+    }
+
+    public EmptyParticle<T> addEmptyParticle(float x, float y){
+        return addEmptyParticle(x,y,0.5f,0.5f,0.5f,1f,true);
+    }
+
+    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a){
+        return addEmptyParticle(x,y,r,g,b,a,true);
+    }
+
+    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible){
+        if(!canAddParticle())
+            return null;
+        EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
+        return particle;
+    }
+
+    private EmptyParticle<T> getNextEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible) {
+        EmptyParticle<T> particle = (EmptyParticle<T>) getParticleFromPool(EmptyParticle.class);
+        if (particle == null)
+            particle = new EmptyParticle<>();
+        this.particleSetParticleData(particle, x, y, r, g, b, a, visible);
+        return particle;
     }
 
     private void deleteQueuedParticles() {
