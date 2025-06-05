@@ -490,7 +490,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         };
         api.component.button.setButtonAction(imageButton2, imageButton2Action);
 
-        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_1, 0, null, BUTTON_MODE.TOGGLE, true);
+        ImageButton imageButton3 = api.component.button.imageButton.create(3, 8, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_1, 0, null, BUTTON_MODE.TOGGLE);
         ImageButton imageButton4 = api.component.button.imageButton.create(5, 8, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_2, 0, null, BUTTON_MODE.TOGGLE);
         ImageButton imageButton5 = api.component.button.imageButton.create(3, 6, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_3, 0, null, BUTTON_MODE.TOGGLE);
         ImageButton imageButton6 = api.component.button.imageButton.create(5, 6, 2, 2, ExampleBaseMedia.ICON_EXAMPLE_4, 0, null, BUTTON_MODE.TOGGLE);

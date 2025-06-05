@@ -3307,12 +3307,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.saveState();
         spriteRenderer.setColor(Color.GRAY, alpha);
         font.setColor(color.r, color.g, color.b, 1f);
-        if (maxWidth == FONT_MAXWIDTH_NONE) {
-            spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, false, false, 0);
-        } else {
-            if (withIcon) maxWidth -= TS();
-            spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, false, false, maxWidth);
-        }
+
+        if (withIcon) maxWidth -= TS();
+        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, 0,text.length(),false, false, maxWidth);
+
 
         spriteRenderer.loadState();
     }

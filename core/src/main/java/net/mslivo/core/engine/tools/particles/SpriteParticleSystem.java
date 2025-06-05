@@ -65,7 +65,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
                 }
                 case TextParticle<T> textParticle -> {
                     spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
-                    spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
+                    spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, 0,textParticle.text.length(),textParticle.centerX, textParticle.centerY);
                 }
                 case EmptyParticle _ -> {
                 }

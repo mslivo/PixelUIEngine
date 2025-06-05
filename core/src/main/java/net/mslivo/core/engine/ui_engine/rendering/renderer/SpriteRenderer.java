@@ -244,10 +244,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1,y1,color,u,v,tweak);
-        vertexPush(x2,y2,color,u,v2,tweak);
-        vertexPush(x3,y3,color,u2,v2,tweak);
-        vertexPush(x4,y4,color,u2,v,tweak);
+        vertexPush(x1, y1, color, u, v, tweak);
+        vertexPush(x2, y2, color, u, v2, tweak);
+        vertexPush(x3, y3, color, u2, v2, tweak);
+        vertexPush(x4, y4, color, u2, v, tweak);
 
     }
 
@@ -283,10 +283,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x,y,color,u,v,tweak);
-        vertexPush(x,fy2,color,u,v2,tweak);
-        vertexPush(fx2,fy2,color,u2,v2,tweak);
-        vertexPush(fx2,y,color,u2,v,tweak);
+        vertexPush(x, y, color, u, v, tweak);
+        vertexPush(x, fy2, color, u, v2, tweak);
+        vertexPush(fx2, fy2, color, u2, v2, tweak);
+        vertexPush(fx2, y, color, u2, v, tweak);
 
 
     }
@@ -311,10 +311,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x,y,color,u,v,tweak);
-        vertexPush(x,fy2,color,u,v2,tweak);
-        vertexPush(fx2,fy2,color,u2,v2,tweak);
-        vertexPush(fx2,y,color,u2,v,tweak);
+        vertexPush(x, y, color, u, v, tweak);
+        vertexPush(x, fy2, color, u, v2, tweak);
+        vertexPush(fx2, fy2, color, u2, v2, tweak);
+        vertexPush(fx2, y, color, u2, v, tweak);
 
 
     }
@@ -335,10 +335,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x,y,color,u,v,tweak);
-        vertexPush(x,fy2,color,u,v2,tweak);
-        vertexPush(fx2,fy2,color,u2,v2,tweak);
-        vertexPush(fx2,y,color,u2,v,tweak);
+        vertexPush(x, y, color, u, v, tweak);
+        vertexPush(x, fy2, color, u, v2, tweak);
+        vertexPush(fx2, fy2, color, u2, v2, tweak);
+        vertexPush(fx2, y, color, u2, v, tweak);
 
 
     }
@@ -367,10 +367,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x,y,color,u,v,tweak);
-        vertexPush(x,fy2,color,u,v2,tweak);
-        vertexPush(fx2,fy2,color,u2,v2,tweak);
-        vertexPush(fx2,y,color,u2,v,tweak);
+        vertexPush(x, y, color, u, v, tweak);
+        vertexPush(x, fy2, color, u, v2, tweak);
+        vertexPush(fx2, fy2, color, u2, v2, tweak);
+        vertexPush(fx2, y, color, u2, v, tweak);
 
 
     }
@@ -395,7 +395,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float tweak = this.tweak;
 
         for (int s = offset, i = 0; i < copyCount; i += 6) {
-            vertexPush(spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],this.tweak);
+            vertexPush(spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], this.tweak);
         }
         count -= copyCount;
         while (count > 0) {
@@ -403,7 +403,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             flush();
             copyCount = Math.min(verticesLength, count);
             for (int s = offset, v = 0, i = 0; i < copyCount; i += 6) {
-                vertexPush(spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],spriteVertices[s++],this.tweak);
+                vertexPush(spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], spriteVertices[s++], this.tweak);
             }
             count -= copyCount;
         }
@@ -460,10 +460,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x,y,color,u,v,tweak);
-        vertexPush(x,fy2,color,u,v2,tweak);
-        vertexPush(fx2,fy2,color,u2,v2,tweak);
-        vertexPush(fx2,y,color,u2,v,tweak);
+        vertexPush(x, y, color, u, v, tweak);
+        vertexPush(x, fy2, color, u, v2, tweak);
+        vertexPush(fx2, fy2, color, u2, v2, tweak);
+        vertexPush(fx2, y, color, u2, v, tweak);
 
     }
 
@@ -561,10 +561,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1,y1,color,u,v,tweak);
-        vertexPush(x2,y2,color,u,v2,tweak);
-        vertexPush(x3,y3,color,u2,v2,tweak);
-        vertexPush(x4,y4,color,u2,v,tweak);
+        vertexPush(x1, y1, color, u, v, tweak);
+        vertexPush(x2, y2, color, u, v2, tweak);
+        vertexPush(x3, y3, color, u2, v2, tweak);
+        vertexPush(x4, y4, color, u2, v, tweak);
 
 
     }
@@ -680,10 +680,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float tweak = this.tweak;
 
 
-        vertexPush(x1,y1,color,u1,v1,tweak);
-        vertexPush(x2,y2,color,u2,v2,tweak);
-        vertexPush(x3,y3,color,u3,v3,tweak);
-        vertexPush(x4,y4,color,u4,v4,tweak);
+        vertexPush(x1, y1, color, u1, v1, tweak);
+        vertexPush(x2, y2, color, u2, v2, tweak);
+        vertexPush(x3, y3, color, u3, v3, tweak);
+        vertexPush(x4, y4, color, u4, v4, tweak);
 
 
     }
@@ -716,10 +716,10 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final float color = this.color;
         final float tweak = this.tweak;
 
-        vertexPush(x1,y1,color,u,v,tweak);
-        vertexPush(x2,y2,color,u,v2,tweak);
-        vertexPush(x3,y3,color,u2,v2,tweak);
-        vertexPush(x4,y4,color,u2,v,tweak);
+        vertexPush(x1, y1, color, u, v, tweak);
+        vertexPush(x2, y2, color, u, v2, tweak);
+        vertexPush(x3, y3, color, u2, v2, tweak);
+        vertexPush(x4, y4, color, u2, v, tweak);
 
 
     }
@@ -983,21 +983,26 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     // ----- CMediaFont -----
 
     public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text) {
-        this.drawCMediaFont(cMediaFont, x, y, text, false, false, 0);
+        this.drawCMediaFont(cMediaFont, x, y, text,0,text.length(), false, false, 0);
     }
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final boolean centerX, final boolean centerY) {
-        this.drawCMediaFont(cMediaFont, x, y, text, centerX, centerY, 0);
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int length) {
+        this.drawCMediaFont(cMediaFont, x, y, text,start,length, false, false, 0);
     }
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final boolean centerX, final boolean centerY, final int maxWidth) {
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int length, final boolean centerX, final boolean centerY) {
+        this.drawCMediaFont(cMediaFont, x, y, text,start,length, centerX, centerY, 0);
+    }
+
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int length, final boolean centerX, final boolean centerY, final int maxWidth) {
         if (cMediaFont == null) return;
         final float x_draw = centerX ? (x - MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f)) : x;
         final float y_draw = centerY ? (y - MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f)) : y;
         final BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
 
         fontCache.clear();
-        fontCache.addText(text, x_draw, y_draw, 0, text.length(), maxWidth, Align.left, false, maxWidth > 0 ? "" : null);
+        final String truncate = maxWidth > 0 ? "" : null;
+        fontCache.addText(text, x_draw, y_draw, start, Math.min(length, text.length()), maxWidth, Align.left, false, truncate);
 
         // Multiply by Batch Color
         Color.abgr8888ToColor(this.tempColor, this.color);
