@@ -6,8 +6,9 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
-    public interface RenderHook{
+    public interface RenderHook {
         void renderBeforeParticle(SpriteParticle particle, SpriteRenderer spriteRenderer);
+
         void renderAfterParticle(SpriteParticle particle, SpriteRenderer spriteRenderer);
     }
 
@@ -18,7 +19,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
     }
 
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
-        this(dataClass,particleUpdater, maxParticles, null);
+        this(dataClass, particleUpdater, maxParticles, null);
     }
 
     public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook renderHook) {
@@ -37,39 +38,46 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size(); i++) {
             SpriteParticle<T> particle = (SpriteParticle) particles.get(i);
             if (!particle.visible) continue;
-            if(renderHook != null) {
+            if (renderHook != null)
                 renderHook.renderBeforeParticle(particle, spriteRenderer);
-            }
+
             switch (particle) {
                 case ImageParticle<T> imageParticle -> {
                     CMediaImage cMediaImage = (CMediaImage) imageParticle.sprite;
-                    spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
-                    spriteRenderer.drawCMediaImage(cMediaImage, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
-                            mediaManager.imageWidth(cMediaImage), mediaManager.imageHeight(cMediaImage),
-                            imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
+                    if (cMediaImage != null) {
+                        spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
+                        spriteRenderer.drawCMediaImage(cMediaImage, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
+                                mediaManager.imageWidth(cMediaImage), mediaManager.imageHeight(cMediaImage),
+                                imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
+                    }
                 }
                 case ArrayParticle<T> arrayParticle -> {
                     CMediaArray cMediaArray = (CMediaArray) arrayParticle.sprite;
-                    spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
-                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
-                            mediaManager.arrayWidth(cMediaArray), mediaManager.arrayHeight(cMediaArray),
-                            arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
+                    if (cMediaArray != null) {
+                        spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
+                        spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
+                                mediaManager.arrayWidth(cMediaArray), mediaManager.arrayHeight(cMediaArray),
+                                arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
+                    }
                 }
                 case AnimationParticle<T> animationParticle -> {
                     CMediaAnimation cMediaAnimation = (CMediaAnimation) animationParticle.sprite;
-                    spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
-                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
-                            mediaManager.animationWidth(cMediaAnimation), mediaManager.animationHeight(cMediaAnimation),
-                            animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
+                    if (cMediaAnimation != null) {
+                        spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
+                        spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
+                                mediaManager.animationWidth(cMediaAnimation), mediaManager.animationHeight(cMediaAnimation),
+                                animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
+                    }
                 }
                 case TextParticle<T> textParticle -> {
-                    spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
-                    spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
+                    if (textParticle != null) {
+                        spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
+                        spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, textParticle.centerX, textParticle.centerY);
+                    }
                 }
-                case null, default -> {
-                }
+                default -> throw new RuntimeException("Invalid particle type");
             }
-            if(renderHook != null)
+            if (renderHook != null)
                 renderHook.renderAfterParticle(particle, spriteRenderer);
         }
 

@@ -612,12 +612,12 @@ public final class MediaManager {
         return medias_music.get(cMediaMusic);
     }
 
-    public int spriteWidth(CMediaSprite cMedia) {
-        return switch (cMedia) {
+    public int spriteWidth(CMediaSprite cMediaSprite) {
+        return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage).getRegionWidth();
             case CMediaArray cMediaArray -> cMediaArray.regionWidth;
             case CMediaAnimation cMediaAnimation -> cMediaAnimation.regionWidth;
-            default -> throw new IllegalStateException("Unexpected value: " + cMedia);
+            default -> throw new IllegalStateException("Unexpected value: " + cMediaSprite);
         };
     }
 
@@ -625,12 +625,12 @@ public final class MediaManager {
         return medias_images.get(cMediaImage).getRegionWidth();
     }
 
-    public int arrayWidth(CMediaArray array) {
-        return array.regionWidth;
+    public int arrayWidth(CMediaArray cMediaArray) {
+        return cMediaArray.regionWidth;
     }
 
-    public int animationWidth(CMediaAnimation animation) {
-        return animation.regionWidth;
+    public int animationWidth(CMediaAnimation cMediaAnimation) {
+        return cMediaAnimation.regionWidth;
     }
 
     public int spriteHeight(CMediaSprite cMedia) {
@@ -638,7 +638,6 @@ public final class MediaManager {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage).getRegionHeight();
             case CMediaArray cMediaArray -> cMediaArray.regionHeight;
             case CMediaAnimation cMediaAnimation -> cMediaAnimation.regionHeight;
-            default -> throw new IllegalStateException("Unexpected value: " + cMedia);
         };
     }
 
@@ -646,12 +645,12 @@ public final class MediaManager {
         return medias_images.get(cMediaImage).getRegionHeight();
     }
 
-    public int arrayHeight(CMediaArray array) {
-        return array.regionHeight;
+    public int arrayHeight(CMediaArray cMediaArray) {
+        return cMediaArray.regionHeight;
     }
 
-    public int animationHeight(CMediaAnimation animation) {
-        return animation.regionHeight;
+    public int animationHeight(CMediaAnimation cMediaAnimation) {
+        return cMediaAnimation.regionHeight;
     }
 
     public int arraySize(CMediaArray cMediaArray) {
@@ -662,14 +661,14 @@ public final class MediaManager {
         return medias_fonts.get(cMediaFont);
     }
 
-    public int fontTextWidth(CMediaFont font, String text) {
-        glyphLayout.setText(font(font), text);
+    public int fontTextWidth(CMediaFont cMediaFont, String text) {
+        glyphLayout.setText(font(cMediaFont), text);
         int width = (int) glyphLayout.width;
         return width;
     }
 
-    public int fontTextHeight(CMediaFont font, String text) {
-        glyphLayout.setText(font(font), text);
+    public int fontTextHeight(CMediaFont cMediaFont, String text) {
+        glyphLayout.setText(font(cMediaFont), text);
         return (int) glyphLayout.height;
     }
 
