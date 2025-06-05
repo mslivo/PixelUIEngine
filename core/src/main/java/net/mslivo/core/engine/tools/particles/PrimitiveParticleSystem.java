@@ -1,17 +1,18 @@
 package net.mslivo.core.engine.tools.particles;
 
+import net.mslivo.core.engine.tools.particles.particles.EmptyParticle;
+import net.mslivo.core.engine.tools.particles.particles.Particle;
 import net.mslivo.core.engine.tools.particles.particles.PrimitiveParticle;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 
 public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
     private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
-    public static final int PRIMITIVE_TYPE_NONE = -1;
 
     public interface RenderHook {
-        void renderBeforeParticle(PrimitiveParticle particle, PrimitiveRenderer primitiveRenderer);
+        void renderBeforeParticle(Particle particle, PrimitiveRenderer primitiveRenderer);
 
-        void renderAfterParticle(PrimitiveParticle particle, PrimitiveRenderer primitiveRenderer);
+        void renderAfterParticle(Particle particle, PrimitiveRenderer primitiveRenderer);
     }
 
     private RenderHook renderHook;
@@ -33,30 +34,36 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         if (super.numParticles == 0) return;
         primitiveRenderer.saveState();
         for (int i = 0; i < particles.size(); i++) {
-            PrimitiveParticle<T> primitiveParticle = (PrimitiveParticle) particles.get(i);
-            if (!primitiveParticle.visible) continue;
+            Particle particle = (Particle) particles.get(i);
+            if (!particle.visible) continue;
             if (renderHook != null)
-                renderHook.renderBeforeParticle(primitiveParticle, primitiveRenderer);
+                renderHook.renderBeforeParticle(particle, primitiveRenderer);
 
-            if(primitiveParticle.primitiveType != PRIMITIVE_TYPE_NONE){
-                // check for correct type
-                if (primitiveRenderer.getPrimitiveType() != primitiveParticle.primitiveType) {
-                    primitiveRenderer.end();
-                    primitiveRenderer.begin(primitiveParticle.primitiveType);
+            switch (particle){
+                case PrimitiveParticle primitiveParticle -> {
+                    // check for correct type
+                    if (primitiveRenderer.getPrimitiveType() != primitiveParticle.primitiveType) {
+                        primitiveRenderer.end();
+                        primitiveRenderer.begin(primitiveParticle.primitiveType);
+                    }
+
+                    primitiveRenderer.setVertexColor(particle.r, particle.g, particle.b, particle.a);
+                    primitiveRenderer.vertex(particle.x, particle.y);
+
+                    // Additional Vertexes
+                    for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
+                        primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
+                        primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
+                    }
                 }
-
-                primitiveRenderer.setVertexColor(primitiveParticle.r, primitiveParticle.g, primitiveParticle.b, primitiveParticle.a);
-                primitiveRenderer.vertex(primitiveParticle.x, primitiveParticle.y);
-
-                // Additional Vertexes
-                for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
-                    primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
-                    primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
+                case EmptyParticle _ -> {
                 }
+                default -> throw new IllegalStateException("Invalid particle type: "+particle.getClass().getSimpleName());
             }
 
+
             if (renderHook != null)
-                renderHook.renderAfterParticle(primitiveParticle, primitiveRenderer);
+                renderHook.renderAfterParticle(particle, primitiveRenderer);
         }
         primitiveRenderer.loadState();
     }
@@ -82,6 +89,21 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
                 x2, y2, r2, g2, b2, a2,
                 true);
         super.addParticleToSystem(particle);
+        return particle;
+    }
+
+    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible){
+        if(!canAddParticle())
+            return null;
+        EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
+        return particle;
+    }
+
+    private EmptyParticle<T> getNextEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible) {
+        EmptyParticle<T> particle = (EmptyParticle<T>) getParticleFromPool(EmptyParticle.class);
+        if (particle == null)
+            particle = new EmptyParticle<>();
+        super.particleSetParticleData(particle, x, y, r, g, b, a, visible);
         return particle;
     }
 
