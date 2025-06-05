@@ -25,7 +25,7 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         this(dataClass, particleUpdater, maxParticles, null);
     }
 
-    public PrimitiveParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook renderHook) {
+    public PrimitiveParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook<T> renderHook) {
         super(dataClass, particleUpdater, maxParticles);
         this.renderHook = renderHook;
     }

@@ -22,7 +22,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         this(dataClass, particleUpdater, maxParticles, null);
     }
 
-    public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook renderHook) {
+    public SpriteParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles, RenderHook<T> renderHook) {
         super(dataClass, particleUpdater, maxParticles);
         this.renderHook = renderHook;
     }
