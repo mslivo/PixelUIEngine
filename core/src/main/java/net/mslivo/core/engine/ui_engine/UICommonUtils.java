@@ -47,9 +47,9 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.CommonNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
@@ -315,8 +315,8 @@ final class UICommonUtils {
 
     static Object component_getUIObjectAtPosition(UIEngineState uiEngineState, int x, int y) {
         // Notification Collision
-        for (int i = 0; i < uiEngineState.topNotifications.size(); i++) {
-            TopNotification notification = uiEngineState.topNotifications.get(i);
+        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
+            Notification notification = uiEngineState.notifications.get(i);
             if (!notification.uiInteractionEnabled) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
                     0, uiEngineState.resolutionHeight - uiEngineState.tileSize.TL(i + 1),
@@ -425,16 +425,16 @@ final class UICommonUtils {
         uiEngineState.keyboardInteractedUIObjectFrame = object;
     }
 
-    static void notification_addToScreen(UIEngineState uiEngineState, Notification notification, int notificationsMax) {
-        if (notification.addedToScreen) return;
-        notification.addedToScreen = true;
+    static void notification_addToScreen(UIEngineState uiEngineState, CommonNotification commonNotification, int notificationsMax) {
+        if (commonNotification.addedToScreen) return;
+        commonNotification.addedToScreen = true;
 
-        switch (notification) {
-            case TopNotification topNotification -> {
-                uiEngineState.topNotifications.add(topNotification);
+        switch (commonNotification) {
+            case Notification notification -> {
+                uiEngineState.notifications.add(notification);
                 // Remove first if too many
-                if (uiEngineState.topNotifications.size() > notificationsMax)
-                    notification_removeFromScreen(uiEngineState, uiEngineState.topNotifications.getFirst());
+                if (uiEngineState.notifications.size() > notificationsMax)
+                    notification_removeFromScreen(uiEngineState, uiEngineState.notifications.getFirst());
             }
             case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.add(tooltipNotification);
@@ -443,12 +443,12 @@ final class UICommonUtils {
 
     }
 
-    static void notification_removeFromScreen(UIEngineState uiEngineState, Notification notification) {
-        if (!notification.addedToScreen) return;
-        notification.addedToScreen = false;
-        switch (notification) {
-            case TopNotification topNotification -> {
-                uiEngineState.topNotifications.remove(topNotification);
+    static void notification_removeFromScreen(UIEngineState uiEngineState, CommonNotification commonNotification) {
+        if (!commonNotification.addedToScreen) return;
+        commonNotification.addedToScreen = false;
+        switch (commonNotification) {
+            case Notification notification -> {
+                uiEngineState.notifications.remove(notification);
             }
             case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.remove(tooltipNotification);

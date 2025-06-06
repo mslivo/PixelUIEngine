@@ -37,7 +37,7 @@ import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 import java.util.ArrayDeque;
@@ -80,7 +80,7 @@ public final class UIEngineState {
     public ArrayList<Component> screenComponents;
     public Window modalWindow;
     public ArrayDeque<Window> modalWindowQueue;
-    public ArrayList<TopNotification> topNotifications;
+    public ArrayList<Notification> notifications;
     public ArrayList<TooltipNotification> tooltipNotifications;
 
     public ArrayList<HotKey> hotKeys;

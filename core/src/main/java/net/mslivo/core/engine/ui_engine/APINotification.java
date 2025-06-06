@@ -7,9 +7,9 @@ import net.mslivo.core.engine.ui_engine.constants.TOOLTIP_NOTIFICATION_STATE;
 import net.mslivo.core.engine.ui_engine.constants.TOP_NOTIFICATION_STATE;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
-import net.mslivo.core.engine.ui_engine.ui.actions.TopNotificationAction;
+import net.mslivo.core.engine.ui_engine.ui.actions.NotificationAction;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 public final class APINotification {
@@ -18,7 +18,6 @@ public final class APINotification {
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
-    public final APITopNotification top = new APITopNotification();
     public final APITooltipNotification tooltip = new APITooltipNotification();
 
     APINotification(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
@@ -28,77 +27,75 @@ public final class APINotification {
         this.uiConfig = uiEngineState.config;
     }
 
-    public final class APITopNotification{
-        public final TopNotificationAction DEFAULT_NOTIFICATION_ACTION = new TopNotificationAction() {};
+    public final NotificationAction DEFAULT_NOTIFICATION_ACTION = new NotificationAction() {};
 
-        public TopNotification create(String text) {
-            return create(text, DEFAULT_NOTIFICATION_ACTION, false, uiConfig.notification_top_defaultDisplayTime);
-        }
+    public Notification create(String text) {
+        return create(text, DEFAULT_NOTIFICATION_ACTION, false, uiConfig.notification_defaultDisplayTime);
+    }
 
-        public TopNotification create(String text, TopNotificationAction topNotificationAction) {
-            return create(text, topNotificationAction, false, uiConfig.notification_top_defaultDisplayTime);
-        }
+    public Notification create(String text, NotificationAction notificationAction) {
+        return create(text, notificationAction, false, uiConfig.notification_defaultDisplayTime);
+    }
 
-        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean uiInteractionEnabled) {
-            return create(text, topNotificationAction,uiInteractionEnabled, uiConfig.notification_top_defaultDisplayTime);
-        }
+    public Notification create(String text, NotificationAction notificationAction, boolean uiInteractionEnabled) {
+        return create(text, notificationAction,uiInteractionEnabled, uiConfig.notification_defaultDisplayTime);
+    }
 
-        public TopNotification create(String text, TopNotificationAction topNotificationAction, boolean uiInteractionEnabled, int displayTime) {
-            TopNotification notification = new TopNotification();
-            notification.text = Tools.Text.validString(text);
-            notification.uiInteractionEnabled = uiInteractionEnabled;
-            notification.displayTime = Math.max(displayTime,0);
-            notification.color = new Color(uiConfig.notification_top_defaultColor);
-            notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
-            notification.topNotificationAction = topNotificationAction != null ? topNotificationAction : DEFAULT_NOTIFICATION_ACTION;
-            notification.timer = 0;
-            int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
-            if (textWidth > uiEngineState.resolutionWidth) {
-                int tooMuch = (textWidth - uiEngineState.resolutionWidth);
-                notification.state = TOP_NOTIFICATION_STATE.INIT_SCROLL;
-                notification.scroll = -(tooMuch / 2) - 4;
-                notification.scrollMax = (tooMuch / 2) + 4;
-            } else {
-                notification.state = TOP_NOTIFICATION_STATE.INIT_DISPLAY;
-                notification.scroll = notification.scrollMax = 0;
-            }
-            return notification;
+    public Notification create(String text, NotificationAction notificationAction, boolean uiInteractionEnabled, int displayTime) {
+        Notification notification = new Notification();
+        notification.text = Tools.Text.validString(text);
+        notification.uiInteractionEnabled = uiInteractionEnabled;
+        notification.displayTime = Math.max(displayTime,0);
+        notification.color = new Color(uiConfig.notification_defaultColor);
+        notification.fontColor = uiConfig.ui_font_defaultColor.cpy();
+        notification.notificationAction = notificationAction != null ? notificationAction : DEFAULT_NOTIFICATION_ACTION;
+        notification.timer = 0;
+        int textWidth = mediaManager.fontTextWidth(uiConfig.ui_font, notification.text);
+        if (textWidth > uiEngineState.resolutionWidth) {
+            int tooMuch = (textWidth - uiEngineState.resolutionWidth);
+            notification.state = TOP_NOTIFICATION_STATE.INIT_SCROLL;
+            notification.scroll = -(tooMuch / 2) - 4;
+            notification.scrollMax = (tooMuch / 2) + 4;
+        } else {
+            notification.state = TOP_NOTIFICATION_STATE.INIT_DISPLAY;
+            notification.scroll = notification.scrollMax = 0;
         }
+        return notification;
+    }
 
-        public void setName(TopNotification notification, String name) {
-            if (notification == null) return;
-            notification.name = Tools.Text.validString(name);
-        }
+    public void setName(Notification notification, String name) {
+        if (notification == null) return;
+        notification.name = Tools.Text.validString(name);
+    }
 
-        public void setData(TopNotification notification, Object data) {
-            if (notification == null) return;
-            notification.data = data;
-        }
+    public void setData(Notification notification, Object data) {
+        if (notification == null) return;
+        notification.data = data;
+    }
 
-        public void setNotificationAction(TopNotification notification, TopNotificationAction topNotificationAction) {
-            if (notification == null) return;
-            notification.topNotificationAction = topNotificationAction;
-        }
+    public void setNotificationAction(Notification notification, NotificationAction notificationAction) {
+        if (notification == null) return;
+        notification.notificationAction = notificationAction;
+    }
 
-        public void setDisplayTime(TopNotification notification, int displayTime) {
-            if (notification == null) return;
-            notification.displayTime = Math.max(displayTime, 0);
-        }
+    public void setDisplayTime(Notification notification, int displayTime) {
+        if (notification == null) return;
+        notification.displayTime = Math.max(displayTime, 0);
+    }
 
-        public void setColor(TopNotification notification, Color color) {
-            if (notification == null || color == null) return;
-            notification.color.set(color);
-        }
+    public void setColor(Notification notification, Color color) {
+        if (notification == null || color == null) return;
+        notification.color.set(color);
+    }
 
-        public void setFontColor(TopNotification notification, Color color) {
-            if (notification == null) return;
-            notification.fontColor.set(color);
-        }
+    public void setFontColor(Notification notification, Color color) {
+        if (notification == null) return;
+        notification.fontColor.set(color);
+    }
 
-        public void setText(TopNotification topNotification, String text) {
-            if (topNotification == null) return;
-            topNotification.text = Tools.Text.validString(text);
-        }
+    public void setText(Notification notification, String text) {
+        if (notification == null) return;
+        notification.text = Tools.Text.validString(text);
     }
 
     public final class APITooltipNotification {

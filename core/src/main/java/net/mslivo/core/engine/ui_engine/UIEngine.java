@@ -54,7 +54,7 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
 import java.util.ArrayDeque;
@@ -183,7 +183,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.pressedTextField = null;
         newUIEngineState.pressedTextFieldMouseX = 0;
         newUIEngineState.focusedTextField = null;
-        newUIEngineState.topNotifications = new ArrayList<>();
+        newUIEngineState.notifications = new ArrayList<>();
         newUIEngineState.tooltipNotifications = new ArrayList<>();
         newUIEngineState.hotKeys = new ArrayList<>();
         newUIEngineState.appViewPorts = new ArrayList<>();
@@ -1776,8 +1776,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
     private void updateUI_notifications() {
-        if (!uiEngineState.topNotifications.isEmpty()) {
-            TopNotification notification = uiEngineState.topNotifications.getFirst();
+        if (!uiEngineState.notifications.isEmpty()) {
+            Notification notification = uiEngineState.notifications.getFirst();
 
             switch (notification.state) {
                 case INIT_SCROLL -> {
@@ -1809,7 +1809,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
                 case FOLD -> {
                     notification.timer++;
-                    if (notification.timer > uiEngineState.config.notification_top_foldTime) {
+                    if (notification.timer > uiEngineState.config.notification_foldTime) {
                         notification.timer = 0;
                         notification.state = TOP_NOTIFICATION_STATE.FINISHED;
                         UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
@@ -1890,7 +1890,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private CommonActions actions_getUIObjectCommonActions(Object uiObject) {
         return switch (uiObject) {
             case Window window -> window.windowAction;
-            case TopNotification notification -> notification.topNotificationAction;
+            case Notification notification -> notification.notificationAction;
             case Button button -> button.buttonAction;
             case Checkbox checkbox -> checkbox.checkBoxAction;
             case Combobox comboBox -> comboBox.comboBoxAction;
@@ -2617,28 +2617,28 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private void render_drawTopNotifications() {
-        if (uiEngineState.topNotifications.isEmpty()) return;
+        if (uiEngineState.notifications.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
         int y = 0;
         int yOffsetSlideFade = 0;
-        for (int i = 0; i < uiEngineState.topNotifications.size(); i++) {
-            TopNotification topNotification = uiEngineState.topNotifications.get(i);
-            final float notificationAlpha = topNotification.color.a;
+        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
+            Notification notification = uiEngineState.notifications.get(i);
+            final float notificationAlpha = notification.color.a;
 
-            if (topNotification.state == TOP_NOTIFICATION_STATE.FOLD) {
-                float fadeoutProgress = (topNotification.timer / (float) uiEngineState.config.notification_top_foldTime);
+            if (notification.state == TOP_NOTIFICATION_STATE.FOLD) {
+                float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification_foldTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             spriteRenderer.saveState();
-            render_setColor(spriteRenderer, topNotification.color, notificationAlpha, false);
+            render_setColor(spriteRenderer, notification.color, notificationAlpha, false);
             for (int ix = 0; ix < width; ix++) {
                 spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_NOTIFICATION_BAR, TS(ix), uiEngineState.resolutionHeight - TS() - TS(y) + yOffsetSlideFade);
             }
             spriteRenderer.loadState();
-            int xOffset = (TS(width) / 2) - (render_textWidth(topNotification.text) / 2) - topNotification.scroll;
-            render_drawFont(topNotification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, topNotification.fontColor, notificationAlpha, false);
+            int xOffset = (TS(width) / 2) - (render_textWidth(notification.text) / 2) - notification.scroll;
+            render_drawFont(notification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, notification.fontColor, notificationAlpha, false);
             y = y + 1;
         }
 
@@ -3344,7 +3344,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.hotKeys.clear();
         uiEngineState.singleUpdateActions.clear();
         uiEngineState.screenComponents.clear();
-        uiEngineState.topNotifications.clear();
+        uiEngineState.notifications.clear();
         uiEngineState.appViewPorts.clear();
         uiEngineState.spriteRenderer_ui.dispose();
 

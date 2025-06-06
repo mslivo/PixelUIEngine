@@ -43,9 +43,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP1;
-import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP2;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
@@ -213,10 +212,10 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         api.component.button.setButtonAction(notiBtn, new ButtonAction() {
             @Override
             public void onRelease() {
-                TopNotification notification = api.notification.top.create(textField.content);
+                Notification notification = api.notification.top.create(textField.content);
                 api.notification.top.setColor(notification, new Color(MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f));
 
-                api.notification.top.setNotificationAction(notification, new TopNotificationAction() {
+                api.notification.top.setNotificationAction(notification, new NotificationAction() {
                     @Override
                     public void onMouseDoubleClick(int button) {
                         if (button == Input.Buttons.LEFT) {

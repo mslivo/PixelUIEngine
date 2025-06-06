@@ -12,9 +12,9 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.CommonNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TopNotification;
+import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 import java.util.ArrayList;
@@ -77,58 +77,58 @@ public final class API {
 
     /* #################### Notifications #################### */
 
-    public ArrayList<TopNotification> topNotifications() {
-        return new ArrayList<>(uiEngineState.topNotifications);
+    public ArrayList<Notification> topNotifications() {
+        return new ArrayList<>(uiEngineState.notifications);
     }
 
     public ArrayList<TooltipNotification> tooltipNotifications() {
         return new ArrayList<>(uiEngineState.tooltipNotifications);
     }
 
-    public void addNotification(Notification notification) {
-        if (notification == null) return;
-        UICommonUtils.notification_addToScreen(uiEngineState, notification, uiConfig.notification_top_max);
+    public void addNotification(CommonNotification commonNotification) {
+        if (commonNotification == null) return;
+        UICommonUtils.notification_addToScreen(uiEngineState, commonNotification, uiConfig.notification__max);
     }
 
-    public void addNotifications(Notification[] notifications) {
-        if (notifications == null) return;
-        for (int i = 0; i < notifications.length; i++) addNotification(notifications[i]);
+    public void addNotifications(CommonNotification[] commonNotifications) {
+        if (commonNotifications == null) return;
+        for (int i = 0; i < commonNotifications.length; i++) addNotification(commonNotifications[i]);
     }
 
-    public void removeNotification(Notification notification) {
-        if (notification == null) return;
-        UICommonUtils.notification_removeFromScreen(uiEngineState, notification);
+    public void removeNotification(CommonNotification commonNotification) {
+        if (commonNotification == null) return;
+        UICommonUtils.notification_removeFromScreen(uiEngineState, commonNotification);
     }
 
-    public void removeNotifications(Notification[] notifications) {
-        if (notifications == null) return;
-        for (int i = 0; i < notifications.length; i++) removeNotification(notifications[i]);
+    public void removeNotifications(CommonNotification[] commonNotifications) {
+        if (commonNotifications == null) return;
+        for (int i = 0; i < commonNotifications.length; i++) removeNotification(commonNotifications[i]);
     }
 
     public void removeAllNotifications() {
-        removeNotifications(uiEngineState.topNotifications.toArray(new Notification[]{}));
-        removeNotifications(uiEngineState.tooltipNotifications.toArray(new Notification[]{}));
+        removeNotifications(uiEngineState.notifications.toArray(new CommonNotification[]{}));
+        removeNotifications(uiEngineState.tooltipNotifications.toArray(new CommonNotification[]{}));
     }
 
-    public ArrayList<Notification> findNotificationsByName(String name) {
+    public ArrayList<CommonNotification> findNotificationsByName(String name) {
         if (name == null) return new ArrayList<>();
-        ArrayList<Notification> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.topNotifications.size(); i++)
-            if (name.equals(uiEngineState.topNotifications.get(i).name)) result.add(uiEngineState.topNotifications.get(i));
+        ArrayList<CommonNotification> result = new ArrayList<>();
+        for (int i = 0; i < uiEngineState.notifications.size(); i++)
+            if (name.equals(uiEngineState.notifications.get(i).name)) result.add(uiEngineState.notifications.get(i));
         for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++)
             if (name.equals(uiEngineState.tooltipNotifications.get(i).name)) result.add(uiEngineState.tooltipNotifications.get(i));
         return result;
     }
 
-    public Notification findNotificationByName(String name) {
+    public CommonNotification findNotificationByName(String name) {
         if (name == null) return null;
-        ArrayList<Notification> result = findNotificationsByName(name);
+        ArrayList<CommonNotification> result = findNotificationsByName(name);
         return result.getFirst();
     }
 
-    public boolean isNotificationAddedToScreen(Notification notification) {
-        if (notification == null) return false;
-        return notification.addedToScreen;
+    public boolean isNotificationAddedToScreen(CommonNotification commonNotification) {
+        if (commonNotification == null) return false;
+        return commonNotification.addedToScreen;
     }
 
     /* #################### Context Menu #################### */

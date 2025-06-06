@@ -58,10 +58,10 @@ public final class UIConfig implements Serializable, Cloneable {
     public float component_knobSensitivity;
     public float component_scrollbarSensitivity;
     public float component_mapOverlayDefaultFadeoutSpeed;
-    public int notification_top_max;
-    public int notification_top_defaultDisplayTime;
-    public Color notification_top_defaultColor;
-    public int notification_top_foldTime;
+    public int notification__max;
+    public int notification_defaultDisplayTime;
+    public Color notification_defaultColor;
+    public int notification_foldTime;
     public int notification_tooltip_defaultDisplayTime;
     public int notification_tooltip_fadeoutTime;
     public Color tooltip_defaultCellColor;
@@ -150,10 +150,10 @@ public final class UIConfig implements Serializable, Cloneable {
                 '!', '?', '.', '+', '-', '=', '&', '%', '*', '$','/',':',';',',',
                 ' '
         };
-        notification_top_max = 20;
-        notification_top_defaultDisplayTime = 70;
-        notification_top_defaultColor = DEFAULT_COlOR.cpy();
-        notification_top_foldTime = 12;
+        notification__max = 20;
+        notification_defaultDisplayTime = 70;
+        notification_defaultColor = DEFAULT_COlOR.cpy();
+        notification_foldTime = 12;
         notification_tooltip_defaultDisplayTime = 70;
         notification_tooltip_fadeoutTime = 12;
         tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();

@@ -404,35 +404,35 @@ public final class APIConfig {
 
         public final class APINotificationsTopConfig {
             public int getMax() {
-                return uiConfig.notification_top_max;
+                return uiConfig.notification__max;
             }
 
             public void setMax(int notifications_max) {
-                uiConfig.notification_top_max = notifications_max;
+                uiConfig.notification__max = notifications_max;
             }
 
             public int getDefaultDisplayTime() {
-                return uiConfig.notification_top_defaultDisplayTime;
+                return uiConfig.notification_defaultDisplayTime;
             }
 
             public void setDefaultDisplayTime(int notifications_defaultDisplayTime) {
-                uiConfig.notification_top_defaultDisplayTime = notifications_defaultDisplayTime;
+                uiConfig.notification_defaultDisplayTime = notifications_defaultDisplayTime;
             }
 
             public Color getDefaultColor() {
-                return uiConfig.notification_top_defaultColor.cpy();
+                return uiConfig.notification_defaultColor.cpy();
             }
 
             public void setDefaultColor(Color notifications_defaultColor) {
-                uiConfig.notification_top_defaultColor = notifications_defaultColor.cpy();
+                uiConfig.notification_defaultColor = notifications_defaultColor.cpy();
             }
 
             public int getFoldTime() {
-                return uiConfig.notification_top_foldTime;
+                return uiConfig.notification_foldTime;
             }
 
             public void setFoldTime(int notifications_fadeoutTime) {
-                uiConfig.notification_top_foldTime = Math.max(notifications_fadeoutTime,0);
+                uiConfig.notification_foldTime = Math.max(notifications_fadeoutTime,0);
             }
         }
 
