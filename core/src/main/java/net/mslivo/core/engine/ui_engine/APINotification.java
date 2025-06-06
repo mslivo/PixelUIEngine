@@ -128,6 +128,16 @@ public final class APINotification {
             tooltipNotification.tooltip = tooltip;
         }
 
+        public void setName(TooltipNotification tooltipNotification, String name) {
+            if (tooltipNotification == null) return;
+            tooltipNotification.name = Tools.Text.validString(name);
+        }
+
+        public void setData(TooltipNotification tooltipNotification, Object data) {
+            if (tooltipNotification == null) return;
+            tooltipNotification.data = data;
+        }
+
     }
 
 
