@@ -123,7 +123,7 @@ public final class API {
     public CommonNotification findNotificationByName(String name) {
         if (name == null) return null;
         ArrayList<CommonNotification> result = findNotificationsByName(name);
-        return result.getFirst();
+        return result.isEmpty() ? null: result.getFirst();
     }
 
     public boolean isNotificationAddedToScreen(CommonNotification commonNotification) {
