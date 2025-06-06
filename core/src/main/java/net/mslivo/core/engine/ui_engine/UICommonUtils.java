@@ -265,9 +265,13 @@ final class UICommonUtils {
         if (uiEngineState.lastUIMouseHover == window) uiEngineState.lastUIMouseHover = null;
         if (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow == window)
             uiEngineState.modalWindow = null;
-        for (int i = 0; i < window.components.size(); i++)
-            if (window.components.get(i) instanceof AppViewport appViewPort)
+        for (int i = window.components.size()-1; i >= 0; i--){
+            final Component component = window.components.get(i);
+            component_removeFromWindow(component,window,uiEngineState);
+            if (component instanceof AppViewport appViewPort)
                 uiEngineState.appViewPorts.remove(appViewPort);
+        }
+
         window_resetReferences(uiEngineState, window);
 
         // Remove

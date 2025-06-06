@@ -276,7 +276,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                 api.addWindowAsModal(api.composites.modal.createTextInputModal("Caption", "Enter Text", "", new Consumer<String>() {
                     @Override
                     public void accept(String s) {
-
+                        System.out.println(s);
                     }
                 }));
             }
