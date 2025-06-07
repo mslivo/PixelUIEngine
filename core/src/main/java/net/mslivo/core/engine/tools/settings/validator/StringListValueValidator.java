@@ -14,23 +14,23 @@ public class StringListValueValidator implements ValueValidator {
 
 
     public StringListValueValidator() {
-        this(null, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(null, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
     }
 
     public StringListValueValidator(String[] allowedValues) {
-        this(allowedValues, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(allowedValues, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
     }
 
     public StringListValueValidator(String[] allowedValues, int listSizeMin, int listSizeMax) {
-        this(null, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(null, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
     }
 
     public StringListValueValidator(int listSizeMin, int listSizeMax) {
-        this(null, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(null, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
     }
 
     public StringListValueValidator(int listSizeMin, int listSizeMax, int listEntryLengthMin, int listEntryLengthMax) {
-        this(null, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(null, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
     }
 
     public StringListValueValidator(String[] allowedValues, int listSizeMin, int listSizeMax, int listEntryLengthMin, int listEntryLengthMax) {
