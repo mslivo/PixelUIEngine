@@ -3,9 +3,11 @@ package net.mslivo.core.engine.tools.appengine;
 public class AppEngineIO {
 
     public static final int PARAMETERS_MAX = 16;
-    private static final String ERROR_PARAMETERS_MAX = String.format("Push exceeds maximum parameter limit of %s", PARAMETERS_MAX);
-    private static final String ERROR_PARAMETERS_COUNT = "Poll exceeds the parameter count of %s";
+    private static final String ERROR_PUSH = String.format("Push exceeds maximum parameter limit of %s", PARAMETERS_MAX);
+    private static final String ERROR_OBJECT_LOCKED = "IO Object is locked";
+    private static final String ERROR_POLL = String.format("Poll exceeds the parameter count of %s",PARAMETERS_MAX);
 
+    boolean locked;
     int type;
     int readIndex, writeIndex;
     final Object[] objectStack;
@@ -22,6 +24,7 @@ public class AppEngineIO {
         this.floatStack = new float[PARAMETERS_MAX];
         this.doubleStack = new double[PARAMETERS_MAX];
         this.booleanStack = new boolean[PARAMETERS_MAX];
+        this.locked = false;
     }
 
     public AppEngineIO push(Object parameter) {
@@ -243,12 +246,15 @@ public class AppEngineIO {
     }
 
     private void checkPoll() {
-        if (readIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
-        if (readIndex >= writeIndex) throw new RuntimeException(String.format(ERROR_PARAMETERS_COUNT, writeIndex));
+        if (readIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PUSH);
+        if (readIndex >= writeIndex) throw new RuntimeException(ERROR_POLL);
     }
 
     private void checkWrite() {
-        if (writeIndex >= PARAMETERS_MAX) throw new RuntimeException(ERROR_PARAMETERS_MAX);
+        if (locked)
+            throw new RuntimeException(ERROR_OBJECT_LOCKED);
+        if (writeIndex >= PARAMETERS_MAX)
+            throw new RuntimeException(ERROR_PUSH);
     }
 
 }

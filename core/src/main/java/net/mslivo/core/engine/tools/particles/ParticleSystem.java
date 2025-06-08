@@ -72,6 +72,7 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         return numParticles > 0;
     }
 
+
     public void removeAllParticles() {
         this.deleteQueue.addAll(this.particles);
         deleteQueuedParticles();
@@ -113,6 +114,26 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         particles.add(particle);
         this.numParticles++;
     }
+
+    public void moveParticleToPosition(Particle<T> particle, int newIndex) {
+        final int index = particles.indexOf(particle);
+        if (index < 0 || index == newIndex) return;
+
+        particles.remove(index);
+        if (index < newIndex) newIndex--;
+
+        particles.add(newIndex, particle);
+    }
+
+    public void moveParticleToFront(Particle<T> particle) {
+        moveParticleToPosition(particle, 0);
+    }
+
+    public void moveParticleToEnd(Particle<T> particle) {
+        moveParticleToPosition(particle, particles.size() - 1);
+    }
+
+
 
     protected void particleSetParticleData(Particle<T> particle, float x, float y, float r, float g, float b, float a, boolean visible) {
         particle.x = x;
