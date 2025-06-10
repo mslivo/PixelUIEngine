@@ -53,7 +53,9 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
 
     private final IntArray indexResets;
-    private boolean restartInsertedLast;
+
+
+
     private float vertexColor;
     private float vertexColor_reset;
     private float vertexColor_save;
@@ -73,8 +75,6 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
     public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
         super(maxVertexes, shaderProgram, printRenderCalls);
         this.indexResets = new IntArray();
-        this.restartInsertedLast = false;
-        this.vertexColor_reset = colorPackedRGBA(1f, 1f, 1f, 1f);
         this.vertexColor_save = vertexColor_reset;
         this.vertexColor = vertexColor_reset;
     }
@@ -123,16 +123,16 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
         return indexBufferObject;
     }
 
+
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
-        if (this.restartInsertedLast)
-            return;
+
         if (isVertexBufferLimitReached()) {
             flush();
         }
 
         // Insert Restart Index
-        final int currentIndex = vertexBufferPosition() / vertexSize;
+        final int currentIndex = vertexBufferIdx() / vertexSize;
         IntBuffer indicesBuffer = getIndexBuffer().getBuffer(true);
         indicesBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
@@ -140,7 +140,6 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
         vertexPush(DUMMY_VERTEX,0,VERTEX_SIZE);
 
         this.indexResets.add(currentIndex);
-        this.restartInsertedLast = true;
     }
 
 
@@ -168,7 +167,6 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
         vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,super.color,super.tweak);
 
-        this.restartInsertedLast = false;
     }
 
     public void vertex(final float x1, final float y1, final float x2, final float y2) {
@@ -189,7 +187,6 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
         vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,super.color,super.tweak);
 
-        this.restartInsertedLast = false;
     }
 
     public void vertex(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
@@ -217,7 +214,6 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
         vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor,super.color,super.tweak);
 
-        this.restartInsertedLast = false;
     }
 
     @Override

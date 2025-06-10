@@ -197,7 +197,7 @@ public abstract class BaseRenderer {
         return sizeMaxIndicesInts;
     }
 
-    public int vertexBufferPosition() {
+    public int vertexBufferIdx() {
         return this.idx;
     }
 

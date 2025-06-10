@@ -385,7 +385,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferPosition();
+            remainingVertices -= vertexBufferIdx();
             if (remainingVertices == 0) {
                 flush();
                 remainingVertices = verticesLength;
@@ -417,7 +417,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferPosition();
+            remainingVertices -= vertexBufferIdx();
             if (remainingVertices == 0) {
                 flush();
                 remainingVertices = this.getSizeMaxVertexesFloats();
