@@ -3,6 +3,8 @@ package net.mslivo.core.engine.ui_engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
@@ -53,10 +55,14 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -975,8 +981,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
         if (uiEngineState.inputEvents.keyDown) {
             boolean processKeyDown = true;
-            Textfield focusedTextField = uiEngineState.focusedTextField;
-            if (focusedTextField == null) processKeyDown = false;
+            final Textfield focusedTextField = uiEngineState.focusedTextField;
+            if (focusedTextField == null)
+                processKeyDown = false;
 
             if (focusedTextField != null) {
                 // TextField Control Keys
@@ -989,7 +996,17 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             uiEngineState.focusedTextField_repeatedKeyTimer = System.currentTimeMillis();
                         }
                         UICommonUtils.textField_executeControlKey(uiEngineState, mediaManager, focusedTextField, keyDownKeyCode);
+                    } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) { // paste
+                        String pasteContent = getClipboardContent();
+                        if (pasteContent != null) {
+                            char[] contentChars = pasteContent.toCharArray();
+                            for (char i = 0; i < contentChars.length; i++) {
+                                UICommonUtils.textField_typeCharacter(uiEngineState, mediaManager, focusedTextField, contentChars[i]);
+                            }
+                        }
+
                     }
+
                     UICommonUtils.setKeyboardInteractedUIObject(uiEngineState, focusedTextField);
                 }
             } else {
@@ -1010,6 +1027,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
         if (uiEngineState.inputEvents.keyUp) {
+
 
             // Hotkeys
             for (int ik = 0; ik < uiEngineState.inputEvents.keyUpKeyCodes.size; ik++) {
@@ -1034,6 +1052,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
                 }
             }
+        }
+    }
+
+    private String getClipboardContent() {
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final Transferable contents = clipboard.getContents(null);
+
+        if (contents == null || !contents.isDataFlavorSupported(DataFlavor.stringFlavor))
+            return null;
+
+        try {
+            return (String) contents.getTransferData(DataFlavor.stringFlavor);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -3309,7 +3341,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         font.setColor(color.r, color.g, color.b, 1f);
 
         if (withIcon) maxWidth -= TS();
-        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, 0,text.length(),false, false, maxWidth);
+        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, 0, text.length(), false, false, maxWidth);
 
 
         spriteRenderer.loadState();
