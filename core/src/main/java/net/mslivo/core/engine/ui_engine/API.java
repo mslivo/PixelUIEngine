@@ -87,7 +87,7 @@ public final class API {
 
     public void addNotification(CommonNotification commonNotification) {
         if (commonNotification == null) return;
-        UICommonUtils.notification_addToScreen(uiEngineState, commonNotification, uiConfig.notification__max);
+        UICommonUtils.notification_addToScreen(uiEngineState, commonNotification, uiConfig.notification_max);
     }
 
     public void addNotifications(CommonNotification[] commonNotifications) {

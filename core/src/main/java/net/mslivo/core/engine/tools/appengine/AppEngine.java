@@ -26,7 +26,6 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         }
     }
 
-    private long lastUpdateTime;
     private long ticks;
     private AppEngineIO lastOutput;
 
@@ -54,7 +53,6 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         if (data == null) throw new RuntimeException(String.format(errorMessageNull, "data"));
         if (adapter == null) throw new RuntimeException(String.format(errorMessageNull, "adapter"));
 
-        this.lastUpdateTime = 0;
         this.lastOutput = null;
         this.ticks = 0;
 
@@ -69,10 +67,6 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
 
     public long getTicks() {
         return ticks;
-    }
-
-    public long getLastUpdateTime() {
-        return lastUpdateTime;
     }
 
     private AppEngineIO getUnlockedUIFromPool(int type) {
@@ -126,7 +120,6 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         }
         // Update Engine
         adapter.update();
-        this.lastUpdateTime = System.currentTimeMillis();
         this.ticks++;
     }
 

@@ -404,11 +404,11 @@ public final class APIConfig {
 
         public final class APINotificationsTopConfig {
             public int getMax() {
-                return uiConfig.notification__max;
+                return uiConfig.notification_max;
             }
 
             public void setMax(int notifications_max) {
-                uiConfig.notification__max = notifications_max;
+                uiConfig.notification_max = notifications_max;
             }
 
             public int getDefaultDisplayTime() {

@@ -993,7 +993,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                         // Repeat certain Control Keys
                         if (UICommonUtils.textField_isRepeatedControlKey(keyDownKeyCode)) {
                             uiEngineState.focusedTextField_repeatedKey = keyDownKeyCode;
-                            uiEngineState.focusedTextField_repeatedKeyTimer = System.currentTimeMillis();
+                            uiEngineState.focusedTextField_repeatedKeyTimer = -20;
                         }
                         UICommonUtils.textField_executeControlKey(uiEngineState, mediaManager, focusedTextField, keyDownKeyCode);
                     } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) { // paste
@@ -1622,9 +1622,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
     private void updateUI_continuousComponentActivities() {
         // TextField Repeat
         if (uiEngineState.focusedTextField_repeatedKey != KeyCode.NONE) {
-            long time = (System.currentTimeMillis() - uiEngineState.focusedTextField_repeatedKeyTimer);
-            if (time > 500) {
+            uiEngineState.focusedTextField_repeatedKeyTimer++;
+            if (uiEngineState.focusedTextField_repeatedKeyTimer > 2) {
                 UICommonUtils.textField_executeControlKey(uiEngineState, mediaManager, uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey);
+                uiEngineState.focusedTextField_repeatedKeyTimer = 0;
             }
         }
     }
@@ -1658,24 +1659,23 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // If UpdateActions are removing/adding other update actions they are caught on the next update/frame
 
         // ScreenComponent UpdateActions
-        long currentTimeMillis = System.currentTimeMillis();
         for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
             Component component = uiEngineState.screenComponents.get(i);
             for (int i2 = 0; i2 < component.updateActions.size(); i2++) {
-                actions_executeUpdateAction(component.updateActions.get(i2), currentTimeMillis);
+                actions_executeUpdateAction(component.updateActions.get(i2));
             }
         }
         for (int i = 0; i < uiEngineState.windows.size(); i++) {
             // Window UpdateActions
             Window window = uiEngineState.windows.get(i);
             for (int i2 = 0; i2 < window.updateActions.size(); i2++) {
-                actions_executeUpdateAction(window.updateActions.get(i2), currentTimeMillis);
+                actions_executeUpdateAction(window.updateActions.get(i2));
             }
             // Window Component UpdateActions
             for (int i2 = 0; i2 < window.components.size(); i2++) {
                 Component component = window.components.get(i2);
                 for (int i3 = 0; i3 < component.updateActions.size(); i3++) {
-                    actions_executeUpdateAction(component.updateActions.get(i3), currentTimeMillis);
+                    actions_executeUpdateAction(component.updateActions.get(i3));
                 }
             }
         }
@@ -1683,14 +1683,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // Tooltip
         if (uiEngineState.tooltip != null) {
             for (int i = 0; i < uiEngineState.tooltip.updateActions.size(); i++) {
-                actions_executeUpdateAction(uiEngineState.tooltip.updateActions.get(i), currentTimeMillis);
+                actions_executeUpdateAction(uiEngineState.tooltip.updateActions.get(i));
             }
         }
 
         // Engine SingleUpdateActions
         for (int i = 0; i < uiEngineState.singleUpdateActions.size(); i++) {
             UpdateAction updateAction = uiEngineState.singleUpdateActions.get(i);
-            if (this.actions_executeUpdateAction(updateAction, currentTimeMillis)) {
+            if (this.actions_executeUpdateAction(updateAction)) {
                 uiEngineState.singleUpdateActionsRemoveQueue.push(updateAction);
             }
         }
@@ -1943,10 +1943,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         };
     }
 
-    private boolean actions_executeUpdateAction(UpdateAction updateAction, long currentTimeMillis) {
-        if ((currentTimeMillis - updateAction.lastUpdate) > updateAction.interval) {
+    private boolean actions_executeUpdateAction(UpdateAction updateAction) {
+        updateAction.timer++;
+        if (updateAction.timer > updateAction.interval) {
             updateAction.onUpdate();
-            updateAction.lastUpdate = currentTimeMillis;
             return true;
         }
         return false;
@@ -2035,12 +2035,13 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void renderGameViewPortFrameBuffer(AppViewport appViewPort) {
         if (render_isComponentNotRendered(appViewPort)) return;
-        if (System.currentTimeMillis() - appViewPort.updateTimer > appViewPort.updateTime) {
+        appViewPort.updateTimer++;
+        if (appViewPort.updateTimer > appViewPort.updateTime) {
             // draw to frambuffer
             appViewPort.frameBuffer.beginGlClear();
             this.uiAdapter.render(appViewPort.camera, appViewPort);
             appViewPort.frameBuffer.end();
-            appViewPort.updateTimer = System.currentTimeMillis();
+            appViewPort.updateTimer = 0;
         }
     }
 

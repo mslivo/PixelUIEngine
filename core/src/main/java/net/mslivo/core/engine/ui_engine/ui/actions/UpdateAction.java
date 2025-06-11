@@ -7,7 +7,7 @@ public abstract class UpdateAction {
 
     public final int interval;
 
-    public long lastUpdate;
+    public long timer;
 
     public UpdateAction() {
         this(0, false);
@@ -19,7 +19,7 @@ public abstract class UpdateAction {
 
     public UpdateAction(int interval, boolean updateOnInit) {
         this.interval = interval;
-        this.lastUpdate = updateOnInit ? 0 : System.currentTimeMillis();
+        this.timer = updateOnInit ? 0 : interval;
     }
 
     public void onUpdate() {
