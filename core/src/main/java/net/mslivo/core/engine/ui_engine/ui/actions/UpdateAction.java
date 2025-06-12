@@ -19,7 +19,7 @@ public abstract class UpdateAction {
 
     public UpdateAction(int interval, boolean updateOnInit) {
         this.interval = interval;
-        this.timer = updateOnInit ? 0 : interval;
+        this.timer = updateOnInit ? interval: 0 ;
     }
 
     public void onUpdate() {
