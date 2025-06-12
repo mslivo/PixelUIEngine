@@ -858,6 +858,17 @@ public class Tools {
             return it.next();
         }
 
+        public static int exponentialGrowth(int baseValue, float exp, int times) {
+            if (times <= 1) return MathUtils.round(baseValue);
+            return MathUtils.round(baseValue * (float)Math.pow(exp, times - 1));
+        }
+
+        public static float exponentialGrowth(float baseValue, float exp, int times) {
+            if (times <= 1) return baseValue;
+            return baseValue * (float)Math.pow(exp, times - 1);
+        }
+
+
         public static float exponentialDecay( float curve, int value){
             return 1f - (float)Math.exp(-curve * value);
         }
