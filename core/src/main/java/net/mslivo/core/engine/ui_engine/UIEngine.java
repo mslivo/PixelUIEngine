@@ -183,7 +183,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.mTextInputUnlock = false;
         newUIEngineState.keyboardInteractedUIObjectFrame = null;
         newUIEngineState.mouseInteractedUIObjectFrame = null;
-        newUIEngineState.updateTooltipComponent = null;
+        newUIEngineState.updateTooltipComponents = new ArrayList<>();
         newUIEngineState.modalWindow = null;
         newUIEngineState.modalWindowQueue = new ArrayDeque<>();
         newUIEngineState.pressedTextField = null;
@@ -1732,9 +1732,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
             boolean updateComponentToolTip;
-            if (uiEngineState.updateTooltipComponent == hoverComponent) {
+            if (uiEngineState.updateTooltipComponents.contains(hoverComponent)) {
                 updateComponentToolTip = true;
-                uiEngineState.updateTooltipComponent = null;
+                uiEngineState.updateTooltipComponents.remove(hoverComponent);
             } else {
                 if (hoverComponent instanceof List || hoverComponent instanceof Grid) {
                     // Check on subitem change

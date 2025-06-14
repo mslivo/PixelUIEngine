@@ -1758,7 +1758,7 @@ public final class APIComponent {
 
     public void forceToolTipUpdate(Component component) {
         if (component == null) return;
-        uiEngineState.updateTooltipComponent = component;
+        uiEngineState.updateTooltipComponents.add(component);
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
