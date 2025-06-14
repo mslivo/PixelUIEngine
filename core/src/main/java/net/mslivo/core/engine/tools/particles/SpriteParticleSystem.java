@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.tools.particles;
 
+import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.tools.particles.particles.*;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
@@ -41,31 +42,34 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
             if (renderHook != null)
                 renderHook.renderBeforeParticle(particle, spriteRenderer);
 
+            final int x = MathUtils.round(particle.x);
+            final int y = MathUtils.round(particle.y);
+
             switch (particle) {
                 case ImageParticle<T> imageParticle -> {
                     CMediaImage cMediaImage = (CMediaImage) imageParticle.sprite;
                     spriteRenderer.setColor(imageParticle.r, imageParticle.g, imageParticle.b, imageParticle.a);
-                    spriteRenderer.drawCMediaImage(cMediaImage, imageParticle.x, imageParticle.y, imageParticle.origin_x, imageParticle.origin_y,
+                    spriteRenderer.drawCMediaImage(cMediaImage, x, y, imageParticle.origin_x, imageParticle.origin_y,
                             mediaManager.imageWidth(cMediaImage), mediaManager.imageHeight(cMediaImage),
                             imageParticle.scaleX, imageParticle.scaleY, imageParticle.rotation);
                 }
                 case ArrayParticle<T> arrayParticle -> {
                     CMediaArray cMediaArray = (CMediaArray) arrayParticle.sprite;
                     spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
-                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex, arrayParticle.x, arrayParticle.y, arrayParticle.origin_x, arrayParticle.origin_y,
+                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex,  x, y, arrayParticle.origin_x, arrayParticle.origin_y,
                             mediaManager.arrayWidth(cMediaArray), mediaManager.arrayHeight(cMediaArray),
                             arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
                 }
                 case AnimationParticle<T> animationParticle -> {
                     CMediaAnimation cMediaAnimation = (CMediaAnimation) animationParticle.sprite;
                     spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
-                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset), animationParticle.x, animationParticle.y, animationParticle.origin_x, animationParticle.origin_y,
+                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset),  x, y, animationParticle.origin_x, animationParticle.origin_y,
                             mediaManager.animationWidth(cMediaAnimation), mediaManager.animationHeight(cMediaAnimation),
                             animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
                 }
                 case TextParticle<T> textParticle -> {
                     spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
-                    spriteRenderer.drawCMediaFont(textParticle.font, textParticle.x, textParticle.y, textParticle.text, 0,textParticle.text.length(),textParticle.centerX, textParticle.centerY);
+                    spriteRenderer.drawCMediaFont(textParticle.font,  x, y, textParticle.text, 0,textParticle.text.length(),textParticle.centerX, textParticle.centerY);
                 }
                 case EmptyParticle _ -> {
                 }

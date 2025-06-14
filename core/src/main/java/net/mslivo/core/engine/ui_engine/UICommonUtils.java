@@ -376,7 +376,7 @@ final class UICommonUtils {
     }
 
     static boolean component_isComponentAtPosition(UIEngineState uiEngineState, int x, int y, Component component) {
-        if (!component.visible || component.disabled) return false;
+        if (!component.visible) return false;
         if (UICommonUtils.component_isHiddenByTab(component)) return false;
 
         if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(component), UICommonUtils.component_getAbsoluteY(component), uiEngineState.tileSize.TL(component.width), uiEngineState.tileSize.TL(component.height))) {

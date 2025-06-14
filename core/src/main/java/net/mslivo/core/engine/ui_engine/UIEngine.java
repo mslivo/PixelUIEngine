@@ -955,14 +955,29 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     }
 
+    private boolean updateUI_keyInteractionsKeyProcessKey(Textfield focusedTextField) {
+        if(focusedTextField != null) {
+            if(UICommonUtils.window_isModalOpen(uiEngineState)){
+                if(focusedTextField.addedToWindow == null){
+                    return false;
+                }else if(focusedTextField.addedToWindow != uiEngineState.modalWindow){
+                    return false;
+                }
+            }
+        }else {
+            return false;
+        }
+
+        return true;
+    }
+
     private void updateUI_keyInteractions() {
         UICommonUtils.setKeyboardInteractedUIObject(uiEngineState, null);
         if (uiEngineState.config.ui_keyInteractionsDisabled) return;
-
+        // Key
         if (uiEngineState.inputEvents.keyTyped) {
-            boolean processKeyTyped = true;
-            Textfield focusedTextField = uiEngineState.focusedTextField;
-            if (focusedTextField == null) processKeyTyped = false;
+            final Textfield focusedTextField = uiEngineState.focusedTextField;
+            final boolean processKeyTyped = updateUI_keyInteractionsKeyProcessKey(focusedTextField);
 
             if (processKeyTyped) {
                 // Into Temp variable because focuseTextField can change after executing actions
@@ -980,12 +995,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         }
         if (uiEngineState.inputEvents.keyDown) {
-            boolean processKeyDown = true;
             final Textfield focusedTextField = uiEngineState.focusedTextField;
-            if (focusedTextField == null)
-                processKeyDown = false;
+            final boolean processKeyDown = updateUI_keyInteractionsKeyProcessKey(focusedTextField);
 
-            if (focusedTextField != null) {
+            if (processKeyDown) {
                 // TextField Control Keys
                 for (int ik = 0; ik < uiEngineState.inputEvents.keyDownKeyCodes.size; ik++) {
                     int keyDownKeyCode = uiEngineState.inputEvents.keyDownKeyCodes.get(ik);
@@ -1069,21 +1082,45 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
     }
 
+    private boolean updateUI_mouseInteractionProcessMouseclick(Object lastUIMouseHover){
+        if (lastUIMouseHover != null) {
+
+            if(lastUIMouseHover instanceof Component component){
+                if(component.disabled || !component.visible)
+                    return false;
+
+                if (UICommonUtils.window_isModalOpen(uiEngineState)) {
+                    if (component.addedToWindow == null) {
+                        return false;
+                    }else if(component.addedToWindow != uiEngineState.modalWindow){
+                        return false;
+                    }
+                }
+            }else if(lastUIMouseHover instanceof Window window){
+                if(!window.visible)
+                    return false;
+
+                if (UICommonUtils.window_isModalOpen(uiEngineState)) {
+                    if (window != uiEngineState.modalWindow) {
+                        return false;
+                    }
+                }
+
+            }
+        } else {
+            return false;
+        }
+
+        return true;
+    }
 
     private void updateUI_mouseInteractions() {
         UICommonUtils.setMouseInteractedUIObject(uiEngineState, null);
         if (uiEngineState.config.ui_mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (uiEngineState.inputEvents.mouseDoubleClick) {
-            boolean processMouseDoubleClick = true;
-            Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
-            if (lastUIMouseHover != null) {
-                if (UICommonUtils.window_isModalOpen(uiEngineState) && lastUIMouseHover != uiEngineState.modalWindow) {
-                    processMouseDoubleClick = false;
-                }
-            } else {
-                processMouseDoubleClick = false;
-            }
+            final Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
+            final boolean processMouseDoubleClick = updateUI_mouseInteractionProcessMouseclick(uiEngineState.lastUIMouseHover);
 
             if (processMouseDoubleClick) {
                 if (lastUIMouseHover instanceof Window window) {
@@ -1112,35 +1149,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
         // ------ MOUSE DOWN ------
         if (uiEngineState.inputEvents.mouseDown) {
-            boolean processMouseClick = true;
-            Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
-            /* Modal ? */
-            if (lastUIMouseHover != null) {
-                if (UICommonUtils.window_isModalOpen(uiEngineState)) {
-                    /* Modal Active? */
-                    if (lastUIMouseHover instanceof Window window) {
-                        if (window != uiEngineState.modalWindow) processMouseClick = false;
-                    } else if (lastUIMouseHover instanceof Component component) {
-                        if (component.addedToWindow == null) {
-                            processMouseClick = false;
-                        } else if (component.addedToWindow != uiEngineState.modalWindow) {
-                            processMouseClick = false;
-                        }
-                    }
-                } else {
-                    /* Hidden ? */
-                    if (lastUIMouseHover instanceof Window window) {
-                        if (!window.visible) processMouseClick = false;
-                    } else if (lastUIMouseHover instanceof Component component) {
-                        if (component.addedToWindow != null && !component.addedToWindow.visible)
-                            processMouseClick = false;
-                    }
-                }
-            } else {
-                processMouseClick = false;
-            }
+            final Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
+            final boolean processMouseclick = updateUI_mouseInteractionProcessMouseclick(uiEngineState.lastUIMouseHover);
 
-            if (processMouseClick) {
+            if (processMouseclick) {
                 Window moveWindow = null;
                 boolean isMouseLeftButton = uiEngineState.inputEvents.mouseButtonsDown[Input.Buttons.LEFT];
                 if (isMouseLeftButton) {

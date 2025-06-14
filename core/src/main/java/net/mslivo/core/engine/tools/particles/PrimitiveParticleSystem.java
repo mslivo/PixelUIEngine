@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.tools.particles;
 
+import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.core.engine.tools.particles.particles.EmptyParticle;
 import net.mslivo.core.engine.tools.particles.particles.Particle;
 import net.mslivo.core.engine.tools.particles.particles.PrimitiveParticle;
@@ -39,7 +40,7 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
             if (renderHook != null)
                 renderHook.renderBeforeParticle(particle, primitiveRenderer);
 
-            switch (particle){
+            switch (particle) {
                 case PrimitiveParticle primitiveParticle -> {
                     // check for correct type
                     if (primitiveRenderer.getPrimitiveType() != primitiveParticle.primitiveType) {
@@ -47,18 +48,25 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
                         primitiveRenderer.begin(primitiveParticle.primitiveType);
                     }
 
+                    final int x = MathUtils.round(particle.x);
+                    final int y = MathUtils.round(particle.y);
+
                     primitiveRenderer.setVertexColor(particle.r, particle.g, particle.b, particle.a);
-                    primitiveRenderer.vertex(particle.x, particle.y);
+                    primitiveRenderer.vertex(x, y);
 
                     // Additional Vertexes
                     for (int iv = 0; iv < primitiveParticle.numAdditionalVertexes; iv++) {
+                        final int x_add = MathUtils.round(particle.x + primitiveParticle.vtx_x[iv]);
+                        final int y_add = MathUtils.round(particle.y + primitiveParticle.vtx_y[iv]);
+
                         primitiveRenderer.setVertexColor(primitiveParticle.vtx_r[iv], primitiveParticle.vtx_g[iv], primitiveParticle.vtx_b[iv], primitiveParticle.vtx_a[iv]);
-                        primitiveRenderer.vertex((primitiveParticle.x + primitiveParticle.vtx_x[iv]), (primitiveParticle.y + primitiveParticle.vtx_y[iv]));
+                        primitiveRenderer.vertex(x_add, y_add);
                     }
                 }
                 case EmptyParticle _ -> {
                 }
-                default -> throw new IllegalStateException("Invalid particle type: "+particle.getClass().getSimpleName());
+                default ->
+                        throw new IllegalStateException("Invalid particle type: " + particle.getClass().getSimpleName());
             }
 
 
@@ -91,7 +99,6 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         super.addParticleToSystem(particle);
         return particle;
     }
-
 
 
     public PrimitiveParticle<T> addPrimitiveParticle(int primitiveType,
