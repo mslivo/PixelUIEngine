@@ -8,7 +8,7 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
@@ -18,6 +18,8 @@ import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /*
     - Collections related functions are provided like
@@ -26,8 +28,6 @@ import java.util.ArrayList;
         - removeX(X)
         - removeXs(X[]) ->  removeX()
         - removeAllX() -> remove(X[])
-        - Optional: ArrayList<X> findXsByName
-        - Optional: X findXByName
 
     - Color related functions are provided like:
         - setColor(X, float r, float g, float b, float a)
@@ -110,20 +110,21 @@ public final class API {
         removeNotifications(uiEngineState.tooltipNotifications.toArray(new CommonNotification[]{}));
     }
 
-    public ArrayList<CommonNotification> findNotificationsByName(String name) {
-        if (name == null) return new ArrayList<>();
+    public ArrayList<CommonNotification> findNotifications(Predicate<Notification> findBy) {
         ArrayList<CommonNotification> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.notifications.size(); i++)
-            if (name.equals(uiEngineState.notifications.get(i).name)) result.add(uiEngineState.notifications.get(i));
-        for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++)
-            if (name.equals(uiEngineState.tooltipNotifications.get(i).name)) result.add(uiEngineState.tooltipNotifications.get(i));
+        result.addAll(UICommonUtils.findMultiple(uiEngineState.notifications, findBy));
+        result.addAll(UICommonUtils.findMultiple(uiEngineState.tooltipNotifications, findBy));
         return result;
     }
 
-    public CommonNotification findNotificationByName(String name) {
-        if (name == null) return null;
-        ArrayList<CommonNotification> result = findNotificationsByName(name);
-        return result.isEmpty() ? null: result.getFirst();
+    public CommonNotification findNotification(Predicate<Notification> findBy) {
+        CommonNotification result = UICommonUtils.find(uiEngineState.notifications, findBy);
+        if(result != null)
+            return result;
+        result = UICommonUtils.find(uiEngineState.tooltipNotifications, findBy);
+        if(result != null)
+            return result;
+        return null;
     }
 
     public boolean isNotificationAddedToScreen(CommonNotification commonNotification) {
@@ -133,24 +134,24 @@ public final class API {
 
     /* #################### Context Menu #################### */
 
-    public Contextmenu contextMenu() {
+    public ContextMenu contextMenu() {
         return uiEngineState.openContextMenu;
     }
 
-    public void openContextMenu(Contextmenu contextMenu) {
+    public void openContextMenu(ContextMenu contextMenu) {
         UICommonUtils.contextMenu_openAtMousePosition(uiEngineState, mediaManager, contextMenu);
     }
 
-    public void openContextMenu(Contextmenu contextMenu, int x, int y) {
+    public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
         UICommonUtils.contextMenu_open(uiEngineState, mediaManager, contextMenu, x, y);
     }
 
-    public void closeContextMenu(Contextmenu contextMenu) {
+    public void closeContextMenu(ContextMenu contextMenu) {
         UICommonUtils.contextMenu_close(uiEngineState, contextMenu);
     }
 
-    public boolean isContextMenuOpen(Contextmenu contextMenu) {
+    public boolean isContextMenuOpen(ContextMenu contextMenu) {
         return UICommonUtils.contextMenu_isOpen(uiEngineState, contextMenu);
     }
 
@@ -289,19 +290,12 @@ public final class API {
         removeScreenComponents(uiEngineState.screenComponents.toArray(new Component[]{}));
     }
 
-    public ArrayList<Component> findScreenComponentsByName(String name) {
-        if (name == null) return new ArrayList<>();
-        ArrayList<Component> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++)
-            if (name.equals(uiEngineState.screenComponents.get(i).name))
-                result.add(uiEngineState.screenComponents.get(i));
-        return result;
+    public ArrayList<Component> findScreenComponents(Predicate<Component> findBy) {
+        return UICommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
     }
 
-    public Component findScreenComponentByName(String name) {
-        if (name == null) return null;
-        ArrayList<Component> result = findScreenComponentsByName(name);
-        return result.size() > 0 ? result.getFirst() : null;
+    public Component findScreenComponent(Predicate<Component> findBy) {
+        return UICommonUtils.find(uiEngineState.screenComponents, findBy);
     }
 
     /* #################### MouseTool #################### */
@@ -354,32 +348,20 @@ public final class API {
         removeHotKeys(uiEngineState.hotKeys.toArray(new HotKey[]{}));
     }
 
-    public ArrayList<HotKey> findHotKeysByName(String name) {
-        if (name == null) return new ArrayList<>();
-        ArrayList<HotKey> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.hotKeys.size(); i++)
-            if (name.equals(uiEngineState.hotKeys.get(i).name)) result.add(uiEngineState.hotKeys.get(i));
-        return result;
+    public HotKey findHotKey(Predicate<HotKey> findBy){
+        return UICommonUtils.find(uiEngineState.hotKeys, findBy);
     }
 
-    public HotKey findHotKeyByName(String name) {
-        if (name == null) return null;
-        ArrayList<HotKey> result = findHotKeysByName(name);
-        return result.size() > 0 ? result.getFirst() : null;
+    public List<HotKey> findHotKeys(Predicate<HotKey> findBy){
+        return UICommonUtils.findMultiple(uiEngineState.hotKeys, findBy);
     }
 
-    public ArrayList<Window> findWindowsByName(String name) {
-        if (name == null) return new ArrayList<>();
-        ArrayList<Window> result = new ArrayList<>();
-        for (int i = 0; i < uiEngineState.windows.size(); i++)
-            if (name.equals(uiEngineState.windows.get(i).name)) result.add(uiEngineState.windows.get(i));
-        return result;
+    public Window findWindow(Predicate<Window> findBy){
+        return UICommonUtils.find(uiEngineState.windows, findBy);
     }
 
-    public Window findWindowByName(String name) {
-        if (name == null) return null;
-        ArrayList<Window> result = findWindowsByName(name);
-        return result.size() > 0 ? result.getFirst() : null;
+    public List<Window> findWindows(Predicate<Window> findBy){
+        return UICommonUtils.findMultiple(uiEngineState.windows, findBy);
     }
 
     /* #################### Misc #################### */

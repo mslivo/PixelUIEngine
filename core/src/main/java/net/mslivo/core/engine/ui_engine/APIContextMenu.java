@@ -7,10 +7,11 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuAction;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public final class APIContextMenu {
     private final API api;
@@ -29,12 +30,12 @@ public final class APIContextMenu {
 
     public ContextMenuAction DEFAULT_CONTEXT_MENU_ACTION  = new ContextMenuAction() {};
 
-    public Contextmenu create(ContextMenuItem[] contextMenuItems) {
+    public ContextMenu create(ContextMenuItem[] contextMenuItems) {
         return create(contextMenuItems, DEFAULT_CONTEXT_MENU_ACTION);
     }
 
-    public Contextmenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
-        Contextmenu contextMenu = new Contextmenu();
+    public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
+        ContextMenu contextMenu = new ContextMenu();
         contextMenu.items = new ArrayList<>();
         if (contextMenuItems != null) {
             for (int i = 0; i < contextMenuItems.length; i++) {
@@ -49,56 +50,51 @@ public final class APIContextMenu {
         return contextMenu;
     }
 
-    public void setContextMenuAction(Contextmenu contextMenu, ContextMenuAction contextMenuAction) {
+    public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
         if (contextMenu == null) return;
         contextMenu.contextMenuAction = contextMenuAction;
     }
 
-    public void setColor(Contextmenu contextMenu, Color color) {
+    public void setColor(ContextMenu contextMenu, Color color) {
         if (contextMenu == null) return;
         contextMenu.color.set(color);
     }
 
-    public void addContextMenuItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
+    public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
         UICommonUtils.contextMenu_addItem(contextMenu, contextMenuItem);
     }
 
-    public void addContextMenuItems(Contextmenu contextMenu, ContextMenuItem[] contextMenuItems) {
+    public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
         if (contextMenu == null || contextMenuItems == null) return;
         for (int i = 0; i < contextMenuItems.length; i++) addContextMenuItem(contextMenu, contextMenuItems[i]);
     }
 
-    public void removeContextMenuItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
+    public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
         UICommonUtils.contextMenu_removeItem(contextMenu, contextMenuItem);
     }
 
-    public void removeContextMenuItems(Contextmenu contextMenu, ContextMenuItem[] contextMenuItems) {
+    public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
         if (contextMenu == null || contextMenuItems == null) return;
         for (int i = 0; i < contextMenuItems.length; i++)
             removeContextMenuItem(contextMenu, contextMenuItems[i]);
     }
 
-    public void removeAllContextMenuItems(Contextmenu contextMenu) {
+    public void removeAllContextMenuItems(ContextMenu contextMenu) {
         if (contextMenu == null) return;
         removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
     }
 
-    public ArrayList<ContextMenuItem> findContextMenuItemsByName(Contextmenu contextMenu, String name) {
-        if (contextMenu == null || name == null) return new ArrayList<>();
-        ArrayList<ContextMenuItem> result = new ArrayList<>();
-        for (int i = 0; i < contextMenu.items.size(); i++)
-            if (name.equals(contextMenu.items.get(i).name)) result.add(contextMenu.items.get(i));
-        return result;
+    public ArrayList<ContextMenuItem> findContextMenuItems(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
+        if (contextMenu == null) return new ArrayList<>();
+        return UICommonUtils.findMultiple(contextMenu.items, findBy);
     }
 
-    public ContextMenuItem findContextMenuItemByName(Contextmenu contextMenu, String name) {
-        if (contextMenu == null || name == null) return null;
-        ArrayList<ContextMenuItem> result = findContextMenuItemsByName(contextMenu, name);
-        return result.size() > 0 ? result.getFirst() : null;
+    public ContextMenuItem findContextMenuItem(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
+        if (contextMenu == null) return null;
+        return UICommonUtils.find(contextMenu.items, findBy);
     }
-
 
     public final class APIContextMenuItem {
 

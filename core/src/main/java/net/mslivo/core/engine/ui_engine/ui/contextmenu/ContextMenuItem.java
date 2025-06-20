@@ -1,7 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.contextmenu;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 
 public class ContextMenuItem {
@@ -9,7 +8,7 @@ public class ContextMenuItem {
     public String text;
     public Color fontColor;
     public ContextMenuItemAction contextMenuItemAction;
-    public Contextmenu addedToContextMenu;
+    public ContextMenu addedToContextMenu;
     public String name;
     public Object data;
 

@@ -44,7 +44,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.CommonNotification;
@@ -58,6 +58,7 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 final class UICommonUtils {
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
@@ -460,7 +461,7 @@ final class UICommonUtils {
         }
     }
 
-    static boolean contextMenu_openAtMousePosition(UIEngineState uiEngineState, MediaManager mediaManager, Contextmenu contextMenu) {
+    static boolean contextMenu_openAtMousePosition(UIEngineState uiEngineState, MediaManager mediaManager, ContextMenu contextMenu) {
         boolean success = contextMenu_open(uiEngineState, mediaManager, contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
@@ -470,7 +471,7 @@ final class UICommonUtils {
         return success;
     }
 
-    static boolean contextMenu_open(UIEngineState uiEngineState, MediaManager mediaManager, Contextmenu contextMenu, int x, int y) {
+    static boolean contextMenu_open(UIEngineState uiEngineState, MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
         if (contextMenu.items.size() == 0) return false;
         // Close open ContextMenus
         if (uiEngineState.openContextMenu != null) {
@@ -492,7 +493,7 @@ final class UICommonUtils {
         return true;
     }
 
-    static void contextMenu_close(UIEngineState uiEngineState, Contextmenu contextMenu) {
+    static void contextMenu_close(UIEngineState uiEngineState, ContextMenu contextMenu) {
         if (contextMenu_isOpen(uiEngineState, contextMenu)) {
             resetOpenContextMenuReference(uiEngineState);
             contextMenu.contextMenuAction.onClose();
@@ -778,13 +779,13 @@ final class UICommonUtils {
         tabBar.tabs.remove(tab);
     }
 
-    static void contextMenu_addItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
+    static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != null) return;
         contextMenuItem.addedToContextMenu = contextMenu;
         contextMenu.items.add(contextMenuItem);
     }
 
-    static void contextMenu_removeItem(Contextmenu contextMenu, ContextMenuItem contextMenuItem) {
+    static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
         contextMenu.items.remove(contextMenuItem);
@@ -792,7 +793,7 @@ final class UICommonUtils {
 
     static void contextMenu_selectItem(UIEngineState uiEngineState, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu == null) return;
-        Contextmenu ContextMenu = contextMenuItem.addedToContextMenu;
+        ContextMenu ContextMenu = contextMenuItem.addedToContextMenu;
         contextMenuItem.contextMenuItemAction.onSelect();
         ContextMenu.contextMenuAction.onItemSelected(contextMenuItem);
         UICommonUtils.contextMenu_close(uiEngineState, ContextMenu);
@@ -858,7 +859,7 @@ final class UICommonUtils {
         return uiEngineState.openComboBox != null && uiEngineState.openComboBox == comboBox;
     }
 
-    static boolean contextMenu_isOpen(UIEngineState uiEngineState, Contextmenu contextMenu) {
+    static boolean contextMenu_isOpen(UIEngineState uiEngineState, ContextMenu contextMenu) {
         return uiEngineState.openContextMenu != null && uiEngineState.openContextMenu == contextMenu;
     }
 
@@ -1498,6 +1499,25 @@ final class UICommonUtils {
     static Color color_brigther(Color color) {
         float amount = 1.3f;
         return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
+    }
+
+    static  <T> T find(java.util.List<T> list, Predicate predicate){
+        for (int i = 0; i < list.size(); i++) {
+            final T object = list.get(i);
+            if (predicate.test(object))
+                return object;
+        }
+        return null;
+    }
+
+    static  <T> ArrayList<T> findMultiple(java.util.List<T> list, Predicate predicate){
+        ArrayList<T> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            final T object = list.get(i);
+            if (predicate.test(object))
+                result.add(object);
+        }
+        return result;
     }
 
 

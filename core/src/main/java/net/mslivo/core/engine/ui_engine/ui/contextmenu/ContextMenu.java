@@ -5,7 +5,7 @@ import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuAction;
 
 import java.util.ArrayList;
 
-public class Contextmenu {
+public class ContextMenu {
     public int x, y;
     public Color color;
     public ArrayList<ContextMenuItem> items;

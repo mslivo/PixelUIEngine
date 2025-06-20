@@ -43,6 +43,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 public final class APIComponent {
     private final API api;
@@ -693,18 +694,14 @@ public final class APIComponent {
             removeTabs(tabBar, tabBar.tabs.toArray(new Tab[]{}));
         }
 
-        public ArrayList<Tab> findTabsByName(Tabbar tabBar, String name) {
-            if (tabBar == null || name == null) return new ArrayList<>();
-            ArrayList<Tab> result = new ArrayList<>();
-            for (int i = 0; i < tabBar.tabs.size(); i++)
-                if (name.equals(tabBar.tabs.get(i).name)) result.add(tabBar.tabs.get(i));
-            return result;
+        public ArrayList<Tab> findTabs(Tabbar tabBar, Predicate<Tab> findBy) {
+            if (tabBar == null) return new ArrayList<>();
+            return UICommonUtils.findMultiple(tabBar.tabs, findBy);
         }
 
-        public Tab findTabByName(Tabbar tabBar, String name) {
-            if (tabBar == null || name == null) return null;
-            ArrayList<Tab> result = findTabsByName(tabBar, name);
-            return result.size() > 0 ? result.getFirst() : null;
+        public Tab findTab(Tabbar tabBar, Predicate<Tab> findBy) {
+            if (tabBar == null) return null;
+            return UICommonUtils.find(tabBar.tabs, findBy);
         }
 
         public boolean isTabVisible(Tabbar tabBar, Tab tab) {

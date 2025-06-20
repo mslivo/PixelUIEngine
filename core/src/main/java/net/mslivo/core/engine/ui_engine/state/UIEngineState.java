@@ -31,7 +31,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarHorizon
 import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarVertical;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
@@ -124,7 +124,7 @@ public final class UIEngineState {
     public Object draggedListItem;
     public Combobox openComboBox;
     public ComboboxItem pressedComboBoxItem;
-    public Contextmenu openContextMenu;
+    public ContextMenu openContextMenu;
     public ContextMenuItem pressedContextMenuItem;
     public int displayedContextMenuWidth;
     public Object keyboardInteractedUIObjectFrame;

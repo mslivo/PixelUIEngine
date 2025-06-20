@@ -12,6 +12,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.generator.*;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public final class APIWindow {
 
@@ -200,7 +201,7 @@ public final class APIWindow {
         for (int i = 0; i < components.length; i++) addComponent(window, components[i]);
     }
 
-    public void moveComponentToTop(Component component){
+    public void moveComponentToTop(Component component) {
         if (component == null) return;
         UICommonUtils.component_windowMoveToTop(component, uiEngineState);
     }
@@ -220,18 +221,14 @@ public final class APIWindow {
         removeComponents(window, window.components.toArray(new Component[]{}));
     }
 
-    public ArrayList<Component> findComponentsByName(Window window, String name) {
-        if (window == null || name == null) return new ArrayList<>();
-        ArrayList<Component> result = new ArrayList<>();
-        for (int i = 0; i < window.components.size(); i++)
-            if (name.equals(window.components.get(i).name)) result.add(window.components.get(i));
-        return result;
+    public ArrayList<Component> findComponents(Window window, Predicate<Window> findBy) {
+        if (window == null) return new ArrayList<>();
+        return UICommonUtils.findMultiple(window.components, findBy);
     }
 
-    public Component findComponentByName(Window window, String name) {
-        if (window == null || name == null) return null;
-        ArrayList<Component> result = findComponentsByName(window, name);
-        return result.size() > 0 ? result.getFirst() : null;
+    public Component findComponent(Window window, Predicate<Window> findBy) {
+        if (window == null) return null;
+        return UICommonUtils.find(window.components, findBy);
     }
 
     public void bringToFront(Window window) {

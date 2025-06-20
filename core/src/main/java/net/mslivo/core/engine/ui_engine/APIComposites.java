@@ -27,7 +27,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
@@ -1456,7 +1456,7 @@ public final class APIComposites {
                                 }
                             }));
                         }
-                        Contextmenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        ContextMenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
                         api.openContextMenu(selectTabMenu);
                     }
                 });

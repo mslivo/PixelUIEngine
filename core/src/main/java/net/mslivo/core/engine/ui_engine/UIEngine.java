@@ -52,7 +52,7 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.Contextmenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -2362,7 +2362,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         if (uiEngineState.openContextMenu != null) {
 
-            final Contextmenu contextMenu = uiEngineState.openContextMenu;
+            final ContextMenu contextMenu = uiEngineState.openContextMenu;
             final int width = uiEngineState.displayedContextMenuWidth;
             final int height = contextMenu.items.size();
             final float contextMenuAlpha = contextMenu.color.a;
