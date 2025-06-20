@@ -17,7 +17,6 @@ import net.mslivo.core.engine.media_manager.CMediaFontArraySymbol;
 import net.mslivo.core.engine.media_manager.CMediaFontSingleSymbol;
 import net.mslivo.core.engine.media_manager.MediaManager;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -30,7 +29,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.zip.ZipEntry;
@@ -49,62 +48,105 @@ public class Tools {
         private static float timeStepX2;
         private static float timeBetweenUpdates;
         private static final Path ERROR_LOG_FILE = Path.of("error.log");
-        private static ArrayDeque<ForkJoinTask> parallelTaskList = new ArrayDeque<>();
 
-        public static void runParallel(int[] array, IntConsumer consumer) {
+        private static final int MAX_TASKS = Runtime.getRuntime().availableProcessors();
+        private static final IntArrayTask[] intTasks = new IntArrayTask[MAX_TASKS];
+        @SuppressWarnings("rawtypes")
+        private static final ListTask[] listTasks = new ListTask[MAX_TASKS];
+
+        static {
+            for (int i = 0; i < MAX_TASKS; i++) {
+                intTasks[i] = new IntArrayTask();
+                listTasks[i] = new ListTask<>();
+            }
+        }
+
+        private static final class IntArrayTask extends RecursiveAction {
+            int[] array;
+            int start, end;
+            IntConsumer consumer;
+
+            void setup(int[] array, int start, int end, IntConsumer consumer) {
+                this.array = array;
+                this.start = start;
+                this.end = end;
+                this.consumer = consumer;
+                this.reinitialize(); // allow reuse after join()
+            }
+
+            @Override
+            protected void compute() {
+                for (int i = start; i < end; i++) {
+                    consumer.accept(array[i]);
+                }
+            }
+        }
+
+        private static final class ListTask<T> extends RecursiveAction {
+            List<T> list;
+            int start, end;
+            Consumer<T> consumer;
+
+            void setup(final List<T> list, final int start, final int end, final Consumer<T> consumer) {
+                this.list = list;
+                this.start = start;
+                this.end = end;
+                this.consumer = consumer;
+                this.reinitialize(); // allow reuse after join()
+            }
+
+            @Override
+            protected void compute() {
+                for (int i = start; i < end; i++) {
+                    consumer.accept(list.get(i));
+                }
+            }
+        }
+
+        public static void runParallel(final int[] array, final IntConsumer consumer) {
             runParallel(array, consumer, array.length);
         }
 
-        public static void runParallel(int[] array, IntConsumer consumer, int size) {
-            if (array.length == 0) return;
-            final int parallelism = ForkJoinPool.commonPool().getParallelism();
-            final int listSize = size;
+        public static void runParallel(final int[] array, final IntConsumer consumer, final int size) {
+            if (size == 0) return;
 
-            int taskCount = Math.min(parallelism, listSize);
-            int chunkSize = MathUtils.ceil(listSize / (float) taskCount);
+            final int taskCount = Math.min(MAX_TASKS, size);
+            final int chunkSize = (size + taskCount - 1) / taskCount;
 
             for (int i = 0; i < taskCount; i++) {
                 int start = i * chunkSize;
-                int end = Math.min(start + chunkSize, listSize);
-
-                ForkJoinTask forkJoinTask = ForkJoinPool.commonPool().submit(() -> {
-                    for (int i2 = start; i2 < end; i2++) {
-                        consumer.accept(array[i2]);
-                    }
-                });
-                parallelTaskList.add(forkJoinTask);
+                int end = Math.min(start + chunkSize, size);
+                IntArrayTask task = intTasks[i];
+                task.setup(array, start, end, consumer);
+                ForkJoinPool.commonPool().execute(task);
             }
 
-            while (!parallelTaskList.isEmpty())
-                parallelTaskList.poll().join();
+            for (int i = 0; i < taskCount; i++)
+                intTasks[i].join();
         }
 
-        public static <T> void runParallel(List<T> list, Consumer<T> consumer) {
+        public static <T> void runParallel(final List<T> list, final Consumer<T> consumer) {
             runParallel(list, consumer, list.size());
         }
 
-        public static <T> void runParallel(List<T> list, Consumer<T> consumer, int size) {
-            if (list.size() == 0) return;
-            final int parallelism = ForkJoinPool.commonPool().getParallelism();
-            final int listSize = size;
+        @SuppressWarnings("unchecked")
+        public static <T> void runParallel(final List<T> list, final Consumer<T> consumer, final int size) {
+            if (size == 0) return;
 
-            int taskCount = Math.min(parallelism, listSize);
-            int chunkSize = MathUtils.ceil(listSize / (float) taskCount);
+            final int taskCount = Math.min(MAX_TASKS, size);
+            final int chunkSize = (size + taskCount - 1) / taskCount;
 
             for (int i = 0; i < taskCount; i++) {
                 int start = i * chunkSize;
-                int end = Math.min(start + chunkSize, listSize);
-
-                ForkJoinTask forkJoinTask = ForkJoinPool.commonPool().submit(() -> {
-                    for (int i2 = start; i2 < end; i2++) {
-                        consumer.accept(list.get(i2));
-                    }
-                });
-                parallelTaskList.add(forkJoinTask);
+                int end = Math.min(start + chunkSize, size);
+                ListTask<T> task = (ListTask<T>) listTasks[i];
+                task.setup(list, start, end, consumer);
+                ForkJoinPool.commonPool().execute(task);
             }
 
-            while (!parallelTaskList.isEmpty())
-                parallelTaskList.poll().join();
+            for (int i = 0; i < taskCount; i++)
+                listTasks[i].join();
+
         }
 
         public static void handleException(Exception e) {
@@ -823,8 +865,8 @@ public class Tools {
             return MathUtils.random(1, oneIn) == 1;
         }
 
-        public static float pctOfRange(float[] range, float pct){
-            return range[0]+((range[1]-range[0])*pct);
+        public static float pctOfRange(float[] range, float pct) {
+            return range[0] + ((range[1] - range[0]) * pct);
         }
 
         public static boolean randomChance(long oneIn) {
@@ -860,26 +902,26 @@ public class Tools {
 
         public static int exponentialGrowth(int baseValue, float exp, int times) {
             if (times <= 1) return MathUtils.round(baseValue);
-            return MathUtils.round(baseValue * (float)Math.pow(exp, times - 1));
+            return MathUtils.round(baseValue * (float) Math.pow(exp, times - 1));
         }
 
         public static float exponentialGrowth(float baseValue, float exp, int times) {
             if (times <= 1) return baseValue;
-            return baseValue * (float)Math.pow(exp, times - 1);
+            return baseValue * (float) Math.pow(exp, times - 1);
         }
 
 
-        public static float exponentialDecay( float curve, int value){
-            return 1f - (float)Math.exp(-curve * value);
+        public static float exponentialDecay(float curve, int value) {
+            return 1f - (float) Math.exp(-curve * value);
         }
 
-        public static int randomCountHits(float baseChance){
-            return randomCountHits(baseChance,1f);
+        public static int randomCountHits(float baseChance) {
+            return randomCountHits(baseChance, 1f);
         }
 
-        public static int randomCountHits(float baseChance, float chanceReduce){
+        public static int randomCountHits(float baseChance, float chanceReduce) {
             int hits = 0;
-            while (Tools.Calc.randomChance(baseChance)){
+            while (Tools.Calc.randomChance(baseChance)) {
                 hits++;
                 baseChance *= chanceReduce;
             }
@@ -1064,16 +1106,16 @@ public class Tools {
                 super();
             }
 
-            public int value(){
+            public int value() {
                 return value;
             }
 
-            public void setValue(int value){
-                this.difference = value-this.value;
+            public void setValue(int value) {
+                this.difference = value - this.value;
                 this.value = value;
             }
 
-            public int delta(){
+            public int delta() {
                 return difference;
             }
 
