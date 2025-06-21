@@ -251,13 +251,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         ComboboxItem comboboxItem2 = api.component.comboBox.item.create("2");
 
 
-        Combobox comboBox = api.component.comboBox.create(25, 7, 6, new ComboboxItem[]{
+        Combobox comboBox = api.component.comboBox.create(25, 7, 12, new ComboboxItem[]{
                 comboboxItem ,
                 comboboxItem2,
                 api.component.comboBox.item.create("3"),
 
         });
 
+        api.component.setColor(comboBox,Color.RED);
+        api.component.setColor2(comboBox,Color.BLUE);
 
 
         Button modal1 = api.component.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {

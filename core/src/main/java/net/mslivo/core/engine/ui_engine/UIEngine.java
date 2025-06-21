@@ -2314,7 +2314,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             itemWidth += api.TS();
                         widthPx = Math.max(widthPx, itemWidth);
                     }
-                    int width = MathUtils.ceil((widthPx + 2) / uiEngineState.tileSize.TSF);
+                    int width = MathUtils.ceil((widthPx ) / uiEngineState.tileSize.TSF);
                     int height = comboBox.items.size();
 
                     /* Menu */
@@ -2329,23 +2329,24 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             // Cell
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
-                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1);
+                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() );
                             spriteRenderer.loadState();
 
                             // Cell - Underline
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1);
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() );
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() - 1, comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() , comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
                                     comboBoxItem.comboBoxItemAction.icon(), comboBoxItem.comboBoxItemAction.iconIndex(), comboBoxItem.comboBoxItemAction.iconColor(),
                                     comboBoxItem.comboBoxItemAction.iconFlipX(), comboBoxItem.comboBoxItemAction.iconFlipY());
+
                         }
                     }
                     // Top
                     if (!comboBox.items.isEmpty()) {
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get3TilesCMediaIndex(ix, width);
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - 1);
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) );
                         }
                     }
 
