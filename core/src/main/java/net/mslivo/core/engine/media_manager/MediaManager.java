@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,6 +82,14 @@ public final class MediaManager {
             prepareCMedia(cMedias[i]);
         return true;
     }
+
+    public boolean prepareCMedia(List<CMedia> cMedias) {
+        if (loaded) return false;
+        for(int i=0;i<cMedias.size();i++)
+            prepareCMedia(cMedias.get(i));
+        return true;
+    }
+
 
     /* ----- Load ---- */
 
