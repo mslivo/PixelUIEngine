@@ -1,12 +1,11 @@
 package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
+import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-
-import java.util.ArrayList;
 
 public final class APICamera {
     private final API api;
@@ -119,15 +118,15 @@ public final class APICamera {
         }
 
         public int activeSize() {
-            return uiEngineState.appViewPorts.size();
+            return uiEngineState.appViewPorts.size;
         }
 
         public AppViewport get(int index) {
             return uiEngineState.appViewPorts.get(index);
         }
 
-        private ArrayList<AppViewport> getAll() {
-            return new ArrayList<>(uiEngineState.appViewPorts);
+        private Array<AppViewport> getAll() {
+            return new Array<>(uiEngineState.appViewPorts);
         }
 
         public boolean pointVisible(AppViewport appViewPort, float x, float y) {
@@ -135,7 +134,7 @@ public final class APICamera {
         }
 
         public boolean pointVisibleAny(float x, float y) {
-            for (int i = 0; i < uiEngineState.appViewPorts.size(); i++) {
+            for (int i = 0; i < uiEngineState.appViewPorts.size; i++) {
                 if (pointVisible(uiEngineState.appViewPorts.get(i), x, y)) return true;
             }
             return false;
@@ -146,7 +145,7 @@ public final class APICamera {
         }
 
         public boolean rectVisibleAny(float x, float y, float width, float height) {
-            for (int i = 0; i < uiEngineState.appViewPorts.size(); i++) {
+            for (int i = 0; i < uiEngineState.appViewPorts.size; i++) {
                 if (rectVisible(uiEngineState.appViewPorts.get(i), x, y, width, height)) return true;
             }
             return false;
@@ -157,7 +156,7 @@ public final class APICamera {
         }
 
         public boolean sphereVisibleAny(float x, float y, float width, float radius) {
-            for (int i = 0; i < uiEngineState.appViewPorts.size(); i++) {
+            for (int i = 0; i < uiEngineState.appViewPorts.size; i++) {
                 if (sphereVisible(uiEngineState.appViewPorts.get(i), x, y, radius)) return true;
             }
             return false;

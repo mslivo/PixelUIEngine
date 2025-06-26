@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.tools.misc;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -8,7 +9,6 @@ import com.badlogic.gdx.utils.ObjectIntMap;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 
 public class ComputeShader {
 
@@ -45,7 +45,7 @@ public class ComputeShader {
     private FloatBuffer inputBuffer;
     private ByteBuffer outputBuffer;
 
-    private ArrayList<Uniform> uniforms;
+    private Array<Uniform> uniforms;
     private String uniFormSource;
     private ObjectIntMap<Uniform> iUniformValues;
     private ObjectFloatMap<Uniform> fUniformValues;
@@ -76,7 +76,7 @@ public class ComputeShader {
     private void initUniforms(Uniform[] uniforms) {
         this.iUniformValues = new ObjectIntMap<>();
         this.fUniformValues = new ObjectFloatMap<>();
-        this.uniforms = new ArrayList<>();
+        this.uniforms = new Array<>();
         StringBuilder uniformSourceBuilder = new StringBuilder();
 
         if (uniforms != null) {
@@ -158,7 +158,6 @@ public class ComputeShader {
         Gdx.gl32.glBindBufferBase(Gdx.gl32.GL_SHADER_STORAGE_BUFFER, 1, this.outputBufferHandle);
 
 
-
     }
 
 
@@ -169,13 +168,11 @@ public class ComputeShader {
         this.inputBuffer.put(inputData).flip();
 
 
-
         Gdx.gl32.glBindBuffer(Gdx.gl32.GL_SHADER_STORAGE_BUFFER, this.inputBufferHandle);
         Gdx.gl32.glBufferData(Gdx.gl32.GL_SHADER_STORAGE_BUFFER, inputData.length * Float.BYTES, this.inputBuffer, Gdx.gl32.GL_DYNAMIC_DRAW);
 
         Gdx.gl32.glBindBuffer(Gdx.gl32.GL_SHADER_STORAGE_BUFFER, this.outputBufferHandle);
         Gdx.gl32.glBufferData(Gdx.gl32.GL_SHADER_STORAGE_BUFFER, inputData.length * Float.BYTES, null, Gdx.gl32.GL_DYNAMIC_READ);
-
 
 
         // Bind and set the compute program
@@ -211,7 +208,6 @@ public class ComputeShader {
                 inputData.length * Float.BYTES,
                 Gdx.gl32.GL_MAP_READ_BIT
         );
-
 
 
     }

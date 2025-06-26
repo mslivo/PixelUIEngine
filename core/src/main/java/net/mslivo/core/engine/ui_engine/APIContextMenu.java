@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
@@ -36,7 +37,7 @@ public final class APIContextMenu {
 
     public ContextMenu create(ContextMenuItem[] contextMenuItems, ContextMenuAction contextMenuAction) {
         ContextMenu contextMenu = new ContextMenu();
-        contextMenu.items = new ArrayList<>();
+        contextMenu.items = new Array<>();
         if (contextMenuItems != null) {
             for (int i = 0; i < contextMenuItems.length; i++) {
                 if (contextMenuItems[i].addedToContextMenu == null) {
@@ -83,11 +84,11 @@ public final class APIContextMenu {
 
     public void removeAllContextMenuItems(ContextMenu contextMenu) {
         if (contextMenu == null) return;
-        removeContextMenuItems(contextMenu, contextMenu.items.toArray(new ContextMenuItem[]{}));
+        removeContextMenuItems(contextMenu, contextMenu.items.toArray(ContextMenuItem[]::new));
     }
 
-    public ArrayList<ContextMenuItem> findContextMenuItems(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
-        if (contextMenu == null) return new ArrayList<>();
+    public Array<ContextMenuItem> findContextMenuItems(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
+        if (contextMenu == null) return new Array<>();
         return UICommonUtils.findMultiple(contextMenu.items, findBy);
     }
 

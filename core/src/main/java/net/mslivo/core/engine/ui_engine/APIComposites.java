@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.CMediaFont;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
@@ -90,8 +91,8 @@ public final class APIComposites {
             public final ImageButton forwardButton;
             public final Text text;
             public final Component[] allComponents;
-            public final ArrayList items;
-            public final ArrayList<Object[][]> pages;
+            public final Array items;
+            public final Array<Object[][]> pages;
             public final AtomicInteger currentPage;
             public final int width, height;
             public final int x, y;
@@ -99,7 +100,7 @@ public final class APIComposites {
             public final boolean displayPagesOf;
             public final boolean doubleSized;
 
-            public PageAbleReadOnlyGrid(Grid grid, ImageButton backButton, ImageButton forwardButton, Text text, ArrayList items, ArrayList<Object[][]> pages, int x, int y, int width, int height, boolean doubleSized, boolean placeButtonsTop, boolean displayPagesOf) {
+            public PageAbleReadOnlyGrid(Grid grid, ImageButton backButton, ImageButton forwardButton, Text text, Array items, Array<Object[][]> pages, int x, int y, int width, int height, boolean doubleSized, boolean placeButtonsTop, boolean displayPagesOf) {
                 this.backButton = backButton;
                 this.forwardButton = forwardButton;
                 this.grid = grid;
@@ -120,7 +121,7 @@ public final class APIComposites {
             }
         }
 
-        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction) {
+        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, Array items, GridAction gridAction) {
             return createPageableReadOnlyGrid(x, y, width, height, items, gridAction, false, false, true);
         }
 
@@ -129,9 +130,9 @@ public final class APIComposites {
         }
 
 
-        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, ArrayList items, GridAction gridAction, boolean doubleSized, boolean placeButtonTop, boolean displayPagesOf) {
+        public PageAbleReadOnlyGrid createPageableReadOnlyGrid(int x, int y, int width, int height, Array items, GridAction gridAction, boolean doubleSized, boolean placeButtonTop, boolean displayPagesOf) {
 
-            ArrayList<Object[][]> pages = new ArrayList<>();
+            Array<Object[][]> pages = new Array<>();
             Grid grid = api.component.grid.create(x, y + (placeButtonTop ? 0 : 1), null, null, false, false, false, false, doubleSized);
 
             int y_controls = pageAbleReadOnlyGridControlsY(y, height, placeButtonTop, doubleSized);
@@ -153,21 +154,21 @@ public final class APIComposites {
             api.component.button.setButtonAction(forwardButton, new ButtonAction() {
                 @Override
                 public void onRelease() {
-                    pageGrid.currentPage.set(Math.min(pageGrid.currentPage.get() + 1, pages.size() - 1));
+                    pageGrid.currentPage.set(Math.min(pageGrid.currentPage.get() + 1, pages.size - 1));
                     pageableGridUpdatePages(pageGrid);
                     pageableGridUpdateButtonsText(pageGrid);
                 }
             });
 
             api.component.addUpdateAction(grid, new UpdateAction(0, true) {
-                ArrayList refList = new ArrayList(items);
+                Array refList = new Array(items);
 
                 @Override
                 public void onUpdate() {
                     if (!Objects.equals(items, refList)) {
                         pageableGridUpdatePages(pageGrid);
                         pageableGridUpdateButtonsText(pageGrid);
-                        refList = new ArrayList(items);
+                        refList = new Array(items);
                     }
 
                 }
@@ -259,7 +260,7 @@ public final class APIComposites {
             if (item == null) {
                 api.component.grid.setSelectedItem(pageGrid.grid, null);
             } else {
-                for (int i = 0; i < pageGrid.pages.size(); i++) {
+                for (int i = 0; i < pageGrid.pages.size; i++) {
                     Object[][] array = pageGrid.pages.get(i);
                     for (int ix = 0; ix < array.length; ix++) {
                         for (int iy = 0; iy < array[0].length; iy++) {
@@ -278,8 +279,8 @@ public final class APIComposites {
 
         private void pageableGridUpdatePages(PageAbleReadOnlyGrid pageGrid) {
             int pageSize = pageGrid.width * pageGrid.height;
-            int pagesCount = MathUtils.floor(pageGrid.items.size() / (float) pageSize);
-            if (pageGrid.items.size() % pageSize > 0 || pageGrid.items.size() == 0) pagesCount++;
+            int pagesCount = MathUtils.floor(pageGrid.items.size / (float) pageSize);
+            if (pageGrid.items.size % pageSize > 0 || pageGrid.items.size == 0) pagesCount++;
 
             pageGrid.pages.clear();
             for (int i = 0; i < pagesCount; i++) {
@@ -290,7 +291,7 @@ public final class APIComposites {
             int pageIndex = 0;
             int ix = 0;
             int iy = pageGrid.height - 1;
-            for (int i = 0; i < pageGrid.items.size(); i++) {
+            for (int i = 0; i < pageGrid.items.size; i++) {
                 Object[][] page = pageGrid.pages.get(pageIndex);
                 page[ix][iy] = pageGrid.items.get(i);
                 ix++;
@@ -312,10 +313,10 @@ public final class APIComposites {
             String pageString, pageStringMax;
 
             if (pageGrid.displayPagesOf) {
-                pageStringMax = String.format(PAGE_TEXT_PAGE_OF, pageGrid.pages.size(), pageGrid.pages.size());
-                pageString = String.format(PAGE_TEXT_PAGE_OF, pageGrid.currentPage.get() + 1, pageGrid.pages.size());
+                pageStringMax = String.format(PAGE_TEXT_PAGE_OF, pageGrid.pages.size, pageGrid.pages.size);
+                pageString = String.format(PAGE_TEXT_PAGE_OF, pageGrid.currentPage.get() + 1, pageGrid.pages.size);
             } else {
-                pageStringMax = String.format(PAGE_TEXT_PAGE, pageGrid.pages.size());
+                pageStringMax = String.format(PAGE_TEXT_PAGE, pageGrid.pages.size);
                 pageString = String.format(PAGE_TEXT_PAGE, pageGrid.currentPage.get() + 1);
             }
 
@@ -346,8 +347,8 @@ public final class APIComposites {
 
         public Textfield createSearchBar(List list, ScrollbarVertical scrollBarVertical, boolean searchTooltips, boolean searchArrayLists) {
             if (list == null) return null;
-            ArrayList originalList = list.items;
-            ArrayList itemsSearched = new ArrayList(list.items);
+            Array originalList = list.items;
+            Array itemsSearched = new Array(list.items);
             api.component.setSize(list, list.width, list.height - 1);
             api.component.setPosition(list, list.x, list.y + 1);
             if (scrollBarVertical != null) {
@@ -397,7 +398,7 @@ public final class APIComposites {
                         scrolledLast = list.scrolled;
                     }
                     // disable scrollbar
-                    if (list.items != null && list.items.size() <= list.height) {
+                    if (list.items != null && list.items.size <= list.height) {
                         api.component.setDisabled(scrollBarVertical, true);
                         api.component.scrollbar.setScrolled(scrollBarVertical, 1f);
                     } else {
@@ -409,18 +410,18 @@ public final class APIComposites {
         }
 
 
-        private void searchBarSearchItemsInternal(List list, ArrayList searchList, ArrayList resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
-            for (int i = 0; i < searchList.size(); i++) {
+        private void searchBarSearchItemsInternal(List list, Array searchList, Array resultList, String searchText, boolean searchTooltips, boolean searchArrayLists) {
+            for (int i = 0; i < searchList.size; i++) {
                 Object item = searchList.get(i);
-                if (searchArrayLists && item instanceof ArrayList itemList) {
-                    searchBarSearchItemsInternal(list, itemList, resultList, searchText, searchTooltips, searchArrayLists);
+                if (searchArrayLists && item instanceof Array array) {
+                    searchBarSearchItemsInternal(list, array, resultList, searchText, searchTooltips, searchArrayLists);
                 } else if (list.listAction.text(item).trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                     resultList.add(item);
                 } else if (searchTooltips) {
                     Tooltip tooltip = list.listAction.toolTip(item);
                     if (tooltip != null) {
                         linesLoop:
-                        for (int i2 = 0; i2 < tooltip.segments.size(); i2++) {
+                        for (int i2 = 0; i2 < tooltip.segments.size; i2++) {
                             if (tooltip.segments.get(i2) instanceof TooltipTextSegment textSegment && textSegment.text.trim().toLowerCase().contains(searchText.trim().toLowerCase())) {
                                 resultList.add(item);
                                 break linesLoop;
@@ -436,8 +437,8 @@ public final class APIComposites {
         APICompositeImage() {
         }
 
-        public ArrayList<Component> createSeparatorHorizontal(int x, int y, int size) {
-            ArrayList<Component> returnComponents = new ArrayList<>();
+        public Array<Component> createSeparatorHorizontal(int x, int y, int size) {
+            Array<Component> returnComponents = new Array<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
                 Image image = api.component.image.create(x + i, y, UIEngineBaseMedia_8x8.UI_SEPARATOR_HORIZONTAL, index);
@@ -446,8 +447,8 @@ public final class APIComposites {
             return returnComponents;
         }
 
-        public ArrayList<Component> createSeparatorVertical(int x, int y, int size) {
-            ArrayList<Component> returnComponents = new ArrayList<>();
+        public Array<Component> createSeparatorVertical(int x, int y, int size) {
+            Array<Component> returnComponents = new Array<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
                 Image image = api.component.image.create(x, y + i, UIEngineBaseMedia_8x8.UI_SEPARATOR_VERTICAL, index);
@@ -456,12 +457,12 @@ public final class APIComposites {
             return returnComponents;
         }
 
-        public ArrayList<Component> createBorder(int x, int y, int width, int height) {
+        public Array<Component> createBorder(int x, int y, int width, int height) {
             return createBorder(x, y, width, height, 0);
         }
 
-        public ArrayList<Component> createBorder(int x, int y, int width, int height, int gap) {
-            ArrayList<Component> borders = new ArrayList<>();
+        public Array<Component> createBorder(int x, int y, int width, int height, int gap) {
+            Array<Component> borders = new Array<>();
             width = Math.max(width, 1);
             height = Math.max(height, 1);
 
@@ -499,8 +500,8 @@ public final class APIComposites {
             return ret;
         }
 
-        public ArrayList<Component> createScrollAbleText(int x, int y, int width, int height, String[] text) {
-            ArrayList<Component> result = new ArrayList<>();
+        public Array<Component> createScrollAbleText(int x, int y, int width, int height, String[] text) {
+            Array<Component> result = new Array<>();
 
             ScrollbarVertical scrollBarVertical = api.component.scrollbar.scrollbarVertical.create(x + width - 1, y, height);
             String[] textConverted;
@@ -508,7 +509,7 @@ public final class APIComposites {
 
             // Scrollbar
             if (text != null) {
-                ArrayList<String> textList = new ArrayList<>();
+                Array<String> textList = new Array<>();
                 int pixelWidth = ((width - 1) * api.TS());
                 for (int i = 0; i < text.length; i++) {
                     String textLine = text[i];
@@ -534,7 +535,7 @@ public final class APIComposites {
                         textList.add("");
                     }
                 }
-                textConverted = textList.toArray(new String[]{});
+                textConverted = textList.toArray(String[]::new);
             } else {
                 textConverted = new String[]{};
             }
@@ -843,7 +844,7 @@ public final class APIComposites {
                 int len = mediaManager.fontTextWidth(uiConfig.ui_font, lines[i]);
                 if (len > longest) longest = len;
             }
-            ArrayList<Component> componentsList = new ArrayList<>();
+            Array<Component> componentsList = new Array<>();
             final int WIDTH = Math.max(MathUtils.round(longest / (float) api.TS()) + 2, 12);
             final int HEIGHT = 4 + lines.length;
             Window modal = api.window.create(0, 0, WIDTH, HEIGHT, caption);
@@ -867,7 +868,7 @@ public final class APIComposites {
             componentsList.add(okBtn);
 
 
-            Component[] componentsArr = componentsList.toArray(new Component[]{});
+            Component[] componentsArr = componentsList.toArray(Component[]::new);
             api.component.move(componentsArr, api.TS_HALF(), api.TS_HALF());
             api.window.addComponents(modal, componentsArr);
             return modal;
@@ -946,7 +947,7 @@ public final class APIComposites {
             }
 
             Window modalWnd = api.window.create(0, 0, wnd_width, wnd_height, caption);
-            ArrayList<Component> componentsList = new ArrayList<>();
+            Array<Component> componentsList = new Array<>();
 
             Text textC = api.component.text.create(0, showOKButton ? 3 : 2, 0, text);
             api.component.move(textC, api.TS_HALF(), api.TS_HALF());
@@ -971,8 +972,8 @@ public final class APIComposites {
             }
 
 
-            ArrayList<Button> lowerCaseButtonsList = new ArrayList<>();
-            ArrayList<Button> upperCaseButtonsList = new ArrayList<>();
+            Array<Button> lowerCaseButtonsList = new Array<>();
+            Array<Button> upperCaseButtonsList = new Array<>();
             if (showTouchInputs) {
                 int ix = 0;
                 int iy = wnd_height - 4;
@@ -1014,9 +1015,9 @@ public final class APIComposites {
                         new ButtonAction() {
                             @Override
                             public void onToggle(boolean value) {
-                                for (int i2 = 0; i2 < lowerCaseButtonsList.size(); i2++)
+                                for (int i2 = 0; i2 < lowerCaseButtonsList.size; i2++)
                                     api.component.setVisible(lowerCaseButtonsList.get(i2), !value);
-                                for (int i2 = 0; i2 < upperCaseButtonsList.size(); i2++)
+                                for (int i2 = 0; i2 < upperCaseButtonsList.size; i2++)
                                     api.component.setVisible(upperCaseButtonsList.get(i2), value);
                             }
                         }, BUTTON_MODE.TOGGLE);
@@ -1076,7 +1077,7 @@ public final class APIComposites {
 
 
             //
-            api.window.addComponents(modalWnd, componentsList.toArray(new Component[]{}));
+            api.window.addComponents(modalWnd, componentsList.toArray(Component[]::new));
             api.window.setWindowAction(modalWnd, new WindowAction() {
                 @Override
                 public void onAdd() {
@@ -1419,8 +1420,8 @@ public final class APIComposites {
         APICompositeTabbar() {
         }
 
-        public ArrayList<Component> createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
-            ArrayList<Component> ret = new ArrayList<>();
+        public Array<Component> createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {
+            Array<Component> ret = new Array<>();
 
             width = Math.max(width, 1);
             Tabbar tabBar = api.component.tabbar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
@@ -1435,16 +1436,16 @@ public final class APIComposites {
         }
 
         private void updateExtendableTabBarButtonInternal(Tabbar tabBar, ImageButton extendButton) {
-            ArrayList<Tab> invisibleTabs = new ArrayList<>();
-            for (int i = 0; i < tabBar.tabs.size(); i++)
+            Array<Tab> invisibleTabs = new Array<>();
+            for (int i = 0; i < tabBar.tabs.size; i++)
                 if (!api.component.tabbar.isTabVisible(tabBar, tabBar.tabs.get(i)))
                     invisibleTabs.add(tabBar.tabs.get(i));
-            if (invisibleTabs.size() > 0) {
+            if (!invisibleTabs.isEmpty()) {
                 api.component.button.setButtonAction(extendButton, new ButtonAction() {
                     @Override
                     public void onRelease() {
-                        ArrayList<ContextMenuItem> contextMenuItems = new ArrayList<>();
-                        for (int i2 = 0; i2 < invisibleTabs.size(); i2++) {
+                        Array<ContextMenuItem> contextMenuItems = new Array<>();
+                        for (int i2 = 0; i2 < invisibleTabs.size; i2++) {
                             Tab invisibleTab = invisibleTabs.get(i2);
                             contextMenuItems.add(api.contextMenu.item.create(invisibleTab.title, new ContextMenuItemAction() {
                                 @Override
@@ -1456,7 +1457,7 @@ public final class APIComposites {
                                 }
                             }));
                         }
-                        ContextMenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(new ContextMenuItem[0]));
+                        ContextMenu selectTabMenu = api.contextMenu.create(contextMenuItems.toArray(ContextMenuItem[]::new));
                         api.openContextMenu(selectTabMenu);
                     }
                 });

@@ -34,8 +34,8 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
     public void render(PrimitiveRenderer primitiveRenderer) {
         if (super.numParticles == 0) return;
         primitiveRenderer.saveState();
-        for (int i = 0; i < particles.size(); i++) {
-            Particle particle = (Particle) particles.get(i);
+        for (int i = 0; i < particles.size; i++) {
+            Particle particle = particles.get(i);
             if (!particle.visible) continue;
             if (renderHook != null)
                 renderHook.renderBeforeParticle(particle, primitiveRenderer);

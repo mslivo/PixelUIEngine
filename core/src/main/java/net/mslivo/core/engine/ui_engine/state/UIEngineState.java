@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
@@ -36,12 +38,9 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
-import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 
 public final class UIEngineState {
 
@@ -76,17 +75,17 @@ public final class UIEngineState {
     public Viewport viewport_screen;
 
     /* #################### UI: Added Elements #################### */
-    public ArrayList<Window> windows;
-    public ArrayList<Component> screenComponents;
+    public Array<Window> windows;
+    public Array<Component> screenComponents;
     public Window modalWindow;
-    public ArrayDeque<Window> modalWindowQueue;
-    public ArrayList<Notification> notifications;
-    public ArrayList<TooltipNotification> tooltipNotifications;
+    public Queue<Window> modalWindowQueue;
+    public Array<Notification> notifications;
+    public Array<TooltipNotification> tooltipNotifications;
 
-    public ArrayList<HotKey> hotKeys;
-    public ArrayList<AppViewport> appViewPorts;
-    public ArrayList<UpdateAction> singleUpdateActions;
-    public ArrayDeque<UpdateAction> singleUpdateActionsRemoveQueue;
+    public Array<HotKey> hotKeys;
+    public Array<AppViewport> appViewPorts;
+    public Array<UpdateAction> singleUpdateActions;
+    public Queue<UpdateAction> singleUpdateActionsRemoveQueue;
 
     /* #################### UI: Actively used UI References #################### */
     public Window draggedWindow;
@@ -129,7 +128,7 @@ public final class UIEngineState {
     public int displayedContextMenuWidth;
     public Object keyboardInteractedUIObjectFrame;
     public Object mouseInteractedUIObjectFrame;
-    public ArrayList<Component> updateTooltipComponents;
+    public Array<Component> updateTooltipComponents;
 
     /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;

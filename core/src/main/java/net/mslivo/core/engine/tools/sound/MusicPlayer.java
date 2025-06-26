@@ -2,12 +2,10 @@ package net.mslivo.core.engine.tools.sound;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
-import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.media_manager.CMediaMusic;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import net.mslivo.core.engine.media_manager.MediaManager;
 
 /*
  * Basic Music Player
@@ -25,7 +23,7 @@ public class MusicPlayer {
     private STATE state;
     private PLAY_MODE playMode;
 
-    private final ArrayList<CMediaMusic> playlist;
+    private final Array<CMediaMusic> playlist;
 
     private final MediaManager mediaManager;
 
@@ -41,9 +39,9 @@ public class MusicPlayer {
 
     private final IntArray randomHistory;
 
-    public MusicPlayer(MediaManager mediaManager){
+    public MusicPlayer(MediaManager mediaManager) {
         this.mediaManager = mediaManager;
-        this.playlist = new ArrayList<>();
+        this.playlist = new Array<>();
         this.playMode = PLAY_MODE.SEQUENTIAL;
         this.state = STATE.STOP;
         this.playCurrent = null;
@@ -54,117 +52,121 @@ public class MusicPlayer {
         this.volume = 1f;
     }
 
-    public void playlistClear(){
+    public void playlistClear() {
         playlist.clear();
     }
 
-    public ArrayList<CMediaMusic> getPlayList(){
-        return new ArrayList<>(playlist);
+    public Array<CMediaMusic> getPlayList() {
+        return new Array<>(playlist);
     }
 
-    public int getCurrentPlayListPosition(){
+    public int getCurrentPlayListPosition() {
         return playListPosition;
     }
 
-    public int getMusicPlayListPosition(CMediaMusic cMediaMusic){
-        for(int i=0;i<playlist.size();i++){
-            if(playlist.get(i) == cMediaMusic){
+    public int getMusicPlayListPosition(CMediaMusic cMediaMusic) {
+        for (int i = 0; i < playlist.size; i++) {
+            if (playlist.get(i) == cMediaMusic) {
                 return i;
             }
         }
         return -1;
     }
 
-    public void playListRemove(int index){
-        if(playlist.size() > 0 && (index > 0 && index < playlist.size()-1)) {
-            playlist.remove(index);
+    public void playListRemove(int index) {
+        if (!playlist.isEmpty() && (index > 0 && index < playlist.size - 1)) {
+            playlist.removeIndex(index);
         }
     }
 
-    public void playListRemove(CMediaMusic cMediaMusic){
-        playlist.remove(cMediaMusic);
+    public void playListRemove(CMediaMusic cMediaMusic) {
+        playlist.removeValue(cMediaMusic, true);
     }
 
-    public boolean isPlaying(){
+    public boolean isPlaying() {
         return playCurrent != null && playCurrent.isPlaying();
     }
 
-    public void playListAdd(CMediaMusic cMediaMusic){
+    public void playListAdd(CMediaMusic cMediaMusic) {
         playlist.add(cMediaMusic);
     }
 
-    public void playListSwap(int index1, int index2){
-        Collections.swap(playlist,index1, index2);
+    public void playListSwap(int index1, int index2) {
+        playlist.swap(index1, index2);
     }
 
-    public void update(){
-        switch (state){
-            case STOP->{
-                if(playCurrent != null){
-                    if(playCurrent.isPlaying()){
+    public void update() {
+        switch (state) {
+            case STOP -> {
+                if (playCurrent != null) {
+                    if (playCurrent.isPlaying()) {
                         playCurrent.stop();
                     }
                 }
             }
-            case PAUSE->{
-                if(playCurrent != null){
-                    if(playCurrent.isPlaying()){
+            case PAUSE -> {
+                if (playCurrent != null) {
+                    if (playCurrent.isPlaying()) {
                         playCurrent.pause();
                     }
                 }
             }
             case PLAY -> {
-                if(playCurrent != null){
-                    if(playCurrent.isPlaying()){
-                        if(playCurrent.getVolume() != volume){
+                if (playCurrent != null) {
+                    if (playCurrent.isPlaying()) {
+                        if (playCurrent.getVolume() != volume) {
                             playCurrent.setVolume(volume);
                         }
-                        if(playNext || playPrevious ){
+                        if (playNext || playPrevious) {
                             playCurrent.stop();
                             playCurrent = null;
                             playCurrentFileName = "";
                         }
-                    }else{
+                    } else {
                         playCurrent.play();
                     }
-                }else{
-                    if(playlist.size() > 0){
-                        if(!playNext && !playPrevious){
+                } else {
+                    if (!playlist.isEmpty()) {
+                        if (!playNext && !playPrevious) {
                             // Default: next song
                             playNext = true;
                         }
 
-                        if(playNext){
+                        if (playNext) {
                             switch (playMode) {
                                 case RANDOM -> {
                                     randomHistory.add(playListPosition);
                                     if (randomHistory.size > 128) randomHistory.removeIndex(0);
 
                                     int newPosition = 0;
-                                    if(playlist.size() >1){
+                                    if (playlist.size > 1) {
                                         int tries = 0;
-                                        while(newPosition == playListPosition && tries < 5){
-                                            newPosition = MathUtils.random(0, playlist.size() - 1);
+                                        while (newPosition == playListPosition && tries < 5) {
+                                            newPosition = MathUtils.random(0, playlist.size - 1);
                                             tries++;
                                         }
                                     }
                                     playListPosition = newPosition;
                                 }
-                                case SEQUENTIAL -> playListPosition = (playListPosition + 1 > (playlist.size() - 1) ? 0 : (playListPosition + 1));
-                                case LOOP -> {}
+                                case SEQUENTIAL ->
+                                        playListPosition = (playListPosition + 1 > (playlist.size - 1) ? 0 : (playListPosition + 1));
+                                case LOOP -> {
+                                }
                             }
                             playNext = false;
-                        }else if(playPrevious){
+                        } else if (playPrevious) {
                             switch (playMode) {
-                                case RANDOM->{
-                                    if(randomHistory.isEmpty()){
-                                        playListPosition = MathUtils.random(0, playlist.size() - 1);
-                                    }else{
-                                        playListPosition = randomHistory.get(randomHistory.size-1);
+                                case RANDOM -> {
+                                    if (randomHistory.isEmpty()) {
+                                        playListPosition = MathUtils.random(0, playlist.size - 1);
+                                    } else {
+                                        playListPosition = randomHistory.get(randomHistory.size - 1);
                                     }
                                 }
-                                case SEQUENTIAL -> playListPosition = (playListPosition - 1 < 0 ? playlist.size()-1 : playListPosition -1);
-                                case LOOP -> {}
+                                case SEQUENTIAL ->
+                                        playListPosition = (playListPosition - 1 < 0 ? playlist.size - 1 : playListPosition - 1);
+                                case LOOP -> {
+                                }
                             }
                             playPrevious = false;
                         }
@@ -172,10 +174,10 @@ public class MusicPlayer {
                         CMediaMusic nextTrack = playlist.get(playListPosition);
                         playCurrent = mediaManager.music(nextTrack);
                         playCurrent.play();
-                        if(playCurrent != null) {
+                        if (playCurrent != null) {
                             playCurrentFileName = nextTrack.file;
                             playCurrent.setVolume(volume);
-                            playCurrent.setOnCompletionListener(music -> {
+                            playCurrent.setOnCompletionListener(_ -> {
                                 playCurrent.stop();
                                 playCurrent = null;
                                 playCurrentFileName = "";
@@ -188,26 +190,27 @@ public class MusicPlayer {
         }
     }
 
-    public void setPlayMode(PLAY_MODE playMode){
-        if(playMode == null) return;
+    public void setPlayMode(PLAY_MODE playMode) {
+        if (playMode == null) return;
         this.playMode = playMode;
     }
-    public PLAY_MODE getPlayMode(){
+
+    public PLAY_MODE getPlayMode() {
         return this.playMode;
     }
 
-    public void playPosition(int playListPosition){
+    public void playPosition(int playListPosition) {
         this.playListPosition = playListPosition;
         this.playNext = true;
     }
 
-    public void playPositionIfNotAlreadyPlaying(int playListPosition){
-        if(this.playListPosition == playListPosition) return;
+    public void playPositionIfNotAlreadyPlaying(int playListPosition) {
+        if (this.playListPosition == playListPosition) return;
         this.playListPosition = playListPosition;
         this.playNext = true;
     }
 
-    public String getCurrentPlayedFileName(){
+    public String getCurrentPlayedFileName() {
         return playCurrentFileName;
     }
 
@@ -219,34 +222,34 @@ public class MusicPlayer {
         return volume;
     }
 
-    public void play(){
+    public void play() {
         this.state = STATE.PLAY;
     }
 
-    public void stop(){
+    public void stop() {
         this.state = STATE.STOP;
     }
 
-    public void previous(){
+    public void previous() {
         this.playPrevious = true;
         this.state = STATE.PLAY;
     }
 
-    public void next(){
+    public void next() {
         this.playNext = true;
         this.state = STATE.PLAY;
     }
 
-    public void pause(){
+    public void pause() {
         this.state = (this.state == STATE.PAUSE ? STATE.PLAY : STATE.PAUSE);
     }
 
-    public boolean isPaused(){
+    public boolean isPaused() {
         return state == STATE.PAUSE;
     }
 
-    public void shutdown(){
-        if(playCurrent != null && playCurrent.isPlaying()) playCurrent.stop();
+    public void shutdown() {
+        if (playCurrent != null && playCurrent.isPlaying()) playCurrent.stop();
         this.playCurrent = null;
         this.playCurrentFileName = "";
         this.playlist.clear();

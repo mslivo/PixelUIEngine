@@ -2,13 +2,13 @@ package net.mslivo.core.engine.tools.misc.jsonparser;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 
 public class JSONIncludeParser {
@@ -48,8 +48,8 @@ public class JSONIncludeParser {
     }
 
 
-    private static ArrayList<String> getFileContent(String basePath, String fileName, boolean include, boolean trimInclude, InputFileMode inputFileMode) throws IOException {
-        ArrayList<String> lines = new ArrayList<>();
+    private static Array<String> getFileContent(String basePath, String fileName, boolean include, boolean trimInclude, InputFileMode inputFileMode) throws IOException {
+        Array<String> lines = new Array<>();
         String fileContent = "";
         if (inputFileMode == InputFileMode.CLASSPATH) {
             FileHandle fileHandle = Gdx.files.internal(basePath + fileName);
@@ -66,11 +66,11 @@ public class JSONIncludeParser {
         if (include) {
             // Remove braces
             if (trimInclude) {
-                lines.removeFirst();
-                lines.removeLast();
+                lines.removeIndex(0);
+                lines.pop();
             }
             // update of sub includes path
-            for (int i = 0; i < lines.size(); i++) {
+            for (int i = 0; i < lines.size; i++) {
                 String line = lines.get(i);
                 IncludeInfo includeInfo = findIncludeInfo(line);
                 if (includeInfo != null) {
@@ -99,22 +99,22 @@ public class JSONIncludeParser {
         fileName = jsonFile.getName();
 
         // Read Base File
-        ArrayList<String> lines = getFileContent(basePath, fileName, false, false, inputFileMode);
+        Array<String> lines = getFileContent(basePath, fileName, false, false, inputFileMode);
 
         // Parse includes
         IntArray removeIndexes = new IntArray();
-        for (int i = 0; i < lines.size(); i++) {
+        for (int i = 0; i < lines.size; i++) {
             String line = lines.get(i);
 
             IncludeInfo includeInfo = findIncludeInfo(line);
             if (includeInfo != null) {
                 lines.set(i, "");
                 removeIndexes.add(i);
-                ArrayList<String> includeLines = getFileContent(basePath, includeInfo.includeFile, true, includeInfo.trim, inputFileMode);
-                if (includeLines.size() > 0) {
-                    for (int i2 = includeLines.size() - 1; i2 >= 0; i2--) {
+                Array<String> includeLines = getFileContent(basePath, includeInfo.includeFile, true, includeInfo.trim, inputFileMode);
+                if (includeLines.size > 0) {
+                    for (int i2 = includeLines.size - 1; i2 >= 0; i2--) {
                         String incLine = includeLines.get(i2);
-                        lines.add(i + 1, incLine);
+                        lines.insert(i + 1, incLine);
                     }
                 }
             }
@@ -122,11 +122,11 @@ public class JSONIncludeParser {
         }
 
         // remove empty
-        while (!removeIndexes.isEmpty()){
-            lines.remove(removeIndexes.removeIndex(removeIndexes.size-1));
+        while (!removeIndexes.isEmpty()) {
+            lines.removeIndex(removeIndexes.removeIndex(removeIndexes.size - 1));
         }
 
-        for (int i = 0; i < lines.size(); i++) result.append(lines.get(i)).append(System.lineSeparator());
+        for (int i = 0; i < lines.size; i++) result.append(lines.get(i)).append(System.lineSeparator());
         return result.toString();
     }
 

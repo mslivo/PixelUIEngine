@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.ui_engine;
 
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
@@ -77,12 +78,12 @@ public final class API {
 
     /* #################### Notifications #################### */
 
-    public ArrayList<Notification> topNotifications() {
-        return new ArrayList<>(uiEngineState.notifications);
+    public Array<Notification> topNotifications() {
+        return new Array<>(uiEngineState.notifications);
     }
 
-    public ArrayList<TooltipNotification> tooltipNotifications() {
-        return new ArrayList<>(uiEngineState.tooltipNotifications);
+    public Array<TooltipNotification> tooltipNotifications() {
+        return new Array<>(uiEngineState.tooltipNotifications);
     }
 
     public void addNotification(CommonNotification commonNotification) {
@@ -106,12 +107,12 @@ public final class API {
     }
 
     public void removeAllNotifications() {
-        removeNotifications(uiEngineState.notifications.toArray(new CommonNotification[]{}));
-        removeNotifications(uiEngineState.tooltipNotifications.toArray(new CommonNotification[]{}));
+        removeNotifications(uiEngineState.notifications.toArray(Notification[]::new));
+        removeNotifications(uiEngineState.tooltipNotifications.toArray(TooltipNotification[]::new));
     }
 
-    public ArrayList<CommonNotification> findNotifications(Predicate<Notification> findBy) {
-        ArrayList<CommonNotification> result = new ArrayList<>();
+    public Array<CommonNotification> findNotifications(Predicate<Notification> findBy) {
+        Array<CommonNotification> result = new Array<>();
         result.addAll(UICommonUtils.findMultiple(uiEngineState.notifications, findBy));
         result.addAll(UICommonUtils.findMultiple(uiEngineState.tooltipNotifications, findBy));
         return result;
@@ -168,8 +169,8 @@ public final class API {
 
     /* #################### Windows #################### */
 
-    public ArrayList<Window> windows() {
-        return new ArrayList<>(uiEngineState.windows);
+    public Array<Window> windows() {
+        return new Array<>(uiEngineState.windows);
     }
 
     public void addWindow(Window window) {
@@ -193,7 +194,7 @@ public final class API {
     }
 
     public void removeAllWindows() {
-        removeWindows(uiEngineState.windows.toArray(new Window[]{}));
+        removeWindows(uiEngineState.windows.toArray(Window[]::new));
     }
 
     public boolean closeWindow(Window window) {
@@ -207,7 +208,7 @@ public final class API {
     }
 
     public void closeAllWindows() {
-        closeWindows(uiEngineState.windows.toArray(new Window[]{}));
+        closeWindows(uiEngineState.windows.toArray(Window[]::new));
     }
 
     public void sendMessageToWindow(Window window, int type, Object... parameters) {
@@ -221,12 +222,12 @@ public final class API {
     }
 
     public void sendMessageToAllWindows(int type, Object... parameters) {
-        for (int i = 0; i < uiEngineState.windows.size(); i++)
+        for (int i = 0; i < uiEngineState.windows.size; i++)
             UICommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
     }
 
     public void windowsEnforceScreenBounds() {
-        for (int i = 0; i < uiEngineState.windows.size(); i++)
+        for (int i = 0; i < uiEngineState.windows.size; i++)
             UICommonUtils.window_enforceScreenBounds(uiEngineState, uiEngineState.windows.get(i));
     }
 
@@ -257,8 +258,8 @@ public final class API {
 
     /* #################### Screen Components #################### */
 
-    public ArrayList<Component> screenComponents() {
-        return new ArrayList<>(uiEngineState.screenComponents);
+    public Array<Component> screenComponents() {
+        return new Array<>(uiEngineState.screenComponents);
     }
 
     public void addScreenComponent(Component component) {
@@ -287,10 +288,10 @@ public final class API {
     }
 
     public void removeAllScreenComponents() {
-        removeScreenComponents(uiEngineState.screenComponents.toArray(new Component[]{}));
+        removeScreenComponents(uiEngineState.screenComponents.toArray(Component[]::new));
     }
 
-    public ArrayList<Component> findScreenComponents(Predicate<Component> findBy) {
+    public Array<Component> findScreenComponents(Predicate<Component> findBy) {
         return UICommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
     }
 
@@ -320,8 +321,8 @@ public final class API {
 
     /* #################### HotKeys #################### */
 
-    public ArrayList<HotKey> hotKeys() {
-        return new ArrayList<>(uiEngineState.hotKeys);
+    public Array<HotKey> hotKeys() {
+        return new Array<>(uiEngineState.hotKeys);
     }
 
     public void addHotKey(HotKey hotKey) {
@@ -336,7 +337,7 @@ public final class API {
 
     public void removeHotKey(HotKey hotKey) {
         if (hotKey == null) return;
-        uiEngineState.hotKeys.remove(hotKey);
+        uiEngineState.hotKeys.removeValue(hotKey, true);
     }
 
     public void removeHotKeys(HotKey[] hotKeys) {
@@ -345,14 +346,14 @@ public final class API {
     }
 
     public void removeAllHotKeys() {
-        removeHotKeys(uiEngineState.hotKeys.toArray(new HotKey[]{}));
+        removeHotKeys(uiEngineState.hotKeys.toArray(HotKey[]::new));
     }
 
     public HotKey findHotKey(Predicate<HotKey> findBy){
         return UICommonUtils.find(uiEngineState.hotKeys, findBy);
     }
 
-    public List<HotKey> findHotKeys(Predicate<HotKey> findBy){
+    public Array<HotKey> findHotKeys(Predicate<HotKey> findBy){
         return UICommonUtils.findMultiple(uiEngineState.hotKeys, findBy);
     }
 
@@ -360,7 +361,7 @@ public final class API {
         return UICommonUtils.find(uiEngineState.windows, findBy);
     }
 
-    public List<Window> findWindows(Predicate<Window> findBy){
+    public Array<Window> findWindows(Predicate<Window> findBy){
         return UICommonUtils.findMultiple(uiEngineState.windows, findBy);
     }
 

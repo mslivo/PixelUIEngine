@@ -1,12 +1,10 @@
 package net.mslivo.core.engine.ui_engine.rendering.shader;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.tools.Tools;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ShaderCommon {
@@ -23,7 +21,7 @@ public class ShaderCommon {
                        #define HIGH
                    #endif
                    const HIGH float FLOAT_CORRECTION = (255.0/254.0);
-                   
+            
             """;
 
     protected String vertexShaderSource;
@@ -72,7 +70,7 @@ public class ShaderCommon {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
 
-            String lineCleaned = line.trim().replace(" ","");
+            String lineCleaned = line.trim().replace(" ", "");
 
             if (lineCleaned.startsWith("BEGINVERTEX")) {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
@@ -86,7 +84,7 @@ public class ShaderCommon {
                 builderIndex = BUILDER_INDEX.VERTEX_DECLARATIONS;
                 continue;
             }
-            if(builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.equals("ENDVERTEX")){
+            if (builderIndex == BUILDER_INDEX.VERTEX_DECLARATIONS && lineCleaned.equals("ENDVERTEX")) {
                 builderIndex = BUILDER_INDEX.NONE;
                 continue;
             }
@@ -98,7 +96,7 @@ public class ShaderCommon {
                 builderIndex = BUILDER_INDEX.FRAGMENT_MAIN;
                 continue;
             }
-            if(builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.equals("ENDFRAGMENT")){
+            if (builderIndex == BUILDER_INDEX.FRAGMENT_DECLARATIONS && lineCleaned.equals("ENDFRAGMENT")) {
                 builderIndex = BUILDER_INDEX.NONE;
                 continue;
             }
@@ -130,43 +128,43 @@ public class ShaderCommon {
 
     }
 
-    public ShaderProgram compile(){
-        if(compiledShader != null)
+    public ShaderProgram compile() {
+        if (compiledShader != null)
             return compiledShader;
 
         this.compiledShader = new ShaderProgram(vertexShaderSource, fragmentShaderSource);
-        if(!this.compiledShader.isCompiled()) {
+        if (!this.compiledShader.isCompiled()) {
             String log = this.compiledShader.getLog();
             String[] lines = log.lines().toList().toArray(new String[]{});
 
             String shaderSource = null;
-            if(lines[0].toLowerCase().contains("vertex shader")){
+            if (lines[0].toLowerCase().contains("vertex shader")) {
                 shaderSource = this.vertexShaderSource;
                 System.out.println("Vertex shader:");
-            }else if(lines[0].toLowerCase().contains("fragment shader")){
+            } else if (lines[0].toLowerCase().contains("fragment shader")) {
                 shaderSource = this.fragmentShaderSource;
                 System.out.println("Fragment shader:");
             }
 
             IntArray lineNumbers = new IntArray();
             Array lineErrors = new Array();
-            for(int i=0;i<lines.length;i++){
+            for (int i = 0; i < lines.length; i++) {
                 String[] lineSplit = lines[i].split(":");
-                if(lineSplit[0].toLowerCase().equals("error") && lineSplit.length >= 5){
-                    lineNumbers.add(Integer.valueOf(lineSplit[2])-1);
-                    lineErrors.add(lineSplit[3]+" "+lineSplit[4]);
+                if (lineSplit[0].toLowerCase().equals("error") && lineSplit.length >= 5) {
+                    lineNumbers.add(Integer.valueOf(lineSplit[2]) - 1);
+                    lineErrors.add(lineSplit[3] + " " + lineSplit[4]);
                 }
             }
 
 
-            if(shaderSource != null){
+            if (shaderSource != null) {
                 lines = shaderSource.lines().toList().toArray(new String[]{});
-                for(int i=0;i<lines.length;i++){
-                    String line = (i+1)+":"+lines[i];
+                for (int i = 0; i < lines.length; i++) {
+                    String line = (i + 1) + ":" + lines[i];
 
                     int errorIndex = lineNumbers.indexOf(i);
-                    if(errorIndex != -1){
-                        line += Tools.Text.Colors.RED+" !!! ERROR !!! -> "+lineErrors.get(errorIndex)+Tools.Text.Colors.RESET;
+                    if (errorIndex != -1) {
+                        line += Tools.Text.Colors.RED + " !!! ERROR !!! -> " + lineErrors.get(errorIndex) + Tools.Text.Colors.RESET;
 
                     }
 

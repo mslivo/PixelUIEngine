@@ -1,5 +1,7 @@
 package net.mslivo.core.engine.tools.appengine;
 
+import com.badlogic.gdx.utils.Queue;
+
 import java.util.ArrayDeque;
 
 /**
@@ -31,14 +33,14 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
 
     private final A adapter;
     private final D data;
-    private final ArrayDeque<AppEngineIO> inputs;
-    private final ArrayDeque<AppEngineIO> outputs;
-    private final ArrayDeque<AppEngineIO> engineIOPool;
+    private final Queue<AppEngineIO> inputs;
+    private final Queue<AppEngineIO> outputs;
+    private final Queue<AppEngineIO> engineIOPool;
     private final AppEngineOutputQueue appEngineOutputQueue = new AppEngineOutputQueue() {
         @Override
         public synchronized void addOutput(AppEngineIO output) {
             output.locked = true;
-            outputs.add(output);
+            outputs.addLast(output);
         }
 
         public synchronized AppEngineIO newIO(int type) {
@@ -57,9 +59,9 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         this.ticks = 0;
 
         this.data = data;
-        this.inputs = new ArrayDeque<>();
-        this.outputs = new ArrayDeque<>();
-        this.engineIOPool = new ArrayDeque<>();
+        this.inputs = new Queue<>();
+        this.outputs = new Queue<>();
+        this.engineIOPool = new Queue<>();
         this.adapter = adapter;
 
         this.adapter.init(this.data, this.appEngineOutputQueue);
@@ -70,7 +72,7 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     }
 
     private AppEngineIO getUnlockedUIFromPool(int type) {
-        AppEngineIO appEngineIO = engineIOPool.isEmpty() ? new AppEngineIO() : engineIOPool.poll();
+        AppEngineIO appEngineIO = engineIOPool.isEmpty() ? new AppEngineIO() : engineIOPool.removeFirst();
         appEngineIO.locked = false;
         appEngineIO.type = type;
         appEngineIO.readIndex = 0;
@@ -86,9 +88,9 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     }
 
     public AppEngineIO processOutput() {
-        if (lastOutput != null) engineIOPool.add(lastOutput);
+        if (lastOutput != null) engineIOPool.addLast(lastOutput);
         if (outputAvailable()) {
-            lastOutput = outputs.poll();
+            lastOutput = outputs.removeFirst();
             return lastOutput;
         } else {
             lastOutput = null;
@@ -97,8 +99,9 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     }
 
     public void clearOutputs() {
-        engineIOPool.addAll(outputs);
-        outputs.clear();
+        for(int i=0;i<this.outputs.size;i++)
+            engineIOPool.addLast(this.outputs.get(i));
+        this.outputs.clear();
         lastOutput = null;
     }
 
@@ -113,10 +116,10 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
     public void update() {
         adapter.beforeInputs();
         // Process Inputs
-        AppEngineIO engineIO;
-        while ((engineIO = this.inputs.pollFirst()) != null) {
+        while (!this.inputs.isEmpty()) {
+            final AppEngineIO engineIO = this.inputs.removeFirst();
             adapter.processInput(engineIO);
-            engineIOPool.add(engineIO);
+            engineIOPool.addLast(engineIO);
         }
         // Update Engine
         adapter.update();
@@ -136,7 +139,7 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
 
     public synchronized void addInput(AppEngineIO input) {
         input.locked = true;
-        inputs.add(input);
+        inputs.addLast(input);
     }
 
 }

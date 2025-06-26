@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -599,7 +600,7 @@ public final class APIComponent {
             tabBar.borderHeight = Math.max(borderHeight, 0);
             tabBar.tabOffset = Math.max(tabOffset, 0);
             tabBar.bigIconMode = bigIconMode;
-            tabBar.tabs = new ArrayList<>();
+            tabBar.tabs = new Array<>();
             if (tabs != null) {
                 for (int i = 0; i < tabs.length; i++) {
                     if (tabs[i].addedToTabBar == null) {
@@ -608,7 +609,7 @@ public final class APIComponent {
                     }
                 }
             }
-            tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size() - 1);
+            tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size - 1);
             return tabBar;
         }
 
@@ -647,11 +648,11 @@ public final class APIComponent {
 
         public Tab tab(Tabbar tabBar, int index) {
             if (tabBar == null) return null;
-            return tabBar.tabs.get(Math.clamp(index, 0, tabBar.tabs.size() - 1));
+            return tabBar.tabs.get(Math.clamp(index, 0, tabBar.tabs.size - 1));
         }
 
         public Tab[] tabs(Tabbar tabBar) {
-            return tabBar.tabs.toArray(new Tab[0]);
+            return tabBar.tabs.toArray(Tab[]::new);
         }
 
         public void selectTab(Tabbar tabBar, int index) {
@@ -691,11 +692,11 @@ public final class APIComponent {
 
         public void removeAllTabs(Tabbar tabBar) {
             if (tabBar == null) return;
-            removeTabs(tabBar, tabBar.tabs.toArray(new Tab[]{}));
+            removeTabs(tabBar, tabBar.tabs.toArray(Tab[]::new));
         }
 
-        public ArrayList<Tab> findTabs(Tabbar tabBar, Predicate<Tab> findBy) {
-            if (tabBar == null) return new ArrayList<>();
+        public Array<Tab> findTabs(Tabbar tabBar, Predicate<Tab> findBy) {
+            if (tabBar == null) return new Array<>();
             return UICommonUtils.findMultiple(tabBar.tabs, findBy);
         }
 
@@ -707,7 +708,7 @@ public final class APIComponent {
         public boolean isTabVisible(Tabbar tabBar, Tab tab) {
             if (tabBar == null || tab == null) return false;
             int xOffset = 0;
-            for (int i = 0; i < tabBar.tabs.size(); i++) {
+            for (int i = 0; i < tabBar.tabs.size; i++) {
                 xOffset += tabBar.tabs.get(i).width;
                 if (tabBar.tabs.get(i) == tab) return xOffset <= tabBar.width;
             }
@@ -717,7 +718,7 @@ public final class APIComponent {
         public int tabsWidth(Tabbar tabBar) {
             if (tabBar == null) return 0;
             int width = 0;
-            for (int i = 0; i < tabBar.tabs.size(); i++) width += tabBar.tabs.get(i).width;
+            for (int i = 0; i < tabBar.tabs.size; i++) width += tabBar.tabs.get(i).width;
             return width;
         }
 
@@ -751,7 +752,7 @@ public final class APIComponent {
                 } else {
                     tab.width = width;
                 }
-                tab.components = new ArrayList<>();
+                tab.components = new Array<>();
                 if (components != null) {
                     for (int i = 0; i < components.length; i++) {
                         if (components[i].addedToTab == null) {
@@ -801,7 +802,7 @@ public final class APIComponent {
 
             public void removeAllTabComponents(Tab tab) {
                 if (tab == null) return;
-                removeTabComponents(tab, tab.components.toArray(new Component[]{}));
+                removeTabComponents(tab, tab.components.toArray(Component[]::new));
             }
 
             public void setTitle(Tab tab, String title) {
@@ -1235,7 +1236,7 @@ public final class APIComponent {
             Combobox comboBox = new Combobox();
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, UICommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
-            comboBox.items = new ArrayList<>();
+            comboBox.items = new Array<>();
             if (combobBoxItems != null) {
                 for (int i = 0; i < combobBoxItems.length; i++) {
                     if (combobBoxItems[i].addedToComboBox == null) {
@@ -1275,7 +1276,7 @@ public final class APIComponent {
 
         public void removeAllComboBoxItems(Combobox comboBox) {
             if (comboBox == null) return;
-            removeComboBoxItems(comboBox, comboBox.items.toArray(new ComboboxItem[]{}));
+            removeComboBoxItems(comboBox, comboBox.items.toArray(ComboboxItem[]::new));
         }
 
         public boolean isItemSelected(Combobox comboBox, ComboboxItem comboBoxItem) {
@@ -1309,7 +1310,7 @@ public final class APIComponent {
 
         public void setSelectedItemByText(Combobox comboBox, String text) {
             if (comboBox == null || text == null) return;
-            for (int i = 0; i < comboBox.items.size(); i++) {
+            for (int i = 0; i < comboBox.items.size; i++) {
                 if (comboBox.items.get(i).text.equals(text)) {
                     UICommonUtils.comboBox_selectItem(uiEngineState, comboBox.items.get(i));
                     return;
@@ -1461,28 +1462,28 @@ public final class APIComponent {
             return create(x, y, width, height, null, DEFAULT_LIST_ACTION, false, false, false, false);
         }
 
-        public List create(int x, int y, int width, int height, ArrayList items) {
+        public List create(int x, int y, int width, int height, Array items) {
             return create(x, y, width, height, items, DEFAULT_LIST_ACTION, false, false, false, false);
         }
 
-        public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction) {
+        public List create(int x, int y, int width, int height, Array items, ListAction listAction) {
             return create(x, y, width, height, items, listAction, false, false, false, false);
         }
 
-        public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect) {
+        public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect) {
             return create(x, y, width, height, items, listAction, multiSelect, false, false, false);
         }
 
-        public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled) {
+        public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect, boolean dragEnabled) {
             return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, false, false);
         }
 
-        public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
+        public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled) {
             return create(x, y, width, height, items, listAction, multiSelect, dragEnabled, dragOutEnabled, false);
         }
 
 
-        public List create(int x, int y, int width, int height, ArrayList items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
+        public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
             setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
             list.selectedItem = null;
@@ -1513,7 +1514,7 @@ public final class APIComponent {
             list.dragEnabled = dragEnabled;
         }
 
-        public void setItems(List list, ArrayList items) {
+        public void setItems(List list, Array items) {
             if (list == null) return;
             list.items = items;
         }
@@ -1540,7 +1541,7 @@ public final class APIComponent {
 
         public void setSelectedItemByText(List list, String text) {
             if (list == null) return;
-            for (int i = 0; i < list.items.size(); i++) {
+            for (int i = 0; i < list.items.size; i++) {
                 if (list.listAction.text(list.items.get(i)).equals(text)) {
                     UICommonUtils.list_setSelectedItem(list, list.items.get(i));
                     return;
@@ -1625,7 +1626,7 @@ public final class APIComponent {
 
     public void removeUpdateAction(Component component, UpdateAction updateAction) {
         if (component == null || updateAction == null) return;
-        component.updateActions.remove(updateAction);
+        component.updateActions.removeValue(updateAction, true);
     }
 
     public void removeUpdateActions(Component component, UpdateAction[] updateActions) {
@@ -1635,7 +1636,7 @@ public final class APIComponent {
 
     public void removeAllUpdateActions(Component component) {
         if (component == null) return;
-        removeUpdateActions(component, component.updateActions.toArray(new UpdateAction[]{}));
+        removeUpdateActions(component, component.updateActions.toArray(UpdateAction[]::new));
     }
 
     public void setName(Component component, String name) {
@@ -1771,7 +1772,7 @@ public final class APIComponent {
         component.height = height;
         component.color = color1.cpy();
         component.color2 = color2.cpy();
-        component.updateActions = new ArrayList<>();
+        component.updateActions = new Array<>();
         component.data = null;
         component.name = "";
         component.disabled = false;

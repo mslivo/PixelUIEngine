@@ -36,7 +36,7 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
     public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer, float animation_timer) {
         if (super.numParticles == 0) return;
         spriteRenderer.saveState();
-        for (int i = 0; i < particles.size(); i++) {
+        for (int i = 0; i < particles.size; i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
             if (renderHook != null)

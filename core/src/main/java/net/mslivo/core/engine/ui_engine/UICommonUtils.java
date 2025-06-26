@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -43,20 +44,18 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.CommonNotification;
-import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
+import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipImageSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.function.Predicate;
 
@@ -64,7 +63,7 @@ final class UICommonUtils {
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();
-    private static ArrayList<Component> windowComponentsVisibleOrder = new ArrayList<>();
+    private static Array<Component> windowComponentsVisibleOrder = new Array<>();
     private static HashSet<Component> windowComponentsVisibleOrderSet = new HashSet<>();
 
     static {
@@ -123,7 +122,7 @@ final class UICommonUtils {
                             component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated.x, uiEngineState.mouse_emulated.y);
                     if (distance < nearestDistance) {
                         nearestDistance = distance;
-                        nearestIndex = windowComponentsVisibleOrder.size() - 1;
+                        nearestIndex = windowComponentsVisibleOrder.size - 1;
                     }
                 }
             }
@@ -132,10 +131,10 @@ final class UICommonUtils {
         if (nearestIndex != -1) {
             if (backwards) {
                 nearestIndex--;
-                if (nearestIndex < 0) nearestIndex = (windowComponentsVisibleOrder.size() - 1);
+                if (nearestIndex < 0) nearestIndex = (windowComponentsVisibleOrder.size - 1);
             } else {
                 nearestIndex++;
-                if (nearestIndex > (windowComponentsVisibleOrder.size() - 1)) nearestIndex = 0;
+                if (nearestIndex > (windowComponentsVisibleOrder.size - 1)) nearestIndex = 0;
             }
 
             emulatedMouse_setPositionComponent(uiEngineState, windowComponentsVisibleOrder.get(nearestIndex));
@@ -147,7 +146,7 @@ final class UICommonUtils {
 
     static Window window_findTopInteractableWindow(UIEngineState uiEngineState) {
         if (uiEngineState.windows.isEmpty()) return null;
-        for (int i = (uiEngineState.windows.size() - 1); i >= 0; i--) {
+        for (int i = (uiEngineState.windows.size - 1); i >= 0; i--) {
             Window window = uiEngineState.windows.get(i);
             if (window.visible) return window;
         }
@@ -175,27 +174,26 @@ final class UICommonUtils {
     }
 
     static void window_bringToFront(UIEngineState uiEngineState, Window window) {
-        if (uiEngineState.windows.size() == 1) return;
+        if (uiEngineState.windows.size == 1) return;
 
-        int currentIndex = uiEngineState.windows.indexOf(window);
+        int currentIndex = uiEngineState.windows.indexOf(window, true);
 
         int targetIndex = 0;
-        if(window.alwaysOnTop){
-            targetIndex = uiEngineState.windows.size()-1;
-        }else{
-            for (int i = (uiEngineState.windows.size()-1); i >= 0; i--) {
-                if(i != currentIndex && !uiEngineState.windows.get(i).alwaysOnTop){
+        if (window.alwaysOnTop) {
+            targetIndex = uiEngineState.windows.size - 1;
+        } else {
+            for (int i = (uiEngineState.windows.size - 1); i >= 0; i--) {
+                if (i != currentIndex && !uiEngineState.windows.get(i).alwaysOnTop) {
                     targetIndex = i;
                     break;
                 }
             }
         }
 
-        if(currentIndex != targetIndex)
-            Collections.swap(uiEngineState.windows,currentIndex,targetIndex);
+        if (currentIndex != targetIndex)
+            uiEngineState.windows.swap(currentIndex, targetIndex);
 
     }
-
 
 
     static void window_setPosition(UIEngineState uiEngineState, Window window, int x, int y) {
@@ -228,7 +226,7 @@ final class UICommonUtils {
             UICommonUtils.window_center(uiEngineState, window);
             UICommonUtils.window_addToScreen(uiEngineState, window);
         } else {
-            uiEngineState.modalWindowQueue.add(window);
+            uiEngineState.modalWindowQueue.addLast(window);
         }
     }
 
@@ -245,11 +243,11 @@ final class UICommonUtils {
         uiEngineState.windows.add(window);
         window.windowAction.onAdd();
         window_enforceScreenBounds(uiEngineState, window);
-        window_bringToFront(uiEngineState,window);
+        window_bringToFront(uiEngineState, window);
     }
 
     static boolean window_close(UIEngineState uiEngineState, Window window) {
-        for (int i = 0; i < window.components.size(); i++) {
+        for (int i = 0; i < window.components.size; i++) {
             if (window.components.get(i).name.equals(WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton) {
                 UICommonUtils.button_press(closeButton);
                 UICommonUtils.button_release(closeButton);
@@ -266,23 +264,23 @@ final class UICommonUtils {
         if (uiEngineState.lastUIMouseHover == window) uiEngineState.lastUIMouseHover = null;
         if (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow == window)
             uiEngineState.modalWindow = null;
-        for (int i = window.components.size()-1; i >= 0; i--){
+        for (int i = window.components.size - 1; i >= 0; i--) {
             final Component component = window.components.get(i);
-            component_removeFromWindow(component,window,uiEngineState);
+            component_removeFromWindow(component, window, uiEngineState);
             if (component instanceof AppViewport appViewPort)
-                uiEngineState.appViewPorts.remove(appViewPort);
+                uiEngineState.appViewPorts.removeValue(appViewPort, true);
         }
 
         window_resetReferences(uiEngineState, window);
 
         // Remove
         window.addedToScreen = false;
-        uiEngineState.windows.remove(window);
+        uiEngineState.windows.removeValue(window, true);
         window.windowAction.onRemove();
 
         // Add Next Modal from Queue queue
-        if (uiEngineState.modalWindowQueue.size() > 0)
-            window_addToScreenAsModal(uiEngineState, uiEngineState.modalWindowQueue.poll());
+        if (!uiEngineState.modalWindowQueue.isEmpty())
+            window_addToScreenAsModal(uiEngineState, uiEngineState.modalWindowQueue.removeLast());
     }
 
     static void component_setSize(UIEngineState uiEngineState, Component component, int width, int height) {
@@ -320,7 +318,7 @@ final class UICommonUtils {
 
     static Object component_getUIObjectAtPosition(UIEngineState uiEngineState, int x, int y) {
         // Notification Collision
-        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
+        for (int i = 0; i < uiEngineState.notifications.size; i++) {
             Notification notification = uiEngineState.notifications.get(i);
             if (!notification.uiInteractionEnabled) continue;
             if (Tools.Calc.pointRectsCollide(x, y,
@@ -332,7 +330,7 @@ final class UICommonUtils {
 
         // Context Menu Item collision
         if (uiEngineState.openContextMenu != null) {
-            for (int i = 0; i < uiEngineState.openContextMenu.items.size(); i++) {
+            for (int i = 0; i < uiEngineState.openContextMenu.items.size; i++) {
                 if (Tools.Calc.pointRectsCollide(x, y, uiEngineState.openContextMenu.x, uiEngineState.openContextMenu.y - (uiEngineState.tileSize.TS) - uiEngineState.tileSize.TL(i), uiEngineState.tileSize.TL(uiEngineState.displayedContextMenuWidth), uiEngineState.tileSize.TS)) {
                     return uiEngineState.openContextMenu.items.get(i);
                 }
@@ -341,13 +339,17 @@ final class UICommonUtils {
 
         // Combobox Open Menu collision
         if (uiEngineState.openComboBox != null) {
-            if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox), UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size())), uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size()))) {
+            if (Tools.Calc.pointRectsCollide(
+                    x, y,
+                    UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox),
+                    UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size)),
+                    uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size))) {
                 return uiEngineState.openComboBox;
             }
         }
 
         // Window / WindowComponent collision
-        for (int i = uiEngineState.windows.size() - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
+        for (int i = uiEngineState.windows.size - 1; i >= 0; i--) { // use for(i) to avoid iterator creation
             Window window = uiEngineState.windows.get(i);
             if (!window.visible) continue;
 
@@ -358,7 +360,7 @@ final class UICommonUtils {
 
             boolean collidesWithWindow = Tools.Calc.pointRectsCollide(x, y, wndX, wndY, wndWidth, wndHeight);
             if (collidesWithWindow) {
-                for (int ic = window.components.size() - 1; ic >= 0; ic--) {
+                for (int ic = window.components.size - 1; ic >= 0; ic--) {
                     Component component = window.components.get(ic);
                     if (component_isComponentAtPosition(uiEngineState, x, y, component)) {
                         return component;
@@ -369,7 +371,7 @@ final class UICommonUtils {
         }
 
         // Screen component collision
-        for (int isc = uiEngineState.screenComponents.size() - 1; isc >= 0; isc--) {
+        for (int isc = uiEngineState.screenComponents.size - 1; isc >= 0; isc--) {
             Component screenComponent = uiEngineState.screenComponents.get(isc);
             if (component_isComponentAtPosition(uiEngineState, x, y, screenComponent)) return screenComponent;
         }
@@ -438,8 +440,8 @@ final class UICommonUtils {
             case Notification notification -> {
                 uiEngineState.notifications.add(notification);
                 // Remove first if too many
-                if (uiEngineState.notifications.size() > notificationsMax)
-                    notification_removeFromScreen(uiEngineState, uiEngineState.notifications.getFirst());
+                if (uiEngineState.notifications.size > notificationsMax)
+                    notification_removeFromScreen(uiEngineState, uiEngineState.notifications.first());
             }
             case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.add(tooltipNotification);
@@ -453,10 +455,10 @@ final class UICommonUtils {
         commonNotification.addedToScreen = false;
         switch (commonNotification) {
             case Notification notification -> {
-                uiEngineState.notifications.remove(notification);
+                uiEngineState.notifications.removeValue(notification, true);
             }
             case TooltipNotification tooltipNotification -> {
-                uiEngineState.tooltipNotifications.remove(tooltipNotification);
+                uiEngineState.tooltipNotifications.removeValue(tooltipNotification, true);
             }
         }
     }
@@ -472,7 +474,7 @@ final class UICommonUtils {
     }
 
     static boolean contextMenu_open(UIEngineState uiEngineState, MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
-        if (contextMenu.items.size() == 0) return false;
+        if (contextMenu.items.isEmpty()) return false;
         // Close open ContextMenus
         if (uiEngineState.openContextMenu != null) {
             contextMenu_close(uiEngineState, uiEngineState.openContextMenu);
@@ -481,7 +483,7 @@ final class UICommonUtils {
         contextMenu.x = x;
         contextMenu.y = y;
         int textwidth = 0;
-        for (int i = 0; i < contextMenu.items.size(); i++) {
+        for (int i = 0; i < contextMenu.items.size; i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
             int w = mediaManager.fontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
             if (contextMenuItem.contextMenuItemAction.icon() != null) w = w + uiEngineState.tileSize.TS;
@@ -512,12 +514,12 @@ final class UICommonUtils {
 
     static Tab tabBar_getSelectedTab(Tabbar tabBar) {
         if (tabBar == null) return null;
-        return tabBar.tabs.get(Math.clamp(tabBar.selectedTab, 0, tabBar.tabs.size() - 1));
+        return tabBar.tabs.get(Math.clamp(tabBar.selectedTab, 0, tabBar.tabs.size - 1));
     }
 
     static void tabBar_selectTab(Tabbar tabBar, Tab tab) {
         if (tab.addedToTabBar != tabBar) return;
-        for (int i = 0; i < tabBar.tabs.size(); i++) {
+        for (int i = 0; i < tabBar.tabs.size; i++) {
             if (tabBar.tabs.get(i) == tab) {
                 UICommonUtils.tabBar_selectTab(tabBar, i);
                 return;
@@ -526,7 +528,7 @@ final class UICommonUtils {
     }
 
     static void tabBar_selectTab(Tabbar tabBar, int index) {
-        tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size() - 1);
+        tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size - 1);
         Tab tab = tabBar.tabs.get(tabBar.selectedTab);
         tab.tabAction.onSelect();
         tabBar.tabBarAction.onChangeTab(index, tab);
@@ -698,9 +700,9 @@ final class UICommonUtils {
     }
 
     static void component_screenMoveToTop(Component component, UIEngineState uiEngineState) {
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
+        for (int i = 0; i < uiEngineState.screenComponents.size; i++) {
             if (uiEngineState.screenComponents.get(i) == component) {
-                uiEngineState.screenComponents.remove(component);
+                uiEngineState.screenComponents.removeValue(component, true);
                 uiEngineState.screenComponents.add(component);
             }
         }
@@ -710,9 +712,9 @@ final class UICommonUtils {
         if (component.addedToWindow == null)
             return;
         Window window = component.addedToWindow;
-        for (int i = 0; i < window.components.size(); i++) {
+        for (int i = 0; i < window.components.size; i++) {
             if (window.components.get(i) == component) {
-                window.components.remove(component);
+                window.components.removeValue(component, true);
                 window.components.add(component);
             }
         }
@@ -726,12 +728,12 @@ final class UICommonUtils {
         // Remove References
         if (uiEngineState.lastUIMouseHover == component) uiEngineState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.remove(appViewPort);
+        if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.removeValue(appViewPort, true);
         component_resetReferences(uiEngineState, component);
 
         // Remove
         component.addedToScreen = true;
-        uiEngineState.screenComponents.remove(component);
+        uiEngineState.screenComponents.removeValue(component, true);
     }
 
     static void component_removeFromWindow(Component component, Window window, UIEngineState uiEngineState) {
@@ -741,17 +743,17 @@ final class UICommonUtils {
         // Remove References
         if (uiEngineState.lastUIMouseHover == component) uiEngineState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
-        if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.remove(appViewPort);
+        if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.removeValue(appViewPort, true);
         component_resetReferences(uiEngineState, component);
 
         // Remove
-        component.addedToWindow.components.remove(component);
+        component.addedToWindow.components.removeValue(component, true);
         component.addedToWindow = null;
     }
 
     static void tab_removeComponent(Tab tab, Component component) {
         if (component.addedToTab != tab) return;
-        component.addedToTab.components.remove(component);
+        component.addedToTab.components.removeValue(component, true);
         component.addedToTab = tab;
     }
 
@@ -770,13 +772,13 @@ final class UICommonUtils {
     static void tabBar_addTab(Tabbar tabBar, Tab tab, int index) {
         if (tab.addedToTabBar != null) return;
         tab.addedToTabBar = tabBar;
-        tabBar.tabs.add(index, tab);
+        tabBar.tabs.insert(index, tab);
     }
 
     static void tabBar_removeTab(Tabbar tabBar, Tab tab) {
         if (tab.addedToTabBar != tabBar) return;
         tab.addedToTabBar = null;
-        tabBar.tabs.remove(tab);
+        tabBar.tabs.removeValue(tab, true);
     }
 
     static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
@@ -788,7 +790,7 @@ final class UICommonUtils {
     static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
-        contextMenu.items.remove(contextMenuItem);
+        contextMenu.items.removeValue(contextMenuItem, true);
     }
 
     static void contextMenu_selectItem(UIEngineState uiEngineState, ContextMenuItem contextMenuItem) {
@@ -818,7 +820,7 @@ final class UICommonUtils {
         if (comboBoxItem.addedToComboBox != comboBox) return;
         if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
-        comboBox.items.remove(comboBoxItem);
+        comboBox.items.removeValue(comboBoxItem, true);
     }
 
     static void tooltip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
@@ -847,7 +849,7 @@ final class UICommonUtils {
     static void tooltip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (segment.addedToTooltip != toolTip) return;
         segment.addedToTooltip = null;
-        toolTip.segments.remove(segment);
+        toolTip.segments.removeValue(segment, true);
     }
 
     static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height) {
@@ -903,7 +905,7 @@ final class UICommonUtils {
 
     static void list_setSelectedItem(List list, Object selectedItem) {
         // Clear selecteditem/items after mode switch
-        if (selectedItem != null && list.items.contains(selectedItem)) {
+        if (selectedItem != null && list.items.contains(selectedItem, true)) {
             if (list.multiSelect) {
                 list.selectedItems.add(selectedItem);
             } else {
@@ -920,13 +922,13 @@ final class UICommonUtils {
             list.selectedItems.clear();
             if (selectedItems != null) {
                 for (int i = 0; i < selectedItems.length; i++) {
-                    if (selectedItems[i] != null && list.items.contains(selectedItems[i])) {
+                    if (selectedItems[i] != null && list.items.contains(selectedItems[i], true)) {
                         list.selectedItems.add(selectedItems[i]);
                     }
                 }
             }
         } else {
-            if (selectedItems != null && selectedItems[0] != null && list.items.contains(selectedItems[0])) {
+            if (selectedItems != null && selectedItems[0] != null && list.items.contains(selectedItems[0], true)) {
                 list.selectedItem = selectedItems[0];
             } else {
                 list.selectedItem = null;
@@ -990,7 +992,7 @@ final class UICommonUtils {
         int y_bar = UICommonUtils.component_getAbsoluteY(tabBar);
 
         int tabXOffset = tabBar.tabOffset;
-        for (int i = 0; i < tabBar.tabs.size(); i++) {
+        for (int i = 0; i < tabBar.tabs.size; i++) {
             Tab tab = tabBar.tabs.get(i);
             int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
             if ((tabXOffset + tabWidth) > tabBar.width) {
@@ -1014,14 +1016,14 @@ final class UICommonUtils {
 
     static void list_updateItemInfoAtMousePosition(UIEngineState uiEngineState, List list) {
         if (list.items != null) {
-            int itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
+            int itemFrom = MathUtils.round(list.scrolled * ((list.items.size) - (list.height)));
             itemFrom = Math.max(itemFrom, 0);
             int x_list = UICommonUtils.component_getAbsoluteX(list);
             int y_list = UICommonUtils.component_getAbsoluteY(list);
             // insert between other items
             for (int iy = 0; iy < list.height; iy++) {
                 int itemIndex = itemFrom + iy;
-                if (itemIndex < list.items.size()) {
+                if (itemIndex < list.items.size) {
                     int itemOffsetY = ((list.height - 1) - iy);
                     if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
                             x_list, y_list + uiEngineState.tileSize.TL(itemOffsetY), uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TS)) {
@@ -1033,7 +1035,7 @@ final class UICommonUtils {
             }
             // Insert at end
             if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_list, y_list, uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TL(list.height))) {
-                uiEngineState.itemInfo_listIndex = list.items.size();
+                uiEngineState.itemInfo_listIndex = list.items.size;
                 uiEngineState.itemInfo_listValid = true;
                 return;
             }
@@ -1501,19 +1503,19 @@ final class UICommonUtils {
         return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
     }
 
-    static  <T> T find(java.util.List<T> list, Predicate predicate){
-        for (int i = 0; i < list.size(); i++) {
-            final T object = list.get(i);
+    static <T> T find(Array<T> array, Predicate predicate) {
+        for (int i = 0; i < array.size; i++) {
+            final T object = array.get(i);
             if (predicate.test(object))
                 return object;
         }
         return null;
     }
 
-    static  <T> ArrayList<T> findMultiple(java.util.List<T> list, Predicate predicate){
-        ArrayList<T> result = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            final T object = list.get(i);
+    static <T> Array<T> findMultiple(Array<T> array, Predicate predicate) {
+        Array<T> result = new Array<>();
+        for (int i = 0; i < array.size; i++) {
+            final T object = array.get(i);
             if (predicate.test(object))
                 result.add(object);
         }

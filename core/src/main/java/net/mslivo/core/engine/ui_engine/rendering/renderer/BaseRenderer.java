@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public abstract class BaseRenderer {
 
@@ -42,7 +42,7 @@ public abstract class BaseRenderer {
 
     protected final Color tempColor;
     protected final Matrix4 projectionMatrix, transformMatrix, combinedMatrix;
-    private final HashMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
+    private final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
 
     protected boolean drawing;
     protected ShaderProgram shader;
@@ -92,7 +92,7 @@ public abstract class BaseRenderer {
         this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
         this.blend_save = Arrays.copyOf(this.blend_reset, this.blend_reset.length);
 
-        this.uniformLocationCache = new HashMap<>();
+        this.uniformLocationCache = new ObjectMap<>();
 
         this.defaultShader = defaultShader;
 

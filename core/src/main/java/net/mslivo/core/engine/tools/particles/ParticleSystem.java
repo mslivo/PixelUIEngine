@@ -1,42 +1,39 @@
 package net.mslivo.core.engine.tools.particles;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Queue;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.particles.particles.EmptyParticle;
 import net.mslivo.core.engine.tools.particles.particles.Particle;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.function.Consumer;
 
 public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, SpriteParticleSystem {
     protected Class<T> dataClass;
     protected int maxParticles;
     protected int numParticles;
-    protected final HashMap<Class, ArrayDeque<Particle<T>>> particlePools;
-    protected final ArrayDeque<Particle<T>> deleteQueue;
+    protected final ObjectMap<Class, Queue<Particle<T>>> particlePools;
+    protected final Queue<Particle<T>> deleteQueue;
     protected final Consumer<Particle<T>> parallelConsumer;
     protected final ParticleUpdater<T> particleUpdater;
-    protected final ArrayList<Particle<T>> particles;
+    protected final Array<Particle<T>> particles;
 
     protected ParticleSystem(Class<T> dataClass, ParticleUpdater<T> particleUpdater, int maxParticles) {
         this.dataClass = dataClass;
         this.numParticles = 0;
         this.maxParticles = Math.max(maxParticles, 0);
-        this.deleteQueue = new ArrayDeque<>();
-        this.particlePools = new HashMap<>();
-        this.particles = new ArrayList<>();
+        this.deleteQueue = new Queue<>();
+        this.particlePools = new ObjectMap<>();
+        this.particles = new Array<>();
         this.particleUpdater = particleUpdater != null ? particleUpdater : new ParticleUpdater<T>() {
         };
-        this.parallelConsumer = new Consumer<>() {
-            @Override
-            public void accept(Particle<T> particle) {
-                boolean remove = !particleUpdater.updateParticle(particle);
-                if (particle != null && remove) {
-                    synchronized (deleteQueue) {
-                        deleteQueue.add(particle);
-                    }
+        this.parallelConsumer = particle -> {
+            boolean remove = !particleUpdater.updateParticle(particle);
+            if (particle != null && remove) {
+                synchronized (deleteQueue) {
+                    deleteQueue.addLast(particle);
                 }
             }
         };
@@ -45,10 +42,10 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     public void update() {
         if (this.numParticles == 0) return;
         // Update
-        for (int i = 0; i < this.particles.size(); i++) {
+        for (int i = 0; i < this.particles.size; i++) {
             Particle<T> particle = particles.get(i);
             if (!particleUpdater.updateParticle(particle))
-                deleteQueue.add(particle);
+                deleteQueue.addLast(particle);
         }
         // Clear DeleteQueue
         deleteQueuedParticles();
@@ -68,13 +65,14 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         return numParticles;
     }
 
-    public boolean hasAnyParticles(){
+    public boolean hasAnyParticles() {
         return numParticles > 0;
     }
 
 
     public void removeAllParticles() {
-        this.deleteQueue.addAll(this.particles);
+        for (int i = 0; i < this.particles.size; i++)
+            this.deleteQueue.addLast(this.particles.get(i));
         deleteQueuedParticles();
     }
 
@@ -82,8 +80,8 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         return maxParticles;
     }
 
-    public void setMaxParticles(int maxParticles){
-        this.maxParticles = Math.max(maxParticles,0);
+    public void setMaxParticles(int maxParticles) {
+        this.maxParticles = Math.max(maxParticles, 0);
     }
 
     public void shutdown() {
@@ -93,18 +91,18 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     }
 
     public void forEachParticle(Consumer<Particle<T>> particleConsumer) {
-        for (int i = 0; i < particles.size(); i++) particleConsumer.accept(particles.get(i));
+        for (int i = 0; i < particles.size; i++) particleConsumer.accept(particles.get(i));
     }
 
     private void addParticleToPool(Class particleClass, Particle<T> particle) {
         if (!this.particlePools.containsKey(particleClass))
-            this.particlePools.put(particleClass, new ArrayDeque<>());
-        this.particlePools.get(particleClass).add(particle);
+            this.particlePools.put(particleClass, new Queue<>());
+        this.particlePools.get(particleClass).addLast(particle);
     }
 
     protected void removeParticleFromSystem(Particle<T> particle) {
         if (particle == null) return;
-        this.particles.remove(particle);
+        this.particles.removeValue(particle, true);
         addParticleToPool(particle.getClass(), particle);
         this.numParticles--;
     }
@@ -116,13 +114,13 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     }
 
     public void moveParticleToPosition(Particle<T> particle, int newIndex) {
-        final int index = particles.indexOf(particle);
+        final int index = particles.indexOf(particle, true);
         if (index < 0 || index == newIndex) return;
 
-        particles.remove(index);
+        particles.removeIndex(index);
         if (index < newIndex) newIndex--;
 
-        particles.add(newIndex, particle);
+        particles.insert(newIndex, particle);
     }
 
     public void moveParticleToFront(Particle<T> particle) {
@@ -130,9 +128,8 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     }
 
     public void moveParticleToEnd(Particle<T> particle) {
-        moveParticleToPosition(particle, particles.size() - 1);
+        moveParticleToPosition(particle, particles.size - 1);
     }
-
 
 
     protected void particleSetParticleData(Particle<T> particle, float x, float y, float r, float g, float b, float a, boolean visible) {
@@ -151,8 +148,9 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
 
     protected Particle<T> getParticleFromPool(Class particleClass) {
         if (!this.particlePools.containsKey(particleClass))
-            this.particlePools.put(particleClass, new ArrayDeque<>());
-        return this.particlePools.get(particleClass).poll();
+            this.particlePools.put(particleClass, new Queue<>());
+        final Queue<Particle<T>> queue = this.particlePools.get(particleClass);
+        return queue.isEmpty() ? null : queue.removeFirst();
     }
 
     private T createDataInstance() {
@@ -169,22 +167,22 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         }
     }
 
-    public ArrayList<Particle<T>> getParticles() {
+    public Array<Particle<T>> getParticles() {
         return particles;
     }
 
-    public EmptyParticle<T> addEmptyParticle(float x, float y){
-        return addEmptyParticle(x,y,0.5f,0.5f,0.5f,1f,true);
+    public EmptyParticle<T> addEmptyParticle(float x, float y) {
+        return addEmptyParticle(x, y, 0.5f, 0.5f, 0.5f, 1f, true);
     }
 
-    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a){
-        return addEmptyParticle(x,y,r,g,b,a,true);
+    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a) {
+        return addEmptyParticle(x, y, r, g, b, a, true);
     }
 
-    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible){
-        if(!canAddParticle())
+    public EmptyParticle<T> addEmptyParticle(float x, float y, float r, float g, float b, float a, boolean visible) {
+        if (!canAddParticle())
             return null;
-        EmptyParticle<T> particle = getNextEmptyParticle(x,y,r,g,b,a,visible);
+        EmptyParticle<T> particle = getNextEmptyParticle(x, y, r, g, b, a, visible);
         addParticleToSystem(particle);
         return particle;
     }
@@ -198,8 +196,8 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
     }
 
     private void deleteQueuedParticles() {
-        Particle<T> deleteParticle;
-        while ((deleteParticle = deleteQueue.poll()) != null) {
+        while (!deleteQueue.isEmpty()) {
+            final Particle<T> deleteParticle = deleteQueue.removeFirst();
             removeParticleFromSystem(deleteParticle);
         }
     }

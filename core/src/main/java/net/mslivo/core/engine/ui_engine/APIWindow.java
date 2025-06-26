@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
@@ -72,9 +73,9 @@ public final class APIWindow {
         window.name = "";
         window.data = null;
         window.enforceScreenBounds = uiConfig.window_defaultEnforceScreenBounds;
-        window.updateActions = new ArrayList<>();
+        window.updateActions = new Array<>();
         window.addedToScreen = false;
-        window.components = new ArrayList<>();
+        window.components = new Array<>();
         return window;
     }
 
@@ -145,7 +146,7 @@ public final class APIWindow {
     public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
         if (window == null) return;
         if (inclusions != null) {
-            for (int i = 0; i < window.components.size(); i++) {
+            for (int i = 0; i < window.components.size; i++) {
                 Component component = window.components.get(i);
                 classLoop:
                 for (int i2 = 0; i2 < inclusions.length; i2++) {
@@ -218,11 +219,11 @@ public final class APIWindow {
 
     public void removeAllComponents(Window window) {
         if (window == null) return;
-        removeComponents(window, window.components.toArray(new Component[]{}));
+        removeComponents(window, window.components.toArray(Component[]::new));
     }
 
-    public ArrayList<Component> findComponents(Window window, Predicate<Window> findBy) {
-        if (window == null) return new ArrayList<>();
+    public Array<Component> findComponents(Window window, Predicate<Window> findBy) {
+        if (window == null) return new Array<>();
         return UICommonUtils.findMultiple(window.components, findBy);
     }
 
@@ -258,7 +259,7 @@ public final class APIWindow {
 
     public void removeUpdateAction(Window window, UpdateAction updateAction) {
         if (window == null || updateAction == null) return;
-        window.updateActions.remove(updateAction);
+        window.updateActions.removeValue(updateAction, true);
     }
 
     public void removeUpdateActions(Window window, UpdateAction[] updateActions) {
@@ -268,7 +269,7 @@ public final class APIWindow {
 
     public void removeAllUpdateActions(Window window) {
         if (window == null) return;
-        removeUpdateActions(window, window.updateActions.toArray(new UpdateAction[]{}));
+        removeUpdateActions(window, window.updateActions.toArray(UpdateAction[]::new));
     }
 
     public void setName(Window window, String name) {
@@ -346,7 +347,7 @@ public final class APIWindow {
                                   boolean windowColor, boolean componentColor1, boolean componentColor2, boolean comboBoxItemColor) {
         if (classes == null) classes = new Class[]{};
         if (windowColor) setColor(window, color);
-        for (int i = 0; i < window.components.size(); i++) {
+        for (int i = 0; i < window.components.size; i++) {
             Component c = window.components.get(i);
             boolean match = setColorMode == 1 ? false : true;
             classLoop:

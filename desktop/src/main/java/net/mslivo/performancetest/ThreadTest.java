@@ -1,6 +1,7 @@
 package net.mslivo.performancetest;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.tools.Tools;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.function.Consumer;
 
 public class ThreadTest {
 
-    private ArrayList<Integer> list = new ArrayList<>();
+    private Array<Integer> list = new Array<>();
     private long startTime;
     private AtomicInteger sum = new AtomicInteger();
     private TestConsumer testConsumer = new TestConsumer();
@@ -31,10 +32,6 @@ public class ThreadTest {
 
 
         for(int i=0;i<10;i++) {
-            threadTest.start("stream.parallel()");
-            threadTest.runTestParallel();
-            threadTest.end();
-
             threadTest.start("parallelRunner.run()");
             threadTest.runTestParallelRunner();
             threadTest.end();
@@ -67,15 +64,10 @@ public class ThreadTest {
     }
 
     public void runTestParallelRunner(){
-
         Tools.App.runParallel(this.list, this.testConsumer);
     }
 
-    public void runTestParallel(){
 
-            list.parallelStream().forEach(this.testConsumer);
-
-    }
 
 
 }

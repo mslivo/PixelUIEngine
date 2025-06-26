@@ -9,8 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.*;
 import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import net.mslivo.core.engine.media_manager.CMedia;
 import net.mslivo.core.engine.media_manager.CMediaFontArraySymbol;
@@ -21,6 +20,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
+import java.lang.StringBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
@@ -52,12 +52,12 @@ public class Tools {
         private static final int MAX_TASKS = Runtime.getRuntime().availableProcessors();
         private static final IntArrayTask[] intTasks = new IntArrayTask[MAX_TASKS];
         @SuppressWarnings("rawtypes")
-        private static final ListTask[] listTasks = new ListTask[MAX_TASKS];
+        private static final ArrayTask[] ARRAY_TASKS = new ArrayTask[MAX_TASKS];
 
         static {
             for (int i = 0; i < MAX_TASKS; i++) {
                 intTasks[i] = new IntArrayTask();
-                listTasks[i] = new ListTask<>();
+                ARRAY_TASKS[i] = new ArrayTask<>();
             }
         }
 
@@ -82,12 +82,12 @@ public class Tools {
             }
         }
 
-        private static final class ListTask<T> extends RecursiveAction {
-            List<T> list;
+        private static final class ArrayTask<T> extends RecursiveAction {
+            Array<T> list;
             int start, end;
             Consumer<T> consumer;
 
-            void setup(final List<T> list, final int start, final int end, final Consumer<T> consumer) {
+            void setup(final Array<T> list, final int start, final int end, final Consumer<T> consumer) {
                 this.list = list;
                 this.start = start;
                 this.end = end;
@@ -125,12 +125,12 @@ public class Tools {
                 intTasks[i].join();
         }
 
-        public static <T> void runParallel(final List<T> list, final Consumer<T> consumer) {
-            runParallel(list, consumer, list.size());
+        public static <T> void runParallel(final Array<T> array, final Consumer<T> consumer) {
+            runParallel(array, consumer, array.size);
         }
 
         @SuppressWarnings("unchecked")
-        public static <T> void runParallel(final List<T> list, final Consumer<T> consumer, final int size) {
+        public static <T> void runParallel(final Array<T> array, final Consumer<T> consumer, final int size) {
             if (size == 0) return;
 
             final int taskCount = Math.min(MAX_TASKS, size);
@@ -139,13 +139,13 @@ public class Tools {
             for (int i = 0; i < taskCount; i++) {
                 int start = i * chunkSize;
                 int end = Math.min(start + chunkSize, size);
-                ListTask<T> task = (ListTask<T>) listTasks[i];
-                task.setup(list, start, end, consumer);
+                ArrayTask<T> task = (ArrayTask<T>) ARRAY_TASKS[i];
+                task.setup(array, start, end, consumer);
                 ForkJoinPool.commonPool().execute(task);
             }
 
             for (int i = 0; i < taskCount; i++)
-                listTasks[i].join();
+                ARRAY_TASKS[i].join();
 
         }
 
@@ -533,7 +533,7 @@ public class Tools {
             return readObjectFromFile(file, zipped, null);
         }
 
-        public static Object readObjectFromFile(Path file, boolean zipped, HashMap<String, String> classReplacements) {
+        public static Object readObjectFromFile(Path file, boolean zipped, ObjectMap<String, String> classReplacements) {
             try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
                 if (zipped) {
                     try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
@@ -654,9 +654,9 @@ public class Tools {
 
         private static class HackedObjectInputStream extends ObjectInputStream {
 
-            private final HashMap<String, String> classReplacements;
+            private final ObjectMap<String, String> classReplacements;
 
-            public HackedObjectInputStream(final InputStream stream, HashMap<String, String> classReplacements) throws IOException {
+            public HackedObjectInputStream(final InputStream stream, ObjectMap<String, String> classReplacements) throws IOException {
                 super(stream);
                 this.classReplacements = classReplacements;
             }
@@ -883,21 +883,9 @@ public class Tools {
             return array[MathUtils.random(0, array.length - 1)];
         }
 
-        public static <T> T randomSelect(List<T> list) {
-            if (list == null || list.size() == 0) return null;
-            return list.get(MathUtils.random(0, list.size() - 1));
-        }
-
-        public static <T> T randomSelect(Set<T> set) {
-            if (set == null || set.isEmpty()) {
-                return null;
-            }
-            int index = MathUtils.random(0, set.size() - 1);
-            Iterator<T> it = set.iterator();
-            for (int i = 0; i < index; i++)
-                it.next();
-
-            return it.next();
+        public static <T> T randomSelect(Array<T> array) {
+            if (array == null || array.size == 0) return null;
+            return array.get(MathUtils.random(0, array.size - 1));
         }
 
         public static int exponentialGrowth(int baseValue, float exp, int times) {
@@ -1156,24 +1144,24 @@ public class Tools {
         }
 
         public static CMedia[] scanStaticClassForCMedia(Class loadFromClass) {
-            ArrayList<CMedia> prepareList = new ArrayList<>();
+            Array<CMedia> prepareList = new Array<>();
             Field[] fields = loadFromClass.getFields();
             for (int i = 0; i < fields.length; i++) {
                 CMedia cMedia;
                 try {
                     if (fields[i].getType().isArray()) {
                         CMedia[] medias = (CMedia[]) fields[i].get(null);
-                        prepareList.addAll(Arrays.asList(medias));
+                        prepareList.addAll(medias);
                     } else {
                         cMedia = (CMedia) fields[i].get(null);
                         prepareList.add(cMedia);
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
-                    return prepareList.toArray(new CMedia[]{});
+                    return prepareList.toArray(CMedia[]::new);
                 }
             }
-            return prepareList.toArray(new CMedia[]{});
+            return prepareList.toArray(CMedia[]::new);
         }
 
         public static CMedia[] scanObjectForCMedia(Object object) {
@@ -1181,17 +1169,17 @@ public class Tools {
         }
 
         public static CMedia[] scanObjectForCMedia(Object object, int scanDepthMax) {
-            ArrayList<CMedia> prepareList = new ArrayList<>();
+            Array<CMedia> prepareList = new Array<>();
             try {
                 scanObjectForCMedia(object, scanDepthMax, 1, prepareList);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new CMedia[]{};
             }
-            return prepareList.toArray(new CMedia[]{});
+            return prepareList.toArray(CMedia[]::new);
         }
 
-        private static void scanObjectForCMedia(Object object, int scanDepthMax, int currentDepth, ArrayList<CMedia> prepareList) {
+        private static void scanObjectForCMedia(Object object, int scanDepthMax, int currentDepth, Array<CMedia> prepareList) {
             if (object == null) return;
             if (object.getClass().getPackageName().startsWith("java")) return;
             if (currentDepth > scanDepthMax) return;
@@ -1214,10 +1202,10 @@ public class Tools {
                     if (CMedia.class.isAssignableFrom(fieldObject.getClass())) {
                         CMedia cMedia = (CMedia) fieldObject;
                         prepareList.add(cMedia);
-                    } else if (fieldObject.getClass() == ArrayList.class) {
-                        ArrayList arrayList = (ArrayList) fieldObject;
-                        for (int i2 = 0; i2 < arrayList.size(); i2++) {
-                            scanObjectForCMedia(arrayList.get(i2), scanDepthMax, currentDepth + 1, prepareList);
+                    } else if (fieldObject.getClass() == Array.class) {
+                        Array array = (Array) fieldObject;
+                        for (int i2 = 0; i2 < array.size; i2++) {
+                            scanObjectForCMedia(array.get(i2), scanDepthMax, currentDepth + 1, prepareList);
                         }
                     } else if (fields[i].getType().isArray()) {
                         if (fields[i].getType().getName().matches("\\[+L")) {

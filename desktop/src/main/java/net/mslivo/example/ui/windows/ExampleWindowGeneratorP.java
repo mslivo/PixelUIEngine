@@ -7,10 +7,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
-import net.mslivo.core.engine.media_manager.MediaManager;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.CMediaArray;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.CMediaImage;
+import net.mslivo.core.engine.media_manager.CMediaSprite;
+import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.API;
 import net.mslivo.core.engine.ui_engine.APIComposites;
@@ -45,14 +46,11 @@ import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP1;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
-import net.mslivo.core.engine.ui_engine.ui.actions.MouseTextInputAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -66,49 +64,49 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
         /* Window */
         boolean aot = Tools.Calc.randomChance();
-        Window window = api.window.create(0, 0, 40, 18, "Example Window "+(aot ? "AOT" : ""), new WindowAction() {
+        Window window = api.window.create(0, 0, 40, 18, "Example Window " + (aot ? "AOT" : ""), new WindowAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_WINDOW;
             }
         });
 
-        if(aot)
-            api.window.setAlwaysOnTop(window,aot);
+        if (aot)
+            api.window.setAlwaysOnTop(window, aot);
 
         api.window.addComponent(window, api.composites.button.createWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
         api.window.center(window);
 
         /* List / Inventory */
-        ArrayList<Component> components_tab1 = createTab1(api,window);
+        Array<Component> components_tab1 = createTab1(api, window);
         /* Button, Text, Image */
-        ArrayList<Component> components_tab2 = createTab2(api,window);
+        Array<Component> components_tab2 = createTab2(api, window);
         /* Slider */
-        ArrayList<Component> components_tab3 = createTab3(api,window);
+        Array<Component> components_tab3 = createTab3(api, window);
         /* Font */
-        ArrayList<Component> components_tab4 = createTab4(api,window);
+        Array<Component> components_tab4 = createTab4(api, window);
 
-        ArrayList<Tab> tabs = new ArrayList<>();
-        tabs.add(api.component.tabbar.tab.create("Tab I", components_tab1.toArray(new Component[]{}), new TabAction() {
+        Array<Tab> tabs = new Array<>();
+        tabs.add(api.component.tabbar.tab.create("Tab I", components_tab1.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
             }
         }));
-        tabs.add(api.component.tabbar.tab.create("Tab II", components_tab2.toArray(new Component[]{}), new TabAction() {
+        tabs.add(api.component.tabbar.tab.create("Tab II", components_tab2.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
             }
         }));
-        tabs.add(api.component.tabbar.tab.create("Tab III",  components_tab3.toArray(new Component[]{}), new TabAction() {
+        tabs.add(api.component.tabbar.tab.create("Tab III", components_tab3.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
             }
         }));
-        tabs.add(api.component.tabbar.tab.create("Font", components_tab4.toArray(new Component[]{}), new TabAction() {
+        tabs.add(api.component.tabbar.tab.create("Font", components_tab4.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
@@ -116,29 +114,29 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         }));
 
 
-        ArrayList<Component> tabBarComponents = api.composites.tabBar.createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(new Tab[]{}),
+        Array<Component> tabBarComponents = api.composites.tabBar.createExtendableTabBar(1, window.height - 3, window.width - 2, tabs.toArray(Tab[]::new),
                 0, api.component.tabbar.DEFAULT_TABBAR_ACTION, true, window.height - 4, false);
 
-        api.window.addComponents(window, tabBarComponents.toArray(new Component[]{}));
+        api.window.addComponents(window, tabBarComponents.toArray(Component[]::new));
 
         return window;
     }
 
 
-    private ArrayList<Component> createTab4(API api,Window window) {
-        Text text1 = api.component.text.create(1, 5,0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        Text text2 = api.component.text.create(1, 4,0, "abcdefghijklmnopqrstuvwxyz");
-        Text text3 = api.component.text.create(1, 3,0, "0123456789");
-        Text text4 = api.component.text.create(1, 2,0, "!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A£¥¦§\"©'·×÷€");
-        Text text5 = api.component.text.create(1, 1,0, "A.A");
+    private Array<Component> createTab4(API api, Window window) {
+        Text text1 = api.component.text.create(1, 5, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        Text text2 = api.component.text.create(1, 4, 0, "abcdefghijklmnopqrstuvwxyz");
+        Text text3 = api.component.text.create(1, 3, 0, "0123456789");
+        Text text4 = api.component.text.create(1, 2, 0, "!\"#$%&'()*+,-./A:A;A<=>?@A[\\]A^_A`A{A|A}A~A£¥¦§\"©'·×÷€");
+        Text text5 = api.component.text.create(1, 1, 0, "A.A");
 
 
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(text1, text2, text3, text4, text5));
-        api.window.addComponents(window, components.toArray(new Component[]{}));
+        Array<Component> components = new Array<>(new Text[]{text1, text2, text3, text4, text5});
+        api.window.addComponents(window, components.toArray());
         return components;
     }
 
-    private ArrayList<Component> createTab3(API api,Window window) {
+    private Array<Component> createTab3(API api, Window window) {
 
         ScrollbarVertical scrollBarVertical = api.component.scrollbar.scrollbarVertical.create(2, 2, 12, new ScrollBarAction() {
             @Override
@@ -180,24 +178,24 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                 oval.color.r = scrolled;
             }
         }, oval.color.r);
-        api.component.setColor(scrollBarHorizontalR, new Color(1f,0f,0f,1f));
-        api.component.setColor2(scrollBarHorizontalR, new Color(0.8f,0f,0f,1f));
+        api.component.setColor(scrollBarHorizontalR, new Color(1f, 0f, 0f, 1f));
+        api.component.setColor2(scrollBarHorizontalR, new Color(0.8f, 0f, 0f, 1f));
         ScrollbarHorizontal scrollBarHorizontalG = api.component.scrollbar.scrollbarHorizontal.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color.g = scrolled;
             }
         }, oval.color.g);
-        api.component.setColor(scrollBarHorizontalG, new Color(0f,1f,0f,1f));
-        api.component.setColor2(scrollBarHorizontalG, new Color(0f,0.8f,0f,1f));
+        api.component.setColor(scrollBarHorizontalG, new Color(0f, 1f, 0f, 1f));
+        api.component.setColor2(scrollBarHorizontalG, new Color(0f, 0.8f, 0f, 1f));
         ScrollbarHorizontal scrollBarHorizontalB = api.component.scrollbar.scrollbarHorizontal.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
                 oval.color.b = scrolled;
             }
         }, oval.color.b);
-        api.component.setColor(scrollBarHorizontalB, new Color(0f,0f,1f,1f));
-        api.component.setColor2(scrollBarHorizontalB, new Color(0f,0f,0.8f,1f));
+        api.component.setColor(scrollBarHorizontalB, new Color(0f, 0f, 1f, 1f));
+        api.component.setColor2(scrollBarHorizontalB, new Color(0f, 0f, 0.8f, 1f));
 
 
         Textfield textField = api.component.textfield.create(18, 11, 10, "", null, 128);
@@ -225,14 +223,14 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                 });
 
                 api.addNotification(notification);
-                api.addNotification(api.notification.tooltip.create(32,32,api.toolTip.create("abc")));
+                api.addNotification(api.notification.tooltip.create(32, 32, api.toolTip.create("abc")));
             }
         });
 
 
         Progressbar progressBar = api.component.progressbar.create(18, 3, 8, 0, true, true);
 
-        api.component.setColor2(progressBar,Color.BLUE);
+        api.component.setColor2(progressBar, Color.BLUE);
         api.component.progressbar.setFontColor(progressBar, Color.WHITE);
 
         ScrollbarHorizontal pgScrollbar = api.component.scrollbar.scrollbarHorizontal.create(18, 5, 8, new ScrollBarAction() {
@@ -252,14 +250,14 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
 
         Combobox comboBox = api.component.comboBox.create(25, 7, 12, new ComboboxItem[]{
-                comboboxItem ,
+                comboboxItem,
                 comboboxItem2,
                 api.component.comboBox.item.create("3"),
 
         });
 
-        api.component.setColor(comboBox,Color.RED);
-        api.component.setColor2(comboBox,Color.BLUE);
+        api.component.setColor(comboBox, Color.RED);
+        api.component.setColor2(comboBox, Color.BLUE);
 
 
         Button modal1 = api.component.button.textButton.create(28, 5, 5, 1, "Modal 1", new ButtonAction() {
@@ -321,7 +319,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
         Checkbox checkBox2 = api.component.checkbox.create(18, 2, "Radio", CHECKBOX_STYLE.RADIO);
 
-        AppViewport appViewPort = api.component.appViewport.create(29, 9, 4, 4, new AppViewPortAction() {}, 100, 100, 1);
+        AppViewport appViewPort = api.component.appViewport.create(29, 9, 4, 4, new AppViewPortAction() {
+        }, 100, 100, 1);
 
         Textfield osKeyBoardTextInput = api.component.textfield.create(18, 13, 10, "", null, 128);
         api.component.textfield.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
@@ -344,26 +343,26 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                         }, null
                 );
 
-                api.mouseTextInput.setColor(mouseTextInput,Color.BLUE);
-                api.mouseTextInput.setColor2(mouseTextInput,Color.RED);
-                api.mouseTextInput.setFontColor(mouseTextInput,Color.YELLOW);
-                api.mouseTextInput.enterCharacters(mouseTextInput,"abc");
+                api.mouseTextInput.setColor(mouseTextInput, Color.BLUE);
+                api.mouseTextInput.setColor2(mouseTextInput, Color.RED);
+                api.mouseTextInput.setFontColor(mouseTextInput, Color.YELLOW);
+                api.mouseTextInput.enterCharacters(mouseTextInput, "abc");
                 api.component.textfield.setMarkerPosition(osKeyBoardTextInput, osKeyBoardTextInput.content.length());
                 api.openMouseTextInput(mouseTextInput);
             }
         });
 
-        ArrayList<Component> components = new ArrayList<>(Arrays.asList(appViewPort, comboBox, checkBox, checkBox2,
+        Array<Component> components = new Array<>(new Component[]{appViewPort, comboBox, checkBox, checkBox2,
                 modal1, modal2, modal3, modal4, soundBtn,
                 number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR,
-                scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput));
-        api.window.addComponents(window, components.toArray(new Component[]{}));
+                scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput});
+        api.window.addComponents(window, components.toArray(Component[]::new));
         return components;
     }
 
 
-    private ArrayList<Component> createTab2(API api,Window window) {
-        ArrayList<Component> components = new ArrayList<>();
+    private Array<Component> createTab2(API api, Window window) {
+        Array<Component> components = new Array<>();
 
         // Text Buttons Tab
 
@@ -420,13 +419,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                                         api.removeAllWindows();
                                     }
                                 }),
-                        },null));
+                        }, null));
             }
         });
 
 
-
-        api.component.setColor(textBtn4, new Color(0.6f,0.5f,0.5f,1f));
+        api.component.setColor(textBtn4, new Color(0.6f, 0.5f, 0.5f, 1f));
         api.component.button.centerContent(textBtn4);
 
         TextButton textBtn5 = api.component.button.textButton.create(10, 9, 8, 2, "Viewport", new ButtonAction() {
@@ -440,10 +438,10 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
             }
         });
 
-        NestedFrameBuffer nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888,32,32);
-        FrameBufferViewport frameBufferViewport = api.component.frameBufferViewport.create(24,5,nestedFrameBuffer);
-        OrthographicCamera camera2 = new OrthographicCamera(32,32);
-        camera2.setToOrtho(false,32,32);
+        NestedFrameBuffer nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, 32, 32);
+        FrameBufferViewport frameBufferViewport = api.component.frameBufferViewport.create(24, 5, nestedFrameBuffer);
+        OrthographicCamera camera2 = new OrthographicCamera(32, 32);
+        camera2.setToOrtho(false, 32, 32);
         camera2.update();
 
 
@@ -451,16 +449,17 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
             float deg1 = 0f;
             float deg2 = 0f;
+
             @Override
             public void onUpdate() {
                 nestedFrameBuffer.begin();
-                Gdx.gl.glClearColor(Math.abs(MathUtils.sin(deg1)), 1f-Math.abs(MathUtils.sin(deg2)), 0f, 1f);
+                Gdx.gl.glClearColor(Math.abs(MathUtils.sin(deg1)), 1f - Math.abs(MathUtils.sin(deg2)), 0f, 1f);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 spriteRenderer2.setProjectionMatrix(camera2.combined);
                 spriteRenderer2.begin();
-                spriteRenderer2.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,12+MathUtils.sin(deg1)*8f,12+MathUtils.cos(deg2)*8f);
-                deg1+= 0.05f;
-                deg2+= 0.08f;
+                spriteRenderer2.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1, 12 + MathUtils.sin(deg1) * 8f, 12 + MathUtils.cos(deg2) * 8f);
+                deg1 += 0.05f;
+                deg2 += 0.08f;
                 spriteRenderer2.end();
                 nestedFrameBuffer.end();
 
@@ -519,12 +518,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         int segment_w = 8;
         int segment_h = 3;
 
-        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888,api.TS(segment_w),api.TS(segment_h));
-        OrthographicCamera tt_camera = new OrthographicCamera(api.TS(segment_w),api.TS(segment_h));
-        tt_camera.setToOrtho(false,api.TS(segment_w),api.TS(segment_h));
+        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, api.TS(segment_w), api.TS(segment_h));
+        OrthographicCamera tt_camera = new OrthographicCamera(api.TS(segment_w), api.TS(segment_h));
+        tt_camera.setToOrtho(false, api.TS(segment_w), api.TS(segment_h));
         tt_camera.update();
 
-        TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer,Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER,segment_w,segment_h);
+        TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer, Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER, segment_w, segment_h);
         SpriteRenderer tt_spriteRenderer = new SpriteRenderer(mediaManager);
 
 
@@ -533,15 +532,15 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
             public Tooltip onShowTooltip() {
                 return api.toolTip.create(
                         new TooltipSegment[]{
-                                api.toolTip.segment.text.create("color[#FF00FF00]Title[][#00FF00AA]Test[]", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
-                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
-                                api.toolTip.segment.text.create("1", Color.WHITE,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, false),
-                                api.toolTip.segment.text.create("2", Color.WHITE,Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false),
-                                api.toolTip.segment.text.create("3", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
-                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.BLUE, SEGMENT_ALIGNMENT.RIGHT, false, true),
-                                api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0,true, false, Color.MAGENTA,Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
-                                api.toolTip.segment.text.create("555555", Color.WHITE,Color.PURPLE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                                api.toolTip.segment.text.create("color[#FF00FF00]Title[][#00FF00AA]Test[]", Color.WHITE, Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("555555", Color.WHITE, Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
+                                api.toolTip.segment.text.create("555555", Color.WHITE, Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false, true),
+                                api.toolTip.segment.text.create("1", Color.WHITE, Color.RED, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("2", Color.WHITE, Color.BLACK, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("3", Color.WHITE, Color.BLUE, SEGMENT_ALIGNMENT.CENTER, false, false),
+                                api.toolTip.segment.text.create("555555", Color.WHITE, Color.BLUE, SEGMENT_ALIGNMENT.RIGHT, false, true),
+                                api.toolTip.segment.image.create(ExampleBaseMedia.EXAMPLE_ANIMATION_3, 0, true, false, Color.MAGENTA, Color.RED, SEGMENT_ALIGNMENT.CENTER, false, true),
+                                api.toolTip.segment.text.create("555555", Color.WHITE, Color.PURPLE, SEGMENT_ALIGNMENT.RIGHT, false, true),
                                 frameBufferSegment,
                         }, new ToolTipAction() {
                             @Override
@@ -555,7 +554,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                                 tt_spriteRenderer.setProjectionMatrix(tt_camera.combined);
                                 tt_spriteRenderer.begin();
-                                tt_spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1,8,8);
+                                tt_spriteRenderer.drawCMediaImage(ExampleBaseMedia.ICON_EXAMPLE_1, 8, 8);
                                 tt_spriteRenderer.end();
                                 tt_nestedFrameBuffer.end();
                             }
@@ -570,19 +569,18 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         });
 
 
-
-        ArrayList<Component> border = api.composites.image.createBorder(10, 4, 4, 4);
-        api.window.addComponents(window, border.toArray(new Component[]{}));
-        api.component.tabbar.tab.addTabComponents(tabImageButton, border.toArray(new Component[]{}));
+        Array<Component> border = api.composites.image.createBorder(10, 4, 4, 4);
+        api.window.addComponents(window, border.toArray(Component[]::new));
+        api.component.tabbar.tab.addTabComponents(tabImageButton, border.toArray(Component[]::new));
 
         api.window.addComponents(window, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
         api.component.tabbar.tab.addTabComponents(tabImageButton, new Component[]{imageButton1, imageButton2, imageButton3, imageButton4, imageButton5, imageButton6});
 
-        ArrayList<String> items = new ArrayList<>();
-             for(int i=0;i<40;i++)
-            items.add("Item "+i);
-        APIComposites.APICompositeGrid.PageAbleReadOnlyGrid pageGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 4, items, null,false, true,false);
-        api.composites.grid.pageableReadOnlyGridSetGridAction(pageGrid,new GridAction() {
+        Array<String> items = new Array<>();
+        for (int i = 0; i < 40; i++)
+            items.add("Item " + i);
+        APIComposites.APICompositeGrid.PageAbleReadOnlyGrid pageGrid = api.composites.grid.createPageableReadOnlyGrid(16, 4, 8, 4, items, null, false, true, false);
+        api.composites.grid.pageableReadOnlyGridSetGridAction(pageGrid, new GridAction() {
             @Override
             public int iconIndex(Object listItem) {
                 return 0;
@@ -613,14 +611,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
         Image image1 = api.component.image.create(3, 4, ExampleBaseMedia.EXAMPLE_ANIMATION_2);
 
-        Text text = api.component.text.create(12, 10, 0,"Lorem [#FF0000]ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
+        Text text = api.component.text.create(12, 10, 0, "Lorem [#FF0000]ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
 
-        Text text2 = api.component.text.create(12, 7, 0,"Lorem ipsum dolor sit[#FF00FF] amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
+        Text text2 = api.component.text.create(12, 7, 0, "Lorem ipsum dolor sit[#FF00FF] amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod");
         api.component.text.setFontColor(text2, Color.WHITE);
         api.window.addComponents(window, new Component[]{image1, text, text2});
         api.component.tabbar.tab.addTabComponents(tabTextImage, new Component[]{image1, text, text2});
-
-
 
 
         // Tab Bar
@@ -641,12 +637,12 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
     }
 
 
-    private ArrayList<Component> createTab1(API api,Window window) {
+    private Array<Component> createTab1(API api, Window window) {
 
-        ArrayList<Component> components = new ArrayList<>();
+        Array<Component> components = new Array<>();
 
         // List Tab
-        ArrayList<ListItem> listItems1 = new ArrayList<>();
+        Array<ListItem> listItems1 = new Array<>();
         addRandomItemsToList(listItems1, "L1 ");
 
 
@@ -691,7 +687,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                if(listItem == null) return null;
+                if (listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -704,9 +700,8 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         };
         api.component.list.setListAction(list1, list1Action);
 
-        ArrayList<ListItem> listItems2 = new ArrayList<>();
+        Array<ListItem> listItems2 = new Array<>();
         addRandomItemsToList(listItems2, "L2 ");
-
 
 
         List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, false, true, true, true);
@@ -744,13 +739,13 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
             @Override
             public boolean onItemSelected(ListItem listItem) {
-                api.addNotification(api.notification.create("Selected: " + listItem,null, true));
+                api.addNotification(api.notification.create("Selected: " + listItem, null, true));
                 return true;
             }
 
             @Override
             public Tooltip toolTip(ListItem listItem) {
-                if(listItem == null) return null;
+                if (listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -770,7 +765,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         ListItem[][] invItems = new ListItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
-        Grid grid1 = api.component.grid.create(18, 2, invItems, null,  true, true, true);
+        Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true);
 
         GridAction gridAction1 = new GridAction<ListItem>() {
             @Override
@@ -823,7 +818,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         ListItem[][] invItems2 = new ListItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
-        Grid grid2 = api.component.grid.create(25, 2, invItems2, null,  true, true, true);
+        Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true);
 
         GridAction gridAction2 = new GridAction<ListItem>() {
             @Override
@@ -912,7 +907,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
             }
 
             @Override
-            public void onDragIntoApp(ListItem listItem, int from_x, int from_y , int to_x, int to_y) {
+            public void onDragIntoApp(ListItem listItem, int from_x, int from_y, int to_x, int to_y) {
                 invItems3[from_x][from_y] = null;
                 api.addNotification(api.notification.create(listItem.text + " " + to_x + "," + to_y));
             }
@@ -931,20 +926,18 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         api.component.grid.setGridAction(grid3, gridAction3);
         api.window.addComponent(window, grid3);
 
-        components.addAll(Arrays.asList(new Component[]{
-                list1, list1ScrollBar, list2, list2ScrollBar, grid1, grid2, grid3
-        }));
+        components.addAll(list1, list1ScrollBar, list2, list2ScrollBar, grid1, grid2, grid3);
 
         return components;
 
     }
 
 
-    private void moveToList(ArrayList fromList, int fromIndex, ArrayList toList, int toIndex) {
+    private void moveToList(Array fromList, int fromIndex, Array toList, int toIndex) {
         Object object = fromList.get(fromIndex);
-        if (fromList == toList && toIndex == toList.size()) toIndex--;
-        fromList.remove(fromIndex);
-        toList.add(toIndex, object);
+        if (fromList == toList && toIndex == toList.size) toIndex--;
+        fromList.removeIndex(fromIndex);
+        toList.insert(toIndex, object);
     }
 
     private void moveToInventory(Object[][] fromInventory, int from_x, int from_y, Object[][] toInventory, int to_x, int to_y) {
@@ -958,19 +951,18 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
         }
     }
 
-    private void moveFromListToInventory(ArrayList fromList, int fromIndex, Object[][] toInventory, int to_x, int to_y) {
-
+    private void moveFromListToInventory(Array fromList, int fromIndex, Object[][] toInventory, int to_x, int to_y) {
         if (toInventory[to_x][to_y] == null) {
             Object object = fromList.get(fromIndex);
             toInventory[to_x][to_y] = object;
-            fromList.remove(fromIndex);
+            fromList.removeIndex(fromIndex);
         }
     }
 
-    private void moveFromInventoryToList(Object[][] fromInventory, int from_x, int from_y, ArrayList toList, int toIndex) {
+    private void moveFromInventoryToList(Object[][] fromInventory, int from_x, int from_y, Array toList, int toIndex) {
         Object object = fromInventory[from_x][from_y];
         fromInventory[from_x][from_y] = null;
-        toList.add(toIndex, object);
+        toList.insert(toIndex, object);
     }
 
 
@@ -994,7 +986,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
             inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_DOUBLE);
     }
 
-    private void addRandomItemsToList(ArrayList list, String prefix) {
+    private void addRandomItemsToList(Array list, String prefix) {
         int rnd;
         rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
@@ -1005,8 +997,6 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
                 default -> throw new IllegalStateException("Unexpected value: " + MathUtils.random(1, 3));
             }));
     }
-
-
 
 
     class ListItem {

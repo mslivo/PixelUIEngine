@@ -1,10 +1,10 @@
 package net.mslivo.core.engine.tools.settings;
 
-import net.mslivo.core.engine.tools.settings.validator.StringValueValidator;
+import com.badlogic.gdx.utils.ObjectMap;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.settings.persistor.PropertiesFilePersistor;
+import net.mslivo.core.engine.tools.settings.validator.StringValueValidator;
 
-import java.util.HashMap;
 import java.util.Properties;
 
 
@@ -15,7 +15,7 @@ public class SettingsManager {
 
     private final String settingsFile;
 
-    private final HashMap<String, SettingsEntry> entries;
+    private final ObjectMap<String, SettingsEntry> entries;
 
     private final SettingsPersistor settingsPersistor;
 
@@ -28,7 +28,7 @@ public class SettingsManager {
 
 
     public SettingsManager(String path, SettingsPersistor settingsPersistor) throws SettingsException {
-        this.entries = new HashMap<>();
+        this.entries = new ObjectMap<>();
         this.properties = new Properties();
         this.backUp = new Properties();
         this.settingsFile = Tools.Text.validString(path);
@@ -123,17 +123,16 @@ public class SettingsManager {
     }
 
     public void setAllToDefault() {
-        String[] entries = this.entries.keySet().toArray(new String[0]);
-        for (int i = 0; i < entries.length; i++) {
-            setToDefault(entries[i]);
-        }
+        ObjectMap.Keys<String> keys = this.entries.keys();
+        while (keys.hasNext())
+            setToDefault(keys.next());
     }
 
     private void validateAllProperties() {
-        String[] entries = this.entries.keySet().toArray(new String[0]);
-        for (int i = 0; i < entries.length; i++) {
-            validateProperty(entries[i]);
-        }
+        ObjectMap.Keys<String> keys = this.entries.keys();
+        while (keys.hasNext())
+            validateProperty(keys.next());
+
     }
 
     private void validateProperty(String name) {

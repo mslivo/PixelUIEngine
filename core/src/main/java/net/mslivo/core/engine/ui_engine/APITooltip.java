@@ -2,6 +2,7 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -68,7 +69,7 @@ public final class APITooltip {
         Tooltip tooltip = new Tooltip();
         tooltip.name = "";
         tooltip.data = null;
-        tooltip.segments = new ArrayList<>();
+        tooltip.segments = new Array<>();
         tooltip.color_border = new Color(borderColor);
         tooltip.color_line = new Color(lineColor);
         tooltip.lineLength = Math.max(lineLength, 0);
@@ -81,7 +82,7 @@ public final class APITooltip {
                 }
             }
         }
-        tooltip.updateActions = new ArrayList<>();
+        tooltip.updateActions = new Array<>();
         tooltip.toolTipAction = toolTipAction != null ? toolTipAction : DEFAULT_TOOLTIP_ACTION;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
@@ -115,7 +116,7 @@ public final class APITooltip {
 
     public void removeAllTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
-        for (int i = 0; i < toolTip.segments.size(); i++)
+        for (int i = 0; i < toolTip.segments.size; i++)
             UICommonUtils.tooltip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
     }
 

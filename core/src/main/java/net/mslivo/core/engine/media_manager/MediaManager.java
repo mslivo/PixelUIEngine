@@ -11,19 +11,15 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
 import net.mslivo.core.engine.ui_engine.rendering.ExtendedAnimation;
 
 import java.io.*;
+import java.lang.StringBuilder;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,14 +45,14 @@ public final class MediaManager {
     private static final Pattern FNT_LINEHEIGHT_PATTERN = Pattern.compile("lineHeight=([0-9]+)");
     private static final String FONT_FILE_DATA = "char id=%d      x=%d   y=%d   width=%d   height=%d   xoffset=%d   yoffset=%d   xadvance=%d    page=0   chnl=0" + System.lineSeparator();
     private boolean loaded = false;
-    private HashMap<CMediaSoundEffect, Sound> medias_sounds = null;
-    private HashMap<CMediaMusic, Music> medias_music = null;
-    private HashMap<CMediaImage, TextureRegion> medias_images = null;
-    private HashMap<CMediaFont, BitmapFont> medias_fonts = null;
-    private HashMap<CMediaArray, TextureRegion[]> medias_arrays = null;
-    private HashMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
-    private final ArrayDeque<CMedia> loadMediaList = new ArrayDeque<>();
-    private ArrayList<CMedia> loadedMediaList = new ArrayList<>();
+    private ObjectMap<CMediaSoundEffect, Sound> medias_sounds = null;
+    private ObjectMap<CMediaMusic, Music> medias_music = null;
+    private ObjectMap<CMediaImage, TextureRegion> medias_images = null;
+    private ObjectMap<CMediaFont, BitmapFont> medias_fonts = null;
+    private ObjectMap<CMediaArray, TextureRegion[]> medias_arrays = null;
+    private ObjectMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
+    private final Queue<CMedia> loadMediaList = new Queue<>();
+    private Array<CMedia> loadedMediaList = new Array<>();
     private TextureAtlas textureAtlas = null;
 
     public MediaManager() {
@@ -72,7 +68,7 @@ public final class MediaManager {
         if (loaded) return false;
         if (cMedia == null)
             return false;
-        loadMediaList.add(cMedia);
+        loadMediaList.addLast(cMedia);
         return true;
     }
 
@@ -83,9 +79,9 @@ public final class MediaManager {
         return true;
     }
 
-    public boolean prepareCMedia(List<CMedia> cMedias) {
+    public boolean prepareCMedia(Array<CMedia> cMedias) {
         if (loaded) return false;
-        for(int i=0;i<cMedias.size();i++)
+        for (int i = 0; i < cMedias.size; i++)
             prepareCMedia(cMedias.get(i));
         return true;
     }
@@ -117,8 +113,8 @@ public final class MediaManager {
 
 
         // detect outline
-        final ArrayDeque<GridPoint2> outLinePoints = new ArrayDeque<>();
-        final ArrayDeque<GridPoint2> removePoints = new ArrayDeque<>();
+        final Queue<GridPoint2> outLinePoints = new Queue<>();
+        final Queue<GridPoint2> removePoints = new Queue<>();
         final int outlineColorRGBA8888 = Color.rgba8888(outline.color);
         final int clearColorRGBA8888 = Color.rgba8888(Color.CLEAR);
 
@@ -131,39 +127,39 @@ public final class MediaManager {
                     continue;
 
                 if (outline.outlineOnly)
-                    removePoints.add(new GridPoint2(ix, iy));
+                    removePoints.addLast(new GridPoint2(ix, iy));
 
                 // UP/DOWN/LEFT_RIGHT
                 if ((iy + 1) < pixmap.getHeight() && getPixelAlpha(pixmap.getPixel(ix, iy + 1)) == 0f && ((outline.directions & OUTLINE.DOWN) != 0))
-                    outLinePoints.add(new GridPoint2(ix, iy + 1));
+                    outLinePoints.addLast(new GridPoint2(ix, iy + 1));
                 if ((iy - 1) >= 0 && getPixelAlpha(pixmap.getPixel(ix, iy - 1)) == 0f && ((outline.directions & OUTLINE.UP) != 0))
-                    outLinePoints.add(new GridPoint2(ix, iy - 1));
+                    outLinePoints.addLast(new GridPoint2(ix, iy - 1));
                 if ((ix - 1) >= 0 && getPixelAlpha(pixmap.getPixel(ix - 1, iy)) == 0f && ((outline.directions & OUTLINE.LEFT) != 0))
-                    outLinePoints.add(new GridPoint2(ix - 1, iy));
+                    outLinePoints.addLast(new GridPoint2(ix - 1, iy));
                 if ((ix + 1) < pixmap.getWidth() && getPixelAlpha(pixmap.getPixel(ix + 1, iy)) == 0f && ((outline.directions & OUTLINE.RIGHT) != 0))
-                    outLinePoints.add(new GridPoint2(ix + 1, iy));
+                    outLinePoints.addLast(new GridPoint2(ix + 1, iy));
                 // CORNERS
                 if ((ix - 1) >= 0 && (iy + 1) < pixmap.getHeight() && getPixelAlpha(pixmap.getPixel(ix - 1, iy + 1)) == 0f && ((outline.directions & OUTLINE.LEFT_DOWN) != 0))
-                    outLinePoints.add(new GridPoint2(ix - 1, iy + 1));
+                    outLinePoints.addLast(new GridPoint2(ix - 1, iy + 1));
                 if ((ix + 1) < pixmap.getWidth() && (iy + 1) < pixmap.getHeight() && getPixelAlpha(pixmap.getPixel(ix + 1, iy + 1)) == 0f && ((outline.directions & OUTLINE.RIGHT_DOWN) != 0))
-                    outLinePoints.add(new GridPoint2(ix + 1, iy + 1));
+                    outLinePoints.addLast(new GridPoint2(ix + 1, iy + 1));
                 if ((ix + 1) < pixmap.getWidth() && (iy - 1) >= 0 && getPixelAlpha(pixmap.getPixel(ix + 1, iy - 1)) == 0f && ((outline.directions & OUTLINE.RIGHT_UP) != 0))
-                    outLinePoints.add(new GridPoint2(ix + 1, iy - 1));
+                    outLinePoints.addLast(new GridPoint2(ix + 1, iy - 1));
                 if ((ix - 1) >= 0 && (iy - 1) >= 0 && getPixelAlpha(pixmap.getPixel(ix - 1, iy - 1)) == 0f && ((outline.directions & OUTLINE.LEFT_UP) != 0))
-                    outLinePoints.add(new GridPoint2(ix - 1, iy - 1));
+                    outLinePoints.addLast(new GridPoint2(ix - 1, iy - 1));
 
             }
         }
 
         // create outline
         while (!outLinePoints.isEmpty()) {
-            GridPoint2 outlinePixel = outLinePoints.poll();
+            GridPoint2 outlinePixel = outLinePoints.removeLast();
             pixmap.drawPixel(outlinePixel.x, outlinePixel.y, outlineColorRGBA8888);
         }
 
         // remove
         while (!removePoints.isEmpty()) {
-            GridPoint2 removePixel = removePoints.poll();
+            GridPoint2 removePixel = removePoints.removeLast();
             pixmap.drawPixel(removePixel.x, removePixel.y, clearColorRGBA8888);
         }
 
@@ -337,18 +333,19 @@ public final class MediaManager {
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
         PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
-        ArrayList<CMediaFont> fontCMediaLoadStack = new ArrayList<>();
-        ArrayList<CMediaSprite> spriteCMediaLoadStack = new ArrayList<>();
-        ArrayList<CMediaSound> soundCMediaLoadStack = new ArrayList<>();
-        HashMap<CMediaFont, String> createFontFontFile = new HashMap<>();
-        HashMap<CMediaFont, String> createFontAtlasPackedName = new HashMap<>();
-        HashMap<CMediaFont, Texture> createFontFontTexture = new HashMap<>();
+        Array<CMediaFont> fontCMediaLoadStack = new Array<>();
+        Array<CMediaSprite> spriteCMediaLoadStack = new Array<>();
+        Array<CMediaSound> soundCMediaLoadStack = new Array<>();
+        ObjectMap<CMediaFont, String> createFontFontFile = new ObjectMap<>();
+        ObjectMap<CMediaFont, String> createFontAtlasPackedName = new ObjectMap<>();
+        ObjectMap<CMediaFont, Texture> createFontFontTexture = new ObjectMap<>();
         int step = 0;
         int stepsMax = 0;
 
         // split into Image and Sound data, skip duplicates, check format and index
-        CMedia loadMedia;
-        while ((loadMedia = loadMediaList.poll()) != null) {
+        while (!loadMediaList.isEmpty()) {
+            final CMedia loadMedia = loadMediaList.removeFirst();
+
             if (!Tools.File.findResource(loadMedia.file).exists()) {
                 throw new RuntimeException(String.format(ERROR_FILE_NOT_FOUND, loadMedia.file));
             }
@@ -361,15 +358,15 @@ public final class MediaManager {
 
             stepsMax++;
         }
-        medias_images = new HashMap<>();
-        medias_arrays = new HashMap<>();
-        medias_animations = new HashMap<>();
-        medias_fonts = new HashMap<>();
-        medias_sounds = new HashMap<>();
-        medias_music = new HashMap<>();
+        medias_images = new ObjectMap<>();
+        medias_arrays = new ObjectMap<>();
+        medias_animations = new ObjectMap<>();
+        medias_fonts = new ObjectMap<>();
+        medias_sounds = new ObjectMap<>();
+        medias_music = new ObjectMap<>();
 
         // Load Sprite Data Into Pixmap Packer
-        for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
+        for (int i = 0; i < spriteCMediaLoadStack.size; i++) {
             CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
 
             if (cMediaSprite.useAtlas) {
@@ -388,7 +385,7 @@ public final class MediaManager {
 
         // Create and Load Font Data Into Pixmap Packer
         int fontCount = 1;
-        for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
+        for (int i = 0; i < fontCMediaLoadStack.size; i++) {
             CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
 
             BitMapFontInformation textureFileHandle = extractBitmapFontInformation(Tools.File.findResource(cMediaFont.file));
@@ -398,11 +395,11 @@ public final class MediaManager {
 
             createFontFontFile.put(cMediaFont, fontResult.fontFileData);
 
-            if(cMediaFont.useAtlas) {
+            if (cMediaFont.useAtlas) {
                 // pack
                 pixmapPacker.pack(packedFontTextureName, fontResult.pixmap);
                 createFontAtlasPackedName.put(cMediaFont, packedFontTextureName);
-            }else{
+            } else {
                 // load
                 createFontFontTexture.put(cMediaFont, new Texture(fontResult.pixmap));
             }
@@ -419,52 +416,52 @@ public final class MediaManager {
         pixmapPacker.dispose();
 
         // Fill Sprite CMedia Arrays with TextureAtlas Data
-        for (int i = 0; i < spriteCMediaLoadStack.size(); i++) {
+        for (int i = 0; i < spriteCMediaLoadStack.size; i++) {
             CMediaSprite cMediaSprite = spriteCMediaLoadStack.get(i);
 
-                switch (cMediaSprite) {
-                    case CMediaImage cMediaImage -> {
-                        if(cMediaImage.useAtlas){
-                            medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
+            switch (cMediaSprite) {
+                case CMediaImage cMediaImage -> {
+                    if (cMediaImage.useAtlas) {
+                        medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
 
-                        }else{
-                            medias_images.put(cMediaImage, new TextureRegion(new Texture(Tools.File.findResource(cMediaImage.file))));
-                        }
-                    }
-                    case CMediaArray cMediaArray -> {
-                        if(cMediaArray.useAtlas) {
-                            medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.regionWidth, cMediaArray.regionHeight,
-                                    cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
-                        }else{
-                            medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.regionWidth, cMediaArray.regionHeight,
-                                    cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion.class));
-                        }
-                    }
-                    case CMediaAnimation cMediaAnimation -> {
-                        if(cMediaAnimation.useAtlas){
-                            medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                                    splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
-                                    cMediaAnimation.playMode
-                            ));
-                        }else{
-                            medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                                    splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
-                                    cMediaAnimation.playMode
-                            ));
-                        }
-
+                    } else {
+                        medias_images.put(cMediaImage, new TextureRegion(new Texture(Tools.File.findResource(cMediaImage.file))));
                     }
                 }
+                case CMediaArray cMediaArray -> {
+                    if (cMediaArray.useAtlas) {
+                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                                cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
+                    } else {
+                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                                cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
+                    }
+                }
+                case CMediaAnimation cMediaAnimation -> {
+                    if (cMediaAnimation.useAtlas) {
+                        medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                                splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                cMediaAnimation.playMode
+                        ));
+                    } else {
+                        medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                                splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                cMediaAnimation.playMode
+                        ));
+                    }
+
+                }
+            }
             loadedMediaList.add(cMediaSprite);
         }
 
         // Fill Font CMedia Arrays with TextureAtlas Data
-        for (int i = 0; i < fontCMediaLoadStack.size(); i++) {
+        for (int i = 0; i < fontCMediaLoadStack.size; i++) {
             CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
             TextureRegion fontTextureRegion;
-            if(cMediaFont.useAtlas){
+            if (cMediaFont.useAtlas) {
                 fontTextureRegion = new TextureRegion(textureAtlas.findRegion(createFontAtlasPackedName.get(cMediaFont)));
-            }else{
+            } else {
                 fontTextureRegion = new TextureRegion(createFontFontTexture.get(cMediaFont));
             }
 
@@ -478,7 +475,7 @@ public final class MediaManager {
         }
 
         // 6. Fill CMedia Arrays with Sound Data
-        for (int i = 0; i < soundCMediaLoadStack.size(); i++) {
+        for (int i = 0; i < soundCMediaLoadStack.size; i++) {
             CMediaSound soundMedia = soundCMediaLoadStack.get(i);
             switch (soundMedia) {
                 case CMediaSoundEffect cMediaSoundEffect -> {
@@ -671,23 +668,23 @@ public final class MediaManager {
         return medias_fonts.get(cMediaFont);
     }
 
-    public int fontTextWidth(final CMediaFont cMediaFont,final  String text) {
-        return fontTextWidth(cMediaFont,text,0,text.length());
+    public int fontTextWidth(final CMediaFont cMediaFont, final String text) {
+        return fontTextWidth(cMediaFont, text, 0, text.length());
     }
 
-    public int fontTextWidth(final CMediaFont cMediaFont,final  String text, final int start,final  int end) {
+    public int fontTextWidth(final CMediaFont cMediaFont, final String text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
-        glyphLayout.setText(font, text, start,end, font.getColor(), 0, Align.left, false, null);
+        glyphLayout.setText(font, text, start, end, font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.width);
     }
 
     public int fontTextHeight(final CMediaFont cMediaFont, final String text) {
-        return fontTextHeight(cMediaFont,text,0,text.length());
+        return fontTextHeight(cMediaFont, text, 0, text.length());
     }
 
-    public int fontTextHeight(final CMediaFont cMediaFont, final String text,final int start,final  int end) {
+    public int fontTextHeight(final CMediaFont cMediaFont, final String text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
-        glyphLayout.setText(font(cMediaFont), text,start,end, font.getColor(), 0, Align.left, false, null);
+        glyphLayout.setText(font(cMediaFont), text, start, end, font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.height);
     }
 

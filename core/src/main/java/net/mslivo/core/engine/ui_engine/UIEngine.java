@@ -10,7 +10,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Queue;
 import net.mslivo.core.engine.media_manager.CMediaArray;
 import net.mslivo.core.engine.media_manager.CMediaImage;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
@@ -51,8 +53,8 @@ import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
 import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
@@ -63,8 +65,6 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -164,8 +164,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         // -----  GUI
-        newUIEngineState.windows = new ArrayList<>();
-        newUIEngineState.screenComponents = new ArrayList<>();
+        newUIEngineState.windows = new Array<>();
+        newUIEngineState.screenComponents = new Array<>();
         newUIEngineState.openContextMenu = null;
         newUIEngineState.pressedContextMenuItem = null;
         newUIEngineState.displayedContextMenuWidth = 0;
@@ -183,18 +183,18 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.mTextInputUnlock = false;
         newUIEngineState.keyboardInteractedUIObjectFrame = null;
         newUIEngineState.mouseInteractedUIObjectFrame = null;
-        newUIEngineState.updateTooltipComponents = new ArrayList<>();
+        newUIEngineState.updateTooltipComponents = new Array<>();
         newUIEngineState.modalWindow = null;
-        newUIEngineState.modalWindowQueue = new ArrayDeque<>();
+        newUIEngineState.modalWindowQueue = new Queue<>();
         newUIEngineState.pressedTextField = null;
         newUIEngineState.pressedTextFieldMouseX = 0;
         newUIEngineState.focusedTextField = null;
-        newUIEngineState.notifications = new ArrayList<>();
-        newUIEngineState.tooltipNotifications = new ArrayList<>();
-        newUIEngineState.hotKeys = new ArrayList<>();
-        newUIEngineState.appViewPorts = new ArrayList<>();
-        newUIEngineState.singleUpdateActions = new ArrayList<>();
-        newUIEngineState.singleUpdateActionsRemoveQueue = new ArrayDeque<>();
+        newUIEngineState.notifications = new Array<>();
+        newUIEngineState.tooltipNotifications = new Array<>();
+        newUIEngineState.hotKeys = new Array<>();
+        newUIEngineState.appViewPorts = new Array<>();
+        newUIEngineState.singleUpdateActions = new Array<>();
+        newUIEngineState.singleUpdateActionsRemoveQueue = new Queue<>();
         // ----- Temp GUI Variables
         newUIEngineState.draggedWindow = null;
         newUIEngineState.draggedWindow_offset = new GridPoint2();
@@ -956,15 +956,15 @@ public final class UIEngine<T extends UIEngineAdapter> {
     }
 
     private boolean updateUI_keyInteractionsKeyProcessKey(Textfield focusedTextField) {
-        if(focusedTextField != null) {
-            if(UICommonUtils.window_isModalOpen(uiEngineState)){
-                if(focusedTextField.addedToWindow == null){
+        if (focusedTextField != null) {
+            if (UICommonUtils.window_isModalOpen(uiEngineState)) {
+                if (focusedTextField.addedToWindow == null) {
                     return false;
-                }else if(focusedTextField.addedToWindow != uiEngineState.modalWindow){
+                } else if (focusedTextField.addedToWindow != uiEngineState.modalWindow) {
                     return false;
                 }
             }
-        }else {
+        } else {
             return false;
         }
 
@@ -1024,7 +1024,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 }
             } else {
                 // Hotkeys
-                for (int ihk = 0; ihk < uiEngineState.hotKeys.size(); ihk++) {
+                for (int ihk = 0; ihk < uiEngineState.hotKeys.size; ihk++) {
                     HotKey hotKey = uiEngineState.hotKeys.get(ihk);
                     if (!hotKey.pressed) {
                         boolean hotKeyPressed = true;
@@ -1051,7 +1051,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     uiEngineState.focusedTextField_repeatedKeyTimer = 0;
                 }
                 // Reset Hotkeys
-                for (int ihk = 0; ihk < uiEngineState.hotKeys.size(); ihk++) {
+                for (int ihk = 0; ihk < uiEngineState.hotKeys.size; ihk++) {
                     HotKey hotKey = uiEngineState.hotKeys.get(ihk);
                     if (hotKey.pressed) {
                         hkLoop:
@@ -1082,22 +1082,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
     }
 
-    private boolean updateUI_mouseInteractionProcessMouseclick(Object lastUIMouseHover){
+    private boolean updateUI_mouseInteractionProcessMouseclick(Object lastUIMouseHover) {
         if (lastUIMouseHover != null) {
 
-            if(lastUIMouseHover instanceof Component component){
-                if(component.disabled || !component.visible)
+            if (lastUIMouseHover instanceof Component component) {
+                if (component.disabled || !component.visible)
                     return false;
 
                 if (UICommonUtils.window_isModalOpen(uiEngineState)) {
                     if (component.addedToWindow == null) {
                         return false;
-                    }else if(component.addedToWindow != uiEngineState.modalWindow){
+                    } else if (component.addedToWindow != uiEngineState.modalWindow) {
                         return false;
                     }
                 }
-            }else if(lastUIMouseHover instanceof Window window){
-                if(!window.visible)
+            } else if (lastUIMouseHover instanceof Window window) {
+                if (!window.visible)
                     return false;
 
                 if (UICommonUtils.window_isModalOpen(uiEngineState)) {
@@ -1192,7 +1192,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                                     UICommonUtils.comboBox_close(uiEngineState, comboBox);
                                 } else {
                                     // Clicked on Item
-                                    for (int i = 0; i < comboBox.items.size(); i++) {
+                                    for (int i = 0; i < comboBox.items.size; i++) {
                                         if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
                                                 UICommonUtils.component_getAbsoluteX(comboBox),
                                                 UICommonUtils.component_getAbsoluteY(comboBox) - TS(i) - TS(),
@@ -1251,7 +1251,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
                             Object pressedListItem = null;
                             if (uiEngineState.itemInfo_listValid) {
-                                pressedListItem = (uiEngineState.itemInfo_listIndex < list.items.size()) ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
+                                pressedListItem = (uiEngineState.itemInfo_listIndex < list.items.size) ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
                             }
                             if (pressedListItem != null && list.dragEnabled) {
                                 uiEngineState.draggedListFromIndex = uiEngineState.itemInfo_listIndex;
@@ -1406,12 +1406,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             if (uiEngineState.pressedGridItem != null) {
                                 if (select) {
                                     if (grid.multiSelect) {
-                                        ArrayList selectedNew = new ArrayList();
+                                        Array selectedNew = new Array();
                                         selectedNew.addAll(grid.selectedItems);
 
-                                        if (grid.selectedItems.contains(uiEngineState.pressedGridItem))
-                                            selectedNew.remove(uiEngineState.pressedGridItem);
-                                        else selectedNew.add(uiEngineState.pressedGridItem);
+                                        if (grid.selectedItems.contains(uiEngineState.pressedGridItem)) {
+                                            selectedNew.removeValue(uiEngineState.pressedGridItem, true);
+                                        } else {
+                                            selectedNew.add(uiEngineState.pressedGridItem);
+                                        }
 
                                         UICommonUtils.grid_setSelectedItems(grid, selectedNew.toArray());
                                     } else {
@@ -1434,11 +1436,11 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             if (uiEngineState.pressedListItem != null) {
                                 if (select) {
                                     if (list.multiSelect) {
-                                        ArrayList selectedNew = new ArrayList();
+                                        Array selectedNew = new Array();
                                         selectedNew.addAll(list.selectedItems);
 
                                         if (list.selectedItems.contains(uiEngineState.pressedListItem))
-                                            selectedNew.remove(uiEngineState.pressedListItem);
+                                            selectedNew.removeValue(uiEngineState.pressedListItem, true);
                                         else selectedNew.add(uiEngineState.pressedListItem);
 
                                         UICommonUtils.list_setSelectedItems(list, selectedNew.toArray());
@@ -1602,7 +1604,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (processMouseScrolled) {
                 switch (lastUIMouseHover) {
                     case List list -> {
-                        int size = list.items != null ? list.items.size() : 0;
+                        int size = list.items != null ? list.items.size : 0;
                         float amount = (1 / (float) Math.max(size, 1)) * uiEngineState.inputEvents.mouseScrolledAmount;
                         UICommonUtils.list_scroll(list, list.scrolled + amount);
                     }
@@ -1671,22 +1673,22 @@ public final class UIEngine<T extends UIEngineAdapter> {
         // If UpdateActions are removing/adding other update actions they are caught on the next update/frame
 
         // ScreenComponent UpdateActions
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
+        for (int i = 0; i < uiEngineState.screenComponents.size; i++) {
             Component component = uiEngineState.screenComponents.get(i);
-            for (int i2 = 0; i2 < component.updateActions.size(); i2++) {
+            for (int i2 = 0; i2 < component.updateActions.size; i2++) {
                 actions_executeUpdateAction(component.updateActions.get(i2));
             }
         }
-        for (int i = 0; i < uiEngineState.windows.size(); i++) {
+        for (int i = 0; i < uiEngineState.windows.size; i++) {
             // Window UpdateActions
             Window window = uiEngineState.windows.get(i);
-            for (int i2 = 0; i2 < window.updateActions.size(); i2++) {
+            for (int i2 = 0; i2 < window.updateActions.size; i2++) {
                 actions_executeUpdateAction(window.updateActions.get(i2));
             }
             // Window Component UpdateActions
-            for (int i2 = 0; i2 < window.components.size(); i2++) {
+            for (int i2 = 0; i2 < window.components.size; i2++) {
                 Component component = window.components.get(i2);
-                for (int i3 = 0; i3 < component.updateActions.size(); i3++) {
+                for (int i3 = 0; i3 < component.updateActions.size; i3++) {
                     actions_executeUpdateAction(component.updateActions.get(i3));
                 }
             }
@@ -1694,21 +1696,21 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Tooltip
         if (uiEngineState.tooltip != null) {
-            for (int i = 0; i < uiEngineState.tooltip.updateActions.size(); i++) {
+            for (int i = 0; i < uiEngineState.tooltip.updateActions.size; i++) {
                 actions_executeUpdateAction(uiEngineState.tooltip.updateActions.get(i));
             }
         }
 
         // Engine SingleUpdateActions
-        for (int i = 0; i < uiEngineState.singleUpdateActions.size(); i++) {
+        for (int i = 0; i < uiEngineState.singleUpdateActions.size; i++) {
             UpdateAction updateAction = uiEngineState.singleUpdateActions.get(i);
             if (this.actions_executeUpdateAction(updateAction)) {
-                uiEngineState.singleUpdateActionsRemoveQueue.push(updateAction);
+                uiEngineState.singleUpdateActionsRemoveQueue.addLast(updateAction);
             }
         }
-        UpdateAction removeUpdateAction;
-        while ((removeUpdateAction = uiEngineState.singleUpdateActionsRemoveQueue.pollFirst()) != null) {
-            uiEngineState.singleUpdateActions.remove(removeUpdateAction);
+        while (!uiEngineState.singleUpdateActionsRemoveQueue.isEmpty()) {
+            final UpdateAction removeUpdateAction = uiEngineState.singleUpdateActionsRemoveQueue.removeFirst();
+            uiEngineState.singleUpdateActions.removeValue(removeUpdateAction, true);
         }
     }
 
@@ -1730,7 +1732,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             if (hoverComponent instanceof List list) {
                 UICommonUtils.list_updateItemInfoAtMousePosition(uiEngineState, list);
                 if (uiEngineState.itemInfo_listValid) {
-                    toolTipSubItem = uiEngineState.itemInfo_listIndex < list.items.size() ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
+                    toolTipSubItem = uiEngineState.itemInfo_listIndex < list.items.size ? list.items.get(uiEngineState.itemInfo_listIndex) : null;
                 }
             } else if (hoverComponent instanceof Grid grid) {
                 int tileSize = grid.bigMode ? TS2() : TS();
@@ -1744,9 +1746,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
             boolean updateComponentToolTip;
-            if (uiEngineState.updateTooltipComponents.contains(hoverComponent)) {
+            if (uiEngineState.updateTooltipComponents.contains(hoverComponent, true)) {
                 updateComponentToolTip = true;
-                uiEngineState.updateTooltipComponents.remove(hoverComponent);
+                uiEngineState.updateTooltipComponents.removeValue(hoverComponent, true);
             } else {
                 if (hoverComponent instanceof List || hoverComponent instanceof Grid) {
                     // Check on subitem change
@@ -1821,7 +1823,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void updateUI_notifications() {
         if (!uiEngineState.notifications.isEmpty()) {
-            Notification notification = uiEngineState.notifications.getFirst();
+            Notification notification = uiEngineState.notifications.first();
 
             switch (notification.state) {
                 case INIT_SCROLL -> {
@@ -1864,7 +1866,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
         }
         if (!uiEngineState.tooltipNotifications.isEmpty()) {
-            for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++) {
+            for (int i = 0; i < uiEngineState.tooltipNotifications.size; i++) {
                 TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
                 switch (tooltipNotification.state) {
                     case INIT -> {
@@ -1977,7 +1979,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             this.uiAdapter.render(uiEngineState.camera_app, null);
             uiEngineState.frameBuffer_app.end();
             // Draw UI AppViewport FrameBuffers
-            for (int i = 0; i < this.uiEngineState.appViewPorts.size(); i++) {
+            for (int i = 0; i < this.uiEngineState.appViewPorts.size; i++) {
                 renderGameViewPortFrameBuffer(uiEngineState.appViewPorts.get(i));
             }
         }
@@ -2068,7 +2070,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.begin();
 
         // Modal Windows
-        for (int i = 0; i < uiEngineState.windows.size(); i++) {
+        for (int i = 0; i < uiEngineState.windows.size; i++) {
             Window window = uiEngineState.windows.get(i);
             render_drawWindow(window, true);
         }
@@ -2107,20 +2109,20 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.begin();
 
         // Draw Screen Components
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
+        for (int i = 0; i < uiEngineState.screenComponents.size; i++) {
             Component component = uiEngineState.screenComponents.get(i);
             render_drawComponent(component);
         }
 
 
         // Draw Screen Components Top Layer
-        for (int i = 0; i < uiEngineState.screenComponents.size(); i++) {
+        for (int i = 0; i < uiEngineState.screenComponents.size; i++) {
             Component component = uiEngineState.screenComponents.get(i);
             render_drawComponentTopLayer(component);
         }
 
         // Draw Windows
-        for (int i = 0; i < uiEngineState.windows.size(); i++) {
+        for (int i = 0; i < uiEngineState.windows.size; i++) {
             Window window = uiEngineState.windows.get(i);
             render_drawWindow(window, false);
 
@@ -2308,14 +2310,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 // Menu
                 if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
                     int widthPx = TS(comboBox.width);
-                    for (int i = 0; i < comboBox.items.size(); i++) {
+                    for (int i = 0; i < comboBox.items.size; i++) {
                         int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text);
                         if (comboBox.items.get(i).comboBoxItemAction.icon() != null)
                             itemWidth += api.TS();
                         widthPx = Math.max(widthPx, itemWidth);
                     }
-                    int width = MathUtils.ceil((widthPx ) / uiEngineState.tileSize.TSF);
-                    int height = comboBox.items.size();
+                    int width = MathUtils.ceil((widthPx) / uiEngineState.tileSize.TSF);
+                    int height = comboBox.items.size;
 
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
@@ -2329,14 +2331,14 @@ public final class UIEngine<T extends UIEngineAdapter> {
                             // Cell
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
-                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() );
+                            spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
                             spriteRenderer.loadState();
 
                             // Cell - Underline
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() );
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_LIST, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
 
                             // Cell Content
-                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS() , comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
+                            render_drawFont(comboBoxItem.text, UICommonUtils.component_getAbsoluteX(comboBox), UICommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS(), comboBoxItem.fontColor, componentAlpha, componentGrayScale, 2, 2, widthPx,
                                     comboBoxItem.comboBoxItemAction.icon(), comboBoxItem.comboBoxItemAction.iconIndex(), comboBoxItem.comboBoxItemAction.iconColor(),
                                     comboBoxItem.comboBoxItemAction.iconFlipX(), comboBoxItem.comboBoxItemAction.iconFlipY());
 
@@ -2346,7 +2348,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     if (!comboBox.items.isEmpty()) {
                         for (int ix = 0; ix < width; ix++) {
                             int index = render_get3TilesCMediaIndex(ix, width);
-                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox) );
+                            spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_COMBOBOX_TOP, index, UICommonUtils.component_getAbsoluteX(comboBox) + TS(ix), UICommonUtils.component_getAbsoluteY(comboBox));
                         }
                     }
 
@@ -2365,7 +2367,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
             final ContextMenu contextMenu = uiEngineState.openContextMenu;
             final int width = uiEngineState.displayedContextMenuWidth;
-            final int height = contextMenu.items.size();
+            final int height = contextMenu.items.size;
             final float contextMenuAlpha = contextMenu.color.a;
 
             /* Menu */
@@ -2410,7 +2412,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private int tooltipWidth(Tooltip tooltip) {
         int width = tooltip.minWidth;
-        for (int is = 0; is < tooltip.segments.size(); is++) {
+        for (int is = 0; is < tooltip.segments.size; is++) {
             TooltipSegment segment = tooltip.segments.get(is);
             width = Math.max(width, segment.width);
         }
@@ -2419,7 +2421,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private int tooltipHeight(Tooltip tooltip) {
         int height = 0;
-        for (int is = 0; is < tooltip.segments.size(); is++) {
+        for (int is = 0; is < tooltip.segments.size; is++) {
             TooltipSegment segment = tooltip.segments.get(is);
             if (!segment.merge)
                 height += segment.height;
@@ -2440,7 +2442,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
         // Draw tooltip
         int iy = tooltip_height;
-        for (int is = 0; is < tooltip.segments.size(); is++) {
+        for (int is = 0; is < tooltip.segments.size; is++) {
             TooltipSegment segment = tooltip.segments.get(is);
             final float segmentAlpha = segment.cellColor.a * alpha;
             final float borderAlpha = tooltip.color_border.a * alpha;
@@ -2637,7 +2639,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         if (uiEngineState.tooltipNotifications.isEmpty()) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
-        for (int i = 0; i < uiEngineState.tooltipNotifications.size(); i++) {
+        for (int i = 0; i < uiEngineState.tooltipNotifications.size; i++) {
             TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
 
             switch (tooltipNotification.state) {
@@ -2669,7 +2671,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
         int y = 0;
         int yOffsetSlideFade = 0;
-        for (int i = 0; i < uiEngineState.notifications.size(); i++) {
+        for (int i = 0; i < uiEngineState.notifications.size; i++) {
             Notification notification = uiEngineState.notifications.get(i);
             final float notificationAlpha = notification.color.a;
 
@@ -2728,7 +2730,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
         // Draw Components
-        for (int i = 0; i < window.components.size(); i++) {
+        for (int i = 0; i < window.components.size; i++) {
             Component component = window.components.get(i);
             if (!window.folded) {
                 render_drawComponent(component);
@@ -2742,7 +2744,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
 
         // Draw Component TopLayer
-        for (int i = 0; i < window.components.size(); i++) {
+        for (int i = 0; i < window.components.size; i++) {
             Component component = window.components.get(i);
             if (!window.folded) render_drawComponentTopLayer(component);
         }
@@ -2871,10 +2873,10 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
             case List list -> {
 
-                boolean itemsValid = (list.items != null && list.items.size() > 0);
+                boolean itemsValid = (list.items != null && list.items.size > 0);
                 int itemFrom = 0;
                 if (itemsValid) {
-                    itemFrom = MathUtils.round(list.scrolled * ((list.items.size()) - (list.height)));
+                    itemFrom = MathUtils.round(list.scrolled * ((list.items.size) - (list.height)));
                     itemFrom = Math.max(itemFrom, 0);
                 }
                 boolean dragEnabled = false;
@@ -2899,8 +2901,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     int itemIndex = itemFrom + iy;
                     int itemOffsetY = (((list.height - 1)) - (iy));
                     Object item = null;
-                    if (list.items != null && list.items.size() > 0) {
-                        if (itemIndex < list.items.size()) {
+                    if (list.items != null && list.items.size > 0) {
+                        if (itemIndex < list.items.size) {
                             item = list.items.get(itemIndex);
                         }
                     }
@@ -3084,7 +3086,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             case Tabbar tabBar -> {
                 int tabXOffset = tabBar.tabOffset;
                 int topBorder;
-                for (int i = 0; i < tabBar.tabs.size(); i++) {
+                for (int i = 0; i < tabBar.tabs.size; i++) {
                     Tab tab = tabBar.tabs.get(i);
                     int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
                     if ((tabXOffset + tabWidth) > tabBar.width) break;
