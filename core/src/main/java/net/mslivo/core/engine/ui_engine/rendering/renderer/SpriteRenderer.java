@@ -982,26 +982,26 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
 
     // ----- CMediaFont -----
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text) {
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, CharSequence text) {
         this.drawCMediaFont(cMediaFont, x, y, text,0,text.length(), false, false, 0);
     }
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int end) {
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, CharSequence text, final int start, final int end) {
         this.drawCMediaFont(cMediaFont, x, y, text,start,end, false, false, 0);
     }
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int end, final boolean centerX, final boolean centerY) {
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, CharSequence text, final int start, final int end, final boolean centerX, final boolean centerY) {
         this.drawCMediaFont(cMediaFont, x, y, text,start,end, centerX, centerY, 0);
     }
 
-    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, String text, final int start, final int end, final boolean centerX, final boolean centerY, final int maxWidth) {
+    public void drawCMediaFont(final CMediaFont cMediaFont, final float x, final float y, CharSequence text, final int start, final int end, final boolean centerX, final boolean centerY, final int maxWidth) {
         if (cMediaFont == null) return;
         final float x_draw = centerX ? (x - MathUtils.round(mediaManager.fontTextWidth(cMediaFont, text) / 2f)) : x;
         final float y_draw = centerY ? (y - MathUtils.round(mediaManager.fontTextHeight(cMediaFont, text) / 2f)) : y;
         final BitmapFontCache fontCache = mediaManager.font(cMediaFont).getCache();
+        final String truncate = maxWidth > 0 ? "" : null;
 
         fontCache.clear();
-        final String truncate = maxWidth > 0 ? "" : null;
         fontCache.addText(text, x_draw, y_draw, start, Math.min(end, text.length()), maxWidth, Align.left, false, truncate);
 
         // Multiply by Batch Color

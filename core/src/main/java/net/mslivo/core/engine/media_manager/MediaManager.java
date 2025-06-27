@@ -668,21 +668,21 @@ public final class MediaManager {
         return medias_fonts.get(cMediaFont);
     }
 
-    public int fontTextWidth(final CMediaFont cMediaFont, final String text) {
+    public int fontTextWidth(final CMediaFont cMediaFont, final CharSequence text) {
         return fontTextWidth(cMediaFont, text, 0, text.length());
     }
 
-    public int fontTextWidth(final CMediaFont cMediaFont, final String text, final int start, final int end) {
+    public int fontTextWidth(final CMediaFont cMediaFont, final CharSequence text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
         glyphLayout.setText(font, text, start, end, font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.width);
     }
 
-    public int fontTextHeight(final CMediaFont cMediaFont, final String text) {
+    public int fontTextHeight(final CMediaFont cMediaFont, final CharSequence text) {
         return fontTextHeight(cMediaFont, text, 0, text.length());
     }
 
-    public int fontTextHeight(final CMediaFont cMediaFont, final String text, final int start, final int end) {
+    public int fontTextHeight(final CMediaFont cMediaFont, final CharSequence text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
         glyphLayout.setText(font(cMediaFont), text, start, end, font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.height);
