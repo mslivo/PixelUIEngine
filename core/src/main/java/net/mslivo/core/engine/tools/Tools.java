@@ -9,25 +9,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongArray;
 import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import net.mslivo.core.engine.media_manager.CMedia;
 import net.mslivo.core.engine.media_manager.CMediaFontArraySymbol;
 import net.mslivo.core.engine.media_manager.CMediaFontSingleSymbol;
 import net.mslivo.core.engine.media_manager.MediaManager;
+import net.mslivo.core.engine.tools.misc.CachedStringBuilder;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
-import java.lang.StringBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.function.Consumer;
@@ -220,11 +221,11 @@ public class Tools {
             String osName = System.getProperty("os.name").toLowerCase();
             PixelUILaunchConfig.GLEmulation glEmulation;
             if (osName.contains("win")) {
-                glEmulation = launchConfiguration.windowsGLEmulation;
+                glEmulation = launchConfiguration.windowsGLEmulation();
             } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
-                glEmulation = launchConfiguration.linuxGLEmulation;
+                glEmulation = launchConfiguration.linuxGLEmulation();
             } else if (osName.contains("mac")) {
-                glEmulation = launchConfiguration.macOSGLEmulation;
+                glEmulation = launchConfiguration.macOSGLEmulation();
             } else {
                 throw new RuntimeException("Operating System \"" + osName + "\n not supported");
             }
@@ -234,17 +235,17 @@ public class Tools {
                     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
                     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
                     config.setResizable(true);
-                    config.setWindowedMode(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight);
-                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight, -1, -1);
-                    config.setTitle(launchConfiguration.appTile);
+                    config.setWindowedMode(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight());
+                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight(), -1, -1);
+                    config.setTitle(launchConfiguration.appTile());
                     config.setDecorated(true);
                     config.setMaximized(true);
-                    config.setForegroundFPS(launchConfiguration.fps);
-                    config.setIdleFPS(launchConfiguration.fps);
-                    config.useVsync(launchConfiguration.vSync);
+                    config.setForegroundFPS(launchConfiguration.fps());
+                    config.setIdleFPS(launchConfiguration.fps());
+                    config.useVsync(launchConfiguration.vSync());
                     config.setWindowPosition(-1, -1);
                     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
-                    if (launchConfiguration.iconPath != null) config.setWindowIcon(launchConfiguration.iconPath);
+                    if (launchConfiguration.iconPath() != null) config.setWindowIcon(launchConfiguration.iconPath());
                     try {
                         new Lwjgl3Application(applicationAdapter, config);
                     } catch (Exception e) {
@@ -257,17 +258,17 @@ public class Tools {
                     com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration config = new com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration();
                     config.setOpenGLEmulation(com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES32, 3, 2);
                     config.setResizable(true);
-                    config.setWindowedMode(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight);
-                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth, launchConfiguration.resolutionHeight, -1, -1);
-                    config.setTitle(launchConfiguration.appTile);
+                    config.setWindowedMode(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight());
+                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight(), -1, -1);
+                    config.setTitle(launchConfiguration.appTile());
                     config.setDecorated(true);
                     config.setMaximized(true);
-                    config.setForegroundFPS(launchConfiguration.fps);
-                    config.setIdleFPS(launchConfiguration.fps);
-                    config.useVsync(launchConfiguration.vSync);
+                    config.setForegroundFPS(launchConfiguration.fps());
+                    config.setIdleFPS(launchConfiguration.fps());
+                    config.useVsync(launchConfiguration.vSync());
                     config.setWindowPosition(-1, -1);
                     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
-                    if (launchConfiguration.iconPath != null) config.setWindowIcon(launchConfiguration.iconPath);
+                    if (launchConfiguration.iconPath() != null) config.setWindowIcon(launchConfiguration.iconPath());
                     try {
                         new Lwjgl3VulkanApplication(applicationAdapter, config);
                     } catch (Exception e) {
@@ -277,7 +278,6 @@ public class Tools {
                     }
                 }
             }
-
         }
 
     }
@@ -285,90 +285,20 @@ public class Tools {
 
     public static class Text {
 
-        public static class Colors {
-
-            // Reset
-            public static final String RESET = "\033[0m";  // Text Reset
-            // Regular Colors
-            public static final String BLACK = "\033[0;30m";   // BLACK
-            public static final String RED = "\033[0;31m";     // RED
-            public static final String GREEN = "\033[0;32m";   // GREEN
-            public static final String YELLOW = "\033[0;33m";  // YELLOW
-            public static final String BLUE = "\033[0;34m";    // BLUE
-            public static final String PURPLE = "\033[0;35m";  // PURPLE
-            public static final String CYAN = "\033[0;36m";    // CYAN
-            public static final String WHITE = "\033[0;37m";   // WHITE
-            // Bold
-            public static final String BLACK_BOLD = "\033[1;30m";  // BLACK
-            public static final String RED_BOLD = "\033[1;31m";    // RED
-            public static final String GREEN_BOLD = "\033[1;32m";  // GREEN
-            public static final String YELLOW_BOLD = "\033[1;33m"; // YELLOW
-            public static final String BLUE_BOLD = "\033[1;34m";   // BLUE
-            public static final String PURPLE_BOLD = "\033[1;35m"; // PURPLE
-            public static final String CYAN_BOLD = "\033[1;36m";   // CYAN
-            public static final String WHITE_BOLD = "\033[1;37m";  // WHITE
-            // Underline
-            public static final String BLACK_UNDERLINED = "\033[4;30m";  // BLACK
-            public static final String RED_UNDERLINED = "\033[4;31m";    // RED
-            public static final String GREEN_UNDERLINED = "\033[4;32m";  // GREEN
-            public static final String YELLOW_UNDERLINED = "\033[4;33m"; // YELLOW
-            public static final String BLUE_UNDERLINED = "\033[4;34m";   // BLUE
-            public static final String PURPLE_UNDERLINED = "\033[4;35m"; // PURPLE
-            public static final String CYAN_UNDERLINED = "\033[4;36m";   // CYAN
-            public static final String WHITE_UNDERLINED = "\033[4;37m";  // WHITE
-            // Background
-            public static final String BLACK_BACKGROUND = "\033[40m";  // BLACK
-            public static final String RED_BACKGROUND = "\033[41m";    // RED
-            public static final String GREEN_BACKGROUND = "\033[42m";  // GREEN
-            public static final String YELLOW_BACKGROUND = "\033[43m"; // YELLOW
-            public static final String BLUE_BACKGROUND = "\033[44m";   // BLUE
-            public static final String PURPLE_BACKGROUND = "\033[45m"; // PURPLE
-            public static final String CYAN_BACKGROUND = "\033[46m";   // CYAN
-            public static final String WHITE_BACKGROUND = "\033[47m";  // WHITE
-            // High Intensity
-            public static final String BLACK_BRIGHT = "\033[0;90m";  // BLACK
-            public static final String RED_BRIGHT = "\033[0;91m";    // RED
-            public static final String GREEN_BRIGHT = "\033[0;92m";  // GREEN
-            public static final String YELLOW_BRIGHT = "\033[0;93m"; // YELLOW
-            public static final String BLUE_BRIGHT = "\033[0;94m";   // BLUE
-            public static final String PURPLE_BRIGHT = "\033[0;95m"; // PURPLE
-            public static final String CYAN_BRIGHT = "\033[0;96m";   // CYAN
-            public static final String WHITE_BRIGHT = "\033[0;97m";  // WHITE
-            // Bold High Intensity
-            public static final String BLACK_BOLD_BRIGHT = "\033[1;90m"; // BLACK
-            public static final String RED_BOLD_BRIGHT = "\033[1;91m";   // RED
-            public static final String GREEN_BOLD_BRIGHT = "\033[1;92m"; // GREEN
-            public static final String YELLOW_BOLD_BRIGHT = "\033[1;93m";// YELLOW
-            public static final String BLUE_BOLD_BRIGHT = "\033[1;94m";  // BLUE
-            public static final String PURPLE_BOLD_BRIGHT = "\033[1;95m";// PURPLE
-            public static final String CYAN_BOLD_BRIGHT = "\033[1;96m";  // CYAN
-            public static final String WHITE_BOLD_BRIGHT = "\033[1;97m"; // WHITE
-            // High Intensity backgrounds
-            public static final String BLACK_BACKGROUND_BRIGHT = "\033[0;100m";// BLACK
-            public static final String RED_BACKGROUND_BRIGHT = "\033[0;101m";// RED
-            public static final String GREEN_BACKGROUND_BRIGHT = "\033[0;102m";// GREEN
-            public static final String YELLOW_BACKGROUND_BRIGHT = "\033[0;103m";// YELLOW
-            public static final String BLUE_BACKGROUND_BRIGHT = "\033[0;104m";// BLUE
-            public static final String PURPLE_BACKGROUND_BRIGHT = "\033[0;105m"; // PURPLE
-            public static final String CYAN_BACKGROUND_BRIGHT = "\033[0;106m";  // CYAN
-            public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
-
-        }
-
-        private static final StringBuilder builder = new StringBuilder();
+        private static final CachedStringBuilder builder = new CachedStringBuilder();
 
         public static String benchmark(String... customValues) {
-            builder.setLength(0);
-            StringBuilder custom = new StringBuilder();
+            builder.reset();
             for (int i = 0; i < customValues.length; i++)
-                custom.append(" | ").append(String.format("%1$10s", customValues[i]));
+                builder.append(" | ").append(String.format("%1$10s", customValues[i]));
             builder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
             builder.append(" FPS | ");
             builder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
             builder.append("MB RAM | ");
             builder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
             builder.append(" Threads");
-            builder.append(custom);
+            for (int i = 0; i < customValues.length; i++)
+                builder.append(customValues[i]);
             return builder.toString();
         }
 
@@ -390,7 +320,7 @@ public class Tools {
         }
 
         public static String formatNumber(long number) {
-            builder.setLength(0);
+            builder.reset();
             boolean minus = number < 0;
             if (minus) {
                 builder.append("-");
@@ -440,7 +370,7 @@ public class Tools {
         public static String fontSymbol(int id, com.badlogic.gdx.graphics.Color color) {
             String symbol = Character.toString((char) (MediaManager.FONT_CUSTOM_SYMBOL_OFFSET + id));
             if (color != null) {
-                builder.setLength(0);
+                builder.reset();
                 builder.append("[#").append(color).append("]").append(symbol).append("[]");
                 return builder.toString();
             } else {
@@ -479,19 +409,23 @@ public class Tools {
         private static final String ZIP_ENTRY_NAME = "packed.data";
 
         public static void writeFrameBuffer(String fileName) {
+            writeFrameBuffer(fileName, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
+
+        public static void writeFrameBuffer(String fileName, int width, int height) {
             Path path = Path.of(fileName);
             if (path.toFile().exists()) return;
-            PixmapIO.writePNG(new FileHandle(path.toFile()), Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+            PixmapIO.writePNG(new FileHandle(path.toFile()), Pixmap.createFromFrameBuffer(0, 0, width, height));
         }
 
         public static String validFileName(String fileName) {
             if (fileName == null || fileName.trim().length() == 0) {
-                fileName = "new_file";
+                fileName = "newFile";
             }
             fileName = fileName.replaceAll("[\\\\/:*?\"<>|]", "");
             fileName = fileName.trim();
             if (fileName.trim().length() == 0) {
-                fileName = "new_file";
+                fileName = "newFile";
             }
             return fileName;
         }
@@ -524,73 +458,11 @@ public class Tools {
             }
         }
 
-
-        public static Object readObjectFromFile(Path file) {
-            return readObjectFromFile(file, false, null);
+        public static void writeTextToFile(Path file, String content) {
+            writeTextToFile(file, content, false);
         }
 
-        public static Object readObjectFromFile(Path file, boolean zipped) {
-            return readObjectFromFile(file, zipped, null);
-        }
-
-        public static Object readObjectFromFile(Path file, boolean zipped, ObjectMap<String, String> classReplacements) {
-            try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
-                if (zipped) {
-                    try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
-                        ZipEntry zipEntry = zipInputStream.getNextEntry();
-                        if (zipEntry != null && zipEntry.getName().equals(ZIP_ENTRY_NAME)) {
-                            try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(zipInputStream, classReplacements)) {
-                                Object readObject = objectInputStream.readObject();
-                                return readObject;
-                            }
-                        }
-                    }
-                } else {
-                    try (HackedObjectInputStream objectInputStream = new HackedObjectInputStream(fileInputStream, classReplacements)) {
-                        Object readObject = objectInputStream.readObject();
-                        return readObject;
-                    }
-                }
-                return null;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public static void writeObjectToFile(Path file, Object data) {
-            writeObjectToFile(file, data, false);
-        }
-
-        public static void writeObjectToFile(Path file, Object data, boolean zipped) {
-            try {
-                Files.createDirectories(file.getParent());
-                try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
-                    if (zipped) {
-                        ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
-                        ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
-                        zipOutputStream.putNextEntry(zipEntry);
-                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(zipOutputStream)) {
-                            objectOutputStream.writeObject(data);
-                            objectOutputStream.flush();
-                        }
-                        zipOutputStream.close();
-                    } else {
-                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-                            objectOutputStream.writeObject(data);
-                            objectOutputStream.flush();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public static void writeTextToFile(Path file, String text) {
-            writeTextToFile(file, text, false);
-        }
-
-        public static void writeTextToFile(Path file, String text, boolean zipped) {
+        public static void writeTextToFile(Path file, String content, boolean zipped) {
             try {
                 Files.createDirectories(file.getParent());
                 try (FileOutputStream fileOutputStream = new FileOutputStream(file.toFile())) {
@@ -599,12 +471,12 @@ public class Tools {
                         ZipEntry zipEntry = new ZipEntry(ZIP_ENTRY_NAME);
                         zipOutputStream.putNextEntry(zipEntry);
                         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(zipOutputStream, StandardCharsets.UTF_8)) {
-                            outputStreamWriter.write(text);
+                            outputStreamWriter.write(content);
                             outputStreamWriter.flush();
                         }
                     } else {
                         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-                            outputStreamWriter.write(text);
+                            outputStreamWriter.write(content);
                             outputStreamWriter.flush();
                         }
                     }
@@ -652,51 +524,18 @@ public class Tools {
             return Gdx.files.internal(path);
         }
 
-        private static class HackedObjectInputStream extends ObjectInputStream {
-
-            private final ObjectMap<String, String> classReplacements;
-
-            public HackedObjectInputStream(final InputStream stream, ObjectMap<String, String> classReplacements) throws IOException {
-                super(stream);
-                this.classReplacements = classReplacements;
-            }
-
-            @Override
-            protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
-                ObjectStreamClass resultClassDescriptor = super.readClassDescriptor();
-                if (classReplacements == null) return resultClassDescriptor;
-
-                // Replace Class
-                String cName = resultClassDescriptor.getName();
-                if (classReplacements.get(cName) != null) {
-                    resultClassDescriptor = ObjectStreamClass.lookup(Class.forName(classReplacements.get(cName)));
-                } else if (cName.startsWith("[")) {
-                    // Replace Arrays of Class
-                    int arraySizeI = 0;
-                    while (arraySizeI < cName.length() && cName.charAt(arraySizeI) == '[') arraySizeI++;
-                    String realCName = cName.substring(arraySizeI + 1, cName.length() - 1);
-                    if (classReplacements.get(realCName) != null) {
-                        Class newClass = Class.forName(classReplacements.get(realCName));
-                        for (int i = 0; i < arraySizeI; i++) newClass = newClass.arrayType();
-                        resultClassDescriptor = ObjectStreamClass.lookup(newClass);
-                    }
-                }
-                return resultClassDescriptor;
-            }
-
-        }
-
     }
 
     public static class Calc {
 
-        public static float maxOfValues(float[] values) {
+        public static float maxOfValues(float... values) {
             float sum = 0;
             for (float f : values) if (f > sum) sum = f;
+
             return sum;
         }
 
-        public static float minOfValues(float[] values) {
+        public static float minOfValues(float... values) {
             float sum = Float.MAX_VALUE;
             for (float f : values) if (f < sum) sum = f;
             return sum;
@@ -1080,44 +919,6 @@ public class Tools {
         public static boolean circleCollideFast(int x1, int y1, int r1, int x2, int y2, int r2) {
             return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
         }
-
-    }
-
-    public static class Misc {
-
-        public static class IntValueWatcher {
-            private int value = 0;
-            private int difference;
-            private boolean initialized;
-
-            public IntValueWatcher() {
-                super();
-            }
-
-            public int value() {
-                return value;
-            }
-
-            public void setValue(int value) {
-                this.difference = value - this.value;
-                this.value = value;
-            }
-
-            public int delta() {
-                return difference;
-            }
-
-            public boolean hasValueChanged(int currentValue) {
-                if (!initialized || this.value != currentValue) {
-                    this.setValue(currentValue);
-                    this.initialized = true;
-                    return true;
-                }
-                return false;
-            }
-
-        }
-
 
     }
 

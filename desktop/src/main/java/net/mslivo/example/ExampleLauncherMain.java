@@ -7,7 +7,6 @@ import net.mslivo.core.engine.tools.Tools;
 public class ExampleLauncherMain {
 
     public static void main(String[] args) {
-
         Tools.App.launch(
                 new ExampleMain(),
                 new PixelUILaunchConfig(
@@ -19,6 +18,6 @@ public class ExampleLauncherMain {
                         PixelUILaunchConfig.GLEmulation.GL32_OPENGL,
                         60, false
                 )
-                );
+        );
     }
 }

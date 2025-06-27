@@ -164,8 +164,7 @@ public class ShaderCommon {
 
                     int errorIndex = lineNumbers.indexOf(i);
                     if (errorIndex != -1) {
-                        line += Tools.Text.Colors.RED + " !!! ERROR !!! -> " + lineErrors.get(errorIndex) + Tools.Text.Colors.RESET;
-
+                        line +=  " !!! ERROR !!! -> " + lineErrors.get(errorIndex);
                     }
 
                     System.out.println(line);

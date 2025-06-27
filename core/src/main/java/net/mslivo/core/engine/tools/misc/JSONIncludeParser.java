@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.tools.misc.jsonparser;
+package net.mslivo.core.engine.tools.misc;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -16,6 +16,11 @@ public class JSONIncludeParser {
     private static final String INCLUDE = "//INCLUDE ";
 
     private static final String INCLUDE_TRIM = "//INCLUDE_TRIM ";
+
+    public enum InputFileMode {
+        CLASSPATH,EXTERNAL
+    }
+
 
     static final class IncludeInfo {
         public final String includeFile;
