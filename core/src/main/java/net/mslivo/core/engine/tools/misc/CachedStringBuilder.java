@@ -2,20 +2,26 @@ package net.mslivo.core.engine.tools.misc;
 
 import java.io.IOException;
 import java.util.stream.IntStream;
+import java.util.zip.CRC32;
 
 public class CachedStringBuilder implements Appendable, Comparable<CachedStringBuilder>, CharSequence {
     private final StringBuilder current;
     private final StringBuilder previous;
+    private final CRC32 crc;
     private String cached;
     private boolean dirty;
+    private long lastChecksum;
 
     public CachedStringBuilder() {
         this.current = new StringBuilder();
         this.previous = new StringBuilder();
         this.cached = "";
         this.dirty = true;
+        this.crc = new CRC32();
+        this.lastChecksum = -1;
     }
 
+    @Override
     public CachedStringBuilder append(CharSequence csq) {
         current.append(csq);
         this.dirty = true;
@@ -96,12 +102,6 @@ public class CachedStringBuilder implements Appendable, Comparable<CachedStringB
         return this;
     }
 
-    public CachedStringBuilder append(StringBuilder sb) {
-        current.append(sb);
-        this.dirty = true;
-        return this;
-    }
-
     public void setLength(int length) {
         if(current.length() != length){
             current.setLength(length);
@@ -136,14 +136,13 @@ public class CachedStringBuilder implements Appendable, Comparable<CachedStringB
 
     @Override
     public String toString() {
-        if (dirty && !equals(current, previous)) {
-            // Only now allocate a new String
-            cached = current.toString();
-
-            // Copy current into previous
-            previous.setLength(0);
-            previous.append(current);
-            this.dirty = false;
+        if (dirty) {
+            long checksum = computeChecksum(current);
+            if (checksum != lastChecksum) {
+                cached = current.toString();
+                lastChecksum = checksum;
+            }
+            dirty = false;
         }
         return cached;
     }
@@ -158,12 +157,14 @@ public class CachedStringBuilder implements Appendable, Comparable<CachedStringB
         return current.codePoints();
     }
 
-    private static boolean equals(StringBuilder a, StringBuilder b) {
-        int len = a.length();
-        if (b.length() != len) return false;
-        for (int i = 0; i < len; i++)
-            if (a.charAt(i) != b.charAt(i)) return false;
-        return true;
+    private long computeChecksum(StringBuilder sb) {
+        this.crc.reset();
+        for (int i = 0; i < sb.length(); i++) {
+            int c = sb.charAt(i);
+            this.crc.update((c >> 8) & 0xFF); // high byte
+            this.crc.update(c & 0xFF);        // low byte
+        }
+        return this.crc.getValue();
     }
 
     @Override
@@ -279,6 +280,7 @@ public class CachedStringBuilder implements Appendable, Comparable<CachedStringB
 
     public CachedStringBuilder reverse() {
         current.reverse();
+        this.dirty = true;
         return this;
     }
 
