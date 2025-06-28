@@ -64,7 +64,7 @@ public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> 
 
         /* Window */
         boolean aot = Tools.Calc.randomChance();
-        Window window = api.window.create(0, 0, 40, 18, "Example Window " + (aot ? "AOT" : ""), new WindowAction() {
+        Window window = api.window.create(0, 0, 40, 18, "Example-Window " + (aot ? "AOT" : ""), new WindowAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_WINDOW;
