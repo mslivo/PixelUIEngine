@@ -285,12 +285,10 @@ public class Tools {
 
     public static class Text {
 
-        private static final CachedStringBuilder builder = new CachedStringBuilder();
+        private static final StringBuilder builder = new StringBuilder();
 
         public static String benchmark(String... customValues) {
-            builder.reset();
-            for (int i = 0; i < customValues.length; i++)
-                builder.append(" | ").append(String.format("%1$10s", customValues[i]));
+            builder.setLength(0);
             builder.append(String.format("%1$6s", Gdx.graphics.getFramesPerSecond()));
             builder.append(" FPS | ");
             builder.append(String.format("%1$6s", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024))));
@@ -298,7 +296,7 @@ public class Tools {
             builder.append(String.format("%1$6s", (Thread.getAllStackTraces().keySet().size())));
             builder.append(" Threads");
             for (int i = 0; i < customValues.length; i++)
-                builder.append(customValues[i]);
+                builder.append(" | ").append(String.format("%1$10s", customValues[i]));
             return builder.toString();
         }
 
@@ -320,7 +318,7 @@ public class Tools {
         }
 
         public static String formatNumber(long number) {
-            builder.reset();
+            builder.setLength(0);
             boolean minus = number < 0;
             if (minus) {
                 builder.append("-");
@@ -367,10 +365,10 @@ public class Tools {
             return fontSymbol(id, Color.GRAY);
         }
 
-        public static String fontSymbol(int id, com.badlogic.gdx.graphics.Color color) {
+        public static String fontSymbol(int id, Color color) {
             String symbol = Character.toString((char) (MediaManager.FONT_CUSTOM_SYMBOL_OFFSET + id));
             if (color != null) {
-                builder.reset();
+                builder.setLength(0);
                 builder.append("[#").append(color).append("]").append(symbol).append("[]");
                 return builder.toString();
             } else {

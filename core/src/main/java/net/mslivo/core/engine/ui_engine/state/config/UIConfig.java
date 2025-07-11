@@ -155,7 +155,7 @@ public final class UIConfig implements Serializable, Cloneable {
         notification_defaultDisplayTime = 120;
         notification_defaultColor = DEFAULT_COlOR.cpy();
         notification_foldTime = 12;
-        notification_tooltip_defaultDisplayTime = 70;
+        notification_tooltip_defaultDisplayTime = 140;
         notification_tooltip_fadeoutTime = 12;
         tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
         tooltip_FadeInSpeed = 0.2f;
