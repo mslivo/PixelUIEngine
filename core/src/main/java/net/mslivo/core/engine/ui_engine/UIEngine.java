@@ -1959,7 +1959,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private boolean actions_executeUpdateAction(UpdateAction updateAction) {
         updateAction.timer++;
-        if (updateAction.timer > updateAction.interval) {
+        if (updateAction.timer >= updateAction.interval) {
             updateAction.onUpdate();
             updateAction.timer = 0;
             return true;
