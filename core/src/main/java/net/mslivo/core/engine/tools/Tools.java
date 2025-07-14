@@ -740,6 +740,10 @@ public class Tools {
             return 1f - (float) Math.exp(-curve * value);
         }
 
+        public static float exponentialDecay(float curve, float value) {
+            return 1f - (float) Math.exp(-curve * value);
+        }
+
         public static int randomCountHits(float baseChance) {
             return randomCountHits(baseChance, 1f);
         }
