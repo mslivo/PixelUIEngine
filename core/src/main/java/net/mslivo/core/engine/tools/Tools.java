@@ -735,13 +735,12 @@ public class Tools {
             return baseValue * (float) Math.pow(exp, times - 1);
         }
 
-
-        public static float exponentialDecay(float curve, int value) {
-            return 1f - (float) Math.exp(-curve * value);
+        public static float exponentialDecay(int baseValue, float exp, int times) {
+            return baseValue * (float) Math.exp(-exp * (times-1));
         }
 
-        public static float exponentialDecay(float curve, float value) {
-            return 1f - (float) Math.exp(-curve * value);
+        public static float exponentialDecay(float baseValue, float exp, int times) {
+            return (baseValue * (float) Math.exp(-exp * (times-1)));
         }
 
         public static int randomCountHits(float baseChance) {
