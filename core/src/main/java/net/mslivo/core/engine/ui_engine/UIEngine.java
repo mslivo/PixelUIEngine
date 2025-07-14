@@ -1961,6 +1961,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         updateAction.timer++;
         if (updateAction.timer > updateAction.interval) {
             updateAction.onUpdate();
+            updateAction.timer = 0;
             return true;
         }
         return false;
