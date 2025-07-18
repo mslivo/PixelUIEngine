@@ -1764,13 +1764,19 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 uiEngineState.tooltip_delay_timer = 0;
                 if (hoverComponent instanceof List list) {
                     // check for list item tooltips
-                    if (toolTipSubItem != null)
+                    if (toolTipSubItem != null) {
                         uiEngineState.tooltip = list.listAction.toolTip(toolTipSubItem);
+                    }else{
+                        uiEngineState.tooltip = null;
+                    }
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
                 } else if (hoverComponent instanceof Grid grid && toolTipSubItem != null) {
                     // check for Grid item tooltip
-                    if (toolTipSubItem != null)
+                    if (toolTipSubItem != null) {
                         uiEngineState.tooltip = grid.gridAction.toolTip(toolTipSubItem);
+                    }else{
+                        uiEngineState.tooltip = null;
+                    }
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
                 } else {
                     // take component tooltip
