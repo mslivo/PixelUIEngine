@@ -730,6 +730,11 @@ public class Tools {
             return MathUtils.round(baseValue * (float) Math.pow(exp, times - 1));
         }
 
+        public static long exponentialGrowth(long baseValue, float exp, int times) {
+            if (times <= 1) return MathUtils.round(baseValue);
+            return MathUtils.round(baseValue * (float) Math.pow(exp, times - 1));
+        }
+
         public static float exponentialGrowth(float baseValue, float exp, int times) {
             if (times <= 1) return baseValue;
             return baseValue * (float) Math.pow(exp, times - 1);
