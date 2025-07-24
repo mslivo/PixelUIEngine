@@ -2320,7 +2320,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
                     int widthPx = TS(comboBox.width);
                     for (int i = 0; i < comboBox.items.size; i++) {
-                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text);
+                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text)+2;
                         if (comboBox.items.get(i).comboBoxItemAction.icon() != null)
                             itemWidth += api.TS();
                         widthPx = Math.max(widthPx, itemWidth);
