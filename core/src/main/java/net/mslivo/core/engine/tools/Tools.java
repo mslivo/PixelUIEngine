@@ -740,8 +740,12 @@ public class Tools {
             return baseValue * (float) Math.pow(exp, times - 1);
         }
 
-        public static float exponentialDecay(int baseValue, float exp, int times) {
-            return baseValue * (float) Math.exp(-exp * (times-1));
+        public static int exponentialDecay(int baseValue, float exp, int times) {
+            return MathUtils.round(baseValue * (float)Math.exp(-exp * (times-1)));
+        }
+
+        public static long exponentialDecay(long baseValue, float exp, int times) {
+            return MathUtils.round(baseValue * (float)Math.exp(-exp * (times-1)));
         }
 
         public static float exponentialDecay(float baseValue, float exp, int times) {
