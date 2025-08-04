@@ -148,14 +148,18 @@ public class SoundPlayer {
     public void stopSounds(Array<CMediaSoundEffect> stopSounds){
         for(int i=0;i<stopSounds.size;i++) {
             final CMediaSoundEffect soundEffect = stopSounds.get(i);
-            final LongArray ids = this.playedSoundIds.get(soundEffect);
-            for (int i2 = 0; i2 < ids.size; i2++) {
-                long id = ids.get(i2);
-                mediaManager.sound(stopSounds.get(i)).stop(id);
-            }
-            this.playedSounds.removeValue(soundEffect, true);
-            this.playedSoundIds.remove(soundEffect);
+            stopSound(soundEffect);
         }
+    }
+
+    public void stopSound(CMediaSoundEffect soundEffect){
+        final LongArray ids = this.playedSoundIds.get(soundEffect);
+        for (int i = 0; i < ids.size; i++) {
+            long id = ids.get(i);
+            mediaManager.sound(soundEffect).stop(id);
+        }
+        this.playedSounds.removeValue(soundEffect, true);
+        this.playedSoundIds.remove(soundEffect);
     }
 
     public void update() {
