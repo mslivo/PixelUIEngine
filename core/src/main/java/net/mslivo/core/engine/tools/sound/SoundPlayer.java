@@ -1,8 +1,7 @@
 package net.mslivo.core.engine.tools.sound;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectLongMap;
+import com.badlogic.gdx.utils.*;
 import net.mslivo.core.engine.media_manager.CMediaSoundEffect;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
@@ -16,6 +15,7 @@ public class SoundPlayer {
     private float camera_x, camera_y;
     private final MediaManager mediaManager;
     private final Array<CMediaSoundEffect> playedSounds;
+    private final ObjectMap<CMediaSoundEffect, LongArray> playedSoundIds;
 
     public SoundPlayer(MediaManager mediaManager) {
         this(mediaManager, 0);
@@ -25,6 +25,7 @@ public class SoundPlayer {
         this.mediaManager = mediaManager;
         this.volume = 1f;
         this.playedSounds = new Array<>();
+        this.playedSoundIds = new ObjectMap<>();
         setRange2D(range2D);
     }
 
@@ -123,21 +124,38 @@ public class SoundPlayer {
             playPan = pan;
         }
 
-        playedSounds.add(cMediaSoundEffect);
-
+        final long soundId;
         if (loop) {
-            return sound.loop(playVolume, pitch, playPan);
+            soundId= sound.loop(playVolume, pitch, playPan);
         } else {
-            return sound.play(playVolume, pitch, playPan);
+            soundId= sound.play(playVolume, pitch, playPan);
         }
 
+        playedSounds.add(cMediaSoundEffect);
+        if(!playedSoundIds.containsKey(cMediaSoundEffect)){
+            playedSoundIds.put(cMediaSoundEffect, new LongArray());
+        }
+        LongArray soundIds = playedSoundIds.get(cMediaSoundEffect);
+        soundIds.add(soundId);
+
+        return soundId;
     }
 
     public void stopAllSounds(){
-        for(int i=0;i<playedSounds.size;i++){
-            mediaManager.sound(playedSounds.get(i)).stop();
+        this.stopSounds(this.playedSounds);
+    }
+
+    public void stopSounds(Array<CMediaSoundEffect> stopSounds){
+        for(int i=0;i<stopSounds.size;i++) {
+            final CMediaSoundEffect soundEffect = stopSounds.get(i);
+            final LongArray ids = this.playedSoundIds.get(soundEffect);
+            for (int i2 = 0; i2 < ids.size; i2++) {
+                long id = ids.get(i2);
+                mediaManager.sound(stopSounds.get(i)).stop(id);
+            }
+            this.playedSounds.removeValue(soundEffect, true);
+            this.playedSoundIds.remove(soundEffect);
         }
-        playedSounds.clear();
     }
 
     public void update() {
