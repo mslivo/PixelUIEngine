@@ -43,7 +43,7 @@ public class MusicPlayer {
         this(mediaManager,null);
     }
 
-    public MusicPlayer(MediaManager mediaManager, CMediaMusic[] playlist) {
+    public MusicPlayer(MediaManager mediaManager, CMediaMusic... playlist) {
         this.mediaManager = mediaManager;
         this.playlist = new Array<>();
         this.playMode = PLAY_MODE.SEQUENTIAL;
