@@ -233,6 +233,12 @@ public class MusicPlayer {
         this.state = STATE.PLAY;
     }
 
+    public void playIfNotPlaying(){
+        if(!this.isPlaying()){
+            this.state = STATE.PLAY;
+        }
+    }
+
     public void stop() {
         this.state = STATE.STOP;
     }
