@@ -13,7 +13,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 public class MusicPlayer {
 
     public enum PLAY_MODE {
-        SEQUENTIAL, RANDOM, LOOP
+        SEQUENTIAL, RANDOM, REPEAT
     }
 
     private enum STATE {
@@ -40,6 +40,10 @@ public class MusicPlayer {
     private final IntArray randomHistory;
 
     public MusicPlayer(MediaManager mediaManager) {
+        this(mediaManager,null);
+    }
+
+    public MusicPlayer(MediaManager mediaManager, CMediaMusic[] playlist) {
         this.mediaManager = mediaManager;
         this.playlist = new Array<>();
         this.playMode = PLAY_MODE.SEQUENTIAL;
@@ -50,6 +54,9 @@ public class MusicPlayer {
         this.randomHistory = new IntArray();
         this.playNext = this.playPrevious = false;
         this.volume = 1f;
+        if(playlist != null)
+            for(int i=0;i<playlist.length;i++)
+                playListAdd(playlist[i]);
     }
 
     public void playlistClear() {
@@ -150,7 +157,7 @@ public class MusicPlayer {
                                 }
                                 case SEQUENTIAL ->
                                         playListPosition = (playListPosition + 1 > (playlist.size - 1) ? 0 : (playListPosition + 1));
-                                case LOOP -> {
+                                case REPEAT -> {
                                 }
                             }
                             playNext = false;
@@ -165,7 +172,7 @@ public class MusicPlayer {
                                 }
                                 case SEQUENTIAL ->
                                         playListPosition = (playListPosition - 1 < 0 ? playlist.size - 1 : playListPosition - 1);
-                                case LOOP -> {
+                                case REPEAT -> {
                                 }
                             }
                             playPrevious = false;
