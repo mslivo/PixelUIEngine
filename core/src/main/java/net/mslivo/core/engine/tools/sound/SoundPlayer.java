@@ -131,12 +131,14 @@ public class SoundPlayer {
             soundId= sound.play(playVolume, pitch, playPan);
         }
 
-        playedSounds.add(cMediaSoundEffect);
-        if(!playedSoundIds.containsKey(cMediaSoundEffect)){
-            playedSoundIds.put(cMediaSoundEffect, new LongArray());
+        if(soundId != -1) {
+            playedSounds.add(cMediaSoundEffect);
+            if (!playedSoundIds.containsKey(cMediaSoundEffect)) {
+                playedSoundIds.put(cMediaSoundEffect, new LongArray());
+            }
+            LongArray soundIds = playedSoundIds.get(cMediaSoundEffect);
+            soundIds.add(soundId);
         }
-        LongArray soundIds = playedSoundIds.get(cMediaSoundEffect);
-        soundIds.add(soundId);
 
         return soundId;
     }
