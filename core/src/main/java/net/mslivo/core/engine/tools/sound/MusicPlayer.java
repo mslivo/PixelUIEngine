@@ -230,10 +230,6 @@ public class MusicPlayer {
     }
 
     public void play() {
-        this.state = STATE.PLAY;
-    }
-
-    public void playIfNotPlaying(){
         if(!this.isPlaying()){
             this.state = STATE.PLAY;
         }
