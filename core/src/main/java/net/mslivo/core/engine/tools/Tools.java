@@ -216,16 +216,16 @@ public class Tools {
             return timeBetweenUpdates;
         }
 
-        public static void launch(ApplicationAdapter applicationAdapter, PixelUILaunchConfig launchConfiguration) {
+        public static void launch(ApplicationAdapter applicationAdapter, PixelUILaunchConfig launchConfig) {
             // Determine glEmulation
             String osName = System.getProperty("os.name").toLowerCase();
             PixelUILaunchConfig.GLEmulation glEmulation;
             if (osName.contains("win")) {
-                glEmulation = launchConfiguration.windowsGLEmulation();
+                glEmulation = launchConfig.windowsGLEmulation;
             } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
-                glEmulation = launchConfiguration.linuxGLEmulation();
+                glEmulation = launchConfig.linuxGLEmulation;
             } else if (osName.contains("mac")) {
-                glEmulation = launchConfiguration.macOSGLEmulation();
+                glEmulation = launchConfig.macOSGLEmulation;
             } else {
                 throw new RuntimeException("Operating System \"" + osName + "\n not supported");
             }
@@ -234,18 +234,18 @@ public class Tools {
                 case GL32_OPENGL -> {
                     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
                     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 3, 2);
-                    config.setResizable(true);
-                    config.setWindowedMode(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight());
-                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight(), -1, -1);
-                    config.setTitle(launchConfiguration.appTile());
-                    config.setDecorated(true);
-                    config.setMaximized(true);
-                    config.setForegroundFPS(launchConfiguration.fps());
-                    config.setIdleFPS(launchConfiguration.fps());
-                    config.useVsync(launchConfiguration.vSync());
+                    config.setResizable(launchConfig.resizeAble);
+                    config.setDecorated(launchConfig.decorated);
+                    config.setMaximized(launchConfig.maximized);
                     config.setWindowPosition(-1, -1);
-                    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
-                    if (launchConfiguration.iconPath() != null) config.setWindowIcon(launchConfiguration.iconPath());
+                    config.setWindowedMode(launchConfig.resolutionWidth, launchConfig.resolutionHeight);
+                    config.setWindowSizeLimits(launchConfig.resolutionWidth, launchConfig.resolutionHeight, -1, -1);
+                    config.setTitle(launchConfig.appTile);
+                    config.setForegroundFPS(launchConfig.fps);
+                    config.setIdleFPS(launchConfig.idleFPS);
+                    config.useVsync(launchConfig.vSync);
+                    config.setBackBufferConfig(launchConfig.r, launchConfig.g, launchConfig.b, launchConfig.a, launchConfig.depth, launchConfig.stencil, launchConfig.samples);
+                    if (launchConfig.iconPath != null) config.setWindowIcon(launchConfig.iconPath);
                     try {
                         new Lwjgl3Application(applicationAdapter, config);
                     } catch (Exception e) {
@@ -257,18 +257,18 @@ public class Tools {
                 case GL32_VULKAN -> {
                     com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration config = new com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration();
                     config.setOpenGLEmulation(com.github.dgzt.gdx.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES32, 3, 2);
-                    config.setResizable(true);
-                    config.setWindowedMode(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight());
-                    config.setWindowSizeLimits(launchConfiguration.resolutionWidth(), launchConfiguration.resolutionHeight(), -1, -1);
-                    config.setTitle(launchConfiguration.appTile());
-                    config.setDecorated(true);
-                    config.setMaximized(true);
-                    config.setForegroundFPS(launchConfiguration.fps());
-                    config.setIdleFPS(launchConfiguration.fps());
-                    config.useVsync(launchConfiguration.vSync());
+                    config.setResizable(launchConfig.resizeAble);
+                    config.setDecorated(launchConfig.decorated);
+                    config.setMaximized(launchConfig.maximized);
                     config.setWindowPosition(-1, -1);
-                    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 0);
-                    if (launchConfiguration.iconPath() != null) config.setWindowIcon(launchConfiguration.iconPath());
+                    config.setWindowedMode(launchConfig.resolutionWidth, launchConfig.resolutionHeight);
+                    config.setWindowSizeLimits(launchConfig.resolutionWidth, launchConfig.resolutionHeight, -1, -1);
+                    config.setTitle(launchConfig.appTile);
+                    config.setForegroundFPS(launchConfig.fps);
+                    config.setIdleFPS(launchConfig.idleFPS);
+                    config.useVsync(launchConfig.vSync);
+                    config.setBackBufferConfig(launchConfig.r, launchConfig.g, launchConfig.b, launchConfig.a, launchConfig.depth, launchConfig.stencil, launchConfig.samples);
+                    if (launchConfig.iconPath != null) config.setWindowIcon(launchConfig.iconPath);
                     try {
                         new Lwjgl3VulkanApplication(applicationAdapter, config);
                     } catch (Exception e) {

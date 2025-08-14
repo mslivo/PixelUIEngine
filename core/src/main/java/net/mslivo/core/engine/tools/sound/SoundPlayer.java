@@ -155,6 +155,8 @@ public class SoundPlayer {
     }
 
     public void stopSound(CMediaSoundEffect soundEffect){
+        if(!this.playedSoundIds.containsKey(soundEffect))
+            return;
         final LongArray ids = this.playedSoundIds.get(soundEffect);
         for (int i = 0; i < ids.size; i++) {
             long id = ids.get(i);
