@@ -658,9 +658,12 @@ public class Tools {
             int sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
+            if (sum <= 0f) return MathUtils.random(0,probabilities.length-1);
+
             int random = MathUtils.random(0, sum);
             int cumulative = 0;
             for (int i = 0; i < probabilities.length; i++) {
+                if (probabilities[i] <= 0) continue;
                 cumulative += probabilities[i];
                 if (random <= cumulative) return i;
             }
@@ -672,9 +675,12 @@ public class Tools {
             float sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
+            if (sum <= 0f) return MathUtils.random(0,probabilities.length-1);
+
             float random = MathUtils.random(0f, sum);
             float cumulative = 0f;
             for (int i = 0; i < probabilities.length; i++) {
+                if (probabilities[i] <= 0f) continue;
                 cumulative += probabilities[i];
                 if (random <= cumulative) return i;
             }
