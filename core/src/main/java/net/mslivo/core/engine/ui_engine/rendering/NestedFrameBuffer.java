@@ -131,4 +131,8 @@ public class NestedFrameBuffer extends FrameBuffer {
         return this.textureRegionFlippedCache;
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
 }
