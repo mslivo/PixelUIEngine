@@ -3391,7 +3391,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.spriteRenderer_ui.dispose();
         uiEngineState.primitiveRenderer_ui.dispose();
 
-
         // FrameBuffers
         for(int i=0;i<uiEngineState.appViewPorts.size;i++){
             uiEngineState.appViewPorts.get(i).frameBuffer.dispose();
@@ -3405,6 +3404,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
             uiEngineState.frameBuffer_upScaled_screen.dispose();
 
 
+
         // Lists
         uiEngineState.windows.clear();
         uiEngineState.modalWindowQueue.clear();
@@ -3413,9 +3413,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         uiEngineState.screenComponents.clear();
         uiEngineState.notifications.clear();
         uiEngineState.appViewPorts.clear();
-
-
-
 
 
 

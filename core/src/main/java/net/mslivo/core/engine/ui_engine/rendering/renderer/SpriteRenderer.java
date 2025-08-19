@@ -26,7 +26,14 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
 
     public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
 
-    private static final SpriteShader DEFAULT_SHADER = new SpriteShader("""
+    private Texture lastTexture;
+    private float invTexWidth, invTexHeight;
+    private MediaManager mediaManager;
+    private int nextSamplerTextureUnit;
+
+    @Override
+    protected ShaderProgram provideDefaultShader() {
+        return new SpriteShader("""
             Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec2 v_texCoord
             
             BEGIN VERTEX
@@ -46,16 +53,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             }
             
             END FRAGMENT
-            """);
-
-    private Texture lastTexture;
-    private float invTexWidth, invTexHeight;
-    private MediaManager mediaManager;
-    private int nextSamplerTextureUnit;
-
-    @Override
-    protected ShaderProgram provideDefaultShader() {
-        return DEFAULT_SHADER.compile();
+            """).compile();
     }
 
     public SpriteRenderer() {

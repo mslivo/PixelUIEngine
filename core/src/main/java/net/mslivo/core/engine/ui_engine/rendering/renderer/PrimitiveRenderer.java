@@ -25,36 +25,8 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
     private static final float[] DUMMY_VERTEX = new float[]{0f, 0f, 0f, 0f, 0f};
 
     private static final int PRIMITIVE_RESTART = -1;
-    private static final PrimitiveShader DEFAULT_SHADER = new PrimitiveShader("""
-            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
-            
-            BEGIN VERTEX
-            
-            vec4 colorTintAdd(vec4 color, vec4 modColor){
-                 color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
-                 color.a *= modColor.a;
-                 return color;
-            }
-            
-            void main(){
-            	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
-            }
-            
-            END VERTEX
-            
-            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
-            
-            BEGIN FRAGMENT
-            void main(){
-            	 gl_FragColor = v_vertexColor;
-            }
-            END FRAGMENT
-            """);
-
 
     private final IntArray indexResets;
-
-
 
     private float vertexColor;
     private float vertexColor_reset;
@@ -75,6 +47,7 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
     public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
         super(maxVertexes, shaderProgram, printRenderCalls);
         this.indexResets = new IntArray();
+        this.vertexColor_reset = colorPackedRGBA(0.5f,0.5f,0.5f,1f);
         this.vertexColor_save = vertexColor_reset;
         this.vertexColor = vertexColor_reset;
     }
@@ -218,7 +191,31 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
     @Override
     protected ShaderProgram provideDefaultShader() {
-        return DEFAULT_SHADER.compile();
+        return new PrimitiveShader("""
+            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+            
+            BEGIN VERTEX
+            
+            vec4 colorTintAdd(vec4 color, vec4 modColor){
+                 color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
+                 color.a *= modColor.a;
+                 return color;
+            }
+            
+            void main(){
+            	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
+            }
+            
+            END VERTEX
+            
+            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+            
+            BEGIN FRAGMENT
+            void main(){
+            	 gl_FragColor = v_vertexColor;
+            }
+            END FRAGMENT
+            """).compile();
     }
 
 
