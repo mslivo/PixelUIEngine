@@ -2070,10 +2070,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void renderUIModalLayer() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
@@ -2109,10 +2107,8 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void renderUIComponentLayer() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
@@ -2141,7 +2137,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.end();
 
         spriteRenderer.setAllReset();
-        primitiveRenderer.setAllReset();
     }
 
     private void render_mouseTextInput() {
@@ -2440,7 +2435,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
 
     private void render_drawTooltip(int x, int y, Tooltip tooltip, float alpha) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         // Determine Dimensions
         final int tooltip_width = tooltipWidth(tooltip);
@@ -2566,7 +2560,6 @@ public final class UIEngine<T extends UIEngineAdapter> {
         }
 
         spriteRenderer.setAllReset();
-        primitiveRenderer.setAllReset();
     }
 
     private void render_drawCursorTooltip() {
@@ -3394,24 +3387,38 @@ public final class UIEngine<T extends UIEngineAdapter> {
     public void shutdown() {
         this.uiAdapter.shutdown();
 
+        // Renderers
+        uiEngineState.spriteRenderer_ui.dispose();
+        uiEngineState.primitiveRenderer_ui.dispose();
+
+
+        // FrameBuffers
+        for(int i=0;i<uiEngineState.appViewPorts.size;i++){
+            uiEngineState.appViewPorts.get(i).frameBuffer.dispose();
+        }
+
+        uiEngineState.frameBuffer_app.dispose();
+        uiEngineState.frameBufferComponent_ui.dispose();
+        uiEngineState.frameBufferModal_ui.dispose();
+        uiEngineState.frameBuffer_composite.dispose();
+        if (uiEngineState.frameBuffer_upScaled_screen != null)
+            uiEngineState.frameBuffer_upScaled_screen.dispose();
+
+
         // Lists
         uiEngineState.windows.clear();
-
         uiEngineState.modalWindowQueue.clear();
         uiEngineState.hotKeys.clear();
         uiEngineState.singleUpdateActions.clear();
         uiEngineState.screenComponents.clear();
         uiEngineState.notifications.clear();
         uiEngineState.appViewPorts.clear();
-        uiEngineState.spriteRenderer_ui.dispose();
 
 
-        // Textures
-        uiEngineState.frameBuffer_app.dispose();
-        uiEngineState.frameBufferComponent_ui.dispose();
-        uiEngineState.frameBuffer_composite.dispose();
-        if (uiEngineState.frameBuffer_upScaled_screen != null)
-            uiEngineState.frameBuffer_upScaled_screen.dispose();
+
+
+
+
 
     }
 
