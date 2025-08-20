@@ -42,7 +42,6 @@ import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
 import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.function.Predicate;
 
@@ -1756,7 +1755,7 @@ public final class APIComponent {
 
     public void forceToolTipUpdate(Component component) {
         if (component == null) return;
-        uiEngineState.updateTooltipComponents.add(component);
+        uiEngineState.forceTooltipUpdateComponents.add(component);
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {

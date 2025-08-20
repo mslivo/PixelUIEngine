@@ -1,6 +1,7 @@
 package net.mslivo.core.engine.tools.particles;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Queue;
 import net.mslivo.core.engine.tools.Tools;
@@ -10,7 +11,7 @@ import net.mslivo.core.engine.tools.particles.particles.Particle;
 import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
-public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, SpriteParticleSystem {
+public sealed abstract class ParticleSystem<T> implements Disposable permits PrimitiveParticleSystem, SpriteParticleSystem  {
     protected Class<T> dataClass;
     protected int maxParticles;
     protected int numParticles;
@@ -84,7 +85,8 @@ public sealed abstract class ParticleSystem<T> permits PrimitiveParticleSystem, 
         this.maxParticles = Math.max(maxParticles, 0);
     }
 
-    public void shutdown() {
+    @Override
+    public void dispose() {
         removeAllParticles();
         particlePools.values().forEach(particlePool -> particlePool.clear());
         particlePools.clear();

@@ -43,6 +43,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
 
+
     public static class ParticleDataInner {
         int randomData = 0;
 
@@ -356,8 +357,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private ShaderProgram shaderProgram = new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile();
 
     @Override
-    public void shutdown() {
-
+    public void dispose() {
+        spriteRenderer.dispose();
     }
 
 

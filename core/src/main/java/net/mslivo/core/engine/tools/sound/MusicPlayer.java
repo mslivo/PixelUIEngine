@@ -3,6 +3,7 @@ package net.mslivo.core.engine.tools.sound;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.media_manager.CMediaMusic;
 import net.mslivo.core.engine.media_manager.MediaManager;
@@ -10,7 +11,7 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 /*
  * Basic Music Player
  */
-public class MusicPlayer {
+public class MusicPlayer implements Disposable {
 
     public enum PLAY_MODE {
         SEQUENTIAL, RANDOM, REPEAT
@@ -257,7 +258,8 @@ public class MusicPlayer {
         return state == STATE.PAUSE;
     }
 
-    public void shutdown() {
+    @Override
+    public void dispose() {
         if (playCurrent != null && playCurrent.isPlaying()) playCurrent.stop();
         this.playCurrent = null;
         this.playCurrentFileName = "";

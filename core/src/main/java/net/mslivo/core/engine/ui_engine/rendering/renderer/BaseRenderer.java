@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.graphics.glutils.VertexData;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -16,7 +17,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
 
-public abstract class BaseRenderer {
+public abstract class BaseRenderer implements Disposable {
 
     public static final String POSITION_ATTRIBUTE = "a_position";
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
@@ -245,6 +246,7 @@ public abstract class BaseRenderer {
         if (drawing) setupMatrices();
     }
 
+    @Override
     public void dispose() {
         vertexBufferObject.dispose();
         indexBufferObject.dispose();

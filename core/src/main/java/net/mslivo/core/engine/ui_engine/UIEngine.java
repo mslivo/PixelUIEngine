@@ -10,8 +10,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Queue;
 import net.mslivo.core.engine.media_manager.CMediaArray;
 import net.mslivo.core.engine.media_manager.CMediaImage;
@@ -74,7 +73,7 @@ import java.util.Arrays;
  * App needs to be implemented inside the uiAdapter
  */
 @SuppressWarnings("ForLoopReplaceableByForEach")
-public final class UIEngine<T extends UIEngineAdapter> {
+public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     private static final int FONT_MAXWIDTH_NONE = -1;
 
     // Basic Configuration
@@ -183,7 +182,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
         newUIEngineState.mTextInputUnlock = false;
         newUIEngineState.keyboardInteractedUIObjectFrame = null;
         newUIEngineState.mouseInteractedUIObjectFrame = null;
-        newUIEngineState.updateTooltipComponents = new Array<>();
+        newUIEngineState.forceTooltipUpdateComponents = new Array<>();
         newUIEngineState.modalWindow = null;
         newUIEngineState.modalWindowQueue = new Queue<>();
         newUIEngineState.pressedTextField = null;
@@ -1395,7 +1394,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     }
                     case FrameBufferViewport frameBufferViewport -> {
                         frameBufferViewport.frameBufferViewportAction.onRelease();
-                        UICommonUtils.resetPressedFrameviewPortReference(uiEngineState);
+                        UICommonUtils.resetPressedFrameBufferViewPortReference(uiEngineState);
                     }
                     case Grid grid -> {
                         UICommonUtils.grid_updateItemInfoAtMousePosition(uiEngineState, grid);
@@ -1746,9 +1745,9 @@ public final class UIEngine<T extends UIEngineAdapter> {
             }
 
             boolean updateComponentToolTip;
-            if (uiEngineState.updateTooltipComponents.contains(hoverComponent, true)) {
+            if (uiEngineState.forceTooltipUpdateComponents.contains(hoverComponent, true)) {
                 updateComponentToolTip = true;
-                uiEngineState.updateTooltipComponents.removeValue(hoverComponent, true);
+                uiEngineState.forceTooltipUpdateComponents.removeValue(hoverComponent, true);
             } else {
                 if (hoverComponent instanceof List || hoverComponent instanceof Grid) {
                     // Check on subitem change
@@ -1766,7 +1765,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // check for list item tooltips
                     if (toolTipSubItem != null) {
                         uiEngineState.tooltip = list.listAction.toolTip(toolTipSubItem);
-                    }else{
+                    } else {
                         uiEngineState.tooltip = null;
                     }
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
@@ -1774,7 +1773,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                     // check for Grid item tooltip
                     if (toolTipSubItem != null) {
                         uiEngineState.tooltip = grid.gridAction.toolTip(toolTipSubItem);
-                    }else{
+                    } else {
                         uiEngineState.tooltip = null;
                     }
                     uiEngineState.tooltip_lastHoverObject = toolTipSubItem;
@@ -2315,7 +2314,7 @@ public final class UIEngine<T extends UIEngineAdapter> {
                 if (UICommonUtils.comboBox_isOpen(uiEngineState, comboBox)) {
                     int widthPx = TS(comboBox.width);
                     for (int i = 0; i < comboBox.items.size; i++) {
-                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text)+2;
+                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text) + 2;
                         if (comboBox.items.get(i).comboBoxItemAction.icon() != null)
                             itemWidth += api.TS();
                         widthPx = Math.max(widthPx, itemWidth);
@@ -3384,40 +3383,81 @@ public final class UIEngine<T extends UIEngineAdapter> {
         spriteRenderer.loadState();
     }
 
-    public void shutdown() {
-        this.uiAdapter.shutdown();
+    @Override
+    public void dispose() {
+        this.uiAdapter.dispose();
 
         // Renderers
         uiEngineState.spriteRenderer_ui.dispose();
         uiEngineState.primitiveRenderer_ui.dispose();
 
         // FrameBuffers
-        for(int i=0;i<uiEngineState.appViewPorts.size;i++){
+        for (int i = uiEngineState.appViewPorts.size - 1; i >= 0; i--) {
             uiEngineState.appViewPorts.get(i).frameBuffer.dispose();
+            uiEngineState.appViewPorts.removeIndex(i);
         }
 
         uiEngineState.frameBuffer_app.dispose();
         uiEngineState.frameBufferComponent_ui.dispose();
         uiEngineState.frameBufferModal_ui.dispose();
         uiEngineState.frameBuffer_composite.dispose();
-        if (uiEngineState.frameBuffer_upScaled_screen != null)
+        if (uiEngineState.frameBuffer_upScaled_screen != null) {
             uiEngineState.frameBuffer_upScaled_screen.dispose();
+        }
+
+        // Tooltips
+        ObjectSet<Tooltip> toolTips = new ObjectSet<>();
+        if (uiEngineState.tooltip != null)
+            toolTips.add(uiEngineState.tooltip);
+        if (uiEngineState.appToolTip != null)
+            toolTips.add(uiEngineState.appToolTip);
+        if (uiEngineState.fadeOutTooltip != null)
+            toolTips.add(uiEngineState.fadeOutTooltip);
+
+        ObjectSet.ObjectSetIterator<Tooltip> iterator = toolTips.iterator();
+        while (iterator.hasNext) {
+            final Tooltip tooltip = iterator.next();
+            if (tooltip.toolTipAction != null)
+                tooltip.toolTipAction.onRemove();
+        }
+
+        // Notifications
+        for (int i = uiEngineState.notifications.size - 1; i >= 0; i--) {
+            if (uiEngineState.notifications.get(i).notificationAction != null)
+                uiEngineState.notifications.get(i).notificationAction.onRemove();
+            uiEngineState.notifications.removeIndex(i);
+        }
+
+        for (int i = uiEngineState.tooltipNotifications.size - 1; i >= 0; i--) {
+            if (uiEngineState.tooltipNotifications.get(i).tooltip.toolTipAction != null)
+                uiEngineState.tooltipNotifications.get(i).tooltip.toolTipAction.onRemove();
+            uiEngineState.tooltipNotifications.removeIndex(i);
+        }
+
+        // Windows
+        for (int i = uiEngineState.windows.size - 1; i >= 0; i--) {
+            if (uiEngineState.windows.get(i).windowAction != null)
+                uiEngineState.windows.get(i).windowAction.onRemove();
+            uiEngineState.windows.removeIndex(i);
+        }
+        for (int i = uiEngineState.modalWindowQueue.size - 1; i >= 0; i--) {
+            if (uiEngineState.modalWindowQueue.get(i).windowAction != null)
+                uiEngineState.modalWindowQueue.get(i).windowAction.onRemove();
+            uiEngineState.modalWindowQueue.removeIndex(i);
+        }
 
 
+        // Misc
+        UICommonUtils.resetAllReferences(uiEngineState);
 
-        // Lists
-        uiEngineState.windows.clear();
-        uiEngineState.modalWindowQueue.clear();
+        uiEngineState.screenComponents.clear();
         uiEngineState.hotKeys.clear();
         uiEngineState.singleUpdateActions.clear();
-        uiEngineState.screenComponents.clear();
-        uiEngineState.notifications.clear();
-        uiEngineState.appViewPorts.clear();
+        uiEngineState.forceTooltipUpdateComponents.clear();
 
-
-
-
+        System.gc();
     }
+
 
     public int getResolutionWidth() {
         return uiEngineState.resolutionWidth;

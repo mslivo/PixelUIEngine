@@ -95,7 +95,7 @@ public class ExampleMain extends ApplicationAdapter {
                     boolean finished = this.transitionManager.update();
                     if (finished) {
                         // Replace with new UIEngine after Reset
-                        this.uiEngine.shutdown();
+                        this.uiEngine.dispose();
                         this.uiEngine = this.uiEngine_transition;
                         this.uiEngine_transition = null;
                         this.state = STATE.RUN;
@@ -123,8 +123,8 @@ public class ExampleMain extends ApplicationAdapter {
     }
 
     private void shutdownEngine() {
-        this.uiEngine.shutdown();
-        this.mediaManager.shutdown();
+        this.uiEngine.dispose();
+        this.mediaManager.dispose();
     }
 
 

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Admin on 07.02.2019.
  */
-public final class MediaManager {
+public final class MediaManager implements Disposable {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int FONT_CUSTOM_SYMBOL_OFFSET = 512;
     private static final String ERROR_FILE_NOT_FOUND = "CMedia File \"%s\": Does not exist";
@@ -689,9 +689,9 @@ public final class MediaManager {
     }
 
     /* ---- Shutdown ---- */
-    public void shutdown() {
+    @Override
+    public void dispose() {
         this.unloadAndReset();
-        return;
     }
 
     public boolean isLoaded() {

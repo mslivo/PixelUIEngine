@@ -2,11 +2,12 @@ package net.mslivo.core.engine.ui_engine;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Disposable;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
 
-public interface UIEngineAdapter {
+public interface UIEngineAdapter extends Disposable {
     void init(API api, MediaManager mediaManager);
     void update();
     void render(OrthographicCamera camera, AppViewport appViewPort);
@@ -32,6 +33,5 @@ public interface UIEngineAdapter {
         spriteRenderer.setAllReset();
     }
 
-    void shutdown();
 
 }

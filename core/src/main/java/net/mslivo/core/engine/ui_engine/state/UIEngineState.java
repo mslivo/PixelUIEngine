@@ -128,7 +128,7 @@ public final class UIEngineState {
     public int displayedContextMenuWidth;
     public Object keyboardInteractedUIObjectFrame;
     public Object mouseInteractedUIObjectFrame;
-    public Array<Component> updateTooltipComponents;
+    public Array<Component> forceTooltipUpdateComponents;
 
     /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;

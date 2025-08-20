@@ -1,6 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public interface WindowAction extends CommonActions, IconSupport {
+public interface WindowAction extends CommonActions, IconSupport, Displayable {
 
     default void onMove(int x, int y) {
     }
@@ -9,12 +9,6 @@ public interface WindowAction extends CommonActions, IconSupport {
     }
 
     default void onUnfold() {
-    }
-
-    default void onRemove() {
-    }
-
-    default void onAdd() {
     }
 
     default void onMessageReceived(int type, Object... parameters) {

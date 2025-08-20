@@ -9,7 +9,7 @@ import net.mslivo.core.engine.tools.Tools;
 /*
  * Plays sounds and automatically adjusts volume to distance
  */
-public class SoundPlayer {
+public class SoundPlayer implements Disposable{
     private int range;
     private float volume;
     private float camera_x, camera_y;
@@ -175,7 +175,8 @@ public class SoundPlayer {
         this.camera_y = camera_y;
     }
 
-    public void shutdown() {
+    @Override
+    public void dispose() {
         stopAllSounds();
     }
 

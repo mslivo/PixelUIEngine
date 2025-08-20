@@ -1080,7 +1080,7 @@ public final class APIComposites {
             api.window.addComponents(modalWnd, componentsList.toArray(Component[]::new));
             api.window.setWindowAction(modalWnd, new WindowAction() {
                 @Override
-                public void onAdd() {
+                public void onDisplay() {
                     api.component.textfield.focus(inputTextField);
                 }
             });

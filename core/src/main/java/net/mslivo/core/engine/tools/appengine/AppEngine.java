@@ -1,5 +1,6 @@
 package net.mslivo.core.engine.tools.appengine;
 
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Queue;
 
 import java.util.ArrayDeque;
@@ -8,7 +9,7 @@ import java.util.ArrayDeque;
  * Modifies Data Structure 1 update step at a time.
  * Sends input to adapter & gathers outputs using object pooling.
  */
-public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
+public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> implements Disposable {
 
     private static final Object[] RESET_OBJECT = new Object[AppEngineIO.PARAMETERS_MAX];
     private static final int[] RESET_INT = new int[AppEngineIO.PARAMETERS_MAX];
@@ -126,7 +127,8 @@ public class AppEngine<A extends AppEngineAdapter<D>, D extends Object> {
         this.ticks++;
     }
 
-    public void shutdown() {
+    @Override
+    public void dispose() {
         inputs.clear();
         outputs.clear();
         adapter.shutdown();

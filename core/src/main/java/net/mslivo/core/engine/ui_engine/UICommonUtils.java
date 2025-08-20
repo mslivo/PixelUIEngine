@@ -241,7 +241,7 @@ final class UICommonUtils {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         uiEngineState.windows.add(window);
-        window.windowAction.onAdd();
+        window.windowAction.onDisplay();
         window_enforceScreenBounds(uiEngineState, window);
         window_bringToFront(uiEngineState, window);
     }
@@ -442,6 +442,8 @@ final class UICommonUtils {
                 // Remove first if too many
                 if (uiEngineState.notifications.size > notificationsMax)
                     notification_removeFromScreen(uiEngineState, uiEngineState.notifications.first());
+                notification.notificationAction.onDisplay();
+
             }
             case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.add(tooltipNotification);
@@ -456,6 +458,7 @@ final class UICommonUtils {
         switch (commonNotification) {
             case Notification notification -> {
                 uiEngineState.notifications.removeValue(notification, true);
+                notification.notificationAction.onRemove();
             }
             case TooltipNotification tooltipNotification -> {
                 uiEngineState.tooltipNotifications.removeValue(tooltipNotification, true);
@@ -491,14 +494,13 @@ final class UICommonUtils {
         }
         uiEngineState.displayedContextMenuWidth = (textwidth + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TS;
         uiEngineState.openContextMenu = contextMenu;
-        uiEngineState.openContextMenu.contextMenuAction.onOpen();
+        uiEngineState.openContextMenu.contextMenuAction.onDisplay();
         return true;
     }
 
     static void contextMenu_close(UIEngineState uiEngineState, ContextMenu contextMenu) {
         if (contextMenu_isOpen(uiEngineState, contextMenu)) {
             resetOpenContextMenuReference(uiEngineState);
-            contextMenu.contextMenuAction.onClose();
         }
     }
 
@@ -872,13 +874,13 @@ final class UICommonUtils {
         }
         // Open this one
         uiEngineState.openComboBox = comboBox;
-        comboBox.comboBoxAction.onOpen();
+        comboBox.comboBoxAction.onDisplay();
     }
 
     static void comboBox_close(UIEngineState uiEngineState, Combobox comboBox) {
         if (comboBox_isOpen(uiEngineState, comboBox)) {
             resetOpenComboBoxReference(uiEngineState);
-            comboBox.comboBoxAction.onClose();
+            comboBox.comboBoxAction.onRemove();
         }
     }
 
@@ -1140,23 +1142,32 @@ final class UICommonUtils {
         uiEngineState.mTextInputMouseX = Gdx.input.getX();
         uiEngineState.mTextInputUnlock = false;
         uiEngineState.openMouseTextInput = mouseTextInput;
+        uiEngineState.openMouseTextInput.mouseTextInputAction.onDisplay();
     }
 
     static void mouseTextInput_close(UIEngineState uiEngineState) {
         // mouseTextInput Keyboard
-        uiEngineState.openMouseTextInput = null;
-        uiEngineState.mTextInputMouse1Pressed = false;
-        uiEngineState.mTextInputMouse2Pressed = false;
-        uiEngineState.mTextInputMouse3Pressed = false;
-        uiEngineState.mTextInputGamePadLeft = false;
-        uiEngineState.mTextInputGamePadRight = false;
-        uiEngineState.mTextInputScrollTimer = 0;
-        uiEngineState.mTextInputScrollTime = 0;
-        uiEngineState.mTextInputScrollSpeed = 0;
-        uiEngineState.mTextInputTranslatedMouse1Down = false;
-        uiEngineState.mTextInputTranslatedMouse2Down = false;
-        uiEngineState.mTextInputTranslatedMouse3Down = false;
-        uiEngineState.mTextInputUnlock = false;
+        resetMouseTextInputReference(uiEngineState);
+    }
+
+    static void resetMouseTextInputReference(UIEngineState uiEngineState) {
+        if (uiEngineState.openMouseTextInput != null) {
+            final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
+            uiEngineState.openMouseTextInput = null;
+            uiEngineState.mTextInputMouse1Pressed = false;
+            uiEngineState.mTextInputMouse2Pressed = false;
+            uiEngineState.mTextInputMouse3Pressed = false;
+            uiEngineState.mTextInputGamePadLeft = false;
+            uiEngineState.mTextInputGamePadRight = false;
+            uiEngineState.mTextInputScrollTimer = 0;
+            uiEngineState.mTextInputScrollTime = 0;
+            uiEngineState.mTextInputScrollSpeed = 0;
+            uiEngineState.mTextInputTranslatedMouse1Down = false;
+            uiEngineState.mTextInputTranslatedMouse2Down = false;
+            uiEngineState.mTextInputTranslatedMouse3Down = false;
+            uiEngineState.mTextInputUnlock = false;
+            mouseTextInput.mouseTextInputAction.onRemove();
+        }
     }
 
 
@@ -1348,7 +1359,8 @@ final class UICommonUtils {
         if (uiEngineState.pressedScrollBarHorizontal == component)
             resetPressedScrollBarHorizontalReference(uiEngineState);
         if (uiEngineState.pressedKnob == component) resetPressedKnobReference(uiEngineState);
-        if (uiEngineState.pressedFramebufferViewport == component) resetPressedFrameviewPortReference(uiEngineState);
+        if (uiEngineState.pressedFramebufferViewport == component)
+            resetPressedFrameBufferViewPortReference(uiEngineState);
         if (uiEngineState.pressedAppViewPort == component) resetPressedAppViewPortReference(uiEngineState);
         if (uiEngineState.pressedTextField == component) resetPressedTextFieldReference(uiEngineState);
         if (uiEngineState.focusedTextField == component) resetFocusedTextFieldReference(uiEngineState);
@@ -1371,7 +1383,7 @@ final class UICommonUtils {
         resetPressedScrollBarVerticalReference(uiEngineState);
         resetPressedScrollBarHorizontalReference(uiEngineState);
         resetPressedKnobReference(uiEngineState);
-        resetPressedFrameviewPortReference(uiEngineState);
+        resetPressedFrameBufferViewPortReference(uiEngineState);
         resetPressedAppViewPortReference(uiEngineState);
         resetPressedTextFieldReference(uiEngineState);
         resetFocusedTextFieldReference(uiEngineState);
@@ -1382,13 +1394,18 @@ final class UICommonUtils {
         resetOpenComboBoxReference(uiEngineState);
         resetPressedCheckBoxReference(uiEngineState);
         resetOpenContextMenuReference(uiEngineState);
+        resetMouseTextInputReference(uiEngineState);
     }
 
 
     static void resetOpenContextMenuReference(UIEngineState uiEngineState) {
-        UICommonUtils.resetPressedContextMenuItemReference(uiEngineState);
-        uiEngineState.openContextMenu = null;
-        uiEngineState.displayedContextMenuWidth = 0;
+        if(uiEngineState.openContextMenu != null) {
+            ContextMenu contextMenu = uiEngineState.openContextMenu;
+            UICommonUtils.resetPressedContextMenuItemReference(uiEngineState);
+            uiEngineState.openContextMenu = null;
+            uiEngineState.displayedContextMenuWidth = 0;
+            contextMenu.contextMenuAction.onRemove();
+        }
     }
 
     static void resetPressedContextMenuItemReference(UIEngineState uiEngineState) {
@@ -1403,7 +1420,7 @@ final class UICommonUtils {
         uiEngineState.pressedAppViewPort = null;
     }
 
-    static void resetPressedFrameviewPortReference(UIEngineState uiEngineState) {
+    static void resetPressedFrameBufferViewPortReference(UIEngineState uiEngineState) {
         uiEngineState.pressedFramebufferViewport = null;
     }
 
@@ -1431,8 +1448,12 @@ final class UICommonUtils {
     }
 
     static void resetOpenComboBoxReference(UIEngineState uiEngineState) {
-        resetPressedComboBoxItemReference(uiEngineState);
-        uiEngineState.openComboBox = null;
+        if (uiEngineState.openComboBox != null) {
+            resetPressedComboBoxItemReference(uiEngineState);
+            final Combobox combobox = uiEngineState.openComboBox;
+            uiEngineState.openComboBox = null;
+            combobox.comboBoxAction.onRemove();
+        }
     }
 
     static void resetPressedComboBoxItemReference(UIEngineState uiEngineState) {
