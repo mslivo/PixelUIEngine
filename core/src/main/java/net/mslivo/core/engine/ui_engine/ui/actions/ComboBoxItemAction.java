@@ -1,8 +1,9 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import com.badlogic.gdx.graphics.Color;
+import net.mslivo.core.engine.ui_engine.ui.actions.support.CellColor;
+import net.mslivo.core.engine.ui_engine.ui.actions.support.Icon;
 
-public interface ComboBoxItemAction extends IconSupport, CellColorSupport {
+public interface ComboBoxItemAction extends Icon, CellColor {
     default void onSelect() {
     }
 

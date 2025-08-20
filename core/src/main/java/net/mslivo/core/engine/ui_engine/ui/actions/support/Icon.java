@@ -1,24 +1,23 @@
-package net.mslivo.core.engine.ui_engine.ui.actions;
+package net.mslivo.core.engine.ui_engine.ui.actions.support;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.media_manager.CMediaSprite;
 
-public interface ItemIconSupport<T> {
+public interface Icon {
 
-    default CMediaSprite icon(T item){
+    default CMediaSprite icon(){
         return null;
     };
 
-    default int iconIndex(T item) {
+    default int iconIndex() {
         return 0;
     }
 
-    default Color iconColor(T item){
+    default Color iconColor(){
         return Color.GRAY;
     }
 
     default boolean iconFlipX(){return false;}
 
     default boolean iconFlipY(){return false;}
-
 }

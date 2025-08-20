@@ -1,5 +1,7 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
+import net.mslivo.core.engine.ui_engine.ui.actions.support.CommonActions;
+
 public interface TextFieldAction extends CommonActions {
 
     default boolean isContentValid(String newContent) {

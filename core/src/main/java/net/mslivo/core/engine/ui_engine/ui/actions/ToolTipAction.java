@@ -1,6 +1,8 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public interface ToolTipAction extends Displayable{
+import net.mslivo.core.engine.ui_engine.ui.actions.support.Displayable;
+
+public interface ToolTipAction extends Displayable {
 
     default void onUpdate() {
     }

@@ -1,4 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public interface ProgressBarAction extends CommonActions{
+import net.mslivo.core.engine.ui_engine.ui.actions.support.CommonActions;
+
+public interface ProgressBarAction extends CommonActions {
 }

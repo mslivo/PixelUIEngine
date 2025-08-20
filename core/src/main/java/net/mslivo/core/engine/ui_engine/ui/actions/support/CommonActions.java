@@ -1,4 +1,4 @@
-package net.mslivo.core.engine.ui_engine.ui.actions;
+package net.mslivo.core.engine.ui_engine.ui.actions.support;
 
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 

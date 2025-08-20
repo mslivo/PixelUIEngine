@@ -29,7 +29,7 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputProcessor;
 import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.CommonActions;
+import net.mslivo.core.engine.ui_engine.ui.actions.support.CommonActions;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.components.button.Button;

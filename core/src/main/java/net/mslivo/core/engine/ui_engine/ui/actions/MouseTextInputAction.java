@@ -1,6 +1,8 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-public interface MouseTextInputAction extends Displayable{
+import net.mslivo.core.engine.ui_engine.ui.actions.support.Displayable;
+
+public interface MouseTextInputAction extends Displayable {
 
     /*Return = close yes/no */
 
