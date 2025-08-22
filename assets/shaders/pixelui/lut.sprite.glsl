@@ -1,12 +1,24 @@
-Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec2 v_texCoord
+Usable Vertex Shader Variables:
+vec4 a_position
+vec4 v_color
+vec4 v_tweak
+vec2 v_texCoord
 
 BEGIN VERTEX
 
 END VERTEX
 
-Useable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec2 v_texCoord, sampler2D u_texture, vec2 u_textureSize
+Useable Fragment Shader Variables:
+vec4 v_color
+vec4 v_tweak
+vec2 v_texCoord
+sampler2D u_texture
+vec2 u_textureSize
 
 BEGIN FRAGMENT
+
+    uniform sampler2D u_lut;
+    uniform vec2 u_lutSize;
 
     vec3 lut(vec3 color, sampler2D lutTexture, vec2 lutTextureSize) {
         float lutSize = lutTextureSize.y;
@@ -30,8 +42,7 @@ BEGIN FRAGMENT
         return mix(slice0Color, slice1Color, zOffset);
     }
 
-    uniform sampler2D u_lut;
-    uniform vec2 u_lutSize;
+
 
     void main(){
 

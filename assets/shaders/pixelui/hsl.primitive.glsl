@@ -1,4 +1,8 @@
-Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+Usable Vertex Shader Variables:
+vec4 a_position
+vec4 v_color
+vec4 v_tweak
+vec2 v_texCoord
 
 BEGIN VERTEX
 
@@ -44,7 +48,12 @@ BEGIN VERTEX
 
 END VERTEX
 
-Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+Useable Fragment Shader Variables:
+vec4 v_color
+vec4 v_tweak
+vec2 v_texCoord
+sampler2D u_texture
+vec2 u_textureSize
 
 BEGIN FRAGMENT
 
