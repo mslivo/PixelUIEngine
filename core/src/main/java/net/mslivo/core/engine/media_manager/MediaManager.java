@@ -628,6 +628,7 @@ public final class MediaManager implements Disposable {
         };
     }
 
+
     public int imageWidth(CMediaImage cMediaImage) {
         return medias_images.get(cMediaImage).getRegionWidth();
     }
@@ -659,6 +660,39 @@ public final class MediaManager implements Disposable {
     public int animationHeight(CMediaAnimation cMediaAnimation) {
         return cMediaAnimation.regionHeight;
     }
+
+    public int spriteWidthHalf(CMediaSprite cMediaSprite) {
+        return MathUtils.round(spriteWidth(cMediaSprite)/2f);
+    }
+
+    public int spriteHeightHalf(CMediaSprite cMediaSprite) {
+        return MathUtils.round(spriteHeightHalf(cMediaSprite)/2f);
+    }
+
+    public int arrayWidthHalf(CMediaArray cMediaArray) {
+        return MathUtils.round(arrayWidth(cMediaArray)/2f);
+    }
+
+    public int arrayHeightHalf(CMediaArray cMediaArray) {
+        return MathUtils.round(arrayHeightHalf(cMediaArray)/2f);
+    }
+
+    public int imageWidthHalf(CMediaImage cMediaImage) {
+        return MathUtils.round(imageWidth(cMediaImage)/2f);
+    }
+
+    public int imageHeightHalf(CMediaImage cMediaImage) {
+        return MathUtils.round(imageHeight(cMediaImage)/2f);
+    }
+
+    public int animationWidthHalf(CMediaAnimation cMediaAnimation) {
+        return MathUtils.round(animationWidth(cMediaAnimation)/2f);
+    }
+
+    public int animationHeightHalf(CMediaAnimation cMediaAnimation) {
+        return MathUtils.round(animationHeight(cMediaAnimation)/2f);
+    }
+
 
     public int arraySize(CMediaArray cMediaArray) {
         return medias_arrays.get(cMediaArray).length;
