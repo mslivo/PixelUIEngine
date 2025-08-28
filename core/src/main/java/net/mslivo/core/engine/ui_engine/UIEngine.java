@@ -2822,11 +2822,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
             case Image image -> {
                 if (image.image != null) {
-                    int width = api.TS(image.width);
-                    int height = api.TS(image.height);
+                    int width = mediaManager.spriteWidth(image.image);
+                    int height = mediaManager.spriteHeight(image.image);
                     spriteRenderer.drawCMediaSprite(image.image, image.arrayIndex, UICommonUtils.ui_getAnimationTimer(uiEngineState),
                             UICommonUtils.component_getAbsoluteX(image), UICommonUtils.component_getAbsoluteY(image),
-                            width, height, 0, 0, mediaManager.spriteWidth(image.image), mediaManager.spriteHeight(image.image),
+                            width, height, 0, 0, width, height,
                             image.flipX, image.flipY
                     );
                 }

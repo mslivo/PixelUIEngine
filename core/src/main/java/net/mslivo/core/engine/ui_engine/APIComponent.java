@@ -1175,8 +1175,8 @@ public final class APIComponent {
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY, ImageAction imageAction) {
             Image imageC = new Image();
-            int width = image != null ? mediaManager.spriteWidth(image) / api.TS() : 0;
-            int height = image != null ? mediaManager.spriteHeight(image) / api.TS() : 0;
+            int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / api.TSF()),1) : 1;
+            int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / api.TSF()),1) : 1;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
