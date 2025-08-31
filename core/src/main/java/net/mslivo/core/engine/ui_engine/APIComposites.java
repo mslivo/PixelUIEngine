@@ -398,7 +398,7 @@ public final class APIComposites {
                         scrolledLast = list.scrolled;
                     }
                     // disable scrollbar
-                    if (list.items != null && list.items.size <= list.height) {
+                    if (list.items == null || list.items.size <= list.height) {
                         api.component.setDisabled(scrollBarVertical, true);
                         api.component.scrollbar.setScrolled(scrollBarVertical, 1f);
                     } else {
