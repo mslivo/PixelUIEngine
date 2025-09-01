@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Align;
 import net.mslivo.core.engine.media_manager.*;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
-import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
+import net.mslivo.core.engine.ui_engine.rendering.ShaderParser;
 
 public class SpriteRenderer extends BaseColorTweakRenderer {
 
@@ -33,15 +33,17 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
 
     @Override
     protected ShaderProgram provideDefaultShader() {
-        return new SpriteShader("""
-            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec2 v_texCoord
+        return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.SPRITE,"""
+            // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec2 v_texCoord
+            // Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec2 v_texCoord | sampler2D u_texture | vec2 u_textureSize
             
-            BEGIN VERTEX
-            END VERTEX
+            // BEGIN VERTEX
             
-            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec2 v_texCoord, sampler2D u_texture, vec2 u_textureSize
+            // END VERTEX
             
-            BEGIN FRAGMENT
+            // BEGIN FRAGMENT
+
+            
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
                  color.a *= modColor.a;
@@ -52,8 +54,8 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             	gl_FragColor = colorTintAdd(texture2D(u_texture, v_texCoord),v_color);
             }
             
-            END FRAGMENT
-            """).compile();
+            // END FRAGMENT
+            """);
     }
 
     public SpriteRenderer() {

@@ -1,19 +1,11 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL32;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.ScreenUtils;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TransitionManager;
 import net.mslivo.core.engine.tools.transitions.transitions.PixelateTransition;
 import net.mslivo.core.engine.ui_engine.UIEngine;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
@@ -36,8 +28,6 @@ public class ExampleMain extends ApplicationAdapter {
     public void resize(int width, int height) {
         if (this.uiEngine != null) this.uiEngine.resize(width, height);
     }
-
-
 
 
     @Override
@@ -63,7 +53,6 @@ public class ExampleMain extends ApplicationAdapter {
         this.state = STATE.RUN;
 
     }
-
 
 
     @Override

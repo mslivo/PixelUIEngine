@@ -18,10 +18,9 @@ import net.mslivo.core.engine.ui_engine.UIEngineAdapter;
 import net.mslivo.core.engine.ui_engine.constants.BUTTON_MODE;
 import net.mslivo.core.engine.ui_engine.constants.KeyCode;
 import net.mslivo.core.engine.ui_engine.media.UIEngineBaseMedia_8x8;
+import net.mslivo.core.engine.ui_engine.rendering.ShaderParser;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
-import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
 import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
@@ -69,9 +68,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
         this.spriteRendererDefault = new SpriteRenderer(mediaManager);
-        this.spriteRenderer = new SpriteRenderer(mediaManager, new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile(), SpriteRenderer.MAX_VERTEXES_DEFAULT);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
-        this.primitiveRenderer = new PrimitiveRenderer( new PrimitiveShader(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")).compile(), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
+        this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
         this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         api.config.window.setDefaultEnforceScreenBounds(false);
@@ -354,7 +353,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
     }
 
-    private ShaderProgram shaderProgram = new SpriteShader(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")).compile();
+    private ShaderProgram shaderProgram = ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl"));
 
     @Override
     public void dispose() {

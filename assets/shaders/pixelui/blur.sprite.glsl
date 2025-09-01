@@ -1,20 +1,13 @@
-Usable Vertex Shader Variables:
-vec4 a_position
-vec4 v_color
-vec4 v_tweak
-vec2 v_texCoord
+// Usable Vertex Shader Variables:  vec4 a_position | vec4 v_color | vec4 v_tweak | vec2 v_texCoord
+// Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec2 v_texCoord | sampler2D u_texture | vec2 u_textureSize
 
-BEGIN VERTEX
-END VERTEX
+// BEGIN VERTEX
 
-Useable Fragment Shader Variables:
-vec4 v_color
-vec4 v_tweak
-vec2 v_texCoord
-sampler2D u_texture
-vec2 u_textureSize
 
-BEGIN FRAGMENT
+// END VERTEX
+
+
+// BEGIN FRAGMENT
 
     vec4 blur(vec2 texCoords, sampler2D texture, vec2 textureSize) {
         vec2 texelSize = 1.0 / textureSize;
@@ -38,4 +31,4 @@ BEGIN FRAGMENT
         gl_FragColor = mix(color, blurred, v_tweak.x);
     }
 
-END FRAGMENT
+// END FRAGMENT

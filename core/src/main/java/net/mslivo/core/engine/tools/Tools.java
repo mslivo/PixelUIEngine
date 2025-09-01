@@ -486,6 +486,9 @@ public class Tools {
         }
 
         public static String readTextFromFile(Path file, boolean zipped) {
+            return readTextFromFile(file,zipped,0,Long.MAX_VALUE);
+        }
+        public static String readTextFromFile(Path file, boolean zipped, long skip, long limit) {
             try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
                 if (zipped) {
                     try (ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
@@ -494,8 +497,12 @@ public class Tools {
                             try (InputStreamReader inputStreamReader = new InputStreamReader(zipInputStream, StandardCharsets.UTF_8)) {
                                 StringBuilder builder = new StringBuilder();
                                 int ch;
+                                int count = 0;
+                                inputStreamReader.skip(skip);
                                 while ((ch = inputStreamReader.read()) != -1) {
                                     builder.append((char) ch);
+                                    if(count++ > limit)
+                                        break;
                                 }
                                 return builder.toString();
                             }
@@ -505,8 +512,12 @@ public class Tools {
                     try (InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8)) {
                         StringBuilder builder = new StringBuilder();
                         int ch;
+                        int count = 0;
+                        inputStreamReader.skip(skip);
                         while ((ch = inputStreamReader.read()) != -1) {
                             builder.append((char) ch);
+                            if(count++ > limit)
+                                break;
                         }
                         return builder.toString();
                     }

@@ -6,8 +6,8 @@ import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.core.engine.tools.transitions.TRANSITION_SPEED;
 import net.mslivo.core.engine.tools.transitions.Transition;
+import net.mslivo.core.engine.ui_engine.rendering.ShaderParser;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.rendering.shader.SpriteShader;
 
 public class PixelateTransition extends Transition {
     private float fadeOut;
@@ -26,7 +26,7 @@ public class PixelateTransition extends Transition {
         return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
-    private ShaderProgram pixelationShader = new SpriteShader(Tools.File.findResource("shaders/pixelui/pixelation.sprite.glsl")).compile();
+    private ShaderProgram pixelationShader = ShaderParser.parse(Tools.File.findResource("shaders/pixelui/pixelation.sprite.glsl"));
 
     @Override
     public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {

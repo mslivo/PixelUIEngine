@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.core.engine.ui_engine.rendering.IntegerIndexBufferObject;
-import net.mslivo.core.engine.ui_engine.rendering.shader.PrimitiveShader;
+import net.mslivo.core.engine.ui_engine.rendering.ShaderParser;
 
 import java.nio.IntBuffer;
 
@@ -191,10 +191,11 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
 
     @Override
     protected ShaderProgram provideDefaultShader() {
-        return new PrimitiveShader("""
-            Usable Vertex Shader Variables: vec4 a_position, vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
+        return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.PRIMITIVE,"""
+            // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec4 v_vertexColor
+            // Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec4 v_vertexColor
             
-            BEGIN VERTEX
+            // BEGIN VERTEX
             
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
@@ -206,16 +207,15 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
             	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
             }
             
-            END VERTEX
+            // END VERTEX
+
+            // BEGIN FRAGMENT
             
-            Usable Fragment Shader Variables: vec4 v_color, vec4 v_tweak, vec4 v_vertexColor
-            
-            BEGIN FRAGMENT
             void main(){
             	 gl_FragColor = v_vertexColor;
             }
-            END FRAGMENT
-            """).compile();
+            // END FRAGMENT
+            """);
     }
 
 
