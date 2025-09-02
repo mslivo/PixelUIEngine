@@ -1,7 +1,7 @@
 package net.mslivo.example;
 
 
-import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
+import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 
 public class ExampleMainConstants {
 

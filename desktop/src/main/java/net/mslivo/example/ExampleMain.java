@@ -1,11 +1,11 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.tools.transitions.TransitionManager;
-import net.mslivo.core.engine.tools.transitions.transitions.PixelateTransition;
-import net.mslivo.core.engine.ui_engine.UIEngine;
+import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.utils.Tools;
+import net.mslivo.pixelui.utils.transitions.TransitionManager;
+import net.mslivo.pixelui.utils.transitions.basic.PixelateTransition;
+import net.mslivo.pixelui.engine.UIEngine;
 import net.mslivo.example.ui.ExampleUIEngineAdapter;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 

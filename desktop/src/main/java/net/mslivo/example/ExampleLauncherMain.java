@@ -1,9 +1,8 @@
 package net.mslivo.example;
 
 
-import com.badlogic.gdx.math.MathUtils;
-import net.mslivo.core.engine.tools.PixelUILaunchConfig;
-import net.mslivo.core.engine.tools.Tools;
+import net.mslivo.pixelui.utils.PixelUILaunchConfig;
+import net.mslivo.pixelui.utils.Tools;
 
 public class ExampleLauncherMain {
 

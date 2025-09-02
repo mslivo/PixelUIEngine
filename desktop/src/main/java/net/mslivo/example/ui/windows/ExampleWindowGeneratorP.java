@@ -8,53 +8,22 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.core.engine.media_manager.CMediaArray;
-import net.mslivo.core.engine.media_manager.CMediaImage;
-import net.mslivo.core.engine.media_manager.CMediaSprite;
-import net.mslivo.core.engine.media_manager.MediaManager;
-import net.mslivo.core.engine.tools.Tools;
-import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.APIWidgets;
-import net.mslivo.core.engine.ui_engine.constants.*;
-import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
-import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
-import net.mslivo.core.engine.ui_engine.ui.window.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.*;
-import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.components.Button;
-import net.mslivo.core.engine.ui_engine.ui.components.ImageButton;
-import net.mslivo.core.engine.ui_engine.ui.components.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.Checkbox;
-import net.mslivo.core.engine.ui_engine.ui.components.Combobox;
-import net.mslivo.core.engine.ui_engine.ui.components.ComboboxItem;
-import net.mslivo.core.engine.ui_engine.ui.components.FrameBufferViewport;
-import net.mslivo.core.engine.ui_engine.ui.components.Grid;
-import net.mslivo.core.engine.ui_engine.ui.components.Image;
-import net.mslivo.core.engine.ui_engine.ui.components.Knob;
-import net.mslivo.core.engine.ui_engine.ui.components.List;
-import net.mslivo.core.engine.ui_engine.ui.components.Progressbar;
-import net.mslivo.core.engine.ui_engine.ui.components.Scrollbar;
-import net.mslivo.core.engine.ui_engine.ui.components.ScrollbarHorizontal;
-import net.mslivo.core.engine.ui_engine.ui.components.ScrollbarVertical;
-import net.mslivo.core.engine.ui_engine.ui.components.Shape;
-import net.mslivo.core.engine.ui_engine.ui.components.Tab;
-import net.mslivo.core.engine.ui_engine.ui.components.Tabbar;
-import net.mslivo.core.engine.ui_engine.ui.components.Text;
-import net.mslivo.core.engine.ui_engine.ui.components.Textfield;
-import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
-import net.mslivo.core.engine.ui_engine.ui.components.ContextMenuItem;
-import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP1;
-import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
-import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipFramebufferViewportSegment;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipSegment;
+import net.mslivo.pixelui.engine.*;
+import net.mslivo.pixelui.engine.actions.*;
+import net.mslivo.pixelui.engine.constants.*;
+import net.mslivo.pixelui.media_manager.CMediaArray;
+import net.mslivo.pixelui.media_manager.CMediaImage;
+import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.utils.Tools;
+import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class ExampleWindowGeneratorP implements WindowGeneratorP1<MediaManager> {
+public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager> {
 
     private MediaManager mediaManager;
 
