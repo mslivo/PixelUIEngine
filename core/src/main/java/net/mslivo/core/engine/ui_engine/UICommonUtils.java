@@ -59,44 +59,50 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.TooltipTextSegment;
 import java.util.HashSet;
 import java.util.function.Predicate;
 
-final class UICommonUtils {
+public class UICommonUtils {
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();
     private static Array<Component> windowComponentsVisibleOrder = new Array<>();
     private static HashSet<Component> windowComponentsVisibleOrderSet = new HashSet<>();
-
     static {
         textFieldControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME, Input.Keys.END, Input.Keys.ENTER);
         textFieldRepeatedControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL);
     }
 
-    static void emulatedMouse_setPosition(UIEngineState uiEngineState, int x, int y) {
+    private final UIEngineState uiEngineState;
+    private final MediaManager mediaManager;
+    UICommonUtils(UIEngineState uiEngineState, MediaManager mediaManager) {
+        this.uiEngineState = uiEngineState;
+        this.mediaManager = mediaManager;
+    }
+
+    public void emulatedMouse_setPosition(int x, int y) {
         if (!uiEngineState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
         uiEngineState.mouse_emulated.x = x;
         uiEngineState.mouse_emulated.y = y;
     }
 
-    static void emulatedMouse_setPositionComponent(UIEngineState uiEngineState, Component component) {
+    public void emulatedMouse_setPositionComponent(Component component) {
         if (component == null) return;
         if (component.addedToWindow == null && !component.addedToScreen) return;
         int x = component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2);
         int y = component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2);
-        emulatedMouse_setPosition(uiEngineState, x, y);
+        emulatedMouse_setPosition( x, y);
     }
 
-    private static boolean emulatedMouse_isInteractAbleComponent(Component component) {
+    private boolean emulatedMouse_isInteractAbleComponent(Component component) {
         if (!(component instanceof Image || component instanceof Text)) {
             if (component.visible && !component.disabled && !component_isHiddenByTab(component)) return true;
         }
         return false;
     }
 
-    static void emulatedMouse_setPositionNextComponent(UIEngineState uiEngineState, boolean backwards) {
+    public void emulatedMouse_setPositionNextComponent(boolean backwards) {
         Window activeWindow = window_findTopInteractableWindow(uiEngineState);
         if (activeWindow != null && activeWindow.folded) {
-            emulatedMouse_setPosition(uiEngineState,
+            emulatedMouse_setPosition(
                     activeWindow.x + (uiEngineState.tileSize.TL(activeWindow.width) / 2),
                     activeWindow.y + (uiEngineState.tileSize.TL(activeWindow.height) - 4)
             );
@@ -114,7 +120,7 @@ final class UICommonUtils {
 
         for (int iy = toY; iy >= fromY; iy -= uiEngineState.tileSize.TS) {
             for (int ix = fromX; ix <= toX; ix += uiEngineState.tileSize.TS) {
-                Object object = UICommonUtils.component_getUIObjectAtPosition(uiEngineState, ix, iy);
+                Object object = component_getUIObjectAtPosition( ix, iy);
                 if (!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)) {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
@@ -137,7 +143,7 @@ final class UICommonUtils {
                 if (nearestIndex > (windowComponentsVisibleOrder.size - 1)) nearestIndex = 0;
             }
 
-            emulatedMouse_setPositionComponent(uiEngineState, windowComponentsVisibleOrder.get(nearestIndex));
+            emulatedMouse_setPositionComponent( windowComponentsVisibleOrder.get(nearestIndex));
         }
 
         return;
@@ -154,26 +160,26 @@ final class UICommonUtils {
     }
 
 
-    static boolean window_isModalOpen(UIEngineState uiEngineState) {
+    public boolean window_isModalOpen(UIEngineState uiEngineState) {
         return uiEngineState.modalWindow != null;
     }
 
-    static void window_fold(Window window) {
+    public void window_fold(Window window) {
         window.folded = true;
         window.windowAction.onFold();
     }
 
-    static void window_unFold(Window window) {
+    public void window_unFold(Window window) {
         window.folded = false;
         window.windowAction.onUnfold();
     }
 
-    static void window_receiveMessage(Window window, int type, Object... parameters) {
+    public void window_receiveMessage(Window window, int type, Object... parameters) {
         if (window == null) return;
         window.windowAction.onMessageReceived(type, parameters);
     }
 
-    static void window_bringToFront(UIEngineState uiEngineState, Window window) {
+    public void window_bringToFront( Window window) {
         if (uiEngineState.windows.size == 1) return;
 
         int currentIndex = uiEngineState.windows.indexOf(window, true);
@@ -196,14 +202,14 @@ final class UICommonUtils {
     }
 
 
-    static void window_setPosition(UIEngineState uiEngineState, Window window, int x, int y) {
+    public void window_setPosition( Window window, int x, int y) {
         window.x = x;
         window.y = y;
-        if (window.enforceScreenBounds) window_enforceScreenBounds(uiEngineState, window);
+        if (window.enforceScreenBounds) window_enforceScreenBounds( window);
     }
 
 
-    static void window_enforceScreenBounds(UIEngineState uiEngineState, Window window) {
+    public void window_enforceScreenBounds( Window window) {
         int wndWidth = uiEngineState.tileSize.TL(window.width);
         window.x = Math.clamp(window.x, 0, uiEngineState.resolutionWidth - wndWidth);
         if (window.folded) {
@@ -213,7 +219,7 @@ final class UICommonUtils {
         }
     }
 
-    static void window_addToScreenAsModal(UIEngineState uiEngineState, Window window) {
+    public void window_addToScreenAsModal( Window window) {
         if (uiEngineState.modalWindow == null) {
             // Closned opened comboxes/menus
             resetAllReferences(uiEngineState);
@@ -223,46 +229,46 @@ final class UICommonUtils {
             window.folded = false;
             window.enforceScreenBounds = true;
             uiEngineState.modalWindow = window;
-            UICommonUtils.window_center(uiEngineState, window);
-            UICommonUtils.window_addToScreen(uiEngineState, window);
+            window_center( window);
+            window_addToScreen( window);
         } else {
             uiEngineState.modalWindowQueue.addLast(window);
         }
     }
 
 
-    static void window_center(UIEngineState uiEngineState, Window window) {
+    public void window_center( Window window) {
         int centerX = (uiEngineState.resolutionWidthHalf) - (uiEngineState.tileSize.TL(window.width) / 2);
         int centerY = (uiEngineState.resolutionHeightHalf) - ((window.folded ? uiEngineState.tileSize.TS : uiEngineState.tileSize.TL(window.height)) / 2);
-        window_setPosition(uiEngineState, window, centerX, centerY);
+        window_setPosition( window, centerX, centerY);
     }
 
-    static void window_addToScreen(UIEngineState uiEngineState, Window window) {
+    public void window_addToScreen( Window window) {
         if (window.addedToScreen) return;
         window.addedToScreen = true;
         uiEngineState.windows.add(window);
         window.windowAction.onDisplay();
-        window_enforceScreenBounds(uiEngineState, window);
-        window_bringToFront(uiEngineState, window);
+        window_enforceScreenBounds( window);
+        window_bringToFront( window);
     }
 
-    static boolean window_close(UIEngineState uiEngineState, Window window) {
+    public boolean window_close( Window window) {
         for (int i = 0; i < window.components.size; i++) {
             if (window.components.get(i).name.equals(WND_CLOSE_BUTTON) && window.components.get(i) instanceof Button closeButton) {
-                UICommonUtils.button_press(closeButton);
-                UICommonUtils.button_release(closeButton);
+                button_press(closeButton);
+                button_release(closeButton);
                 return true;
             }
         }
         return false;
     }
 
-    static void window_removeFromScreen(UIEngineState uiEngineState, Window window) {
+    public void window_removeFromScreen( Window window) {
         if (!window.addedToScreen) return;
 
         // Remove References
         if (uiEngineState.lastUIMouseHover == window) uiEngineState.lastUIMouseHover = null;
-        if (UICommonUtils.window_isModalOpen(uiEngineState) && uiEngineState.modalWindow == window)
+        if (window_isModalOpen(uiEngineState) && uiEngineState.modalWindow == window)
             uiEngineState.modalWindow = null;
         for (int i = window.components.size - 1; i >= 0; i--) {
             final Component component = window.components.get(i);
@@ -271,7 +277,7 @@ final class UICommonUtils {
                 uiEngineState.appViewPorts.removeValue(appViewPort, true);
         }
 
-        window_resetReferences(uiEngineState, window);
+        window_resetReferences( window);
 
         // Remove
         window.addedToScreen = false;
@@ -280,43 +286,43 @@ final class UICommonUtils {
 
         // Add Next Modal from Queue queue
         if (!uiEngineState.modalWindowQueue.isEmpty())
-            window_addToScreenAsModal(uiEngineState, uiEngineState.modalWindowQueue.removeLast());
+            window_addToScreenAsModal( uiEngineState.modalWindowQueue.removeLast());
     }
 
-    static void component_setSize(UIEngineState uiEngineState, Component component, int width, int height) {
+    public void component_setSize( Component component, int width, int height) {
         component.width = Math.max(width, 1);
         component.height = Math.max(height, 1);
 
         if (component instanceof AppViewport appViewPort) {
-            appViewPort_resizeCameraTextureAndFrameBuffer(uiEngineState, appViewPort);
+            appViewPort_resizeCameraTextureAndFrameBuffer( appViewPort);
         }
     }
 
-    static int component_getParentWindowX(Component component) {
+    public int component_getParentWindowX(Component component) {
         return component.addedToWindow != null ? component.addedToWindow.x : 0;
     }
 
-    static int component_getParentWindowY(Component component) {
+    public int component_getParentWindowY(Component component) {
         return component.addedToWindow != null ? component.addedToWindow.y : 0;
     }
 
-    static int component_getAbsoluteX(Component component) {
+    public int component_getAbsoluteX(Component component) {
         return component_getParentWindowX(component) + component.x;
     }
 
-    static int component_getAbsoluteY(Component component) {
+    public int component_getAbsoluteY(Component component) {
         return component_getParentWindowY(component) + component.y;
     }
 
-    static int component_getRelativeMouseX(int mouse_ui_x, Component component) {
+    public int component_getRelativeMouseX(int mouse_ui_x, Component component) {
         return mouse_ui_x - component_getAbsoluteX(component);
     }
 
-    static int component_getRelativeMouseY(int mouse_ui_y, Component component) {
+    public int component_getRelativeMouseY(int mouse_ui_y, Component component) {
         return mouse_ui_y - component_getAbsoluteY(component);
     }
 
-    static Object component_getUIObjectAtPosition(UIEngineState uiEngineState, int x, int y) {
+    public Object component_getUIObjectAtPosition( int x, int y) {
         // Notification Collision
         for (int i = 0; i < uiEngineState.notifications.size; i++) {
             Notification notification = uiEngineState.notifications.get(i);
@@ -341,8 +347,8 @@ final class UICommonUtils {
         if (uiEngineState.openComboBox != null) {
             if (Tools.Calc.pointRectsCollide(
                     x, y,
-                    UICommonUtils.component_getAbsoluteX(uiEngineState.openComboBox),
-                    UICommonUtils.component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size)),
+                    component_getAbsoluteX(uiEngineState.openComboBox),
+                    component_getAbsoluteY(uiEngineState.openComboBox) - (uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size)),
                     uiEngineState.tileSize.TL(uiEngineState.openComboBox.width), uiEngineState.tileSize.TL(uiEngineState.openComboBox.items.size))) {
                 return uiEngineState.openComboBox;
             }
@@ -362,7 +368,7 @@ final class UICommonUtils {
             if (collidesWithWindow) {
                 for (int ic = window.components.size - 1; ic >= 0; ic--) {
                     Component component = window.components.get(ic);
-                    if (component_isComponentAtPosition(uiEngineState, x, y, component)) {
+                    if (component_isComponentAtPosition( x, y, component)) {
                         return component;
                     }
                 }
@@ -373,22 +379,22 @@ final class UICommonUtils {
         // Screen component collision
         for (int isc = uiEngineState.screenComponents.size - 1; isc >= 0; isc--) {
             Component screenComponent = uiEngineState.screenComponents.get(isc);
-            if (component_isComponentAtPosition(uiEngineState, x, y, screenComponent)) return screenComponent;
+            if (component_isComponentAtPosition( x, y, screenComponent)) return screenComponent;
         }
         return null;
     }
 
-    static boolean component_isComponentAtPosition(UIEngineState uiEngineState, int x, int y, Component component) {
+    public boolean component_isComponentAtPosition( int x, int y, Component component) {
         if (!component.visible) return false;
-        if (UICommonUtils.component_isHiddenByTab(component)) return false;
+        if (component_isHiddenByTab(component)) return false;
 
-        if (Tools.Calc.pointRectsCollide(x, y, UICommonUtils.component_getAbsoluteX(component), UICommonUtils.component_getAbsoluteY(component), uiEngineState.tileSize.TL(component.width), uiEngineState.tileSize.TL(component.height))) {
+        if (Tools.Calc.pointRectsCollide(x, y, component_getAbsoluteX(component), component_getAbsoluteY(component), uiEngineState.tileSize.TL(component.width), uiEngineState.tileSize.TL(component.height))) {
             return true;
         }
         return false;
     }
 
-    static boolean component_isHiddenByTab(Component component) {
+    public boolean component_isHiddenByTab(Component component) {
         if (component.addedToTab == null) return false;
         Tab selectedTab = UICommonUtils.tabBar_getSelectedTab(component.addedToTab.addedToTabBar);
         if (selectedTab != null && selectedTab == component.addedToTab) {
@@ -402,37 +408,37 @@ final class UICommonUtils {
         }
     }
 
-    static void hotkey_press(HotKey hotKey) {
+    public void hotkey_press(HotKey hotKey) {
         hotKey.pressed = true;
         hotKey.hotKeyAction.onPress();
     }
 
-    static void hotkey_release(HotKey hotKey) {
+    public void hotkey_release(HotKey hotKey) {
         hotKey.pressed = false;
         hotKey.hotKeyAction.onRelease();
     }
 
-    static void checkbox_check(Checkbox checkBox) {
+    public void checkbox_check(Checkbox checkBox) {
         if (checkBox.checked) return;
         checkBox.checked = true;
         checkBox.checkBoxAction.onCheck(true);
     }
 
-    static void checkbox_unCheck(Checkbox checkBox) {
+    public void checkbox_unCheck(Checkbox checkBox) {
         if (!checkBox.checked) return;
         checkBox.checked = false;
         checkBox.checkBoxAction.onCheck(false);
     }
 
-    static void setMouseInteractedUIObject(UIEngineState uiEngineState, Object object) {
+    public void setMouseInteractedUIObject( Object object) {
         uiEngineState.mouseInteractedUIObjectFrame = object;
     }
 
-    static void setKeyboardInteractedUIObject(UIEngineState uiEngineState, Object object) {
+    public void setKeyboardInteractedUIObject( Object object) {
         uiEngineState.keyboardInteractedUIObjectFrame = object;
     }
 
-    static void notification_addToScreen(UIEngineState uiEngineState, CommonNotification commonNotification, int notificationsMax) {
+    public void notification_addToScreen( CommonNotification commonNotification, int notificationsMax) {
         if (commonNotification.addedToScreen) return;
         commonNotification.addedToScreen = true;
 
@@ -441,7 +447,7 @@ final class UICommonUtils {
                 uiEngineState.notifications.add(notification);
                 // Remove first if too many
                 if (uiEngineState.notifications.size > notificationsMax)
-                    notification_removeFromScreen(uiEngineState, uiEngineState.notifications.first());
+                    notification_removeFromScreen( uiEngineState.notifications.first());
                 notification.notificationAction.onDisplay();
 
             }
@@ -452,7 +458,7 @@ final class UICommonUtils {
 
     }
 
-    static void notification_removeFromScreen(UIEngineState uiEngineState, CommonNotification commonNotification) {
+    public void notification_removeFromScreen( CommonNotification commonNotification) {
         if (!commonNotification.addedToScreen) return;
         commonNotification.addedToScreen = false;
         switch (commonNotification) {
@@ -466,8 +472,8 @@ final class UICommonUtils {
         }
     }
 
-    static boolean contextMenu_openAtMousePosition(UIEngineState uiEngineState, MediaManager mediaManager, ContextMenu contextMenu) {
-        boolean success = contextMenu_open(uiEngineState, mediaManager, contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
+    public boolean contextMenu_openAtMousePosition(  ContextMenu contextMenu) {
+        boolean success = contextMenu_open(  contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
             uiEngineState.mouse_emulated.x += uiEngineState.tileSize.TS_HALF;
@@ -476,11 +482,11 @@ final class UICommonUtils {
         return success;
     }
 
-    static boolean contextMenu_open(UIEngineState uiEngineState, MediaManager mediaManager, ContextMenu contextMenu, int x, int y) {
+    public boolean contextMenu_open(  ContextMenu contextMenu, int x, int y) {
         if (contextMenu.items.isEmpty()) return false;
         // Close open ContextMenus
         if (uiEngineState.openContextMenu != null) {
-            contextMenu_close(uiEngineState, uiEngineState.openContextMenu);
+            contextMenu_close(uiEngineState.openContextMenu);
         }
         // Open this one
         contextMenu.x = x;
@@ -498,8 +504,8 @@ final class UICommonUtils {
         return true;
     }
 
-    static void contextMenu_close(UIEngineState uiEngineState, ContextMenu contextMenu) {
-        if (contextMenu_isOpen(uiEngineState, contextMenu)) {
+    public void contextMenu_close( ContextMenu contextMenu) {
+        if (contextMenu_isOpen( contextMenu)) {
             resetOpenContextMenuReference(uiEngineState);
         }
     }
@@ -519,17 +525,17 @@ final class UICommonUtils {
         return tabBar.tabs.get(Math.clamp(tabBar.selectedTab, 0, tabBar.tabs.size - 1));
     }
 
-    static void tabBar_selectTab(Tabbar tabBar, Tab tab) {
+    public void tabBar_selectTab(Tabbar tabBar, Tab tab) {
         if (tab.addedToTabBar != tabBar) return;
         for (int i = 0; i < tabBar.tabs.size; i++) {
             if (tabBar.tabs.get(i) == tab) {
-                UICommonUtils.tabBar_selectTab(tabBar, i);
+                tabBar_selectTab(tabBar, i);
                 return;
             }
         }
     }
 
-    static void tabBar_selectTab(Tabbar tabBar, int index) {
+    public void tabBar_selectTab(Tabbar tabBar, int index) {
         tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size - 1);
         Tab tab = tabBar.tabs.get(tabBar.selectedTab);
         tab.tabAction.onSelect();
@@ -537,33 +543,33 @@ final class UICommonUtils {
     }
 
 
-    static void button_press(Button button) {
+    public void button_press(Button button) {
         if (button.pressed || button.mode != BUTTON_MODE.DEFAULT) return;
         button.pressed = true;
         button.buttonAction.onPress();
     }
 
-    static void button_release(Button button) {
+    public void button_release(Button button) {
         if (!button.pressed || button.mode != BUTTON_MODE.DEFAULT) return;
         button.pressed = false;
         button.buttonAction.onRelease();
     }
 
-    static void button_toggle(Button button) {
+    public void button_toggle(Button button) {
         button_toggle(button, !button.pressed);
     }
 
-    static void progressbar_setProgress(Progressbar progressBar, float progress) {
+    public void progressbar_setProgress(Progressbar progressBar, float progress) {
         progressBar.progress = Math.clamp(progress, 0f, 1f);
     }
 
-    static void button_toggle(Button button, boolean pressed) {
+    public void button_toggle(Button button, boolean pressed) {
         if (button.toggleDisabled || button.pressed == pressed || button.mode != BUTTON_MODE.TOGGLE) return;
         button.pressed = pressed;
         button.buttonAction.onToggle(button.pressed);
     }
 
-    static void button_centerContent(UIEngineState uiEngineState, MediaManager mediaManager, Button button) {
+    public void button_centerContent( MediaManager mediaManager, Button button) {
         if (button == null) return;
         if (button instanceof ImageButton imageButton) {
             if (imageButton.image == null) return;
@@ -580,19 +586,19 @@ final class UICommonUtils {
         }
     }
 
-    static boolean grid_positionValid(Grid grid, int x, int y) {
+    public boolean grid_positionValid(Grid grid, int x, int y) {
         if (grid.items != null) {
             return x >= 0 && x < grid.items.length && y >= 0 && y < grid.items[0].length;
         }
         return false;
     }
 
-    static void grid_setItems(Grid grid, Object[][] items) {
+    public void grid_setItems(Grid grid, Object[][] items) {
         grid.items = items;
         grid_updateSize(grid);
     }
 
-    static void grid_updateSize(Grid grid) {
+    public void grid_updateSize(Grid grid) {
         int factor = grid.bigMode ? 2 : 1;
         if (grid.items != null) {
             grid.width = grid.items.length * factor;
@@ -603,7 +609,7 @@ final class UICommonUtils {
         }
     }
 
-    static void textField_setMarkerPosition(UIEngineState uiEngineState, MediaManager mediaManager, Textfield textField, int position) {
+    public void textField_setMarkerPosition( Textfield textField, int position) {
         textField.markerPosition = Math.clamp(position, 0, textField.content.length());
         if (textField.markerPosition < textField.offset) {
             while (textField.markerPosition < textField.offset) {
@@ -621,39 +627,39 @@ final class UICommonUtils {
         }
     }
 
-    static boolean textField_isControlKey(int keyCode) {
+    public boolean textField_isControlKey(int keyCode) {
         return textFieldControlKeys.contains(keyCode);
     }
 
-    static boolean textField_isRepeatedControlKey(int keyCode) {
+    public boolean textField_isRepeatedControlKey(int keyCode) {
         return textFieldRepeatedControlKeys.contains(keyCode);
     }
 
-    static void textField_executeControlKey(UIEngineState uiEngineState, MediaManager mediaManager, Textfield textField, int keyCode) {
+    public void textField_executeControlKey( Textfield textField, int keyCode) {
         switch (keyCode) {
             case Input.Keys.LEFT ->
-                    textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition - 1);
+                    textField_setMarkerPosition(  textField, textField.markerPosition - 1);
             case Input.Keys.RIGHT ->
-                    textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition + 1);
+                    textField_setMarkerPosition( textField, textField.markerPosition + 1);
             case Input.Keys.BACKSPACE -> {
                 if (!textField.content.isEmpty() && textField.markerPosition > 0) {
                     String newContent = textField.content.substring(0, textField.markerPosition - 1) + textField.content.substring(textField.markerPosition);
-                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition - 1);
-                    UICommonUtils.textField_setContent(textField, newContent);
+                    textField_setMarkerPosition( textField, textField.markerPosition - 1);
+                    textField_setContent(textField, newContent);
                 }
             }
             case Input.Keys.FORWARD_DEL -> {
                 if (!textField.content.isEmpty() && textField.markerPosition < textField.content.length()) {
                     String newContent = textField.content.substring(0, textField.markerPosition) + textField.content.substring(textField.markerPosition + 1);
-                    UICommonUtils.textField_setContent(textField, newContent);
+                    textField_setContent(textField, newContent);
                 }
             }
             case Input.Keys.HOME ->
-                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, 0);
+                    textField_setMarkerPosition( textField, 0);
             case Input.Keys.END ->
-                    UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.content.length());
+                    textField_setMarkerPosition( textField, textField.content.length());
             case Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
-                UICommonUtils.textField_unFocus(uiEngineState, textField); // Unfocus
+                textField_unFocus( textField); // Unfocus
                 textField.textFieldAction.onEnter(textField.content, textField.contentValid);
             }
             default -> {
@@ -661,16 +667,16 @@ final class UICommonUtils {
         }
     }
 
-    static void textField_typeCharacter(UIEngineState uiEngineState, MediaManager mediaManager, Textfield textField, char character) {
+    public void textField_typeCharacter( Textfield textField, char character) {
         if (textField.allowedCharacters == null || textField.allowedCharacters.contains(character)) {
             String newContent = textField.content.substring(0, textField.markerPosition) + character + textField.content.substring(textField.markerPosition);
-            UICommonUtils.textField_setContent(textField, newContent);
-            UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, textField.markerPosition + 1);
+            textField_setContent(textField, newContent);
+            textField_setMarkerPosition( textField, textField.markerPosition + 1);
             textField.textFieldAction.onTyped(character);
         }
     }
 
-    static void textField_setContent(Textfield textField, String content) {
+    public void textField_setContent(Textfield textField, String content) {
         if (content.length() > textField.contentMaxLength) content = content.substring(0, textField.contentMaxLength);
         textField.content = Tools.Text.validString(content);
         textField.markerPosition = Math.clamp(textField.markerPosition, 0, textField.content.length());
@@ -678,14 +684,14 @@ final class UICommonUtils {
         textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
     }
 
-    static void component_setDisabled(UIEngineState uiEngineState, Component component, boolean disabled) {
+    public void component_setDisabled( Component component, boolean disabled) {
         if (disabled) {
-            if (component instanceof Combobox combobox) comboBox_close(uiEngineState, combobox);
+            if (component instanceof Combobox combobox) comboBox_close( combobox);
         }
         component.disabled = disabled;
     }
 
-    static void component_addToWindow(Component component, UIEngineState uiEngineState, Window window) {
+    public void component_addToWindow(Component component, UIEngineState uiEngineState, Window window) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
         if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.add(appViewPort);
@@ -693,7 +699,7 @@ final class UICommonUtils {
         window.components.add(component);
     }
 
-    static void component_addToScreen(Component component, UIEngineState uiEngineState) {
+    public void component_addToScreen(Component component, UIEngineState uiEngineState) {
         if (component.addedToWindow != null) return;
         if (component.addedToScreen) return;
         if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.add(appViewPort);
@@ -701,7 +707,7 @@ final class UICommonUtils {
         uiEngineState.screenComponents.add(component);
     }
 
-    static void component_screenMoveToTop(Component component, UIEngineState uiEngineState) {
+    public void component_screenMoveToTop(Component component, UIEngineState uiEngineState) {
         for (int i = 0; i < uiEngineState.screenComponents.size; i++) {
             if (uiEngineState.screenComponents.get(i) == component) {
                 uiEngineState.screenComponents.removeValue(component, true);
@@ -710,7 +716,7 @@ final class UICommonUtils {
         }
     }
 
-    static void component_windowMoveToTop(Component component, UIEngineState uiEngineState) {
+    public void component_windowMoveToTop(Component component, UIEngineState uiEngineState) {
         if (component.addedToWindow == null)
             return;
         Window window = component.addedToWindow;
@@ -723,7 +729,7 @@ final class UICommonUtils {
     }
 
 
-    static void component_removeFromScreen(Component component, UIEngineState uiEngineState) {
+    public void component_removeFromScreen(Component component, UIEngineState uiEngineState) {
         if (component.addedToWindow != null) return;
         if (!component.addedToScreen) return;
 
@@ -731,14 +737,14 @@ final class UICommonUtils {
         if (uiEngineState.lastUIMouseHover == component) uiEngineState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.removeValue(appViewPort, true);
-        component_resetReferences(uiEngineState, component);
+        component_resetReferences( component);
 
         // Remove
         component.addedToScreen = true;
         uiEngineState.screenComponents.removeValue(component, true);
     }
 
-    static void component_removeFromWindow(Component component, Window window, UIEngineState uiEngineState) {
+    public void component_removeFromWindow(Component component, Window window, UIEngineState uiEngineState) {
         if (component.addedToWindow != window) return;
         if (component.addedToScreen) return;
 
@@ -746,86 +752,86 @@ final class UICommonUtils {
         if (uiEngineState.lastUIMouseHover == component) uiEngineState.lastUIMouseHover = null;
         if (component.addedToTab != null) tab_removeComponent(component.addedToTab, component);
         if (component instanceof AppViewport appViewPort) uiEngineState.appViewPorts.removeValue(appViewPort, true);
-        component_resetReferences(uiEngineState, component);
+        component_resetReferences( component);
 
         // Remove
         component.addedToWindow.components.removeValue(component, true);
         component.addedToWindow = null;
     }
 
-    static void tab_removeComponent(Tab tab, Component component) {
+    public void tab_removeComponent(Tab tab, Component component) {
         if (component.addedToTab != tab) return;
         component.addedToTab.components.removeValue(component, true);
         component.addedToTab = tab;
     }
 
-    static void tab_addComponent(Tab tab, Component component) {
+    public void tab_addComponent(Tab tab, Component component) {
         if (component.addedToTab != null) return;
         component.addedToTab = tab;
         tab.components.add(component);
     }
 
-    static void tabBar_addTab(Tabbar tabBar, Tab tab) {
+    public void tabBar_addTab(Tabbar tabBar, Tab tab) {
         if (tab.addedToTabBar != null) return;
         tab.addedToTabBar = tabBar;
         tabBar.tabs.add(tab);
     }
 
-    static void tabBar_addTab(Tabbar tabBar, Tab tab, int index) {
+    public void tabBar_addTab(Tabbar tabBar, Tab tab, int index) {
         if (tab.addedToTabBar != null) return;
         tab.addedToTabBar = tabBar;
         tabBar.tabs.insert(index, tab);
     }
 
-    static void tabBar_removeTab(Tabbar tabBar, Tab tab) {
+    public void tabBar_removeTab(Tabbar tabBar, Tab tab) {
         if (tab.addedToTabBar != tabBar) return;
         tab.addedToTabBar = null;
         tabBar.tabs.removeValue(tab, true);
     }
 
-    static void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+    public void contextMenu_addItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != null) return;
         contextMenuItem.addedToContextMenu = contextMenu;
         contextMenu.items.add(contextMenuItem);
     }
 
-    static void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
+    public void contextMenu_removeItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu != contextMenu) return;
         contextMenuItem.addedToContextMenu = null;
         contextMenu.items.removeValue(contextMenuItem, true);
     }
 
-    static void contextMenu_selectItem(UIEngineState uiEngineState, ContextMenuItem contextMenuItem) {
+    public void contextMenu_selectItem( ContextMenuItem contextMenuItem) {
         if (contextMenuItem.addedToContextMenu == null) return;
         ContextMenu ContextMenu = contextMenuItem.addedToContextMenu;
         contextMenuItem.contextMenuItemAction.onSelect();
         ContextMenu.contextMenuAction.onItemSelected(contextMenuItem);
-        UICommonUtils.contextMenu_close(uiEngineState, ContextMenu);
+        contextMenu_close( ContextMenu);
     }
 
-    static void comboBox_selectItem(UIEngineState uiEngineState, ComboboxItem comboBoxItem) {
+    public void comboBox_selectItem( ComboboxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox == null) return;
         Combobox comboBox = comboBoxItem.addedToComboBox;
         comboBox.selectedItem = comboBoxItem;
         comboBoxItem.comboBoxItemAction.onSelect();
         comboBox.comboBoxAction.onItemSelected(comboBoxItem);
-        UICommonUtils.comboBox_close(uiEngineState, comboBox);
+        comboBox_close( comboBox);
     }
 
-    static void comboBox_addItem(Combobox comboBox, ComboboxItem comboBoxItem) {
+    public void comboBox_addItem(Combobox comboBox, ComboboxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != null) return;
         comboBoxItem.addedToComboBox = comboBox;
         comboBox.items.add(comboBoxItem);
     }
 
-    static void comboBox_removeItem(Combobox comboBox, ComboboxItem comboBoxItem) {
+    public void comboBox_removeItem(Combobox comboBox, ComboboxItem comboBoxItem) {
         if (comboBoxItem.addedToComboBox != comboBox) return;
         if (comboBox.selectedItem == comboBoxItem) comboBox.selectedItem = null;
         comboBoxItem.addedToComboBox = null;
         comboBox.items.removeValue(comboBoxItem, true);
     }
 
-    static void tooltip_setImageSegmentImage(UIEngineState uiEngineState, MediaManager mediaManager, TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
+    public void tooltip_setImageSegmentImage( TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
         tooltipImageSegment.image = image;
         if (tooltipImageSegment.image != null) {
             tooltipImageSegment.width = MathUtils.round((mediaManager.spriteWidth(image) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
@@ -836,76 +842,76 @@ final class UICommonUtils {
         }
     }
 
-    static void tooltip_setTextSegmentText(UIEngineState uiEngineState, MediaManager mediaManager, TooltipTextSegment tooltipTextSegment, String text) {
+    public void tooltip_setTextSegmentText( TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = Tools.Text.validString(text);
         tooltipTextSegment.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineState.config.ui_font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         tooltipTextSegment.height = 1;
     }
 
-    static void tooltip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+    public void tooltip_addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (segment.addedToTooltip != null) return;
         segment.addedToTooltip = toolTip;
         toolTip.segments.add(segment);
     }
 
-    static void tooltip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
+    public void tooltip_removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (segment.addedToTooltip != toolTip) return;
         segment.addedToTooltip = null;
         toolTip.segments.removeValue(segment, true);
     }
 
-    static void tooltip_resizeSegment(UIEngineState uiEngineState, TooltipSegment tooltipSegment, int width, int height) {
+    public void tooltip_resizeSegment( TooltipSegment tooltipSegment, int width, int height) {
         tooltipSegment.width = Math.max(width, 0);
         tooltipSegment.height = Math.max(height, 0);
     }
 
-    static boolean comboBox_isOpen(UIEngineState uiEngineState, Combobox comboBox) {
+    public boolean comboBox_isOpen( Combobox comboBox) {
         return uiEngineState.openComboBox != null && uiEngineState.openComboBox == comboBox;
     }
 
-    static boolean contextMenu_isOpen(UIEngineState uiEngineState, ContextMenu contextMenu) {
+    public boolean contextMenu_isOpen( ContextMenu contextMenu) {
         return uiEngineState.openContextMenu != null && uiEngineState.openContextMenu == contextMenu;
     }
 
-    static void comboBox_open(UIEngineState uiEngineState, Combobox comboBox) {
+    public void comboBox_open( Combobox comboBox) {
         // Close other Comboboxes
         if (uiEngineState.openComboBox != null) {
-            comboBox_close(uiEngineState, uiEngineState.openComboBox);
+            comboBox_close( uiEngineState.openComboBox);
         }
         // Open this one
         uiEngineState.openComboBox = comboBox;
         comboBox.comboBoxAction.onDisplay();
     }
 
-    static void comboBox_close(UIEngineState uiEngineState, Combobox comboBox) {
-        if (comboBox_isOpen(uiEngineState, comboBox)) {
+    public void comboBox_close( Combobox comboBox) {
+        if (comboBox_isOpen( comboBox)) {
             resetOpenComboBoxReference(uiEngineState);
             comboBox.comboBoxAction.onRemove();
         }
     }
 
-    static boolean textField_isFocused(UIEngineState uiEngineState, Textfield textField) {
+    public boolean textField_isFocused( Textfield textField) {
         return uiEngineState.focusedTextField != null && uiEngineState.focusedTextField == textField;
     }
 
-    static void textField_focus(UIEngineState uiEngineState, Textfield textField) {
+    public void textField_focus( Textfield textField) {
         // Unfocus other textfields
         if (uiEngineState.focusedTextField != null && uiEngineState.focusedTextField != textField) {
-            textField_unFocus(uiEngineState, uiEngineState.focusedTextField);
+            textField_unFocus( uiEngineState.focusedTextField);
         }
         // Focus this one
         uiEngineState.focusedTextField = textField;
         textField.textFieldAction.onFocus();
     }
 
-    static void textField_unFocus(UIEngineState uiEngineState, Textfield textField) {
-        if (textField_isFocused(uiEngineState, textField)) {
+    public void textField_unFocus( Textfield textField) {
+        if (textField_isFocused( textField)) {
             resetFocusedTextFieldReference(uiEngineState);
             textField.textFieldAction.onUnFocus();
         }
     }
 
-    static void list_setSelectedItem(List list, Object selectedItem) {
+    public void list_setSelectedItem(List list, Object selectedItem) {
         // Clear selecteditem/items after mode switch
         if (selectedItem != null && list.items.contains(selectedItem, true)) {
             if (list.multiSelect) {
@@ -919,7 +925,7 @@ final class UICommonUtils {
     }
 
 
-    static void list_setSelectedItems(List list, Object[] selectedItems) {
+    public void list_setSelectedItems(List list, Object[] selectedItems) {
         if (list.multiSelect) {
             list.selectedItems.clear();
             if (selectedItems != null) {
@@ -939,7 +945,7 @@ final class UICommonUtils {
     }
 
 
-    static void list_setMultiSelect(List list, boolean multiSelect) {
+    public void list_setMultiSelect(List list, boolean multiSelect) {
         // Clear selecteditem/items after mode switch
         list.multiSelect = multiSelect;
         if (multiSelect) {
@@ -950,7 +956,7 @@ final class UICommonUtils {
     }
 
 
-    static void knob_turnKnob(Knob knob, float newValue) {
+    public void knob_turnKnob(Knob knob, float newValue) {
         if (knob.endless) {
             if (newValue > 1) {
                 newValue = newValue - 1f;
@@ -963,15 +969,15 @@ final class UICommonUtils {
         knob.knobAction.onTurned(knob.turned, (newValue - oldValue));
     }
 
-    static boolean list_canDragIntoScreen(List list) {
+    public boolean list_canDragIntoScreen(List list) {
         return list.dragEnabled && list.dragOutEnabled && list.listAction.canDragIntoApp();
     }
 
-    static boolean grid_canDragIntoScreen(Grid grid) {
+    public boolean grid_canDragIntoScreen(Grid grid) {
         return grid.dragEnabled && grid.dragOutEnabled && grid.gridAction.canDragIntoApp();
     }
 
-    static boolean list_canDragIntoList(UIEngineState uiEngineState, List list) {
+    public boolean list_canDragIntoList( List list) {
         List draggedList = uiEngineState.draggedList;
         Grid draggedGrid = uiEngineState.draggedGrid;
 
@@ -989,9 +995,9 @@ final class UICommonUtils {
         return false;
     }
 
-    static void tabBar_updateItemInfoAtMousePosition(UIEngineState uiEngineState, Tabbar tabBar) {
-        int x_bar = UICommonUtils.component_getAbsoluteX(tabBar);
-        int y_bar = UICommonUtils.component_getAbsoluteY(tabBar);
+    public void tabBar_updateItemInfoAtMousePosition( Tabbar tabBar) {
+        int x_bar = component_getAbsoluteX(tabBar);
+        int y_bar = component_getAbsoluteY(tabBar);
 
         int tabXOffset = tabBar.tabOffset;
         for (int i = 0; i < tabBar.tabs.size; i++) {
@@ -1016,12 +1022,12 @@ final class UICommonUtils {
         return;
     }
 
-    static void list_updateItemInfoAtMousePosition(UIEngineState uiEngineState, List list) {
+    public void list_updateItemInfoAtMousePosition( List list) {
         if (list.items != null) {
             int itemFrom = MathUtils.round(list.scrolled * ((list.items.size) - (list.height)));
             itemFrom = Math.max(itemFrom, 0);
-            int x_list = UICommonUtils.component_getAbsoluteX(list);
-            int y_list = UICommonUtils.component_getAbsoluteY(list);
+            int x_list = component_getAbsoluteX(list);
+            int y_list = component_getAbsoluteY(list);
             // insert between other items
             for (int iy = 0; iy < list.height; iy++) {
                 int itemIndex = itemFrom + iy;
@@ -1049,13 +1055,13 @@ final class UICommonUtils {
         return;
     }
 
-    static void grid_updateItemInfoAtMousePosition(UIEngineState uiEngineState, Grid grid) {
+    public void grid_updateItemInfoAtMousePosition( Grid grid) {
         int tileSize = grid.bigMode ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
-        int x_grid = UICommonUtils.component_getAbsoluteX(grid);
-        int y_grid = UICommonUtils.component_getAbsoluteY(grid);
+        int x_grid = component_getAbsoluteX(grid);
+        int y_grid = component_getAbsoluteY(grid);
         int inv_to_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
         int inv_to_y = (uiEngineState.mouse_ui.y - y_grid) / tileSize;
-        if (UICommonUtils.grid_positionValid(grid, inv_to_x, inv_to_y)) {
+        if (grid_positionValid(grid, inv_to_x, inv_to_y)) {
             uiEngineState.itemInfo_gridPos.x = inv_to_x;
             uiEngineState.itemInfo_gridPos.y = inv_to_y;
             uiEngineState.itemInfo_gridValid = true;
@@ -1066,7 +1072,7 @@ final class UICommonUtils {
         return;
     }
 
-    static void grid_setSelectedItems(Grid grid, Object[] selectedItems) {
+    public void grid_setSelectedItems(Grid grid, Object[] selectedItems) {
         if (grid.multiSelect) {
             grid.selectedItems.clear();
             if (selectedItems != null) {
@@ -1085,7 +1091,7 @@ final class UICommonUtils {
         }
     }
 
-    static void grid_setSelectedItem(Grid grid, Object selectedItem) {
+    public void grid_setSelectedItem(Grid grid, Object selectedItem) {
         if (selectedItem != null && grid_contains(grid, selectedItem)) {
             if (grid.multiSelect) {
                 grid.selectedItems.add(selectedItem);
@@ -1097,7 +1103,7 @@ final class UICommonUtils {
         }
     }
 
-    static boolean grid_contains(Grid grid, Object object) {
+    public boolean grid_contains(Grid grid, Object object) {
         for (int ix = 0; ix < grid.items.length; ix++) {
             for (int iy = 0; iy < grid.items[0].length; iy++) {
                 if (grid.items[ix][iy] == object)
@@ -1107,7 +1113,7 @@ final class UICommonUtils {
         return false;
     }
 
-    static boolean grid_canDragIntoGrid(UIEngineState uiEngineState, Grid grid) {
+    public boolean grid_canDragIntoGrid( Grid grid) {
         List draggedList = uiEngineState.draggedList;
         Grid draggedGrid = uiEngineState.draggedGrid;
 
@@ -1126,7 +1132,7 @@ final class UICommonUtils {
     }
 
 
-    static void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar) {
+    public void mouseTextInput_selectCharacter(MouseTextInput mouseTextInput, char selectChar) {
         findCharLoop:
         for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
             if (mouseTextInput.charactersLC[i] == selectChar || mouseTextInput.charactersUC[i] == selectChar) {
@@ -1137,7 +1143,7 @@ final class UICommonUtils {
         }
     }
 
-    static void mouseTextInput_open(UIEngineState uiEngineState, MouseTextInput mouseTextInput) {
+    public void mouseTextInput_open( MouseTextInput mouseTextInput) {
         if (uiEngineState.openMouseTextInput != null) return;
         uiEngineState.mTextInputMouseX = Gdx.input.getX();
         uiEngineState.mTextInputUnlock = false;
@@ -1145,12 +1151,12 @@ final class UICommonUtils {
         uiEngineState.openMouseTextInput.mouseTextInputAction.onDisplay();
     }
 
-    static void mouseTextInput_close(UIEngineState uiEngineState) {
+    public void mouseTextInput_close(UIEngineState uiEngineState) {
         // mouseTextInput Keyboard
         resetMouseTextInputReference(uiEngineState);
     }
 
-    static void resetMouseTextInputReference(UIEngineState uiEngineState) {
+    public void resetMouseTextInputReference(UIEngineState uiEngineState) {
         if (uiEngineState.openMouseTextInput != null) {
             final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
             uiEngineState.openMouseTextInput = null;
@@ -1171,7 +1177,7 @@ final class UICommonUtils {
     }
 
 
-    static void mouseTextInput_setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
+    public void mouseTextInput_setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
         if (charactersLC == null || charactersUC == null) return;
         int maxCharacters = Math.min(charactersLC.length, charactersUC.length);
         mouseTextInput.charactersLC = new char[maxCharacters + 3];
@@ -1189,66 +1195,66 @@ final class UICommonUtils {
 
     }
 
-    static void text_setText(UIEngineState uiEngineState, Text textC, String text) {
+    public void text_setText( Text textC, String text) {
         textC.text = Tools.Text.validString(text);
     }
 
-    static void image_setImage(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC, CMediaSprite image) {
+    public void image_setImage( Image imageC, CMediaSprite image) {
         imageC.image = image;
-        UICommonUtils.image_updateSize(uiEngineState, mediaManager, imageC);
+        image_updateSize(  imageC);
     }
 
 
-    static void image_updateSize(UIEngineState uiEngineState, MediaManager mediaManager, Image imageC) {
+    public void image_updateSize( Image imageC) {
         imageC.width = imageC.image != null ? mediaManager.spriteWidth(imageC.image) / uiEngineState.tileSize.TS : 0;
         imageC.height = imageC.image != null ? mediaManager.spriteHeight(imageC.image) / uiEngineState.tileSize.TS : 0;
     }
 
-    static void framebufferViewport_setFrameBuffer(UIEngineState uiEngineState, FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
+    public void framebufferViewport_setFrameBuffer( FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
         frameBufferViewport.frameBuffer = nestedFrameBuffer;
-        UICommonUtils.framebufferViewport_updateSize(uiEngineState, frameBufferViewport);
+        framebufferViewport_updateSize( frameBufferViewport);
     }
 
-    static void framebufferViewport_updateSize(UIEngineState uiEngineState, FrameBufferViewport frameBufferViewport) {
+    public void framebufferViewport_updateSize( FrameBufferViewport frameBufferViewport) {
         frameBufferViewport.width = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getWidth() / uiEngineState.tileSize.TS : 0;
         frameBufferViewport.height = frameBufferViewport.frameBuffer != null ? frameBufferViewport.frameBuffer.getHeight() / uiEngineState.tileSize.TS : 0;
     }
 
 
-    static void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
+    public void mouseTextInput_selectIndex(MouseTextInput mouseTextInput, int index) {
         int maxCharacters = Math.min(mouseTextInput.charactersLC.length, mouseTextInput.charactersUC.length);
         mouseTextInput.selectedIndex = Math.clamp(index, 0, (maxCharacters - 1));
     }
 
-    static void scrollBar_scroll(Scrollbar scrollBar, float scrolled) {
+    public void scrollBar_scroll(Scrollbar scrollBar, float scrolled) {
         scrollBar.scrolled = Math.clamp(scrolled, 0f, 1f);
         scrollBar.scrollBarAction.onScrolled(scrollBar.scrolled);
     }
 
-    static void scrollBar_pressButton(Scrollbar scrollBar) {
+    public void scrollBar_pressButton(Scrollbar scrollBar) {
         if (scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = true;
         scrollBar.scrollBarAction.onPress(scrollBar.scrolled);
     }
 
-    static void scrollBar_releaseButton(Scrollbar scrollBar) {
+    public void scrollBar_releaseButton(Scrollbar scrollBar) {
         if (!scrollBar.buttonPressed) return;
         scrollBar.buttonPressed = false;
         scrollBar.scrollBarAction.onRelease(scrollBar.scrolled);
     }
 
-    static float scrollBar_calculateScrolled(UIEngineState uiEngineState, Scrollbar scrollBar, int mouse_ui_x, int mouse_ui_y) {
+    public float scrollBar_calculateScrolled( Scrollbar scrollBar, int mouse_ui_x, int mouse_ui_y) {
         int relativePos;
         float maxPos;
         float buttonOffset;
         switch (scrollBar) {
             case ScrollbarHorizontal scrollBarHorizontal -> {
-                relativePos = mouse_ui_x - UICommonUtils.component_getAbsoluteX(scrollBarHorizontal);
+                relativePos = mouse_ui_x - component_getAbsoluteX(scrollBarHorizontal);
                 maxPos = uiEngineState.tileSize.TL(scrollBarHorizontal.width) - uiEngineState.tileSize.TS;
                 buttonOffset = (1 / (float) scrollBarHorizontal.width) / 2f;
             }
             case ScrollbarVertical scrollBarVertical -> {
-                relativePos = mouse_ui_y - UICommonUtils.component_getAbsoluteY(scrollBarVertical);
+                relativePos = mouse_ui_y - component_getAbsoluteY(scrollBarVertical);
                 maxPos = uiEngineState.tileSize.TL(scrollBarVertical.height) - uiEngineState.tileSize.TS;
                 buttonOffset = (1 / (float) scrollBarVertical.height) / 2f;
             }
@@ -1258,13 +1264,13 @@ final class UICommonUtils {
         return (relativePos / maxPos) - buttonOffset;
     }
 
-    static void list_scroll(List list, float scrolled) {
+    public void list_scroll(List list, float scrolled) {
         list.scrolled = Math.clamp(scrolled, 0f, 1f);
         list.listAction.onScrolled(list.scrolled);
     }
 
 
-    static void appViewPort_resizeCameraTextureAndFrameBuffer(UIEngineState uiEngineState, AppViewport appViewPort) {
+    public void appViewPort_resizeCameraTextureAndFrameBuffer( AppViewport appViewPort) {
         // Clean Up
         if (appViewPort.camera != null) appViewPort.camera = null;
         if (appViewPort.textureRegion != null) appViewPort.textureRegion.getTexture().dispose();
@@ -1290,7 +1296,7 @@ final class UICommonUtils {
         camera_setPosition(appViewPort.camera, x, y);
     }
 
-    static int viewport_determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
+    public int viewport_determineUpscaleFactor(int internalResolutionWidth, int internalResolutionHeight) {
         int upSampling = 1;
         int testWidth = Gdx.graphics.getDisplayMode().width;
         int testHeight = Gdx.graphics.getDisplayMode().height;
@@ -1300,7 +1306,7 @@ final class UICommonUtils {
         return upSampling;
     }
 
-    static void viewport_changeViewPortMode(UIEngineState uiEngineState, VIEWPORT_MODE viewportMode) {
+    public void viewport_changeViewPortMode( VIEWPORT_MODE viewportMode) {
         if (viewportMode == null || viewportMode == uiEngineState.viewportMode) return;
 
         if (uiEngineState.viewportMode.upscale && !viewportMode.upscale) {
@@ -1331,12 +1337,12 @@ final class UICommonUtils {
         };
     }
 
-    static void camera_setPosition(OrthographicCamera camera, float x, float y) {
+    public void camera_setPosition(OrthographicCamera camera, float x, float y) {
         camera.position.set(x, y, 0f);
         camera.update();
     }
 
-    static void camera_setZoom(OrthographicCamera camera, float zoom) {
+    public void camera_setZoom(OrthographicCamera camera, float zoom) {
         camera.zoom = Math.max(zoom, 0f);
         camera.update();
     }
@@ -1346,14 +1352,14 @@ final class UICommonUtils {
         return state.config.ui_animationTimerFunction.getAnimationTimer();
     }
 
-    static void window_resetReferences(UIEngineState uiEngineState, Window window) {
+    public void window_resetReferences( Window window) {
         if (uiEngineState.draggedWindow == window) {
             uiEngineState.draggedWindow = null;
             uiEngineState.draggedWindow_offset.set(0, 0);
         }
     }
 
-    static void component_resetReferences(UIEngineState uiEngineState, Component component) {
+    public void component_resetReferences( Component component) {
         if (uiEngineState.pressedButton == component) resetPressedButtonReference(uiEngineState);
         if (uiEngineState.pressedScrollBarVertical == component) resetPressedScrollBarVerticalReference(uiEngineState);
         if (uiEngineState.pressedScrollBarHorizontal == component)
@@ -1378,7 +1384,7 @@ final class UICommonUtils {
             resetOpenComboBoxReference(uiEngineState);
     }
 
-    static void resetAllReferences(UIEngineState uiEngineState) {
+    public void resetAllReferences(UIEngineState uiEngineState) {
         resetPressedButtonReference(uiEngineState);
         resetPressedScrollBarVerticalReference(uiEngineState);
         resetPressedScrollBarHorizontalReference(uiEngineState);
@@ -1398,56 +1404,56 @@ final class UICommonUtils {
     }
 
 
-    static void resetOpenContextMenuReference(UIEngineState uiEngineState) {
+    public void resetOpenContextMenuReference(UIEngineState uiEngineState) {
         if(uiEngineState.openContextMenu != null) {
             ContextMenu contextMenu = uiEngineState.openContextMenu;
-            UICommonUtils.resetPressedContextMenuItemReference(uiEngineState);
+            resetPressedContextMenuItemReference(uiEngineState);
             uiEngineState.openContextMenu = null;
             uiEngineState.displayedContextMenuWidth = 0;
             contextMenu.contextMenuAction.onRemove();
         }
     }
 
-    static void resetPressedContextMenuItemReference(UIEngineState uiEngineState) {
+    public void resetPressedContextMenuItemReference(UIEngineState uiEngineState) {
         uiEngineState.pressedContextMenuItem = null;
     }
 
-    static void resetPressedCheckBoxReference(UIEngineState uiEngineState) {
+    public void resetPressedCheckBoxReference(UIEngineState uiEngineState) {
         uiEngineState.pressedCheckBox = null;
     }
 
-    static void resetPressedAppViewPortReference(UIEngineState uiEngineState) {
+    public void resetPressedAppViewPortReference(UIEngineState uiEngineState) {
         uiEngineState.pressedAppViewPort = null;
     }
 
-    static void resetPressedFrameBufferViewPortReference(UIEngineState uiEngineState) {
+    public void resetPressedFrameBufferViewPortReference(UIEngineState uiEngineState) {
         uiEngineState.pressedFramebufferViewport = null;
     }
 
-    static void resetPressedKnobReference(UIEngineState uiEngineState) {
+    public void resetPressedKnobReference(UIEngineState uiEngineState) {
         uiEngineState.pressedKnob = null;
     }
 
-    static void resetPressedScrollBarVerticalReference(UIEngineState uiEngineState) {
+    public void resetPressedScrollBarVerticalReference(UIEngineState uiEngineState) {
         uiEngineState.pressedScrollBarVertical = null;
     }
 
-    static void resetPressedScrollBarHorizontalReference(UIEngineState uiEngineState) {
+    public void resetPressedScrollBarHorizontalReference(UIEngineState uiEngineState) {
         uiEngineState.pressedScrollBarHorizontal = null;
     }
 
-    static void resetPressedButtonReference(UIEngineState uiEngineState) {
+    public void resetPressedButtonReference(UIEngineState uiEngineState) {
         if (uiEngineState.pressedButton != null && uiEngineState.pressedButton.mode == BUTTON_MODE.DEFAULT)
             uiEngineState.pressedButton.pressed = false;
         uiEngineState.pressedButton = null;
     }
 
-    static void resetPressedTextFieldReference(UIEngineState uiEngineState) {
+    public void resetPressedTextFieldReference(UIEngineState uiEngineState) {
         uiEngineState.pressedTextField = null;
         uiEngineState.pressedTextFieldMouseX = 0;
     }
 
-    static void resetOpenComboBoxReference(UIEngineState uiEngineState) {
+    public void resetOpenComboBoxReference(UIEngineState uiEngineState) {
         if (uiEngineState.openComboBox != null) {
             resetPressedComboBoxItemReference(uiEngineState);
             final Combobox combobox = uiEngineState.openComboBox;
@@ -1456,49 +1462,49 @@ final class UICommonUtils {
         }
     }
 
-    static void resetPressedComboBoxItemReference(UIEngineState uiEngineState) {
+    public void resetPressedComboBoxItemReference(UIEngineState uiEngineState) {
         uiEngineState.pressedComboBoxItem = null;
     }
 
-    static void resetFocusedTextFieldReference(UIEngineState uiEngineState) {
+    public void resetFocusedTextFieldReference(UIEngineState uiEngineState) {
         uiEngineState.focusedTextField = null;
         uiEngineState.focusedTextField_repeatedKey = KeyCode.NONE;
         uiEngineState.focusedTextField_repeatedKeyTimer = 0;
     }
 
-    static void resetDraggedGridReference(UIEngineState uiEngineState) {
+    public void resetDraggedGridReference(UIEngineState uiEngineState) {
         uiEngineState.draggedGrid = null;
         uiEngineState.draggedGridFrom.set(0, 0);
         uiEngineState.draggedGridOffset.set(0, 0);
         uiEngineState.draggedGridItem = null;
     }
 
-    static void resetDraggedListReference(UIEngineState uiEngineState) {
+    public void resetDraggedListReference(UIEngineState uiEngineState) {
         uiEngineState.draggedList = null;
         uiEngineState.draggedListFromIndex = 0;
         uiEngineState.draggedListOffset.set(0, 0);
         uiEngineState.draggedListItem = null;
     }
 
-    static void resetPressedGridReference(UIEngineState uiEngineState) {
+    public void resetPressedGridReference(UIEngineState uiEngineState) {
         uiEngineState.pressedGrid = null;
         uiEngineState.pressedGridItem = null;
     }
 
-    static void resetPressedListReference(UIEngineState uiEngineState) {
+    public void resetPressedListReference(UIEngineState uiEngineState) {
         uiEngineState.pressedList = null;
         uiEngineState.pressedListItem = null;
     }
 
 
-    static Object getDraggedUIReference(UIEngineState uiEngineState) {
+    public Object getDraggedUIReference(UIEngineState uiEngineState) {
         if (uiEngineState.draggedWindow != null) return uiEngineState.draggedWindow;
         if (uiEngineState.draggedGrid != null) return uiEngineState.draggedGrid;
         if (uiEngineState.draggedList != null) return uiEngineState.draggedList;
         return null;
     }
 
-    static Object getPressedUIReference(UIEngineState uiEngineState) {
+    public Object getPressedUIReference(UIEngineState uiEngineState) {
         if (uiEngineState.pressedButton != null) return uiEngineState.pressedButton;
         if (uiEngineState.pressedScrollBarHorizontal != null) return uiEngineState.pressedScrollBarHorizontal;
         if (uiEngineState.pressedScrollBarVertical != null) return uiEngineState.pressedScrollBarVertical;
@@ -1514,17 +1520,17 @@ final class UICommonUtils {
         return null;
     }
 
-    static Color color_darker(Color color) {
+    public Color color_darker(Color color) {
         float amount = 0.7f;
         return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
     }
 
-    static Color color_brigther(Color color) {
+    public Color color_brigther(Color color) {
         float amount = 1.3f;
         return new Color(color.r * amount, color.g * amount, color.b * amount, color.a);
     }
 
-    static <T> T find(Array<T> array, Predicate predicate) {
+    public <T> T find(Array<T> array, Predicate predicate) {
         for (int i = 0; i < array.size; i++) {
             final T object = array.get(i);
             if (predicate.test(object))
@@ -1533,7 +1539,7 @@ final class UICommonUtils {
         return null;
     }
 
-    static <T> Array<T> findMultiple(Array<T> array, Predicate predicate) {
+    public  <T> Array<T> findMultiple(Array<T> array, Predicate predicate) {
         Array<T> result = new Array<>();
         for (int i = 0; i < array.size; i++) {
             final T object = array.get(i);

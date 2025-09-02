@@ -16,15 +16,19 @@ import java.util.function.Predicate;
 public final class APIContextMenu {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
+
     public final APIContextMenuItem item;
 
-    APIContextMenu(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIContextMenu(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.config;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.config;
+
         this.item = new APIContextMenuItem();
     }
 
@@ -62,7 +66,7 @@ public final class APIContextMenu {
 
     public void addContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
-        UICommonUtils.contextMenu_addItem(contextMenu, contextMenuItem);
+        uiCommonUtils.contextMenu_addItem(contextMenu, contextMenuItem);
     }
 
     public void addContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
@@ -72,7 +76,7 @@ public final class APIContextMenu {
 
     public void removeContextMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem) {
         if (contextMenu == null || contextMenuItem == null) return;
-        UICommonUtils.contextMenu_removeItem(contextMenu, contextMenuItem);
+        uiCommonUtils.contextMenu_removeItem(contextMenu, contextMenuItem);
     }
 
     public void removeContextMenuItems(ContextMenu contextMenu, ContextMenuItem[] contextMenuItems) {
@@ -88,12 +92,12 @@ public final class APIContextMenu {
 
     public Array<ContextMenuItem> findContextMenuItems(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
         if (contextMenu == null) return new Array<>();
-        return UICommonUtils.findMultiple(contextMenu.items, findBy);
+        return uiCommonUtils.findMultiple(contextMenu.items, findBy);
     }
 
     public ContextMenuItem findContextMenuItem(ContextMenu contextMenu, Predicate<ContextMenuItem> findBy) {
         if (contextMenu == null) return null;
-        return UICommonUtils.find(contextMenu.items, findBy);
+        return uiCommonUtils.find(contextMenu.items, findBy);
     }
 
     public final class APIContextMenuItem {
@@ -147,7 +151,7 @@ public final class APIContextMenu {
 
         public void selectItem(ContextMenuItem contextMenuItem) {
             if (contextMenuItem == null) return;
-            UICommonUtils.contextMenu_selectItem(uiEngineState, contextMenuItem);
+            uiCommonUtils.contextMenu_selectItem( contextMenuItem);
         }
 
     }

@@ -8,4 +8,6 @@ public class TooltipImage {
     public int y;
     public float color_r, color_g, color_b, color_a;
     public Tooltip addedToToolTip;
+
+
 }

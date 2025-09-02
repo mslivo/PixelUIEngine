@@ -15,20 +15,22 @@ import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.*;
 
-import java.util.ArrayList;
-
 public final class APITooltip {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
+
     public final APITooltipSegment segment;
 
-    APITooltip(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APITooltip(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
+
         this.segment = new APITooltipSegment();
     }
 
@@ -106,18 +108,18 @@ public final class APITooltip {
 
     public void addTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
-        UICommonUtils.tooltip_addTooltipSegment(toolTip, segment);
+        uiCommonUtils.tooltip_addTooltipSegment(toolTip, segment);
     }
 
     public void removeTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
-        UICommonUtils.tooltip_removeTooltipSegment(toolTip, segment);
+        uiCommonUtils.tooltip_removeTooltipSegment(toolTip, segment);
     }
 
     public void removeAllTooltipSegment(Tooltip toolTip, TooltipSegment segment) {
         if (toolTip == null || segment == null) return;
         for (int i = 0; i < toolTip.segments.size; i++)
-            UICommonUtils.tooltip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
+            uiCommonUtils.tooltip_removeTooltipSegment(toolTip, toolTip.segments.get(i));
     }
 
     public void setToolTipAction(Tooltip toolTip, ToolTipAction toolTipAction) {
@@ -157,7 +159,7 @@ public final class APITooltip {
 
         public void resize(TooltipSegment tooltipSegment, int width, int height) {
             if (tooltipSegment == null) return;
-            UICommonUtils.tooltip_resizeSegment(uiEngineState, tooltipSegment, width, height);
+            uiCommonUtils.tooltip_resizeSegment( tooltipSegment, width, height);
         }
 
         private void setSegmentValues(TooltipSegment tooltipSegment, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
@@ -225,7 +227,7 @@ public final class APITooltip {
 
             public void setImage(TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
                 if (tooltipImageSegment == null) return;
-                UICommonUtils.tooltip_setImageSegmentImage(uiEngineState, mediaManager, tooltipImageSegment, image);
+                uiCommonUtils.tooltip_setImageSegmentImage( tooltipImageSegment, image);
             }
 
             public void setArrayIndex(TooltipImageSegment tooltipImageSegment, int arrayIndex) {
@@ -277,7 +279,7 @@ public final class APITooltip {
 
             public void setText(TooltipTextSegment tooltipTextSegment, String text) {
                 if (tooltipTextSegment == null) return;
-                UICommonUtils.tooltip_setTextSegmentText(uiEngineState, mediaManager, tooltipTextSegment, text);
+                uiCommonUtils.tooltip_setTextSegmentText( tooltipTextSegment, text);
             }
 
         }

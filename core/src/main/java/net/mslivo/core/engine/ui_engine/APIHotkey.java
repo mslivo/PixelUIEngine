@@ -12,14 +12,17 @@ import java.util.Arrays;
 public final class APIHotkey {
     private final API api;
     private final UIEngineState uiEngineState;
-    private final UIConfig uiConfig;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
-    APIHotkey(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIHotkey(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.config;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.config;
+
     }
 
     public final HotKeyAction DEFAULT_HOTKEY_ACTION = new HotKeyAction() {

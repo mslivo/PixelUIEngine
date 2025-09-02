@@ -23,8 +23,11 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
+import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
 import net.mslivo.core.engine.ui_engine.ui.components.TextButton;
 import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
+import net.mslivo.core.engine.ui_engine.ui.generator.WindowGeneratorP1;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 
@@ -130,7 +133,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.composites.modal.createMessageModal("test", new String[]{"test"}, null));
+                api.addWindowAsModal(api.widgets.modal.createMessageModal("test", new String[]{"test"}, null));
             }
         }));
 

@@ -15,16 +15,20 @@ import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 public final class APINotification {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
-    public final APITooltipNotification tooltip = new APITooltipNotification();
+    public final APITooltipNotification tooltip;
 
-    APINotification(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APINotification(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
+
+        this.tooltip = new APITooltipNotification();
     }
 
     public final NotificationAction DEFAULT_NOTIFICATION_ACTION = new NotificationAction() {};

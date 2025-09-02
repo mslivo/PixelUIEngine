@@ -41,11 +41,13 @@ import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 
-public final class APIComposites {
+public final class APIWidgets {
     private static final char[] numbersAllowedCharacters = new char[]{'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     private static final char[] decimalsAllowedCharacters = new char[]{'-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
@@ -60,11 +62,13 @@ public final class APIComposites {
     public final APICompositeTextfield textfield;
     public final APICompositeTabbar tabBar;
 
-    APIComposites(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIWidgets(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
+        
         this.list = new APICompositeList();
         this.image = new APICompositeImage();
         this.text = new APICompositeText();
@@ -547,7 +551,7 @@ public final class APIComposites {
                     @Override
                     public void onMouseScroll(float scrolled) {
                         float scrollAmount = (-1 / (float) Math.max(textConverted.length, 1)) * api.input.mouse.event.scrolledAmount();
-                        UICommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
+                        uiCommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
                     }
                 });
                 result.add(texts[i]);
@@ -580,7 +584,7 @@ public final class APIComposites {
             });
 
             // Init
-            UICommonUtils.scrollBar_scroll(scrollBarVertical, 1f);
+            uiCommonUtils.scrollBar_scroll(scrollBarVertical, 1f);
             if (textConverted.length <= height) {
                 api.component.setDisabled(scrollBarVertical, true);
             }
@@ -648,12 +652,12 @@ public final class APIComposites {
             return new HotKeyAction() {
                 @Override
                 public void onPress() {
-                    UICommonUtils.button_press(button);
+                    uiCommonUtils.button_press(button);
                 }
 
                 @Override
                 public void onRelease() {
-                    UICommonUtils.button_release(button);
+                    uiCommonUtils.button_release(button);
                 }
             };
         }
@@ -1084,7 +1088,7 @@ public final class APIComposites {
                 }
             });
 
-            UICommonUtils.textField_setContent(inputTextField, originalText);
+            uiCommonUtils.textField_setContent(inputTextField, originalText);
             return modalWnd;
         }
 
@@ -1243,7 +1247,7 @@ public final class APIComposites {
 
         public ImageButton createWindowCloseButton(Window window, Consumer<Window> closeFunction) {
             ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_CLOSE);
-            api.component.setName(closeButton, UICommonUtils.WND_CLOSE_BUTTON);
+            api.component.setName(closeButton, uiCommonUtils.WND_CLOSE_BUTTON);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
 
                 @Override

@@ -10,6 +10,7 @@ import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 public final class APIConfig {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
@@ -22,11 +23,13 @@ public final class APIConfig {
     public final APIMouseTextInputConfig mouseTextInput;
     public final APIContextMenuConfig contextMenu;
 
-    APIConfig(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIConfig(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
+
         this.ui = new APIUIConfig();
         this.input = new APIInputConfig();
         this.window = new APIWindowConfig();

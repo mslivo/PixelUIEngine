@@ -3,7 +3,7 @@ package net.mslivo.core.engine.ui_engine.ui.tooltip;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.ui_engine.constants.DIRECTION;
-import net.mslivo.core.engine.ui_engine.ui.UpdateActionSupport;
+import net.mslivo.core.engine.ui_engine.ui.actions.UpdateActionSupport;
 import net.mslivo.core.engine.ui_engine.ui.actions.ToolTipAction;
 
 public class Tooltip extends UpdateActionSupport {
@@ -16,4 +16,5 @@ public class Tooltip extends UpdateActionSupport {
     public DIRECTION direction;
     public String name;
     public Object data;
+
 }

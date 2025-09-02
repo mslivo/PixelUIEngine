@@ -12,12 +12,15 @@ import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 public final class APIMouseTextInput {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
-    APIMouseTextInput(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+
+    APIMouseTextInput(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
     }
@@ -116,19 +119,19 @@ public final class APIMouseTextInput {
 
     public void selectCharacter(MouseTextInput mouseTextInput, char character) {
         if (mouseTextInput == null) return;
-        UICommonUtils.mouseTextInput_selectCharacter(mouseTextInput, character);
+        uiCommonUtils.mouseTextInput_selectCharacter(mouseTextInput, character);
     }
 
     public void selectIndex(MouseTextInput mouseTextInput, int index) {
         if (mouseTextInput == null) return;
-        UICommonUtils.mouseTextInput_selectIndex(mouseTextInput, index);
+        uiCommonUtils.mouseTextInput_selectIndex(mouseTextInput, index);
     }
 
     public void setCharacters(MouseTextInput mouseTextInput, char[] charactersLC, char[] charactersUC) {
         if (mouseTextInput == null) return;
         charactersLC = charactersLC != null ? charactersLC : new char[]{};
         charactersUC = charactersUC != null ? charactersUC : new char[]{};
-        UICommonUtils.mouseTextInput_setCharacters(mouseTextInput, charactersLC, charactersUC);
+        uiCommonUtils.mouseTextInput_setCharacters(mouseTextInput, charactersLC, charactersUC);
     }
 
     public void setAlpha(MouseTextInput mouseTextInput, float alpha) {

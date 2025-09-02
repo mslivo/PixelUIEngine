@@ -38,6 +38,7 @@ public final class API {
 
     // ##### PRIVATE Fields #####
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
@@ -54,24 +55,26 @@ public final class API {
 
     public final APICamera camera;
     public final APIConfig config;
-    public final APIComposites composites;
+    public final APIWidgets widgets;
 
-    public API(UIEngineState uiEngineState, MediaManager mediaManager) {
+    API(UIEngineState uiEngineState, MediaManager mediaManager) {
         this.uiEngineState = uiEngineState;
         this.mediaManager = mediaManager;
-        this.uiConfig = uiEngineState.config;
-        this.window = new APIWindow(this, uiEngineState, mediaManager);
-        this.component = new APIComponent(this, uiEngineState, mediaManager);
-        this.input = new APIInput(this, uiEngineState, mediaManager);
-        this.contextMenu = new APIContextMenu(this, uiEngineState, mediaManager);
-        this.notification = new APINotification(this, uiEngineState, mediaManager);
-        this.toolTip = new APITooltip(this, uiEngineState, mediaManager);
-        this.hotkey = new APIHotkey(this, uiEngineState, mediaManager);
-        this.mouseTool = new APIMouseTool(this, uiEngineState, mediaManager);
-        this.mouseTextInput = new APIMouseTextInput(this, uiEngineState, mediaManager);
-        this.camera = new APICamera(this, uiEngineState, mediaManager);
-        this.config = new APIConfig(this, uiEngineState, mediaManager);
-        this.composites = new APIComposites(this, uiEngineState, mediaManager);
+        this.uiCommonUtils = new UICommonUtils(this.uiEngineState, this.mediaManager);
+        this.uiConfig = this.uiEngineState.config;
+        // init sub APIs
+        this.window = new APIWindow(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.component = new APIComponent(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.input = new APIInput(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.contextMenu = new APIContextMenu(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.notification = new APINotification(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.toolTip = new APITooltip(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.hotkey = new APIHotkey(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.mouseTool = new APIMouseTool(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.mouseTextInput = new APIMouseTextInput(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.camera = new APICamera(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.config = new APIConfig(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.widgets = new APIWidgets(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
     }
 
     /* #################### Notifications #################### */
@@ -86,7 +89,7 @@ public final class API {
 
     public void addNotification(CommonNotification commonNotification) {
         if (commonNotification == null) return;
-        UICommonUtils.notification_addToScreen(uiEngineState, commonNotification, uiConfig.notification_max);
+        uiCommonUtils.notification_addToScreen( commonNotification, uiConfig.notification_max);
     }
 
     public void addNotifications(CommonNotification[] commonNotifications) {
@@ -96,7 +99,7 @@ public final class API {
 
     public void removeNotification(CommonNotification commonNotification) {
         if (commonNotification == null) return;
-        UICommonUtils.notification_removeFromScreen(uiEngineState, commonNotification);
+        uiCommonUtils.notification_removeFromScreen( commonNotification);
     }
 
     public void removeNotifications(CommonNotification[] commonNotifications) {
@@ -111,16 +114,16 @@ public final class API {
 
     public Array<CommonNotification> findNotifications(Predicate<Notification> findBy) {
         Array<CommonNotification> result = new Array<>();
-        result.addAll(UICommonUtils.findMultiple(uiEngineState.notifications, findBy));
-        result.addAll(UICommonUtils.findMultiple(uiEngineState.tooltipNotifications, findBy));
+        result.addAll(uiCommonUtils.findMultiple(uiEngineState.notifications, findBy));
+        result.addAll(uiCommonUtils.findMultiple(uiEngineState.tooltipNotifications, findBy));
         return result;
     }
 
     public CommonNotification findNotification(Predicate<Notification> findBy) {
-        CommonNotification result = UICommonUtils.find(uiEngineState.notifications, findBy);
+        CommonNotification result = uiCommonUtils.find(uiEngineState.notifications, findBy);
         if(result != null)
             return result;
-        result = UICommonUtils.find(uiEngineState.tooltipNotifications, findBy);
+        result = uiCommonUtils.find(uiEngineState.tooltipNotifications, findBy);
         if(result != null)
             return result;
         return null;
@@ -138,31 +141,31 @@ public final class API {
     }
 
     public void openContextMenu(ContextMenu contextMenu) {
-        UICommonUtils.contextMenu_openAtMousePosition(uiEngineState, mediaManager, contextMenu);
+        uiCommonUtils.contextMenu_openAtMousePosition(  contextMenu);
     }
 
     public void openContextMenu(ContextMenu contextMenu, int x, int y) {
         if (contextMenu == null) return;
-        UICommonUtils.contextMenu_open(uiEngineState, mediaManager, contextMenu, x, y);
+        uiCommonUtils.contextMenu_open(  contextMenu, x, y);
     }
 
     public void closeContextMenu(ContextMenu contextMenu) {
-        UICommonUtils.contextMenu_close(uiEngineState, contextMenu);
+        uiCommonUtils.contextMenu_close( contextMenu);
     }
 
     public boolean isContextMenuOpen(ContextMenu contextMenu) {
-        return UICommonUtils.contextMenu_isOpen(uiEngineState, contextMenu);
+        return uiCommonUtils.contextMenu_isOpen( contextMenu);
     }
 
     /* #################### MouseTextInput #################### */
 
     public void openMouseTextInput(MouseTextInput mouseTextInput){
         if(mouseTextInput == null) return;
-        UICommonUtils.mouseTextInput_open(uiEngineState, mouseTextInput);
+        uiCommonUtils.mouseTextInput_open( mouseTextInput);
     }
 
     public void closeMouseTextInput(){
-        UICommonUtils.mouseTextInput_close(uiEngineState);
+        uiCommonUtils.mouseTextInput_close(uiEngineState);
     }
 
     /* #################### Windows #################### */
@@ -173,7 +176,7 @@ public final class API {
 
     public void addWindow(Window window) {
         if (window == null) return;
-        UICommonUtils.window_addToScreen(uiEngineState, window);
+        uiCommonUtils.window_addToScreen( window);
     }
 
     public void addWindows(Window[] windows) {
@@ -183,7 +186,7 @@ public final class API {
 
     public void removeWindow(Window window) {
         if (window == null) return;
-        UICommonUtils.window_removeFromScreen(uiEngineState, window);
+        uiCommonUtils.window_removeFromScreen( window);
     }
 
     public void removeWindows(Window[] windows) {
@@ -197,7 +200,7 @@ public final class API {
 
     public boolean closeWindow(Window window) {
         if (window == null) return false;
-        return UICommonUtils.window_close(uiEngineState, window);
+        return uiCommonUtils.window_close( window);
     }
 
     public void closeWindows(Window[] windows) {
@@ -211,22 +214,22 @@ public final class API {
 
     public void sendMessageToWindow(Window window, int type, Object... parameters) {
         if (window == null) return;
-        UICommonUtils.window_receiveMessage(window, type, parameters);
+        uiCommonUtils.window_receiveMessage(window, type, parameters);
     }
 
     public void sendMessageToWindows(Window[] windows, int type, Object... parameters) {
         if (windows == null) return;
-        for (int i = 0; i < windows.length; i++) UICommonUtils.window_receiveMessage(windows[i], type, parameters);
+        for (int i = 0; i < windows.length; i++) uiCommonUtils.window_receiveMessage(windows[i], type, parameters);
     }
 
     public void sendMessageToAllWindows(int type, Object... parameters) {
         for (int i = 0; i < uiEngineState.windows.size; i++)
-            UICommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
+            uiCommonUtils.window_receiveMessage(uiEngineState.windows.get(i), type, parameters);
     }
 
     public void windowsEnforceScreenBounds() {
         for (int i = 0; i < uiEngineState.windows.size; i++)
-            UICommonUtils.window_enforceScreenBounds(uiEngineState, uiEngineState.windows.get(i));
+            uiCommonUtils.window_enforceScreenBounds( uiEngineState.windows.get(i));
     }
 
     /* #################### Modal #################### */
@@ -237,21 +240,21 @@ public final class API {
 
     public void addWindowAsModal(Window modalWindow) {
         if (modalWindow == null) return;
-        UICommonUtils.window_addToScreenAsModal(uiEngineState, modalWindow);
+        uiCommonUtils.window_addToScreenAsModal( modalWindow);
     }
 
     public void removeCurrentModalWindow() {
         if (uiEngineState.modalWindow == null) return;
-        UICommonUtils.window_removeFromScreen(uiEngineState, uiEngineState.modalWindow);
+        uiCommonUtils.window_removeFromScreen(uiEngineState.modalWindow);
     }
 
     public boolean closeCurrentModalWindow() {
-        if (UICommonUtils.window_isModalOpen(uiEngineState)) closeWindow(uiEngineState.modalWindow);
+        if (uiCommonUtils.window_isModalOpen(uiEngineState)) closeWindow(uiEngineState.modalWindow);
         return false;
     }
 
     public boolean isModalOpen() {
-        return UICommonUtils.window_isModalOpen(uiEngineState);
+        return uiCommonUtils.window_isModalOpen(uiEngineState);
     }
 
     /* #################### Screen Components #################### */
@@ -262,12 +265,12 @@ public final class API {
 
     public void addScreenComponent(Component component) {
         if (component == null) return;
-        UICommonUtils.component_addToScreen(component, uiEngineState);
+        uiCommonUtils.component_addToScreen(component, uiEngineState);
     }
 
     public void moveScreenComponentToTop(Component component){
         if (component == null) return;
-        UICommonUtils.component_screenMoveToTop(component, uiEngineState);
+        uiCommonUtils.component_screenMoveToTop(component, uiEngineState);
     }
 
     public void addScreenComponents(Component[] components) {
@@ -277,7 +280,7 @@ public final class API {
 
     public void removeScreenComponent(Component component) {
         if (component == null) return;
-        UICommonUtils.component_removeFromScreen(component, uiEngineState);
+        uiCommonUtils.component_removeFromScreen(component, uiEngineState);
     }
 
     public void removeScreenComponents(Component[] components) {
@@ -290,11 +293,11 @@ public final class API {
     }
 
     public Array<Component> findScreenComponents(Predicate<Component> findBy) {
-        return UICommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
+        return uiCommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
     }
 
     public Component findScreenComponent(Predicate<Component> findBy) {
-        return UICommonUtils.find(uiEngineState.screenComponents, findBy);
+        return uiCommonUtils.find(uiEngineState.screenComponents, findBy);
     }
 
     /* #################### MouseTool #################### */
@@ -348,19 +351,19 @@ public final class API {
     }
 
     public HotKey findHotKey(Predicate<HotKey> findBy){
-        return UICommonUtils.find(uiEngineState.hotKeys, findBy);
+        return uiCommonUtils.find(uiEngineState.hotKeys, findBy);
     }
 
     public Array<HotKey> findHotKeys(Predicate<HotKey> findBy){
-        return UICommonUtils.findMultiple(uiEngineState.hotKeys, findBy);
+        return uiCommonUtils.findMultiple(uiEngineState.hotKeys, findBy);
     }
 
     public Window findWindow(Predicate<Window> findBy){
-        return UICommonUtils.find(uiEngineState.windows, findBy);
+        return uiCommonUtils.find(uiEngineState.windows, findBy);
     }
 
     public Array<Window> findWindows(Predicate<Window> findBy){
-        return UICommonUtils.findMultiple(uiEngineState.windows, findBy);
+        return uiCommonUtils.findMultiple(uiEngineState.windows, findBy);
     }
 
     /* #################### Misc #################### */
@@ -408,7 +411,7 @@ public final class API {
 
     public void setViewportMode(VIEWPORT_MODE viewPortMode) {
         if (viewPortMode == null) return;
-        UICommonUtils.viewport_changeViewPortMode(uiEngineState, viewPortMode);
+        uiCommonUtils.viewport_changeViewPortMode( viewPortMode);
     }
 
     public int resolutionWidth() {
@@ -428,7 +431,7 @@ public final class API {
     }
 
     public float animationTimer(){
-        return UICommonUtils.ui_getAnimationTimer(uiEngineState);
+        return uiCommonUtils.ui_getAnimationTimer(uiEngineState);
     }
 
     public int TS() {

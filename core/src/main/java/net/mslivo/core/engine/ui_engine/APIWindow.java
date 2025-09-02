@@ -18,12 +18,14 @@ public final class APIWindow {
 
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final UIConfig uiConfig;
     private final MediaManager mediaManager;
 
-    APIWindow(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIWindow(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
     }
@@ -193,7 +195,7 @@ public final class APIWindow {
 
     public void addComponent(Window window, Component component) {
         if (window == null || component == null) return;
-        UICommonUtils.component_addToWindow(component, uiEngineState, window);
+        uiCommonUtils.component_addToWindow(component, uiEngineState, window);
     }
 
     public void addComponents(Window window, Component[] components) {
@@ -203,12 +205,12 @@ public final class APIWindow {
 
     public void moveComponentToTop(Component component) {
         if (component == null) return;
-        UICommonUtils.component_windowMoveToTop(component, uiEngineState);
+        uiCommonUtils.component_windowMoveToTop(component, uiEngineState);
     }
 
     public void removeComponent(Window window, Component component) {
         if (window == null || component == null) return;
-        UICommonUtils.component_removeFromWindow(component, window, uiEngineState);
+        uiCommonUtils.component_removeFromWindow(component, window, uiEngineState);
     }
 
     public void removeComponents(Window window, Component[] components) {
@@ -223,22 +225,22 @@ public final class APIWindow {
 
     public Array<Component> findComponents(Window window, Predicate<Window> findBy) {
         if (window == null) return new Array<>();
-        return UICommonUtils.findMultiple(window.components, findBy);
+        return uiCommonUtils.findMultiple(window.components, findBy);
     }
 
     public Component findComponent(Window window, Predicate<Window> findBy) {
         if (window == null) return null;
-        return UICommonUtils.find(window.components, findBy);
+        return uiCommonUtils.find(window.components, findBy);
     }
 
     public void bringToFront(Window window) {
         if (window == null) return;
-        UICommonUtils.window_bringToFront(uiEngineState, window);
+        uiCommonUtils.window_bringToFront( window);
     }
 
     public void center(Window window) {
         if (window == null) return;
-        UICommonUtils.window_center(uiEngineState, window);
+        uiCommonUtils.window_center( window);
     }
 
     public void setFontColor(Window window, Color color) {
@@ -308,7 +310,7 @@ public final class APIWindow {
 
     public void setPosition(Window window, int x, int y) {
         if (window == null) return;
-        UICommonUtils.window_setPosition(uiEngineState, window, x, y);
+        uiCommonUtils.window_setPosition( window, x, y);
     }
 
     public void setPositionGrid(Window window, int x, int y) {

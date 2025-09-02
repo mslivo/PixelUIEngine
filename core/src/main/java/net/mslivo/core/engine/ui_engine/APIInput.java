@@ -15,19 +15,23 @@ public final class APIInput {
 
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
+    private final MediaManager mediaManager;
     private final UIConfig uiConfig;
     private final UIInputEvents inputEvents;
-    private final MediaManager mediaManager;
+
     public final APIMouse mouse;
     public final APIKeyboard keyboard;
     public final APIGamepad gamepad;
 
-    APIInput(API api, UIEngineState uiEngineState, MediaManager mediaManager){
+    APIInput(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.config;
-        this.inputEvents = uiEngineState.inputEvents;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.config;
+
+        this.inputEvents = uiEngineState.inputEvents;
         this.mouse = new APIMouse();
         this.keyboard = new APIKeyboard();
         this.gamepad = new APIGamepad();
@@ -101,19 +105,19 @@ public final class APIInput {
         public final class APIEmulated {
 
             public void setPosition(int x, int y) {
-                UICommonUtils.emulatedMouse_setPosition(uiEngineState, x, y);
+                uiCommonUtils.emulatedMouse_setPosition( x, y);
             }
 
             public void setPositionComponent(Component component) {
-                UICommonUtils.emulatedMouse_setPositionComponent(uiEngineState, component);
+                uiCommonUtils.emulatedMouse_setPositionComponent( component);
             }
 
             public void setPositionNextComponent() {
-                UICommonUtils.emulatedMouse_setPositionNextComponent(uiEngineState, false);
+                uiCommonUtils.emulatedMouse_setPositionNextComponent( false);
             }
 
             public void setPositionPreviousComponent() {
-                UICommonUtils.emulatedMouse_setPositionNextComponent(uiEngineState, true);
+                uiCommonUtils.emulatedMouse_setPositionNextComponent( true);
             }
 
         }

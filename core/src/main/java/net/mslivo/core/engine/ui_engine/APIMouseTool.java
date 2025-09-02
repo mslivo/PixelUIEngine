@@ -8,16 +8,19 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
 
 public final class APIMouseTool {
-    private API api;
-    private UIEngineState uiEngineState;
-    private UIConfig uiConfig;
-    private MediaManager mediaManager;
+    private final API api;
+    private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
+    private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
 
-    APIMouseTool(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+
+    APIMouseTool(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.config;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.config;
     }
 
     public MouseTool create(String name, Object data, CMediaSprite cursor) {

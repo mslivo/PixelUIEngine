@@ -10,15 +10,19 @@ import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
 public final class APICamera {
     private final API api;
     private final UIEngineState uiEngineState;
-    private final UIConfig uiConfig;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
+    private final UIConfig uiConfig;
+    
     public final APIAppViewports appViewport;
 
-    APICamera(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APICamera(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
-        this.uiConfig = uiEngineState.config;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
+        this.uiConfig = uiEngineState.config;
+        
         this.appViewport = new APIAppViewports();
     }
 
@@ -38,46 +42,46 @@ public final class APICamera {
     }
 
     public void setPosition(float x, float y) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app, x, y);
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app, x, y);
     }
 
     public void move(float x, float y) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app,
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app,
                 (uiEngineState.camera_app.position.x + x),
                 (uiEngineState.camera_app.position.y + y)
         );
     }
 
     public void setX(float x) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app,
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app,
                 x,
                 uiEngineState.camera_app.position.y
         );
     }
 
     public void moveX(float x) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app,
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app,
                 (uiEngineState.camera_app.position.x + x),
                 uiEngineState.camera_app.position.y
         );
     }
 
     public void setY(float y) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app,
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app,
                 uiEngineState.camera_app.position.x,
                 y
         );
     }
 
     public void moveY(float y) {
-        UICommonUtils.camera_setPosition(uiEngineState.camera_app,
+        uiCommonUtils.camera_setPosition(uiEngineState.camera_app,
                 uiEngineState.camera_app.position.x,
                 (uiEngineState.camera_app.position.y + y)
         );
     }
 
     public void setZoom(float zoom) {
-        UICommonUtils.camera_setZoom(uiEngineState.camera_app, zoom);
+        uiCommonUtils.camera_setZoom(uiEngineState.camera_app, zoom);
     }
 
     public float x() {

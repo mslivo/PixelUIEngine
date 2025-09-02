@@ -36,6 +36,7 @@ import java.util.function.Predicate;
 public final class APIComponent {
     private final API api;
     private final UIEngineState uiEngineState;
+    private final UICommonUtils uiCommonUtils;
     private final MediaManager mediaManager;
     private final UIConfig uiConfig;
 
@@ -55,9 +56,10 @@ public final class APIComponent {
     public final APIAppViewport appViewport;
     public final APIFrameBufferViewport frameBufferViewport;
 
-    APIComponent(API api, UIEngineState uiEngineState, MediaManager mediaManager) {
+    APIComponent(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
         this.uiEngineState = uiEngineState;
+        this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiConfig = uiEngineState.config;
         this.shape = new APIShape();
@@ -136,38 +138,38 @@ public final class APIComponent {
 
         public void setCamPosition(AppViewport appViewPort, float x, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, x, y);
+            uiCommonUtils.camera_setPosition(appViewPort.camera, x, y);
         }
 
 
         public void moveCam(AppViewport appViewPort, float x, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), (appViewPort.camera.position.y + y));
+            uiCommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), (appViewPort.camera.position.y + y));
         }
 
         public void setCamX(AppViewport appViewPort, float x) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, x, appViewPort.camera.position.y);
+            uiCommonUtils.camera_setPosition(appViewPort.camera, x, appViewPort.camera.position.y);
         }
 
         public void moveCamX(AppViewport appViewPort, float x) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), appViewPort.camera.position.y);
+            uiCommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), appViewPort.camera.position.y);
         }
 
         public void setCamY(AppViewport appViewPort, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, y);
+            uiCommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, y);
         }
 
         public void moveCamY(AppViewport appViewPort, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, (appViewPort.camera.position.y + y));
+            uiCommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, (appViewPort.camera.position.y + y));
         }
 
         public void setCamZoom(AppViewport appViewPort, float zoom) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setZoom(appViewPort.camera, zoom);
+            uiCommonUtils.camera_setZoom(appViewPort.camera, zoom);
         }
 
     }
@@ -196,7 +198,7 @@ public final class APIComponent {
 
         public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, ProgressBarAction progressBarAction) {
             Progressbar progressBar = new Progressbar();
-            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiConfig.component_defaultColor, uiCommonUtils.color_darker(uiConfig.component_defaultColor));
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
@@ -212,7 +214,7 @@ public final class APIComponent {
 
         public void setProgress(Progressbar progressBar, float progress) {
             if (progressBar == null) return;
-            UICommonUtils.progressbar_setProgress(progressBar, progress);
+            uiCommonUtils.progressbar_setProgress(progressBar, progress);
         }
 
         public void setProgressText(Progressbar progressBar, boolean progressText) {
@@ -301,7 +303,7 @@ public final class APIComponent {
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
                 textButton.fontColor = uiConfig.ui_font_defaultColor.cpy();
-                UICommonUtils.button_centerContent(uiEngineState, mediaManager, textButton);
+                uiCommonUtils.button_centerContent( mediaManager, textButton);
                 return textButton;
             }
 
@@ -351,7 +353,7 @@ public final class APIComponent {
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
-                UICommonUtils.button_centerContent(uiEngineState, mediaManager, imageButton);
+                uiCommonUtils.button_centerContent( mediaManager, imageButton);
                 return imageButton;
             }
 
@@ -380,7 +382,7 @@ public final class APIComponent {
 
         public void press(Button button) {
             if (button == null) return;
-            UICommonUtils.button_press(button);
+            uiCommonUtils.button_press(button);
         }
 
         public void press(Button[] buttons, boolean pressed) {
@@ -390,7 +392,7 @@ public final class APIComponent {
 
         public void release(Button button) {
             if (button == null) return;
-            UICommonUtils.button_release(button);
+            uiCommonUtils.button_release(button);
         }
 
         public void release(Button[] buttons) {
@@ -400,7 +402,7 @@ public final class APIComponent {
 
         public void toggle(Button button) {
             if (button == null) return;
-            UICommonUtils.button_toggle(button);
+            uiCommonUtils.button_toggle(button);
         }
 
         public void toggle(Button[] buttons) {
@@ -410,7 +412,7 @@ public final class APIComponent {
 
         public void toggle(Button button, boolean pressed) {
             if (button == null) return;
-            UICommonUtils.button_toggle(button, pressed);
+            uiCommonUtils.button_toggle(button, pressed);
         }
 
         public void toggle(Button[] buttons, boolean pressed) {
@@ -439,7 +441,7 @@ public final class APIComponent {
         }
 
         public void centerContent(Button button) {
-            UICommonUtils.button_centerContent(uiEngineState, mediaManager, button);
+            uiCommonUtils.button_centerContent( mediaManager, button);
         }
 
         public void centerContent(Button[] buttons) {
@@ -481,7 +483,7 @@ public final class APIComponent {
 
         public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
-            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiConfig.component_defaultColor, uiCommonUtils.color_brigther(uiConfig.component_defaultColor));
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction != null ? checkBoxAction : DEFAULT_CHECKBOX_ACTION;
@@ -502,12 +504,12 @@ public final class APIComponent {
 
         public void check(Checkbox checkBox) {
             if (checkBox == null) return;
-            UICommonUtils.checkbox_check(checkBox);
+            uiCommonUtils.checkbox_check(checkBox);
         }
 
         public void unCheck(Checkbox checkBox) {
             if (checkBox == null) return;
-            UICommonUtils.checkbox_unCheck(checkBox);
+            uiCommonUtils.checkbox_unCheck(checkBox);
         }
 
         public void setChecked(Checkbox checkBox, boolean checked) {
@@ -608,7 +610,7 @@ public final class APIComponent {
 
         public Tab selectedTab(Tabbar tabBar) {
             if (tabBar == null) return null;
-            return UICommonUtils.tabBar_getSelectedTab(tabBar);
+            return uiCommonUtils.tabBar_getSelectedTab(tabBar);
         }
 
         public int selectedTabIndex(Tabbar tabBar) {
@@ -627,22 +629,22 @@ public final class APIComponent {
 
         public void selectTab(Tabbar tabBar, int index) {
             if (tabBar == null) return;
-            UICommonUtils.tabBar_selectTab(tabBar, index);
+            uiCommonUtils.tabBar_selectTab(tabBar, index);
         }
 
         public void selectTab(Tabbar tabBar, Tab tab) {
             if (tabBar == null) return;
-            UICommonUtils.tabBar_selectTab(tabBar, tab);
+            uiCommonUtils.tabBar_selectTab(tabBar, tab);
         }
 
         public void addTab(Tabbar tabBar, Tab tab) {
             if (tabBar == null || tab == null) return;
-            UICommonUtils.tabBar_addTab(tabBar, tab);
+            uiCommonUtils.tabBar_addTab(tabBar, tab);
         }
 
         public void addTab(Tabbar tabBar, Tab tab, int index) {
             if (tabBar == null || tab == null) return;
-            UICommonUtils.tabBar_addTab(tabBar, tab, index);
+            uiCommonUtils.tabBar_addTab(tabBar, tab, index);
         }
 
         public void addTabs(Tabbar tabBar, Tab[] tabs) {
@@ -652,7 +654,7 @@ public final class APIComponent {
 
         public void removeTab(Tabbar tabBar, Tab tab) {
             if (tabBar == null || tab == null) return;
-            UICommonUtils.tabBar_removeTab(tabBar, tab);
+            uiCommonUtils.tabBar_removeTab(tabBar, tab);
         }
 
         public void removeTabs(Tabbar tabBar, Tab[] tabs) {
@@ -667,12 +669,12 @@ public final class APIComponent {
 
         public Array<Tab> findTabs(Tabbar tabBar, Predicate<Tab> findBy) {
             if (tabBar == null) return new Array<>();
-            return UICommonUtils.findMultiple(tabBar.tabs, findBy);
+            return uiCommonUtils.findMultiple(tabBar.tabs, findBy);
         }
 
         public Tab findTab(Tabbar tabBar, Predicate<Tab> findBy) {
             if (tabBar == null) return null;
-            return UICommonUtils.find(tabBar.tabs, findBy);
+            return uiCommonUtils.find(tabBar.tabs, findBy);
         }
 
         public boolean isTabVisible(Tabbar tabBar, Tab tab) {
@@ -745,7 +747,7 @@ public final class APIComponent {
 
             public void addTabComponent(Tab tab, Component component) {
                 if (tab == null || component == null) return;
-                UICommonUtils.tab_addComponent(tab, component);
+                uiCommonUtils.tab_addComponent(tab, component);
             }
 
             public void setTabComponents(Tab tab, Component[] components) {
@@ -761,7 +763,7 @@ public final class APIComponent {
 
             public void removeTabComponent(Tab tab, Component component) {
                 if (tab == null || component == null) return;
-                UICommonUtils.tab_removeComponent(tab, component);
+                uiCommonUtils.tab_removeComponent(tab, component);
             }
 
             public void removeTabComponents(Tab tab, Component[] components) {
@@ -837,7 +839,7 @@ public final class APIComponent {
                 width = items.length * (doubleSized ? 2 : 1);
                 height = items[0].length * (doubleSized ? 2 : 1);
             }
-            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiConfig.component_defaultColor, uiCommonUtils.color_brigther(uiConfig.component_defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
@@ -852,12 +854,12 @@ public final class APIComponent {
 
         public void setDoubleSized(Grid grid, boolean doubleSized) {
             grid.bigMode = doubleSized;
-            UICommonUtils.grid_updateSize(grid);
+            uiCommonUtils.grid_updateSize(grid);
         }
 
         public boolean isPositionValid(Grid grid, int x, int y) {
             if (grid == null) return false;
-            return UICommonUtils.grid_positionValid(grid, x, y);
+            return uiCommonUtils.grid_positionValid(grid, x, y);
         }
 
         public void setDragInEnabled(Grid grid, boolean dragInEnabled) {
@@ -882,17 +884,17 @@ public final class APIComponent {
 
         public void setItems(Grid grid, Object[][] items) {
             if (grid == null || items == null) return;
-            UICommonUtils.grid_setItems(grid, items);
+            uiCommonUtils.grid_setItems(grid, items);
         }
 
         public void setSelectedItem(Grid grid, Object selectedItem) {
             if (grid == null) return;
-            UICommonUtils.grid_setSelectedItem(grid, selectedItem);
+            uiCommonUtils.grid_setSelectedItem(grid, selectedItem);
         }
 
         public void setSelectedItems(Grid grid, Object[] selectedItems) {
             if (grid == null) return;
-            UICommonUtils.grid_setSelectedItems(grid, selectedItems);
+            uiCommonUtils.grid_setSelectedItems(grid, selectedItems);
         }
 
     }
@@ -925,7 +927,7 @@ public final class APIComponent {
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
-            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiConfig.component_defaultColor, uiCommonUtils.color_brigther(uiConfig.component_defaultColor));
             textField.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
@@ -941,12 +943,12 @@ public final class APIComponent {
 
         public void setMarkerPosition(Textfield textField, int position) {
             if (textField == null) return;
-            UICommonUtils.textField_setMarkerPosition(uiEngineState, mediaManager, textField, position);
+            uiCommonUtils.textField_setMarkerPosition(  textField, position);
         }
 
         public void setContent(Textfield textField, String content) {
             if (textField == null) return;
-            UICommonUtils.textField_setContent(textField, content);
+            uiCommonUtils.textField_setContent(textField, content);
         }
 
         public void setFontColor(Textfield textField, Color color) {
@@ -957,7 +959,7 @@ public final class APIComponent {
         public void setTextFieldAction(Textfield textField, TextFieldAction textFieldAction) {
             if (textField == null) return;
             textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
-            UICommonUtils.textField_setContent(textField, textField.content); // Trigger validation
+            uiCommonUtils.textField_setContent(textField, textField.content); // Trigger validation
         }
 
         public void setContentMaxLength(Textfield textField, int contentMaxLength) {
@@ -976,16 +978,16 @@ public final class APIComponent {
 
         public void unFocus(Textfield textField) {
             if (textField == null) return;
-            UICommonUtils.textField_unFocus(uiEngineState, textField);
+            uiCommonUtils.textField_unFocus( textField);
         }
 
         public void focus(Textfield textField) {
             if (textField == null) return;
-            UICommonUtils.textField_focus(uiEngineState, textField);
+            uiCommonUtils.textField_focus( textField);
         }
 
         public boolean isFocused(Textfield textField) {
-            return UICommonUtils.textField_isFocused(uiEngineState, textField);
+            return uiCommonUtils.textField_isFocused( textField);
         }
 
         public boolean isContentValid(Textfield textField) {
@@ -1016,7 +1018,7 @@ public final class APIComponent {
 
         public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
             Knob knob = new Knob();
-            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiConfig.component_defaultColor, uiCommonUtils.color_darker(uiConfig.component_defaultColor));
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
             knob.knobAction = knobAction != null ? knobAction : DEFAULT_KNOB_ACTION;
@@ -1025,7 +1027,7 @@ public final class APIComponent {
 
         public void setTurned(Knob knob, float turned) {
             if (knob == null) return;
-            UICommonUtils.knob_turnKnob(knob, turned);
+            uiCommonUtils.knob_turnKnob(knob, turned);
         }
 
         public void setKnobAction(Knob knob, KnobAction knobAction) {
@@ -1070,7 +1072,7 @@ public final class APIComponent {
 
         public void setText(Text textC, String text) {
             if (textC == null) return;
-            UICommonUtils.text_setText(uiEngineState, textC, text);
+            uiCommonUtils.text_setText( textC, text);
         }
 
         public void setFontColor(Text text, Color color) {
@@ -1110,7 +1112,7 @@ public final class APIComponent {
 
         public void setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
             if (frameBufferViewport == null) return;
-            UICommonUtils.framebufferViewport_setFrameBuffer(uiEngineState, frameBufferViewport, nestedFrameBuffer);
+            uiCommonUtils.framebufferViewport_setFrameBuffer( frameBufferViewport, nestedFrameBuffer);
         }
 
 
@@ -1163,7 +1165,7 @@ public final class APIComponent {
 
         public void setImage(Image image, CMediaSprite imageSprite) {
             if (image == null) return;
-            UICommonUtils.image_setImage(uiEngineState, mediaManager, image, imageSprite);
+            uiCommonUtils.image_setImage( image, imageSprite);
         }
 
         public void setFlipXY(Image image, boolean flipX, boolean flipY) {
@@ -1198,7 +1200,7 @@ public final class APIComponent {
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
-            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, UICommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
+            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, uiCommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
             comboBox.items = new Array<>();
             if (combobBoxItems != null) {
@@ -1220,7 +1222,7 @@ public final class APIComponent {
 
         public void addComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
             if (comboBox == null || comboBoxItem == null) return;
-            UICommonUtils.comboBox_addItem(comboBox, comboBoxItem);
+            uiCommonUtils.comboBox_addItem(comboBox, comboBoxItem);
         }
 
         public void addComboBoxItems(Combobox comboBox, ComboboxItem[] comboBoxItems) {
@@ -1230,7 +1232,7 @@ public final class APIComponent {
 
         public void removeComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
             if (comboBox == null || comboBoxItem == null) return;
-            UICommonUtils.comboBox_removeItem(comboBox, comboBoxItem);
+            uiCommonUtils.comboBox_removeItem(comboBox, comboBoxItem);
         }
 
         public void removeComboBoxItems(Combobox comboBox, ComboboxItem[] comboBoxItems) {
@@ -1255,28 +1257,28 @@ public final class APIComponent {
 
         public void setSelectedItem(ComboboxItem selectItem) {
             if (selectItem == null) return;
-            UICommonUtils.comboBox_selectItem(uiEngineState, selectItem);
+            uiCommonUtils.comboBox_selectItem( selectItem);
         }
 
         public void open(Combobox comboBox) {
             if (comboBox == null) return;
-            UICommonUtils.comboBox_open(uiEngineState, comboBox);
+            uiCommonUtils.comboBox_open( comboBox);
         }
 
         public void close(Combobox comboBox) {
             if (comboBox == null) return;
-            UICommonUtils.comboBox_close(uiEngineState, comboBox);
+            uiCommonUtils.comboBox_close( comboBox);
         }
 
         public boolean isOpen(Combobox comboBox) {
-            return UICommonUtils.comboBox_isOpen(uiEngineState, comboBox);
+            return uiCommonUtils.comboBox_isOpen( comboBox);
         }
 
         public void setSelectedItemByText(Combobox comboBox, String text) {
             if (comboBox == null || text == null) return;
             for (int i = 0; i < comboBox.items.size; i++) {
                 if (comboBox.items.get(i).text.equals(text)) {
-                    UICommonUtils.comboBox_selectItem(uiEngineState, comboBox.items.get(i));
+                    uiCommonUtils.comboBox_selectItem( comboBox.items.get(i));
                     return;
                 }
             }
@@ -1374,7 +1376,7 @@ public final class APIComponent {
 
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarHorizontal scrollBarHorizontal = new ScrollbarHorizontal();
-                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
+                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiConfig.component_defaultColor, uiCommonUtils.color_darker(uiConfig.component_defaultColor));
                 scrollBarHorizontal.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarHorizontal;
@@ -1398,7 +1400,7 @@ public final class APIComponent {
 
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarVertical scrollBarVertical = new ScrollbarVertical();
-                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiConfig.component_defaultColor, UICommonUtils.color_darker(uiConfig.component_defaultColor));
+                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiConfig.component_defaultColor, uiCommonUtils.color_darker(uiConfig.component_defaultColor));
                 scrollBarVertical.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarVertical;
@@ -1408,7 +1410,7 @@ public final class APIComponent {
 
         public void setScrolled(Scrollbar scrollBar, float scrolled) {
             if (scrollBar == null) return;
-            UICommonUtils.scrollBar_scroll(scrollBar, scrolled);
+            uiCommonUtils.scrollBar_scroll(scrollBar, scrolled);
         }
 
         public void setScrollBarAction(Scrollbar scrollBar, ScrollBarAction scrollBarAction) {
@@ -1453,7 +1455,7 @@ public final class APIComponent {
 
         public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
-            setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, UICommonUtils.color_brigther(uiConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(list, x, y, width, height, uiConfig.component_defaultColor, uiCommonUtils.color_brigther(uiConfig.component_defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
@@ -1489,7 +1491,7 @@ public final class APIComponent {
 
         public void setScrolled(List list, float scrolled) {
             if (list == null) return;
-            UICommonUtils.list_scroll(list, scrolled);
+            uiCommonUtils.list_scroll(list, scrolled);
         }
 
         public void setListAction(List list, ListAction listAction) {
@@ -1504,14 +1506,14 @@ public final class APIComponent {
 
         public void setMultiSelect(List list, boolean multiSelect) {
             if (list == null) return;
-            UICommonUtils.list_setMultiSelect(list, multiSelect);
+            uiCommonUtils.list_setMultiSelect(list, multiSelect);
         }
 
         public void setSelectedItemByText(List list, String text) {
             if (list == null) return;
             for (int i = 0; i < list.items.size; i++) {
                 if (list.listAction.text(list.items.get(i)).equals(text)) {
-                    UICommonUtils.list_setSelectedItem(list, list.items.get(i));
+                    uiCommonUtils.list_setSelectedItem(list, list.items.get(i));
                     return;
                 }
             }
@@ -1519,12 +1521,12 @@ public final class APIComponent {
 
         public void setSelectedItem(List list, Object selectedItem) {
             if (list == null) return;
-            UICommonUtils.list_setSelectedItem(list, selectedItem);
+            uiCommonUtils.list_setSelectedItem(list, selectedItem);
         }
 
         public void setSelectedItems(List list, Object[] selectedItems) {
             if (list == null) return;
-            UICommonUtils.list_setSelectedItems(list, selectedItems);
+            uiCommonUtils.list_setSelectedItems(list, selectedItems);
         }
 
     }
@@ -1572,7 +1574,7 @@ public final class APIComponent {
 
     public void setDisabled(Component component, boolean disabled) {
         if (component == null) return;
-        UICommonUtils.component_setDisabled(uiEngineState, component, disabled);
+        uiCommonUtils.component_setDisabled( component, disabled);
     }
 
     public void setDisabled(Component[] components, boolean disabled) {
@@ -1617,7 +1619,7 @@ public final class APIComponent {
 
     public void setSize(Component component, int width, int height) {
         if (component == null) return;
-        UICommonUtils.component_setSize(uiEngineState, component, width, height);
+        uiCommonUtils.component_setSize( component, width, height);
     }
 
     public void setWidth(Component component, int width) {
@@ -1692,12 +1694,12 @@ public final class APIComponent {
 
     public int absoluteX(Component component) {
         if (component == null) return 0;
-        return UICommonUtils.component_getAbsoluteX(component);
+        return uiCommonUtils.component_getAbsoluteX(component);
     }
 
     public int absoluteY(Component component) {
         if (component == null) return 0;
-        return UICommonUtils.component_getAbsoluteY(component);
+        return uiCommonUtils.component_getAbsoluteY(component);
     }
 
     public int realWidth(Component component) {
