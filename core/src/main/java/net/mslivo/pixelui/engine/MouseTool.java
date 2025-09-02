@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media.CMediaSprite;
 
 public class MouseTool {
     public String name;

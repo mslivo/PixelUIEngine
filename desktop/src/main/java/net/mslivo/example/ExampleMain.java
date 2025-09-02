@@ -1,7 +1,7 @@
 package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.transitions.TransitionManager;
 import net.mslivo.pixelui.utils.transitions.basic.PixelateTransition;
@@ -37,7 +37,7 @@ public class ExampleMain extends ApplicationAdapter {
         // Load Assets
         System.out.println("Loading Assets");
         this.mediaManager = new MediaManager();
-        this.mediaManager.prepareUICMedia();
+        this.mediaManager.prepareUIEngineBaseCMedia();
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
         System.out.println("Done.");

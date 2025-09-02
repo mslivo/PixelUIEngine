@@ -2,7 +2,7 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.actions.UpdateAction;
 import net.mslivo.pixelui.engine.actions.WindowAction;

@@ -2,8 +2,8 @@ package net.mslivo.pixelui.utils.sound;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.*;
-import net.mslivo.pixelui.media_manager.CMediaSoundEffect;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaSoundEffect;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 
 /*

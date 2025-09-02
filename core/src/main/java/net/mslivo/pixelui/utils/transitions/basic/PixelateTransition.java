@@ -6,8 +6,8 @@ import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
-import net.mslivo.pixelui.utils.rendering.ShaderParser;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.ShaderParser;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class PixelateTransition extends Transition {
     private float fadeOut;

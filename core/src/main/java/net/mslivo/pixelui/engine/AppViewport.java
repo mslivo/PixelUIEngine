@@ -2,7 +2,7 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.engine.actions.AppViewPortAction;
 
 public class AppViewport extends Component {

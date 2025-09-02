@@ -1,7 +1,7 @@
 package net.mslivo.pixelui.utils.transitions;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public abstract class Transition {
 

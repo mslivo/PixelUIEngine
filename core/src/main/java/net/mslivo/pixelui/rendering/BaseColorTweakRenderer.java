@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.utils.rendering;
+package net.mslivo.pixelui.rendering;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;

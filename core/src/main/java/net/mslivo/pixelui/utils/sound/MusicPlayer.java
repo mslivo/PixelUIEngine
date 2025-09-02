@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
-import net.mslivo.pixelui.media_manager.CMediaMusic;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaMusic;
+import net.mslivo.pixelui.media.MediaManager;
 
 /*
  * Basic Music Player

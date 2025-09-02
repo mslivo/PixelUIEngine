@@ -1,6 +1,6 @@
 package net.mslivo.example.ui.media;
 
-import net.mslivo.pixelui.media_manager.*;
+import net.mslivo.pixelui.media.*;
 
 public class ExampleBaseMedia {
     private static final String DIR_EXAMPLE_GRAPHICS = MediaManager.DIR_GRAPHICS + "example/";

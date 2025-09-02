@@ -1,7 +1,7 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.TOOLTIP_NOTIFICATION_STATE;
 import net.mslivo.pixelui.engine.constants.TOP_NOTIFICATION_STATE;

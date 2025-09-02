@@ -1,6 +1,4 @@
-package net.mslivo.pixelui.engine;
-
-import net.mslivo.pixelui.media_manager.*;
+package net.mslivo.pixelui.media;
 
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what

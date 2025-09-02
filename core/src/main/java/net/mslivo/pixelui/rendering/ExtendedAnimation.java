@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.utils.rendering;
+package net.mslivo.pixelui.rendering;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;

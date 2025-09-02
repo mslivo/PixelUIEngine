@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.media_manager;
+package net.mslivo.pixelui.media;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -13,8 +13,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
 import net.mslivo.pixelui.utils.Tools;
-import net.mslivo.pixelui.engine.UIEngineBaseMedia_8x8;
-import net.mslivo.pixelui.utils.rendering.ExtendedAnimation;
+import net.mslivo.pixelui.rendering.ExtendedAnimation;
 
 import java.io.*;
 import java.lang.StringBuilder;
@@ -58,7 +57,7 @@ public final class MediaManager implements Disposable {
     }
 
     /* ----- Prepare ----- */
-    public boolean prepareUICMedia() {
+    public boolean prepareUIEngineBaseCMedia() {
         return prepareCMedia(UIEngineBaseMedia_8x8.ALL);
     }
 

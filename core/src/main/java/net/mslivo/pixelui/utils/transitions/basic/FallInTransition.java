@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class FallInTransition extends Transition {
     private float yTo;

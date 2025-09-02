@@ -3,8 +3,8 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.media.MediaManager;
 
 public interface UIEngineAdapter extends Disposable {
     void init(API api, MediaManager mediaManager);

@@ -13,10 +13,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
-import net.mslivo.pixelui.media_manager.CMedia;
-import net.mslivo.pixelui.media_manager.CMediaFontArraySymbol;
-import net.mslivo.pixelui.media_manager.CMediaFontSingleSymbol;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMedia;
+import net.mslivo.pixelui.media.CMediaFontArraySymbol;
+import net.mslivo.pixelui.media.CMediaFontSingleSymbol;
+import net.mslivo.pixelui.media.MediaManager;
 
 import javax.swing.*;
 import java.awt.*;

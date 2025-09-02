@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.actions.HotKeyAction;
 

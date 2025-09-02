@@ -1,8 +1,9 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.pixelui.media_manager.CMediaFont;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media.CMediaFont;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.UIEngineBaseMedia_8x8;
 
 public final class UIEngineConfig {
 

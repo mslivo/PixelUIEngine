@@ -3,12 +3,12 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.DIRECTION;
 import net.mslivo.pixelui.engine.constants.SEGMENT_ALIGNMENT;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.engine.actions.ToolTipAction;
 import net.mslivo.pixelui.engine.actions.UpdateAction;
 

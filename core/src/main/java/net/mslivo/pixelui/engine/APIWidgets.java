@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.*;
-import net.mslivo.pixelui.media_manager.CMediaFont;
-import net.mslivo.pixelui.media_manager.CMediaImage;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.*;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 

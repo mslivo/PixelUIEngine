@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;

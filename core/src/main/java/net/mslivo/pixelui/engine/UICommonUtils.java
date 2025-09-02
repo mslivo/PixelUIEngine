@@ -13,14 +13,14 @@ import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.utils.rendering.PixelPerfectViewport;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.PixelPerfectViewport;
 
 import java.util.HashSet;
 import java.util.function.Predicate;

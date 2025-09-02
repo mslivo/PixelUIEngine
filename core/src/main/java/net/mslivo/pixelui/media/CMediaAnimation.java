@@ -1,6 +1,6 @@
-package net.mslivo.pixelui.media_manager;
+package net.mslivo.pixelui.media;
 
-import net.mslivo.pixelui.utils.rendering.ExtendedAnimation;
+import net.mslivo.pixelui.rendering.ExtendedAnimation;
 
 import java.io.Serializable;
 

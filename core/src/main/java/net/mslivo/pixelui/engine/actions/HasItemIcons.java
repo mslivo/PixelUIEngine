@@ -1,7 +1,7 @@
 package net.mslivo.pixelui.engine.actions;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media.CMediaSprite;
 
 public interface HasItemIcons<T> {
 

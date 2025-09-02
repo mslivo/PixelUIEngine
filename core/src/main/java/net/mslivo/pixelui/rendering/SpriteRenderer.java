@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.utils.rendering;
+package net.mslivo.pixelui.rendering;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Align;
-import net.mslivo.pixelui.media_manager.*;
+import net.mslivo.pixelui.media.*;
 
 public class SpriteRenderer extends BaseColorTweakRenderer {
 

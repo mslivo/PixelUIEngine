@@ -9,14 +9,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import net.mslivo.pixelui.engine.actions.*;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.CHECKBOX_STYLE;
 import net.mslivo.pixelui.engine.constants.SHAPE_ROTATION;
 import net.mslivo.pixelui.engine.constants.SHAPE_TYPE;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 
 import java.util.HashSet;
 import java.util.function.Predicate;

@@ -8,13 +8,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.pixelui.engine.constants.TILE_SIZE;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.utils.rendering.PrimitiveRenderer;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.PrimitiveRenderer;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.UpdateAction;
 
 public final class UIEngineState {

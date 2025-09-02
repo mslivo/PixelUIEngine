@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 
 public final class TooltipFramebufferViewportSegment extends TooltipSegment {
 

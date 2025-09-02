@@ -2,7 +2,7 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.actions.MouseTextInputAction;
 
 public final class APIMouseTextInput {

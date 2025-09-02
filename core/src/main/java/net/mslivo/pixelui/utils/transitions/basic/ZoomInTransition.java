@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class ZoomInTransition extends Transition {
     private float zoom, zoomAcc;

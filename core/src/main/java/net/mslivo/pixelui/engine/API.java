@@ -1,8 +1,8 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.engine.actions.UpdateAction;
 

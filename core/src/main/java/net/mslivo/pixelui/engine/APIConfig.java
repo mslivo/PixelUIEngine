@@ -1,9 +1,9 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
-import net.mslivo.pixelui.media_manager.MediaManager;
-import net.mslivo.pixelui.media_manager.CMediaFont;
-import net.mslivo.pixelui.media_manager.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.media.CMediaFont;
+import net.mslivo.pixelui.media.CMediaSprite;
 
 public final class APIConfig {
     private final API api;

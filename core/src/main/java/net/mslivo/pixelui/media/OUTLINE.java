@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.media_manager;
+package net.mslivo.pixelui.media;
 
 public class OUTLINE {
     public static final int UP = 1;

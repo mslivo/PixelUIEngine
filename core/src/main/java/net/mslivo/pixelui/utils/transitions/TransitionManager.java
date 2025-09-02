@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.engine.UIEngine;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.utils.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.utils.rendering.PixelPerfectViewport;
-import net.mslivo.pixelui.utils.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.PixelPerfectViewport;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class TransitionManager {
     private static final String ERROR_FROM_TO_NULL = "\"from\" and \"to\" are both null";

@@ -2,7 +2,7 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.media_manager.MediaManager;
+import net.mslivo.pixelui.media.MediaManager;
 
 public final class APICamera {
     private final API api;
