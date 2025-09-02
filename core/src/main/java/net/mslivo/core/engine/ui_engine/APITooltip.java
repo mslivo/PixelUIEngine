@@ -122,7 +122,7 @@ public final class APITooltip {
 
     public void setToolTipAction(Tooltip toolTip, ToolTipAction toolTipAction) {
         if (toolTip == null) return;
-        toolTip.toolTipAction = toolTipAction;
+        toolTip.toolTipAction = toolTipAction != null ? toolTipAction : DEFAULT_TOOLTIP_ACTION;
     }
 
     public void setMinWidth(Tooltip tooltip, int minWidth) {

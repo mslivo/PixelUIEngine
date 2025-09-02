@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
-import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
+import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
 
 public final class APICamera {
     private final API api;

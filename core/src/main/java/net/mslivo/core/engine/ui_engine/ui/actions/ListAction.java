@@ -1,9 +1,9 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import net.mslivo.core.engine.ui_engine.ui.actions.support.ItemCellColor;
-import net.mslivo.core.engine.ui_engine.ui.actions.support.CommonActions;
-import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
-import net.mslivo.core.engine.ui_engine.ui.components.list.List;
+import net.mslivo.core.engine.ui_engine.ui.actions.extendable.ItemCellColor;
+import net.mslivo.core.engine.ui_engine.ui.actions.extendable.CommonActions;
+import net.mslivo.core.engine.ui_engine.ui.components.Grid;
+import net.mslivo.core.engine.ui_engine.ui.components.List;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
 public interface ListAction<T> extends CommonActions, HasItemIcons<T>, ItemCellColor<T> {

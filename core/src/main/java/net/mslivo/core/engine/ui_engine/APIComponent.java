@@ -18,29 +18,17 @@ import net.mslivo.core.engine.ui_engine.constants.SHAPE_TYPE;
 import net.mslivo.core.engine.ui_engine.rendering.NestedFrameBuffer;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
-import net.mslivo.core.engine.ui_engine.ui.Window;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.*;
-import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.components.button.Button;
-import net.mslivo.core.engine.ui_engine.ui.components.button.ImageButton;
-import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.checkbox.Checkbox;
-import net.mslivo.core.engine.ui_engine.ui.components.combobox.Combobox;
-import net.mslivo.core.engine.ui_engine.ui.components.combobox.ComboboxItem;
-import net.mslivo.core.engine.ui_engine.ui.components.framebuffer.FrameBufferViewport;
-import net.mslivo.core.engine.ui_engine.ui.components.grid.Grid;
-import net.mslivo.core.engine.ui_engine.ui.components.image.Image;
-import net.mslivo.core.engine.ui_engine.ui.components.knob.Knob;
-import net.mslivo.core.engine.ui_engine.ui.components.list.List;
-import net.mslivo.core.engine.ui_engine.ui.components.progressbar.Progressbar;
-import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarHorizontal;
-import net.mslivo.core.engine.ui_engine.ui.components.scrollbar.ScrollbarVertical;
-import net.mslivo.core.engine.ui_engine.ui.components.shape.Shape;
-import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
-import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tabbar;
-import net.mslivo.core.engine.ui_engine.ui.components.text.Text;
-import net.mslivo.core.engine.ui_engine.ui.components.textfield.Textfield;
-import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
+import net.mslivo.core.engine.ui_engine.ui.components.*;
+import net.mslivo.core.engine.ui_engine.ui.components.ScrollbarHorizontal;
+import net.mslivo.core.engine.ui_engine.ui.components.ScrollbarVertical;
+import net.mslivo.core.engine.ui_engine.ui.components.Shape;
+import net.mslivo.core.engine.ui_engine.ui.components.Tab;
+import net.mslivo.core.engine.ui_engine.ui.components.Tabbar;
+import net.mslivo.core.engine.ui_engine.ui.components.Text;
+import net.mslivo.core.engine.ui_engine.ui.components.Textfield;
+import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
 
 import java.util.HashSet;
 import java.util.function.Predicate;
@@ -96,7 +84,7 @@ public final class APIComponent {
 
         }
 
-        public final AppViewPortAction DEFAULT_APPVIEWPORT_ACTION = new AppViewPortAction() {
+        private final AppViewPortAction DEFAULT_APPVIEWPORT_ACTION = new AppViewPortAction() {
         };
 
         public AppViewport create(int x, int y, int width, int height) {
@@ -138,7 +126,7 @@ public final class APIComponent {
 
         public void setAppViewPortAction(AppViewport appViewPort, AppViewPortAction appViewPortAction) {
             if (appViewPort == null) return;
-            appViewPort.appViewPortAction = appViewPortAction;
+            appViewPort.appViewPortAction = appViewPortAction != null ? appViewPortAction : DEFAULT_APPVIEWPORT_ACTION;
         }
 
         public void setUpdateTime(AppViewport appViewPort, int updateTime) {
@@ -154,42 +142,27 @@ public final class APIComponent {
 
         public void moveCam(AppViewport appViewPort, float x, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera,
-                    (appViewPort.camera.position.x + x),
-                    (appViewPort.camera.position.y + y)
-            );
+            UICommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), (appViewPort.camera.position.y + y));
         }
 
         public void setCamX(AppViewport appViewPort, float x) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera,
-                    x,
-                    appViewPort.camera.position.y
-            );
+            UICommonUtils.camera_setPosition(appViewPort.camera, x, appViewPort.camera.position.y);
         }
 
         public void moveCamX(AppViewport appViewPort, float x) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera,
-                    (appViewPort.camera.position.x + x),
-                    appViewPort.camera.position.y
-            );
+            UICommonUtils.camera_setPosition(appViewPort.camera, (appViewPort.camera.position.x + x), appViewPort.camera.position.y);
         }
 
         public void setCamY(AppViewport appViewPort, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera,
-                    appViewPort.camera.position.x,
-                    y
-            );
+            UICommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, y);
         }
 
         public void moveCamY(AppViewport appViewPort, float y) {
             if (appViewPort == null) return;
-            UICommonUtils.camera_setPosition(appViewPort.camera,
-                    appViewPort.camera.position.x,
-                    (appViewPort.camera.position.y + y)
-            );
+            UICommonUtils.camera_setPosition(appViewPort.camera, appViewPort.camera.position.x, (appViewPort.camera.position.y + y));
         }
 
         public void setCamZoom(AppViewport appViewPort, float zoom) {
@@ -205,8 +178,9 @@ public final class APIComponent {
 
         }
 
-        public final ProgressBarAction DEFAULT_PROGRESSBAR_ACTION = new ProgressBarAction() {
+        private final ProgressBarAction DEFAULT_PROGRESSBAR_ACTION = new ProgressBarAction() {
         };
+
 
         public Progressbar create(int x, int y, int width) {
             return create(x, y, width, 0f, false, false, DEFAULT_PROGRESSBAR_ACTION);
@@ -251,10 +225,9 @@ public final class APIComponent {
             progressBar.progressText2Decimal = progressText2Decimal;
         }
 
-        public void setProgressBarAction(Progressbar progressBar, ProgressBarAction progressBarAction){
-            if(progressBar == null)
-                return;
-            progressBar.progressBarAction = progressBarAction;
+        public void setProgressBarAction(Progressbar progressBar, ProgressBarAction progressBarAction) {
+            if (progressBar == null) return;
+            progressBar.progressBarAction = progressBarAction != null ? progressBarAction : DEFAULT_PROGRESSBAR_ACTION;
         }
 
     }
@@ -301,7 +274,7 @@ public final class APIComponent {
             this.imageButton = new APIImageButton();
         }
 
-        public final ButtonAction DEFAULT_BUTTON_ACTION = new ButtonAction() {
+        private final ButtonAction DEFAULT_BUTTON_ACTION = new ButtonAction() {
         };
 
 
@@ -340,8 +313,7 @@ public final class APIComponent {
             public void setText(TextButton textButton, String text, boolean centerContent) {
                 if (textButton == null) return;
                 textButton.text = Tools.Text.validString(text);
-                if (centerContent)
-                    button.centerContent(textButton);
+                if (centerContent) button.centerContent(textButton);
             }
 
             public void setFontColor(TextButton textButton, Color color) {
@@ -391,8 +363,7 @@ public final class APIComponent {
             public void setImage(ImageButton imageButton, CMediaSprite image, boolean centerContent) {
                 if (imageButton == null) return;
                 imageButton.image = image;
-                if (centerContent)
-                    centerContent(imageButton);
+                if (centerContent) centerContent(imageButton);
             }
 
             public void setArrayIndex(ImageButton imageButton, int arrayIndex) {
@@ -404,7 +375,7 @@ public final class APIComponent {
 
         public void setButtonAction(Button button, ButtonAction buttonAction) {
             if (button == null) return;
-            button.buttonAction = buttonAction;
+            button.buttonAction = buttonAction != null ? buttonAction : DEFAULT_BUTTON_ACTION;
         }
 
         public void press(Button button) {
@@ -492,7 +463,7 @@ public final class APIComponent {
         APICheckbox() {
         }
 
-        public final CheckboxAction DEFAULT_CHECKBOX_ACTION = new CheckboxAction() {
+        private final CheckboxAction DEFAULT_CHECKBOX_ACTION = new CheckboxAction() {
         };
 
 
@@ -555,14 +526,14 @@ public final class APIComponent {
 
         public void setCheckBoxAction(Checkbox checkBox, CheckboxAction checkBoxAction) {
             if (checkBox == null) return;
-            checkBox.checkBoxAction = checkBoxAction;
+            checkBox.checkBoxAction = checkBoxAction != null ? checkBoxAction : DEFAULT_CHECKBOX_ACTION;
         }
 
     }
 
     public final class APITabbar {
 
-        public final TabBarAction DEFAULT_TABBAR_ACTION = new TabBarAction() {
+        private final TabBarAction DEFAULT_TABBAR_ACTION = new TabBarAction() {
         };
 
         public final APITab tab;
@@ -632,7 +603,7 @@ public final class APIComponent {
 
         public void setTabBarAction(Tabbar tabBar, TabBarAction tabBarAction) {
             if (tabBar == null) return;
-            tabBar.tabBarAction = tabBarAction;
+            tabBar.tabBarAction = tabBarAction != null ? tabBarAction : DEFAULT_TABBAR_ACTION;
         }
 
         public Tab selectedTab(Tabbar tabBar) {
@@ -723,9 +694,8 @@ public final class APIComponent {
 
         public final class APITab {
 
-            public final TabAction DEFAULT_TAB_ACTION = new TabAction() {
+            private final TabAction DEFAULT_TAB_ACTION = new TabAction() {
             };
-
 
             public Tab create(String title) {
                 return create(title, null, DEFAULT_TAB_ACTION, 0);
@@ -816,7 +786,7 @@ public final class APIComponent {
 
             public void setTabAction(Tab tab, TabAction tabAction) {
                 if (tab == null) return;
-                tab.tabAction = tabAction;
+                tab.tabAction = tabAction != null ? tabAction : DEFAULT_TAB_ACTION;
             }
 
             public void setWidth(Tab tab, int width) {
@@ -832,7 +802,7 @@ public final class APIComponent {
         public APIGrid() {
         }
 
-        public final GridAction DEFAULT_GRID_ACTION = new GridAction() {
+        private final GridAction DEFAULT_GRID_ACTION = new GridAction() {
         };
 
         public Grid create(int x, int y, Object[][] items) {
@@ -907,7 +877,7 @@ public final class APIComponent {
 
         public void setGridAction(Grid grid, GridAction gridAction) {
             if (grid == null) return;
-            grid.gridAction = gridAction;
+            grid.gridAction = gridAction != null ? gridAction : DEFAULT_GRID_ACTION;
         }
 
         public void setItems(Grid grid, Object[][] items) {
@@ -932,29 +902,25 @@ public final class APIComponent {
         APITextfield() {
         }
 
-        public final TextFieldAction DEFAULT_TEXTFIELD_ACTION = new TextFieldAction() {
+        private final TextFieldAction DEFAULT_TEXTFIELD_ACTION = new TextFieldAction() {
         };
 
         public Textfield create(int x, int y, int width) {
-            return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32,
-                    uiConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32, uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content) {
-            return create(x, y, width, content, DEFAULT_TEXTFIELD_ACTION, 32,
-                    uiConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, DEFAULT_TEXTFIELD_ACTION, 32, uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
-            return create(x, y, width, content, textFieldAction, 32,
-                    uiConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, textFieldAction, 32, uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
-            return create(x, y, width, content, textFieldAction, contentMaxLength,
-                    uiConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, textFieldAction, contentMaxLength, uiConfig.component_textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
@@ -990,7 +956,7 @@ public final class APIComponent {
 
         public void setTextFieldAction(Textfield textField, TextFieldAction textFieldAction) {
             if (textField == null) return;
-            textField.textFieldAction = textFieldAction;
+            textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
             UICommonUtils.textField_setContent(textField, textField.content); // Trigger validation
         }
 
@@ -1033,7 +999,7 @@ public final class APIComponent {
         APIKnob() {
         }
 
-        public final KnobAction DEFAULT_KNOB_ACTION = new KnobAction() {
+        private final KnobAction DEFAULT_KNOB_ACTION = new KnobAction() {
         };
 
         public Knob create(int x, int y) {
@@ -1064,7 +1030,7 @@ public final class APIComponent {
 
         public void setKnobAction(Knob knob, KnobAction knobAction) {
             if (knob == null) return;
-            knob.knobAction = knobAction;
+            knob.knobAction = knobAction != null ? knobAction : DEFAULT_KNOB_ACTION;
         }
 
         public void setEndless(Knob knob, boolean endless) {
@@ -1076,12 +1042,11 @@ public final class APIComponent {
 
     public final class APIText {
 
-        APIText() {
-        }
+        private final TextAction DEFAULT_TEXT_ACTION = new TextAction() {
+        };
 
-        public TextAction defaultTextAction() {
-            return new TextAction() {
-            };
+
+        APIText() {
         }
 
         public Text create(int x, int y, int width, String text) {
@@ -1094,13 +1059,13 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(textC, x, y, width, 1);
             textC.fontColor = uiConfig.ui_font_defaultColor.cpy();
             textC.text = Tools.Text.validString(text);
-            textC.textAction = textAction != null ? textAction : defaultTextAction();
+            textC.textAction = textAction != null ? textAction : DEFAULT_TEXT_ACTION;
             return textC;
         }
 
         public void setTextAction(Text text, TextAction textAction) {
             if (text == null) return;
-            text.textAction = textAction;
+            text.textAction = textAction != null ? textAction : DEFAULT_TEXT_ACTION;
         }
 
         public void setText(Text textC, String text) {
@@ -1120,7 +1085,7 @@ public final class APIComponent {
         APIFrameBufferViewport() {
         }
 
-        public final FrameBufferViewportAction DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION = new FrameBufferViewportAction() {
+        private final FrameBufferViewportAction DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION = new FrameBufferViewportAction() {
         };
 
 
@@ -1140,7 +1105,7 @@ public final class APIComponent {
 
         public void setFrameBufferViewportAction(FrameBufferViewport frameBufferViewport, FrameBufferViewportAction frameBufferViewportAction) {
             if (frameBufferViewport == null) return;
-            frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction;
+            frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction != null ? frameBufferViewportAction : DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION;
         }
 
         public void setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
@@ -1156,7 +1121,7 @@ public final class APIComponent {
         APIImage() {
         }
 
-        public final ImageAction DEFAULT_IMAGE_ACTION = new ImageAction() {
+        private final ImageAction DEFAULT_IMAGE_ACTION = new ImageAction() {
         };
 
         public Image create(int x, int y, CMediaSprite image) {
@@ -1175,8 +1140,8 @@ public final class APIComponent {
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY, ImageAction imageAction) {
             Image imageC = new Image();
-            int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / api.TSF()),1) : 1;
-            int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / api.TSF()),1) : 1;
+            int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / api.TSF()), 1) : 1;
+            int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / api.TSF()), 1) : 1;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
@@ -1188,7 +1153,7 @@ public final class APIComponent {
 
         public void setImageAction(Image image, ImageAction imageAction) {
             if (image == null) return;
-            image.imageAction = imageAction;
+            image.imageAction = imageAction != null ? imageAction : DEFAULT_IMAGE_ACTION;
         }
 
         public void setArrayIndex(Image image, int arrayIndex) {
@@ -1216,7 +1181,7 @@ public final class APIComponent {
             this.item = new APIComboboxItem();
         }
 
-        public final ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {
+        private final ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {
         };
 
         public Combobox create(int x, int y, int width) {
@@ -1250,7 +1215,7 @@ public final class APIComponent {
 
         public void setComboBoxAction(Combobox comboBox, ComboBoxAction comboBoxAction) {
             if (comboBox == null) return;
-            comboBox.comboBoxAction = comboBoxAction;
+            comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction :DEFAULT_COMBOBOX_ACTION;
         }
 
         public void addComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
@@ -1327,7 +1292,7 @@ public final class APIComponent {
             APIComboboxItem() {
             }
 
-            public final ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {
+            private final ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {
             };
 
             public ComboboxItem create(String text) {
@@ -1335,12 +1300,16 @@ public final class APIComponent {
             }
 
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
+                return create(text, comboBoxItemAction, null);
+            }
+
+            public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, Object data) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.fontColor = uiConfig.ui_font_defaultColor.cpy();
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
                 comboBoxItem.name = "";
-                comboBoxItem.data = null;
+                comboBoxItem.data = data;
                 return comboBoxItem;
             }
 
@@ -1361,7 +1330,7 @@ public final class APIComponent {
 
             public void setComboBoxItemAction(ComboboxItem comboBoxItem, ComboBoxItemAction comboBoxItemAction) {
                 if (comboBoxItem == null) return;
-                comboBoxItem.comboBoxItemAction = comboBoxItemAction;
+                comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
             }
 
             public void setText(ComboboxItem comboBoxItem, String text) {
@@ -1437,12 +1406,12 @@ public final class APIComponent {
 
         }
 
-        public void setScrolled(net.mslivo.core.engine.ui_engine.ui.components.scrollbar.Scrollbar scrollBar, float scrolled) {
+        public void setScrolled(Scrollbar scrollBar, float scrolled) {
             if (scrollBar == null) return;
             UICommonUtils.scrollBar_scroll(scrollBar, scrolled);
         }
 
-        public void setScrollBarAction(net.mslivo.core.engine.ui_engine.ui.components.scrollbar.Scrollbar scrollBar, ScrollBarAction scrollBarAction) {
+        public void setScrollBarAction(Scrollbar scrollBar, ScrollBarAction scrollBarAction) {
             if (scrollBar == null) return;
             scrollBar.scrollBarAction = scrollBarAction;
         }
@@ -1454,7 +1423,7 @@ public final class APIComponent {
         APIList() {
         }
 
-        public final ListAction DEFAULT_LIST_ACTION = new ListAction() {
+        private final ListAction DEFAULT_LIST_ACTION = new ListAction() {
         };
 
         public List create(int x, int y, int width, int height) {
@@ -1525,7 +1494,7 @@ public final class APIComponent {
 
         public void setListAction(List list, ListAction listAction) {
             if (list == null) return;
-            list.listAction = listAction;
+            list.listAction = listAction != null ? listAction : DEFAULT_LIST_ACTION;
         }
 
         public void setFontColor(List list, Color color) {
@@ -1610,8 +1579,6 @@ public final class APIComponent {
         if (components == null) return;
         for (int i = 0; i < components.length; i++) setDisabled(components[i], disabled);
     }
-
-
 
     public void addUpdateAction(Component component, UpdateAction updateAction) {
         if (component == null || updateAction == null) return;

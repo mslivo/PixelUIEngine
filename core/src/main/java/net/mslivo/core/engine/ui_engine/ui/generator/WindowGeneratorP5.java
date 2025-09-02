@@ -1,7 +1,7 @@
 package net.mslivo.core.engine.ui_engine.ui.generator;
 
 import net.mslivo.core.engine.ui_engine.API;
-import net.mslivo.core.engine.ui_engine.ui.Window;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 
 public interface WindowGeneratorP5<P1, P2, P3, P4, P5> {
 

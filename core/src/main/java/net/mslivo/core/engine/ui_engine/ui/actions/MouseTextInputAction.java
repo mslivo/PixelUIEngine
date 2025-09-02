@@ -1,6 +1,6 @@
 package net.mslivo.core.engine.ui_engine.ui.actions;
 
-import net.mslivo.core.engine.ui_engine.ui.actions.support.Displayable;
+import net.mslivo.core.engine.ui_engine.ui.actions.extendable.Displayable;
 
 public interface MouseTextInputAction extends Displayable {
 

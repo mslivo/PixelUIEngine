@@ -8,10 +8,9 @@ import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuItemAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.ContextMenuAction;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenuItem;
+import net.mslivo.core.engine.ui_engine.ui.components.ContextMenu;
+import net.mslivo.core.engine.ui_engine.ui.components.ContextMenuItem;
 
-import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public final class APIContextMenu {
@@ -29,7 +28,7 @@ public final class APIContextMenu {
         this.item = new APIContextMenuItem();
     }
 
-    public ContextMenuAction DEFAULT_CONTEXT_MENU_ACTION  = new ContextMenuAction() {};
+    public final ContextMenuAction DEFAULT_CONTEXT_MENU_ACTION  = new ContextMenuAction() {};
 
     public ContextMenu create(ContextMenuItem[] contextMenuItems) {
         return create(contextMenuItems, DEFAULT_CONTEXT_MENU_ACTION);
@@ -53,7 +52,7 @@ public final class APIContextMenu {
 
     public void setContextMenuAction(ContextMenu contextMenu, ContextMenuAction contextMenuAction) {
         if (contextMenu == null) return;
-        contextMenu.contextMenuAction = contextMenuAction;
+        contextMenu.contextMenuAction = contextMenuAction != null ? contextMenuAction : DEFAULT_CONTEXT_MENU_ACTION;
     }
 
     public void setColor(ContextMenu contextMenu, Color color) {
@@ -102,7 +101,7 @@ public final class APIContextMenu {
         APIContextMenuItem() {
         }
 
-        public ContextMenuItemAction DEFAULT_CONTEXT_MENU_ITEM_ACTION = new ContextMenuItemAction() {};
+        public final ContextMenuItemAction DEFAULT_CONTEXT_MENU_ITEM_ACTION = new ContextMenuItemAction() {};
 
         public ContextMenuItem create(String text) {
             return create(text, DEFAULT_CONTEXT_MENU_ITEM_ACTION);
@@ -138,7 +137,7 @@ public final class APIContextMenu {
 
         public void setContextMenuItemAction(ContextMenuItem contextMenuItem, ContextMenuItemAction contextMenuItemAction) {
             if (contextMenuItem == null) return;
-            contextMenuItem.contextMenuItemAction = contextMenuItemAction;
+            contextMenuItem.contextMenuItemAction = contextMenuItemAction != null ? contextMenuItemAction : DEFAULT_CONTEXT_MENU_ITEM_ACTION;
         }
 
         public void setText(ContextMenuItem contextMenuItem, String text) {

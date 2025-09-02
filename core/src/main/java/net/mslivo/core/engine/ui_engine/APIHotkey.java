@@ -22,7 +22,7 @@ public final class APIHotkey {
         this.mediaManager = mediaManager;
     }
 
-    public HotKeyAction DEFAULT_HOTKEY_ACTION = new HotKeyAction() {
+    public final HotKeyAction DEFAULT_HOTKEY_ACTION = new HotKeyAction() {
     };
 
     public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
@@ -42,7 +42,7 @@ public final class APIHotkey {
 
     public void setHotKeyAction(HotKey hotKey, HotKeyAction hotKeyAction) {
         if (hotKey == null) return;
-        hotKey.hotKeyAction = hotKeyAction;
+        hotKey.hotKeyAction = hotKeyAction != null ? hotKeyAction : DEFAULT_HOTKEY_ACTION;
     }
 
     public void setName(HotKey hotKey, String name) {

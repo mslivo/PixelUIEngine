@@ -22,7 +22,7 @@ public final class APIMouseTextInput {
         this.uiConfig = uiEngineState.config;
     }
 
-    public MouseTextInputAction DEFAULT_MOUSE_TEXTINPUT_ACTION =  new MouseTextInputAction() {};
+    public final MouseTextInputAction DEFAULT_MOUSE_TEXTINPUT_ACTION =  new MouseTextInputAction() {};
 
     public MouseTextInput create(int x, int y) {
         return create(x, y, DEFAULT_MOUSE_TEXTINPUT_ACTION,
@@ -155,7 +155,7 @@ public final class APIMouseTextInput {
 
     public void setMouseTextInputAction(MouseTextInput mouseTextInput, MouseTextInputAction mouseTextInputAction) {
         if (mouseTextInput == null) return;
-        mouseTextInput.mouseTextInputAction = mouseTextInputAction;
+        mouseTextInput.mouseTextInputAction = mouseTextInputAction != null ? mouseTextInputAction : DEFAULT_MOUSE_TEXTINPUT_ACTION;
     }
 
     public void setFontColor(MouseTextInput mouseTextInput, Color color) {

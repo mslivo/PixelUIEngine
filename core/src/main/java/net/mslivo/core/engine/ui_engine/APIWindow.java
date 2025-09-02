@@ -6,13 +6,12 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.tools.Tools;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
-import net.mslivo.core.engine.ui_engine.ui.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.WindowAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.generator.*;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 
-import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public final class APIWindow {
@@ -96,7 +95,7 @@ public final class APIWindow {
 
     public void setWindowAction(Window window, WindowAction windowAction) {
         if (window == null) return;
-        window.windowAction = windowAction;
+        window.windowAction = windowAction != null ? windowAction : DEFAULT_WINDOW_ACTION;
     }
 
     public boolean isAddedToScreen(Window window) {

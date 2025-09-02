@@ -7,7 +7,7 @@ import net.mslivo.core.engine.ui_engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.input.UIInputEvents;
-import net.mslivo.core.engine.ui_engine.ui.Window;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 

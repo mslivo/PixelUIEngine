@@ -2,12 +2,7 @@ package net.mslivo.core.engine.ui_engine.ui.components;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.core.engine.ui_engine.ui.UpdateActionSupport;
-import net.mslivo.core.engine.ui_engine.ui.Window;
-import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
-import net.mslivo.core.engine.ui_engine.ui.components.tabbar.Tab;
-import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
-
-import java.util.ArrayList;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 
 public abstract class Component extends UpdateActionSupport {
     public int x, y, width, height;

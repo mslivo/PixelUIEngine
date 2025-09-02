@@ -23,8 +23,8 @@ import net.mslivo.core.engine.ui_engine.rendering.renderer.PrimitiveRenderer;
 import net.mslivo.core.engine.ui_engine.rendering.renderer.SpriteRenderer;
 import net.mslivo.core.engine.ui_engine.ui.actions.ButtonAction;
 import net.mslivo.core.engine.ui_engine.ui.actions.HotKeyAction;
-import net.mslivo.core.engine.ui_engine.ui.components.button.TextButton;
-import net.mslivo.core.engine.ui_engine.ui.components.viewport.AppViewport;
+import net.mslivo.core.engine.ui_engine.ui.components.TextButton;
+import net.mslivo.core.engine.ui_engine.ui.components.AppViewport;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 import net.mslivo.example.ui.windows.ExampleWindowGeneratorP;
 

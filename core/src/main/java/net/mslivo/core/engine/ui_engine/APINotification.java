@@ -75,7 +75,7 @@ public final class APINotification {
 
     public void setNotificationAction(Notification notification, NotificationAction notificationAction) {
         if (notification == null) return;
-        notification.notificationAction = notificationAction;
+        notification.notificationAction = notificationAction != null ? notificationAction : DEFAULT_NOTIFICATION_ACTION;
     }
 
     public void setDisplayTime(Notification notification, int displayTime) {

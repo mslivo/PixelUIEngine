@@ -6,10 +6,10 @@ import net.mslivo.core.engine.media_manager.MediaManager;
 import net.mslivo.core.engine.ui_engine.constants.VIEWPORT_MODE;
 import net.mslivo.core.engine.ui_engine.state.UIEngineState;
 import net.mslivo.core.engine.ui_engine.state.config.UIConfig;
-import net.mslivo.core.engine.ui_engine.ui.Window;
+import net.mslivo.core.engine.ui_engine.ui.window.Window;
 import net.mslivo.core.engine.ui_engine.ui.actions.UpdateAction;
 import net.mslivo.core.engine.ui_engine.ui.components.Component;
-import net.mslivo.core.engine.ui_engine.ui.contextmenu.ContextMenu;
+import net.mslivo.core.engine.ui_engine.ui.components.ContextMenu;
 import net.mslivo.core.engine.ui_engine.ui.hotkeys.HotKey;
 import net.mslivo.core.engine.ui_engine.ui.mousetextinput.MouseTextInput;
 import net.mslivo.core.engine.ui_engine.ui.mousetool.MouseTool;
@@ -18,8 +18,6 @@ import net.mslivo.core.engine.ui_engine.ui.notification.TooltipNotification;
 import net.mslivo.core.engine.ui_engine.ui.notification.Notification;
 import net.mslivo.core.engine.ui_engine.ui.tooltip.Tooltip;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Predicate;
 
 /*
