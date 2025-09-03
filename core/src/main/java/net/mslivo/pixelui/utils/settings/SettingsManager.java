@@ -11,8 +11,6 @@ import java.util.Properties;
 public class SettingsManager {
     private final Properties properties;
 
-    private final Properties backUp;
-
     private final String settingsFile;
 
     private final ObjectMap<String, SettingsEntry> entries;
@@ -26,11 +24,9 @@ public class SettingsManager {
         this.init();
     }
 
-
     public SettingsManager(String path, SettingsPersistor settingsPersistor) throws SettingsException {
         this.entries = new ObjectMap<>();
         this.properties = new Properties();
-        this.backUp = new Properties();
         this.settingsFile = Tools.Text.validString(path);
         this.settingsPersistor = settingsPersistor;
         this.init();
@@ -42,50 +38,21 @@ public class SettingsManager {
         settingsPersistor.saveSettings(settingsFile, properties);
     }
 
-
-    public void restoreBackup() {
-        if (isBackupActive()) {
-            this.properties.clear();
-            backUp.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
-            validateAllProperties();
-            settingsPersistor.saveSettings(settingsFile, properties);
-            discardBackup();
-        }
-    }
-
-    public void createBackup() {
-        this.backUp.clear();
+    public Properties exportSettings(){
+        Properties result = new Properties();
         String[] properties = this.properties.keySet().toArray(new String[0]);
         for (int i = 0; i < properties.length; i++) {
             String property = properties[i];
-            this.backUp.setProperty(property, this.properties.getProperty(property));
+            result.setProperty(property, this.properties.getProperty(property));
         }
+        return result;
     }
 
-    public boolean doesSettingDeviateFromBackup(String name) {
-        if (isBackupActive()) {
-            if (this.properties.get(name) != null && this.backUp.get(name) != null) {
-                return !this.properties.get(name).equals(this.backUp.get(name));
-            } else return this.properties.get(name) != null || this.backUp.get(name) != null;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean doesAnySettingDeviateFromBackup() {
-        if (this.backUp != null) {
-            return !this.properties.equals(this.backUp);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isBackupActive() {
-        return this.backUp != null;
-    }
-
-    public void discardBackup() {
-        this.backUp.clear();
+    public void importSettings(Properties importFrom){
+        this.properties.clear();
+        importFrom.forEach((key, value) -> this.properties.setProperty((String) key, (String) value));
+        validateAllProperties();
+        return;
     }
 
     public void addSetting(String name, String defaultValue) {
