@@ -3,6 +3,7 @@ package net.mslivo.pixelui.utils.transitions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -12,7 +13,7 @@ import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PixelPerfectViewport;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 
-public class TransitionManager {
+public class TransitionManager implements Disposable {
     private static final String ERROR_FROM_TO_NULL = "\"from\" and \"to\" are both null";
 
     private NestedFrameBuffer frameBuffer_from;
@@ -34,7 +35,6 @@ public class TransitionManager {
     public TransitionManager(UIEngine from, UIEngine to, Transition transition) {
         this(from, to, transition, false);
     }
-
 
     public TransitionManager(UIEngine from, UIEngine to, Transition transition, boolean updateUIEngine) {
         if (from == null && to == null)
@@ -189,8 +189,7 @@ public class TransitionManager {
 
     private void finish() {
         if (this.finished) return;
-        this.frameBuffer_from.dispose();
-        this.frameBuffer_to.dispose();
+
         this.transition.finished(spriteRenderer_screen);
         this.transition = null;
         this.camera_screen = null;
@@ -206,4 +205,12 @@ public class TransitionManager {
         };
     }
 
+    @Override
+    public void dispose() {
+        this.frameBuffer_from.dispose();
+        this.frameBuffer_to.dispose();
+        this.texture_from.getTexture().dispose();
+        this.texture_to.getTexture().dispose();
+        this.spriteRenderer_screen.dispose();
+    }
 }
