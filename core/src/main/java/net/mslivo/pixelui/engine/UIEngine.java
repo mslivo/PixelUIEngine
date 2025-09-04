@@ -1527,7 +1527,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.scrollBar_scroll(scrolledScrollBarHorizontal, uiCommonUtils.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                     }
                     case Knob turnedKnob -> {
-                        float amount = (uiEngineState.mouse_delta.y / 100f) * uiEngineState.config.component_knobSensitivity;
+                        final float BASE_SENSITIVITY = 1/50f;
+                        float amount = (uiEngineState.mouse_delta.y * BASE_SENSITIVITY) * uiEngineState.config.component_knobSensitivity;
                         float newValue = turnedKnob.turned + amount;
                         uiCommonUtils.knob_turnKnob(turnedKnob, newValue);
                         if (uiEngineState.currentControlMode.emulated) {
@@ -1567,6 +1568,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             if (lastUIMouseHover == null) processMouseScrolled = false;
 
             if (processMouseScrolled) {
+                final float BASE_SENSITIVITY = (-1 / 20f);
                 switch (lastUIMouseHover) {
                     case List list -> {
                         int size = list.items != null ? list.items.size : 0;
@@ -1574,16 +1576,16 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
-                        float amount = ((-1 / 20f) * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_knobSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_knobSensitivity;
                         float newValue = knob.turned + amount;
                         uiCommonUtils.knob_turnKnob(knob, newValue);
                     }
                     case ScrollbarHorizontal scrollBarHorizontal -> {
-                        float amount = ((-1 / 20f) * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
                         uiCommonUtils.scrollBar_scroll(scrollBarHorizontal, scrollBarHorizontal.scrolled + amount);
                     }
                     case ScrollbarVertical scrollBarVertical -> {
-                        float amount = ((-1 / 20f) * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
                         uiCommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + amount);
                     }
                     case null, default -> {
