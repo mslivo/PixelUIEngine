@@ -5,6 +5,7 @@ import java.io.Serializable;
 public final class CMediaSoundEffect extends CMediaSound implements Serializable {
 
     public CMediaSoundEffect(){
+        super();
     }
 
     public CMediaSoundEffect(String filename) {

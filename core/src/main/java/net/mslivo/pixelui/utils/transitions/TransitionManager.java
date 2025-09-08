@@ -207,10 +207,15 @@ public class TransitionManager implements Disposable {
 
     @Override
     public void dispose() {
-        this.frameBuffer_from.dispose();
-        this.frameBuffer_to.dispose();
-        this.texture_from.getTexture().dispose();
-        this.texture_to.getTexture().dispose();
-        this.spriteRenderer_screen.dispose();
+        if (this.frameBuffer_from != null)
+            this.frameBuffer_from.dispose();
+        if (this.frameBuffer_to != null)
+            this.frameBuffer_to.dispose();
+        if (this.texture_from != null)
+            this.texture_from.getTexture().dispose();
+        if (this.texture_to != null)
+            this.texture_to.getTexture().dispose();
+        if (this.spriteRenderer_screen != null)
+            this.spriteRenderer_screen.dispose();
     }
 }

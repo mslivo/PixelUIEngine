@@ -7,6 +7,8 @@ public abstract sealed class CMedia implements Serializable permits CMediaFont, 
     public String file;
 
     public CMedia(){
+        super();
+        this.file = "";
     }
 
     CMedia(String file) {

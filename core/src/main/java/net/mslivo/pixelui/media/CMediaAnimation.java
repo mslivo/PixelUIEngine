@@ -8,12 +8,19 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
 
     public int regionWidth;
     public int regionHeight;
-    public float animationSpeed;
     public int frameOffset;
     public int frameLength;
+    public float animationSpeed;
     public ExtendedAnimation.PlayMode playMode;
 
     public CMediaAnimation() {
+        super();
+        this.regionWidth = 0;
+        this.regionHeight = 0;
+        this.frameOffset = 0;
+        this.frameLength = 0;
+        this.animationSpeed = 0f;
+        this.playMode = ExtendedAnimation.PlayMode.LOOP;
     }
 
     public CMediaAnimation(String file, int tileWidth, int tileHeight) {

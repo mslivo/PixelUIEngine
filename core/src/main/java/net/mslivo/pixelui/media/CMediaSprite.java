@@ -4,11 +4,13 @@ import java.io.Serializable;
 
 public sealed abstract class CMediaSprite extends CMedia implements Serializable permits CMediaImage, CMediaArray, CMediaAnimation {
 
+    public boolean useAtlas;
+
     public CMediaSprite(){
         super();
+        this.useAtlas = true;
     }
 
-    public boolean useAtlas;
 
     public CMediaSprite(String filename, boolean useAtlas) {
         super(filename);

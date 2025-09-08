@@ -741,6 +741,20 @@ public class Tools {
             return array.get(MathUtils.random(0, array.size - 1));
         }
 
+        public static long quadraticGrowth(long baseValue, int times, float divisor){
+            final int timesMinus1 = times-1;
+            long factor = timesMinus1 * timesMinus1;
+            long addValue = (long) ((baseValue*factor)/divisor);
+            return baseValue+addValue;
+        }
+
+        public static int quadraticGrowth(int baseValue, int times, float divisor){
+            final int timesMinus1 = times-1;
+            int factor = timesMinus1 * timesMinus1;
+            int addValue = (int) ((baseValue*factor)/divisor);
+            return baseValue+addValue;
+        }
+
         public static int exponentialGrowth(int baseValue, float exp, int times) {
             if (times <= 1) return MathUtils.round(baseValue);
             return MathUtils.round(baseValue * (float) Math.pow(exp, times - 1));

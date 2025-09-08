@@ -11,6 +11,11 @@ public final class CMediaFont extends CMedia implements Serializable {
     public boolean useAtlas;
 
     public CMediaFont() {
+        super();
+        this.markupEnabled = true;
+        this.outline = null;
+        this.symbols = new CMediaFontSymbol[]{};
+        this.useAtlas = true;
     }
 
     public CMediaFont(String file) {

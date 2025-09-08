@@ -5,6 +5,7 @@ import java.io.Serializable;
 public final class CMediaImage extends CMediaSprite implements Serializable {
 
     public CMediaImage(){
+        super();
     }
 
     public CMediaImage(String filename) {

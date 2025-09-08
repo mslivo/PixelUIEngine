@@ -4,6 +4,8 @@ public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
     public int id;
 
     public CMediaFontSingleSymbol() {
+        super();
+        this.id = 0;
     }
 
     public CMediaFontSingleSymbol(int id, String file) {

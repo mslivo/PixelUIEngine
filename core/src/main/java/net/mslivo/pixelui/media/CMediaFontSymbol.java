@@ -9,6 +9,9 @@ public sealed abstract class CMediaFontSymbol implements Serializable permits CM
     public int x_advance;
 
     public CMediaFontSymbol(){
+        super();
+        this.y_offset = 0;
+        this.x_advance = 0;
     }
 
     public CMediaFontSymbol(String file, int y_offset, int  x_advance) {

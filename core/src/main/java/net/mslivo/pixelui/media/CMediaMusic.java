@@ -5,6 +5,7 @@ import java.io.Serializable;
 public final class CMediaMusic extends CMediaSound implements Serializable {
 
     public CMediaMusic() {
+        super();
     }
 
     public CMediaMusic(String filename) {

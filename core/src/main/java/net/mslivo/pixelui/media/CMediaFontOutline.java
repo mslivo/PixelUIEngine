@@ -11,6 +11,11 @@ public class CMediaFontOutline {
     public boolean outlineOnly;
 
     public CMediaFontOutline(){
+        super();
+        this.color = new Color(0f,0f,0f,0f);
+        this.directions = 0;
+        this.withSymbols = false;
+        this.outlineOnly = false;
     }
 
     public CMediaFontOutline(Color color, int directions, boolean withSymbols, boolean outlineOnly) {
