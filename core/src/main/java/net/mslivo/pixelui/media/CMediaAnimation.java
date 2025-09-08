@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 public final class CMediaAnimation extends CMediaSprite implements Serializable {
 
-    public int regionWidth;
-    public int regionHeight;
+    public int frameWidth;
+    public int frameHeight;
     public int frameOffset;
     public int frameLength;
     public float animationSpeed;
@@ -15,8 +15,8 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
 
     public CMediaAnimation() {
         super();
-        this.regionWidth = 0;
-        this.regionHeight = 0;
+        this.frameWidth = 0;
+        this.frameHeight = 0;
         this.frameOffset = 0;
         this.frameLength = 0;
         this.animationSpeed = 0f;
@@ -35,14 +35,14 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
-    public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
-        this(filename, regionWidth, regionHeight, animationSpeed, frameOffset, frameLength, playMode, true);
+    public CMediaAnimation(String filename, int frameWidth, int frameHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
+        this(filename, frameWidth, frameHeight, animationSpeed, frameOffset, frameLength, playMode, true);
     }
 
-    public CMediaAnimation(String filename, int regionWidth, int regionHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode, boolean useAtlas) {
+    public CMediaAnimation(String filename, int frameWidth, int frameHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode, boolean useAtlas) {
         super(filename, useAtlas);
-        this.regionWidth = regionWidth;
-        this.regionHeight = regionHeight;
+        this.frameWidth = frameWidth;
+        this.frameHeight = frameHeight;
         this.animationSpeed = animationSpeed;
         this.frameOffset = frameOffset;
         this.frameLength = frameLength;
@@ -52,8 +52,8 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
     public CMediaAnimation copy() {
         CMediaAnimation copy = new CMediaAnimation();
         copy.copyFields(this);
-        copy.regionWidth = this.regionWidth;
-        copy.regionHeight = this.regionHeight;
+        copy.frameWidth = this.frameWidth;
+        copy.frameHeight = this.frameHeight;
         copy.animationSpeed = this.animationSpeed;
         copy.frameOffset = this.frameOffset;
         copy.frameLength = this.frameLength;
@@ -67,14 +67,14 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         if (!super.equals(o)) return false;
 
         CMediaAnimation that = (CMediaAnimation) o;
-        return regionWidth == that.regionWidth && regionHeight == that.regionHeight && Float.compare(animationSpeed, that.animationSpeed) == 0 && frameOffset == that.frameOffset && frameLength == that.frameLength && playMode == that.playMode;
+        return frameWidth == that.frameWidth && frameHeight == that.frameHeight && Float.compare(animationSpeed, that.animationSpeed) == 0 && frameOffset == that.frameOffset && frameLength == that.frameLength && playMode == that.playMode;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + regionWidth;
-        result = 31 * result + regionHeight;
+        result = 31 * result + frameWidth;
+        result = 31 * result + frameHeight;
         result = 31 * result + Float.hashCode(animationSpeed);
         result = 31 * result + frameOffset;
         result = 31 * result + frameLength;

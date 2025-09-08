@@ -427,22 +427,22 @@ public final class MediaManager implements Disposable {
                 }
                 case CMediaArray cMediaArray -> {
                     if (cMediaArray.useAtlas) {
-                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.frameWidth, cMediaArray.frameHeight,
                                 cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
                     } else {
-                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.regionWidth, cMediaArray.regionHeight,
+                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.frameWidth, cMediaArray.frameHeight,
                                 cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
                     }
                 }
                 case CMediaAnimation cMediaAnimation -> {
                     if (cMediaAnimation.useAtlas) {
                         medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                                splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                                 cMediaAnimation.playMode
                         ));
                     } else {
                         medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                                splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.regionWidth, cMediaAnimation.regionHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                                 cMediaAnimation.playMode
                         ));
                     }
@@ -619,8 +619,8 @@ public final class MediaManager implements Disposable {
     public int spriteWidth(CMediaSprite cMediaSprite) {
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage).getRegionWidth();
-            case CMediaArray cMediaArray -> cMediaArray.regionWidth;
-            case CMediaAnimation cMediaAnimation -> cMediaAnimation.regionWidth;
+            case CMediaArray cMediaArray -> cMediaArray.frameWidth;
+            case CMediaAnimation cMediaAnimation -> cMediaAnimation.frameWidth;
             default -> throw new IllegalStateException("Unexpected value: " + cMediaSprite);
         };
     }
@@ -631,18 +631,18 @@ public final class MediaManager implements Disposable {
     }
 
     public int arrayWidth(CMediaArray cMediaArray) {
-        return cMediaArray.regionWidth;
+        return cMediaArray.frameWidth;
     }
 
     public int animationWidth(CMediaAnimation cMediaAnimation) {
-        return cMediaAnimation.regionWidth;
+        return cMediaAnimation.frameWidth;
     }
 
     public int spriteHeight(CMediaSprite cMedia) {
         return switch (cMedia) {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage).getRegionHeight();
-            case CMediaArray cMediaArray -> cMediaArray.regionHeight;
-            case CMediaAnimation cMediaAnimation -> cMediaAnimation.regionHeight;
+            case CMediaArray cMediaArray -> cMediaArray.frameHeight;
+            case CMediaAnimation cMediaAnimation -> cMediaAnimation.frameHeight;
         };
     }
 
@@ -651,11 +651,11 @@ public final class MediaManager implements Disposable {
     }
 
     public int arrayHeight(CMediaArray cMediaArray) {
-        return cMediaArray.regionHeight;
+        return cMediaArray.frameHeight;
     }
 
     public int animationHeight(CMediaAnimation cMediaAnimation) {
-        return cMediaAnimation.regionHeight;
+        return cMediaAnimation.frameHeight;
     }
 
     public int spriteWidthHalf(CMediaSprite cMediaSprite) {
