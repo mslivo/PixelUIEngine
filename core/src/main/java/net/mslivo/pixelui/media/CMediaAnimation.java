@@ -18,7 +18,7 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.frameWidth = 0;
         this.frameHeight = 0;
         this.frameOffset = 0;
-        this.frameLength = 0;
+        this.frameLength = Integer.MAX_VALUE;
         this.animationSpeed = 0f;
         this.playMode = ExtendedAnimation.PlayMode.LOOP;
     }
