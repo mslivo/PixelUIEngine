@@ -23,16 +23,16 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.playMode = ExtendedAnimation.PlayMode.LOOP;
     }
 
-    public CMediaAnimation(String file, int tileWidth, int tileHeight) {
-        this(file, tileWidth, tileHeight, 0.1f, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
+    public CMediaAnimation(String file, int frameWidth, int frameHeight) {
+        this(file, frameWidth, frameHeight, 0.1f, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
-    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animationSpeed) {
-        this(file, tileWidth, tileHeight, animationSpeed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
+    public CMediaAnimation(String file, int frameWidth, int frameHeight, float animationSpeed) {
+        this(file, frameWidth, frameHeight, animationSpeed, 0, Integer.MAX_VALUE, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
-    public CMediaAnimation(String file, int tileWidth, int tileHeight, float animation_speed, int frameOffset, int frameLength) {
-        this(file, tileWidth, tileHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP, true);
+    public CMediaAnimation(String file, int frameWidth, int frameHeight, float animation_speed, int frameOffset, int frameLength) {
+        this(file, frameWidth, frameHeight, animation_speed, frameOffset, frameLength, ExtendedAnimation.PlayMode.LOOP, true);
     }
 
     public CMediaAnimation(String filename, int frameWidth, int frameHeight, float animationSpeed, int frameOffset, int frameLength, ExtendedAnimation.PlayMode playMode) {
