@@ -11,9 +11,13 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
     private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
 
     public interface RenderHook<T> {
-        void renderBeforeParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer);
+        default void renderBeforeParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer){};
 
-        void renderAfterParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer);
+        default void renderAfterParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer){};
+
+        default boolean renderParticle(Particle<T> particle){
+            return true;
+        };
     }
 
     private RenderHook renderHook;
@@ -37,9 +41,11 @@ public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size; i++) {
             Particle particle = particles.get(i);
             if (!particle.visible) continue;
-            if (renderHook != null)
+            if (renderHook != null) {
+                if (!renderHook.renderParticle(particle))
+                    continue;
                 renderHook.renderBeforeParticle(particle, primitiveRenderer);
-
+            }
             switch (particle) {
                 case PrimitiveParticle primitiveParticle -> {
                     // check for correct type

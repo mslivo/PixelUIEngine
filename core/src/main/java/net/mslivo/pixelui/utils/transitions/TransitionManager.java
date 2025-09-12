@@ -33,10 +33,6 @@ public class TransitionManager implements Disposable {
     private UIEngine to;
 
     public TransitionManager(UIEngine from, UIEngine to, Transition transition) {
-        this(from, to, transition, false);
-    }
-
-    public TransitionManager(UIEngine from, UIEngine to, Transition transition, boolean updateUIEngine) {
         if (from == null && to == null)
             throw new RuntimeException(ERROR_FROM_TO_NULL);
 
@@ -72,8 +68,8 @@ public class TransitionManager implements Disposable {
         this.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
 
-        this.captureUIEngineFrameBuffer(this.from, this.frameBuffer_from, updateUIEngine);
-        this.captureUIEngineFrameBuffer(this.to, this.frameBuffer_to, updateUIEngine);
+        this.captureUIEngineFrameBuffer(this.from, this.frameBuffer_from);
+        this.captureUIEngineFrameBuffer(this.to, this.frameBuffer_to);
 
         this.transitionRenderMode = this.transition.getRenderMode();
         if (this.transitionRenderMode == null)
@@ -115,9 +111,8 @@ public class TransitionManager implements Disposable {
         return to.getViewportMode();
     }
 
-    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer, boolean updateUIEngine) {
+    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer) {
         if (uiEngine != null) {
-            if (updateUIEngine) uiEngine.update();
             uiEngine.render(true);
         }
         frameBuffer.begin();

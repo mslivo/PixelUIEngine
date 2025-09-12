@@ -12,8 +12,8 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
-import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.rendering.ExtendedAnimation;
+import net.mslivo.pixelui.utils.Tools;
 
 import java.io.*;
 import java.lang.StringBuilder;
@@ -28,6 +28,7 @@ public final class MediaManager implements Disposable {
     public static final String DIR_MUSIC = "music/", DIR_GRAPHICS = "sprites/", DIR_SOUND = "sound/", DIR_MODELS = "models/";
     public static final int FONT_CUSTOM_SYMBOL_OFFSET = 512;
     private static final String ERROR_FILE_NOT_FOUND = "CMedia File \"%s\": Does not exist";
+    private static final String ERROR_ANIMATION_INVALID = "CMedia File \"%s\": Animation dimensions invalid";
     private static final String ERROR_SPLIT_FRAMES = "Error splitting frames for: \"%s\": Negative frameCount = %d";
     private static final String ERROR_READ_FONT = "Error reading font file \"%s\"";
     private static final String ERROR_READ_FONT_FILE_DESCRIPTOR = "Error reading font file \"%s\": file= descriptor not found";
@@ -435,18 +436,24 @@ public final class MediaManager implements Disposable {
                     }
                 }
                 case CMediaAnimation cMediaAnimation -> {
+                    ExtendedAnimation extendedAnimation;
                     if (cMediaAnimation.useAtlas) {
-                        medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                        extendedAnimation = new ExtendedAnimation(cMediaAnimation.animationSpeed,
                                 splitFrames(cMediaAnimation, textureAtlas.findRegion(cMediaAnimation.file), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                                 cMediaAnimation.playMode
-                        ));
+                        );
                     } else {
-                        medias_animations.put(cMediaAnimation, new ExtendedAnimation(cMediaAnimation.animationSpeed,
+                        extendedAnimation = new ExtendedAnimation(cMediaAnimation.animationSpeed,
                                 splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                                 cMediaAnimation.playMode
-                        ));
+                        );
                     }
-
+                    try {
+                        extendedAnimation.getKeyFrame(0);
+                    }catch (ArithmeticException e){
+                        throw new RuntimeException(String.format(ERROR_ANIMATION_INVALID, cMediaAnimation.file));
+                    }
+                    medias_animations.put(cMediaAnimation, extendedAnimation);
                 }
             }
             loadedMediaList.add(cMediaSprite);
@@ -659,35 +666,35 @@ public final class MediaManager implements Disposable {
     }
 
     public int spriteWidthHalf(CMediaSprite cMediaSprite) {
-        return MathUtils.round(spriteWidth(cMediaSprite)/2f);
+        return MathUtils.round(spriteWidth(cMediaSprite) / 2f);
     }
 
     public int spriteHeightHalf(CMediaSprite cMediaSprite) {
-        return MathUtils.round(spriteHeightHalf(cMediaSprite)/2f);
+        return MathUtils.round(spriteHeightHalf(cMediaSprite) / 2f);
     }
 
     public int arrayWidthHalf(CMediaArray cMediaArray) {
-        return MathUtils.round(arrayWidth(cMediaArray)/2f);
+        return MathUtils.round(arrayWidth(cMediaArray) / 2f);
     }
 
     public int arrayHeightHalf(CMediaArray cMediaArray) {
-        return MathUtils.round(arrayHeightHalf(cMediaArray)/2f);
+        return MathUtils.round(arrayHeightHalf(cMediaArray) / 2f);
     }
 
     public int imageWidthHalf(CMediaImage cMediaImage) {
-        return MathUtils.round(imageWidth(cMediaImage)/2f);
+        return MathUtils.round(imageWidth(cMediaImage) / 2f);
     }
 
     public int imageHeightHalf(CMediaImage cMediaImage) {
-        return MathUtils.round(imageHeight(cMediaImage)/2f);
+        return MathUtils.round(imageHeight(cMediaImage) / 2f);
     }
 
     public int animationWidthHalf(CMediaAnimation cMediaAnimation) {
-        return MathUtils.round(animationWidth(cMediaAnimation)/2f);
+        return MathUtils.round(animationWidth(cMediaAnimation) / 2f);
     }
 
     public int animationHeightHalf(CMediaAnimation cMediaAnimation) {
-        return MathUtils.round(animationHeight(cMediaAnimation)/2f);
+        return MathUtils.round(animationHeight(cMediaAnimation) / 2f);
     }
 
 

@@ -1,16 +1,20 @@
 package net.mslivo.pixelui.utils.particles;
 
 import com.badlogic.gdx.math.MathUtils;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.media.*;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.utils.particles.particles.*;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
     public interface RenderHook<T> {
-        void renderBeforeParticle(Particle<T> particle, SpriteRenderer spriteRenderer);
+        default void renderBeforeParticle(Particle<T> particle, SpriteRenderer spriteRenderer){};
 
-        void renderAfterParticle(Particle<T> particle, SpriteRenderer spriteRenderer);
+        default void renderAfterParticle(Particle<T> particle, SpriteRenderer spriteRenderer){};
+
+        default boolean renderParticle(Particle<T> particle){
+            return true;
+        };
     }
 
     private RenderHook renderHook;
@@ -39,9 +43,11 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
         for (int i = 0; i < particles.size; i++) {
             Particle<T> particle = particles.get(i);
             if (!particle.visible) continue;
-            if (renderHook != null)
+            if (renderHook != null) {
+                if (!renderHook.renderParticle(particle))
+                    continue;
                 renderHook.renderBeforeParticle(particle, spriteRenderer);
-
+            }
             final int x = MathUtils.round(particle.x);
             final int y = MathUtils.round(particle.y);
 
@@ -56,24 +62,25 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
                 case ArrayParticle<T> arrayParticle -> {
                     CMediaArray cMediaArray = (CMediaArray) arrayParticle.sprite;
                     spriteRenderer.setColor(arrayParticle.r, arrayParticle.g, arrayParticle.b, arrayParticle.a);
-                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex,  x, y, arrayParticle.origin_x, arrayParticle.origin_y,
+                    spriteRenderer.drawCMediaArray(cMediaArray, arrayParticle.arrayIndex, x, y, arrayParticle.origin_x, arrayParticle.origin_y,
                             mediaManager.arrayWidth(cMediaArray), mediaManager.arrayHeight(cMediaArray),
                             arrayParticle.scaleX, arrayParticle.scaleY, arrayParticle.rotation);
                 }
                 case AnimationParticle<T> animationParticle -> {
                     CMediaAnimation cMediaAnimation = (CMediaAnimation) animationParticle.sprite;
                     spriteRenderer.setColor(animationParticle.r, animationParticle.g, animationParticle.b, animationParticle.a);
-                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset),  x, y, animationParticle.origin_x, animationParticle.origin_y,
+                    spriteRenderer.drawCMediaAnimation(cMediaAnimation, (animation_timer + animationParticle.animationOffset), x, y, animationParticle.origin_x, animationParticle.origin_y,
                             mediaManager.animationWidth(cMediaAnimation), mediaManager.animationHeight(cMediaAnimation),
                             animationParticle.scaleX, animationParticle.scaleY, animationParticle.rotation);
                 }
                 case TextParticle<T> textParticle -> {
                     spriteRenderer.setColor(textParticle.r, textParticle.g, textParticle.b, textParticle.a);
-                    spriteRenderer.drawCMediaFont(textParticle.font,  x, y, textParticle.text, 0,textParticle.text.length(),textParticle.centerX, textParticle.centerY);
+                    spriteRenderer.drawCMediaFont(textParticle.font, x, y, textParticle.text, 0, textParticle.text.length(), textParticle.centerX, textParticle.centerY);
                 }
                 case EmptyParticle _ -> {
                 }
-                default -> throw new IllegalStateException("Invalid particle type: "+particle.getClass().getSimpleName());
+                default ->
+                        throw new IllegalStateException("Invalid particle type: " + particle.getClass().getSimpleName());
             }
             if (renderHook != null)
                 renderHook.renderAfterParticle(particle, spriteRenderer);
