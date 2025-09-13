@@ -12,15 +12,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Queue;
+import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.CommonActions;
 import net.mslivo.pixelui.engine.constants.*;
 import net.mslivo.pixelui.media.*;
-import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.rendering.ShaderParser;
 import net.mslivo.pixelui.rendering.PrimitiveRenderer;
+import net.mslivo.pixelui.rendering.ShaderParser;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
-import net.mslivo.pixelui.engine.actions.common.CommonActions;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.utils.Tools;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -886,7 +886,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void mouseControl_updateLastUIMouseHover() {
-        uiEngineState.lastUIMouseHover = uiCommonUtils.component_getUIObjectAtPosition( uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
+        uiEngineState.lastUIMouseHover = uiCommonUtils.component_getUIObjectAtPosition(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
     }
 
 
@@ -937,7 +937,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void updateUI_keyInteractions() {
-        uiCommonUtils.setKeyboardInteractedUIObject( null);
+        uiCommonUtils.setKeyboardInteractedUIObject(null);
         if (uiEngineState.config.ui_keyInteractionsDisabled) return;
         // Key
         if (uiEngineState.inputEvents.keyTyped) {
@@ -948,14 +948,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 // Into Temp variable because focuseTextField can change after executing actions
                 for (int ic = 0; ic < uiEngineState.inputEvents.keyTypedCharacters.size; ic++) {
                     char keyTypedCharacter = (char) uiEngineState.inputEvents.keyTypedCharacters.get(ic);
-                    uiCommonUtils.textField_typeCharacter(  focusedTextField, keyTypedCharacter);
+                    uiCommonUtils.textField_typeCharacter(focusedTextField, keyTypedCharacter);
                 }
                 // MouseTextInput open = focus on last typed character
                 if (uiEngineState.openMouseTextInput != null) {
                     char typedChar = (char) uiEngineState.inputEvents.keyTypedCharacters.get(uiEngineState.inputEvents.keyTypedCharacters.size - 1);
                     uiCommonUtils.mouseTextInput_selectCharacter(uiEngineState.openMouseTextInput, typedChar);
                 }
-                uiCommonUtils.setKeyboardInteractedUIObject( focusedTextField);
+                uiCommonUtils.setKeyboardInteractedUIObject(focusedTextField);
             }
 
         }
@@ -973,19 +973,19 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiEngineState.focusedTextField_repeatedKey = keyDownKeyCode;
                             uiEngineState.focusedTextField_repeatedKeyTimer = -20;
                         }
-                        uiCommonUtils.textField_executeControlKey(  focusedTextField, keyDownKeyCode);
+                        uiCommonUtils.textField_executeControlKey(focusedTextField, keyDownKeyCode);
                     } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) { // paste
                         String pasteContent = getClipboardContent();
                         if (pasteContent != null) {
                             char[] contentChars = pasteContent.toCharArray();
                             for (char i = 0; i < contentChars.length; i++) {
-                                uiCommonUtils.textField_typeCharacter(  focusedTextField, contentChars[i]);
+                                uiCommonUtils.textField_typeCharacter(focusedTextField, contentChars[i]);
                             }
                         }
 
                     }
 
-                    uiCommonUtils.setKeyboardInteractedUIObject( focusedTextField);
+                    uiCommonUtils.setKeyboardInteractedUIObject(focusedTextField);
                 }
             } else {
                 // Hotkeys
@@ -1080,7 +1080,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void updateUI_mouseInteractions() {
-        uiCommonUtils.setMouseInteractedUIObject( null);
+        uiCommonUtils.setMouseInteractedUIObject(null);
         if (uiEngineState.config.ui_mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (uiEngineState.inputEvents.mouseDoubleClick) {
@@ -1109,7 +1109,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     actions_executeOnMouseDoubleClickCommonAction(lastUIMouseHover, mouseDownButton);
                 }
 
-                uiCommonUtils.setMouseInteractedUIObject( lastUIMouseHover);
+                uiCommonUtils.setMouseInteractedUIObject(lastUIMouseHover);
             }
         }
         // ------ MOUSE DOWN ------
@@ -1139,7 +1139,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         case ScrollbarVertical scrollBarVertical -> {
                             uiCommonUtils.scrollBar_pressButton(scrollBarVertical);
                             uiCommonUtils.scrollBar_scroll(scrollBarVertical,
-                                    uiCommonUtils.scrollBar_calculateScrolled( scrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
+                                    uiCommonUtils.scrollBar_calculateScrolled(scrollBarVertical, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                             uiEngineState.pressedScrollBarVertical = scrollBarVertical;
                         }
                         case ScrollbarHorizontal scrollBarHorizontal -> {
@@ -1323,7 +1323,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         for (int i = 0; i < fieldContent.length; i++) {
                             testString += fieldContent[i];
                             if (render_textWidth(testString) > mouseX) {
-                                uiCommonUtils.textField_setMarkerPosition( textField,
+                                uiCommonUtils.textField_setMarkerPosition(textField,
                                         textField.offset + i);
                                 found = true;
                                 break;
@@ -1331,7 +1331,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                         if (!found) {
                             // Set to end
-                            uiCommonUtils.textField_setMarkerPosition( textField,
+                            uiCommonUtils.textField_setMarkerPosition(textField,
                                     textField.offset + fieldContent.length);
                         }
                         // Set Focus
@@ -1527,7 +1527,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.scrollBar_scroll(scrolledScrollBarHorizontal, uiCommonUtils.scrollBar_calculateScrolled(scrolledScrollBarHorizontal, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y));
                     }
                     case Knob turnedKnob -> {
-                        final float BASE_SENSITIVITY = 1/50f;
+                        final float BASE_SENSITIVITY = 1 / 50f;
                         float amount = (uiEngineState.mouse_delta.y * BASE_SENSITIVITY) * uiEngineState.config.component_knobSensitivity;
                         float newValue = turnedKnob.turned + amount;
                         uiCommonUtils.knob_turnKnob(turnedKnob, newValue);
@@ -1605,7 +1605,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (uiEngineState.focusedTextField_repeatedKey != KeyCode.NONE) {
             uiEngineState.focusedTextField_repeatedKeyTimer++;
             if (uiEngineState.focusedTextField_repeatedKeyTimer > 2) {
-                uiCommonUtils.textField_executeControlKey( uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey);
+                uiCommonUtils.textField_executeControlKey(uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey);
                 uiEngineState.focusedTextField_repeatedKeyTimer = 0;
             }
         }
@@ -2790,22 +2790,29 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
             case Image image -> {
                 if (image.image != null) {
-                    int width = mediaManager.spriteWidth(image.image);
-                    int height = mediaManager.spriteHeight(image.image);
+                    final int srcWidth, srcHeight, width, height;
+                    srcWidth = mediaManager.spriteWidth(image.image);
+                    srcHeight = mediaManager.spriteHeight(image.image);
+                    width = image.stretchToSize ? api.TS(image.width) : srcWidth;
+                    height = image.stretchToSize ? api.TS(image.height) : srcHeight;
                     spriteRenderer.drawCMediaSprite(image.image, image.arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState),
                             uiCommonUtils.component_getAbsoluteX(image), uiCommonUtils.component_getAbsoluteY(image),
-                            width, height, 0, 0, width, height,
+                            width, height, 0, 0, srcWidth, srcHeight,
                             image.flipX, image.flipY
                     );
                 }
             }
             case FrameBufferViewport frameBufferViewport -> {
                 if (frameBufferViewport.frameBuffer != null) {
-                    int width = api.TS(frameBufferViewport.width);
-                    int height = api.TS(frameBufferViewport.height);
-                    spriteRenderer.draw(frameBufferViewport.frameBuffer.getFlippedTextureRegion(),
-                            uiCommonUtils.component_getAbsoluteX(frameBufferViewport), uiCommonUtils.component_getAbsoluteY(frameBufferViewport),
-                            width, height
+                    final int srcWidth, srcHeight, width, height;
+                    final Texture texture = frameBufferViewport.frameBuffer.getColorBufferTexture();
+                    srcWidth = texture.getWidth();
+                    srcHeight = texture.getHeight();
+                    width = frameBufferViewport.stretchToSize ? api.TS(frameBufferViewport.width) : srcWidth;
+                    height = frameBufferViewport.stretchToSize ? api.TS(frameBufferViewport.height) : srcHeight;
+
+                    spriteRenderer.draw(texture, uiCommonUtils.component_getAbsoluteX(frameBufferViewport), uiCommonUtils.component_getAbsoluteY(frameBufferViewport),
+                            width, height, 0,0,width,height,frameBufferViewport.flipX, !frameBufferViewport.flipY
                     );
                 }
             }

@@ -25,6 +25,10 @@ public final class APIHotkey {
     public final HotKeyAction DEFAULT_HOTKEY_ACTION = new HotKeyAction() {
     };
 
+    public HotKey create(int keyCode, HotKeyAction hotKeyAction) {
+        return create(new int[]{keyCode}, hotKeyAction);
+    }
+
     public HotKey create(int[] keyCodes, HotKeyAction hotKeyAction) {
         HotKey hotKey = new HotKey();
         hotKey.pressed = false;

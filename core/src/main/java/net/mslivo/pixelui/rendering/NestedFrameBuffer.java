@@ -123,6 +123,7 @@ public class NestedFrameBuffer extends FrameBuffer {
         this.getBoundFBOCache = -1;
     }
 
+
     public TextureRegion getFlippedTextureRegion(){
         if(this.textureRegionFlippedCache == null){
             this.textureRegionFlippedCache = new TextureRegion(this.getColorBufferTexture());

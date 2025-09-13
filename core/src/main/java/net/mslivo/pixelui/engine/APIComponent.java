@@ -9,14 +9,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import net.mslivo.pixelui.engine.actions.*;
-import net.mslivo.pixelui.media.CMediaSprite;
-import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.CHECKBOX_STYLE;
 import net.mslivo.pixelui.engine.constants.SHAPE_ROTATION;
 import net.mslivo.pixelui.engine.constants.SHAPE_TYPE;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.utils.Tools;
 
 import java.util.HashSet;
 import java.util.function.Predicate;
@@ -291,7 +291,7 @@ public final class APIComponent {
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
                 textButton.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
-                uiCommonUtils.button_centerContent( mediaManager, textButton);
+                uiCommonUtils.button_centerContent(mediaManager, textButton);
                 return textButton;
             }
 
@@ -341,7 +341,7 @@ public final class APIComponent {
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
-                uiCommonUtils.button_centerContent( mediaManager, imageButton);
+                uiCommonUtils.button_centerContent(mediaManager, imageButton);
                 return imageButton;
             }
 
@@ -429,7 +429,7 @@ public final class APIComponent {
         }
 
         public void centerContent(Button button) {
-            uiCommonUtils.button_centerContent( mediaManager, button);
+            uiCommonUtils.button_centerContent(mediaManager, button);
         }
 
         public void centerContent(Button[] buttons) {
@@ -931,7 +931,7 @@ public final class APIComponent {
 
         public void setMarkerPosition(Textfield textField, int position) {
             if (textField == null) return;
-            uiCommonUtils.textField_setMarkerPosition(  textField, position);
+            uiCommonUtils.textField_setMarkerPosition(textField, position);
         }
 
         public void setContent(Textfield textField, String content) {
@@ -966,16 +966,16 @@ public final class APIComponent {
 
         public void unFocus(Textfield textField) {
             if (textField == null) return;
-            uiCommonUtils.textField_unFocus( textField);
+            uiCommonUtils.textField_unFocus(textField);
         }
 
         public void focus(Textfield textField) {
             if (textField == null) return;
-            uiCommonUtils.textField_focus( textField);
+            uiCommonUtils.textField_focus(textField);
         }
 
         public boolean isFocused(Textfield textField) {
-            return uiCommonUtils.textField_isFocused( textField);
+            return uiCommonUtils.textField_isFocused(textField);
         }
 
         public boolean isContentValid(Textfield textField) {
@@ -1060,7 +1060,7 @@ public final class APIComponent {
 
         public void setText(Text textC, String text) {
             if (textC == null) return;
-            uiCommonUtils.text_setText( textC, text);
+            uiCommonUtils.text_setText(textC, text);
         }
 
         public void setFontColor(Text text, Color color) {
@@ -1078,19 +1078,36 @@ public final class APIComponent {
         private final FrameBufferViewportAction DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION = new FrameBufferViewportAction() {
         };
 
-
         public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer) {
-            return create(x, y, nestedFrameBuffer, DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION);
+            return create(x, y, nestedFrameBuffer, null, false, false, false);
         }
 
         public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction) {
+            return create(x, y, nestedFrameBuffer, frameBufferViewportAction, false, false, false);
+        }
+
+        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction, boolean flipX, boolean flipY, boolean stretchToSize) {
             FrameBufferViewport frameBufferViewport = new FrameBufferViewport();
             int width = nestedFrameBuffer != null ? nestedFrameBuffer.getWidth() / api.TS() : 0;
             int height = nestedFrameBuffer != null ? nestedFrameBuffer.getHeight() / api.TS() : 0;
             setComponentCommonInitValuesInternal(frameBufferViewport, x, y, width, height, Color.GRAY, Color.GRAY);
             frameBufferViewport.frameBuffer = nestedFrameBuffer;
             frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction != null ? frameBufferViewportAction : DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION;
+            frameBufferViewport.flipX = flipX;
+            frameBufferViewport.flipY = flipY;
+            frameBufferViewport.stretchToSize = stretchToSize;
             return frameBufferViewport;
+        }
+
+        public void setStretchToSize(FrameBufferViewport frameBufferViewport, boolean stretchToSize){
+            if (frameBufferViewport == null) return;
+            frameBufferViewport.stretchToSize = stretchToSize;
+        }
+
+        public void setFlipXY(FrameBufferViewport frameBufferViewport, boolean flipX, boolean flipY){
+            if (frameBufferViewport == null) return;
+            frameBufferViewport.flipX = flipX;
+            frameBufferViewport.flipY = flipY;
         }
 
         public void setFrameBufferViewportAction(FrameBufferViewport frameBufferViewport, FrameBufferViewportAction frameBufferViewportAction) {
@@ -1100,7 +1117,7 @@ public final class APIComponent {
 
         public void setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
             if (frameBufferViewport == null) return;
-            uiCommonUtils.framebufferViewport_setFrameBuffer( frameBufferViewport, nestedFrameBuffer);
+            uiCommonUtils.framebufferViewport_setFrameBuffer(frameBufferViewport, nestedFrameBuffer);
         }
 
 
@@ -1115,20 +1132,18 @@ public final class APIComponent {
         };
 
         public Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0, false, false, DEFAULT_IMAGE_ACTION);
+            return create(x, y, image, 0, null, false, false ,false);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex, false, false, DEFAULT_IMAGE_ACTION);
+            return create(x, y, image, arrayIndex, null, false, false ,false);
         }
 
-
-        public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY) {
-            return create(x, y, image, arrayIndex, flipX, flipY, DEFAULT_IMAGE_ACTION);
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction) {
+            return create(x, y, image, arrayIndex, imageAction, false, false ,false);
         }
 
-
-        public Image create(int x, int y, CMediaSprite image, int arrayIndex, boolean flipX, boolean flipY, ImageAction imageAction) {
+        public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, boolean flipX, boolean flipY, boolean stretchToSize) {
             Image imageC = new Image();
             int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / api.TSF()), 1) : 1;
             int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / api.TSF()), 1) : 1;
@@ -1138,7 +1153,13 @@ public final class APIComponent {
             imageC.imageAction = imageAction != null ? imageAction : DEFAULT_IMAGE_ACTION;
             imageC.flipX = flipX;
             imageC.flipY = flipY;
+            imageC.stretchToSize = stretchToSize;
             return imageC;
+        }
+
+        public void setStretchToSize(Image image, boolean stretchToSize) {
+            if (image == null) return;
+            image.stretchToSize = stretchToSize;
         }
 
         public void setImageAction(Image image, ImageAction imageAction) {
@@ -1153,7 +1174,7 @@ public final class APIComponent {
 
         public void setImage(Image image, CMediaSprite imageSprite) {
             if (image == null) return;
-            uiCommonUtils.image_setImage( image, imageSprite);
+            uiCommonUtils.image_setImage(image, imageSprite);
         }
 
         public void setFlipXY(Image image, boolean flipX, boolean flipY) {
@@ -1205,7 +1226,7 @@ public final class APIComponent {
 
         public void setComboBoxAction(Combobox comboBox, ComboBoxAction comboBoxAction) {
             if (comboBox == null) return;
-            comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction :DEFAULT_COMBOBOX_ACTION;
+            comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
         }
 
         public void addComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
@@ -1245,28 +1266,28 @@ public final class APIComponent {
 
         public void setSelectedItem(ComboboxItem selectItem) {
             if (selectItem == null) return;
-            uiCommonUtils.comboBox_selectItem( selectItem);
+            uiCommonUtils.comboBox_selectItem(selectItem);
         }
 
         public void open(Combobox comboBox) {
             if (comboBox == null) return;
-            uiCommonUtils.comboBox_open( comboBox);
+            uiCommonUtils.comboBox_open(comboBox);
         }
 
         public void close(Combobox comboBox) {
             if (comboBox == null) return;
-            uiCommonUtils.comboBox_close( comboBox);
+            uiCommonUtils.comboBox_close(comboBox);
         }
 
         public boolean isOpen(Combobox comboBox) {
-            return uiCommonUtils.comboBox_isOpen( comboBox);
+            return uiCommonUtils.comboBox_isOpen(comboBox);
         }
 
         public void setSelectedItemByText(Combobox comboBox, String text) {
             if (comboBox == null || text == null) return;
             for (int i = 0; i < comboBox.items.size; i++) {
                 if (comboBox.items.get(i).text.equals(text)) {
-                    uiCommonUtils.comboBox_selectItem( comboBox.items.get(i));
+                    uiCommonUtils.comboBox_selectItem(comboBox.items.get(i));
                     return;
                 }
             }
@@ -1562,7 +1583,7 @@ public final class APIComponent {
 
     public void setDisabled(Component component, boolean disabled) {
         if (component == null) return;
-        uiCommonUtils.component_setDisabled( component, disabled);
+        uiCommonUtils.component_setDisabled(component, disabled);
     }
 
     public void setDisabled(Component[] components, boolean disabled) {
@@ -1607,7 +1628,7 @@ public final class APIComponent {
 
     public void setSize(Component component, int width, int height) {
         if (component == null) return;
-        uiCommonUtils.component_setSize( component, width, height);
+        uiCommonUtils.component_setSize(component, width, height);
     }
 
     public void setWidth(Component component, int width) {

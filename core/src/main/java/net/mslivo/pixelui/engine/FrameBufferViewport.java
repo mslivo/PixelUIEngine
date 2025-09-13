@@ -6,6 +6,7 @@ import net.mslivo.pixelui.engine.actions.FrameBufferViewportAction;
 public class FrameBufferViewport extends Component {
     public NestedFrameBuffer frameBuffer;
     public FrameBufferViewportAction frameBufferViewportAction;
+    public boolean flipX, flipY,stretchToSize;
 
     FrameBufferViewport() {
     }
