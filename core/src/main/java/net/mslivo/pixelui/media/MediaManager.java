@@ -670,7 +670,7 @@ public final class MediaManager implements Disposable {
     }
 
     public int spriteHeightHalf(CMediaSprite cMediaSprite) {
-        return MathUtils.round(spriteHeightHalf(cMediaSprite) / 2f);
+        return MathUtils.round(spriteHeight(cMediaSprite) / 2f);
     }
 
     public int arrayWidthHalf(CMediaArray cMediaArray) {
@@ -678,7 +678,7 @@ public final class MediaManager implements Disposable {
     }
 
     public int arrayHeightHalf(CMediaArray cMediaArray) {
-        return MathUtils.round(arrayHeightHalf(cMediaArray) / 2f);
+        return MathUtils.round(arrayHeight(cMediaArray) / 2f);
     }
 
     public int imageWidthHalf(CMediaImage cMediaImage) {
