@@ -280,11 +280,19 @@ public final class API {
     }
 
     public Array<Component> findScreenComponents(Predicate<Component> findBy) {
-        return uiCommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
+        return findScreenComponents(findBy, Component.class);
+    }
+
+    public <T extends Component> Array<T> findScreenComponents(Predicate<Component> findBy, Class<T> tClass) {
+        return (Array<T>)uiCommonUtils.findMultiple(uiEngineState.screenComponents, findBy);
     }
 
     public Component findScreenComponent(Predicate<Component> findBy) {
-        return uiCommonUtils.find(uiEngineState.screenComponents, findBy);
+        return  uiCommonUtils.find(uiEngineState.screenComponents, findBy);
+    }
+
+    public <T extends Component> T findScreenComponent(Predicate<Component> findBy, Class<T> tClass) {
+        return (T) uiCommonUtils.find(uiEngineState.screenComponents, findBy);
     }
 
     /* #################### MouseTool #################### */

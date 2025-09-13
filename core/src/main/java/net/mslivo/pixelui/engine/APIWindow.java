@@ -217,15 +217,24 @@ public final class APIWindow {
         if (window == null) return;
         removeComponents(window, window.components.toArray(Component[]::new));
     }
-
-    public Array<Component> findComponents(Window window, Predicate<Window> findBy) {
+    public Array<Component> findComponents(Window window,Predicate<Component> findBy) {
         if (window == null) return new Array<>();
-        return uiCommonUtils.findMultiple(window.components, findBy);
+        return findComponents(window, findBy, Component.class);
     }
 
-    public Component findComponent(Window window, Predicate<Window> findBy) {
+    public <T extends Component> Array<T> findComponents(Window window,Predicate<Component> findBy, Class<T> tClass) {
+        if (window == null) return new Array<>();
+        return (Array<T>) uiCommonUtils.findMultiple(window.components, findBy);
+    }
+
+    public Component findComponent(Window window, Predicate<Component> findBy) {
         if (window == null) return null;
         return uiCommonUtils.find(window.components, findBy);
+    }
+
+    public <T extends Component> T findComponent(Window window, Predicate<Component> findBy, Class<T> tClass) {
+        if (window == null) return null;
+        return (T) uiCommonUtils.find(window.components, findBy);
     }
 
     public void bringToFront(Window window) {
