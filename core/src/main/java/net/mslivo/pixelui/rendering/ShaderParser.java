@@ -211,7 +211,7 @@ public class ShaderParser {
     public enum SHADER_TEMPLATE {
         SPRITE(".sprite.glsl",
                     """
-                    attribute vec4 a_position;
+                    attribute highp vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
                     attribute vec2 a_texCoord;
@@ -255,7 +255,7 @@ public class ShaderParser {
             """),
         PRIMITIVE(".primitive.glsl","""
                     
-                    attribute vec4 a_position;
+                    attribute highp vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
                     attribute vec4 a_vertexColor;

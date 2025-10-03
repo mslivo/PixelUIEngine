@@ -2074,9 +2074,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void renderUIComponentLayer() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
         spriteRenderer.setBlendFunctionLayer();
+        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+        primitiveRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
 
@@ -2432,7 +2435,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             drawBottomborder = y_combined != 0;
                         } else {
                             final int isPlus1 = is + 1;
-                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(is).border;
+                            drawBottomborder = isPlus1 < tooltip.segments.size && tooltip.segments.get(is).border;
                         }
                     }
 
@@ -3116,7 +3119,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case Shape shape -> {
                 if (shape.shapeType != null) {
                     spriteRenderer.end();
-
                     primitiveRenderer.begin(GL32.GL_TRIANGLES);
                     render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
                     primitiveRenderer.setVertexColor(shape.color2);
@@ -3125,7 +3127,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     final int cw = TS(shape.width);
                     final int ch = TS(shape.height);
                     final int cw2 = cw / 2;
-                    final int ch2 = cw / 2;
+                    final int ch2 = ch / 2;
                     final int center_x = cx + cw2;
                     final int center_y = cy + ch2;
 
