@@ -2431,8 +2431,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         if (segment.border) {
                             drawBottomborder = y_combined != 0;
                         } else {
-                            int isPlus1 = is + 1;
-                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(isPlus1).border;
+                            final int isPlus1 = is + 1;
+                            drawBottomborder = isPlus1 < segment.height && tooltip.segments.get(is).border;
                         }
                     }
 
