@@ -892,6 +892,28 @@ public class Tools {
             return 1.0f / x;
         }
 
+        public static float distanceFast(float x1, float y1, float z1,
+                                         float x2, float y2, float z2) {
+            float dx = x2 - x1;
+            float dy = y2 - y1;
+            float dz = z2 - z1;
+
+            float dist2 = dx * dx + dy * dy + dz * dz;
+            if (dist2 <= 0f) return 0f;
+
+            float xhalf = 0.5f * dist2;
+            int i = Float.floatToIntBits(dist2);
+            i = 0x5f3759df - (i >> 1);
+            float y = Float.intBitsToFloat(i);
+
+            // One Newton–Raphson iteration
+            y = y * (1.5f - xhalf * y * y);
+
+            // Convert inverse sqrt to actual sqrt
+            return dist2 * y;
+        }
+
+
         public static float distanceFast(int x1, int y1, int x2, int y2) {
             return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
         }
