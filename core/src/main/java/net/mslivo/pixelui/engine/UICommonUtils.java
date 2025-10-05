@@ -90,7 +90,7 @@ public class UICommonUtils {
                 if (!windowComponentsVisibleOrderSet.contains(object) && object instanceof Component component && emulatedMouse_isInteractAbleComponent(component)) {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
-                    float distance = Tools.Calc.distanceFast(component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2),
+                    float distance = Tools.Calc.distance(component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2),
                             component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated.x, uiEngineState.mouse_emulated.y);
                     if (distance < nearestDistance) {
                         nearestDistance = distance;

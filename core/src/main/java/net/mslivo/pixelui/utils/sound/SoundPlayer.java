@@ -110,7 +110,7 @@ public class SoundPlayer implements Disposable{
         final Sound sound = mediaManager.sound(cMediaSoundEffect);
         final float playVolume, playPan;
         if (play2D) {
-            float positionVolume = (range - (Math.clamp(Tools.Calc.distanceFast(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
+            float positionVolume = (range - (Math.clamp(Tools.Calc.distance(camera_x, camera_y, position_x, position_y), 0, range))) / (float) range;
             float positionPan = 0;
             if (camera_x > position_x) {
                 pan = Math.clamp(-((camera_x - position_x) / (float) range), -1, 0);
