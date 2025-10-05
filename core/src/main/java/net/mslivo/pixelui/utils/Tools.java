@@ -880,44 +880,6 @@ public class Tools {
             return false;
         }
 
-        public static float distanceFast(float x1, float y1, float x2, float y2) {
-            float dx = x2 - x1;
-            float dy = y2 - y1;
-            float x = dx * dx + dy * dy;
-            float xhalf = 0.5f * x;
-            int i = Float.floatToIntBits(x);
-            i = 0x5f3759df - (i >> 1);
-            x = Float.intBitsToFloat(i);
-            x = x * (1.5f - xhalf * x * x);
-            return 1.0f / x;
-        }
-
-        public static float distanceFast(float x1, float y1, float z1,
-                                         float x2, float y2, float z2) {
-            float dx = x2 - x1;
-            float dy = y2 - y1;
-            float dz = z2 - z1;
-
-            float dist2 = dx * dx + dy * dy + dz * dz;
-            if (dist2 <= 0f) return 0f;
-
-            float xhalf = 0.5f * dist2;
-            int i = Float.floatToIntBits(dist2);
-            i = 0x5f3759df - (i >> 1);
-            float y = Float.intBitsToFloat(i);
-
-            // One Newton–Raphson iteration
-            y = y * (1.5f - xhalf * y * y);
-
-            // Convert inverse sqrt to actual sqrt
-            return dist2 * y;
-        }
-
-
-        public static float distanceFast(int x1, int y1, int x2, int y2) {
-            return distanceFast((float) x1, (float) y1, (float) x2, (float) y2);
-        }
-
         public static int distance(int x1, int y1, int x2, int y2) {
             return MathUtils.floor((float) (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))));
         }
@@ -932,14 +894,6 @@ public class Tools {
 
         public static boolean isWithinDistance(float x1, float y1, float x2, float y2, float distance) {
             return distance(x1, y1, x2, y2) <= distance;
-        }
-
-        public static boolean isWithinDistanceFast(float x1, float y1, float x2, float y2, float distance) {
-            return distanceFast(x1, y1, x2, y2) <= distance;
-        }
-
-        public static boolean isWithinDistanceFast(int x1, int y1, int x2, int y2, int radius) {
-            return distanceFast(x1, y1, x2, y2) <= radius;
         }
 
         public static float degreeBetweenPoints(float x1, float y1, float x2, float y2) {
@@ -968,18 +922,6 @@ public class Tools {
 
         public static boolean circlesCollide(float x1, float y1, float r1, float x2, float y2, float r2) {
             return distance(x1, y1, x2, y2) <= (r1 + r2);
-        }
-
-        public static boolean circleCollideFast(float x1, float y1, float r1, float x2, float y2, float r2) {
-            return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
-        }
-
-        public static boolean circlesCollide(int x1, int y1, int r1, int x2, int y2, int r2) {
-            return distance(x1, y1, x2, y2) <= (r1 + r2);
-        }
-
-        public static boolean circleCollideFast(int x1, int y1, int r1, int x2, int y2, int r2) {
-            return distanceFast(x1, y1, x2, y2) <= (r1 + r2);
         }
 
     }
