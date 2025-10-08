@@ -923,15 +923,23 @@ public final class APIComponent {
             textField.offset = 0;
             textField.content = Tools.Text.validString(content);
             textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
-            textField.markerPosition = textField.content.length();
+            textField.caretPosition = textField.content.length();
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
+            textField.markedContentBegin = 0;
+            textField.markedContentEnd = 0;
+            textField.markerColor = uiEngineConfig.component_textFieldDefaultMarkerColor.cpy();
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
             return textField;
         }
 
+        public void setMarkerColor(Textfield textField, Color color) {
+            if (textField == null) return;
+            textField.markerColor = color.cpy();
+        }
+
         public void setMarkerPosition(Textfield textField, int position) {
             if (textField == null) return;
-            uiCommonUtils.textField_setMarkerPosition(textField, position);
+            uiCommonUtils.textField_setCaretPosition(textField, position);
         }
 
         public void setContent(Textfield textField, String content) {

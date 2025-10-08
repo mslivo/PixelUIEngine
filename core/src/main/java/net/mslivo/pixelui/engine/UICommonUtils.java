@@ -575,19 +575,31 @@ public class UICommonUtils {
         }
     }
 
-    public void textField_setMarkerPosition( Textfield textField, int position) {
-        textField.markerPosition = Math.clamp(position, 0, textField.content.length());
-        if (textField.markerPosition < textField.offset) {
-            while (textField.markerPosition < textField.offset) {
+    public int textField_findTextPosition(Textfield textField, int mouseX) {
+        String testString = "";
+        for (int i = 0; i < textField.content.length(); i++) {
+            testString += textField.content.charAt(i);
+            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font,testString) > mouseX) {
+                return Math.min(textField.offset + i,textField.content.length());
+            }
+        }
+        // If mouse past end, return end position
+        return Math.min(textField.offset + textField.content.length(),textField.content.length());
+    }
+
+    public void textField_setCaretPosition(Textfield textField, int position) {
+        textField.caretPosition = Math.clamp(position, 0, textField.content.length());
+        if (textField.caretPosition < textField.offset) {
+            while (textField.caretPosition < textField.offset) {
                 textField.offset--;
             }
         } else {
-            String subContent = textField.content.substring(textField.offset, textField.markerPosition);
+            String subContent = textField.content.substring(textField.offset, textField.caretPosition);
             int width = uiEngineState.tileSize.TL(textField.width) - 4;
             if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
                 while (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
                     textField.offset++;
-                    subContent = textField.content.substring(textField.offset, textField.markerPosition);
+                    subContent = textField.content.substring(textField.offset, textField.caretPosition);
                 }
             }
         }
@@ -604,26 +616,26 @@ public class UICommonUtils {
     public void textField_executeControlKey( Textfield textField, int keyCode) {
         switch (keyCode) {
             case Input.Keys.LEFT ->
-                    textField_setMarkerPosition(  textField, textField.markerPosition - 1);
+                    textField_setCaretPosition(  textField, textField.caretPosition - 1);
             case Input.Keys.RIGHT ->
-                    textField_setMarkerPosition( textField, textField.markerPosition + 1);
+                    textField_setCaretPosition( textField, textField.caretPosition + 1);
             case Input.Keys.BACKSPACE -> {
-                if (!textField.content.isEmpty() && textField.markerPosition > 0) {
-                    String newContent = textField.content.substring(0, textField.markerPosition - 1) + textField.content.substring(textField.markerPosition);
-                    textField_setMarkerPosition( textField, textField.markerPosition - 1);
+                if (!textField.content.isEmpty() && textField.caretPosition > 0) {
+                    String newContent = textField.content.substring(0, textField.caretPosition - 1) + textField.content.substring(textField.caretPosition);
+                    textField_setCaretPosition( textField, textField.caretPosition - 1);
                     textField_setContent(textField, newContent);
                 }
             }
             case Input.Keys.FORWARD_DEL -> {
-                if (!textField.content.isEmpty() && textField.markerPosition < textField.content.length()) {
-                    String newContent = textField.content.substring(0, textField.markerPosition) + textField.content.substring(textField.markerPosition + 1);
+                if (!textField.content.isEmpty() && textField.caretPosition < textField.content.length()) {
+                    String newContent = textField.content.substring(0, textField.caretPosition) + textField.content.substring(textField.caretPosition + 1);
                     textField_setContent(textField, newContent);
                 }
             }
             case Input.Keys.HOME ->
-                    textField_setMarkerPosition( textField, 0);
+                    textField_setCaretPosition( textField, 0);
             case Input.Keys.END ->
-                    textField_setMarkerPosition( textField, textField.content.length());
+                    textField_setCaretPosition( textField, textField.content.length());
             case Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
                 textField_unFocus( textField); // Unfocus
                 textField.textFieldAction.onEnter(textField.content, textField.contentValid);
@@ -635,9 +647,9 @@ public class UICommonUtils {
 
     public void textField_typeCharacter( Textfield textField, char character) {
         if (textField.allowedCharacters == null || textField.allowedCharacters.contains(character)) {
-            String newContent = textField.content.substring(0, textField.markerPosition) + character + textField.content.substring(textField.markerPosition);
+            String newContent = textField.content.substring(0, textField.caretPosition) + character + textField.content.substring(textField.caretPosition);
             textField_setContent(textField, newContent);
-            textField_setMarkerPosition( textField, textField.markerPosition + 1);
+            textField_setCaretPosition( textField, textField.caretPosition + 1);
             textField.textFieldAction.onTyped(character);
         }
     }
@@ -645,7 +657,7 @@ public class UICommonUtils {
     public void textField_setContent(Textfield textField, String content) {
         if (content.length() > textField.contentMaxLength) content = content.substring(0, textField.contentMaxLength);
         textField.content = Tools.Text.validString(content);
-        textField.markerPosition = Math.clamp(textField.markerPosition, 0, textField.content.length());
+        textField.caretPosition = Math.clamp(textField.caretPosition, 0, textField.content.length());
         textField.contentValid = textField.textFieldAction.isContentValid(content);
         textField.textFieldAction.onContentChange(textField.content, textField.contentValid);
     }
@@ -1416,7 +1428,7 @@ public class UICommonUtils {
 
     public void resetPressedTextFieldReference(UIEngineState uiEngineState) {
         uiEngineState.pressedTextField = null;
-        uiEngineState.pressedTextFieldMouseX = 0;
+        uiEngineState.pressedTextFieldInitCaretPosition = 0;
     }
 
     public void resetOpenComboBoxReference(UIEngineState uiEngineState) {

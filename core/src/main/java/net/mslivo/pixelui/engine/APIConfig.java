@@ -370,6 +370,14 @@ public final class APIConfig {
             uiEngineConfig.component_knobSensitivity = knob_sensitivity;
         }
 
+        public void setTextFieldDefaultMarkerColor(Color color) {
+            uiEngineConfig.component_textFieldDefaultMarkerColor = color;
+        }
+
+        public Color getTextFieldDefaultMarkerColor(Color color) {
+            return color.cpy();
+        }
+
         public float getScrollbarSensitivity() {
             return uiEngineConfig.component_scrollbarSensitivity;
         }

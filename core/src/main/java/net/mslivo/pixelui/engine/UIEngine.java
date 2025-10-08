@@ -152,7 +152,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.modalWindow = null;
         newUIEngineState.modalWindowQueue = new Queue<>();
         newUIEngineState.pressedTextField = null;
-        newUIEngineState.pressedTextFieldMouseX = 0;
+        newUIEngineState.pressedTextFieldInitCaretPosition = 0;
         newUIEngineState.focusedTextField = null;
         newUIEngineState.notifications = new Array<>();
         newUIEngineState.tooltipNotifications = new Array<>();
@@ -1191,8 +1191,19 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiEngineState.pressedAppViewPort = appViewPort;
                         }
                         case Textfield textField -> {
-                            uiEngineState.pressedTextFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
+                            int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
                             uiEngineState.pressedTextField = textField;
+
+                            int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
+
+                            uiEngineState.pressedTextFieldInitCaretPosition = textPosition;
+                            textField.markedContentBegin = textPosition;
+                            textField.markedContentEnd = textPosition;
+                            uiCommonUtils.textField_setCaretPosition(textField, textPosition);
+
+                            // Set Focus
+                            uiCommonUtils.textField_focus(textField);
+
                         }
                         case Grid grid -> {
                             int tileSize = grid.bigMode ? TS2() : TS();
@@ -1314,28 +1325,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.resetPressedCheckBoxReference(uiEngineState);
                     }
                     case Textfield textField -> {
-                        // Set Marker to mouse position
-                        int mouseX = uiEngineState.pressedTextFieldMouseX;
-                        char[] fieldContent = textField.content.substring(textField.offset).toCharArray();
-                        String testString = "";
-                        boolean found = false;
-                        charLoop:
-                        for (int i = 0; i < fieldContent.length; i++) {
-                            testString += fieldContent[i];
-                            if (render_textWidth(testString) > mouseX) {
-                                uiCommonUtils.textField_setMarkerPosition(textField,
-                                        textField.offset + i);
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            // Set to end
-                            uiCommonUtils.textField_setMarkerPosition(textField,
-                                    textField.offset + fieldContent.length);
-                        }
-                        // Set Focus
-                        uiCommonUtils.textField_focus(textField);
                         uiCommonUtils.resetPressedTextFieldReference(uiEngineState);
                     }
                     case AppViewport appViewPort -> {
@@ -1535,6 +1524,18 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             // emulated: keep mouse position steady
                             uiCommonUtils.emulatedMouse_setPositionComponent(turnedKnob);
                         }
+                    }
+                    case Textfield textField -> {
+                        int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
+                        int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
+                        textField.markedContentBegin = Math.min(textPosition, uiEngineState.pressedTextFieldInitCaretPosition);
+                        textField.markedContentEnd = Math.max(textPosition, uiEngineState.pressedTextFieldInitCaretPosition);
+
+                        if (textFieldMouseX < 0) {
+                            textPosition -= 1;
+                        }
+
+                        uiCommonUtils.textField_setCaretPosition(textField, textPosition);
                     }
                     case null, default -> {
                     }
@@ -2815,7 +2816,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     height = frameBufferViewport.stretchToSize ? api.TS(frameBufferViewport.height) : srcHeight;
 
                     spriteRenderer.draw(texture, uiCommonUtils.component_getAbsoluteX(frameBufferViewport), uiCommonUtils.component_getAbsoluteY(frameBufferViewport),
-                            width, height, 0,0,width,height,frameBufferViewport.flipX, !frameBufferViewport.flipY
+                            width, height, 0, 0, width, height, frameBufferViewport.flipX, !frameBufferViewport.flipY
                     );
                 }
             }
@@ -2984,14 +2985,43 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 spriteRenderer.loadState();
 
                 if (textField.content != null) {
-                    render_drawFont(textField.content.substring(textField.offset), uiCommonUtils.component_getAbsoluteX(textField), uiCommonUtils.component_getAbsoluteY(textField),
-                            textField.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(textField.width) - 4);
+                    //String contentString = textField.content.substring(textField.offset);
+
+
+                    // Marker
+                    int begin = Math.max(textField.markedContentBegin - textField.offset, 0);
+                    int end = Math.max(textField.markedContentEnd - textField.offset, 0);
+                    if ((end - begin) > 0) {
+                        int drawFrom = render_textWidth(textField.content, 0, begin);
+                        int drawTo = Math.min(drawFrom + render_textWidth(textField.content, begin, end), TS(textField.width));
+                        int drawWidth = drawTo - drawFrom;
+                        if (drawWidth > 0) {
+                            spriteRenderer.saveState();
+                            render_setColor(spriteRenderer, textField.markerColor, componentAlpha, false);
+                            int drawXFrom = uiCommonUtils.component_getAbsoluteX(textField) + drawFrom + 1;
+                            drawWidth++;
+                            spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,
+                                    drawXFrom,
+                                    uiCommonUtils.component_getAbsoluteY(textField),
+                                    drawWidth, 8
+                            );
+                            spriteRenderer.loadState();
+                        }
+                    }
+
+                    // Text
+                    render_drawFont(textField.content, uiCommonUtils.component_getAbsoluteX(textField), uiCommonUtils.component_getAbsoluteY(textField),
+                            textField.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(textField.width),null, 0, null,false,false, textField.offset, textField.content.length());
+
+                    // Caret
                     if (uiCommonUtils.textField_isFocused(textField)) {
-                        int xOffset = render_textWidth(textField.content.substring(textField.offset, textField.markerPosition)) + 2;
+                        int xOffset = render_textWidth(textField.content, textField.offset, textField.caretPosition) + 1;
                         if (xOffset < TS(textField.width)) {
                             spriteRenderer.drawCMediaAnimation(UIEngineBaseMedia_8x8.UI_TEXTFIELD_CARET, uiCommonUtils.ui_getAnimationTimer(uiEngineState), uiCommonUtils.component_getAbsoluteX(textField) + xOffset, uiCommonUtils.component_getAbsoluteY(textField));
                         }
                     }
+
+
                 }
             }
             case Grid grid -> {
@@ -3301,28 +3331,35 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private int render_textWidth(String text) {
+        return render_textWidth(text, 0, text.length());
+    }
+
+    private int render_textWidth(String text, int start, int end) {
         if (text == null || text.length() == 0) return 0;
-        return mediaManager.fontTextWidth(uiEngineState.config.ui_font, text);
+        return mediaManager.fontTextWidth(uiEngineState.config.ui_font, text, start, end);
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale) {
-        render_drawFont(text, x, y, color, alpha, iconGrayScale, 0, 0, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, 0, 0, FONT_MAXWIDTH_NONE, null, 0, null, false, false, 0, text.length());
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset) {
-        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, FONT_MAXWIDTH_NONE, null, 0, null, false, false);
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, FONT_MAXWIDTH_NONE, null, 0, null, false, false, 0, text.length());
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth) {
-        render_drawFont(text, x, y, alpha, iconGrayScale, color, textXOffset, textYOffset, maxWidth);
+        render_drawFont(text, x, y,color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null,0,null,false,false , 0, text.length());
     }
 
     private void render_drawFont(String text, int x, int y, float alpha, boolean iconGrayScale, Color color, int textXOffset, int textYOffset, int maxWidth) {
-        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null, 0, null, false, false);
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null, 0, null, false, false, 0, text.length());
     }
 
-
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY) {
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, icon, iconIndex, iconColor, iconFlipX, iconFlipY, 0, text.length());
+    }
+
+    private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY, int textOffset, int textLength) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final BitmapFont font = mediaManager.font(uiEngineState.config.ui_font);
         final boolean withIcon = icon != null;
@@ -3335,7 +3372,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         font.setColor(color.r, color.g, color.b, 1f);
 
         if (withIcon) maxWidth -= TS();
-        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, 0, text.length(), false, false, maxWidth);
+        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, textOffset, textLength, false, false, maxWidth);
 
 
         spriteRenderer.loadState();

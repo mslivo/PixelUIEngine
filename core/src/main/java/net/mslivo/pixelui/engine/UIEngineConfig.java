@@ -64,6 +64,7 @@ public final class UIEngineConfig {
     public int tooltip_FadeInDelay;
     public float tooltip_FadeoutSpeed;
     public char[] component_textFieldDefaultAllowedCharacters;
+    public Color component_textFieldDefaultMarkerColor;
     public char[] mouseTextInput_defaultLowerCaseCharacters;
     public char[] mouseTextInput_defaultUpperCaseCharacters;
     public Color mouseTextInput_defaultColor;
@@ -146,6 +147,7 @@ public final class UIEngineConfig {
                 '"', '(', ')', '_',
                 ' '
         };
+        component_textFieldDefaultMarkerColor = Color.valueOf("8FD3FF");
         notification_max = 20;
         notification_defaultDisplayTime = 120;
         notification_defaultColor = DEFAULT_COlOR.cpy();

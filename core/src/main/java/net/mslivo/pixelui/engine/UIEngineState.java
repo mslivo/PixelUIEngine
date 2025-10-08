@@ -79,7 +79,7 @@ public final class UIEngineState {
     public Knob pressedKnob;
     public AppViewport pressedAppViewPort;
     public Textfield pressedTextField;
-    public int pressedTextFieldMouseX;
+    public int pressedTextFieldInitCaretPosition;
     public Textfield focusedTextField;
     public int focusedTextField_repeatedKey;
     public long focusedTextField_repeatedKeyTimer;

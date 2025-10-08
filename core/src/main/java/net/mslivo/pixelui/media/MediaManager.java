@@ -712,7 +712,8 @@ public final class MediaManager implements Disposable {
 
     public int fontTextWidth(final CMediaFont cMediaFont, final CharSequence text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
-        glyphLayout.setText(font, text, start, end, font.getColor(), 0, Align.left, false, null);
+        final int textLength = text.length();
+        glyphLayout.setText(font, text, Math.min(start,textLength), Math.min(end,textLength), font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.width);
     }
 
