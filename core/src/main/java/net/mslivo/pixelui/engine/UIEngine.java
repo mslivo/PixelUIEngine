@@ -3012,7 +3012,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         int drawFrom = render_textWidth(textField.content, 0, begin);
                         int drawTo = Math.min(drawFrom + render_textWidth(textField.content, begin, end), TS(textField.width));
                         int drawWidth = drawTo - drawFrom;
-                        System.out.println(drawFrom+"-"+drawTo);
                         if (drawWidth > 0) {
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, textField.markerColor, componentAlpha, false);
