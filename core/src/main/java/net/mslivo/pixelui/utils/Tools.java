@@ -722,6 +722,10 @@ public class Tools {
             return MathUtils.lerp(range[0],range[1],pct);
         }
 
+        public static int lerpRange(int[] range, float pct) {
+            return MathUtils.round(MathUtils.lerp(range[0],range[1],pct));
+        }
+
         public static boolean randomChance(long oneIn) {
             if (oneIn <= 0) return false;
             return MathUtils.random(1, oneIn) == 1;
