@@ -25,6 +25,7 @@ import net.mslivo.pixelui.utils.Tools;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.util.Arrays;
 
@@ -154,6 +155,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.pressedTextField = null;
         newUIEngineState.pressedTextFieldInitCaretPosition = 0;
         newUIEngineState.focusedTextField = null;
+        newUIEngineState.focusedTextField_repeatedKey = KeyCode.NONE;
+        newUIEngineState.focusedTextField_repeatedKeyTimer = 0;
         newUIEngineState.notifications = new Array<>();
         newUIEngineState.tooltipNotifications = new Array<>();
         newUIEngineState.hotKeys = new Array<>();
@@ -974,7 +977,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiEngineState.focusedTextField_repeatedKeyTimer = -20;
                         }
                         uiCommonUtils.textField_executeControlKey(focusedTextField, keyDownKeyCode);
-                    } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) { // paste
+                    } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                        // paste
                         String pasteContent = getClipboardContent();
                         if (pasteContent != null) {
                             char[] contentChars = pasteContent.toCharArray();
@@ -983,7 +987,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             }
                         }
 
+                    }else if (keyDownKeyCode == KeyCode.Key.C && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                        // Copy
+                        setClipboardContent(uiCommonUtils.textField_getMarkedContent(focusedTextField));
+                    }else if (keyDownKeyCode == KeyCode.Key.X && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                        // Cut
+                        setClipboardContent(uiCommonUtils.textField_removeMarkedContent(focusedTextField));
                     }
+
 
                     uiCommonUtils.setKeyboardInteractedUIObject(focusedTextField);
                 }
@@ -1031,6 +1042,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
             }
         }
+    }
+
+    private void setClipboardContent(String content) {
+        if (content == null) return;
+        StringSelection selection = new StringSelection(content);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
     }
 
     private String getClipboardContent() {
@@ -2995,6 +3012,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         int drawFrom = render_textWidth(textField.content, 0, begin);
                         int drawTo = Math.min(drawFrom + render_textWidth(textField.content, begin, end), TS(textField.width));
                         int drawWidth = drawTo - drawFrom;
+                        System.out.println(drawFrom+"-"+drawTo);
                         if (drawWidth > 0) {
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, textField.markerColor, componentAlpha, false);
@@ -3002,8 +3020,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             drawWidth++;
                             spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,
                                     drawXFrom,
-                                    uiCommonUtils.component_getAbsoluteY(textField),
-                                    drawWidth, 8
+                                    uiCommonUtils.component_getAbsoluteY(textField)+1,
+                                    drawWidth, 7
                             );
                             spriteRenderer.loadState();
                         }

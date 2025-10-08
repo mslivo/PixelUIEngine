@@ -1000,7 +1000,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         final String truncate = maxWidth > 0 ? "" : null;
 
         fontCache.clear();
-        fontCache.addText(text, x_draw, y_draw, start, Math.min(end, text.length()), maxWidth, Align.left, false, truncate);
+        fontCache.addText(text, x_draw, y_draw, Math.min(start,end), Math.min(end, text.length()), maxWidth, Align.left, false, truncate);
 
         // Multiply by Batch Color
         Color.abgr8888ToColor(this.tempColor, this.color);
