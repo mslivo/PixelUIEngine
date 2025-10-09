@@ -993,6 +993,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     }else if (keyDownKeyCode == KeyCode.Key.X && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // Cut
                         setClipboardContent(uiCommonUtils.textField_removeMarkedContent(focusedTextField));
+                    }else if (keyDownKeyCode == KeyCode.Key.A && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                        // Select all
+                        focusedTextField.markedContentBegin = 0;
+                        focusedTextField.markedContentEnd = focusedTextField.content.length();
                     }
 
 
@@ -3006,25 +3010,42 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
                     // Marker
-                    int begin = Math.max(textField.markedContentBegin - textField.offset, 0);
-                    int end = Math.max(textField.markedContentEnd - textField.offset, 0);
-                    if ((end - begin) > 0) {
+// Marker
+                    int begin = textField.markedContentBegin;
+                    int end = textField.markedContentEnd;
+                    if (end > begin) {
+                        // Compute in text-space first
                         int drawFrom = render_textWidth(textField.content, 0, begin);
-                        int drawTo = Math.min(drawFrom + render_textWidth(textField.content, begin, end), TS(textField.width));
+                        int drawTo = render_textWidth(textField.content, 0, end);
+
+                        // Shift by scroll offset (in pixels)
+                        int scrollOffsetPx = render_textWidth(textField.content, 0, textField.offset);
+                        drawFrom -= scrollOffsetPx;
+                        drawTo   -= scrollOffsetPx;
+
+                        // Clip to visible text area (not to 0-based text indices)
+                        drawFrom = Math.max(drawFrom, 0);
+                        drawTo   = Math.min(drawTo, TS(textField.width));
+
                         int drawWidth = drawTo - drawFrom;
                         if (drawWidth > 0) {
                             spriteRenderer.saveState();
                             render_setColor(spriteRenderer, textField.markerColor, componentAlpha, false);
+
                             int drawXFrom = uiCommonUtils.component_getAbsoluteX(textField) + drawFrom + 1;
                             drawWidth++;
-                            spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_PIXEL,
+
+                            spriteRenderer.drawCMediaImage(
+                                    UIEngineBaseMedia_8x8.UI_PIXEL,
                                     drawXFrom,
-                                    uiCommonUtils.component_getAbsoluteY(textField)+1,
+                                    uiCommonUtils.component_getAbsoluteY(textField) + 1,
                                     drawWidth, 7
                             );
+
                             spriteRenderer.loadState();
                         }
                     }
+
 
                     // Text
                     render_drawFont(textField.content, uiCommonUtils.component_getAbsoluteX(textField), uiCommonUtils.component_getAbsoluteY(textField),

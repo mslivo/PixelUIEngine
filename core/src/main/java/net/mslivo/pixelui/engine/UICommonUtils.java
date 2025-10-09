@@ -39,6 +39,7 @@ public class UICommonUtils {
 
     private final UIEngineState uiEngineState;
     private final MediaManager mediaManager;
+    private StringBuilder testStringBuilder = new StringBuilder();
 
     UICommonUtils(UIEngineState uiEngineState, MediaManager mediaManager) {
         this.uiEngineState = uiEngineState;
@@ -578,11 +579,13 @@ public class UICommonUtils {
     }
 
     public int textField_findTextPosition(Textfield textField, int mouseX) {
-        String testString = "";
-        for (int i = 0; i < textField.content.length(); i++) {
-            testString += textField.content.charAt(i);
-            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, testString) > mouseX) {
-                return Math.min(textField.offset + i, textField.content.length());
+        testStringBuilder.setLength(0);
+        int checkRange = textField.content.length()-textField.offset;
+        for (int i = 0; i < checkRange; i++) {
+            int realOffset = textField.offset+i;
+            testStringBuilder.append(textField.content.charAt(realOffset));
+            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, testStringBuilder.toString()) > mouseX) {
+                return Math.min(realOffset, textField.content.length());
             }
         }
         // If mouse past end, return end position
