@@ -478,37 +478,47 @@ public final class APIWidgets {
             }
             return ret;
         }
-
         public Array<Component> createScrollAbleText(int x, int y, int width, int height, String[] text) {
             Array<Component> result = new Array<>();
 
-            ScrollbarVertical scrollBarVertical = api.component.scrollbar.scrollbarVertical.create(x + width - 1, y, height);
-            String[] textConverted;
-            String[] textDisplayedLines = new String[height];
+            final ScrollbarVertical scrollBarVertical =
+                    api.component.scrollbar.scrollbarVertical.create(x + width - 1, y, height);
 
-            // Scrollbar
+            final String[] textDisplayedLines = new String[height];
+
+            // Convert input text into wrapped lines that fit into (width - 1) columns
+            final String[] textConverted;
             if (text != null) {
                 Array<String> textList = new Array<>();
-                int pixelWidth = ((width - 1) * api.TS());
+                final int pixelWidth =  api.TS(width - 1);
+
                 for (int i = 0; i < text.length; i++) {
-                    String textLine = text[i];
-                    textLine = Tools.Text.validString(textLine);
+                    String textLine = Tools.Text.validString(text[i]);
                     if (textLine.trim().length() > 0) {
-                        String[] split = textLine.split(" ");
-                        if (split.length > 0) {
+                        String[] words = textLine.split("\\s+");
+                        if (words.length > 0) {
                             StringBuilder currentLine = new StringBuilder();
-                            for (int i2 = 0; i2 < split.length; i2++) {
-                                String value = split[i2];
-                                if (mediaManager.fontTextWidth(uiEngineConfig.ui_font, currentLine + value + " ") >= pixelWidth) {
-                                    textList.add(currentLine.toString());
-                                    currentLine = new StringBuilder(value + " ");
+                            for (int w = 0; w < words.length; w++) {
+                                String value = words[w];
+                                // Predict candidate line (add a trailing space while building)
+                                String candidate = currentLine.length() == 0
+                                        ? value + " "
+                                        : currentLine.toString() + value + " ";
+
+                                if (mediaManager.fontTextWidth(uiEngineConfig.ui_font, candidate) >= pixelWidth) {
+                                    // Flush current line
+                                    String flushed = currentLine.toString().trim();
+                                    if (flushed.length() > 0) textList.add(flushed);
+                                    // Start a new line with the word
+                                    currentLine.setLength(0);
+                                    currentLine.append(value).append(' ');
                                 } else {
-                                    currentLine.append(value).append(" ");
+                                    currentLine.setLength(0);
+                                    currentLine.append(candidate);
                                 }
                             }
-                            if (currentLine.toString().trim().length() > 0) {
-                                textList.add(currentLine.toString());
-                            }
+                            String last = currentLine.toString().trim();
+                            if (last.length() > 0) textList.add(last);
                         }
                     } else {
                         textList.add("");
@@ -519,57 +529,70 @@ public final class APIWidgets {
                 textConverted = new String[]{};
             }
 
-            // Text
-            Text[] texts = new Text[height];
+            // Create text rows
+            final Text[] texts = new Text[height];
             for (int i = 0; i < height; i++) {
-                texts[i] = api.component.text.create(x, y + 1, width - 1, null);
+                texts[i] = api.component.text.create(x, y + i, width - 1, null);
+                // Per-row mouse scroll handler: use the provided 'scrolled' delta
                 api.component.text.setTextAction(texts[i], new TextAction() {
                     @Override
                     public void onMouseScroll(float scrolled) {
-                        float scrollAmount = (-1 / (float) Math.max(textConverted.length, 1)) * api.input.mouse.event.scrolledAmount();
-                        uiCommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + scrollAmount);
+                        // How many extra lines beyond the viewport?
+                        int extra = Math.max(textConverted.length - height, 0);
+                        // If nothing to scroll, ignore
+                        if (extra == 0) return;
+
+                        // One wheel notch ≈ one line. Negative to make wheel-up scroll up.
+                        float step = -scrolled / (float) extra;
+
+                        float target = scrollBarVertical.scrolled + step;
+                        // Clamp to [0, 1]
+                        if (target < 0f) target = 0f;
+                        else if (target > 1f) target = 1f;
+
+                        uiCommonUtils.scrollBar_scroll(scrollBarVertical, target);
                     }
                 });
                 result.add(texts[i]);
             }
 
+            // Scrollbar action → map to which lines to show
             api.component.scrollbar.setScrollBarAction(scrollBarVertical, new ScrollBarAction() {
                 @Override
                 public void onScrolled(float scrolledPct) {
+                    // Convert to "top-aligned" fraction (0 = top, 1 = bottom)
                     float scrolled = 1f - scrolledPct;
-                    int scrolledTextIndex;
-                    if (textConverted.length > height) {
-                        scrolledTextIndex = MathUtils.round((textConverted.length - height) * scrolled);
-                    } else {
-                        scrolledTextIndex = 0;
-                    }
+
+                    int extra = Math.max(textConverted.length - height, 0);
+                    int scrolledTextIndex = (extra > 0)
+                            ? MathUtils.clamp(MathUtils.round(extra * scrolled), 0, extra)
+                            : 0;
+
                     for (int iy = 0; iy < height; iy++) {
                         int textIndex = scrolledTextIndex + iy;
-                        if (textIndex < textConverted.length) {
-                            textDisplayedLines[iy] = textConverted[textIndex];
-                        } else {
-                            textDisplayedLines[iy] = "";
-                        }
+                        textDisplayedLines[iy] = (textIndex < textConverted.length)
+                                ? textConverted[textIndex]
+                                : "";
                     }
 
                     for (int i = 0; i < texts.length; i++) {
                         api.component.text.setText(texts[i], textDisplayedLines[i]);
                     }
-
                 }
             });
 
-            // Init
+            // Initialize: show top
             uiCommonUtils.scrollBar_scroll(scrollBarVertical, 1f);
+
+            // Disable scrollbar if not needed
             if (textConverted.length <= height) {
                 api.component.setDisabled(scrollBarVertical, true);
             }
 
-
             result.add(scrollBarVertical);
-
             return result;
         }
+
 
         public Text createClickableURL(int x, int y, String url) {
             return createClickableURL(x, y, url, url, Color.BLACK, url, Color.BLUE);
