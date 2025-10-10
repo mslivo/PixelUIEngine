@@ -490,11 +490,18 @@ public final class APIWidgets {
             final String[] textConverted;
             if (text != null) {
                 Array<String> textList = new Array<>();
-                final int pixelWidth =  api.TS(width - 1);
+                final int pixelWidth = api.TS(width - 1);
 
                 for (int i = 0; i < text.length; i++) {
                     String textLine = Tools.Text.validString(text[i]);
                     if (textLine.trim().length() > 0) {
+
+                        // --- NEW: detect a color tag once per original line ---
+                        java.util.regex.Matcher m = java.util.regex.Pattern
+                                .compile("\\[#([0-9a-fA-F]{6})]")
+                                .matcher(textLine);
+                        final String colorTag = m.find() ? m.group(0) : null;
+
                         String[] words = textLine.split("\\s+");
                         if (words.length > 0) {
                             StringBuilder currentLine = new StringBuilder();
@@ -503,12 +510,17 @@ public final class APIWidgets {
                                 // Predict candidate line (add a trailing space while building)
                                 String candidate = currentLine.length() == 0
                                         ? value + " "
-                                        : currentLine.toString() + value + " ";
+                                        : currentLine + value + " ";
 
                                 if (mediaManager.fontTextWidth(uiEngineConfig.ui_font, candidate) >= pixelWidth) {
                                     // Flush current line
                                     String flushed = currentLine.toString().trim();
-                                    if (flushed.length() > 0) textList.add(flushed);
+                                    if (flushed.length() > 0) {
+                                        // --- NEW: force color on every wrapped sub-line ---
+                                        if (colorTag != null && !flushed.startsWith("[#")) flushed = colorTag + flushed;
+                                        if (!flushed.endsWith("[]")) flushed = flushed + "[]";
+                                        textList.add(flushed);
+                                    }
                                     // Start a new line with the word
                                     currentLine.setLength(0);
                                     currentLine.append(value).append(' ');
@@ -518,7 +530,12 @@ public final class APIWidgets {
                                 }
                             }
                             String last = currentLine.toString().trim();
-                            if (last.length() > 0) textList.add(last);
+                            if (last.length() > 0) {
+                                // --- NEW: same enforcement for the final sub-line ---
+                                if (colorTag != null && !last.startsWith("[#")) last = colorTag + last;
+                                if (!last.endsWith("[]")) last = last + "[]";
+                                textList.add(last);
+                            }
                         }
                     } else {
                         textList.add("");
