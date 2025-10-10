@@ -93,6 +93,22 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
 
     private Array<Component> createTab4(API api, Window window) {
+
+        String[] text = {
+                "11111111",
+                "22222222",
+                "33333333",
+                "44444444",
+                "55555555",
+                "66666666",
+                "77777777 88888 99999 909 0 090 909 09 09 [#ff0000]TEST[]",
+        };
+
+        Array<Component> textComponent = api.widgets.text.createScrollAbleText(1,8,10,6,text);
+
+
+
+
         Text text1 = api.component.text.create(1, 5, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         Text text2 = api.component.text.create(1, 4, 0, "abcdefghijklmnopqrstuvwxyz");
         Text text3 = api.component.text.create(1, 3, 0, "0123456789");
@@ -100,8 +116,10 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         Text text5 = api.component.text.create(1, 1, 0, "A.A");
 
 
-        Array<Component> components = new Array<>(new Text[]{text1, text2, text3, text4, text5});
-        api.window.addComponents(window, components.toArray());
+        Array<Component> components = new Array<>();
+        components.addAll(text1, text2, text3, text4, text5);
+        components.addAll(textComponent);
+        api.window.addComponents(window, components.toArray(Component[]::new));
         return components;
     }
 

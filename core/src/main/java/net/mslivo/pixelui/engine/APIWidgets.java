@@ -532,7 +532,8 @@ public final class APIWidgets {
             // Create text rows
             final Text[] texts = new Text[height];
             for (int i = 0; i < height; i++) {
-                texts[i] = api.component.text.create(x, y + i, width - 1, null);
+                int text_y = y + ((height-1)-i);
+                texts[i] = api.component.text.create(x, text_y, width - 1, null);
                 // Per-row mouse scroll handler: use the provided 'scrolled' delta
                 api.component.text.setTextAction(texts[i], new TextAction() {
                     @Override
@@ -561,12 +562,13 @@ public final class APIWidgets {
                 @Override
                 public void onScrolled(float scrolledPct) {
                     // Convert to "top-aligned" fraction (0 = top, 1 = bottom)
-                    float scrolled = 1f - scrolledPct;
+                    float scrolled = 1f-scrolledPct;
 
                     int extra = Math.max(textConverted.length - height, 0);
                     int scrolledTextIndex = (extra > 0)
                             ? MathUtils.clamp(MathUtils.round(extra * scrolled), 0, extra)
                             : 0;
+
 
                     for (int iy = 0; iy < height; iy++) {
                         int textIndex = scrolledTextIndex + iy;
