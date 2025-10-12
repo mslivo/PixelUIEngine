@@ -95,8 +95,12 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
     private Array<Component> createTab4(API api, Window window) {
 
         String[] text = {
-                "[#ff0000]77777777 88888 99999 909 0 090 909 09 09 TEST[]",
+                "[#69357eff]You: whats up[]",
+                "[#863a9cff]Carp: It's just another day in the pond.[]",
+                "[#69357eff]You: how come?[]",
+                "[#863a9cff]Carp: Im just enjoying the warm sunshine.[]"
         };
+
 
         Array<Component> textComponent = api.widgets.text.createScrollAbleText(1,8,10,6,text);
 

@@ -569,7 +569,11 @@ public final class APIComponent {
                     }
                 }
             }
-            tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size - 1);
+            if(tabBar.tabs.isEmpty()){
+                tabBar.selectedTab = 0;
+            }else{
+                tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size - 1);
+            }
             return tabBar;
         }
 
