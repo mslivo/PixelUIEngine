@@ -13,6 +13,7 @@ public class Tab {
     public Array<Component> components;
     public String name;
     public Object data;
+    public boolean disabled;
 
     Tab() {
     }

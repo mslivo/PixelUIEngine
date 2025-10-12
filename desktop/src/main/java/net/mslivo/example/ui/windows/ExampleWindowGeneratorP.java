@@ -63,12 +63,17 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
             }
         }));
-        tabs.add(api.component.tabbar.tab.create("Tab II", components_tab2.toArray(Component[]::new), new TabAction() {
+
+        Tab tab2 = api.component.tabbar.tab.create("Tab II", components_tab2.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_BULLET_BLUE;
             }
-        }));
+        });
+        tabs.add(tab2);
+
+        api.component.tabbar.tab.setDisabled(tab2, true);
+
         tabs.add(api.component.tabbar.tab.create("Tab III", components_tab3.toArray(Component[]::new), new TabAction() {
             @Override
             public CMediaSprite icon() {
@@ -148,7 +153,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
         // Shape
         Shape oval = api.component.shape.create(11, 3, 4, 4, SHAPE_TYPE.OVAL);
-        api.component.setDisabled(oval, true);
+        api.component.setDisabled(oval, false);
         api.component.setColor(oval, Color.GREEN);
 
         Shape rect = api.component.shape.create(11, 8, 2, 2, SHAPE_TYPE.RECT);
@@ -179,6 +184,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
                 oval.color.b = scrolled;
             }
         }, oval.color.b);
+
         api.component.setColor(scrollBarHorizontalB, new Color(0f, 0f, 1f, 1f));
         api.component.setColor2(scrollBarHorizontalB, new Color(0f, 0f, 0.8f, 1f));
 

@@ -3135,6 +3135,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 int topBorder;
                 for (int i = 0; i < tabBar.tabs.size; i++) {
                     Tab tab = tabBar.tabs.get(i);
+
+                    boolean tabGrayscale = componentGrayScale || tab.disabled;
+
+
                     int tabWidth = tabBar.bigIconMode ? 2 : tab.width;
                     if ((tabXOffset + tabWidth) > tabBar.width) break;
 
@@ -3145,7 +3149,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         spriteRenderer.drawCMediaImage(tabGraphic, uiCommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), uiCommonUtils.component_getAbsoluteY(tabBar));
                         int selected_offset = selected ? 0 : 1;
                         render_drawIcon(tab.tabAction.icon(), uiCommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset) + selected_offset, uiCommonUtils.component_getAbsoluteY(tabBar) - selected_offset,
-                                tab.tabAction.iconColor(), componentAlpha, componentGrayScale,
+                                tab.tabAction.iconColor(), componentAlpha, tabGrayscale,
                                 tab.tabAction.iconIndex(), true,
                                 tab.tabAction.iconFlipX(), tab.tabAction.iconFlipY());
                     } else {
@@ -3157,11 +3161,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                     if (!tabBar.bigIconMode) {
                         render_drawFont(tab.title, uiCommonUtils.component_getAbsoluteX(tabBar) + TS(tabXOffset), uiCommonUtils.component_getAbsoluteY(tabBar),
-                                tab.fontColor, componentAlpha, componentGrayScale, 2, 1, TS(tabWidth),
+                                tab.fontColor, componentAlpha, tabGrayscale, 2, 1, TS(tabWidth),
                                 tab.tabAction.icon(), tab.tabAction.iconIndex(), tab.tabAction.iconColor(),
                                 tab.tabAction.iconFlipX(), tab.tabAction.iconFlipY());
                     }
                     tabXOffset += tabWidth;
+
+
                 }
 
                 topBorder = tabBar.width - tabXOffset;
@@ -3189,7 +3195,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.end();
                     primitiveRenderer.begin(GL32.GL_TRIANGLES);
                     render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
-                    primitiveRenderer.setVertexColor(shape.color2);
+                    primitiveRenderer.setVertexColor(shape.color);
                     final int cx = uiCommonUtils.component_getAbsoluteX(shape);
                     final int cy = uiCommonUtils.component_getAbsoluteY(shape);
                     final int cw = TS(shape.width);

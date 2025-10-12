@@ -505,10 +505,14 @@ public class UICommonUtils {
     }
 
     public void tabBar_selectTab(Tabbar tabBar, int index) {
-        tabBar.selectedTab = Math.clamp(index, 0, tabBar.tabs.size - 1);
-        Tab tab = tabBar.tabs.get(tabBar.selectedTab);
+        int selectTab = Math.clamp(index, 0, tabBar.tabs.size - 1);
+        Tab tab = tabBar.tabs.get(selectTab);
+        if (tab.disabled)
+            return;
+        tabBar.selectedTab = selectTab;
         tab.tabAction.onSelect();
         tabBar.tabBarAction.onChangeTab(index, tab);
+
     }
 
 
@@ -580,9 +584,9 @@ public class UICommonUtils {
 
     public int textField_findTextPosition(Textfield textField, int mouseX) {
         testStringBuilder.setLength(0);
-        int checkRange = textField.content.length()-textField.offset;
+        int checkRange = textField.content.length() - textField.offset;
         for (int i = 0; i < checkRange; i++) {
-            int realOffset = textField.offset+i;
+            int realOffset = textField.offset + i;
             testStringBuilder.append(textField.content.charAt(realOffset));
             if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, testStringBuilder.toString()) > mouseX) {
                 return Math.min(realOffset, textField.content.length());
@@ -663,7 +667,7 @@ public class UICommonUtils {
         int to = Math.min(textField.markedContentEnd, textField.content.length());
         if (to - from <= 0)
             return "";
-        String markedContent = textField.content.substring(from,to);
+        String markedContent = textField.content.substring(from, to);
         return markedContent;
     }
 

@@ -710,6 +710,7 @@ public final class APIComponent {
                 tab.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
+                tab.disabled = false;
                 if (width == 0) {
                     tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui_font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
@@ -725,6 +726,11 @@ public final class APIComponent {
                     }
                 }
                 return tab;
+            }
+
+            public void setDisabled(Tab tab, boolean disabled){
+                if (tab == null) return;
+                tab.disabled = disabled;
             }
 
             public void setName(Tab tab, String name) {
