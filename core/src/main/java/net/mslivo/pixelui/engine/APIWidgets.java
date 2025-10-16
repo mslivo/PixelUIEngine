@@ -1035,11 +1035,12 @@ public final class APIWidgets {
                 ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8x8.UI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
-                            public void onToggle(boolean value) {
+                            public boolean onToggle(boolean value) {
                                 for (int i2 = 0; i2 < lowerCaseButtonsList.size; i2++)
                                     api.component.setVisible(lowerCaseButtonsList.get(i2), !value);
                                 for (int i2 = 0; i2 < upperCaseButtonsList.size; i2++)
                                     api.component.setVisible(upperCaseButtonsList.get(i2), value);
+                                return true;
                             }
                         }, BUTTON_MODE.TOGGLE);
                 api.component.move(caseButton, api.TS_HALF(), api.TS_HALF());
@@ -1304,7 +1305,7 @@ public final class APIWidgets {
                     }
 
                     @Override
-                    public void onToggle(boolean value) {
+                    public boolean onToggle(boolean value) {
                         if (value) {
                             api.component.button.setToggleDisabled(button, true);
                             for (int i = 0; i < buttons.length; i++) {
@@ -1317,6 +1318,7 @@ public final class APIWidgets {
                             }
                             toggleFunction.accept(button, true);
                         }
+                        return true;
                     }
 
                     @Override

@@ -807,16 +807,13 @@ public class Tools {
                 return false;
             }
 
-            default boolean doInRadiusContinue(int x_center, int y_center, int x, int y) {
-                return false;
-            }
         }
 
         private static void doInRadiusInternal(int x, int y, int radius, DoInRadiusFunction radiusFunction) {
             for (int iy = -radius; iy <= radius; iy++) {
                 for (int ix = -radius; ix <= radius; ix++) {
                     if ((ix * ix) + (iy * iy) <= (radius * radius)) {
-                        if (!radiusFunction.doInRadiusContinue(x, y, x + ix, y + iy)) {
+                        if (!radiusFunction.doInRadiusContinue(x, y, x + ix, y + iy, null)) {
                             return;
                         }
                     }
@@ -856,7 +853,7 @@ public class Tools {
             } else {
                 for (int i = 0; i < cached.size; i++) {
                     long positions = cached.get(i);
-                    if (!radiusFunction.doInRadiusContinue(x, y, x + ((int) (positions >> 32)), y + ((int) positions)))
+                    if (!radiusFunction.doInRadiusContinue(x, y, x + ((int) (positions >> 32)), y + ((int) positions), null))
                         return;
                 }
             }

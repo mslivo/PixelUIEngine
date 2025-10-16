@@ -538,8 +538,9 @@ public class UICommonUtils {
 
     public void button_toggle(Button button, boolean pressed) {
         if (button.toggleDisabled || button.pressed == pressed || button.mode != BUTTON_MODE.TOGGLE) return;
-        button.pressed = pressed;
-        button.buttonAction.onToggle(button.pressed);
+        if (button.buttonAction.onToggle(pressed)) {
+            button.pressed = pressed;
+        }
     }
 
     public void button_centerContent(MediaManager mediaManager, Button button) {

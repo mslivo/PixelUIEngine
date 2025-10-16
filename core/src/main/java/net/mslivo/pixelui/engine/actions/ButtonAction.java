@@ -11,7 +11,8 @@ public interface ButtonAction extends CommonActions, Icon {
     default void onRelease() {
     }
 
-    default void onToggle(boolean value) {
+    default boolean onToggle(boolean value) {
+        return true;
     }
 
 }
