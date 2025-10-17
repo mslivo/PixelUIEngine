@@ -597,6 +597,15 @@ public class UICommonUtils {
         return Math.min(textField.offset + textField.content.length(), textField.content.length());
     }
 
+    public void textField_resetMarkedContent(Textfield textField) {
+        textField_setMarkedContent(textField,0,0);
+    }
+
+    public void textField_setMarkedContent(Textfield textField, int begin, int end) {
+        textField.markedContentBegin = Math.max(begin,0);
+        textField.markedContentEnd = Math.min(end,textField.content.length());
+    }
+
     public void textField_setCaretPosition(Textfield textField, int position) {
         textField.caretPosition = Math.clamp(position, 0, textField.content.length());
         if (textField.caretPosition < textField.offset) {
@@ -625,11 +634,19 @@ public class UICommonUtils {
 
     public void textField_executeControlKey(Textfield textField, int keyCode) {
 
-        boolean contentIsMarked = textField.markedContentEnd - textField.markedContentBegin > 0;
+        final boolean contentIsMarked = Math.abs(textField.markedContentEnd - textField.markedContentBegin) > 0;
 
         switch (keyCode) {
-            case Input.Keys.LEFT -> textField_setCaretPosition(textField, textField.caretPosition - 1);
-            case Input.Keys.RIGHT -> textField_setCaretPosition(textField, textField.caretPosition + 1);
+            case Input.Keys.LEFT -> {
+                int caretPosition = contentIsMarked ? textField.markedContentBegin : textField.caretPosition - 1;
+                textField_resetMarkedContent(textField);
+                textField_setCaretPosition(textField, caretPosition);
+            }
+            case Input.Keys.RIGHT -> {
+                int caretPosition = contentIsMarked ? textField.markedContentEnd : textField.caretPosition + 1;
+                textField_resetMarkedContent(textField);
+                textField_setCaretPosition(textField, caretPosition);
+            }
             case Input.Keys.BACKSPACE -> {
                 if (!textField.content.isEmpty()) {
                     if (contentIsMarked) {
@@ -678,7 +695,7 @@ public class UICommonUtils {
         if (to - from <= 0)
             return "";
         String cutContent = textField_getMarkedContent(textField);
-        textField.markedContentBegin = textField.markedContentEnd = 0;
+        textField_resetMarkedContent(textField);
         String newContent = textField.content.substring(0, from) + textField.content.substring(to, textField.content.length());
         textField_setContent(textField, newContent);
         textField.caretPosition = Math.clamp(from, 0, textField.content.length());
@@ -691,7 +708,7 @@ public class UICommonUtils {
             String newContent = textField.content.substring(0, textField.caretPosition) + character + textField.content.substring(textField.caretPosition);
             textField_setContent(textField, newContent);
             textField_setCaretPosition(textField, textField.caretPosition + 1);
-            textField.markedContentBegin = textField.markedContentEnd = 0;
+            textField_resetMarkedContent(textField);
             textField.textFieldAction.onTyped(character);
         }
     }

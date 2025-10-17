@@ -995,8 +995,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         setClipboardContent(uiCommonUtils.textField_removeMarkedContent(focusedTextField));
                     }else if (keyDownKeyCode == KeyCode.Key.A && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // Select all
-                        focusedTextField.markedContentBegin = 0;
-                        focusedTextField.markedContentEnd = focusedTextField.content.length();
+                        uiCommonUtils.textField_setMarkedContent(focusedTextField, 0,focusedTextField.content.length());
                     }
 
 
@@ -1218,8 +1217,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
 
                             uiEngineState.pressedTextFieldInitCaretPosition = textPosition;
-                            textField.markedContentBegin = textPosition;
-                            textField.markedContentEnd = textPosition;
+                            uiCommonUtils.textField_setMarkedContent(textField, textPosition, textPosition);
                             uiCommonUtils.textField_setCaretPosition(textField, textPosition);
 
                             // Set Focus
@@ -1549,9 +1547,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     case Textfield textField -> {
                         int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
                         int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
-                        textField.markedContentBegin = Math.min(textPosition, uiEngineState.pressedTextFieldInitCaretPosition);
-                        textField.markedContentEnd = Math.max(textPosition, uiEngineState.pressedTextFieldInitCaretPosition);
 
+
+                        uiCommonUtils.textField_setMarkedContent(textField,
+                                Math.min(textPosition, uiEngineState.pressedTextFieldInitCaretPosition),
+                                Math.max(textPosition, uiEngineState.pressedTextFieldInitCaretPosition)
+                        );
                         if (textFieldMouseX < 0) {
                             textPosition -= 1;
                         }

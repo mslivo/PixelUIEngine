@@ -935,8 +935,7 @@ public final class APIComponent {
             textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
             textField.caretPosition = textField.content.length();
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
-            textField.markedContentBegin = 0;
-            textField.markedContentEnd = 0;
+            textField.markedContentBegin = textField.markedContentEnd = 0;
             textField.markerColor = uiEngineConfig.component_textFieldDefaultMarkerColor.cpy();
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
             return textField;
