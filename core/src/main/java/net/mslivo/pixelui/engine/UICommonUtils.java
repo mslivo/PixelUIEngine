@@ -943,6 +943,7 @@ public class UICommonUtils {
 
     public void textField_unFocus(Textfield textField) {
         if (textField_isFocused(textField)) {
+            textField_resetMarkedContent(textField);
             resetFocusedTextFieldReference(uiEngineState);
             textField.textFieldAction.onUnFocus();
         }
