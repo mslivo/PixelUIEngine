@@ -47,7 +47,7 @@ public final class CMediaFont extends CMedia implements Serializable {
         }
 
         if (outline != null) {
-            this.outline = new CMediaFontOutline(outline.color, outline.directions, outline.withSymbols, outline.outlineOnly);
+            this.outline = new CMediaFontOutline(outline.color, outline.directions, outline.outlineSymbols, outline.outlineOnly);
         } else {
             this.outline = null;
         }

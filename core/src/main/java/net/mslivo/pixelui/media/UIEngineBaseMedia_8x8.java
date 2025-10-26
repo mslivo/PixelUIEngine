@@ -1,5 +1,7 @@
 package net.mslivo.pixelui.media;
 
+import com.badlogic.gdx.graphics.Color;
+
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
  */
@@ -90,7 +92,7 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true, null,null, false);
+    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true, null,new CMediaFontOutline(Color.GRAY,OUTLINE.ALL,true,false), false);
     public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt", true);
 
     // Misc

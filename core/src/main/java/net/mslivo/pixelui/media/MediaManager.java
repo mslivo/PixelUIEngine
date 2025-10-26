@@ -16,7 +16,6 @@ import net.mslivo.pixelui.rendering.ExtendedAnimation;
 import net.mslivo.pixelui.utils.Tools;
 
 import java.io.*;
-import java.lang.StringBuilder;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +103,7 @@ public final class MediaManager implements Disposable {
     }
 
 
-    private Pixmap modifyPixmapAddOutline(Pixmap pixmap, CMediaFontOutline outline) {
+    private Pixmap modifyPixmapAddOutline(Pixmap pixmap, CMediaFontOutline outline, int symbolAreaY) {
         if (outline == null)
             return pixmap;
         pixmap.setBlending(Pixmap.Blending.None);
@@ -126,6 +125,10 @@ public final class MediaManager implements Disposable {
 
                 if (outline.outlineOnly)
                     removePoints.addLast(new GridPoint2(ix, iy));
+
+                if (!outline.outlineSymbols && iy > symbolAreaY) {
+                    continue;
+                }
 
                 // UP/DOWN/LEFT_RIGHT
                 if ((iy + 1) < pixmap.getHeight() && getPixelAlpha(pixmap.getPixel(ix, iy + 1)) == 0f && ((outline.directions & OUTLINE.DOWN) != 0))
@@ -179,10 +182,6 @@ public final class MediaManager implements Disposable {
 
         // Load Original Texture
         Pixmap pixmap = createTexturePixmap(bitMapFontInformation.textureFileHandle);
-
-        if (outline != null && !outline.withSymbols) {  // outline before adding symbols
-            modifyPixmapAddOutline(pixmap, outline);
-        }
 
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
@@ -265,11 +264,11 @@ public final class MediaManager implements Disposable {
         symbolAreaHeight += symbolHeightMax;
         int resultPixmapWidth = pixmap.getWidth();
         int originalHeight = pixmap.getHeight();
-        int reultPixMapHeight = originalHeight + symbolAreaHeight;
-        pixmap = copyPixmap(pixmap, resultPixmapWidth, reultPixMapHeight, 0, 0, pixmap.getWidth(), pixmap.getHeight());
+        int resultPixMapHeight = originalHeight + symbolAreaHeight;
+        pixmap = copyPixmap(pixmap, resultPixmapWidth, resultPixMapHeight, 0, 0, pixmap.getWidth(), pixmap.getHeight());
 
 
-        // copy symbols
+        // create symbols
         xCurrent = 0;
         symbolHeightMax = 0;
         int yCurrent = originalHeight;
@@ -303,9 +302,10 @@ public final class MediaManager implements Disposable {
             }
         }
 
+
         // outline everything
-        if (outline != null && outline.withSymbols) {
-            modifyPixmapAddOutline(pixmap, outline);
+        if (outline != null) {
+            modifyPixmapAddOutline(pixmap, outline, originalHeight);
         }
 
         // Dispose Symbol Pixmaps
@@ -450,7 +450,7 @@ public final class MediaManager implements Disposable {
                     }
                     try {
                         extendedAnimation.getKeyFrame(0);
-                    }catch (ArithmeticException e){
+                    } catch (ArithmeticException e) {
                         throw new RuntimeException(String.format(ERROR_ANIMATION_INVALID, cMediaAnimation.file));
                     }
                     medias_animations.put(cMediaAnimation, extendedAnimation);
@@ -713,7 +713,7 @@ public final class MediaManager implements Disposable {
     public int fontTextWidth(final CMediaFont cMediaFont, final CharSequence text, final int start, final int end) {
         final BitmapFont font = font(cMediaFont);
         final int textLength = text.length();
-        glyphLayout.setText(font, text, Math.min(start,textLength), Math.min(end,textLength), font.getColor(), 0, Align.left, false, null);
+        glyphLayout.setText(font, text, Math.min(start, textLength), Math.min(end, textLength), font.getColor(), 0, Align.left, false, null);
         return MathUtils.round(glyphLayout.width);
     }
 
