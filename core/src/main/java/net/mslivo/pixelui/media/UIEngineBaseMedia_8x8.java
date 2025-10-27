@@ -92,8 +92,8 @@ public class UIEngineBaseMedia_8x8 {
 
 
     // Fonts
-    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt", true, null,new CMediaFontOutline(Color.GRAY,OUTLINE.ALL,true,false), false);
-    public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt", true);
+    public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt");
+    public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt");
 
     // Misc
     public static final CMediaImage UI_PIXEL = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
