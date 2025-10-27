@@ -24,28 +24,28 @@ public final class UIEngineConfig {
         public float emulatedMouseCursorSpeed = 4.0f;
         public boolean hardwareMouseEnabled = true;
         public boolean keyboardMouseEnabled = false;
-        public int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
-        public int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
-        public int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
-        public int[] keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
-        public int[] keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
-        public int[] keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.ALT_LEFT};
-        public int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.SHIFT_LEFT};
+        public int[] keyboardMouseButtonsUp = {KeyCode.Key.UP};
+        public int[] keyboardMouseButtonsDown = {KeyCode.Key.DOWN};
+        public int[] keyboardMouseButtonsLeft = {KeyCode.Key.LEFT};
+        public int[] keyboardMouseButtonsRight = {KeyCode.Key.RIGHT};
+        public int[] keyboardMouseButtonsMouse1 = {KeyCode.Key.CONTROL_LEFT};
+        public int[] keyboardMouseButtonsMouse2 = {KeyCode.Key.ALT_LEFT};
+        public int[] keyboardMouseButtonsMouse3 = {KeyCode.Key.SHIFT_LEFT};
         public int[] keyboardMouseButtonsMouse4 = null;
         public int[] keyboardMouseButtonsMouse5 = null;
-        public int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
-        public int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
+        public int[] keyboardMouseButtonsScrollUp = {KeyCode.Key.PAGE_UP};
+        public int[] keyboardMouseButtonsScrollDown = {KeyCode.Key.PAGE_DOWN};
         public boolean gamePadMouseEnabled = false;
         public float gamePadMouseJoystickDeadZone = 0.3f;
         public boolean gamePadMouseStickLeftEnabled = true;
         public boolean gamePadMouseStickRightEnabled = true;
-        public int[] gamePadMouseButtonsMouse1 = new int[KeyCode.GamePad.A];
-        public int[] gamePadMouseButtonsMouse2 = new int[KeyCode.GamePad.B];
-        public int[] gamePadMouseButtonsMouse3 = new int[KeyCode.GamePad.Y];
+        public int[] gamePadMouseButtonsMouse1 = {KeyCode.GamePad.A};
+        public int[] gamePadMouseButtonsMouse2 = {KeyCode.GamePad.B};
+        public int[] gamePadMouseButtonsMouse3 = {KeyCode.GamePad.Y};
         public int[] gamePadMouseButtonsMouse4 = null;
         public int[] gamePadMouseButtonsMouse5 = null;
-        public int[] gamePadMouseButtonsScrollUp = new int[KeyCode.GamePad.DPAD_UP];
-        public int[] gamePadMouseButtonsScrollDown = new int[KeyCode.GamePad.DPAD_DOWN];
+        public int[] gamePadMouseButtonsScrollUp = {KeyCode.GamePad.DPAD_UP};
+        public int[] gamePadMouseButtonsScrollDown = {KeyCode.GamePad.DPAD_DOWN};
     }
 
     public class UI {
@@ -122,7 +122,7 @@ public final class UIEngineConfig {
     }
 
     public class MouseTextInput {
-        public char[]  defaultLowerCaseCharacters = new char[]{
+        public char[]  defaultLowerCaseCharacters = {
             'a', 'b', 'c', 'd', 'e', 'f',
                     'g', 'h', 'i', 'j', 'k', 'l',
                     'm', 'n', 'o', 'p', 'q', 'r',
@@ -130,7 +130,7 @@ public final class UIEngineConfig {
                     'x', 'y', 'z',
                     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
         };
-        public char[] defaultUpperCaseCharacters = new char[]{
+        public char[] defaultUpperCaseCharacters = {
             'A', 'B', 'C', 'D', 'E', 'F',
                     'G', 'H', 'I', 'J', 'K', 'L',
                     'M', 'N', 'O', 'P', 'Q', 'R',
