@@ -41,7 +41,7 @@ public final class API {
     public final APIMouseTool mouseTool;
     public final APIMouseTextInput mouseTextInput;
     public final APICamera camera;
-    public final APIConfig config;
+    public final UIEngineConfig config;
     public final APIWidgets widgets;
 
     API(UIEngineState uiEngineState, MediaManager mediaManager) {
@@ -60,8 +60,8 @@ public final class API {
         this.mouseTool = new APIMouseTool(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
         this.mouseTextInput = new APIMouseTextInput(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
         this.camera = new APICamera(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
-        this.config = new APIConfig(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
         this.widgets = new APIWidgets(this, this.uiEngineState, this.uiCommonUtils, mediaManager);
+        this.config = this.uiEngineConfig;
     }
 
     /* #################### Notifications #################### */
@@ -76,7 +76,7 @@ public final class API {
 
     public void addNotification(GenericNotification genericNotification) {
         if (genericNotification == null) return;
-        uiCommonUtils.notification_addToScreen(genericNotification, uiEngineConfig.notification_max);
+        uiCommonUtils.notification_addToScreen(genericNotification, uiEngineConfig.notification.maxNotifications);
     }
 
     public void addNotifications(GenericNotification[] genericNotifications) {

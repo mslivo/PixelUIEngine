@@ -178,15 +178,15 @@ public final class APITooltip {
             }
 
             public TooltipImageSegment create(CMediaSprite sprite) {
-                return create(sprite, 0, false, false, uiEngineConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, 0, false, false, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex) {
-                return create(sprite, arrayIndex, false, false, uiEngineConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, arrayIndex, false, false, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, boolean flipX, boolean flipY) {
-                return create(sprite, arrayIndex, flipX, flipY, uiEngineConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(sprite, arrayIndex, flipX, flipY, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipImageSegment create(CMediaSprite sprite, int arrayIndex, boolean flipX, boolean flipY, Color cellColor, Color contentColor) {
@@ -245,7 +245,7 @@ public final class APITooltip {
             }
 
             public TooltipTextSegment create(String text) {
-                return create(text, uiEngineConfig.tooltip_defaultCellColor, uiEngineConfig.ui_font_defaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
+                return create(text, uiEngineConfig.tooltip.defaultCellColor, uiEngineConfig.ui.fontDefaultColor, SEGMENT_ALIGNMENT.LEFT, false, false, false);
             }
 
             public TooltipTextSegment create(String text, Color cellColor, Color contentColor) {
@@ -267,7 +267,7 @@ public final class APITooltip {
             public TooltipTextSegment create(String text, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
                 TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
                 String segmentText = Tools.Text.validString(text);
-                int width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui_font, segmentText) + api.TS()) / api.TSF());
+                int width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, segmentText) + api.TS()) / api.TSF());
                 int height = 1;
                 setSegmentValues(tooltipTextSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
                 tooltipTextSegment.text = segmentText;
@@ -288,11 +288,11 @@ public final class APITooltip {
 
 
             public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer) {
-                return create(nestedFrameBuffer, uiEngineConfig.tooltip_defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
+                return create(nestedFrameBuffer, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
             public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, SEGMENT_ALIGNMENT alignment) {
-                return create(nestedFrameBuffer, uiEngineConfig.tooltip_defaultCellColor, Color.GRAY, alignment, 1, 1, false, false, false);
+                return create(nestedFrameBuffer, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, alignment, 1, 1, false, false, false);
 
             }
 

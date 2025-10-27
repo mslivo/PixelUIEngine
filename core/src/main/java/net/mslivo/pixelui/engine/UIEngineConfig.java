@@ -12,77 +12,51 @@ public final class UIEngineConfig {
     private static final Color DEFAULT_COlOR_BRIGHT = Color.valueOf("FFFFFF");
     private static final Color DEFAULT_COLOR_FONT = Color.valueOf("000000");
 
+    public final UI ui = new UI();
+    public final Input input = new Input();
+    public final Window window = new Window();
+    public final Component component = new Component();
+    public final Notification notification = new Notification();
+    public final Tooltip tooltip = new Tooltip();
+    public final MouseTextInput mouseTextInput = new MouseTextInput();
 
-    public CMediaFont ui_font;
-    public Color ui_font_defaultColor;
-    public CMediaSprite ui_cursor;
-    public boolean ui_keyInteractionsDisabled;
-    public boolean ui_mouseInteractionsDisabled;
-    public boolean ui_foldWindowsOnDoubleClick;
-    public AnimationTimerFunction ui_animationTimerFunction;
-    public float input_emulatedMouseCursorSpeed;
-    public boolean input_hardwareMouseEnabled;
-    public boolean input_keyboardMouseEnabled;
-    public int[] input_keyboardMouseButtonsUp;
-    public int[] input_keyboardMouseButtonsDown;
-    public int[] input_keyboardMouseButtonsLeft;
-    public int[] input_keyboardMouseButtonsRight;
-    public int[] input_keyboardMouseButtonsMouse1;
-    public int[] input_keyboardMouseButtonsMouse2;
-    public int[] input_keyboardMouseButtonsMouse3;
-    public int[] input_keyboardMouseButtonsMouse4;
-    public int[] input_keyboardMouseButtonsMouse5;
-    public int[] input_keyboardMouseButtonsScrollUp;
-    public int[] input_keyboardMouseButtonsScrollDown;
-    public boolean input_gamePadMouseEnabled;
-    public float input_gamePadMouseJoystickDeadZone;
-    public boolean input_gamePadMouseStickLeftEnabled;
-    public boolean input_gamePadMouseStickRightEnabled;
-    public int[] input_gamePadMouseButtonsMouse1;
-    public int[] input_gamePadMouseButtonsMouse2;
-    public int[] input_gamePadMouseButtonsMouse3;
-    public int[] input_gamePadMouseButtonsMouse4;
-    public int[] input_gamePadMouseButtonsMouse5;
-    public int[] input_gamePadMouseButtonsScrollUp;
-    public int[] input_gamePadMouseButtonsScrollDown;
-    public boolean window_defaultEnforceScreenBounds;
-    public Color window_defaultColor;
-    public Color component_defaultColor;
-    public Color contextMenu_defaultColor;
-    public int component_appViewportDefaultUpdateTime;
-    public float component_listDragAlpha;
-    public float component_gridDragAlpha;
-    public float component_knobSensitivity;
-    public float component_scrollbarSensitivity;
-    public float component_mapOverlayDefaultFadeoutSpeed;
-    public int notification_max;
-    public int notification_defaultDisplayTime;
-    public Color notification_defaultColor;
-    public int notification_foldTime;
-    public int notification_tooltip_defaultDisplayTime;
-    public int notification_tooltip_fadeoutTime;
-    public Color tooltip_defaultCellColor;
-    public float tooltip_FadeInSpeed;
-    public int tooltip_FadeInDelay;
-    public float tooltip_FadeoutSpeed;
-    public char[] component_textFieldDefaultAllowedCharacters;
-    public Color component_textFieldDefaultMarkerColor;
-    public char[] mouseTextInput_defaultLowerCaseCharacters;
-    public char[] mouseTextInput_defaultUpperCaseCharacters;
-    public Color mouseTextInput_defaultColor;
+    public class Input {
+        public float emulatedMouseCursorSpeed = 4.0f;
+        public boolean hardwareMouseEnabled = true;
+        public boolean keyboardMouseEnabled = false;
+        public int[] keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
+        public int[] keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
+        public int[] keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
+        public int[] keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
+        public int[] keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
+        public int[] keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.ALT_LEFT};
+        public int[] keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.SHIFT_LEFT};
+        public int[] keyboardMouseButtonsMouse4 = null;
+        public int[] keyboardMouseButtonsMouse5 = null;
+        public int[] keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
+        public int[] keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
+        public boolean gamePadMouseEnabled = false;
+        public float gamePadMouseJoystickDeadZone = 0.3f;
+        public boolean gamePadMouseStickLeftEnabled = true;
+        public boolean gamePadMouseStickRightEnabled = true;
+        public int[] gamePadMouseButtonsMouse1 = new int[KeyCode.GamePad.A];
+        public int[] gamePadMouseButtonsMouse2 = new int[KeyCode.GamePad.B];
+        public int[] gamePadMouseButtonsMouse3 = new int[KeyCode.GamePad.Y];
+        public int[] gamePadMouseButtonsMouse4 = null;
+        public int[] gamePadMouseButtonsMouse5 = null;
+        public int[] gamePadMouseButtonsScrollUp = new int[KeyCode.GamePad.DPAD_UP];
+        public int[] gamePadMouseButtonsScrollDown = new int[KeyCode.GamePad.DPAD_DOWN];
+    }
 
-    public UIEngineConfig() {
-
-        // Initialize Default Values
-        // ##### UI Default Values #####
-        ui_font = UIEngineBaseMedia_8x8.UI_FONT;
-        ui_font_defaultColor = DEFAULT_COLOR_FONT.cpy();
-        ui_cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
-        ui_keyInteractionsDisabled = false;
-        ui_mouseInteractionsDisabled = false;
-        ui_foldWindowsOnDoubleClick = true;
-        ui_animationTimerFunction = new AnimationTimerFunction() {
-            float delta = 0.016f;
+    public class UI {
+        public CMediaFont font= UIEngineBaseMedia_8x8.UI_FONT;
+        public Color fontDefaultColor = DEFAULT_COLOR_FONT.cpy();
+        public CMediaSprite cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
+        public boolean keyInteractionsDisabled = false;
+        public boolean mouseInteractionsDisabled = false;
+        public boolean foldWindowsOnDoubleClick= true;
+        public AnimationTimerFunction animationTimerFunction = new AnimationTimerFunction() {
+            final float delta = 1/60f;
             float animationTimer = 0;
 
             @Override
@@ -96,44 +70,23 @@ public final class UIEngineConfig {
                 return animationTimer;
             }
         };
-        // ##### Input Default Values #####
-        input_emulatedMouseCursorSpeed = 4.0f;
-        input_hardwareMouseEnabled = true;
-        input_keyboardMouseEnabled = false;
-        input_keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
-        input_keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
-        input_keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
-        input_keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
-        input_keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
-        input_keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.ALT_LEFT};
-        input_keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.SHIFT_LEFT};
-        input_keyboardMouseButtonsMouse4 = null;
-        input_keyboardMouseButtonsMouse5 = null;
-        input_keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
-        input_keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
-        input_gamePadMouseEnabled = false;
-        input_gamePadMouseJoystickDeadZone = 0.3f;
-        input_gamePadMouseStickLeftEnabled = true;
-        input_gamePadMouseStickRightEnabled = true;
-        input_gamePadMouseButtonsMouse1 = new int[KeyCode.GamePad.A];
-        input_gamePadMouseButtonsMouse2 = new int[KeyCode.GamePad.B];
-        input_gamePadMouseButtonsMouse3 = new int[KeyCode.GamePad.Y];
-        input_gamePadMouseButtonsMouse4 = null;
-        input_gamePadMouseButtonsMouse5 = null;
-        input_gamePadMouseButtonsScrollUp = new int[KeyCode.GamePad.DPAD_UP];
-        input_gamePadMouseButtonsScrollDown = new int[KeyCode.GamePad.DPAD_DOWN];
-        // ##### Window & Component Default Values #####
-        window_defaultEnforceScreenBounds = true;
-        window_defaultColor = DEFAULT_COlOR.cpy();
-        component_defaultColor = DEFAULT_COlOR.cpy();
-        contextMenu_defaultColor = DEFAULT_COlOR_BRIGHT.cpy();
-        component_appViewportDefaultUpdateTime = 0;
-        component_listDragAlpha = 0.8f;
-        component_gridDragAlpha = 0.8f;
-        component_knobSensitivity = 1f;
-        component_scrollbarSensitivity = 1f;
-        component_mapOverlayDefaultFadeoutSpeed = 0.05f;
-        component_textFieldDefaultAllowedCharacters = new char[]{
+    }
+
+    public class Window {
+        public boolean defaultEnforceScreenBounds  = true;
+        public Color defaultColor  = DEFAULT_COlOR.cpy();
+    }
+
+    public class Component {
+        public Color defaultColor = DEFAULT_COlOR.cpy();
+        public Color contextMenuDefaultColor = DEFAULT_COlOR_BRIGHT.cpy();
+        public int appViewportDefaultUpdateTime = 0;
+        public float listDragAlpha = 0.8f;
+        public float gridDragAlpha = 0.8f;
+        public float knobSensitivity = 1f;
+        public float scrollbarSensitivity = 1f;
+        public float mapOverlayDefaultFadeoutSpeed = 0.05f;
+        public char[] textFieldDefaultAllowedCharacters= new char[]{
                 'a', 'b', 'c', 'd', 'e', 'f',
                 'g', 'h', 'i', 'j', 'k', 'l',
                 'm', 'n', 'o', 'p', 'q', 'r',
@@ -149,35 +102,43 @@ public final class UIEngineConfig {
                 '"', '(', ')', '_',
                 ' '
         };
-        component_textFieldDefaultMarkerColor = Color.valueOf("8FD3FF");
-        notification_max = 20;
-        notification_defaultDisplayTime = 120;
-        notification_defaultColor = DEFAULT_COlOR.cpy();
-        notification_foldTime = 12;
-        notification_tooltip_defaultDisplayTime = 140;
-        notification_tooltip_fadeoutTime = 12;
-        tooltip_defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
-        tooltip_FadeInSpeed = 0.2f;
-        tooltip_FadeoutSpeed = 0.2f;
-        tooltip_FadeInDelay = 20;
-        // ##### MouseTextInput Default Values #####
-        mouseTextInput_defaultLowerCaseCharacters = new char[]{
-                'a', 'b', 'c', 'd', 'e', 'f',
-                'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r',
-                's', 't', 'u', 'v', 'w',
-                'x', 'y', 'z',
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        public Color textFieldDefaultMarkerColor  = Color.valueOf("8FD3FF");
+    }
+
+    public class Notification {
+        public int maxNotifications = 20;
+        public int defaultDisplayTime = 120;
+        public Color defaultColor = DEFAULT_COlOR.cpy();
+        public int foldTime = 12;
+        public int toolTipNotificationDefaultDisplayTime = 140;
+        public int toolTipNotificationFadeoutTime = 12;
+    }
+
+    public class Tooltip {
+        public Color defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
+        public float fadeInSpeed = 0.2f;
+        public int fadeInDelay = 20;
+        public float fadeOutSpeed = 0.2f;
+    }
+
+    public class MouseTextInput {
+        public char[]  defaultLowerCaseCharacters = new char[]{
+            'a', 'b', 'c', 'd', 'e', 'f',
+                    'g', 'h', 'i', 'j', 'k', 'l',
+                    'm', 'n', 'o', 'p', 'q', 'r',
+                    's', 't', 'u', 'v', 'w',
+                    'x', 'y', 'z',
+                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
         };
-        mouseTextInput_defaultUpperCaseCharacters = new char[]{
-                'A', 'B', 'C', 'D', 'E', 'F',
-                'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R',
-                'S', 'T', 'U', 'V', 'W',
-                'X', 'Y', 'Z',
-                '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
+        public char[] defaultUpperCaseCharacters = new char[]{
+            'A', 'B', 'C', 'D', 'E', 'F',
+                    'G', 'H', 'I', 'J', 'K', 'L',
+                    'M', 'N', 'O', 'P', 'Q', 'R',
+                    'S', 'T', 'U', 'V', 'W',
+                    'X', 'Y', 'Z',
+                    '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
         };
-        mouseTextInput_defaultColor = DEFAULT_COlOR.cpy();
+        public Color defaultColor = DEFAULT_COlOR.cpy();
     }
 
     public interface AnimationTimerFunction {

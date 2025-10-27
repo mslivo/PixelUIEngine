@@ -246,15 +246,15 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void updateMouseControl() {
-        if (!uiEngineState.config.input_gamePadMouseEnabled && !uiEngineState.config.input_keyboardMouseEnabled && !uiEngineState.config.input_hardwareMouseEnabled) {
+        if (!uiEngineState.config.input.gamePadMouseEnabled && !uiEngineState.config.input.keyboardMouseEnabled && !uiEngineState.config.input.hardwareMouseEnabled) {
             mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
             mouseControl_chokeAllMouseEvents();
         } else {
-            if (uiEngineState.config.input_gamePadMouseEnabled && mouseControl_gamePadMouseTranslateAndChokeEvents()) {
+            if (uiEngineState.config.input.gamePadMouseEnabled && mouseControl_gamePadMouseTranslateAndChokeEvents()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
-            } else if (uiEngineState.config.input_keyboardMouseEnabled && mouseControl_keyboardMouseTranslateAndChokeEvents()) {
+            } else if (uiEngineState.config.input.keyboardMouseEnabled && mouseControl_keyboardMouseTranslateAndChokeEvents()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
-            } else if (uiEngineState.config.input_hardwareMouseEnabled && mouseControl_hardwareMouseDetectUse()) {
+            } else if (uiEngineState.config.input.hardwareMouseEnabled && mouseControl_hardwareMouseDetectUse()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
             }
         }
@@ -374,14 +374,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 mouse3Pressed = uiEngineState.mTextInputTranslatedMouse3Down;
             }
             case GAMEPAD -> {
-                boolean stickLeft = uiEngineState.config.input_gamePadMouseStickLeftEnabled;
-                boolean stickRight = uiEngineState.config.input_gamePadMouseStickRightEnabled;
+                boolean stickLeft = uiEngineState.config.input.gamePadMouseStickLeftEnabled;
+                boolean stickRight = uiEngineState.config.input.gamePadMouseStickRightEnabled;
                 final float sensitivity = 0.4f;
                 boolean moveLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -sensitivity);
                 boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > sensitivity);
-                mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse1);
-                mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse2);
-                mouse3Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse3);
+                mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse1);
+                mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse2);
+                mouse3Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse3);
 
                 if (moveLeft) {
                     if (!uiEngineState.mTextInputGamePadLeft) {
@@ -534,17 +534,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private int[] mouseControl_keyboardMouseGetButtons(int index) {
         return switch (index) {
-            case 0 -> uiEngineState.config.input_keyboardMouseButtonsUp;
-            case 1 -> uiEngineState.config.input_keyboardMouseButtonsDown;
-            case 2 -> uiEngineState.config.input_keyboardMouseButtonsLeft;
-            case 3 -> uiEngineState.config.input_keyboardMouseButtonsRight;
-            case 4 -> uiEngineState.config.input_keyboardMouseButtonsMouse1;
-            case 5 -> uiEngineState.config.input_keyboardMouseButtonsMouse2;
-            case 6 -> uiEngineState.config.input_keyboardMouseButtonsMouse3;
-            case 7 -> uiEngineState.config.input_keyboardMouseButtonsMouse4;
-            case 8 -> uiEngineState.config.input_keyboardMouseButtonsMouse5;
-            case 9 -> uiEngineState.config.input_keyboardMouseButtonsScrollUp;
-            case 10 -> uiEngineState.config.input_keyboardMouseButtonsScrollDown;
+            case 0 -> uiEngineState.config.input.keyboardMouseButtonsUp;
+            case 1 -> uiEngineState.config.input.keyboardMouseButtonsDown;
+            case 2 -> uiEngineState.config.input.keyboardMouseButtonsLeft;
+            case 3 -> uiEngineState.config.input.keyboardMouseButtonsRight;
+            case 4 -> uiEngineState.config.input.keyboardMouseButtonsMouse1;
+            case 5 -> uiEngineState.config.input.keyboardMouseButtonsMouse2;
+            case 6 -> uiEngineState.config.input.keyboardMouseButtonsMouse3;
+            case 7 -> uiEngineState.config.input.keyboardMouseButtonsMouse4;
+            case 8 -> uiEngineState.config.input.keyboardMouseButtonsMouse5;
+            case 9 -> uiEngineState.config.input.keyboardMouseButtonsScrollUp;
+            case 10 -> uiEngineState.config.input.keyboardMouseButtonsScrollDown;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
     }
@@ -552,13 +552,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private int[] mouseControl_gamePadMouseGetButtons(int index) {
         return switch (index) {
-            case 0 -> uiEngineState.config.input_gamePadMouseButtonsMouse1;
-            case 1 -> uiEngineState.config.input_gamePadMouseButtonsMouse2;
-            case 2 -> uiEngineState.config.input_gamePadMouseButtonsMouse3;
-            case 3 -> uiEngineState.config.input_gamePadMouseButtonsMouse4;
-            case 4 -> uiEngineState.config.input_gamePadMouseButtonsMouse5;
-            case 5 -> uiEngineState.config.input_gamePadMouseButtonsScrollUp;
-            case 6 -> uiEngineState.config.input_gamePadMouseButtonsScrollDown;
+            case 0 -> uiEngineState.config.input.gamePadMouseButtonsMouse1;
+            case 1 -> uiEngineState.config.input.gamePadMouseButtonsMouse2;
+            case 2 -> uiEngineState.config.input.gamePadMouseButtonsMouse3;
+            case 3 -> uiEngineState.config.input.gamePadMouseButtonsMouse4;
+            case 4 -> uiEngineState.config.input.gamePadMouseButtonsMouse5;
+            case 5 -> uiEngineState.config.input.gamePadMouseButtonsScrollUp;
+            case 6 -> uiEngineState.config.input.gamePadMouseButtonsScrollDown;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
     }
@@ -598,7 +598,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
         // Joystick Events Left
-        if (uiEngineState.config.input_gamePadMouseStickLeftEnabled) {
+        if (uiEngineState.config.input.gamePadMouseStickLeftEnabled) {
             if (uiEngineState.inputEvents.gamePadLeftXMoved) {
                 uiEngineState.gamePadTranslatedStickLeft.x = uiEngineState.inputEvents.gamePadLeftX;
                 uiEngineState.inputEvents.gamePadLeftX = 0;
@@ -616,7 +616,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             uiEngineState.gamePadTranslatedStickLeft.y = 0;
         }
         // Joystick Events Right
-        if (uiEngineState.config.input_gamePadMouseStickRightEnabled) {
+        if (uiEngineState.config.input.gamePadMouseStickRightEnabled) {
             if (uiEngineState.inputEvents.gamePadRightXMoved) {
                 uiEngineState.gamePadTranslatedStickRight.x = uiEngineState.inputEvents.gamePadRightX;
                 uiEngineState.inputEvents.gamePadRightX = 0;
@@ -689,8 +689,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         float deltaX = 0;
         float deltaY = 0;
         if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            cursorChangeX *= uiEngineState.config.input_emulatedMouseCursorSpeed;
-            cursorChangeY *= uiEngineState.config.input_emulatedMouseCursorSpeed;
+            cursorChangeX *= uiEngineState.config.input.emulatedMouseCursorSpeed;
+            cursorChangeY *= uiEngineState.config.input.emulatedMouseCursorSpeed;
             if (buttonLeft) deltaX -= cursorChangeX;
             if (buttonRight) deltaX += cursorChangeX;
             if (buttonUp) deltaY -= cursorChangeY;
@@ -784,21 +784,21 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // Swallow & Translate Gamepad Events
         boolean[] translatedButtons = uiEngineState.gamePadTranslatedButtonsDown;
-        boolean stickLeft = uiEngineState.config.input_gamePadMouseStickLeftEnabled;
-        boolean stickRight = uiEngineState.config.input_gamePadMouseStickRightEnabled;
+        boolean stickLeft = uiEngineState.config.input.gamePadMouseStickLeftEnabled;
+        boolean stickRight = uiEngineState.config.input.gamePadMouseStickRightEnabled;
 
-        float joystickDeadZone = uiEngineState.config.input_gamePadMouseJoystickDeadZone;
+        float joystickDeadZone = uiEngineState.config.input.gamePadMouseJoystickDeadZone;
         boolean buttonLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -joystickDeadZone);
         boolean buttonRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > joystickDeadZone);
         boolean buttonUp = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.y > joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.y > joystickDeadZone);
         boolean buttonDown = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.y < -joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.y < -joystickDeadZone);
-        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsMouse1);
-        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsMouse2);
-        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsMouse3);
-        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsMouse4);
-        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsMouse5);
-        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsScrollUp);
-        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input_gamePadMouseButtonsScrollDown);
+        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse1);
+        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse2);
+        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse3);
+        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse4);
+        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse5);
+        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollUp);
+        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
 
         float cursorChangeX = 0f;
         if (buttonLeft || buttonRight) {
@@ -823,17 +823,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         // Swallow & Translate keyboard events
         boolean[] translatedKeys = uiEngineState.keyBoardTranslatedKeysDown;
 
-        boolean buttonLeft = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsLeft);
-        boolean buttonRight = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsRight);
-        boolean buttonUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsUp);
-        boolean buttonDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsDown);
-        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsMouse1);
-        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsMouse2);
-        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsMouse3);
-        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsMouse4);
-        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsMouse5);
-        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsScrollUp);
-        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input_keyboardMouseButtonsScrollDown);
+        boolean buttonLeft = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsLeft);
+        boolean buttonRight = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsRight);
+        boolean buttonUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsUp);
+        boolean buttonDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsDown);
+        boolean buttonMouse1Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse1);
+        boolean buttonMouse2Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse2);
+        boolean buttonMouse3Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse3);
+        boolean buttonMouse4Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse4);
+        boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse5);
+        boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollUp);
+        boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollDown);
 
         final float SPEEDUP_SPEED = 0.1f;
         if (buttonLeft || buttonRight) {
@@ -898,7 +898,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         /* Update Cursor*/
         if (uiEngineState.lastUIMouseHover != null) {
             // 1. GUI Cursor
-            uiEngineState.cursor = uiEngineState.config.ui_cursor;
+            uiEngineState.cursor = uiEngineState.config.ui.cursor;
             uiEngineState.cursorArrayIndex = 0;
         } else {
             // 2. Manually overidden Cursor
@@ -942,7 +942,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void updateUI_keyInteractions() {
         uiCommonUtils.setKeyboardInteractedUIObject(null);
-        if (uiEngineState.config.ui_keyInteractionsDisabled) return;
+        if (uiEngineState.config.ui.keyInteractionsDisabled) return;
         // Key
         if (uiEngineState.inputEvents.keyTyped) {
             final Textfield focusedTextField = uiEngineState.focusedTextField;
@@ -1102,7 +1102,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void updateUI_mouseInteractions() {
         uiCommonUtils.setMouseInteractedUIObject(null);
-        if (uiEngineState.config.ui_mouseInteractionsDisabled) return;
+        if (uiEngineState.config.ui.mouseInteractionsDisabled) return;
         // ------ MOUSE DOUBLE CLICK ------
         if (uiEngineState.inputEvents.mouseDoubleClick) {
             final Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
@@ -1112,7 +1112,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 if (lastUIMouseHover instanceof Window window) {
                     for (int ib = 0; ib < uiEngineState.inputEvents.mouseDownButtons.size; ib++) {
                         int mouseDownButton = uiEngineState.inputEvents.mouseDownButtons.get(ib);
-                        if (uiEngineState.config.ui_foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
+                        if (uiEngineState.config.ui.foldWindowsOnDoubleClick && mouseDownButton == Input.Buttons.LEFT) {
                             if (window.hasTitleBar && Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, window.x, window.y + TS(window.height - 1), TS(window.width), TS())) {
                                 if (window.folded) {
                                     uiCommonUtils.window_unFold(window);
@@ -1537,7 +1537,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     }
                     case Knob turnedKnob -> {
                         final float BASE_SENSITIVITY = 1 / 50f;
-                        float amount = (uiEngineState.mouse_delta.y * BASE_SENSITIVITY) * uiEngineState.config.component_knobSensitivity;
+                        float amount = (uiEngineState.mouse_delta.y * BASE_SENSITIVITY) * uiEngineState.config.component.knobSensitivity;
                         float newValue = turnedKnob.turned + amount;
                         uiCommonUtils.knob_turnKnob(turnedKnob, newValue);
                         if (uiEngineState.currentControlMode.emulated) {
@@ -1600,16 +1600,16 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.list_scroll(list, list.scrolled + amount);
                     }
                     case Knob knob -> {
-                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_knobSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component.knobSensitivity;
                         float newValue = knob.turned + amount;
                         uiCommonUtils.knob_turnKnob(knob, newValue);
                     }
                     case ScrollbarHorizontal scrollBarHorizontal -> {
-                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component.scrollbarSensitivity;
                         uiCommonUtils.scrollBar_scroll(scrollBarHorizontal, scrollBarHorizontal.scrolled + amount);
                     }
                     case ScrollbarVertical scrollBarVertical -> {
-                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component_scrollbarSensitivity;
+                        float amount = (BASE_SENSITIVITY * uiEngineState.inputEvents.mouseScrolledAmount) * uiEngineState.config.component.scrollbarSensitivity;
                         uiCommonUtils.scrollBar_scroll(scrollBarVertical, scrollBarVertical.scrolled + amount);
                     }
                     case null, default -> {
@@ -1654,8 +1654,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void updateUI_animationTimer() {
-        if (uiEngineState.config.ui_animationTimerFunction != null) {
-            uiEngineState.config.ui_animationTimerFunction.updateAnimationTimer();
+        if (uiEngineState.config.ui.animationTimerFunction != null) {
+            uiEngineState.config.ui.animationTimerFunction.updateAnimationTimer();
         }
     }
 
@@ -1793,15 +1793,15 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         // Fade In
         if (uiEngineState.tooltip != null) {
             if (uiEngineState.tooltip_wait_delay) {
-                uiEngineState.tooltip_delay_timer += uiEngineState.config.tooltip_FadeInDelay;
-                if (uiEngineState.tooltip_delay_timer >= uiEngineState.config.tooltip_FadeInDelay) {
+                uiEngineState.tooltip_delay_timer += uiEngineState.config.tooltip.fadeInDelay;
+                if (uiEngineState.tooltip_delay_timer >= uiEngineState.config.tooltip.fadeInDelay) {
                     uiEngineState.tooltip_wait_delay = false;
                     uiEngineState.tooltip_delay_timer = 0;
                     uiEngineState.tooltip_fadePct = 0f;
                     uiEngineState.tooltip.toolTipAction.onDisplay();
                 }
             } else if (uiEngineState.tooltip_fadePct < 1f) {
-                uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct + uiEngineState.config.tooltip_FadeInSpeed, 0f, 1f);
+                uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct + uiEngineState.config.tooltip.fadeInSpeed, 0f, 1f);
             } else {
                 uiEngineState.tooltip.toolTipAction.onUpdate();
             }
@@ -1810,7 +1810,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         } else {
             if (uiEngineState.fadeOutTooltip != null) {
                 if (uiEngineState.tooltip_fadePct > 0f) {
-                    uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip_FadeoutSpeed, 0f, 1f);
+                    uiEngineState.tooltip_fadePct = Math.clamp(uiEngineState.tooltip_fadePct - uiEngineState.config.tooltip.fadeOutSpeed, 0f, 1f);
                 } else {
                     uiEngineState.fadeOutTooltip.toolTipAction.onRemove();
                     uiEngineState.fadeOutTooltip = null;
@@ -1854,7 +1854,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
                 case FOLD -> {
                     notification.timer++;
-                    if (notification.timer > uiEngineState.config.notification_foldTime) {
+                    if (notification.timer > uiEngineState.config.notification.foldTime) {
                         notification.timer = 0;
                         notification.state = TOP_NOTIFICATION_STATE.FINISHED;
                         uiCommonUtils.notification_removeFromScreen(notification);
@@ -1880,7 +1880,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     }
                     case FADE -> {
                         tooltipNotification.timer++;
-                        if (tooltipNotification.timer > api.config.notification.tooltip.getFadeoutTime()) {
+                        if (tooltipNotification.timer > api.config.notification.toolTipNotificationFadeoutTime) {
                             uiCommonUtils.notification_removeFromScreen(tooltipNotification);
                             tooltipNotification.state = TOOLTIP_NOTIFICATION_STATE.FINISHED;
                             tooltipNotification.timer = 0;
@@ -2309,7 +2309,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 if (uiCommonUtils.comboBox_isOpen(comboBox)) {
                     int widthPx = TS(comboBox.width);
                     for (int i = 0; i < comboBox.items.size; i++) {
-                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, comboBox.items.get(i).text) + 2;
+                        int itemWidth = mediaManager.fontTextWidth(uiEngineState.config.ui.font, comboBox.items.get(i).text) + 2;
                         if (comboBox.items.get(i).comboBoxItemAction.icon() != null)
                             itemWidth += api.TS();
                         widthPx = Math.max(widthPx, itemWidth);
@@ -2648,7 +2648,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
             float alpha = 1f;
             if (tooltipNotification.state == TOOLTIP_NOTIFICATION_STATE.FADE) {
-                alpha = (1f - (tooltipNotification.timer / (float) api.config.notification.tooltip.getFadeoutTime()));
+                alpha = (1f - (tooltipNotification.timer / (float) api.config.notification.toolTipNotificationFadeoutTime));
             }
 
             if (tooltipNotification.tooltip != null) {
@@ -2672,7 +2672,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             final float notificationAlpha = notification.color.a;
 
             if (notification.state == TOP_NOTIFICATION_STATE.FOLD) {
-                float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification_foldTime);
+                float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification.foldTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
             spriteRenderer.saveState();
@@ -3354,7 +3354,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             final int dragOffsetX = uiEngineState.draggedGridOffset.x;
             final int dragOffsetY = uiEngineState.draggedGridOffset.y;
             final Object dragItem = uiEngineState.draggedGridItem;
-            final float dragAlpha = componentAlpha(dragGrid) * uiEngineState.config.component_gridDragAlpha;
+            final float dragAlpha = componentAlpha(dragGrid) * uiEngineState.config.component.gridDragAlpha;
             render_drawIcon(dragGrid.gridAction.icon(dragItem), uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
                     dragGrid.gridAction.iconColor(dragItem), dragAlpha, false,
                     dragGrid.gridAction.iconIndex(dragItem), dragGrid.bigMode,
@@ -3364,7 +3364,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             final int dragOffsetX = uiEngineState.draggedListOffset.x;
             final int dragOffsetY = uiEngineState.draggedListOffset.y;
             final Object dragItem = uiEngineState.draggedListItem;
-            final float dragAlpha = componentAlpha(dragList) * uiEngineState.config.component_listDragAlpha;
+            final float dragAlpha = componentAlpha(dragList) * uiEngineState.config.component.listDragAlpha;
             String text = dragList.listAction.text(dragItem);
             render_drawFont(text, uiEngineState.mouse_ui.x - dragOffsetX, uiEngineState.mouse_ui.y - dragOffsetY,
                     dragList.fontColor, dragAlpha, false, 2, 1,
@@ -3382,7 +3382,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private int render_textWidth(String text, int start, int end) {
         if (text == null || text.length() == 0) return 0;
-        return mediaManager.fontTextWidth(uiEngineState.config.ui_font, text, start, end);
+        return mediaManager.fontTextWidth(uiEngineState.config.ui.font, text, start, end);
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale) {
@@ -3407,7 +3407,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY, int textOffset, int textLength) {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final BitmapFont font = mediaManager.font(uiEngineState.config.ui_font);
+        final BitmapFont font = mediaManager.font(uiEngineState.config.ui.font);
         final boolean withIcon = icon != null;
         if (withIcon) {
             render_drawIcon(icon, x, y, iconColor, alpha, iconGrayScale, iconIndex, false, iconFlipX, iconFlipY);
@@ -3418,7 +3418,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         font.setColor(color.r, color.g, color.b, 1f);
 
         if (withIcon) maxWidth -= TS();
-        spriteRenderer.drawCMediaFont(uiEngineState.config.ui_font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, textOffset, textLength, false, false, maxWidth);
+        spriteRenderer.drawCMediaFont(uiEngineState.config.ui.font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, textOffset, textLength, false, false, maxWidth);
 
 
         spriteRenderer.loadState();

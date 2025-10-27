@@ -463,7 +463,7 @@ public class UICommonUtils {
         int textwidth = 0;
         for (int i = 0; i < contextMenu.items.size; i++) {
             ContextMenuItem contextMenuItem = contextMenu.items.get(i);
-            int w = mediaManager.fontTextWidth(uiEngineState.config.ui_font, contextMenuItem.text);
+            int w = mediaManager.fontTextWidth(uiEngineState.config.ui.font, contextMenuItem.text);
             if (contextMenuItem.contextMenuItemAction.icon() != null) w = w + uiEngineState.tileSize.TS;
             if (w > textwidth) textwidth = w;
         }
@@ -553,8 +553,8 @@ public class UICommonUtils {
         } else if (button instanceof TextButton textButton) {
             if (textButton.text == null) return;
             int iconWidth = textButton.buttonAction.icon() != null ? uiEngineState.tileSize.TS : 0;
-            int contentWidth = mediaManager.fontTextWidth(uiEngineState.config.ui_font, textButton.text) + iconWidth;
-            int contentHeight = mediaManager.fontTextHeight(uiEngineState.config.ui_font, textButton.text);
+            int contentWidth = mediaManager.fontTextWidth(uiEngineState.config.ui.font, textButton.text) + iconWidth;
+            int contentHeight = mediaManager.fontTextHeight(uiEngineState.config.ui.font, textButton.text);
             textButton.contentOffset_x = MathUtils.round((uiEngineState.tileSize.TL(textButton.width) - contentWidth) / 2f);
             textButton.contentOffset_y = MathUtils.round(((uiEngineState.tileSize.TL(textButton.height) - contentHeight)) / 2f) - 2;
         }
@@ -589,7 +589,7 @@ public class UICommonUtils {
         for (int i = 0; i < checkRange; i++) {
             int realOffset = textField.offset + i;
             testStringBuilder.append(textField.content.charAt(realOffset));
-            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, testStringBuilder.toString()) > mouseX) {
+            if (mediaManager.fontTextWidth(uiEngineState.config.ui.font, testStringBuilder.toString()) > mouseX) {
                 return Math.min(realOffset, textField.content.length());
             }
         }
@@ -615,8 +615,8 @@ public class UICommonUtils {
         } else {
             String subContent = textField.content.substring(textField.offset, textField.caretPosition);
             int width = uiEngineState.tileSize.TL(textField.width) - 4;
-            if (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
-                while (mediaManager.fontTextWidth(uiEngineState.config.ui_font, subContent) > width) {
+            if (mediaManager.fontTextWidth(uiEngineState.config.ui.font, subContent) > width) {
+                while (mediaManager.fontTextWidth(uiEngineState.config.ui.font, subContent) > width) {
                     textField.offset++;
                     subContent = textField.content.substring(textField.offset, textField.caretPosition);
                 }
@@ -881,7 +881,7 @@ public class UICommonUtils {
 
     public void tooltip_setTextSegmentText(TooltipTextSegment tooltipTextSegment, String text) {
         tooltipTextSegment.text = Tools.Text.validString(text);
-        tooltipTextSegment.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineState.config.ui_font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
+        tooltipTextSegment.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineState.config.ui.font, tooltipTextSegment.text) + uiEngineState.tileSize.TS) / uiEngineState.tileSize.TSF);
         tooltipTextSegment.height = 1;
     }
 
@@ -1386,8 +1386,8 @@ public class UICommonUtils {
     }
 
     static float ui_getAnimationTimer(UIEngineState state) {
-        if (state.config.ui_animationTimerFunction == null) return 0f;
-        return state.config.ui_animationTimerFunction.getAnimationTimer();
+        if (state.config.ui.animationTimerFunction == null) return 0f;
+        return state.config.ui.animationTimerFunction.getAnimationTimer();
     }
 
     public void window_resetReferences(Window window) {

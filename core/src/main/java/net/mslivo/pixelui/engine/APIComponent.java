@@ -78,19 +78,19 @@ public final class APIComponent {
         };
 
         public AppViewport create(int x, int y, int width, int height) {
-            return create(x, y, width, height, DEFAULT_APPVIEWPORT_ACTION, 0, 0, 1f, uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, DEFAULT_APPVIEWPORT_ACTION, 0, 0, 1f, uiEngineConfig.component.appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction) {
-            return create(x, y, width, height, appViewPortAction, 0, 0, 1f, uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, 0, 0, 1f, uiEngineConfig.component.appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY) {
-            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, 1f, uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, 1f, uiEngineConfig.component.appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom) {
-            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, camZoom, uiEngineConfig.component_appViewportDefaultUpdateTime);
+            return create(x, y, width, height, appViewPortAction, camPositionX, camPositionY, camZoom, uiEngineConfig.component.appViewportDefaultUpdateTime);
         }
 
         public AppViewport create(int x, int y, int width, int height, AppViewPortAction appViewPortAction, float camPositionX, float camPositionY, float camZoom, int updateTime) {
@@ -186,11 +186,11 @@ public final class APIComponent {
 
         public Progressbar create(int x, int y, int width, float progress, boolean progressText, boolean progressText2Decimal, ProgressBarAction progressBarAction) {
             Progressbar progressBar = new Progressbar();
-            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiEngineConfig.component_defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(progressBar, x, y, width, 1, uiEngineConfig.component.defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component.defaultColor));
             progressBar.progress = Math.clamp(progress, 0f, 1f);
             progressBar.progressText = progressText;
             progressBar.progressText2Decimal = progressText2Decimal;
-            progressBar.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            progressBar.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             progressBar.progressBarAction = progressBarAction;
             return progressBar;
         }
@@ -290,7 +290,7 @@ public final class APIComponent {
                 setComponentCommonInitValuesInternal(textButton, x, y, width, height);
                 setButtonCommonInitValuesInternal(textButton, buttonAction, buttonMode, togglePressed);
                 textButton.text = Tools.Text.validString(text);
-                textButton.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+                textButton.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
                 uiCommonUtils.button_centerContent(mediaManager, textButton);
                 return textButton;
             }
@@ -337,7 +337,7 @@ public final class APIComponent {
 
             public ImageButton create(int x, int y, int width, int height, CMediaSprite image, int arrayIndex, ButtonAction buttonAction, BUTTON_MODE buttonMode, boolean togglePressed) {
                 ImageButton imageButton = new ImageButton();
-                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiEngineConfig.component_defaultColor, Color.GRAY);
+                setComponentCommonInitValuesInternal(imageButton, x, y, width, height, uiEngineConfig.component.defaultColor, Color.GRAY);
                 setButtonCommonInitValuesInternal(imageButton, buttonAction, buttonMode, togglePressed);
                 imageButton.image = image;
                 imageButton.arrayIndex = arrayIndex;
@@ -471,11 +471,11 @@ public final class APIComponent {
 
         public Checkbox create(int x, int y, String text, CHECKBOX_STYLE checkBoxStyle, CheckboxAction checkBoxAction, boolean checked) {
             Checkbox checkBox = new Checkbox();
-            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiEngineConfig.component_defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(checkBox, x, y, 1, 1, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             checkBox.text = Tools.Text.validString(text);
             checkBox.checkBoxStyle = checkBoxStyle;
             checkBox.checkBoxAction = checkBoxAction != null ? checkBoxAction : DEFAULT_CHECKBOX_ACTION;
-            checkBox.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            checkBox.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             checkBox.checked = checked;
             return checkBox;
         }
@@ -707,12 +707,12 @@ public final class APIComponent {
                 Tab tab = new Tab();
                 tab.title = Tools.Text.validString(title);
                 tab.tabAction = tabAction != null ? tabAction : DEFAULT_TAB_ACTION;
-                tab.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+                tab.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
                 tab.name = "";
                 tab.data = null;
                 tab.disabled = false;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui_font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
+                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
                 } else {
                     tab.width = width;
                 }
@@ -837,7 +837,7 @@ public final class APIComponent {
                 width = items.length * (doubleSized ? 2 : 1);
                 height = items[0].length * (doubleSized ? 2 : 1);
             }
-            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiEngineConfig.component_defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(grid, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
             grid.items = items;
@@ -906,27 +906,27 @@ public final class APIComponent {
         };
 
         public Textfield create(int x, int y, int width) {
-            return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content) {
-            return create(x, y, width, content, DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
-            return create(x, y, width, content, textFieldAction, 32, uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, textFieldAction, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
-            return create(x, y, width, content, textFieldAction, contentMaxLength, uiEngineConfig.component_textFieldDefaultAllowedCharacters);
+            return create(x, y, width, content, textFieldAction, contentMaxLength, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
         public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
             Textfield textField = new Textfield();
-            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiEngineConfig.component_defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component_defaultColor));
-            textField.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
+            textField.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             textField.allowedCharacters = new IntSet();
             for (int i = 0; i < allowedCharacters.length; i++)
                 textField.allowedCharacters.add(allowedCharacters[i]);
@@ -936,7 +936,7 @@ public final class APIComponent {
             textField.caretPosition = textField.content.length();
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
             textField.markedContentBegin = textField.markedContentEnd = 0;
-            textField.markerColor = uiEngineConfig.component_textFieldDefaultMarkerColor.cpy();
+            textField.markerColor = uiEngineConfig.component.textFieldDefaultMarkerColor.cpy();
             textField.contentValid = textField.textFieldAction == null || textField.textFieldAction.isContentValid(textField.content);
             return textField;
         }
@@ -1023,7 +1023,7 @@ public final class APIComponent {
 
         public Knob create(int x, int y, KnobAction knobAction, boolean endless, float turned) {
             Knob knob = new Knob();
-            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiEngineConfig.component_defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(knob, x, y, 2, 2, uiEngineConfig.component.defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component.defaultColor));
             knob.endless = endless;
             knob.turned = Math.clamp(turned, 0f, 1f);
             knob.knobAction = knobAction != null ? knobAction : DEFAULT_KNOB_ACTION;
@@ -1062,9 +1062,9 @@ public final class APIComponent {
 
         public Text create(int x, int y, int width, String text, TextAction textAction) {
             Text textC = new Text();
-            width = text != null && width <= 0 ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiEngineConfig.ui_font, text) / (float) api.TS()), 1) : width; // autowidth
+            width = text != null && width <= 0 ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiEngineConfig.ui.font, text) / (float) api.TS()), 1) : width; // autowidth
             setComponentCommonInitValuesInternal(textC, x, y, width, 1);
-            textC.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            textC.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             textC.text = Tools.Text.validString(text);
             textC.textAction = textAction != null ? textAction : DEFAULT_TEXT_ACTION;
             return textC;
@@ -1226,7 +1226,7 @@ public final class APIComponent {
 
         public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, ComboboxItem selectedItem) {
             Combobox comboBox = new Combobox();
-            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component_defaultColor, uiCommonUtils.color_brigther(uiEngineState.config.component_defaultColor));
+            setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component.defaultColor, uiCommonUtils.color_brigther(uiEngineState.config.component.defaultColor));
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
             comboBox.items = new Array<>();
             if (combobBoxItems != null) {
@@ -1334,7 +1334,7 @@ public final class APIComponent {
             public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, Object data) {
                 ComboboxItem comboBoxItem = new ComboboxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
-                comboBoxItem.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+                comboBoxItem.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
                 comboBoxItem.name = "";
                 comboBoxItem.data = data;
@@ -1402,7 +1402,7 @@ public final class APIComponent {
 
             public ScrollbarHorizontal create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarHorizontal scrollBarHorizontal = new ScrollbarHorizontal();
-                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiEngineConfig.component_defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component_defaultColor));
+                setComponentCommonInitValuesInternal(scrollBarHorizontal, x, y, length, 1, uiEngineConfig.component.defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component.defaultColor));
                 scrollBarHorizontal.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarHorizontal.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarHorizontal;
@@ -1426,7 +1426,7 @@ public final class APIComponent {
 
             public ScrollbarVertical create(int x, int y, int length, ScrollBarAction scrollBarAction, float scrolled) {
                 ScrollbarVertical scrollBarVertical = new ScrollbarVertical();
-                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiEngineConfig.component_defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component_defaultColor));
+                setComponentCommonInitValuesInternal(scrollBarVertical, x, y, 1, length, uiEngineConfig.component.defaultColor, uiCommonUtils.color_darker(uiEngineConfig.component.defaultColor));
                 scrollBarVertical.scrollBarAction = scrollBarAction != null ? scrollBarAction : DEFAULT_SCROLLBAR_ACTION;
                 scrollBarVertical.scrolled = Math.clamp(scrolled, 0f, 1f);
                 return scrollBarVertical;
@@ -1481,7 +1481,7 @@ public final class APIComponent {
 
         public List create(int x, int y, int width, int height, Array items, ListAction listAction, boolean multiSelect, boolean dragEnabled, boolean dragOutEnabled, boolean dragInEnabled) {
             List list = new List();
-            setComponentCommonInitValuesInternal(list, x, y, width, height, uiEngineConfig.component_defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component_defaultColor));
+            setComponentCommonInitValuesInternal(list, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
             list.items = items;
@@ -1491,7 +1491,7 @@ public final class APIComponent {
             list.dragEnabled = dragEnabled;
             list.dragInEnabled = dragInEnabled;
             list.dragOutEnabled = dragOutEnabled;
-            list.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            list.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             return list;
         }
 
@@ -1754,7 +1754,7 @@ public final class APIComponent {
     }
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height) {
-        setComponentCommonInitValuesInternal(component, x, y, width, height, uiEngineConfig.component_defaultColor, uiEngineConfig.component_defaultColor);
+        setComponentCommonInitValuesInternal(component, x, y, width, height, uiEngineConfig.component.defaultColor, uiEngineConfig.component.defaultColor);
     }
 
 

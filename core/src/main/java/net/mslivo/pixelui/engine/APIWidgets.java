@@ -303,7 +303,7 @@ public final class APIWidgets {
 
             api.component.setPositionGrid(pageGrid.backButton, pageGrid.x, y_controls);
             api.component.setPositionGrid(pageGrid.text, pageGrid.x + 1, y_controls);
-            int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.getFont(), pageStringMax) + 1) / api.TSF());
+            int textWidthTiles = MathUtils.ceil((mediaManager.fontTextWidth(api.config.ui.font, pageStringMax) + 1) / api.TSF());
             api.component.setPositionGrid(pageGrid.forwardButton, (pageGrid.x + 1) + textWidthTiles, y_controls);
             api.component.text.setText(pageGrid.text, pageString);
             api.component.setWidth(pageGrid.text, textWidthTiles);
@@ -512,7 +512,7 @@ public final class APIWidgets {
                                         ? value + " "
                                         : currentLine + value + " ";
 
-                                if (mediaManager.fontTextWidth(uiEngineConfig.ui_font, candidate) >= pixelWidth) {
+                                if (mediaManager.fontTextWidth(uiEngineConfig.ui.font, candidate) >= pixelWidth) {
                                     // Flush current line
                                     String flushed = currentLine.toString().trim();
                                     if (flushed.length() > 0) {
@@ -844,11 +844,11 @@ public final class APIWidgets {
         }
 
         public Window createTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction) {
-            return createTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters, uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
+            return createTextInputModalInternal(caption, text, originalText, inputResultFunction, 0, Integer.MAX_VALUE, true, true, uiEngineConfig.mouseTextInput.defaultLowerCaseCharacters, uiEngineConfig.mouseTextInput.defaultUpperCaseCharacters, 11);
         }
 
         public Window createTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength) {
-            return createTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters, uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters, 11);
+            return createTextInputModalInternal(caption, text, originalText, inputResultFunction, minInputLength, maxInputLength, true, true, uiEngineConfig.mouseTextInput.defaultLowerCaseCharacters, uiEngineConfig.mouseTextInput.defaultUpperCaseCharacters, 11);
         }
 
         public Window createTouchTextInputModal(String caption, String text, String originalText, Consumer<String> inputResultFunction, int minInputLength, int maxInputLength, char[] lowerCaseCharacters, char[] upperCaseCharacters) {
@@ -862,7 +862,7 @@ public final class APIWidgets {
         public Window createMessageModal(String caption, String[] lines, Runnable closeFunction) {
             int longest = 0;
             for (int i = 0; i < lines.length; i++) {
-                int len = mediaManager.fontTextWidth(uiEngineConfig.ui_font, lines[i]);
+                int len = mediaManager.fontTextWidth(uiEngineConfig.ui.font, lines[i]);
                 if (len > longest) longest = len;
             }
             Array<Component> componentsList = new Array<>();
@@ -902,8 +902,8 @@ public final class APIWidgets {
         public Window createYesNoRequester(String caption, String text, Consumer<Boolean> choiceFunction, String yes, String no) {
 
             int textWidthMin = Math.max(
-                    (mediaManager.fontTextWidth(uiEngineConfig.ui_font, caption) + 8),
-                    mediaManager.fontTextWidth(uiEngineConfig.ui_font, text)
+                    (mediaManager.fontTextWidth(uiEngineConfig.ui.font, caption) + 8),
+                    mediaManager.fontTextWidth(uiEngineConfig.ui.font, text)
             );
 
             int width = Math.max(MathUtils.round(textWidthMin / (float) api.TS()) + 2, 12);
@@ -950,7 +950,7 @@ public final class APIWidgets {
             originalText = Tools.Text.validString(originalText);
             windowMinWidth = Math.max(windowMinWidth, 11);
             int wnd_width = Math.clamp(
-                    MathUtils.round(mediaManager.fontTextWidth(uiEngineConfig.ui_font, text) / (float) api.TS()) + 2,
+                    MathUtils.round(mediaManager.fontTextWidth(uiEngineConfig.ui.font, text) / (float) api.TS()) + 2,
                     windowMinWidth, Integer.MAX_VALUE);
             int wnd_height = 5;
             if (showOKButton) wnd_height++;

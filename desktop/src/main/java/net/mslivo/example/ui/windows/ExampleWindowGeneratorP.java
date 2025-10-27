@@ -292,8 +292,8 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
                             }
                         }, 1, 20,
-                        api.config.mouseTextInput.getDefaultLowerCaseCharacters(),
-                        api.config.mouseTextInput.getDefaultUpperCaseCharacters(),
+                        api.config.mouseTextInput.defaultLowerCaseCharacters,
+                        api.config.mouseTextInput.defaultUpperCaseCharacters,
                         14
                 ));
             }

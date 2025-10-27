@@ -73,7 +73,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
         this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
-        api.config.window.setDefaultEnforceScreenBounds(false);
+        api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
         TextButton createExampleWindowButton = api.component.button.textButton.create(0, 0, 10, 2, "Example Wnd", new ButtonAction() {
             @Override
@@ -109,22 +109,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         api.setMouseTool(api.mouseTool.create("Pointer", null, UIEngineBaseMedia_8x8.UI_CURSOR_ARROW));
 
 
-        api.config.input.setHardwareMouseEnabled(true);
-
-        api.config.input.setKeyboardMouseEnabled(true);
-        api.config.input.setKeyboardMouseButtonsUp(new int[]{KeyCode.Key.UP});
-        api.config.input.setKeyboardMouseButtonsDown(new int[]{KeyCode.Key.DOWN});
-        api.config.input.setKeyboardMouseButtonsLeft(new int[]{KeyCode.Key.LEFT});
-        api.config.input.setKeyboardMouseButtonsRight(new int[]{KeyCode.Key.RIGHT});
-        api.config.input.setKeyboardMouseButtonsMouse1(new int[]{KeyCode.Key.CONTROL_LEFT});
-
-        api.config.input.setGamePadMouseEnabled(true);
-        api.config.input.setGamePadMouseStickLeftEnabled(true);
-        api.config.input.setGamePadMouseStickRightEnabled(true);
-        api.config.input.setGamePadMouseButtonsMouse1(new int[]{KeyCode.GamePad.A});
-        api.config.input.setGamePadMouseButtonsMouse2(new int[]{KeyCode.GamePad.B});
-
-        api.config.ui.setFont(UIEngineBaseMedia_8x8.UI_FONT);
+        api.config.input.hardwareMouseEnabled = true;
+        api.config.input.gamePadMouseEnabled = true;
 
 
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {

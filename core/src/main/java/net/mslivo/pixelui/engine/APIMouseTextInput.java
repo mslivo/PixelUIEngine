@@ -26,22 +26,22 @@ public final class APIMouseTextInput {
     public MouseTextInput create(int x, int y) {
         return create(x, y, DEFAULT_MOUSE_TEXTINPUT_ACTION,
                 null,
-                uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiEngineConfig.mouseTextInput.defaultLowerCaseCharacters,
+                uiEngineConfig.mouseTextInput.defaultUpperCaseCharacters);
     }
 
     public MouseTextInput create(int x, int y, MouseTextInputAction mouseTextInputAction) {
         return create(x, y, mouseTextInputAction,
                 null,
-                uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters);
+                uiEngineConfig.mouseTextInput.defaultLowerCaseCharacters,
+                uiEngineConfig.mouseTextInput.defaultUpperCaseCharacters);
     }
 
     public MouseTextInput create(int x, int y, MouseTextInputAction onConfirm, Character selectedCharacter) {
         return create(x, y, onConfirm,
                 selectedCharacter,
-                uiEngineConfig.mouseTextInput_defaultLowerCaseCharacters,
-                uiEngineConfig.mouseTextInput_defaultUpperCaseCharacters
+                uiEngineConfig.mouseTextInput.defaultLowerCaseCharacters,
+                uiEngineConfig.mouseTextInput.defaultUpperCaseCharacters
         );
     }
 
@@ -50,9 +50,9 @@ public final class APIMouseTextInput {
         charactersUC = charactersUC != null ? charactersUC : new char[]{};
 
         MouseTextInput mouseTextInput = new MouseTextInput();
-        mouseTextInput.color = new Color(uiEngineConfig.mouseTextInput_defaultColor);
-        mouseTextInput.color2 = new Color(uiEngineConfig.mouseTextInput_defaultColor).mul(0.5f);
-        mouseTextInput.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+        mouseTextInput.color = new Color(uiEngineConfig.mouseTextInput.defaultColor);
+        mouseTextInput.color2 = new Color(uiEngineConfig.mouseTextInput.defaultColor).mul(0.5f);
+        mouseTextInput.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
         mouseTextInput.x = x - 6;
         mouseTextInput.y = y - 12;
         mouseTextInput.mouseTextInputAction = mouseTextInputAction != null ? mouseTextInputAction : DEFAULT_MOUSE_TEXTINPUT_ACTION;

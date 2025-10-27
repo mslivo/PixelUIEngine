@@ -61,14 +61,14 @@ public final class APIWindow {
         window.title = Tools.Text.validString(title);
         window.alwaysOnTop = alwaysOnTop;
         window.moveAble = moveAble;
-        window.color = new Color(uiEngineConfig.window_defaultColor);
-        window.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+        window.color = new Color(uiEngineConfig.window.defaultColor);
+        window.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
         window.hasTitleBar = hasTitleBar;
         window.visible = visible;
         window.windowAction = windowAction != null ? windowAction : DEFAULT_WINDOW_ACTION;
         window.name = "";
         window.data = null;
-        window.enforceScreenBounds = uiEngineConfig.window_defaultEnforceScreenBounds;
+        window.enforceScreenBounds = uiEngineConfig.window.defaultEnforceScreenBounds;
         window.updateActions = new Array<>();
         window.addedToScreen = false;
         window.components = new Array<>();

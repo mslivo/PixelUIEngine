@@ -45,7 +45,7 @@ public final class APIContextMenu {
                 }
             }
         }
-        contextMenu.color = new Color(uiEngineConfig.contextMenu_defaultColor);
+        contextMenu.color = new Color(uiEngineConfig.component.contextMenuDefaultColor);
         contextMenu.contextMenuAction = contextMenuAction != null ? contextMenuAction : DEFAULT_CONTEXT_MENU_ACTION;
         return contextMenu;
     }
@@ -110,7 +110,7 @@ public final class APIContextMenu {
         public ContextMenuItem create(String text, ContextMenuItemAction contextMenuItemAction) {
             ContextMenuItem contextMenuItem = new ContextMenuItem();
             contextMenuItem.text = Tools.Text.validString(text);
-            contextMenuItem.fontColor = uiEngineConfig.ui_font_defaultColor.cpy();
+            contextMenuItem.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             contextMenuItem.name = "";
             contextMenuItem.data = null;
             contextMenuItem.contextMenuItemAction = contextMenuItemAction;
