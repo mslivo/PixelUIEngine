@@ -1,6 +1,7 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
+import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.media.CMediaFont;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.UIEngineBaseMedia_8x8;
@@ -10,6 +11,7 @@ public final class UIEngineConfig {
     private static final Color DEFAULT_COlOR = Color.valueOf("CECECE");
     private static final Color DEFAULT_COlOR_BRIGHT = Color.valueOf("FFFFFF");
     private static final Color DEFAULT_COLOR_FONT = Color.valueOf("000000");
+
 
     public CMediaFont ui_font;
     public Color ui_font_defaultColor;
@@ -98,28 +100,28 @@ public final class UIEngineConfig {
         input_emulatedMouseCursorSpeed = 4.0f;
         input_hardwareMouseEnabled = true;
         input_keyboardMouseEnabled = false;
-        input_keyboardMouseButtonsUp = null;
-        input_keyboardMouseButtonsDown = null;
-        input_keyboardMouseButtonsLeft = null;
-        input_keyboardMouseButtonsRight = null;
-        input_keyboardMouseButtonsMouse1 = null;
-        input_keyboardMouseButtonsMouse2 = null;
-        input_keyboardMouseButtonsMouse3 = null;
+        input_keyboardMouseButtonsUp = new int[]{KeyCode.Key.UP};
+        input_keyboardMouseButtonsDown = new int[]{KeyCode.Key.DOWN};
+        input_keyboardMouseButtonsLeft = new int[]{KeyCode.Key.LEFT};
+        input_keyboardMouseButtonsRight = new int[]{KeyCode.Key.RIGHT};
+        input_keyboardMouseButtonsMouse1 = new int[]{KeyCode.Key.CONTROL_LEFT};
+        input_keyboardMouseButtonsMouse2 = new int[]{KeyCode.Key.ALT_LEFT};
+        input_keyboardMouseButtonsMouse3 = new int[]{KeyCode.Key.SHIFT_LEFT};
         input_keyboardMouseButtonsMouse4 = null;
         input_keyboardMouseButtonsMouse5 = null;
-        input_keyboardMouseButtonsScrollUp = null;
-        input_keyboardMouseButtonsScrollDown = null;
+        input_keyboardMouseButtonsScrollUp = new int[]{KeyCode.Key.PAGE_UP};
+        input_keyboardMouseButtonsScrollDown = new int[]{KeyCode.Key.PAGE_DOWN};
         input_gamePadMouseEnabled = false;
         input_gamePadMouseJoystickDeadZone = 0.3f;
-        input_gamePadMouseStickLeftEnabled = false;
-        input_gamePadMouseStickRightEnabled = false;
-        input_gamePadMouseButtonsMouse1 = null;
-        input_gamePadMouseButtonsMouse2 = null;
-        input_gamePadMouseButtonsMouse3 = null;
+        input_gamePadMouseStickLeftEnabled = true;
+        input_gamePadMouseStickRightEnabled = true;
+        input_gamePadMouseButtonsMouse1 = new int[KeyCode.GamePad.A];
+        input_gamePadMouseButtonsMouse2 = new int[KeyCode.GamePad.B];
+        input_gamePadMouseButtonsMouse3 = new int[KeyCode.GamePad.Y];
         input_gamePadMouseButtonsMouse4 = null;
         input_gamePadMouseButtonsMouse5 = null;
-        input_gamePadMouseButtonsScrollUp = null;
-        input_gamePadMouseButtonsScrollDown = null;
+        input_gamePadMouseButtonsScrollUp = new int[KeyCode.GamePad.DPAD_UP];
+        input_gamePadMouseButtonsScrollDown = new int[KeyCode.GamePad.DPAD_DOWN];
         // ##### Window & Component Default Values #####
         window_defaultEnforceScreenBounds = true;
         window_defaultColor = DEFAULT_COlOR.cpy();

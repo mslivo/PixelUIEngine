@@ -377,13 +377,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 boolean stickLeft = uiEngineState.config.input_gamePadMouseStickLeftEnabled;
                 boolean stickRight = uiEngineState.config.input_gamePadMouseStickRightEnabled;
                 final float sensitivity = 0.4f;
-                boolean leftGamePad = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -sensitivity);
-                boolean rightGamePad = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > sensitivity);
+                boolean moveLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -sensitivity);
+                boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > sensitivity);
                 mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse1);
                 mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse2);
                 mouse3Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input_gamePadMouseButtonsMouse3);
 
-                if (leftGamePad) {
+                if (moveLeft) {
                     if (!uiEngineState.mTextInputGamePadLeft) {
                         scrollDirection = -1;
                         uiEngineState.mTextInputGamePadLeft = true;
@@ -391,7 +391,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 } else {
                     uiEngineState.mTextInputGamePadLeft = false;
                 }
-                if (rightGamePad) {
+                if (moveRight) {
                     if (!uiEngineState.mTextInputGamePadRight) {
                         scrollDirection = 1;
                         uiEngineState.mTextInputGamePadRight = true;
@@ -401,7 +401,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
 
                 // Continue Scroll
-                if (leftGamePad || rightGamePad) {
+                if (moveLeft || moveRight) {
                     uiEngineState.mTextInputScrollTimer++;
                     if (uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime) {
                         uiEngineState.mTextInputGamePadLeft = false;
@@ -451,18 +451,19 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             uiEngineState.mTextInputMouse1Pressed = false;
         }
 
-        if (mouse3Pressed && !uiEngineState.mTextInputMouse2Pressed) uiEngineState.mTextInputMouse2Pressed = true;
-        if (!mouse3Pressed && uiEngineState.mTextInputMouse2Pressed) {
-            // Change case from Mouse 2
-            changeCaseMouse2 = true;
-            uiEngineState.mTextInputMouse2Pressed = false;
-        }
 
-        if (mouse2Pressed && !uiEngineState.mTextInputMouse3Pressed) uiEngineState.mTextInputMouse3Pressed = true;
-        if (!mouse2Pressed && uiEngineState.mTextInputMouse3Pressed) {
-            // Delete from Mouse 3
+        if (mouse2Pressed && !uiEngineState.mTextInputMouse2Pressed) uiEngineState.mTextInputMouse2Pressed = true;
+        if (!mouse2Pressed && uiEngineState.mTextInputMouse2Pressed) {
+            // Delete from Mouse 2
             deleteCharacterMouse3 = true;
             uiEngineState.mTextInputMouse3Pressed = false;
+        }
+
+        if (mouse3Pressed && !uiEngineState.mTextInputMouse3Pressed) uiEngineState.mTextInputMouse3Pressed = true;
+        if (!mouse3Pressed && uiEngineState.mTextInputMouse3Pressed) {
+            // Change case from Mouse 3
+            changeCaseMouse2 = true;
+            uiEngineState.mTextInputMouse2Pressed = false;
         }
 
         // Confirm Character from API Queue if nothing was pressed
@@ -987,15 +988,15 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             }
                         }
 
-                    }else if (keyDownKeyCode == KeyCode.Key.C && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                    } else if (keyDownKeyCode == KeyCode.Key.C && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // Copy
                         setClipboardContent(uiCommonUtils.textField_getMarkedContent(focusedTextField));
-                    }else if (keyDownKeyCode == KeyCode.Key.X && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                    } else if (keyDownKeyCode == KeyCode.Key.X && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // Cut
                         setClipboardContent(uiCommonUtils.textField_removeMarkedContent(focusedTextField));
-                    }else if (keyDownKeyCode == KeyCode.Key.A && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
+                    } else if (keyDownKeyCode == KeyCode.Key.A && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // Select all
-                        uiCommonUtils.textField_setMarkedContent(focusedTextField, 0,focusedTextField.content.length());
+                        uiCommonUtils.textField_setMarkedContent(focusedTextField, 0, focusedTextField.content.length());
                     }
 
 
@@ -3022,11 +3023,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         // Shift by scroll offset (in pixels)
                         int scrollOffsetPx = render_textWidth(textField.content, 0, textField.offset);
                         drawFrom -= scrollOffsetPx;
-                        drawTo   -= scrollOffsetPx;
+                        drawTo -= scrollOffsetPx;
 
                         // Clip to visible text area (not to 0-based text indices)
                         drawFrom = Math.max(drawFrom, 0);
-                        drawTo   = Math.min(drawTo, TS(textField.width));
+                        drawTo = Math.min(drawTo, TS(textField.width));
 
                         int drawWidth = drawTo - drawFrom;
                         if (drawWidth > 0) {
@@ -3050,7 +3051,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                     // Text
                     render_drawFont(textField.content, uiCommonUtils.component_getAbsoluteX(textField), uiCommonUtils.component_getAbsoluteY(textField),
-                            textField.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(textField.width),null, 0, null,false,false, textField.offset, textField.content.length());
+                            textField.fontColor, componentAlpha, componentGrayScale, 1, 2, TS(textField.width), null, 0, null, false, false, textField.offset, textField.content.length());
 
                     // Caret
                     if (uiCommonUtils.textField_isFocused(textField)) {
@@ -3393,7 +3394,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth) {
-        render_drawFont(text, x, y,color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null,0,null,false,false , 0, text.length());
+        render_drawFont(text, x, y, color, alpha, iconGrayScale, textXOffset, textYOffset, maxWidth, null, 0, null, false, false, 0, text.length());
     }
 
     private void render_drawFont(String text, int x, int y, float alpha, boolean iconGrayScale, Color color, int textXOffset, int textYOffset, int maxWidth) {
