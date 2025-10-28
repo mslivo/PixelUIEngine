@@ -28,7 +28,7 @@ public final class UIEngineConfig {
         public boolean hardwareMouseEnabled = true;
         public boolean keyboardMouseEnabled = false;
         public float keyboardMouseCursorSpeed = 3.0f;
-        public float keyboardMouseCursorSmoothing = 0.5f;
+        public float keyboardMouseCursorSmoothing = 0.25f;
         public int[] keyboardMouseButtonsUp = {KeyCode.Key.UP};
         public int[] keyboardMouseButtonsDown = {KeyCode.Key.DOWN};
         public int[] keyboardMouseButtonsLeft = {KeyCode.Key.LEFT};

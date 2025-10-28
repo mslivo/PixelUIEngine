@@ -820,28 +820,29 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollDown);
         boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsCursorSpeedDouble);
 
+        final float smoothing = uiEngineState.config.input.keyboardMouseCursorSmoothing;
         if(buttonLeft){
-            uiEngineState.keyBoardMouseSmoothing.x = -1f;
+            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,-1, smoothing);
         }else if(buttonRight){
-            uiEngineState.keyBoardMouseSmoothing.x = 1f;
+            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,1f, smoothing);
         }else{
-            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.x) > 0.001f) {
-                uiEngineState.keyBoardMouseSmoothing.x *= uiEngineState.config.input.keyboardMouseCursorSmoothing;
-            }else{
+            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.x) < 0.001f) {
                 uiEngineState.keyBoardMouseSmoothing.x = 0;
+            }else{
+                uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,0f, smoothing);
             }
 
         }
 
         if (buttonUp ) {
-            uiEngineState.keyBoardMouseSmoothing.y = -1f;
+            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,-1, smoothing);
         } else if(buttonDown) {
-            uiEngineState.keyBoardMouseSmoothing.y = 1f;
+            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,1, smoothing);
         }else{
             if(Math.abs(uiEngineState.keyBoardMouseSmoothing.y) < 0.001f) {
-                uiEngineState.keyBoardMouseSmoothing.y = 0;
+                uiEngineState.keyBoardMouseSmoothing.y = 0f;
             }else{
-                uiEngineState.keyBoardMouseSmoothing.y *= uiEngineState.config.input.keyboardMouseCursorSmoothing;
+                uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,0f, smoothing);
             }
         }
 
@@ -982,7 +983,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiEngineState.focusedTextField_repeatedKey = keyDownKeyCode;
                             uiEngineState.focusedTextField_repeatedKeyTimer = -20;
                         }
-                        uiCommonUtils.textField_executeControlKey(focusedTextField, keyDownKeyCode);
+                        uiCommonUtils.textField_executeControlKey(focusedTextField, keyDownKeyCode, isAnyShiftPressed());
                     } else if (keyDownKeyCode == KeyCode.Key.V && uiEngineState.inputEvents.keysDown[KeyCode.Key.CONTROL_LEFT]) {
                         // paste
                         String pasteContent = getClipboardContent();
@@ -1290,7 +1291,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.window_bringToFront(uiEngineState.draggedWindow);
                     }
 
-                    // Unfocus focused textfields
+                    // Unfocus focused textFields
                     if (uiEngineState.focusedTextField != null && lastUIMouseHover != uiEngineState.focusedTextField) {
                         uiCommonUtils.textField_unFocus(uiEngineState.focusedTextField);
                     }
@@ -1349,7 +1350,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         checkBox.checkBoxAction.onCheck(checkBox.checked);
                         uiCommonUtils.resetPressedCheckBoxReference(uiEngineState);
                     }
-                    case Textfield textField -> {
+                    case Textfield _ -> {
                         uiCommonUtils.resetPressedTextFieldReference(uiEngineState);
                     }
                     case AppViewport appViewPort -> {
@@ -1551,19 +1552,20 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                     }
                     case Textfield textField -> {
-                        int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
-                        int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
+                        if(uiCommonUtils.textField_isFocused(textField)) {
+                            int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
+                            int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
 
+                            uiCommonUtils.textField_setMarkedContent(textField,
+                                    Math.min(textPosition, uiEngineState.pressedTextFieldInitCaretPosition),
+                                    Math.max(textPosition, uiEngineState.pressedTextFieldInitCaretPosition)
+                            );
+                            if (textFieldMouseX < 0) {
+                                textPosition -= 1;
+                            }
 
-                        uiCommonUtils.textField_setMarkedContent(textField,
-                                Math.min(textPosition, uiEngineState.pressedTextFieldInitCaretPosition),
-                                Math.max(textPosition, uiEngineState.pressedTextFieldInitCaretPosition)
-                        );
-                        if (textFieldMouseX < 0) {
-                            textPosition -= 1;
+                            uiCommonUtils.textField_setCaretPosition(textField, textPosition);
                         }
-
-                        uiCommonUtils.textField_setCaretPosition(textField, textPosition);
                     }
                     case null, default -> {
                     }
@@ -1634,10 +1636,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (uiEngineState.focusedTextField_repeatedKey != KeyCode.NONE) {
             uiEngineState.focusedTextField_repeatedKeyTimer++;
             if (uiEngineState.focusedTextField_repeatedKeyTimer > 2) {
-                uiCommonUtils.textField_executeControlKey(uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey);
+                uiCommonUtils.textField_executeControlKey(uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey,isAnyShiftPressed());
                 uiEngineState.focusedTextField_repeatedKeyTimer = 0;
             }
         }
+    }
+
+    private boolean isAnyShiftPressed(){
+        return  uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_LEFT] || uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_RIGHT];
     }
 
     private void updateUI() {
@@ -3017,7 +3023,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
                     // Marker
-// Marker
                     int begin = textField.markedContentBegin;
                     int end = textField.markedContentEnd;
                     if (end > begin) {

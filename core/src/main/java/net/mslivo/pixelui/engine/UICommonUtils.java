@@ -632,20 +632,72 @@ public class UICommonUtils {
         return textFieldRepeatedControlKeys.contains(keyCode);
     }
 
-    public void textField_executeControlKey(Textfield textField, int keyCode) {
+    public void textField_executeControlKey(Textfield textField, int keyCode, boolean shiftPressed) {
 
-        final boolean contentIsMarked = Math.abs(textField.markedContentEnd - textField.markedContentBegin) > 0;
+        boolean contentIsMarked = textField_isContentMarked(textField);
+        int caret = textField.caretPosition;
 
         switch (keyCode) {
             case Input.Keys.LEFT -> {
-                int caretPosition = contentIsMarked ? textField.markedContentBegin : textField.caretPosition - 1;
-                textField_resetMarkedContent(textField);
-                textField_setCaretPosition(textField, caretPosition);
+                if (caret > 0) {
+                    int newCaret = caret - 1;
+
+                    if (shiftPressed) {
+                        int anchor;
+                        if (contentIsMarked) {
+                            // Keep the side opposite to caret as anchor
+                            anchor = (caret == textField.markedContentBegin)
+                                    ? textField.markedContentEnd
+                                    : textField.markedContentBegin;
+                        } else {
+                            anchor = caret;
+                        }
+
+                        textField_setMarkedContent(
+                                textField,
+                                Math.min(anchor, newCaret),
+                                Math.max(anchor, newCaret)
+                        );
+                    } else {
+                        if(contentIsMarked){
+                            textField_resetMarkedContent(textField);
+                            newCaret++;
+                        }
+                    }
+
+                    textField_setCaretPosition(textField, newCaret);
+                }
             }
+
             case Input.Keys.RIGHT -> {
-                int caretPosition = contentIsMarked ? textField.markedContentEnd : textField.caretPosition + 1;
-                textField_resetMarkedContent(textField);
-                textField_setCaretPosition(textField, caretPosition);
+                if (caret < textField.content.length()) {
+                    int newCaret = caret + 1;
+
+                    if (shiftPressed) {
+                        int anchor;
+                        if (contentIsMarked) {
+                            // Keep the side opposite to caret as anchor
+                            anchor = (caret == textField.markedContentEnd)
+                                    ? textField.markedContentBegin
+                                    : textField.markedContentEnd;
+                        } else {
+                            anchor = caret;
+                        }
+
+                        textField_setMarkedContent(
+                                textField,
+                                Math.min(anchor, newCaret),
+                                Math.max(anchor, newCaret)
+                        );
+                    } else {
+                        if(contentIsMarked){
+                            textField_resetMarkedContent(textField);
+                            newCaret--;
+                        }
+                    }
+
+                    textField_setCaretPosition(textField, newCaret);
+                }
             }
             case Input.Keys.BACKSPACE -> {
                 if (!textField.content.isEmpty()) {
@@ -687,6 +739,10 @@ public class UICommonUtils {
             return "";
         String markedContent = textField.content.substring(from, to);
         return markedContent;
+    }
+
+    public boolean textField_isContentMarked(Textfield textField){
+        return Math.abs(textField.markedContentBegin-textField.markedContentEnd) > 0;
     }
 
     public String textField_removeMarkedContent(Textfield textField) {
