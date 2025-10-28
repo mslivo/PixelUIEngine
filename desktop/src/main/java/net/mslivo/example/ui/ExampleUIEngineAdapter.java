@@ -111,6 +111,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         api.config.input.hardwareMouseEnabled = true;
         api.config.input.gamePadMouseEnabled = true;
+        api.config.input.keyboardMouseEnabled = true;
 
 
         api.addHotKey(api.hotkey.create(new int[]{KeyCode.Key.F5}, new HotKeyAction() {

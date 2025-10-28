@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Queue;
 import net.mslivo.pixelui.engine.actions.UpdateAction;
@@ -208,7 +205,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.vector2_unproject = new Vector2(0, 0);
         newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
         newUIEngineState.emulatedMouseLastMouseClick = 0;
-        newUIEngineState.keyBoardMouseSpeedUp = new Vector2(0, 0);
+        newUIEngineState.keyBoardMouseSmoothing = new Vector2(0, 0);
         newUIEngineState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
         newUIEngineState.keyBoardTranslatedKeysDown = new boolean[256];
         newUIEngineState.gamePadTranslatedButtonsDown = new boolean[15];
@@ -293,7 +290,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     // Keyboard
                     for (int i = 0; i < uiEngineState.keyBoardTranslatedKeysDown.length; i++)
                         uiEngineState.keyBoardTranslatedKeysDown[i] = false;
-                    uiEngineState.keyBoardMouseSpeedUp.set(0f, 0f);
+                    uiEngineState.keyBoardMouseSmoothing.set(0f, 0f);
                 }
                 // Simulated
                 for (int i = 0; i <= 4; i++) uiEngineState.emulatedMouseIsButtonDown[i] = false;
@@ -532,42 +529,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 uiEngineState.inputEvents.mouseMoved || uiEngineState.inputEvents.mouseDragged || uiEngineState.inputEvents.mouseScrolled;
     }
 
-    private int[] mouseControl_keyboardMouseGetButtons(int index) {
-        return switch (index) {
-            case 0 -> uiEngineState.config.input.keyboardMouseButtonsUp;
-            case 1 -> uiEngineState.config.input.keyboardMouseButtonsDown;
-            case 2 -> uiEngineState.config.input.keyboardMouseButtonsLeft;
-            case 3 -> uiEngineState.config.input.keyboardMouseButtonsRight;
-            case 4 -> uiEngineState.config.input.keyboardMouseButtonsMouse1;
-            case 5 -> uiEngineState.config.input.keyboardMouseButtonsMouse2;
-            case 6 -> uiEngineState.config.input.keyboardMouseButtonsMouse3;
-            case 7 -> uiEngineState.config.input.keyboardMouseButtonsMouse4;
-            case 8 -> uiEngineState.config.input.keyboardMouseButtonsMouse5;
-            case 9 -> uiEngineState.config.input.keyboardMouseButtonsScrollUp;
-            case 10 -> uiEngineState.config.input.keyboardMouseButtonsScrollDown;
-            default -> throw new IllegalStateException("Unexpected value: " + index);
-        };
-    }
 
 
-    private int[] mouseControl_gamePadMouseGetButtons(int index) {
-        return switch (index) {
-            case 0 -> uiEngineState.config.input.gamePadMouseButtonsMouse1;
-            case 1 -> uiEngineState.config.input.gamePadMouseButtonsMouse2;
-            case 2 -> uiEngineState.config.input.gamePadMouseButtonsMouse3;
-            case 3 -> uiEngineState.config.input.gamePadMouseButtonsMouse4;
-            case 4 -> uiEngineState.config.input.gamePadMouseButtonsMouse5;
-            case 5 -> uiEngineState.config.input.gamePadMouseButtonsScrollUp;
-            case 6 -> uiEngineState.config.input.gamePadMouseButtonsScrollDown;
-            default -> throw new IllegalStateException("Unexpected value: " + index);
-        };
-    }
 
     private boolean mouseControl_gamePadMouseTranslateAndChokeEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         boolean gamepadMouseUsed = false;
-        for (int i = 0; i <= 6; i++) {
-            int[] buttons = mouseControl_gamePadMouseGetButtons(i);
+        for (int i = 0; i <= UIEngineConfig.GAMEPAD_MOUSE_BUTTONS; i++) {
+            int[] buttons = uiEngineState.config.input.gamepadMouseButtons(i);
             if (buttons != null) {
                 for (int i2 = 0; i2 < buttons.length; i2++) {
                     int keyCode = buttons[i2];
@@ -641,8 +610,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (uiEngineState.focusedTextField != null) return false; // Disable during Textfield Input
         boolean keyboardMouseUsed = false;
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
-        for (int i = 0; i <= 10; i++) {
-            int[] buttons = mouseControl_keyboardMouseGetButtons(i);
+        for (int i = 0; i <= UIEngineConfig.KEYBOARD_MOUSE_BUTTONS; i++) {
+            int[] buttons = uiEngineState.config.input.keyboardMouseButtons(i);
             if (buttons != null) {
                 if (uiEngineState.inputEvents.keyDown) {
                     for (int i2 = 0; i2 < buttons.length; i2++) {
@@ -682,20 +651,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
 
-    private void mouseControl_emulateMouseEvents(boolean buttonLeft, boolean buttonRight, boolean buttonUp, boolean buttonDown,
-                                                 boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
+    private void mouseControl_emulateMouseEvents(boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
                                                  boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorChangeX, float cursorChangeY
     ) {
-        float deltaX = 0;
-        float deltaY = 0;
-        if (buttonLeft || buttonRight || buttonUp || buttonDown) {
-            cursorChangeX *= uiEngineState.config.input.emulatedMouseCursorSpeed;
-            cursorChangeY *= uiEngineState.config.input.emulatedMouseCursorSpeed;
-            if (buttonLeft) deltaX -= cursorChangeX;
-            if (buttonRight) deltaX += cursorChangeX;
-            if (buttonUp) deltaY -= cursorChangeY;
-            if (buttonDown) deltaY += cursorChangeY;
-        }
+        final float deltaX = cursorChangeX;
+        final float deltaY = cursorChangeY;
 
         // Set to final
         uiEngineState.mouse_emulated.x = Math.clamp(uiEngineState.mouse_emulated.x + deltaX, 0, uiEngineState.resolutionWidth);
@@ -799,20 +759,44 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse5);
         boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollUp);
         boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
+        boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsCursorSpeedDouble);
 
-        float cursorChangeX = 0f;
-        if (buttonLeft || buttonRight) {
-            cursorChangeX = Math.max(Math.abs(uiEngineState.gamePadTranslatedStickLeft.x), Math.abs(uiEngineState.gamePadTranslatedStickRight.x));
-            cursorChangeX = (cursorChangeX - joystickDeadZone) / (1f - joystickDeadZone);
+        final float deadZoneDelta = 1f - joystickDeadZone;
+        float cursorChangeX;
+        if (buttonLeft) {
+            cursorChangeX = Math.min(uiEngineState.gamePadTranslatedStickLeft.x, uiEngineState.gamePadTranslatedStickRight.x);
+            cursorChangeX = (cursorChangeX + joystickDeadZone) / deadZoneDelta;
+        }else if(buttonRight){
+            cursorChangeX = Math.max(uiEngineState.gamePadTranslatedStickLeft.x, uiEngineState.gamePadTranslatedStickRight.x);
+            cursorChangeX = (cursorChangeX - joystickDeadZone) / deadZoneDelta;
+        }else{
+            cursorChangeX = 0;
         }
-        float cursorChangeY = 0f;
-        if (buttonUp || buttonDown) {
-            cursorChangeY = Math.max(Math.abs(uiEngineState.gamePadTranslatedStickLeft.y), Math.abs(uiEngineState.gamePadTranslatedStickRight.y));
-            cursorChangeY = (cursorChangeY - joystickDeadZone) / (1f - joystickDeadZone);
+
+        float cursorChangeY;
+        if (buttonUp) {
+            cursorChangeY = Math.max(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
+            cursorChangeY = (cursorChangeY - joystickDeadZone) / deadZoneDelta;
+        }else if(buttonDown){
+            cursorChangeY = Math.min(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
+            cursorChangeY = (cursorChangeY + joystickDeadZone) / deadZoneDelta;
+        }else{
+            cursorChangeY = 0;
         }
+
+        cursorChangeY = -cursorChangeY;
+
+        cursorChangeX *= uiEngineState.config.input.gamepadMouseCursorSpeed;
+        cursorChangeY *= uiEngineState.config.input.gamepadMouseCursorSpeed;
+
+        if(buttonCursorSpeedDoubleDown){
+            cursorChangeX *= 2;
+            cursorChangeY *= 2;
+        }
+
+
         // Translate to mouse events
-        mouseControl_emulateMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
-                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
+        mouseControl_emulateMouseEvents(buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
                 buttonScrolledUp, buttonScrolledDown, cursorChangeX, cursorChangeY
         );
     }
@@ -834,23 +818,44 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse5);
         boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollUp);
         boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollDown);
+        boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsCursorSpeedDouble);
 
-        final float SPEEDUP_SPEED = 0.1f;
-        if (buttonLeft || buttonRight) {
-            uiEngineState.keyBoardMouseSpeedUp.x = Math.clamp(uiEngineState.keyBoardMouseSpeedUp.x < 1f ? uiEngineState.keyBoardMouseSpeedUp.x + SPEEDUP_SPEED : uiEngineState.keyBoardMouseSpeedUp.x, 0f, 1f);
-        } else {
-            uiEngineState.keyBoardMouseSpeedUp.set(0, uiEngineState.keyBoardMouseSpeedUp.y);
+        if(buttonLeft){
+            uiEngineState.keyBoardMouseSmoothing.x = -1f;
+        }else if(buttonRight){
+            uiEngineState.keyBoardMouseSmoothing.x = 1f;
+        }else{
+            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.x) > 0.001f) {
+                uiEngineState.keyBoardMouseSmoothing.x *= uiEngineState.config.input.keyboardMouseCursorSmoothing;
+            }else{
+                uiEngineState.keyBoardMouseSmoothing.x = 0;
+            }
+
         }
-        if (buttonUp || buttonDown) {
-            uiEngineState.keyBoardMouseSpeedUp.y = Math.clamp(uiEngineState.keyBoardMouseSpeedUp.y < 1f ? uiEngineState.keyBoardMouseSpeedUp.y + SPEEDUP_SPEED : uiEngineState.keyBoardMouseSpeedUp.y, 0f, 1f);
-        } else {
-            uiEngineState.keyBoardMouseSpeedUp.set(uiEngineState.keyBoardMouseSpeedUp.x, 0);
+
+        if (buttonUp ) {
+            uiEngineState.keyBoardMouseSmoothing.y = -1f;
+        } else if(buttonDown) {
+            uiEngineState.keyBoardMouseSmoothing.y = 1f;
+        }else{
+            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.y) < 0.001f) {
+                uiEngineState.keyBoardMouseSmoothing.y = 0;
+            }else{
+                uiEngineState.keyBoardMouseSmoothing.y *= uiEngineState.config.input.keyboardMouseCursorSmoothing;
+            }
+        }
+
+        float cursorChangeX = uiEngineState.keyBoardMouseSmoothing.x * uiEngineState.config.input.keyboardMouseCursorSpeed;
+        float cursorChangeY = uiEngineState.keyBoardMouseSmoothing.y * uiEngineState.config.input.keyboardMouseCursorSpeed;
+
+        if(buttonCursorSpeedDoubleDown){
+            cursorChangeX *= 2f;
+            cursorChangeY *= 2f;
         }
 
         // Translate to mouse events
-        mouseControl_emulateMouseEvents(buttonLeft, buttonRight, buttonUp, buttonDown,
-                buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
-                buttonScrolledUp, buttonScrolledDown, uiEngineState.keyBoardMouseSpeedUp.x, uiEngineState.keyBoardMouseSpeedUp.y
+        mouseControl_emulateMouseEvents(buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
+                buttonScrolledUp, buttonScrolledDown, cursorChangeX, cursorChangeY
         );
     }
 

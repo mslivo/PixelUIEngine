@@ -135,7 +135,7 @@ public final class UIEngineState {
     public Vector3 vector_fboCursor;
     public Vector2 vector2_unproject;
     public boolean[] keyBoardTranslatedKeysDown;
-    public Vector2 keyBoardMouseSpeedUp;
+    public Vector2 keyBoardMouseSmoothing;
     public Vector2 gamePadTranslatedStickLeft;
     public Vector2 gamePadTranslatedStickRight;
     public boolean[] gamePadTranslatedButtonsDown;
