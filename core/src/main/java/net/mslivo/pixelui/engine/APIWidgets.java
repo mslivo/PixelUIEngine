@@ -1108,7 +1108,6 @@ public final class APIWidgets {
                     if(api.input.lastUsedInputMethod() == INPUT_METHOD.GAMEPAD){
                         api.openMouseTextInput(api.mouseTextInput.createForTextField(inputTextField));
                     }
-
                 }
             });
 

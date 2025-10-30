@@ -1,10 +1,9 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.IntArray;
-import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.actions.MouseTextInputAction;
+import net.mslivo.pixelui.media.MediaManager;
 
 import java.util.ArrayList;
 
@@ -24,7 +23,8 @@ public final class APIMouseTextInput {
         this.uiEngineConfig = uiEngineState.config;
     }
 
-    public final MouseTextInputAction DEFAULT_MOUSE_TEXTINPUT_ACTION =  new MouseTextInputAction() {};
+    public final MouseTextInputAction DEFAULT_MOUSE_TEXTINPUT_ACTION = new MouseTextInputAction() {
+    };
 
     public MouseTextInput create(int x, int y) {
         return create(x, y, DEFAULT_MOUSE_TEXTINPUT_ACTION,
@@ -73,17 +73,17 @@ public final class APIMouseTextInput {
                 mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectedCharacter;
             }
         }
-        mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = '\t';
-        mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = '\b';
-        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = '\n';
+        mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = UIEngine.MOUSETEXTINPUT_CHANGE_CASE_CHAR;
+        mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = UIEngine.MOUSETEXTINPUT_BACK_CHAR;
+        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = UIEngine.MOUSETEXTINPUT_ACCEPT;
         return mouseTextInput;
     }
 
-    public boolean isOpen(){
+    public boolean isOpen() {
         return uiCommonUtils.mouseTextInput_isOpen();
     }
 
-    public MouseTextInput currentMouseTextInput(){
+    public MouseTextInput currentMouseTextInput() {
         return uiEngineState.openMouseTextInput;
     }
 
@@ -99,18 +99,18 @@ public final class APIMouseTextInput {
     public void enterChangeCase(MouseTextInput mouseTextInput, boolean upperCase) {
         if (mouseTextInput == null) return;
         if (mouseTextInput.upperCase != upperCase) {
-            enterCharacter(mouseTextInput,'\t');
+            enterCharacter(mouseTextInput, '\t');
         }
     }
 
     public void enterDelete(MouseTextInput mouseTextInput) {
         if (mouseTextInput == null) return;
-        enterCharacter(mouseTextInput,'\b');
+        enterCharacter(mouseTextInput, '\b');
     }
 
     public void enterConfirm(MouseTextInput mouseTextInput) {
         if (mouseTextInput == null) return;
-        enterCharacter(mouseTextInput,'\n');
+        enterCharacter(mouseTextInput, '\n');
     }
 
     public void enterCharacters(MouseTextInput mouseTextInput, String text) {
@@ -173,7 +173,7 @@ public final class APIMouseTextInput {
         mouseTextInput.fontColor.set(color);
     }
 
-    public MouseTextInput createForTextField(Textfield textfield){
+    public MouseTextInput createForTextField(Textfield textfield) {
         ArrayList<Character> filteredLower = new ArrayList<>();
         ArrayList<Character> filteredUpper = new ArrayList<>();
 
@@ -208,14 +208,15 @@ public final class APIMouseTextInput {
             allowedUpperCaseCharacters[i] = filteredUpper.get(i);
         }
 
-        int xOffset = api.TS(textfield.width)/2;
-        MouseTextInput mouseTextInput = api.mouseTextInput.create(api.component.absoluteX(textfield)+xOffset, api.component.absoluteY(textfield), new MouseTextInputAction() {
+        int xOffset = api.TS(textfield.width) / 2;
+        MouseTextInput mouseTextInput = api.mouseTextInput.create(api.component.absoluteX(textfield) + xOffset, api.component.absoluteY(textfield), new MouseTextInputAction() {
             @Override
             public boolean onConfirm() {
                 api.component.textfield.unFocus(textfield);
+                textfield.textFieldAction.onEnter(textfield.content, textfield.contentValid);
                 return true;
             }
-        }, null,allowedLowerCaseCharacters,allowedUpperCaseCharacters);
+        }, null, allowedLowerCaseCharacters, allowedUpperCaseCharacters);
 
         return mouseTextInput;
     }

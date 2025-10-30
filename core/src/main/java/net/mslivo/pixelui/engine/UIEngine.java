@@ -35,6 +35,10 @@ import java.util.Arrays;
 @SuppressWarnings("ForLoopReplaceableByForEach")
 public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     private static final int FONT_MAXWIDTH_NONE = -1;
+    static final char MOUSETEXTINPUT_CHANGE_CASE_CHAR = '\u0014'; // Device Control 4, ascii unused
+    static final char MOUSETEXTINPUT_BACK_CHAR = '\b'; // Device Control 4, ascii unused
+    static final char MOUSETEXTINPUT_ACCEPT = '\n'; // Device Control 4, ascii unused
+
 
     // Basic Configuration
     private final T uiAdapter;
@@ -460,25 +464,24 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
         if (enterRegularCharacterMouse1 || deleteCharacterMouse2 || changeCase) {
-            final char CHANGE_CASE_CHAR = '\u0014'; // Device Control 4, ascii unused
             char c;
 
             if (changeCase) {
-                c = CHANGE_CASE_CHAR;
+                c = MOUSETEXTINPUT_CHANGE_CASE_CHAR;
             } else if (deleteCharacterMouse2) {
-                c = '\b';
+                c = MOUSETEXTINPUT_BACK_CHAR;
             } else {
                 c = characters[mouseTextInput.selectedIndex];
             }
 
             switch (c) {
                 // Control ChangeCase
-                case CHANGE_CASE_CHAR -> {
+                case MOUSETEXTINPUT_CHANGE_CASE_CHAR -> {
                     mouseTextInput.upperCase = !mouseTextInput.upperCase;
                     mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
                 }
                 // Control Delete
-                case '\b' -> {
+                case MOUSETEXTINPUT_BACK_CHAR -> {
                     uiEngineState.inputEvents.keyDown = true;
                     uiEngineState.inputEvents.keyDownKeyCodes.add(KeyCode.Key.BACKSPACE);
                     uiEngineState.inputEvents.keyUp = true;
@@ -486,7 +489,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     mouseTextInput.mouseTextInputAction.onDelete();
                 }
                 // Control Confirm
-                case '\n' -> {
+                case MOUSETEXTINPUT_ACCEPT -> {
                     boolean close = mouseTextInput.mouseTextInputAction == null || mouseTextInput.mouseTextInputAction.onConfirm();
                     if (close) uiCommonUtils.mouseTextInput_close(uiEngineState);
                 }
