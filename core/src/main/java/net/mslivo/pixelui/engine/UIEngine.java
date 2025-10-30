@@ -2199,13 +2199,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_BUTTON, pressedIndex, x, y);
 
         switch (c) {
-            case '\n', '\t', '\b' -> {
+            case MOUSETEXTINPUT_CHANGE_CASE_CHAR, MOUSETEXTINPUT_BACK_CHAR,MOUSETEXTINPUT_ACCEPT -> {
                 render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a * textInputAlpha, false);
                 CMediaArray specialCharacterSprite = switch (c) {
-                    case '\n' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
-                    case '\t' ->
-                            upperCase ? UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_LOWERCASE;
-                    case '\b' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
+                    case MOUSETEXTINPUT_CHANGE_CASE_CHAR -> upperCase ? UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_LOWERCASE;
+                    case MOUSETEXTINPUT_BACK_CHAR -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
+                    case MOUSETEXTINPUT_ACCEPT -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
                     default -> throw new IllegalStateException("Unexpected value: " + c);
                 };
                 spriteRenderer.drawCMediaArray(specialCharacterSprite, pressedIndex, x, y);
