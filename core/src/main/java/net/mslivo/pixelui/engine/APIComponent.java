@@ -988,7 +988,7 @@ public final class APIComponent {
 
         public void focus(Textfield textField) {
             if (textField == null) return;
-            uiCommonUtils.textField_focus(textField);
+            uiCommonUtils.textField_focus(textField, api);
         }
 
         public boolean isFocused(Textfield textField) {

@@ -988,14 +988,20 @@ public class UICommonUtils {
         return uiEngineState.focusedTextField != null && uiEngineState.focusedTextField == textField;
     }
 
-    public void textField_focus(Textfield textField) {
+    public void textField_focus(Textfield textField, API api) {
+        if(textField_isFocused(textField))
+            return;
+
         // Unfocus other textfields
         if (uiEngineState.focusedTextField != null && uiEngineState.focusedTextField != textField) {
             textField_unFocus(uiEngineState.focusedTextField);
         }
+
         // Focus this one
         uiEngineState.focusedTextField = textField;
         textField.textFieldAction.onFocus();
+
+
     }
 
     public void textField_unFocus(Textfield textField) {

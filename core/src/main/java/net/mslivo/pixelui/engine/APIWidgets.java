@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.*;
+import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
 import net.mslivo.pixelui.media.*;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
@@ -1104,6 +1105,10 @@ public final class APIWidgets {
                 @Override
                 public void onDisplay() {
                     api.component.textfield.focus(inputTextField);
+                    if(api.input.lastUsedInputMethod() == INPUT_METHOD.GAMEPAD){
+                        api.openMouseTextInput(api.mouseTextInput.createForTextField(inputTextField));
+                    }
+
                 }
             });
 

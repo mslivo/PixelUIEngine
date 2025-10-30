@@ -1249,14 +1249,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiCommonUtils.textField_setCaretPosition(textField, textPosition);
 
                             // Set Focus
-                            uiCommonUtils.textField_focus(textField);
+                            uiCommonUtils.textField_focus(textField, api);
 
-                            // Open mouse text input?
-                            boolean autoOpenKeyboard = uiEngineState.config.mouseTextInput.autoOpenOnTextFieldFocusForKeyboardControl && uiEngineState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD;
-                            boolean autoOpenGamepad = uiEngineState.config.mouseTextInput.autoOpenOnTextFieldFocusForGamepadControl && uiEngineState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD;
-                            if ((autoOpenKeyboard || autoOpenGamepad)) {
-                                uiCommonUtils.mouseTextInput_open(uiEngineState.config.mouseTextInput.autoMouseTextInputFunction.provideMouseTextInput(api, textField));
-                            }
 
 
                         }

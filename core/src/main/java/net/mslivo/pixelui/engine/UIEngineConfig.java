@@ -159,61 +159,8 @@ public final class UIEngineConfig {
         public char[] defaultUpperCaseCharacters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'};
         public Color defaultColor = DEFAULT_COlOR.cpy();
         public float transparencyEffect = 0.5f;
-
-        public boolean autoOpenOnTextFieldFocusForKeyboardControl = false;
-        public boolean autoOpenOnTextFieldFocusForGamepadControl = false;
-        public MouseTextInputAutoOpenFunction autoMouseTextInputFunction = new MouseTextInputAutoOpenFunction() {};
     }
 
-    public interface MouseTextInputAutoOpenFunction {
-        default MouseTextInput provideMouseTextInput(API api, Textfield textfield) {
-
-            ArrayList<Character> filteredLower = new ArrayList<>();
-            ArrayList<Character> filteredUpper = new ArrayList<>();
-
-            char[] defaultLower = api.config.mouseTextInput.defaultLowerCaseCharacters;
-            char[] defaultUpper = api.config.mouseTextInput.defaultUpperCaseCharacters;
-
-            int maxLen = Math.max(defaultLower.length, defaultUpper.length);
-            for (int i = 0; i < maxLen; i++) {
-                char lower = i < defaultLower.length ? defaultLower[i] : 0;
-                char upper = i < defaultUpper.length ? defaultUpper[i] : 0;
-
-                boolean lowerAllowed = lower != 0 && textfield.allowedCharacters.contains(lower);
-                boolean upperAllowed = upper != 0 && textfield.allowedCharacters.contains(upper);
-
-                if (lowerAllowed && upperAllowed) {
-                    filteredLower.add(lower);
-                    filteredUpper.add(upper);
-                } else if (lowerAllowed) {
-                    filteredLower.add(lower);
-                    filteredUpper.add(lower);
-                } else if (upperAllowed) {
-                    filteredLower.add(upper);
-                    filteredUpper.add(upper);
-                }
-            }
-
-            char[] allowedLowerCaseCharacters = new char[filteredLower.size()];
-            char[] allowedUpperCaseCharacters = new char[filteredUpper.size()];
-
-            for (int i = 0; i < filteredLower.size(); i++) {
-                allowedLowerCaseCharacters[i] = filteredLower.get(i);
-                allowedUpperCaseCharacters[i] = filteredUpper.get(i);
-            }
-
-            int xOffset = api.TS(textfield.width)/2;
-            MouseTextInput mouseTextInput = api.mouseTextInput.create(api.component.absoluteX(textfield)+xOffset, api.component.absoluteY(textfield), new MouseTextInputAction() {
-                @Override
-                public boolean onConfirm() {
-                    api.component.textfield.unFocus(textfield);
-                    return true;
-                }
-            }, null,allowedLowerCaseCharacters,allowedUpperCaseCharacters);
-
-            return mouseTextInput;
-        }
-    }
 
     public interface AnimationTimerFunction {
         void updateAnimationTimer();
