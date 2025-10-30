@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
+import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
@@ -1237,8 +1238,12 @@ public class UICommonUtils {
         }
     }
 
+    public boolean mouseTextInput_isOpen() {
+        return uiEngineState.openMouseTextInput != null;
+    }
+
     public void mouseTextInput_open(MouseTextInput mouseTextInput) {
-        if (uiEngineState.openMouseTextInput != null) return;
+        if (mouseTextInput_isOpen()) return;
         uiEngineState.mTextInputMouseX = Gdx.input.getX();
         uiEngineState.mTextInputUnlock = false;
         uiEngineState.openMouseTextInput = mouseTextInput;
@@ -1251,7 +1256,7 @@ public class UICommonUtils {
     }
 
     public void resetMouseTextInputReference(UIEngineState uiEngineState) {
-        if (uiEngineState.openMouseTextInput != null) {
+        if (mouseTextInput_isOpen()) {
             final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
             uiEngineState.openMouseTextInput = null;
             uiEngineState.mTextInputMouse1Pressed = false;

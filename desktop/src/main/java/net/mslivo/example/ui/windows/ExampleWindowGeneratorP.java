@@ -322,24 +322,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
             @Override
             public void onFocus() {
-                MouseTextInput mouseTextInput = api.mouseTextInput.create(
-                        api.component.absoluteX(osKeyBoardTextInput),
-                        api.component.absoluteY(osKeyBoardTextInput)
-                        , new MouseTextInputAction() {
-                            @Override
-                            public boolean onConfirm() {
-                                api.component.textfield.unFocus(osKeyBoardTextInput);
-                                return true;
-                            }
-                        }, null
-                );
 
-                api.mouseTextInput.setColor(mouseTextInput, Color.BLUE);
-                api.mouseTextInput.setColor2(mouseTextInput, Color.RED);
-                api.mouseTextInput.setFontColor(mouseTextInput, Color.YELLOW);
-                api.mouseTextInput.enterCharacters(mouseTextInput, "abc");
-                api.component.textfield.setMarkerPosition(osKeyBoardTextInput, osKeyBoardTextInput.content.length());
-                api.openMouseTextInput(mouseTextInput);
             }
         });
 

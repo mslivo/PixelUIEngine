@@ -76,6 +76,14 @@ public final class APIMouseTextInput {
         return mouseTextInput;
     }
 
+    public boolean isOpen(){
+        return uiCommonUtils.mouseTextInput_isOpen();
+    }
+
+    public MouseTextInput currentMouseTextInput(){
+        return uiEngineState.openMouseTextInput;
+    }
+
     public boolean isUpperCase(MouseTextInput mouseTextInput) {
         if (mouseTextInput == null) return false;
         return mouseTextInput.upperCase;

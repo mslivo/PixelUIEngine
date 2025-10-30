@@ -256,7 +256,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
 
-        if (uiEngineState.openMouseTextInput != null) {
+        if (uiCommonUtils.mouseTextInput_isOpen()) {
             // Translate to Text Input
             mouseControl_updateMouseTextInput();
         } else {
@@ -313,8 +313,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         int scrollDirection = 0;
         boolean mouse1Pressed = false;
-        boolean mouse3Pressed = false;
         boolean mouse2Pressed = false;
+        int mouseScrolled = 0;
         switch (uiEngineState.currentControlMode) {
             case HARDWARE_MOUSE -> {
                 int deltaX = Gdx.input.getX() - uiEngineState.mTextInputMouseX;
@@ -368,7 +368,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
                 mouse1Pressed = uiEngineState.mTextInputTranslatedMouse1Down;
                 mouse2Pressed = uiEngineState.mTextInputTranslatedMouse2Down;
-                mouse3Pressed = uiEngineState.mTextInputTranslatedMouse3Down;
+
+                if (uiEngineState.inputEvents.mouseScrolled) {
+                    mouseScrolled = uiEngineState.inputEvents.mouseScrolledAmount < 0f ? 1 : -1;
+                }
+
             }
             case GAMEPAD -> {
                 boolean stickLeft = uiEngineState.config.input.gamePadMouseStickLeftEnabled;
@@ -378,7 +382,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > sensitivity);
                 mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse1);
                 mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse2);
-                mouse3Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse3);
+                boolean scrollDown = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
+                boolean scrollUp = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsScrollUp);
 
                 if (moveLeft) {
                     if (!uiEngineState.mTextInputGamePadLeft) {
@@ -418,6 +423,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     uiEngineState.mTextInputScrollTime = 20;
                     uiEngineState.mTextInputScrollSpeed = 0;
                 }
+
+                if (scrollUp) {
+                    mouseScrolled = 1;
+                } else if (scrollDown) {
+                    mouseScrolled = -1;
+                }
+
             }
             case KEYBOARD -> {
                 // Not Needed since you are already using a keyboard to type
@@ -439,12 +451,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
         // Confirm Character from Input
-        boolean enterRegularCharacter = false;
-        boolean changeCaseMouse2 = false;
-        boolean deleteCharacterMouse3 = false;
+        boolean enterRegularCharacterMouse1 = false;
+        boolean deleteCharacterMouse2 = false;
+        boolean changeCase = false;
         if (mouse1Pressed && !uiEngineState.mTextInputMouse1Pressed) uiEngineState.mTextInputMouse1Pressed = true;
         if (!mouse1Pressed && uiEngineState.mTextInputMouse1Pressed) {
-            enterRegularCharacter = true;
+            enterRegularCharacterMouse1 = true;
             uiEngineState.mTextInputMouse1Pressed = false;
         }
 
@@ -452,28 +464,30 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (mouse2Pressed && !uiEngineState.mTextInputMouse2Pressed) uiEngineState.mTextInputMouse2Pressed = true;
         if (!mouse2Pressed && uiEngineState.mTextInputMouse2Pressed) {
             // Delete from Mouse 2
-            deleteCharacterMouse3 = true;
-            uiEngineState.mTextInputMouse3Pressed = false;
-        }
-
-        if (mouse3Pressed && !uiEngineState.mTextInputMouse3Pressed) uiEngineState.mTextInputMouse3Pressed = true;
-        if (!mouse3Pressed && uiEngineState.mTextInputMouse3Pressed) {
-            // Change case from Mouse 3
-            changeCaseMouse2 = true;
+            deleteCharacterMouse2 = true;
             uiEngineState.mTextInputMouse2Pressed = false;
         }
 
-        // Confirm Character from API Queue if nothing was pressed
-        if (!enterRegularCharacter && !mouseTextInput.enterCharacterQueue.isEmpty()) {
-            uiCommonUtils.mouseTextInput_selectCharacter(uiEngineState.openMouseTextInput, (char) mouseTextInput.enterCharacterQueue.removeIndex(0));
-            enterRegularCharacter = true;
+        if (mouseScrolled == 1 && !mouseTextInput.upperCase) {
+            changeCase = true;
+        } else if (mouseScrolled == -1 && mouseTextInput.upperCase) {
+            changeCase = true;
         }
 
-        if (changeCaseMouse2 || deleteCharacterMouse3 || enterRegularCharacter) {
+
+        // Confirm Character from API Queue if nothing was pressed
+        if (!enterRegularCharacterMouse1 && !mouseTextInput.enterCharacterQueue.isEmpty()) {
+            uiCommonUtils.mouseTextInput_selectCharacter(uiEngineState.openMouseTextInput, (char) mouseTextInput.enterCharacterQueue.removeIndex(0));
+            enterRegularCharacterMouse1 = true;
+        }
+
+        if (enterRegularCharacterMouse1 || deleteCharacterMouse2 || changeCase) {
+            final char CHANGE_CASE_CHAR = '\u0014'; // Device Control 4, ascii unused
             char c;
-            if (changeCaseMouse2) {
-                c = '\t';
-            } else if (deleteCharacterMouse3) {
+
+            if (changeCase) {
+                c = CHANGE_CASE_CHAR;
+            } else if (deleteCharacterMouse2) {
                 c = '\b';
             } else {
                 c = characters[mouseTextInput.selectedIndex];
@@ -481,7 +495,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
             switch (c) {
                 // Control ChangeCase
-                case '\t' -> {
+                case CHANGE_CASE_CHAR -> {
                     mouseTextInput.upperCase = !mouseTextInput.upperCase;
                     mouseTextInput.mouseTextInputAction.onChangeCase(mouseTextInput.upperCase);
                 }
@@ -528,8 +542,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         return uiEngineState.inputEvents.mouseDown || uiEngineState.inputEvents.mouseUp ||
                 uiEngineState.inputEvents.mouseMoved || uiEngineState.inputEvents.mouseDragged || uiEngineState.inputEvents.mouseScrolled;
     }
-
-
 
 
     private boolean mouseControl_gamePadMouseTranslateAndChokeEvents() {
@@ -747,6 +759,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean stickLeft = uiEngineState.config.input.gamePadMouseStickLeftEnabled;
         boolean stickRight = uiEngineState.config.input.gamePadMouseStickRightEnabled;
 
+
         float joystickDeadZone = uiEngineState.config.input.gamePadMouseJoystickDeadZone;
         boolean buttonLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -joystickDeadZone);
         boolean buttonRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > joystickDeadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > joystickDeadZone);
@@ -766,10 +779,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (buttonLeft) {
             cursorChangeX = Math.min(uiEngineState.gamePadTranslatedStickLeft.x, uiEngineState.gamePadTranslatedStickRight.x);
             cursorChangeX = (cursorChangeX + joystickDeadZone) / deadZoneDelta;
-        }else if(buttonRight){
+        } else if (buttonRight) {
             cursorChangeX = Math.max(uiEngineState.gamePadTranslatedStickLeft.x, uiEngineState.gamePadTranslatedStickRight.x);
             cursorChangeX = (cursorChangeX - joystickDeadZone) / deadZoneDelta;
-        }else{
+        } else {
             cursorChangeX = 0;
         }
 
@@ -777,10 +790,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (buttonUp) {
             cursorChangeY = Math.max(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
             cursorChangeY = (cursorChangeY - joystickDeadZone) / deadZoneDelta;
-        }else if(buttonDown){
+        } else if (buttonDown) {
             cursorChangeY = Math.min(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
             cursorChangeY = (cursorChangeY + joystickDeadZone) / deadZoneDelta;
-        }else{
+        } else {
             cursorChangeY = 0;
         }
 
@@ -789,7 +802,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         cursorChangeX *= uiEngineState.config.input.gamepadMouseCursorSpeed;
         cursorChangeY *= uiEngineState.config.input.gamepadMouseCursorSpeed;
 
-        if(buttonCursorSpeedDoubleDown){
+        if (buttonCursorSpeedDoubleDown) {
             cursorChangeX *= 2;
             cursorChangeY *= 2;
         }
@@ -821,35 +834,35 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsCursorSpeedDouble);
 
         final float smoothing = uiEngineState.config.input.keyboardMouseCursorSmoothing;
-        if(buttonLeft){
-            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,-1, smoothing);
-        }else if(buttonRight){
-            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,1f, smoothing);
-        }else{
-            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.x) < 0.001f) {
+        if (buttonLeft) {
+            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x, -1, smoothing);
+        } else if (buttonRight) {
+            uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x, 1f, smoothing);
+        } else {
+            if (Math.abs(uiEngineState.keyBoardMouseSmoothing.x) < 0.001f) {
                 uiEngineState.keyBoardMouseSmoothing.x = 0;
-            }else{
-                uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x,0f, smoothing);
+            } else {
+                uiEngineState.keyBoardMouseSmoothing.x = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.x, 0f, smoothing);
             }
 
         }
 
-        if (buttonUp ) {
-            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,-1, smoothing);
-        } else if(buttonDown) {
-            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,1, smoothing);
-        }else{
-            if(Math.abs(uiEngineState.keyBoardMouseSmoothing.y) < 0.001f) {
+        if (buttonUp) {
+            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y, -1, smoothing);
+        } else if (buttonDown) {
+            uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y, 1, smoothing);
+        } else {
+            if (Math.abs(uiEngineState.keyBoardMouseSmoothing.y) < 0.001f) {
                 uiEngineState.keyBoardMouseSmoothing.y = 0f;
-            }else{
-                uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y,0f, smoothing);
+            } else {
+                uiEngineState.keyBoardMouseSmoothing.y = Interpolation.linear.apply(uiEngineState.keyBoardMouseSmoothing.y, 0f, smoothing);
             }
         }
 
         float cursorChangeX = uiEngineState.keyBoardMouseSmoothing.x * uiEngineState.config.input.keyboardMouseCursorSpeed;
         float cursorChangeY = uiEngineState.keyBoardMouseSmoothing.y * uiEngineState.config.input.keyboardMouseCursorSpeed;
 
-        if(buttonCursorSpeedDoubleDown){
+        if (buttonCursorSpeedDoubleDown) {
             cursorChangeX *= 2f;
             cursorChangeY *= 2f;
         }
@@ -946,9 +959,15 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         return true;
     }
 
+    private void updateUI_gamepadInteraction() {
+
+    }
+
     private void updateUI_keyInteractions() {
         uiCommonUtils.setKeyboardInteractedUIObject(null);
-        if (uiEngineState.config.ui.keyInteractionsDisabled) return;
+        if (uiEngineState.config.ui.keyInteractionsDisabled)
+            return;
+
         // Key
         if (uiEngineState.inputEvents.keyTyped) {
             final Textfield focusedTextField = uiEngineState.focusedTextField;
@@ -961,13 +980,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     uiCommonUtils.textField_typeCharacter(focusedTextField, keyTypedCharacter);
                 }
                 // MouseTextInput open = focus on last typed character
-                if (uiEngineState.openMouseTextInput != null) {
+                if (uiCommonUtils.mouseTextInput_isOpen()) {
                     char typedChar = (char) uiEngineState.inputEvents.keyTypedCharacters.get(uiEngineState.inputEvents.keyTypedCharacters.size - 1);
                     uiCommonUtils.mouseTextInput_selectCharacter(uiEngineState.openMouseTextInput, typedChar);
                 }
                 uiCommonUtils.setKeyboardInteractedUIObject(focusedTextField);
             }
-
         }
         if (uiEngineState.inputEvents.keyDown) {
             final Textfield focusedTextField = uiEngineState.focusedTextField;
@@ -1108,7 +1126,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void updateUI_mouseInteractions() {
         uiCommonUtils.setMouseInteractedUIObject(null);
-        if (uiEngineState.config.ui.mouseInteractionsDisabled) return;
+        if (uiCommonUtils.mouseTextInput_isOpen())
+            return;
+        if (uiEngineState.config.ui.mouseInteractionsDisabled)
+            return;
         // ------ MOUSE DOUBLE CLICK ------
         if (uiEngineState.inputEvents.mouseDoubleClick) {
             final Object lastUIMouseHover = uiEngineState.lastUIMouseHover;
@@ -1229,6 +1250,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                             // Set Focus
                             uiCommonUtils.textField_focus(textField);
+
+                            // Open mouse text input?
+                            boolean autoOpenKeyboard = uiEngineState.config.mouseTextInput.autoOpenOnTextFieldFocusForKeyboardControl && uiEngineState.currentControlMode == MOUSE_CONTROL_MODE.KEYBOARD;
+                            boolean autoOpenGamepad = uiEngineState.config.mouseTextInput.autoOpenOnTextFieldFocusForGamepadControl && uiEngineState.currentControlMode == MOUSE_CONTROL_MODE.GAMEPAD;
+                            if ((autoOpenKeyboard || autoOpenGamepad)) {
+                                uiCommonUtils.mouseTextInput_open(uiEngineState.config.mouseTextInput.autoMouseTextInputFunction.provideMouseTextInput(api, textField));
+                            }
+
 
                         }
                         case Grid grid -> {
@@ -1528,10 +1557,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             boolean processMouseDraggedDragged = true;
             // Press interaction
             Object pressedUIObject = uiCommonUtils.getPressedUIReference(uiEngineState);
-            if (pressedUIObject == null) processMouseDraggedPressed = false;
+            if (pressedUIObject == null)
+                processMouseDraggedPressed = false;
             // Drag interaction
             Object draggedUIObject = uiCommonUtils.getDraggedUIReference(uiEngineState);
-            if (draggedUIObject == null) processMouseDraggedDragged = false;
+            if (draggedUIObject == null)
+                processMouseDraggedDragged = false;
 
             if (processMouseDraggedPressed) {
                 switch (pressedUIObject) {
@@ -1552,7 +1583,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                     }
                     case Textfield textField -> {
-                        if(uiCommonUtils.textField_isFocused(textField)) {
+                        if (uiCommonUtils.textField_isFocused(textField)) {
                             int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouse_ui.x, textField);
                             int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
 
@@ -1636,14 +1667,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         if (uiEngineState.focusedTextField_repeatedKey != KeyCode.NONE) {
             uiEngineState.focusedTextField_repeatedKeyTimer++;
             if (uiEngineState.focusedTextField_repeatedKeyTimer > 2) {
-                uiCommonUtils.textField_executeControlKey(uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey,isAnyShiftPressed());
+                uiCommonUtils.textField_executeControlKey(uiEngineState.focusedTextField, uiEngineState.focusedTextField_repeatedKey, isAnyShiftPressed());
                 uiEngineState.focusedTextField_repeatedKeyTimer = 0;
             }
         }
     }
 
-    private boolean isAnyShiftPressed(){
-        return  uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_LEFT] || uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_RIGHT];
+    private boolean isAnyShiftPressed() {
+        return uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_LEFT] || uiEngineState.inputEvents.keysDown[KeyCode.Key.SHIFT_RIGHT];
     }
 
     private void updateUI() {
@@ -2154,19 +2185,26 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         final float textInputAlpha = color1.a;
         final int CHARACTERS = 4;
         char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
+        final float maxTransparency = 1f-uiEngineState.config.mouseTextInput.transparencyEffect;
 
         // 4 to the left
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont, textInputAlpha, mouseTextInput.upperCase, false);
+                float alpha = (1f-maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
+                        textInputAlpha * alpha,
+                        mouseTextInput.upperCase, false);
             }
         }
         // 4 to the right
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 12), mouseTextInput.y - ((i * i) / 2), color1, colorFont, textInputAlpha, mouseTextInput.upperCase, false);
+                float alpha = (1f-maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
+                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
+                        textInputAlpha * alpha,
+                        mouseTextInput.upperCase, false);
             }
         }
         // 1 in center
@@ -2187,7 +2225,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         switch (c) {
             case '\n', '\t', '\b' -> {
-                render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a, false);
+                render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a * textInputAlpha, false);
                 CMediaArray specialCharacterSprite = switch (c) {
                     case '\n' -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
                     case '\t' ->

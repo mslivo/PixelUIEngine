@@ -1,10 +1,14 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntSet;
+import net.mslivo.pixelui.engine.actions.MouseTextInputAction;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.media.CMediaFont;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.UIEngineBaseMedia_8x8;
+
+import java.util.ArrayList;
 
 public final class UIEngineConfig {
 
@@ -15,17 +19,18 @@ public final class UIEngineConfig {
     public static final int GAMEPAD_MOUSE_BUTTONS = 7;
     public static final int KEYBOARD_MOUSE_BUTTONS = 11;
 
-    public final UI ui = new UI();
-    public final Input input = new Input();
-    public final Window window = new Window();
-    public final Component component = new Component();
+    public final UIConfig ui = new UIConfig();
+    public final InputConfig input = new InputConfig();
+    public final WindowConfig window = new WindowConfig();
+    public final ComponentConfig component = new ComponentConfig();
     public final Notification notification = new Notification();
-    public final Tooltip tooltip = new Tooltip();
-    public final MouseTextInput mouseTextInput = new MouseTextInput();
+    public final TooltipConfig tooltip = new TooltipConfig();
+    public final MouseTextInputConfig mouseTextInput = new MouseTextInputConfig();
 
 
-    public class Input {
+    public class InputConfig {
         public boolean hardwareMouseEnabled = true;
+
         public boolean keyboardMouseEnabled = false;
         public float keyboardMouseCursorSpeed = 3.0f;
         public float keyboardMouseCursorSmoothing = 0.25f;
@@ -35,29 +40,29 @@ public final class UIEngineConfig {
         public int[] keyboardMouseButtonsRight = {KeyCode.Key.RIGHT};
         public int[] keyboardMouseButtonsMouse1 = {KeyCode.Key.CONTROL_LEFT};
         public int[] keyboardMouseButtonsMouse2 = {KeyCode.Key.ALT_LEFT};
-        public int[] keyboardMouseButtonsMouse3 = {KeyCode.Key.TAB};
+        public int[] keyboardMouseButtonsMouse3 = null;
         public int[] keyboardMouseButtonsMouse4 = null;
         public int[] keyboardMouseButtonsMouse5 = null;
         public int[] keyboardMouseButtonsScrollUp = {KeyCode.Key.PAGE_UP};
         public int[] keyboardMouseButtonsScrollDown = {KeyCode.Key.PAGE_DOWN};
         public int[] keyboardMouseButtonsCursorSpeedDouble = {KeyCode.Key.SHIFT_LEFT};
-        public boolean gamePadMouseEnabled = false;
 
-        public float gamepadMouseCursorSpeed = 4.0f;
+        public boolean gamePadMouseEnabled = false;
+        public float gamepadMouseCursorSpeed = 3.0f;
         public float gamePadMouseJoystickDeadZone = 0.3f;
         public boolean gamePadMouseStickLeftEnabled = true;
         public boolean gamePadMouseStickRightEnabled = true;
         public int[] gamePadMouseButtonsMouse1 = {KeyCode.GamePad.A};
         public int[] gamePadMouseButtonsMouse2 = {KeyCode.GamePad.B};
-        public int[] gamePadMouseButtonsMouse3 = {KeyCode.GamePad.Y};
+        public int[] gamePadMouseButtonsMouse3 = null;
         public int[] gamePadMouseButtonsMouse4 = null;
         public int[] gamePadMouseButtonsMouse5 = null;
         public int[] gamePadMouseButtonsScrollUp = {KeyCode.GamePad.DPAD_UP};
         public int[] gamePadMouseButtonsScrollDown = {KeyCode.GamePad.DPAD_DOWN};
-        public int[] gamePadMouseButtonsCursorSpeedDouble = {KeyCode.GamePad.R1};
+        public int[] gamePadMouseButtonsCursorSpeedDouble = {KeyCode.GamePad.X};
 
         public int[] gamepadMouseButtons(int index) {
-            index = Math.clamp(index,0,GAMEPAD_MOUSE_BUTTONS);
+            index = Math.clamp(index, 0, GAMEPAD_MOUSE_BUTTONS);
             return switch (index) {
                 case 0 -> this.gamePadMouseButtonsMouse1;
                 case 1 -> this.gamePadMouseButtonsMouse2;
@@ -72,7 +77,7 @@ public final class UIEngineConfig {
         }
 
         public int[] keyboardMouseButtons(int index) {
-            index = Math.clamp(index,0,KEYBOARD_MOUSE_BUTTONS);
+            index = Math.clamp(index, 0, KEYBOARD_MOUSE_BUTTONS);
             return switch (index) {
                 case 0 -> this.keyboardMouseButtonsUp;
                 case 1 -> this.keyboardMouseButtonsDown;
@@ -92,15 +97,15 @@ public final class UIEngineConfig {
 
     }
 
-    public class UI {
-        public CMediaFont font= UIEngineBaseMedia_8x8.UI_FONT;
+    public class UIConfig {
+        public CMediaFont font = UIEngineBaseMedia_8x8.UI_FONT;
         public Color fontDefaultColor = DEFAULT_COLOR_FONT.cpy();
         public CMediaSprite cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
         public boolean keyInteractionsDisabled = false;
         public boolean mouseInteractionsDisabled = false;
-        public boolean foldWindowsOnDoubleClick= true;
+        public boolean foldWindowsOnDoubleClick = true;
         public AnimationTimerFunction animationTimerFunction = new AnimationTimerFunction() {
-            final float delta = 1/60f;
+            final float delta = 1 / 60f;
             float animationTimer = 0;
 
             @Override
@@ -116,12 +121,12 @@ public final class UIEngineConfig {
         };
     }
 
-    public class Window {
-        public boolean defaultEnforceScreenBounds  = true;
-        public Color defaultColor  = DEFAULT_COlOR.cpy();
+    public class WindowConfig {
+        public boolean defaultEnforceScreenBounds = true;
+        public Color defaultColor = DEFAULT_COlOR.cpy();
     }
 
-    public class Component {
+    public class ComponentConfig {
         public Color defaultColor = DEFAULT_COlOR.cpy();
         public Color contextMenuDefaultColor = DEFAULT_COlOR_BRIGHT.cpy();
         public int appViewportDefaultUpdateTime = 0;
@@ -129,24 +134,8 @@ public final class UIEngineConfig {
         public float gridDragAlpha = 0.8f;
         public float knobSensitivity = 1f;
         public float scrollbarSensitivity = 1f;
-        public float mapOverlayDefaultFadeoutSpeed = 0.05f;
-        public char[] textFieldDefaultAllowedCharacters= new char[]{
-                'a', 'b', 'c', 'd', 'e', 'f',
-                'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r',
-                's', 't', 'u', 'v', 'w',
-                'x', 'y', 'z',
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F',
-                'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R',
-                'S', 'T', 'U', 'V', 'W',
-                'X', 'Y', 'Z',
-                '!', '?', '.', '+', '-', '=', '&', '%', '*', '$', '/', ':', ';', ',',
-                '"', '(', ')', '_',
-                ' '
-        };
-        public Color textFieldDefaultMarkerColor  = Color.valueOf("8FD3FF");
+        public char[] textFieldDefaultAllowedCharacters = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$', '/', ':', ';', ',', '"', '(', ')', '_', ' '};
+        public Color textFieldDefaultMarkerColor = Color.valueOf("8FD3FF");
     }
 
     public class Notification {
@@ -158,31 +147,72 @@ public final class UIEngineConfig {
         public int toolTipNotificationFadeoutTime = 12;
     }
 
-    public class Tooltip {
+    public class TooltipConfig {
         public Color defaultCellColor = DEFAULT_COlOR_BRIGHT.cpy();
         public float fadeInSpeed = 0.2f;
         public int fadeInDelay = 20;
         public float fadeOutSpeed = 0.2f;
     }
 
-    public class MouseTextInput {
-        public char[]  defaultLowerCaseCharacters = {
-            'a', 'b', 'c', 'd', 'e', 'f',
-                    'g', 'h', 'i', 'j', 'k', 'l',
-                    'm', 'n', 'o', 'p', 'q', 'r',
-                    's', 't', 'u', 'v', 'w',
-                    'x', 'y', 'z',
-                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        };
-        public char[] defaultUpperCaseCharacters = {
-            'A', 'B', 'C', 'D', 'E', 'F',
-                    'G', 'H', 'I', 'J', 'K', 'L',
-                    'M', 'N', 'O', 'P', 'Q', 'R',
-                    'S', 'T', 'U', 'V', 'W',
-                    'X', 'Y', 'Z',
-                    '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'
-        };
+    public class MouseTextInputConfig {
+        public char[] defaultLowerCaseCharacters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        public char[] defaultUpperCaseCharacters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'};
         public Color defaultColor = DEFAULT_COlOR.cpy();
+        public float transparencyEffect = 0.5f;
+
+        public boolean autoOpenOnTextFieldFocusForKeyboardControl = false;
+        public boolean autoOpenOnTextFieldFocusForGamepadControl = false;
+        public MouseTextInputAutoOpenFunction autoMouseTextInputFunction = new MouseTextInputAutoOpenFunction() {};
+    }
+
+    public interface MouseTextInputAutoOpenFunction {
+        default MouseTextInput provideMouseTextInput(API api, Textfield textfield) {
+
+            ArrayList<Character> filteredLower = new ArrayList<>();
+            ArrayList<Character> filteredUpper = new ArrayList<>();
+
+            char[] defaultLower = api.config.mouseTextInput.defaultLowerCaseCharacters;
+            char[] defaultUpper = api.config.mouseTextInput.defaultUpperCaseCharacters;
+
+            int maxLen = Math.max(defaultLower.length, defaultUpper.length);
+            for (int i = 0; i < maxLen; i++) {
+                char lower = i < defaultLower.length ? defaultLower[i] : 0;
+                char upper = i < defaultUpper.length ? defaultUpper[i] : 0;
+
+                boolean lowerAllowed = lower != 0 && textfield.allowedCharacters.contains(lower);
+                boolean upperAllowed = upper != 0 && textfield.allowedCharacters.contains(upper);
+
+                if (lowerAllowed && upperAllowed) {
+                    filteredLower.add(lower);
+                    filteredUpper.add(upper);
+                } else if (lowerAllowed) {
+                    filteredLower.add(lower);
+                    filteredUpper.add(lower);
+                } else if (upperAllowed) {
+                    filteredLower.add(upper);
+                    filteredUpper.add(upper);
+                }
+            }
+
+            char[] allowedLowerCaseCharacters = new char[filteredLower.size()];
+            char[] allowedUpperCaseCharacters = new char[filteredUpper.size()];
+
+            for (int i = 0; i < filteredLower.size(); i++) {
+                allowedLowerCaseCharacters[i] = filteredLower.get(i);
+                allowedUpperCaseCharacters[i] = filteredUpper.get(i);
+            }
+
+            int xOffset = api.TS(textfield.width)/2;
+            MouseTextInput mouseTextInput = api.mouseTextInput.create(api.component.absoluteX(textfield)+xOffset, api.component.absoluteY(textfield), new MouseTextInputAction() {
+                @Override
+                public boolean onConfirm() {
+                    api.component.textfield.unFocus(textfield);
+                    return true;
+                }
+            }, null,allowedLowerCaseCharacters,allowedUpperCaseCharacters);
+
+            return mouseTextInput;
+        }
     }
 
     public interface AnimationTimerFunction {
