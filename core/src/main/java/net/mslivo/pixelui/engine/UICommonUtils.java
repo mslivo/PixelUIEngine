@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
-import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
@@ -599,12 +598,12 @@ public class UICommonUtils {
     }
 
     public void textField_resetMarkedContent(Textfield textField) {
-        textField_setMarkedContent(textField,0,0);
+        textField_setMarkedContent(textField, 0, 0);
     }
 
     public void textField_setMarkedContent(Textfield textField, int begin, int end) {
-        textField.markedContentBegin = Math.max(begin,0);
-        textField.markedContentEnd = Math.min(end,textField.content.length());
+        textField.markedContentBegin = Math.max(begin, 0);
+        textField.markedContentEnd = Math.min(end, textField.content.length());
     }
 
     public void textField_setCaretPosition(Textfield textField, int position) {
@@ -660,7 +659,7 @@ public class UICommonUtils {
                                 Math.max(anchor, newCaret)
                         );
                     } else {
-                        if(contentIsMarked){
+                        if (contentIsMarked) {
                             textField_resetMarkedContent(textField);
                             newCaret++;
                         }
@@ -691,7 +690,7 @@ public class UICommonUtils {
                                 Math.max(anchor, newCaret)
                         );
                     } else {
-                        if(contentIsMarked){
+                        if (contentIsMarked) {
                             textField_resetMarkedContent(textField);
                             newCaret--;
                         }
@@ -742,8 +741,8 @@ public class UICommonUtils {
         return markedContent;
     }
 
-    public boolean textField_isContentMarked(Textfield textField){
-        return Math.abs(textField.markedContentBegin-textField.markedContentEnd) > 0;
+    public boolean textField_isContentMarked(Textfield textField) {
+        return Math.abs(textField.markedContentBegin - textField.markedContentEnd) > 0;
     }
 
     public String textField_removeMarkedContent(Textfield textField) {
@@ -989,7 +988,7 @@ public class UICommonUtils {
     }
 
     public void textField_focus(Textfield textField, API api) {
-        if(textField_isFocused(textField))
+        if (textField_isFocused(textField))
             return;
 
         // Unfocus other textfields
@@ -1238,7 +1237,13 @@ public class UICommonUtils {
         for (int i = 0; i < mouseTextInput.charactersLC.length; i++) {
             if (mouseTextInput.charactersLC[i] == selectChar || mouseTextInput.charactersUC[i] == selectChar) {
                 mouseTextInput_selectIndex(mouseTextInput, i);
-                mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectChar;
+                if (mouseTextInput.charactersUC[i] != mouseTextInput.charactersLC[i]) {
+                    if (mouseTextInput.charactersUC[i] == selectChar) {
+                        mouseTextInput.upperCase = true;
+                    } else if (mouseTextInput.charactersLC[i] == selectChar) {
+                        mouseTextInput.upperCase = false;
+                    }
+                }
                 break findCharLoop;
             }
         }
@@ -1268,14 +1273,11 @@ public class UICommonUtils {
             uiEngineState.mTextInputMouse1Pressed = false;
             uiEngineState.mTextInputMouse2Pressed = false;
             uiEngineState.mTextInputMouse3Pressed = false;
-            uiEngineState.mTextInputGamePadLeft = false;
-            uiEngineState.mTextInputGamePadRight = false;
             uiEngineState.mTextInputScrollTimer = 0;
             uiEngineState.mTextInputScrollTime = 0;
             uiEngineState.mTextInputScrollSpeed = 0;
             uiEngineState.mTextInputTranslatedMouse1Down = false;
             uiEngineState.mTextInputTranslatedMouse2Down = false;
-            uiEngineState.mTextInputTranslatedMouse3Down = false;
             uiEngineState.mTextInputUnlock = false;
             mouseTextInput.mouseTextInputAction.onRemove();
         }

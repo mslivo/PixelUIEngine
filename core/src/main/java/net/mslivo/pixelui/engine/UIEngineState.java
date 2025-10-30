@@ -109,14 +109,11 @@ public final class UIEngineState {
     public MouseTextInput openMouseTextInput;
     public int mTextInputMouseX;
     public boolean mTextInputMouse1Pressed, mTextInputMouse2Pressed, mTextInputMouse3Pressed;
-    public boolean mTextInputGamePadLeft;
-    public boolean mTextInputGamePadRight;
     public int mTextInputScrollTimer;
     public int mTextInputScrollTime;
     public int mTextInputScrollSpeed;
     public boolean mTextInputTranslatedMouse1Down;
     public boolean mTextInputTranslatedMouse2Down;
-    public boolean mTextInputTranslatedMouse3Down;
     public boolean mTextInputUnlock;
 
     /* #################### Control #################### */

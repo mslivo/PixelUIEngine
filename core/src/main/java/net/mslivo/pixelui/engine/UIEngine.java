@@ -136,8 +136,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.mTextInputMouse1Pressed = false;
         newUIEngineState.mTextInputMouse2Pressed = false;
         newUIEngineState.mTextInputMouse3Pressed = false;
-        newUIEngineState.mTextInputGamePadLeft = false;
-        newUIEngineState.mTextInputGamePadRight = false;
         newUIEngineState.mTextInputScrollTimer = 0;
         newUIEngineState.mTextInputScrollTime = 0;
         newUIEngineState.mTextInputScrollSpeed = 0;
@@ -339,12 +337,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiEngineState.inputEvents.mouseDownButtons.removeIndex(indexOfRight);
                         uiEngineState.mTextInputTranslatedMouse2Down = true;
                     }
-                    int indexOfMiddle = uiEngineState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.MIDDLE);
-                    if (indexOfMiddle != -1) {
-                        uiEngineState.inputEvents.mouseButtonsDown[KeyCode.Mouse.MIDDLE] = false;
-                        uiEngineState.inputEvents.mouseDownButtons.removeIndex(indexOfMiddle);
-                        uiEngineState.mTextInputTranslatedMouse3Down = true;
-                    }
                     uiEngineState.inputEvents.mouseDown = uiEngineState.inputEvents.mouseDownButtons.size > 0;
                 }
                 if (uiEngineState.inputEvents.mouseUp) {
@@ -359,11 +351,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiEngineState.inputEvents.mouseUpButtons.removeIndex(indexOfRight);
                         uiEngineState.mTextInputTranslatedMouse2Down = false;
                     }
-                    int indexOfMiddle = uiEngineState.inputEvents.mouseUpButtons.indexOf(KeyCode.Mouse.MIDDLE);
-                    if (indexOfMiddle != -1) {
-                        uiEngineState.inputEvents.mouseUpButtons.removeIndex(indexOfMiddle);
-                        uiEngineState.mTextInputTranslatedMouse3Down = false;
-                    }
                     uiEngineState.inputEvents.mouseUp = uiEngineState.inputEvents.mouseUpButtons.size > 0;
                 }
                 mouse1Pressed = uiEngineState.mTextInputTranslatedMouse1Down;
@@ -377,50 +364,41 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case GAMEPAD -> {
                 boolean stickLeft = uiEngineState.config.input.gamePadMouseStickLeftEnabled;
                 boolean stickRight = uiEngineState.config.input.gamePadMouseStickRightEnabled;
-                final float sensitivity = 0.4f;
-                boolean moveLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -sensitivity);
-                boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > sensitivity) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > sensitivity);
+                final float deadZone = uiEngineState.config.input.gamePadMouseJoystickDeadZone;
+                boolean moveLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -deadZone);
+                boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > deadZone);
                 mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse1);
                 mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse2);
                 boolean scrollDown = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
                 boolean scrollUp = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsScrollUp);
 
-                if (moveLeft) {
-                    if (!uiEngineState.mTextInputGamePadLeft) {
-                        scrollDirection = -1;
-                        uiEngineState.mTextInputGamePadLeft = true;
-                    }
-                } else {
-                    uiEngineState.mTextInputGamePadLeft = false;
-                }
-                if (moveRight) {
-                    if (!uiEngineState.mTextInputGamePadRight) {
-                        scrollDirection = 1;
-                        uiEngineState.mTextInputGamePadRight = true;
-                    }
-                } else {
-                    uiEngineState.mTextInputGamePadRight = false;
-                }
 
                 // Continue Scroll
                 if (moveLeft || moveRight) {
                     uiEngineState.mTextInputScrollTimer++;
                     if (uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime) {
-                        uiEngineState.mTextInputGamePadLeft = false;
-                        uiEngineState.mTextInputGamePadRight = false;
-                        uiEngineState.mTextInputScrollTimer = 0;
-                        uiEngineState.mTextInputScrollSpeed++;
-                        if (uiEngineState.mTextInputScrollSpeed >= 3) {
-                            uiEngineState.mTextInputScrollTime = 2;
-                        } else if (uiEngineState.mTextInputScrollSpeed == 2) {
-                            uiEngineState.mTextInputScrollTime = 5;
-                        } else if (uiEngineState.mTextInputScrollSpeed == 1) {
-                            uiEngineState.mTextInputScrollTime = 10;
+                        if (moveLeft) {
+                            scrollDirection = -1;
+                        }else  if (moveRight) {
+                            scrollDirection = 1;
                         }
+
+                        uiEngineState.mTextInputScrollTimer = 0;
+                        if (uiEngineState.mTextInputScrollSpeed == 0) {
+                            uiEngineState.mTextInputScrollTime = 10;
+                        }else if(uiEngineState.mTextInputScrollSpeed == 1){
+                            uiEngineState.mTextInputScrollTime = 5;
+                        }else if(uiEngineState.mTextInputScrollSpeed == 2){
+                            uiEngineState.mTextInputScrollTime = 2;
+                        }else{
+                            uiEngineState.mTextInputScrollTime = 0;
+                        }
+
+                        uiEngineState.mTextInputScrollSpeed = Math.min(uiEngineState.mTextInputScrollSpeed+1,3);
                     }
                 } else {
                     uiEngineState.mTextInputScrollTimer = 0;
-                    uiEngineState.mTextInputScrollTime = 20;
+                    uiEngineState.mTextInputScrollTime = 0;
                     uiEngineState.mTextInputScrollSpeed = 0;
                 }
 

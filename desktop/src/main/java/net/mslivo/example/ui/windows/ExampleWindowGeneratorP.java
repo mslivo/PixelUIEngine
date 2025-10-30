@@ -322,7 +322,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
             @Override
             public void onFocus() {
-
+                api.openMouseTextInput(api.mouseTextInput.createForTextField(osKeyBoardTextInput));
             }
         });
 
