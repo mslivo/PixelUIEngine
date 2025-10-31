@@ -12,6 +12,7 @@ public enum DIRECTION {
     public final String text;
     public final int dx;
     public final int dy;
+    public static final DIRECTION[] VALUES = DIRECTION.values();
 
     DIRECTION(String text, int dx, int dy) {
         this.text = text;
