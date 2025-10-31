@@ -1262,15 +1262,26 @@ public class UICommonUtils {
 
     public void mouseTextInput_open(MouseTextInput mouseTextInput) {
         if (mouseTextInput_isOpen()) return;
-        uiEngineState.mTextInputMouseX = Gdx.input.getX();
         uiEngineState.mTextInputUnlock = false;
+        uiEngineState.mTextInputTempMousePosition.set(Gdx.input.getX(),Gdx.input.getY());
         uiEngineState.openMouseTextInput = mouseTextInput;
         uiEngineState.openMouseTextInput.mouseTextInputAction.onDisplay();
     }
 
     public void mouseTextInput_close(UIEngineState uiEngineState) {
+        if(!mouseTextInput_isOpen())
+            return;
+
+        int x = uiEngineState.openMouseTextInput.x;
+        int y = uiEngineState.openMouseTextInput.y;
+
         // mouseTextInput Keyboard
         resetMouseTextInputReference(uiEngineState);
+
+
+        if(uiEngineState.currentControlMode.emulated){
+            emulatedMouse_setPosition(x,y);
+        }
     }
 
     public void resetMouseTextInputReference(UIEngineState uiEngineState) {
@@ -1279,10 +1290,9 @@ public class UICommonUtils {
             uiEngineState.openMouseTextInput = null;
             uiEngineState.mTextInputMouse1Pressed = false;
             uiEngineState.mTextInputMouse2Pressed = false;
-            uiEngineState.mTextInputMouse3Pressed = false;
             uiEngineState.mTextInputScrollTimer = 0;
+            uiEngineState.mTextInputTempMousePosition.set(0,0);
             uiEngineState.mTextInputScrollTime = 0;
-            uiEngineState.mTextInputScrollSpeed = 0;
             uiEngineState.mTextInputTranslatedMouse1Down = false;
             uiEngineState.mTextInputTranslatedMouse2Down = false;
             uiEngineState.mTextInputUnlock = false;

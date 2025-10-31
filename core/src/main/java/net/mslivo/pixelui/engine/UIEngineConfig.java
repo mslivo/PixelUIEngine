@@ -1,14 +1,10 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.IntSet;
-import net.mslivo.pixelui.engine.actions.MouseTextInputAction;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.media.CMediaFont;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.UIEngineBaseMedia_8x8;
-
-import java.util.ArrayList;
 
 public final class UIEngineConfig {
 
@@ -33,6 +29,7 @@ public final class UIEngineConfig {
 
         public boolean keyboardMouseEnabled = false;
         public float keyboardMouseCursorSpeed = 3.0f;
+        public float keyboardMouseCursorSpeedUpFactor = 2.0f;
         public float keyboardMouseCursorSmoothing = 0.25f;
         public int[] keyboardMouseButtonsUp = {KeyCode.Key.UP};
         public int[] keyboardMouseButtonsDown = {KeyCode.Key.DOWN};
@@ -45,10 +42,11 @@ public final class UIEngineConfig {
         public int[] keyboardMouseButtonsMouse5 = null;
         public int[] keyboardMouseButtonsScrollUp = {KeyCode.Key.PAGE_UP};
         public int[] keyboardMouseButtonsScrollDown = {KeyCode.Key.PAGE_DOWN};
-        public int[] keyboardMouseButtonsCursorSpeedDouble = {KeyCode.Key.SHIFT_LEFT};
+        public int[] keyboardMouseButtonsCursorSpeedUp = {KeyCode.Key.SHIFT_LEFT};
 
         public boolean gamePadMouseEnabled = false;
         public float gamepadMouseCursorSpeed = 3.0f;
+        public float gamepadMouseCursorSpeedUpFactor = 2.0f;
         public float gamePadMouseJoystickDeadZone = 0.3f;
         public boolean gamePadMouseStickLeftEnabled = true;
         public boolean gamePadMouseStickRightEnabled = true;
@@ -59,7 +57,7 @@ public final class UIEngineConfig {
         public int[] gamePadMouseButtonsMouse5 = null;
         public int[] gamePadMouseButtonsScrollUp = {KeyCode.GamePad.DPAD_UP};
         public int[] gamePadMouseButtonsScrollDown = {KeyCode.GamePad.DPAD_DOWN};
-        public int[] gamePadMouseButtonsCursorSpeedDouble = {KeyCode.GamePad.X};
+        public int[] gamePadMouseButtonsCursorSpeedUp = {KeyCode.GamePad.X};
 
         public int[] gamepadMouseButtons(int index) {
             index = Math.clamp(index, 0, GAMEPAD_MOUSE_BUTTONS);
@@ -71,7 +69,7 @@ public final class UIEngineConfig {
                 case 4 -> this.gamePadMouseButtonsMouse5;
                 case 5 -> this.gamePadMouseButtonsScrollUp;
                 case 6 -> this.gamePadMouseButtonsScrollDown;
-                case 7 -> this.gamePadMouseButtonsCursorSpeedDouble;
+                case 7 -> this.gamePadMouseButtonsCursorSpeedUp;
                 default -> throw new IllegalStateException("Unexpected value: " + index);
             };
         }
@@ -90,7 +88,7 @@ public final class UIEngineConfig {
                 case 8 -> this.keyboardMouseButtonsMouse5;
                 case 9 -> this.keyboardMouseButtonsScrollUp;
                 case 10 -> this.keyboardMouseButtonsScrollDown;
-                case 11 -> this.keyboardMouseButtonsCursorSpeedDouble;
+                case 11 -> this.keyboardMouseButtonsCursorSpeedUp;
                 default -> throw new IllegalStateException("Unexpected value: " + index);
             };
         }
@@ -158,7 +156,7 @@ public final class UIEngineConfig {
         public char[] defaultLowerCaseCharacters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         public char[] defaultUpperCaseCharacters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',' ', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'};
         public Color defaultColor = DEFAULT_COlOR.cpy();
-        public float transparencyEffect = 0.5f;
+        public int charsPerRow = 8;
     }
 
 

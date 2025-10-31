@@ -137,12 +137,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.pressedContextMenuItem = null;
         newUIEngineState.displayedContextMenuWidth = 0;
         newUIEngineState.openMouseTextInput = null;
+        newUIEngineState.mTextInputTempMousePosition = new GridPoint2(0,0);
         newUIEngineState.mTextInputMouse1Pressed = false;
         newUIEngineState.mTextInputMouse2Pressed = false;
-        newUIEngineState.mTextInputMouse3Pressed = false;
         newUIEngineState.mTextInputScrollTimer = 0;
         newUIEngineState.mTextInputScrollTime = 0;
-        newUIEngineState.mTextInputScrollSpeed = 0;
         newUIEngineState.mTextInputTranslatedMouse1Down = false;
         newUIEngineState.mTextInputTranslatedMouse2Down = false;
         newUIEngineState.mTextInputUnlock = false;
@@ -310,20 +309,32 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
         char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
-        int scrollDirection = 0;
+        DIRECTION scrollDirection = DIRECTION.NONE;
         boolean mouse1Pressed = false;
         boolean mouse2Pressed = false;
         int mouseScrolled = 0;
         switch (uiEngineState.currentControlMode) {
             case HARDWARE_MOUSE -> {
-                int deltaX = Gdx.input.getX() - uiEngineState.mTextInputMouseX;
-                if (deltaX > 6) {
-                    scrollDirection = 1;
-                    uiEngineState.mTextInputMouseX = Gdx.input.getX();
-                } else if (deltaX < -6) {
-                    scrollDirection = -1;
-                    uiEngineState.mTextInputMouseX = Gdx.input.getX();
+                int deltaX = Gdx.input.getX() - uiEngineState.mTextInputTempMousePosition.x;
+                int deltaY = Gdx.input.getY() - uiEngineState.mTextInputTempMousePosition.y;
+                final int SENSITIVITY = 8;
+
+                if (deltaX > SENSITIVITY) {
+                    scrollDirection = DIRECTION.RIGHT;
+                    uiEngineState.mTextInputTempMousePosition.x = Gdx.input.getX();
+                } else if (deltaX < -SENSITIVITY) {
+                    scrollDirection = DIRECTION.LEFT;
+                    uiEngineState.mTextInputTempMousePosition.x = Gdx.input.getX();
                 }
+
+                if (deltaY > SENSITIVITY) {
+                    scrollDirection = DIRECTION.DOWN;
+                    uiEngineState.mTextInputTempMousePosition.y = Gdx.input.getY();
+                } else if (deltaY < -SENSITIVITY) {
+                    scrollDirection = DIRECTION.UP;
+                    uiEngineState.mTextInputTempMousePosition.y = Gdx.input.getY();
+                }
+
                 if (uiEngineState.inputEvents.mouseDown) {
                     // Choke Events & Translate
                     int indexOfLeft = uiEngineState.inputEvents.mouseDownButtons.indexOf(KeyCode.Mouse.LEFT);
@@ -368,6 +379,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 final float deadZone = uiEngineState.config.input.gamePadMouseJoystickDeadZone;
                 boolean moveLeft = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x < -deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x < -deadZone);
                 boolean moveRight = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.x > deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.x > deadZone);
+                boolean moveUp = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.y > deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.y > deadZone);
+                boolean moveDown = (stickLeft && uiEngineState.gamePadTranslatedStickLeft.y < -deadZone) || (stickRight && uiEngineState.gamePadTranslatedStickRight.y < -deadZone);
                 mouse1Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse1);
                 mouse2Pressed = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsMouse2);
                 boolean scrollDown = mouseControl_isTranslatedKeyCodeDown(uiEngineState.gamePadTranslatedButtonsDown, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
@@ -375,32 +388,29 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
                 // Continue Scroll
-                if (moveLeft || moveRight) {
+                if (moveLeft || moveRight || moveUp || moveDown) {
                     uiEngineState.mTextInputScrollTimer++;
                     if (uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime) {
                         if (moveLeft) {
-                            scrollDirection = -1;
+                            scrollDirection = DIRECTION.LEFT;
                         } else if (moveRight) {
-                            scrollDirection = 1;
+                            scrollDirection = DIRECTION.RIGHT;
+                        } else if(moveUp){
+                            scrollDirection = DIRECTION.UP;
+                        }else if(moveDown){
+                            scrollDirection = DIRECTION.DOWN;
                         }
 
-                        uiEngineState.mTextInputScrollTimer = 0;
-                        if (uiEngineState.mTextInputScrollSpeed == 0) {
-                            uiEngineState.mTextInputScrollTime = 10;
-                        } else if (uiEngineState.mTextInputScrollSpeed == 1) {
+                        if(uiEngineState.mTextInputScrollTime == 0){
+                            uiEngineState.mTextInputScrollTime = 20;
+                        }else if(uiEngineState.mTextInputScrollTime == 20){
                             uiEngineState.mTextInputScrollTime = 5;
-                        } else if (uiEngineState.mTextInputScrollSpeed == 2) {
-                            uiEngineState.mTextInputScrollTime = 2;
-                        } else {
-                            uiEngineState.mTextInputScrollTime = 0;
                         }
-
-                        uiEngineState.mTextInputScrollSpeed = Math.min(uiEngineState.mTextInputScrollSpeed + 1, 3);
+                        uiEngineState.mTextInputScrollTimer = 0;
                     }
                 } else {
                     uiEngineState.mTextInputScrollTimer = 0;
                     uiEngineState.mTextInputScrollTime = 0;
-                    uiEngineState.mTextInputScrollSpeed = 0;
                 }
 
                 if (scrollUp) {
@@ -425,9 +435,48 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
         // Scroll Forward/Backwards
-        if (scrollDirection != 0) {
-            mouseTextInput.selectedIndex = Math.clamp(mouseTextInput.selectedIndex + scrollDirection, 0, (characters.length - 1));
+        final int charsPerRow = uiEngineState.config.mouseTextInput.charsPerRow;
+        int index = mouseTextInput.selectedIndex;
+        int totalChars = mouseTextInput.upperCase ? mouseTextInput.charactersUC.length : mouseTextInput.charactersLC.length;
+
+        switch (scrollDirection) {
+            case NONE -> {}
+            case LEFT -> {
+                int rowStart = (index / charsPerRow) * charsPerRow;
+                if (index > rowStart) {
+                    index--;
+                }else{
+                    index = rowStart+charsPerRow-1;
+                }
+            }
+            case RIGHT -> {
+                int rowEnd = Math.min(((index / charsPerRow) + 1) * charsPerRow - 1, totalChars - 1);
+                if (index < rowEnd) {
+                    index++;
+                }else{
+                    index = rowEnd-charsPerRow+1;
+                }
+            }
+            case UP -> {
+                if (index - charsPerRow >= 0) {
+                    index -= charsPerRow;
+                } else {
+                    int lastRowStart = (Math.max((totalChars - 1) / charsPerRow, 0)) * charsPerRow;
+                    int col = index % charsPerRow;
+                    index = Math.min(lastRowStart + col, totalChars - 1);
+                }
+            }
+            case DOWN -> {
+                if (index + charsPerRow < totalChars) {
+                    index += charsPerRow;
+                } else {
+                    int col = index % charsPerRow;
+                    index = col;
+                }
+            }
         }
+        uiCommonUtils.mouseTextInput_selectIndex(mouseTextInput, index);
+
 
         // Confirm Character from Input
         boolean enterRegularCharacterMouse1 = false;
@@ -751,7 +800,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsMouse5);
         boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollUp);
         boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsScrollDown);
-        boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsCursorSpeedDouble);
+        boolean buttonCursorSpeedUpDown = mouseControl_isTranslatedKeyCodeDown(translatedButtons, uiEngineState.config.input.gamePadMouseButtonsCursorSpeedUp);
 
         final float deadZoneDelta = 1f - joystickDeadZone;
         float cursorChangeX;
@@ -768,24 +817,23 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         float cursorChangeY;
         if (buttonUp) {
             cursorChangeY = Math.max(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
-            cursorChangeY = (cursorChangeY - joystickDeadZone) / deadZoneDelta;
+            cursorChangeY = -((cursorChangeY - joystickDeadZone) / deadZoneDelta);
         } else if (buttonDown) {
             cursorChangeY = Math.min(uiEngineState.gamePadTranslatedStickLeft.y, uiEngineState.gamePadTranslatedStickRight.y);
-            cursorChangeY = (cursorChangeY + joystickDeadZone) / deadZoneDelta;
+            cursorChangeY = -((cursorChangeY + joystickDeadZone) / deadZoneDelta);
         } else {
             cursorChangeY = 0;
         }
 
-        cursorChangeY = -cursorChangeY;
+        final float speed = uiEngineState.config.input.gamepadMouseCursorSpeed;
+        cursorChangeX *= speed;
+        cursorChangeY *= speed;
 
-        cursorChangeX *= uiEngineState.config.input.gamepadMouseCursorSpeed;
-        cursorChangeY *= uiEngineState.config.input.gamepadMouseCursorSpeed;
-
-        if (buttonCursorSpeedDoubleDown) {
-            cursorChangeX *= 2;
-            cursorChangeY *= 2;
+        if (buttonCursorSpeedUpDown) {
+            final float speedUpFactor = uiEngineState.config.input.gamepadMouseCursorSpeedUpFactor;
+            cursorChangeX *= speedUpFactor;
+            cursorChangeY *= speedUpFactor;
         }
-
 
         // Translate to mouse events
         mouseControl_emulateMouseEvents(buttonMouse1Down, buttonMouse2Down, buttonMouse3Down, buttonMouse4Down, buttonMouse5Down,
@@ -810,7 +858,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         boolean buttonMouse5Down = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsMouse5);
         boolean buttonScrolledUp = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollUp);
         boolean buttonScrolledDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsScrollDown);
-        boolean buttonCursorSpeedDoubleDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsCursorSpeedDouble);
+        boolean buttonCursorSpeedUpDown = mouseControl_isTranslatedKeyCodeDown(translatedKeys, uiEngineState.config.input.keyboardMouseButtonsCursorSpeedUp);
 
         final float smoothing = uiEngineState.config.input.keyboardMouseCursorSmoothing;
         if (buttonLeft) {
@@ -838,12 +886,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
 
-        float cursorChangeX = uiEngineState.keyBoardMouseSmoothing.x * uiEngineState.config.input.keyboardMouseCursorSpeed;
-        float cursorChangeY = uiEngineState.keyBoardMouseSmoothing.y * uiEngineState.config.input.keyboardMouseCursorSpeed;
+        final float speed = uiEngineState.config.input.keyboardMouseCursorSpeed;
+        float cursorChangeX = uiEngineState.keyBoardMouseSmoothing.x * speed;
+        float cursorChangeY = uiEngineState.keyBoardMouseSmoothing.y * speed;
 
-        if (buttonCursorSpeedDoubleDown) {
-            cursorChangeX *= 2f;
-            cursorChangeY *= 2f;
+        if (buttonCursorSpeedUpDown) {
+            final float speedUpFactor = uiEngineState.config.input.keyboardMouseCursorSpeedUpFactor;
+            cursorChangeX *= speedUpFactor;
+            cursorChangeY *= speedUpFactor;
         }
 
         // Translate to mouse events
@@ -2153,43 +2203,46 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     private void render_mouseTextInput() {
         if (!uiCommonUtils.mouseTextInput_isOpen())
             return;
+
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
-        final Color color1 = uiEngineState.openMouseTextInput.color;
-        final Color color2 = uiEngineState.openMouseTextInput.color2;
-        final Color colorFont = uiEngineState.openMouseTextInput.fontColor;
+        final Color color1 = mouseTextInput.color;
+        final Color color2 = mouseTextInput.color2;
+        final Color colorFont = mouseTextInput.fontColor;
         final float textInputAlpha = color1.a;
-        final int CHARACTERS = 4;
-        char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
-        final float maxTransparency = 1f - uiEngineState.config.mouseTextInput.transparencyEffect;
+        final char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
 
-        // 4 to the left
-        for (int i = 1; i <= CHARACTERS; i++) {
-            int index = mouseTextInput.selectedIndex - i;
-            if (index >= 0 && index < chars.length) {
-                float alpha = (1f - maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
-                        textInputAlpha * alpha,
-                        mouseTextInput.upperCase, false);
-            }
-        }
-        // 4 to the right
-        for (int i = 1; i <= CHARACTERS; i++) {
-            int index = mouseTextInput.selectedIndex + i;
-            if (index >= 0 && index < chars.length) {
-                float alpha = (1f - maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
-                render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
-                        textInputAlpha * alpha,
-                        mouseTextInput.upperCase, false);
-            }
-        }
-        // 1 in center
-        render_mouseTextInputCharacter(chars[mouseTextInput.selectedIndex], mouseTextInput.x, mouseTextInput.y, color1, colorFont, textInputAlpha, mouseTextInput.upperCase, uiEngineState.mTextInputMouse1Pressed);
+        // ===== Layout constants =====
+        final int CHARS_PER_ROW = uiEngineState.config.mouseTextInput.charsPerRow;        // how many characters before wrapping
+        final int ROW_HEIGHT = 12;          // vertical spacing between rows
+        final int CHAR_SPACING_X = 12;      // horizontal spacing between characters
 
-        // Selection
+        final int totalChars = chars.length;
+
+        // ===== Draw all characters =====
+        for (int i = 0; i < totalChars; i++) {
+            char c = chars[i];
+
+            int col = i % CHARS_PER_ROW;
+            int row = i / CHARS_PER_ROW;
+
+            // horizontally center the row on x
+            int x = MathUtils.round(mouseTextInput.x + (col - CHARS_PER_ROW / 2f) * CHAR_SPACING_X);
+            int y = MathUtils.round(mouseTextInput.y - row * ROW_HEIGHT);
+
+            render_mouseTextInputCharacter(c, x,y, color1, colorFont, textInputAlpha, mouseTextInput.upperCase, i == mouseTextInput.selectedIndex && uiEngineState.mTextInputMouse1Pressed);
+        }
+
+        // ===== Selection highlight =====
+        int selCol = mouseTextInput.selectedIndex % CHARS_PER_ROW;
+        int selRow = mouseTextInput.selectedIndex / CHARS_PER_ROW;
+        float selX = mouseTextInput.x + (selCol - CHARS_PER_ROW / 2f) * CHAR_SPACING_X;
+        float selY = mouseTextInput.y - selRow * ROW_HEIGHT;
+
         render_setColor(spriteRenderer, color2, textInputAlpha, false);
-        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_SELECTED, mouseTextInput.x - 1, mouseTextInput.y - 1);
+        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_SELECTED, selX - 1, selY - 1);
         spriteRenderer.setAllReset();
+
     }
 
     private void render_mouseTextInputCharacter(char c, int x, int y, Color color1, Color colorFont, float textInputAlpha, boolean upperCase, boolean pressed) {
@@ -2604,6 +2657,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case UP ->
                     uiEngineState.mouse_ui.y + lineLengthAbs > uiEngineState.resolutionHeight - TS(tooltip_height) ? DIRECTION.DOWN : DIRECTION.UP;
             case DOWN -> uiEngineState.mouse_ui.y - TS(tooltip_height) < 0 ? DIRECTION.UP : DIRECTION.DOWN;
+            case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
         };
 
         int tooltip_x = switch (direction) {
@@ -2613,6 +2667,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     Math.clamp(uiEngineState.mouse_ui.x - TS(tooltip_width + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width), 0));
             case UP, DOWN ->
                     Math.clamp(uiEngineState.mouse_ui.x - (TS(tooltip_width) / 2), 0, Math.max(uiEngineState.resolutionWidth - TS(tooltip_width), 0));
+            case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
         };
 
         int tooltip_y = switch (direction) {
@@ -2622,6 +2677,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     Math.clamp(uiEngineState.mouse_ui.y + TS(tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1, 0));
             case DOWN ->
                     Math.clamp(uiEngineState.mouse_ui.y - TS(tooltip_height + tooltip.lineLength), 0, Math.max(uiEngineState.resolutionHeight - TS(tooltip_height) - 1, 0));
+            case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
         };
 
         // Draw Tooltip
@@ -2635,15 +2691,18 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 case LEFT -> -TS(i + 1);
                 case RIGHT -> TS(i);
                 case UP, DOWN -> 0;
+                case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
             };
             int yOffset = switch (direction) {
                 case LEFT, RIGHT -> 0;
                 case UP -> TS(i);
                 case DOWN -> -TS(i + 1);
+                case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
             };
             CMediaImage sprite = switch (direction) {
                 case LEFT, RIGHT -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_HORIZONTAL;
                 case UP, DOWN -> UIEngineBaseMedia_8x8.UI_TOOLTIP_LINE_VERTICAL;
+                case NONE -> throw new IllegalStateException("Unexpected value: " + tooltip.direction);
             };
             spriteRenderer.drawCMediaImage(sprite, uiEngineState.mouse_ui.x + xOffset, uiEngineState.mouse_ui.y + yOffset);
         }
