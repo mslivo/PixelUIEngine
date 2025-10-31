@@ -278,7 +278,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         Button modal3 = api.component.button.textButton.create(28, 3, 5, 1, "Modal 3", new ButtonAction() {
             @Override
             public void onRelease() {
-                api.addWindowAsModal(api.widgets.modal.createColorPickerModal("Caption", fColor -> lastColor[0] = fColor, lastColor[0]));
+                api.openMouseTextInput(api.mouseTextInput.create(200,200));
             }
         });
 

@@ -49,8 +49,9 @@ public class UICommonUtils {
     public void emulatedMouse_setPosition(float x, float y) {
         if (!uiEngineState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
-        uiEngineState.mouse_emulated_pos.x = Math.clamp(x,0,uiEngineState.resolutionWidth);
-        uiEngineState.mouse_emulated_pos.y = Math.clamp(y,0,uiEngineState.resolutionHeight);
+        uiEngineState.emulatedMousePosition.x = Math.clamp(x,0,uiEngineState.resolutionWidth);
+        uiEngineState.emulatedMousePosition.y = Math.clamp(y,0,uiEngineState.resolutionHeight);
+
     }
 
     public void emulatedMouse_setPositionComponent(Component component) {
@@ -101,7 +102,7 @@ public class UICommonUtils {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
                     float distance = Tools.Calc.distance(component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2),
-                            component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated_pos.x, uiEngineState.mouse_emulated_pos.y);
+                            component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.emulatedMousePosition.x, uiEngineState.emulatedMousePosition.y);
                     if (distance < nearestDistance) {
                         nearestDistance = distance;
                         nearestIndex = windowComponentsVisibleOrder.size - 1;
@@ -449,11 +450,11 @@ public class UICommonUtils {
     }
 
     public boolean contextMenu_openAtMousePosition(ContextMenu contextMenu) {
-        boolean success = contextMenu_open(contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
+        boolean success = contextMenu_open(contextMenu, uiEngineState.mouseUI.x, uiEngineState.mouseUI.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
-            uiEngineState.mouse_emulated_pos.x += uiEngineState.tileSize.TS_HALF;
-            uiEngineState.mouse_emulated_pos.y -= uiEngineState.tileSize.TS_HALF;
+            uiEngineState.emulatedMousePosition.x += uiEngineState.tileSize.TS_HALF;
+            uiEngineState.emulatedMousePosition.y -= uiEngineState.tileSize.TS_HALF;
         }
         return success;
     }
@@ -1115,7 +1116,7 @@ public class UICommonUtils {
             }
 
             int tabHeight = tabBar.bigIconMode ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
-            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_bar + (tabXOffset * uiEngineState.tileSize.TS), y_bar, tabWidth * uiEngineState.tileSize.TS, tabHeight)) {
+            if (Tools.Calc.pointRectsCollide(uiEngineState.mouseUI.x, uiEngineState.mouseUI.y, x_bar + (tabXOffset * uiEngineState.tileSize.TS), y_bar, tabWidth * uiEngineState.tileSize.TS, tabHeight)) {
                 uiEngineState.itemInfo_tabBarTabIndex = i;
                 uiEngineState.itemInfo_tabBarValid = true;
                 return;
@@ -1140,7 +1141,7 @@ public class UICommonUtils {
                 int itemIndex = itemFrom + iy;
                 if (itemIndex < list.items.size) {
                     int itemOffsetY = ((list.height - 1) - iy);
-                    if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y,
+                    if (Tools.Calc.pointRectsCollide(uiEngineState.mouseUI.x, uiEngineState.mouseUI.y,
                             x_list, y_list + uiEngineState.tileSize.TL(itemOffsetY), uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TS)) {
                         uiEngineState.itemInfo_listIndex = itemIndex;
                         uiEngineState.itemInfo_listValid = true;
@@ -1149,7 +1150,7 @@ public class UICommonUtils {
                 }
             }
             // Insert at end
-            if (Tools.Calc.pointRectsCollide(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y, x_list, y_list, uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TL(list.height))) {
+            if (Tools.Calc.pointRectsCollide(uiEngineState.mouseUI.x, uiEngineState.mouseUI.y, x_list, y_list, uiEngineState.tileSize.TL(list.width), uiEngineState.tileSize.TL(list.height))) {
                 uiEngineState.itemInfo_listIndex = list.items.size;
                 uiEngineState.itemInfo_listValid = true;
                 return;
@@ -1166,8 +1167,8 @@ public class UICommonUtils {
         int tileSize = grid.bigMode ? uiEngineState.tileSize.TS2 : uiEngineState.tileSize.TS;
         int x_grid = component_getAbsoluteX(grid);
         int y_grid = component_getAbsoluteY(grid);
-        int inv_to_x = (uiEngineState.mouse_ui.x - x_grid) / tileSize;
-        int inv_to_y = (uiEngineState.mouse_ui.y - y_grid) / tileSize;
+        int inv_to_x = (uiEngineState.mouseUI.x - x_grid) / tileSize;
+        int inv_to_y = (uiEngineState.mouseUI.y - y_grid) / tileSize;
         if (grid_positionValid(grid, inv_to_x, inv_to_y)) {
             uiEngineState.itemInfo_gridPos.x = inv_to_x;
             uiEngineState.itemInfo_gridPos.y = inv_to_y;
@@ -1263,7 +1264,7 @@ public class UICommonUtils {
     public void mouseTextInput_open(MouseTextInput mouseTextInput) {
         if (mouseTextInput_isOpen()) return;
         uiEngineState.mTextInputUnlock = false;
-        uiEngineState.mTextInputTempMousePosition.set(Gdx.input.getX(),Gdx.input.getY());
+        uiEngineState.mTextInputTempHardwareMousePosition.set(uiEngineState.mouseUI.x,uiEngineState.mouseUI.y);
         uiEngineState.openMouseTextInput = mouseTextInput;
         uiEngineState.openMouseTextInput.mouseTextInputAction.onDisplay();
     }
@@ -1277,11 +1278,6 @@ public class UICommonUtils {
 
         // mouseTextInput Keyboard
         resetMouseTextInputReference(uiEngineState);
-
-
-        if(uiEngineState.currentControlMode.emulated){
-            emulatedMouse_setPosition(x,y);
-        }
     }
 
     public void resetMouseTextInputReference(UIEngineState uiEngineState) {
@@ -1291,10 +1287,8 @@ public class UICommonUtils {
             uiEngineState.mTextInputMouse1Pressed = false;
             uiEngineState.mTextInputMouse2Pressed = false;
             uiEngineState.mTextInputScrollTimer = 0;
-            uiEngineState.mTextInputTempMousePosition.set(0,0);
+            uiEngineState.mTextInputTempHardwareMousePosition.set(0,0);
             uiEngineState.mTextInputScrollTime = 0;
-            uiEngineState.mTextInputTranslatedMouse1Down = false;
-            uiEngineState.mTextInputTranslatedMouse2Down = false;
             uiEngineState.mTextInputUnlock = false;
             mouseTextInput.mouseTextInputAction.onRemove();
         }

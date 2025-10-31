@@ -1,6 +1,5 @@
 package net.mslivo.pixelui.engine;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
@@ -108,28 +107,27 @@ public final class UIEngineState {
     /* #################### MouseTextInput #################### */
     public MouseTextInput openMouseTextInput;
     public boolean mTextInputMouse1Pressed, mTextInputMouse2Pressed;
-    public GridPoint2 mTextInputTempMousePosition;
+    public GridPoint2 mTextInputTempHardwareMousePosition;
     public int mTextInputScrollTimer;
     public int mTextInputScrollTime;
-    public boolean mTextInputTranslatedMouse1Down;
-    public boolean mTextInputTranslatedMouse2Down;
     public boolean mTextInputUnlock;
 
     /* #################### Control #################### */
     public Object lastUIMouseHover; // Last GUI Element the mouse hovered over
     public MOUSE_CONTROL_MODE currentControlMode;
-    public GridPoint2 mouse_app;
-    public Vector2 mouse_emulated_pos; // Mouse Position for Keyboard/Gamepad mouse control
-    public GridPoint2 mouse_ui;
-    public GridPoint2 mouse_delta;
+    public GridPoint2 mouseApp;
+    public GridPoint2 mouseUI;
+    public Vector2 emulatedMousePosition; // Mouse Position for Keyboard/Gamepad mouse control
+    public Vector2 emulatedMouseDirection;
+    public GridPoint2 mouseDelta;
     public CMediaSprite cursor;
     public int cursorArrayIndex;
     public MouseTool mouseTool;
     public CMediaSprite overrideCursor;
     public int overrideCursorArrayIndex;
     public boolean displayOverrideCursor;
-    public Vector3 vector_fboCursor;
-    public Vector2 vector2_unproject;
+    public Vector3 fboCursorVector;
+    public Vector2 unProjectVector;
     public boolean[] keyBoardTranslatedKeysDown;
     public Vector2 keyBoardMouseSmoothing;
     public Vector2 gamePadTranslatedStickLeft;
@@ -146,7 +144,6 @@ public final class UIEngineState {
     public GridPoint2 itemInfo_gridPos;
     public int itemInfo_tabBarTabIndex;
     public boolean itemInfo_listValid, itemInfo_tabBarValid, itemInfo_gridValid;
-    public Color tempFontColor;
 
     UIEngineState() {
     }

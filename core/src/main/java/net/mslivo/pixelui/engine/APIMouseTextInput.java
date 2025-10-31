@@ -73,9 +73,9 @@ public final class APIMouseTextInput {
                 mouseTextInput.upperCase = mouseTextInput.charactersUC[i] == selectedCharacter;
             }
         }
-        mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = UIEngine.MOUSETEXTINPUT_CHANGE_CASE_CHAR;
-        mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = UIEngine.MOUSETEXTINPUT_BACK_CHAR;
-        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = UIEngine.MOUSETEXTINPUT_ACCEPT;
+        mouseTextInput.charactersLC[maxCharacters] = mouseTextInput.charactersUC[maxCharacters] = UIEngine.M_TEXTINPUT_CHAR_CHANGE_CASE;
+        mouseTextInput.charactersLC[maxCharacters + 1] = mouseTextInput.charactersUC[maxCharacters + 1] = UIEngine.M_TEXTINPUT_CHAR_BACK_;
+        mouseTextInput.charactersLC[maxCharacters + 2] = mouseTextInput.charactersUC[maxCharacters + 2] = UIEngine.M_TEXTINPUT_CHAR_ACCEPT;
         return mouseTextInput;
     }
 

@@ -165,27 +165,27 @@ public final class APIInput {
 
         public final class APIState {
             public int x() {
-                return uiEngineState.mouse_app.x;
+                return uiEngineState.mouseApp.x;
             }
 
             public int y() {
-                return uiEngineState.mouse_app.y;
+                return uiEngineState.mouseApp.y;
             }
 
             public int xUI() {
-                return uiEngineState.mouse_ui.x;
+                return uiEngineState.mouseUI.x;
             }
 
             public int yUI() {
-                return uiEngineState.mouse_ui.y;
+                return uiEngineState.mouseUI.y;
             }
 
             public int xDelta() {
-                return uiEngineState.mouse_delta.x;
+                return uiEngineState.mouseDelta.x;
             }
 
             public int yDelta() {
-                return uiEngineState.mouse_delta.y;
+                return uiEngineState.mouseDelta.y;
             }
 
             public boolean isButtonUp(int keyCode) {
