@@ -173,7 +173,7 @@ public final class APIMouseTextInput {
         mouseTextInput.fontColor.set(color);
     }
 
-    public MouseTextInput createForTextField(Textfield textfield) {
+    public MouseTextInput createForTextField(TextField textfield) {
         ArrayList<Character> filteredLower = new ArrayList<>();
         ArrayList<Character> filteredUpper = new ArrayList<>();
 

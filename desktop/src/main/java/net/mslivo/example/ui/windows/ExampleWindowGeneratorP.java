@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.*;
 import net.mslivo.pixelui.engine.actions.*;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.*;
 import net.mslivo.pixelui.media.CMediaArray;
 import net.mslivo.pixelui.media.CMediaImage;
@@ -32,16 +33,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         this.mediaManager = mediaManager;
 
         /* Window */
-        boolean aot = Tools.Calc.randomChance();
-        Window window = api.window.create(0, 0, 40, 18, "Example-Window " + (aot ? "AOT" : ""), new WindowAction() {
+        Window window = api.window.create(0, 0, 40, 18, "Example-Window", new WindowAction() {
             @Override
             public CMediaSprite icon() {
                 return ExampleBaseMedia.ICON_EXAMPLE_WINDOW;
             }
         });
 
-        if (aot)
-            api.window.setAlwaysOnTop(window, aot);
 
         api.window.addComponent(window, api.widgets.button.createWindowCloseButton(window));
         //api.windows.setPosition(window,MathUtils.random(0,inputState.internal_resolution_w-window.width*16),MathUtils.random(0,inputState.internal_resolution_h-window.height*16));
@@ -189,7 +187,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         api.component.setColor2(scrollBarHorizontalB, new Color(0f, 0f, 0.8f, 1f));
 
 
-        Textfield textField = api.component.textfield.create(18, 11, 10, "", null, 128);
+        TextField textField = api.component.textfield.create(18, 11, 10, "", null, 128);
         Button notiBtn = api.component.button.textButton.create(18, 9, 10, 2, "Notification");
         api.component.button.centerContent(notiBtn);
         api.component.addUpdateAction(notiBtn, new UpdateAction() {
@@ -231,18 +229,18 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
         });
 
-        Textfield number = api.widgets.textfield.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
+        TextField number = api.widgets.textField.createIntegerInputField(18, 7, 4, -100, 100, integer -> api.addNotification(api.notification.create("Input: " + integer)));
 
 
-        ComboboxItem comboboxItem = api.component.comboBox.item.create("Test");
+        ComboBoxItem comboboxItem = api.component.comboBox.item.create("Test");
 
 
-        ComboboxItem comboboxItem2 = api.component.comboBox.item.create("2");
+        ComboBoxItem comboBoxItem2 = api.component.comboBox.item.create("2");
 
 
-        Combobox comboBox = api.component.comboBox.create(25, 7, 7, new ComboboxItem[]{
+        ComboBox comboBox = api.component.comboBox.create(25, 7, 7, new ComboBoxItem[]{
                 comboboxItem,
-                comboboxItem2,
+                comboBoxItem2,
                 api.component.comboBox.item.create("3"),
 
         });
@@ -313,7 +311,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         AppViewport appViewPort = api.component.appViewport.create(29, 9, 4, 4, new AppViewPortAction() {
         }, 100, 100, 1);
 
-        Textfield osKeyBoardTextInput = api.component.textfield.create(18, 13, 10, "", null, 128);
+        TextField osKeyBoardTextInput = api.component.textfield.create(18, 13, 10, "", null, 128);
         api.component.textfield.setTextFieldAction(osKeyBoardTextInput, new TextFieldAction() {
             @Override
             public void onEnter(String content, boolean valid) {
@@ -617,20 +615,20 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         Array<Component> components = new Array<>();
 
         // List Tab
-        Array<ListItem> listItems1 = new Array<>();
+        Array<ExampleItem> listItems1 = new Array<>();
         addRandomItemsToList(listItems1, "L1 ");
 
 
         List list1 = api.component.list.create(2, 2, 6, 12, listItems1, null, true, true, true);
-        ListAction list1Action = new ListAction<ListItem>() {
+        ListAction list1Action = new ListAction<ExampleItem>() {
 
             @Override
-            public CMediaSprite icon(ListItem listItem) {
+            public CMediaSprite icon(ExampleItem listItem) {
                 return listItem.icon;
             }
 
             @Override
-            public String text(ListItem listItem) {
+            public String text(ExampleItem listItem) {
                 return (listItem.text);
             }
 
@@ -655,13 +653,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public boolean onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ExampleItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
                 return true;
             }
 
             @Override
-            public Tooltip toolTip(ListItem listItem) {
+            public Tooltip toolTip(ExampleItem listItem) {
                 if (listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
@@ -669,25 +667,25 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public Color cellColor(ListItem listItem) {
+            public Color cellColor(ExampleItem listItem) {
                 return listItem != null ? Color.valueOf("65F7B3") : Color.BLUE;
             }
         };
         api.component.list.setListAction(list1, list1Action);
 
-        Array<ListItem> listItems2 = new Array<>();
+        Array<ExampleItem> listItems2 = new Array<>();
         addRandomItemsToList(listItems2, "L2 ");
 
 
         List list2 = api.component.list.create(10, 2, 6, 12, listItems2, null, false, true, true, true);
-        ListAction list2Action = new ListAction<ListItem>() {
+        ListAction list2Action = new ListAction<ExampleItem>() {
             @Override
-            public CMediaSprite icon(ListItem listItem) {
+            public CMediaSprite icon(ExampleItem listItem) {
                 return listItem.icon;
             }
 
             @Override
-            public String text(ListItem listItem) {
+            public String text(ExampleItem listItem) {
                 return (listItem.text);
             }
 
@@ -713,13 +711,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public boolean onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ExampleItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem, null, true));
                 return true;
             }
 
             @Override
-            public Tooltip toolTip(ListItem listItem) {
+            public Tooltip toolTip(ExampleItem listItem) {
                 if (listItem == null) return null;
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
@@ -737,14 +735,14 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         api.window.addComponent(window, list2ScrollBar);
 
 
-        ListItem[][] invItems = new ListItem[6][12];
+        ExampleItem[][] invItems = new ExampleItem[6][12];
         addRandomItemsToInventory(invItems, "I1");
 
         Grid grid1 = api.component.grid.create(18, 2, invItems, null, true, true, true);
 
-        GridAction gridAction1 = new GridAction<ListItem>() {
+        GridAction gridAction1 = new GridAction<ExampleItem>() {
             @Override
-            public CMediaSprite icon(ListItem listItem) {
+            public CMediaSprite icon(ExampleItem listItem) {
                 return listItem.icon;
             }
 
@@ -759,7 +757,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public Tooltip toolTip(ListItem listItem) {
+            public Tooltip toolTip(ExampleItem listItem) {
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -776,13 +774,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public boolean onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ExampleItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
                 return true;
             }
 
             @Override
-            public Color iconColor(ListItem item) {
+            public Color iconColor(ExampleItem item) {
                 return grid1.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
             }
         };
@@ -790,14 +788,14 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         api.window.addComponent(window, grid1);
 
 
-        ListItem[][] invItems2 = new ListItem[6][12];
+        ExampleItem[][] invItems2 = new ExampleItem[6][12];
         addRandomItemsToInventory(invItems2, "I2");
 
         Grid grid2 = api.component.grid.create(25, 2, invItems2, null, true, true, true);
 
-        GridAction gridAction2 = new GridAction<ListItem>() {
+        GridAction gridAction2 = new GridAction<ExampleItem>() {
             @Override
-            public CMediaSprite icon(ListItem listItem) {
+            public CMediaSprite icon(ExampleItem listItem) {
                 return listItem.icon;
             }
 
@@ -812,7 +810,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public Tooltip toolTip(ListItem listItem) {
+            public Tooltip toolTip(ExampleItem listItem) {
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -829,13 +827,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public boolean onItemSelected(ListItem listItem) {
+            public boolean onItemSelected(ExampleItem listItem) {
                 api.addNotification(api.notification.create("Selected: " + listItem));
                 return true;
             }
 
             @Override
-            public Color iconColor(ListItem item) {
+            public Color iconColor(ExampleItem item) {
                 return grid2.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
             }
 
@@ -843,14 +841,14 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         api.component.grid.setGridAction(grid2, gridAction2);
         api.window.addComponent(window, grid2);
 
-        ListItem[][] invItems3 = new ListItem[3][5];
+        ExampleItem[][] invItems3 = new ExampleItem[3][5];
         addRandomItemsToBigInventory(invItems3, "I3");
 
         Grid grid3 = api.component.grid.create(32, 2, invItems3, null, false, true, true, false, true);
 
-        GridAction gridAction3 = new GridAction<ListItem>() {
+        GridAction gridAction3 = new GridAction<ExampleItem>() {
             @Override
-            public CMediaSprite icon(ListItem listItem) {
+            public CMediaSprite icon(ExampleItem listItem) {
                 return listItem.icon;
             }
 
@@ -865,7 +863,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public Tooltip toolTip(ListItem listItem) {
+            public Tooltip toolTip(ExampleItem listItem) {
                 return api.toolTip.create(new TooltipSegment[]{
                         api.toolTip.segment.text.create(listItem.text)
                 });
@@ -882,9 +880,9 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public void onDragIntoApp(ListItem listItem, int from_x, int from_y, int to_x, int to_y) {
-                invItems3[from_x][from_y] = null;
-                api.addNotification(api.notification.create(listItem.text + " " + to_x + "," + to_y));
+            public void onDragIntoApp(ExampleItem gridItem, int from_x, int from_y, int to_x, int to_y) {
+                grid3.items[from_x][from_y] = null;
+                api.addNotification(api.notification.create(gridItem.text + " " + to_x + "," + to_y));
             }
 
             @Override
@@ -893,7 +891,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
 
             @Override
-            public Color iconColor(ListItem item) {
+            public Color iconColor(ExampleItem item) {
                 return item == grid3.selectedItem ? Color.LIGHT_GRAY : Color.GRAY;
             }
 
@@ -945,27 +943,27 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         int rnd;
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_1);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ExampleItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_1);
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_2);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ExampleItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_2);
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_3);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ExampleItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_3);
     }
 
     private void addRandomItemsToBigInventory(Object[][] inventory, String prefix) {
         int rnd;
         rnd = MathUtils.random(1, 10);
         for (int i = 1; i <= rnd; i++)
-            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ListItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_DOUBLE);
+            inventory[MathUtils.random(0, inventory.length - 1)][MathUtils.random(0, inventory[0].length - 1)] = new ExampleItem(prefix + "Item " + i, ExampleBaseMedia.ICON_EXAMPLE_DOUBLE);
     }
 
     private void addRandomItemsToList(Array list, String prefix) {
         int rnd;
         rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
-            list.add(new ListItem(prefix + "Item " + i, switch (MathUtils.random(1, 3)) {
+            list.add(new ExampleItem(prefix + "Item " + i, switch (MathUtils.random(1, 3)) {
                 case 1 -> ExampleBaseMedia.ICON_EXAMPLE_1;
                 case 2 -> ExampleBaseMedia.ICON_EXAMPLE_2;
                 case 3 -> ExampleBaseMedia.ICON_EXAMPLE_3;
@@ -974,12 +972,12 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
     }
 
 
-    class ListItem {
+    class ExampleItem {
         public String text;
 
         public CMediaImage icon;
 
-        public ListItem(String text, CMediaImage icon) {
+        public ExampleItem(String text, CMediaImage icon) {
             this.text = text;
             this.icon = icon;
         }

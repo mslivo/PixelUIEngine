@@ -3,11 +3,11 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.ComboBoxAction;
 
-public class Combobox extends Component {
-    public Array<ComboboxItem> items;
+public final class ComboBox extends Component {
+    public Array<ComboBoxItem> items;
     public ComboBoxAction comboBoxAction;
-    public ComboboxItem selectedItem;
+    public ComboBoxItem selectedItem;
 
-    Combobox() {
+    ComboBox() {
     }
 }

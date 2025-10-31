@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-public class WindowGenerator {
+public final class WindowGenerator {
 
     public interface P0 {
         Window createWindow(API api);

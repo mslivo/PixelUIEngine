@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.*;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
 import net.mslivo.pixelui.media.*;
 import net.mslivo.pixelui.utils.Tools;
@@ -36,8 +37,8 @@ public final class APIWidgets {
     public final APICompositeCheckbox checkBox;
     public final APICompositeModal modal;
     public final APICompositeButton button;
-    public final APICompositeTextfield textfield;
-    public final APICompositeTabbar tabBar;
+    public final APICompositeTextField textField;
+    public final APICompositeTabBar tabBar;
 
     APIWidgets(API api, UIEngineState uiEngineState, UICommonUtils uiCommonUtils, MediaManager mediaManager) {
         this.api = api;
@@ -53,8 +54,8 @@ public final class APIWidgets {
         this.checkBox = new APICompositeCheckbox();
         this.modal = new APICompositeModal();
         this.button = new APICompositeButton();
-        this.textfield = new APICompositeTextfield();
-        this.tabBar = new APICompositeTabbar();
+        this.textField = new APICompositeTextField();
+        this.tabBar = new APICompositeTabBar();
         this.grid = new APICompositeGrid();
     }
 
@@ -317,15 +318,15 @@ public final class APIWidgets {
         APICompositeList() {
         }
 
-        public Textfield createSearchBar(List list) {
+        public TextField createSearchBar(List list) {
             return createSearchBar(list, null, false, false);
         }
 
-        public Textfield createSearchBar(List list, ScrollbarVertical scrollBarVertical) {
+        public TextField createSearchBar(List list, ScrollbarVertical scrollBarVertical) {
             return createSearchBar(list, scrollBarVertical, false, false);
         }
 
-        public Textfield createSearchBar(List list, ScrollbarVertical scrollBarVertical, boolean searchTooltips, boolean searchArrayLists) {
+        public TextField createSearchBar(List list, ScrollbarVertical scrollBarVertical, boolean searchTooltips, boolean searchArrayLists) {
             if (list == null) return null;
             Array originalList = list.items;
             Array itemsSearched = new Array(list.items);
@@ -335,7 +336,7 @@ public final class APIWidgets {
                 api.component.setSize(scrollBarVertical, scrollBarVertical.width, scrollBarVertical.height - 1);
                 api.component.setPosition(scrollBarVertical, scrollBarVertical.x, scrollBarVertical.y + 1);
             }
-            Textfield textField = api.component.textfield.create(list.x, list.y - 1, list.width + 1, "");
+            TextField textField = api.component.textfield.create(list.x, list.y - 1, list.width + 1, "");
             api.component.textfield.setTextFieldAction(textField, new TextFieldAction() {
 
 
@@ -975,7 +976,7 @@ public final class APIWidgets {
             api.component.move(textC, api.TS_HALF(), api.TS_HALF());
             componentsList.add(textC);
 
-            Textfield inputTextField = api.component.textfield.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
+            TextField inputTextField = api.component.textfield.create(0, showOKButton ? 2 : 1, wnd_width - 1, originalText, null, maxInputLength);
             componentsList.add(inputTextField);
             api.component.move(inputTextField, api.TS_HALF(), 0);
 
@@ -1379,12 +1380,12 @@ public final class APIWidgets {
 
     }
 
-    public final class APICompositeTextfield {
-        APICompositeTextfield() {
+    public final class APICompositeTextField {
+        APICompositeTextField() {
         }
 
-        public Textfield createDecimalInputField(int x, int y, int width, float min, float max, DoubleConsumer onChange) {
-            Textfield textField = api.component.textfield.create(x, y, width);
+        public TextField createDecimalInputField(int x, int y, int width, float min, float max, DoubleConsumer onChange) {
+            TextField textField = api.component.textfield.create(x, y, width);
             api.component.textfield.setAllowedCharacters(textField, decimalsAllowedCharacters);
             api.component.textfield.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
@@ -1405,15 +1406,14 @@ public final class APIWidgets {
                         value = Float.parseFloat(content);
                         onChange.accept(value);
                     } catch (NumberFormatException e) {
-                        api.component.textfield.focus(textField);
                     }
                 }
             });
             return textField;
         }
 
-        public Textfield createIntegerInputField(int x, int y, int width, int min, int max, IntConsumer onChange) {
-            Textfield textField = api.component.textfield.create(x, y, width);
+        public TextField createIntegerInputField(int x, int y, int width, int min, int max, IntConsumer onChange) {
+            TextField textField = api.component.textfield.create(x, y, width);
             api.component.textfield.setAllowedCharacters(textField, numbersAllowedCharacters);
             api.component.textfield.setTextFieldAction(textField, new TextFieldAction() {
                 @Override
@@ -1434,7 +1434,6 @@ public final class APIWidgets {
                         value = Integer.parseInt(content);
                         onChange.accept(value);
                     } catch (NumberFormatException e) {
-                        api.component.textfield.focus(textField);
                     }
                 }
             });
@@ -1443,8 +1442,8 @@ public final class APIWidgets {
 
     }
 
-    public final class APICompositeTabbar {
-        APICompositeTabbar() {
+    public final class APICompositeTabBar {
+        APICompositeTabBar() {
         }
 
         public Array<Component> createExtendableTabBar(int x, int y, int width, Tab[] tabs, int selectedTab, TabBarAction tabBarAction, boolean border, int borderHeight, boolean bigIconMode) {

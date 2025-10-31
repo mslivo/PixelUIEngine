@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.TabAction;
 
-public class Tab {
+public final class Tab {
     public String title;
     public int width;
     public TabAction tabAction;

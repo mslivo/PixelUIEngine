@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 import net.mslivo.pixelui.engine.actions.MouseTextInputAction;
 
-public class MouseTextInput {
+public final class MouseTextInput {
     public int x,y;
     public char[] charactersLC;
     public char[] charactersUC;

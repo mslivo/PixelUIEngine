@@ -5,8 +5,9 @@ import net.mslivo.pixelui.engine.actions.common.ItemCellColor;
 import net.mslivo.pixelui.engine.Grid;
 import net.mslivo.pixelui.engine.List;
 import net.mslivo.pixelui.engine.Tooltip;
+import net.mslivo.pixelui.engine.actions.common.ItemIcons;
 
-public interface GridAction<T> extends CommonActions, HasItemIcons<T>, ItemCellColor<T> {
+public interface GridAction<T> extends CommonActions, ItemIcons<T>, ItemCellColor<T> {
 
     default Tooltip toolTip(T gridItem) {
         return null;

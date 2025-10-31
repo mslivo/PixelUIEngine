@@ -2,7 +2,7 @@ package net.mslivo.pixelui.engine;
 
 import net.mslivo.pixelui.media.CMediaSprite;
 
-public class TooltipImage {
+public final class TooltipImage {
     public CMediaSprite image;
     public int x;
     public int y;

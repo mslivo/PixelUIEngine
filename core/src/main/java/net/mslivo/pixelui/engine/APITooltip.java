@@ -10,7 +10,7 @@ import net.mslivo.pixelui.engine.constants.DIRECTION;
 import net.mslivo.pixelui.engine.constants.SEGMENT_ALIGNMENT;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.engine.actions.ToolTipAction;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 
 public final class APITooltip {
     private final API api;

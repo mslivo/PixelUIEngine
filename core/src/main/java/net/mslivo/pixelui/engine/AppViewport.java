@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.engine.actions.AppViewPortAction;
 
-public class AppViewport extends Component {
+public final class AppViewport extends Component {
     public OrthographicCamera camera;
     public NestedFrameBuffer frameBuffer;
     public TextureRegion textureRegion;

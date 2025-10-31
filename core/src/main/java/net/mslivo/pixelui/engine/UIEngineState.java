@@ -14,7 +14,7 @@ import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 
 public final class UIEngineState {
 
@@ -77,9 +77,9 @@ public final class UIEngineState {
     public Object tooltip_lastHoverObject;
     public Knob pressedKnob;
     public AppViewport pressedAppViewPort;
-    public Textfield pressedTextField;
+    public TextField pressedTextField;
     public int pressedTextFieldInitCaretPosition;
-    public Textfield focusedTextField;
+    public TextField focusedTextField;
     public int focusedTextField_repeatedKey;
     public long focusedTextField_repeatedKeyTimer;
     public Grid draggedGrid;
@@ -95,8 +95,8 @@ public final class UIEngineState {
     public int draggedListFromIndex;
     public GridPoint2 draggedListOffset;
     public Object draggedListItem;
-    public Combobox openComboBox;
-    public ComboboxItem pressedComboBoxItem;
+    public ComboBox openComboBox;
+    public ComboBoxItem pressedComboBoxItem;
     public ContextMenu openContextMenu;
     public ContextMenuItem pressedContextMenuItem;
     public int displayedContextMenuWidth;

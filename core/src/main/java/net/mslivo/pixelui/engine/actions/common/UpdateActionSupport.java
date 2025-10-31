@@ -1,4 +1,4 @@
-package net.mslivo.pixelui.engine.actions;
+package net.mslivo.pixelui.engine.actions.common;
 
 import com.badlogic.gdx.utils.Array;
 

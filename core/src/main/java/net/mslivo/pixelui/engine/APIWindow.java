@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.actions.WindowAction;
 
 import java.util.function.Predicate;

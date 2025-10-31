@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntSet;
 import net.mslivo.pixelui.engine.actions.TextFieldAction;
 
-public class Textfield extends Component {
+public final class TextField extends Component {
     public String content;
     public Color fontColor;
     public Color markerColor;
@@ -17,6 +17,6 @@ public class Textfield extends Component {
     public int markedContentEnd;
     public boolean contentValid;
 
-    Textfield() {
+    TextField() {
     }
 }

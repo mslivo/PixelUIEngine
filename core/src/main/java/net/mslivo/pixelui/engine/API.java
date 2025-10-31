@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 
 import java.util.function.Predicate;
 

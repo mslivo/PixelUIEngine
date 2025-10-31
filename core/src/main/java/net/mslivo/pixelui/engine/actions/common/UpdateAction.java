@@ -1,8 +1,5 @@
-package net.mslivo.pixelui.engine.actions;
+package net.mslivo.pixelui.engine.actions.common;
 
-/**
- * Created by Admin on 16.03.2019.
- */
 public abstract class UpdateAction {
 
     public final int interval;

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import net.mslivo.pixelui.engine.actions.*;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.CHECKBOX_STYLE;
 import net.mslivo.pixelui.engine.constants.SHAPE_ROTATION;
@@ -569,9 +570,9 @@ public final class APIComponent {
                     }
                 }
             }
-            if(tabBar.tabs.isEmpty()){
+            if (tabBar.tabs.isEmpty()) {
                 tabBar.selectedTab = 0;
-            }else{
+            } else {
                 tabBar.selectedTab = Math.clamp(selectedTab, 0, tabBar.tabs.size - 1);
             }
             return tabBar;
@@ -728,7 +729,7 @@ public final class APIComponent {
                 return tab;
             }
 
-            public void setDisabled(Tab tab, boolean disabled){
+            public void setDisabled(Tab tab, boolean disabled) {
                 if (tab == null) return;
                 tab.disabled = disabled;
             }
@@ -840,7 +841,10 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(grid, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             grid.selectedItem = null;
             grid.selectedItems = new HashSet();
-            grid.items = items;
+            grid.items = items != null ?  new Object[items.length][items[0].length] : new Object[][]{};
+            for (int ix = 0; ix < grid.items.length; ix++)
+                for (int iy = 0; iy < grid.items[0].length; iy++)
+                    grid.items[ix][iy] = items[ix][iy];
             grid.gridAction = gridAction != null ? gridAction : DEFAULT_GRID_ACTION;
             grid.dragEnabled = dragEnabled;
             grid.dragInEnabled = dragInEnabled;
@@ -905,26 +909,26 @@ public final class APIComponent {
         private final TextFieldAction DEFAULT_TEXTFIELD_ACTION = new TextFieldAction() {
         };
 
-        public Textfield create(int x, int y, int width) {
+        public TextField create(int x, int y, int width) {
             return create(x, y, width, "", DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
 
-        public Textfield create(int x, int y, int width, String content) {
+        public TextField create(int x, int y, int width, String content) {
             return create(x, y, width, content, DEFAULT_TEXTFIELD_ACTION, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
 
-        public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
+        public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction) {
             return create(x, y, width, content, textFieldAction, 32, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
-        public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
+        public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength) {
             return create(x, y, width, content, textFieldAction, contentMaxLength, uiEngineConfig.component.textFieldDefaultAllowedCharacters);
         }
 
-        public Textfield create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
-            Textfield textField = new Textfield();
+        public TextField create(int x, int y, int width, String content, TextFieldAction textFieldAction, int contentMaxLength, char[] allowedCharacters) {
+            TextField textField = new TextField();
             setComponentCommonInitValuesInternal(textField, x, y, width, 1, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             textField.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             textField.allowedCharacters = new IntSet();
@@ -941,38 +945,38 @@ public final class APIComponent {
             return textField;
         }
 
-        public void setMarkerColor(Textfield textField, Color color) {
+        public void setMarkerColor(TextField textField, Color color) {
             if (textField == null) return;
             textField.markerColor = color.cpy();
         }
 
-        public void setMarkerPosition(Textfield textField, int position) {
+        public void setMarkerPosition(TextField textField, int position) {
             if (textField == null) return;
             uiCommonUtils.textField_setCaretPosition(textField, position);
         }
 
-        public void setContent(Textfield textField, String content) {
+        public void setContent(TextField textField, String content) {
             if (textField == null) return;
             uiCommonUtils.textField_setContent(textField, content);
         }
 
-        public void setFontColor(Textfield textField, Color color) {
+        public void setFontColor(TextField textField, Color color) {
             if (textField == null) return;
             textField.fontColor.set(color);
         }
 
-        public void setTextFieldAction(Textfield textField, TextFieldAction textFieldAction) {
+        public void setTextFieldAction(TextField textField, TextFieldAction textFieldAction) {
             if (textField == null) return;
             textField.textFieldAction = textFieldAction != null ? textFieldAction : DEFAULT_TEXTFIELD_ACTION;
             uiCommonUtils.textField_setContent(textField, textField.content); // Trigger validation
         }
 
-        public void setContentMaxLength(Textfield textField, int contentMaxLength) {
+        public void setContentMaxLength(TextField textField, int contentMaxLength) {
             if (textField == null) return;
             textField.contentMaxLength = Math.max(contentMaxLength, 0);
         }
 
-        public void setAllowedCharacters(Textfield textField, char[] allowedCharacters) {
+        public void setAllowedCharacters(TextField textField, char[] allowedCharacters) {
             if (textField == null) return;
             textField.allowedCharacters.clear();
             if (allowedCharacters != null) {
@@ -981,21 +985,21 @@ public final class APIComponent {
             }
         }
 
-        public void unFocus(Textfield textField) {
+        public void unFocus(TextField textField) {
             if (textField == null) return;
             uiCommonUtils.textField_unFocus(textField);
         }
 
-        public void focus(Textfield textField) {
+        public void focus(TextField textField) {
             if (textField == null) return;
             uiCommonUtils.textField_focus(textField, api);
         }
 
-        public boolean isFocused(Textfield textField) {
+        public boolean isFocused(TextField textField) {
             return uiCommonUtils.textField_isFocused(textField);
         }
 
-        public boolean isContentValid(Textfield textField) {
+        public boolean isContentValid(TextField textField) {
             if (textField == null) return false;
             return textField.contentValid;
         }
@@ -1116,12 +1120,12 @@ public final class APIComponent {
             return frameBufferViewport;
         }
 
-        public void setStretchToSize(FrameBufferViewport frameBufferViewport, boolean stretchToSize){
+        public void setStretchToSize(FrameBufferViewport frameBufferViewport, boolean stretchToSize) {
             if (frameBufferViewport == null) return;
             frameBufferViewport.stretchToSize = stretchToSize;
         }
 
-        public void setFlipXY(FrameBufferViewport frameBufferViewport, boolean flipX, boolean flipY){
+        public void setFlipXY(FrameBufferViewport frameBufferViewport, boolean flipX, boolean flipY) {
             if (frameBufferViewport == null) return;
             frameBufferViewport.flipX = flipX;
             frameBufferViewport.flipY = flipY;
@@ -1149,15 +1153,15 @@ public final class APIComponent {
         };
 
         public Image create(int x, int y, CMediaSprite image) {
-            return create(x, y, image, 0, null, false, false ,false);
+            return create(x, y, image, 0, null, false, false, false);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex) {
-            return create(x, y, image, arrayIndex, null, false, false ,false);
+            return create(x, y, image, arrayIndex, null, false, false, false);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction) {
-            return create(x, y, image, arrayIndex, imageAction, false, false ,false);
+            return create(x, y, image, arrayIndex, imageAction, false, false, false);
         }
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, boolean flipX, boolean flipY, boolean stretchToSize) {
@@ -1212,20 +1216,20 @@ public final class APIComponent {
         private final ComboBoxAction DEFAULT_COMBOBOX_ACTION = new ComboBoxAction() {
         };
 
-        public Combobox create(int x, int y, int width) {
+        public ComboBox create(int x, int y, int width) {
             return create(x, y, width, null, DEFAULT_COMBOBOX_ACTION, null);
         }
 
-        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems) {
+        public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems) {
             return create(x, y, width, combobBoxItems, DEFAULT_COMBOBOX_ACTION, null);
         }
 
-        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
+        public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction) {
             return create(x, y, width, combobBoxItems, comboBoxAction, null);
         }
 
-        public Combobox create(int x, int y, int width, ComboboxItem[] combobBoxItems, ComboBoxAction comboBoxAction, ComboboxItem selectedItem) {
-            Combobox comboBox = new Combobox();
+        public ComboBox create(int x, int y, int width, ComboBoxItem[] combobBoxItems, ComboBoxAction comboBoxAction, ComboBoxItem selectedItem) {
+            ComboBox comboBox = new ComboBox();
             setComponentCommonInitValuesInternal(comboBox, x, y, width, 1, uiEngineState.config.component.defaultColor, uiCommonUtils.color_brigther(uiEngineState.config.component.defaultColor));
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
             comboBox.items = new Array<>();
@@ -1241,66 +1245,66 @@ public final class APIComponent {
             return comboBox;
         }
 
-        public void setComboBoxAction(Combobox comboBox, ComboBoxAction comboBoxAction) {
+        public void setComboBoxAction(ComboBox comboBox, ComboBoxAction comboBoxAction) {
             if (comboBox == null) return;
             comboBox.comboBoxAction = comboBoxAction != null ? comboBoxAction : DEFAULT_COMBOBOX_ACTION;
         }
 
-        public void addComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
+        public void addComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
             if (comboBox == null || comboBoxItem == null) return;
             uiCommonUtils.comboBox_addItem(comboBox, comboBoxItem);
         }
 
-        public void addComboBoxItems(Combobox comboBox, ComboboxItem[] comboBoxItems) {
+        public void addComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
             if (comboBox == null || comboBoxItems == null) return;
             for (int i = 0; i < comboBoxItems.length; i++) addComboBoxItem(comboBox, comboBoxItems[i]);
         }
 
-        public void removeComboBoxItem(Combobox comboBox, ComboboxItem comboBoxItem) {
+        public void removeComboBoxItem(ComboBox comboBox, ComboBoxItem comboBoxItem) {
             if (comboBox == null || comboBoxItem == null) return;
             uiCommonUtils.comboBox_removeItem(comboBox, comboBoxItem);
         }
 
-        public void removeComboBoxItems(Combobox comboBox, ComboboxItem[] comboBoxItems) {
+        public void removeComboBoxItems(ComboBox comboBox, ComboBoxItem[] comboBoxItems) {
             if (comboBox == null || comboBoxItems == null) return;
             for (int i = 0; i < comboBoxItems.length; i++) removeComboBoxItem(comboBox, comboBoxItems[i]);
         }
 
-        public void removeAllComboBoxItems(Combobox comboBox) {
+        public void removeAllComboBoxItems(ComboBox comboBox) {
             if (comboBox == null) return;
-            removeComboBoxItems(comboBox, comboBox.items.toArray(ComboboxItem[]::new));
+            removeComboBoxItems(comboBox, comboBox.items.toArray(ComboBoxItem[]::new));
         }
 
-        public boolean isItemSelected(Combobox comboBox, ComboboxItem comboBoxItem) {
+        public boolean isItemSelected(ComboBox comboBox, ComboBoxItem comboBoxItem) {
             if (comboBox == null || comboBoxItem == null) return false;
             return comboBox.selectedItem != null ? comboBox.selectedItem == comboBoxItem : false;
         }
 
-        public boolean isAnyItemSelected(Combobox comboBox) {
+        public boolean isAnyItemSelected(ComboBox comboBox) {
             if (comboBox == null) return false;
             return comboBox.selectedItem != null;
         }
 
-        public void setSelectedItem(ComboboxItem selectItem) {
+        public void setSelectedItem(ComboBoxItem selectItem) {
             if (selectItem == null) return;
             uiCommonUtils.comboBox_selectItem(selectItem);
         }
 
-        public void open(Combobox comboBox) {
+        public void open(ComboBox comboBox) {
             if (comboBox == null) return;
             uiCommonUtils.comboBox_open(comboBox);
         }
 
-        public void close(Combobox comboBox) {
+        public void close(ComboBox comboBox) {
             if (comboBox == null) return;
             uiCommonUtils.comboBox_close(comboBox);
         }
 
-        public boolean isOpen(Combobox comboBox) {
+        public boolean isOpen(ComboBox comboBox) {
             return uiCommonUtils.comboBox_isOpen(comboBox);
         }
 
-        public void setSelectedItemByText(Combobox comboBox, String text) {
+        public void setSelectedItemByText(ComboBox comboBox, String text) {
             if (comboBox == null || text == null) return;
             for (int i = 0; i < comboBox.items.size; i++) {
                 if (comboBox.items.get(i).text.equals(text)) {
@@ -1310,7 +1314,7 @@ public final class APIComponent {
             }
         }
 
-        public boolean isSelectedItemText(Combobox comboBox, String text) {
+        public boolean isSelectedItemText(ComboBox comboBox, String text) {
             if (comboBox == null || text == null) return false;
             return comboBox.selectedItem != null ? comboBox.selectedItem.text.equals(text) : false;
         }
@@ -1323,16 +1327,16 @@ public final class APIComponent {
             private final ComboBoxItemAction DEFAULT_COMBOBOX_ITEM_ACTION = new ComboBoxItemAction() {
             };
 
-            public ComboboxItem create(String text) {
+            public ComboBoxItem create(String text) {
                 return create(text, DEFAULT_COMBOBOX_ITEM_ACTION);
             }
 
-            public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
+            public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction) {
                 return create(text, comboBoxItemAction, null);
             }
 
-            public ComboboxItem create(String text, ComboBoxItemAction comboBoxItemAction, Object data) {
-                ComboboxItem comboBoxItem = new ComboboxItem();
+            public ComboBoxItem create(String text, ComboBoxItemAction comboBoxItemAction, Object data) {
+                ComboBoxItem comboBoxItem = new ComboBoxItem();
                 comboBoxItem.text = Tools.Text.validString(text);
                 comboBoxItem.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
@@ -1341,27 +1345,27 @@ public final class APIComponent {
                 return comboBoxItem;
             }
 
-            public void setName(ComboboxItem comboBoxItem, String name) {
+            public void setName(ComboBoxItem comboBoxItem, String name) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.name = Tools.Text.validString(name);
             }
 
-            public void setData(ComboboxItem comboBoxItem, Object data) {
+            public void setData(ComboBoxItem comboBoxItem, Object data) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.data = data;
             }
 
-            public void setFontColor(ComboboxItem comboBoxItem, Color color) {
+            public void setFontColor(ComboBoxItem comboBoxItem, Color color) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.fontColor.set(color);
             }
 
-            public void setComboBoxItemAction(ComboboxItem comboBoxItem, ComboBoxItemAction comboBoxItemAction) {
+            public void setComboBoxItemAction(ComboBoxItem comboBoxItem, ComboBoxItemAction comboBoxItemAction) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.comboBoxItemAction = comboBoxItemAction != null ? comboBoxItemAction : DEFAULT_COMBOBOX_ITEM_ACTION;
             }
 
-            public void setText(ComboboxItem comboBoxItem, String text) {
+            public void setText(ComboBoxItem comboBoxItem, String text) {
                 if (comboBoxItem == null) return;
                 comboBoxItem.text = Tools.Text.validString(text);
             }
@@ -1484,7 +1488,10 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(list, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             list.selectedItem = null;
             list.selectedItems = new HashSet<>();
-            list.items = items;
+            list.items = new Array();
+            if (items != null)
+                for (int i = 0; i < items.size; i++)
+                    list.items.add(items.get(i));
             list.listAction = listAction != null ? listAction : DEFAULT_LIST_ACTION;
             list.multiSelect = multiSelect;
             list.scrolled = 0f;
@@ -1512,7 +1519,7 @@ public final class APIComponent {
 
         public void setItems(List list, Array items) {
             if (list == null) return;
-            list.items = items;
+            uiCommonUtils.list_setItems(list, items);
         }
 
         public void setScrolled(List list, float scrolled) {

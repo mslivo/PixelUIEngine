@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Queue;
-import net.mslivo.pixelui.engine.actions.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.actions.common.CommonActions;
 import net.mslivo.pixelui.engine.constants.*;
 import net.mslivo.pixelui.media.*;
@@ -987,7 +987,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     }
 
-    private boolean updateUI_keyInteractionsKeyProcessKey(Textfield focusedTextField) {
+    private boolean updateUI_keyInteractionsKeyProcessKey(TextField focusedTextField) {
         if (focusedTextField != null) {
             if (uiCommonUtils.window_isModalOpen(uiEngineState)) {
                 if (focusedTextField.addedToWindow == null) {
@@ -1014,7 +1014,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // Key
         if (uiEngineState.inputEvents.keyTyped) {
-            final Textfield focusedTextField = uiEngineState.focusedTextField;
+            final TextField focusedTextField = uiEngineState.focusedTextField;
             final boolean processKeyTyped = updateUI_keyInteractionsKeyProcessKey(focusedTextField);
 
             if (processKeyTyped) {
@@ -1032,7 +1032,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
         if (uiEngineState.inputEvents.keyDown) {
-            final Textfield focusedTextField = uiEngineState.focusedTextField;
+            final TextField focusedTextField = uiEngineState.focusedTextField;
             final boolean processKeyDown = updateUI_keyInteractionsKeyProcessKey(focusedTextField);
 
             if (processKeyDown) {
@@ -1238,7 +1238,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                     uiCommonUtils.scrollBar_calculateScrolled(scrollBarHorizontal, uiEngineState.mouseUI.x, uiEngineState.mouseUI.y));
                             uiEngineState.pressedScrollBarHorizontal = scrollBarHorizontal;
                         }
-                        case Combobox comboBox -> {
+                        case ComboBox comboBox -> {
                             if (uiCommonUtils.comboBox_isOpen(comboBox)) {
                                 if (Tools.Calc.pointRectsCollide(uiEngineState.mouseUI.x, uiEngineState.mouseUI.y,
                                         uiCommonUtils.component_getAbsoluteX(comboBox), uiCommonUtils.component_getAbsoluteY(comboBox),
@@ -1280,7 +1280,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                     uiCommonUtils.component_getRelativeMouseY(uiEngineState.mouseUI.y, appViewPort));
                             uiEngineState.pressedAppViewPort = appViewPort;
                         }
-                        case Textfield textField -> {
+                        case TextField textField -> {
                             int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouseUI.x, textField);
                             uiEngineState.pressedTextField = textField;
 
@@ -1401,7 +1401,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.contextMenu_selectItem(contextMenuItem);
                         uiCommonUtils.contextMenu_close(contextMenuItem.addedToContextMenu);
                     }
-                    case ComboboxItem comboBoxItem -> {
+                    case ComboBoxItem comboBoxItem -> {
                         uiCommonUtils.comboBox_selectItem(comboBoxItem);
                         if (uiEngineState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
                             // emulated: move mouse back to combobox on item select
@@ -1414,7 +1414,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         checkBox.checkBoxAction.onCheck(checkBox.checked);
                         uiCommonUtils.resetPressedCheckBoxReference(uiEngineState);
                     }
-                    case Textfield _ -> {
+                    case TextField _ -> {
                         uiCommonUtils.resetPressedTextFieldReference(uiEngineState);
                     }
                     case AppViewport appViewPort -> {
@@ -1620,7 +1620,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         float newValue = turnedKnob.turned + amount;
                         uiCommonUtils.knob_turnKnob(turnedKnob, newValue);
                     }
-                    case Textfield textField -> {
+                    case TextField textField -> {
                         if (uiCommonUtils.textField_isFocused(textField)) {
                             int textFieldMouseX = uiCommonUtils.component_getRelativeMouseX(uiEngineState.mouseUI.x, textField);
                             int textPosition = uiCommonUtils.textField_findTextPosition(textField, textFieldMouseX);
@@ -2023,7 +2023,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case Notification notification -> notification.notificationAction;
             case Button button -> button.buttonAction;
             case Checkbox checkbox -> checkbox.checkBoxAction;
-            case Combobox comboBox -> comboBox.comboBoxAction;
+            case ComboBox comboBox -> comboBox.comboBoxAction;
             case AppViewport appViewPort -> appViewPort.appViewPortAction;
             case Image image -> image.imageAction;
             case Grid grid -> grid.gridAction;
@@ -2033,7 +2033,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case ScrollbarHorizontal scrollBarHorizontal -> scrollBarHorizontal.scrollBarAction;
             case Tabbar tabBar -> tabBar.tabBarAction;
             case Text text -> text.textAction;
-            case Textfield textField -> textField.textFieldAction;
+            case TextField textField -> textField.textFieldAction;
             case Progressbar progressbar -> progressbar.progressBarAction;
             case Shape shape -> shape.shapeAction;
             case Knob knob -> knob.knobAction;
@@ -2402,7 +2402,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         render_setColor(spriteRenderer, component.color, componentAlpha, componentGrayScale);
 
         switch (component) {
-            case Combobox comboBox -> {
+            case ComboBox comboBox -> {
                 // Menu
                 if (uiCommonUtils.comboBox_isOpen(comboBox)) {
                     int widthPx = TS(comboBox.width);
@@ -2417,7 +2417,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                     /* Menu */
                     for (int iy = 0; iy < height; iy++) {
-                        ComboboxItem comboBoxItem = comboBox.items.get(iy);
+                        ComboBoxItem comboBoxItem = comboBox.items.get(iy);
                         boolean selected = Tools.Calc.pointRectsCollide(uiEngineState.mouseUI.x, uiEngineState.mouseUI.y, uiCommonUtils.component_getAbsoluteX(comboBox), uiCommonUtils.component_getAbsoluteY(comboBox) - TS() - TS(iy), widthPx, TS());
 
                         for (int ix = 0; ix < width; ix++) {
@@ -3049,7 +3049,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
             }
-            case Combobox comboBox -> {
+            case ComboBox comboBox -> {
 
                 // Cell
                 spriteRenderer.saveState();
@@ -3088,7 +3088,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_KNOB, index, uiCommonUtils.component_getAbsoluteX(knob), uiCommonUtils.component_getAbsoluteY(knob));
                 }
             }
-            case Textfield textField -> {
+            case TextField textField -> {
 
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;

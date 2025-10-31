@@ -3,7 +3,7 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.constants.DIRECTION;
-import net.mslivo.pixelui.engine.actions.UpdateActionSupport;
+import net.mslivo.pixelui.engine.actions.common.UpdateActionSupport;
 import net.mslivo.pixelui.engine.actions.ToolTipAction;
 
 public class Tooltip extends UpdateActionSupport {

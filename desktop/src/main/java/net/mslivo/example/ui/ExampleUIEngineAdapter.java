@@ -142,14 +142,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     @Override
     public void update() {
         APIInput.APIKeyboard keyBoard = api.input.keyboard;
-        while (keyBoard.event.keyDownHasNext()) {
-            int key = keyBoard.event.keyDownNext();
-            switch (key) {
-                case KeyCode.Key.Q -> api.input.mouse.emulated.setPosition(10, 10);
-                case KeyCode.Key.W -> api.input.mouse.emulated.setPositionPreviousComponent();
-                case KeyCode.Key.E -> api.input.mouse.emulated.setPositionNextComponent();
-            }
-        }
+
 
         if (Tools.Calc.randomChance(30)) {
             spriteParticleSystem.addImageParticle(UIEngineBaseMedia_8x8.UI_CURSOR_ARROW, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight());

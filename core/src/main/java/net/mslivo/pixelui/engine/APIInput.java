@@ -44,12 +44,10 @@ public final class APIInput {
     public final class APIMouse {
         public final APIEvent event;
         public final APIState state;
-        public final APIEmulated emulated;
 
         APIMouse() {
             event = new APIEvent();
             state = new APIState();
-            emulated = new APIEmulated();
         }
 
         public Object hoverUIObject() {
@@ -92,28 +90,12 @@ public final class APIInput {
             return isUsingAnyUIObject() || isHoveringAnyUIObject();
         }
 
-        public MOUSE_CONTROL_MODE currentControlMode() {
-            return uiEngineState.currentControlMode;
+        public void setEmulatedMousePosition(int x, int y){
+            uiCommonUtils.emulatedMouse_setPosition(x, y);
         }
 
-        public final class APIEmulated {
-
-            public void setPosition(int x, int y) {
-                uiCommonUtils.emulatedMouse_setPosition(x, y);
-            }
-
-            public void setPositionComponent(Component component) {
-                uiCommonUtils.emulatedMouse_setPositionComponent(component);
-            }
-
-            public void setPositionNextComponent() {
-                uiCommonUtils.emulatedMouse_setPositionNextComponent();
-            }
-
-            public void setPositionPreviousComponent() {
-                uiCommonUtils.emulatedMouse_setPositionPreviousComponent();
-            }
-
+        public MOUSE_CONTROL_MODE currentControlMode() {
+            return uiEngineState.currentControlMode;
         }
 
         public final class APIEvent {

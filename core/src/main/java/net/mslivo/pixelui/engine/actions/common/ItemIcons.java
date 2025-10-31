@@ -1,9 +1,9 @@
-package net.mslivo.pixelui.engine.actions;
+package net.mslivo.pixelui.engine.actions.common;
 
 import com.badlogic.gdx.graphics.Color;
 import net.mslivo.pixelui.media.CMediaSprite;
 
-public interface HasItemIcons<T> {
+public interface ItemIcons<T> {
 
     default CMediaSprite icon(T item){
         return null;
