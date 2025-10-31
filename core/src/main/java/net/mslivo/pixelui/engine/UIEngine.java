@@ -195,7 +195,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.currentControlMode = MOUSE_CONTROL_MODE.DISABLED;
         newUIEngineState.mouse_ui = new GridPoint2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
         newUIEngineState.mouse_app = new GridPoint2(0, 0);
-        newUIEngineState.mouse_delta = new Vector2(0, 0);
+        newUIEngineState.mouse_delta = new GridPoint2(0, 0);
         newUIEngineState.lastUIMouseHover = null;
         newUIEngineState.cursor = null;
         newUIEngineState.cursorArrayIndex = 0;
@@ -205,7 +205,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.displayOverrideCursor = false;
         newUIEngineState.vector_fboCursor = new Vector3(0, 0, 0);
         newUIEngineState.vector2_unproject = new Vector2(0, 0);
-        newUIEngineState.mouse_emulated = new Vector2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
+        newUIEngineState.mouse_emulated_pos = new Vector2(newUIEngineState.resolutionWidthHalf, newUIEngineState.resolutionHeightHalf);
         newUIEngineState.emulatedMouseLastMouseClick = 0;
         newUIEngineState.keyBoardMouseSmoothing = new Vector2(0, 0);
         newUIEngineState.emulatedMouseIsButtonDown = new boolean[]{false, false, false, false, false};
@@ -235,7 +235,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         // UI
         this.updateMouseControl();
         this.updateUI(); // Main UI Updates happen here
-        this.updateMouseCursor();
+
 
         // Update Game
         this.uiAdapter.update();
@@ -249,28 +249,25 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.DISABLED);
             mouseControl_chokeAllMouseEvents();
         } else {
-            if (uiEngineState.config.input.gamePadMouseEnabled && mouseControl_gamePadMouseTranslateAndChokeEvents()) {
+            if (uiEngineState.config.input.gamePadMouseEnabled && mouseControl_gamePadMouseChokeAndTranslateEvents()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.GAMEPAD);
-            } else if (uiEngineState.config.input.keyboardMouseEnabled && mouseControl_keyboardMouseTranslateAndChokeEvents()) {
+            } else if (uiEngineState.config.input.keyboardMouseEnabled && mouseControl_keyboardMouseChokeAndTranslate()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.KEYBOARD);
             } else if (uiEngineState.config.input.hardwareMouseEnabled && mouseControl_hardwareMouseDetectUse()) {
                 mouseControl_setNextMouseControlMode(MOUSE_CONTROL_MODE.HARDWARE_MOUSE);
             }
         }
 
-        if (uiCommonUtils.mouseTextInput_isOpen()) {
-            // Translate to Text Input
-            mouseControl_updateMouseTextInput();
-        } else {
-            // Translate to MouseGUI position
-            switch (uiEngineState.currentControlMode) {
-                case GAMEPAD -> mouseControl_updateGamePadMouse();
-                case KEYBOARD -> mouseControl_updateKeyBoardMouse();
-                case HARDWARE_MOUSE -> mouseControl_updateHardwareMouse();
-                case DISABLED -> {
-                }
+
+        // Translate to MouseGUI position
+        switch (uiEngineState.currentControlMode) {
+            case GAMEPAD -> mouseControl_updateGamePadMouse();
+            case KEYBOARD -> mouseControl_updateKeyBoardMouse();
+            case HARDWARE_MOUSE -> mouseControl_updateHardwareMouse();
+            case DISABLED -> {
             }
         }
+
 
         mouseControl_enforceUIMouseBounds(); // Enforce UI mouse screen bounds
         mouseControl_updateGameMouseXY(); // Translate UI mouse x,y to Game mouse x,y
@@ -301,14 +298,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
             // Set Next ControlMode
             if (nextControlMode.emulated) {
-                this.uiEngineState.mouse_emulated.set(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
+                uiCommonUtils.emulatedMouse_setPosition(uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
             }
             uiEngineState.currentControlMode = nextControlMode;
         }
     }
 
 
-    private void mouseControl_updateMouseTextInput() {
+    private void updateUI_updateMouseTextInput() {
         if (uiEngineState.openMouseTextInput == null) return;
         MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
         char[] characters = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
@@ -383,22 +380,22 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     if (uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime) {
                         if (moveLeft) {
                             scrollDirection = -1;
-                        }else  if (moveRight) {
+                        } else if (moveRight) {
                             scrollDirection = 1;
                         }
 
                         uiEngineState.mTextInputScrollTimer = 0;
                         if (uiEngineState.mTextInputScrollSpeed == 0) {
                             uiEngineState.mTextInputScrollTime = 10;
-                        }else if(uiEngineState.mTextInputScrollSpeed == 1){
+                        } else if (uiEngineState.mTextInputScrollSpeed == 1) {
                             uiEngineState.mTextInputScrollTime = 5;
-                        }else if(uiEngineState.mTextInputScrollSpeed == 2){
+                        } else if (uiEngineState.mTextInputScrollSpeed == 2) {
                             uiEngineState.mTextInputScrollTime = 2;
-                        }else{
+                        } else {
                             uiEngineState.mTextInputScrollTime = 0;
                         }
 
-                        uiEngineState.mTextInputScrollSpeed = Math.min(uiEngineState.mTextInputScrollSpeed+1,3);
+                        uiEngineState.mTextInputScrollSpeed = Math.min(uiEngineState.mTextInputScrollSpeed + 1, 3);
                     }
                 } else {
                     uiEngineState.mTextInputScrollTimer = 0;
@@ -525,7 +522,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
 
-    private boolean mouseControl_gamePadMouseTranslateAndChokeEvents() {
+    private boolean mouseControl_gamePadMouseChokeAndTranslateEvents() {
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
         boolean gamepadMouseUsed = false;
         for (int i = 0; i <= UIEngineConfig.GAMEPAD_MOUSE_BUTTONS; i++) {
@@ -599,7 +596,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         return gamepadMouseUsed;
     }
 
-    private boolean mouseControl_keyboardMouseTranslateAndChokeEvents() {
+    private boolean mouseControl_keyboardMouseChokeAndTranslate() {
         if (uiEngineState.focusedTextField != null) return false; // Disable during Textfield Input
         boolean keyboardMouseUsed = false;
         // Remove Key down input events and set to temporary variable keyBoardTranslatedKeysDown
@@ -647,16 +644,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     private void mouseControl_emulateMouseEvents(boolean buttonMouse1Down, boolean buttonMouse2Down, boolean buttonMouse3Down, boolean buttonMouse4Down, boolean buttonMouse5Down,
                                                  boolean buttonScrolledUp, boolean buttonScrolledDown, float cursorChangeX, float cursorChangeY
     ) {
-        final float deltaX = cursorChangeX;
-        final float deltaY = cursorChangeY;
+        uiCommonUtils.emulatedMouse_setPosition(uiEngineState.mouse_emulated_pos.x + cursorChangeX, uiEngineState.mouse_emulated_pos.y - cursorChangeY);
 
         // Set to final
-        uiEngineState.mouse_emulated.x = Math.clamp(uiEngineState.mouse_emulated.x + deltaX, 0, uiEngineState.resolutionWidth);
-        uiEngineState.mouse_emulated.y = Math.clamp(uiEngineState.mouse_emulated.y - deltaY, 0, uiEngineState.resolutionHeight);
-        uiEngineState.mouse_delta.x = deltaX;
-        uiEngineState.mouse_delta.y = -deltaY;
-        uiEngineState.mouse_ui.x = MathUtils.round(uiEngineState.mouse_emulated.x);
-        uiEngineState.mouse_ui.y = MathUtils.round(uiEngineState.mouse_emulated.y);
+        int xNew = MathUtils.round(uiEngineState.mouse_emulated_pos.x);
+        int yNew = MathUtils.round(uiEngineState.mouse_emulated_pos.y);
+
+        uiEngineState.mouse_delta.x = xNew - uiEngineState.mouse_ui.x;
+        uiEngineState.mouse_delta.y = yNew - uiEngineState.mouse_ui.y;
+
+        uiEngineState.mouse_ui.x = xNew;
+        uiEngineState.mouse_ui.y = yNew;
 
         // Simluate Mouse Button Press Events
         boolean anyButtonChanged = false;
@@ -700,7 +698,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
         // Simluate Mouse Move Events
-        if (deltaX != 0 || deltaY != 0) {
+        if (cursorChangeX != 0 || cursorChangeY != 0) {
             uiEngineState.inputEvents.mouseMoved = true;
             uiEngineState.inputEvents.mouseDragged = false;
             draggedLoop:
@@ -894,7 +892,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
 
-    private void updateMouseCursor() {
+    private void updateUI_mouseCursor() {
         /* Update Cursor*/
         if (uiEngineState.lastUIMouseHover != null) {
             // 1. GUI Cursor
@@ -1107,8 +1105,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void updateUI_mouseInteractions() {
         uiCommonUtils.setMouseInteractedUIObject(null);
-        if (uiCommonUtils.mouseTextInput_isOpen())
-            return;
         if (uiEngineState.config.ui.mouseInteractionsDisabled)
             return;
         // ------ MOUSE DOUBLE CLICK ------
@@ -1233,7 +1229,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             uiCommonUtils.textField_focus(textField, api);
 
 
-
                         }
                         case Grid grid -> {
                             int tileSize = grid.bigMode ? TS2() : TS();
@@ -1345,7 +1340,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         uiCommonUtils.comboBox_selectItem(comboBoxItem);
                         if (uiEngineState.currentControlMode.emulated && comboBoxItem.addedToComboBox != null) {
                             // emulated: move mouse back to combobox on item select
-                            uiEngineState.mouse_emulated.y = uiCommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TS_HALF();
+                            uiCommonUtils.emulatedMouse_setPosition(uiEngineState.mouse_emulated_pos.x, uiCommonUtils.component_getAbsoluteY(comboBoxItem.addedToComboBox) + TS_HALF());
                         }
                         uiCommonUtils.resetPressedComboBoxItemReference(uiEngineState);
                     }
@@ -1656,7 +1651,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         updateUI_animationTimer();
 
-        updateUI_mouseInteractions();
+        if (uiCommonUtils.mouseTextInput_isOpen()) {
+            updateUI_updateMouseTextInput();
+        } else {
+            updateUI_mouseInteractions();
+        }
 
         updateUI_keyInteractions();
 
@@ -1668,6 +1667,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         updateUI_toolTip();
 
+        updateUI_mouseCursor();
     }
 
     private void updateUI_animationTimer() {
@@ -2151,7 +2151,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void render_mouseTextInput() {
-        if (uiEngineState.openMouseTextInput == null) return;
+        if (!uiCommonUtils.mouseTextInput_isOpen())
+            return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
         final Color color1 = uiEngineState.openMouseTextInput.color;
@@ -2160,13 +2161,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         final float textInputAlpha = color1.a;
         final int CHARACTERS = 4;
         char[] chars = mouseTextInput.upperCase ? mouseTextInput.charactersUC : mouseTextInput.charactersLC;
-        final float maxTransparency = 1f-uiEngineState.config.mouseTextInput.transparencyEffect;
+        final float maxTransparency = 1f - uiEngineState.config.mouseTextInput.transparencyEffect;
 
         // 4 to the left
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex - i;
             if (index >= 0 && index < chars.length) {
-                float alpha = (1f-maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
+                float alpha = (1f - maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
                 render_mouseTextInputCharacter(chars[index], mouseTextInput.x - (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
                         textInputAlpha * alpha,
                         mouseTextInput.upperCase, false);
@@ -2176,7 +2177,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         for (int i = 1; i <= CHARACTERS; i++) {
             int index = mouseTextInput.selectedIndex + i;
             if (index >= 0 && index < chars.length) {
-                float alpha = (1f-maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
+                float alpha = (1f - maxTransparency) + ((1f - (i / (float) CHARACTERS)) * maxTransparency);
                 render_mouseTextInputCharacter(chars[index], mouseTextInput.x + (i * 13), mouseTextInput.y - (i * i), color1, colorFont,
                         textInputAlpha * alpha,
                         mouseTextInput.upperCase, false);
@@ -2199,12 +2200,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         spriteRenderer.drawCMediaArray(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_BUTTON, pressedIndex, x, y);
 
         switch (c) {
-            case MOUSETEXTINPUT_CHANGE_CASE_CHAR, MOUSETEXTINPUT_BACK_CHAR,MOUSETEXTINPUT_ACCEPT -> {
+            case MOUSETEXTINPUT_CHANGE_CASE_CHAR, MOUSETEXTINPUT_BACK_CHAR, MOUSETEXTINPUT_ACCEPT -> {
                 render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a * textInputAlpha, false);
                 CMediaArray specialCharacterSprite = switch (c) {
-                    case MOUSETEXTINPUT_CHANGE_CASE_CHAR -> upperCase ? UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_LOWERCASE;
-                    case MOUSETEXTINPUT_BACK_CHAR -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
-                    case MOUSETEXTINPUT_ACCEPT -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
+                    case MOUSETEXTINPUT_CHANGE_CASE_CHAR ->
+                            upperCase ? UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_LOWERCASE;
+                    case MOUSETEXTINPUT_BACK_CHAR -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
+                    case MOUSETEXTINPUT_ACCEPT -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
                     default -> throw new IllegalStateException("Unexpected value: " + c);
                 };
                 spriteRenderer.drawCMediaArray(specialCharacterSprite, pressedIndex, x, y);
@@ -2219,6 +2221,8 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void render_drawCursor() {
+        if (uiCommonUtils.mouseTextInput_isOpen())
+            return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.cursor != null) {

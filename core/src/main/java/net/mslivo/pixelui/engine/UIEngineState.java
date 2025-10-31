@@ -120,9 +120,9 @@ public final class UIEngineState {
     public Object lastUIMouseHover; // Last GUI Element the mouse hovered over
     public MOUSE_CONTROL_MODE currentControlMode;
     public GridPoint2 mouse_app;
-    public Vector2 mouse_emulated; // Mouse Position for Keyboard/Gamepad mouse control
+    public Vector2 mouse_emulated_pos; // Mouse Position for Keyboard/Gamepad mouse control
     public GridPoint2 mouse_ui;
-    public Vector2 mouse_delta;
+    public GridPoint2 mouse_delta;
     public CMediaSprite cursor;
     public int cursorArrayIndex;
     public MouseTool mouseTool;

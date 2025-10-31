@@ -1,9 +1,9 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
+import net.mslivo.pixelui.media.MediaManager;
 
 public final class APIInput {
 
@@ -35,9 +35,9 @@ public final class APIInput {
         return inputEvents.lastUsedInputMethod;
     }
 
-    public boolean isAnyInputHoveringOrUsingUI(){
-        if(mouse.isUsingOrHoveringAnyUIObject()) return true;
-        if(keyboard.isUsingAnyUIObject()) return true;
+    public boolean isAnyInputHoveringOrUsingUI() {
+        if (mouse.isUsingOrHoveringAnyUIObject()) return true;
+        if (keyboard.isUsingAnyUIObject()) return true;
         return false;
     }
 
@@ -46,7 +46,7 @@ public final class APIInput {
         public final APIState state;
         public final APIEmulated emulated;
 
-        APIMouse(){
+        APIMouse() {
             event = new APIEvent();
             state = new APIState();
             emulated = new APIEmulated();
@@ -57,12 +57,12 @@ public final class APIInput {
         }
 
         public boolean isHoverUIObject(Object object) {
-            if(object == null) return false;
+            if (object == null) return false;
             return uiEngineState.lastUIMouseHover == object;
         }
 
         public boolean isHoverUIObjectName(String name) {
-            if(name == null) return false;
+            if (name == null) return false;
             return uiEngineState.lastUIMouseHover != null && name.equals(mouseUIObjectName(uiEngineState.lastUIMouseHover));
         }
 
@@ -71,24 +71,24 @@ public final class APIInput {
         }
 
         public boolean isUseUIObject(Object object) {
-            if(object == null) return false;
+            if (object == null) return false;
             return uiEngineState.mouseInteractedUIObjectFrame == object;
         }
 
         public boolean isUseUIObjectName(String name) {
-            if(name == null) return false;
+            if (name == null) return false;
             return uiEngineState.mouseInteractedUIObjectFrame != null && name.equals(mouseUIObjectName(uiEngineState.mouseInteractedUIObjectFrame));
         }
 
-        public boolean isUsingAnyUIObject(){
+        public boolean isUsingAnyUIObject() {
             return useUIObject() != null;
         }
 
-        public boolean isHoveringAnyUIObject(){
+        public boolean isHoveringAnyUIObject() {
             return hoverUIObject() != null;
         }
 
-        public boolean isUsingOrHoveringAnyUIObject(){
+        public boolean isUsingOrHoveringAnyUIObject() {
             return isUsingAnyUIObject() || isHoveringAnyUIObject();
         }
 
@@ -99,19 +99,19 @@ public final class APIInput {
         public final class APIEmulated {
 
             public void setPosition(int x, int y) {
-                uiCommonUtils.emulatedMouse_setPosition( x, y);
+                uiCommonUtils.emulatedMouse_setPosition(x, y);
             }
 
             public void setPositionComponent(Component component) {
-                uiCommonUtils.emulatedMouse_setPositionComponent( component);
+                uiCommonUtils.emulatedMouse_setPositionComponent(component);
             }
 
             public void setPositionNextComponent() {
-                uiCommonUtils.emulatedMouse_setPositionNextComponent( false);
+                uiCommonUtils.emulatedMouse_setPositionNextComponent();
             }
 
             public void setPositionPreviousComponent() {
-                uiCommonUtils.emulatedMouse_setPositionNextComponent( true);
+                uiCommonUtils.emulatedMouse_setPositionPreviousComponent();
             }
 
         }
@@ -180,11 +180,11 @@ public final class APIInput {
                 return uiEngineState.mouse_ui.y;
             }
 
-            public float xDelta() {
+            public int xDelta() {
                 return uiEngineState.mouse_delta.x;
             }
 
-            public float yDelta() {
+            public int yDelta() {
                 return uiEngineState.mouse_delta.y;
             }
 
@@ -229,7 +229,7 @@ public final class APIInput {
         public final APIEvent event;
         public final APIState state;
 
-        APIKeyboard(){
+        APIKeyboard() {
             this.event = new APIEvent();
             this.state = new APIState();
         }
@@ -239,12 +239,12 @@ public final class APIInput {
         }
 
         public boolean isUseUIObject(Object object) {
-            if(object == null) return false;
+            if (object == null) return false;
             return uiEngineState.keyboardInteractedUIObjectFrame == object;
         }
 
         public boolean isUseUIObjectName(String name) {
-            if(name == null) return false;
+            if (name == null) return false;
             return uiEngineState.keyboardInteractedUIObjectFrame != null && name.equals(keyboardUIObjectName(uiEngineState.keyboardInteractedUIObjectFrame));
         }
 
@@ -338,7 +338,7 @@ public final class APIInput {
         public final APIEvent event;
         public final APIState state;
 
-        APIGamepad(){
+        APIGamepad() {
             this.event = new APIEvent();
             this.state = new APIState();
         }

@@ -46,11 +46,11 @@ public class UICommonUtils {
         this.mediaManager = mediaManager;
     }
 
-    public void emulatedMouse_setPosition(int x, int y) {
+    public void emulatedMouse_setPosition(float x, float y) {
         if (!uiEngineState.currentControlMode.emulated) return;
         // not possibe with hardware mouse - would be resetted instantly
-        uiEngineState.mouse_emulated.x = x;
-        uiEngineState.mouse_emulated.y = y;
+        uiEngineState.mouse_emulated_pos.x = Math.clamp(x,0,uiEngineState.resolutionWidth);
+        uiEngineState.mouse_emulated_pos.y = Math.clamp(y,0,uiEngineState.resolutionHeight);
     }
 
     public void emulatedMouse_setPositionComponent(Component component) {
@@ -68,7 +68,14 @@ public class UICommonUtils {
         return false;
     }
 
-    public void emulatedMouse_setPositionNextComponent(boolean backwards) {
+    public void emulatedMouse_setPositionNextComponent() {
+        emulatedMouse_setPositionComponent(false);
+    }
+    public void emulatedMouse_setPositionPreviousComponent() {
+        emulatedMouse_setPositionComponent(true);
+    }
+
+    private void emulatedMouse_setPositionComponent(boolean backwards) {
         Window activeWindow = window_findTopInteractableWindow(uiEngineState);
         if (activeWindow != null && activeWindow.folded) {
             emulatedMouse_setPosition(
@@ -94,7 +101,7 @@ public class UICommonUtils {
                     windowComponentsVisibleOrder.add(component);
                     windowComponentsVisibleOrderSet.add(component);
                     float distance = Tools.Calc.distance(component_getAbsoluteX(component) + (uiEngineState.tileSize.TL(component.width) / 2),
-                            component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated.x, uiEngineState.mouse_emulated.y);
+                            component_getAbsoluteY(component) + (uiEngineState.tileSize.TL(component.height) / 2), uiEngineState.mouse_emulated_pos.x, uiEngineState.mouse_emulated_pos.y);
                     if (distance < nearestDistance) {
                         nearestDistance = distance;
                         nearestIndex = windowComponentsVisibleOrder.size - 1;
@@ -445,8 +452,8 @@ public class UICommonUtils {
         boolean success = contextMenu_open(contextMenu, uiEngineState.mouse_ui.x, uiEngineState.mouse_ui.y);
         if (success && (uiEngineState.currentControlMode.emulated)) {
             // emulated mode: move mouse onto the opened menu
-            uiEngineState.mouse_emulated.x += uiEngineState.tileSize.TS_HALF;
-            uiEngineState.mouse_emulated.y -= uiEngineState.tileSize.TS_HALF;
+            uiEngineState.mouse_emulated_pos.x += uiEngineState.tileSize.TS_HALF;
+            uiEngineState.mouse_emulated_pos.y -= uiEngineState.tileSize.TS_HALF;
         }
         return success;
     }
