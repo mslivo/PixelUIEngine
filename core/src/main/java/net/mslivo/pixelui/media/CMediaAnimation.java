@@ -1,10 +1,9 @@
 package net.mslivo.pixelui.media;
 
 import net.mslivo.pixelui.rendering.ExtendedAnimation;
+import net.mslivo.pixelui.utils.misc.Copyable;
 
-import java.io.Serializable;
-
-public final class CMediaAnimation extends CMediaSprite implements Serializable {
+public final class CMediaAnimation extends CMediaSprite implements Copyable<CMediaAnimation> {
 
     public int frameWidth;
     public int frameHeight;
@@ -49,6 +48,8 @@ public final class CMediaAnimation extends CMediaSprite implements Serializable 
         this.playMode = playMode;
     }
 
+
+    @Override
     public CMediaAnimation copy() {
         CMediaAnimation copy = new CMediaAnimation();
         copy.copyFields(this);

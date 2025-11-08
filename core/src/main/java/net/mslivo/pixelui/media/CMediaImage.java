@@ -1,10 +1,10 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
+import net.mslivo.pixelui.utils.misc.Copyable;
 
-public final class CMediaImage extends CMediaSprite implements Serializable {
+public final class CMediaImage extends CMediaSprite implements Copyable<CMediaImage> {
 
-    public CMediaImage(){
+    public CMediaImage() {
         super();
     }
 
@@ -16,7 +16,7 @@ public final class CMediaImage extends CMediaSprite implements Serializable {
         super(filename, useAtlas);
     }
 
-    public CMediaImage copy(){
+    public CMediaImage copy() {
         CMediaImage copy = new CMediaImage();
         copy.copyFields(this);
         return copy;

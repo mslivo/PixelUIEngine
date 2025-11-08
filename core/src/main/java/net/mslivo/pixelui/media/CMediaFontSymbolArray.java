@@ -1,15 +1,17 @@
 package net.mslivo.pixelui.media;
 
+import net.mslivo.pixelui.utils.misc.Copyable;
+
 import java.util.Arrays;
 
-public final class CMediaFontArraySymbol extends CMediaFontSymbol {
+public final class CMediaFontSymbolArray extends CMediaFontSymbol implements Copyable<CMediaFontSymbolArray> {
     public int[] ids;
     public int regionWidth;
     public int regionHeight;
     public int frameOffset;
     public int frameLength;
 
-    public CMediaFontArraySymbol() {
+    public CMediaFontSymbolArray() {
         super();
         this.ids = new int[]{};
         this.regionWidth = 0;
@@ -18,11 +20,11 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
         this.frameLength = 0;
     }
 
-    public CMediaFontArraySymbol(int[] ids, String file, int y_offset, int x_advance, int regionWidth, int regionHeight) {
+    public CMediaFontSymbolArray(int[] ids, String file, int y_offset, int x_advance, int regionWidth, int regionHeight) {
         this(ids, file, y_offset, x_advance,regionWidth,regionHeight, 0, Integer.MAX_VALUE);
     }
 
-    public CMediaFontArraySymbol(int[] ids, String file, int y_offset, int x_advance, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
+    public CMediaFontSymbolArray(int[] ids, String file, int y_offset, int x_advance, int regionWidth, int regionHeight, int frameOffset, int frameLength) {
         super(file, y_offset, x_advance);
         if(ids != null){
             this.ids = new int[ids.length];
@@ -36,8 +38,8 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
         this.frameLength = frameLength;
     }
 
-    public CMediaFontArraySymbol copy(){
-        CMediaFontArraySymbol copy = new CMediaFontArraySymbol();
+    public CMediaFontSymbolArray copy(){
+        CMediaFontSymbolArray copy = new CMediaFontSymbolArray();
         copy.copyFields(this);
         copy.ids = new int[this.ids.length];
         for(int i=0;i<this.ids.length;i++)
@@ -54,7 +56,7 @@ public final class CMediaFontArraySymbol extends CMediaFontSymbol {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        CMediaFontArraySymbol that = (CMediaFontArraySymbol) o;
+        CMediaFontSymbolArray that = (CMediaFontSymbolArray) o;
         return regionWidth == that.regionWidth && regionHeight == that.regionHeight && frameOffset == that.frameOffset && frameLength == that.frameLength && Arrays.equals(ids, that.ids);
     }
 

@@ -3,7 +3,6 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.ListAction;
-import net.mslivo.pixelui.engine.actions.common.Copy;
 
 import java.util.HashSet;
 

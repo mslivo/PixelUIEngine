@@ -1,8 +1,8 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
+import net.mslivo.pixelui.utils.misc.Copyable;
 
-public final class CMediaArray extends CMediaSprite implements Serializable {
+public final class CMediaArray extends CMediaSprite implements Copyable<CMediaArray> {
     public int frameWidth;
     public int frameHeight;
     public int frameOffset;
@@ -32,6 +32,7 @@ public final class CMediaArray extends CMediaSprite implements Serializable {
         this.frameLength = frameLength;
     }
 
+    @Override
     public CMediaArray copy() {
         CMediaArray copy = new CMediaArray();
         copy.copyFields(this);

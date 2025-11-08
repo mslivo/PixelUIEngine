@@ -192,7 +192,7 @@ public final class MediaManager implements Disposable {
             Pixmap symbolPixmap = createTexturePixmap(Tools.File.findResource(symbols[i].file));
             Pixmap[] symbolPixmapResults;
             switch (symbols[i]) {
-                case CMediaFontSingleSymbol singleSymbol -> {
+                case CMediaFontSymbolSingle singleSymbol -> {
                     if (!uniqueSymbolIds.contains(singleSymbol.id)) {
                         symbolPixmapResults = new Pixmap[]{symbolPixmap};
                         uniqueSymbolIds.add(singleSymbol.id);
@@ -200,7 +200,7 @@ public final class MediaManager implements Disposable {
                         throw new RuntimeException(String.format(ERROR_SYMBOL_ID_DUPLICATE, singleSymbol.file, singleSymbol.id));
                     }
                 }
-                case CMediaFontArraySymbol arraySymbol -> {
+                case CMediaFontSymbolArray arraySymbol -> {
                     int symbolsX = MathUtils.floor(symbolPixmap.getWidth() / (float) arraySymbol.regionWidth);
                     int symbolsY = MathUtils.floor(symbolPixmap.getHeight() / (float) arraySymbol.regionHeight);
                     int maxSymbolsInPixMap = symbolsX * symbolsY;
@@ -286,8 +286,8 @@ public final class MediaManager implements Disposable {
                 pixmap.drawPixmap(symbolPixmap, xCurrent, yCurrent);
 
                 int symbolId = switch (symbols[i]) {
-                    case CMediaFontSingleSymbol singleSymbol -> singleSymbol.id;
-                    case CMediaFontArraySymbol arraySymbol -> arraySymbol.ids[i2];
+                    case CMediaFontSymbolSingle singleSymbol -> singleSymbol.id;
+                    case CMediaFontSymbolArray arraySymbol -> arraySymbol.ids[i2];
                 };
 
                 fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,

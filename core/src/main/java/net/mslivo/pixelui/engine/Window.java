@@ -2,7 +2,6 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.engine.actions.common.Copy;
 import net.mslivo.pixelui.engine.actions.common.UpdateActionSupport;
 import net.mslivo.pixelui.engine.actions.WindowAction;
 

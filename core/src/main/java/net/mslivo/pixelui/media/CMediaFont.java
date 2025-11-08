@@ -1,10 +1,11 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
+import net.mslivo.pixelui.utils.misc.Copyable;
+
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class CMediaFont extends CMedia implements Serializable {
+public final class CMediaFont extends CMedia implements Copyable<CMediaFont> {
     public boolean markupEnabled;
     public CMediaFontOutline outline;
     public CMediaFontSymbol[] symbols;
@@ -53,13 +54,14 @@ public final class CMediaFont extends CMedia implements Serializable {
         }
     }
 
-    public CMediaFont copy(){
+    @Override
+    public CMediaFont copy() {
         CMediaFont copy = new CMediaFont();
         copy.copyFields(this);
         copy.markupEnabled = this.markupEnabled;
         copy.outline = this.outline.copy();
         copy.symbols = new CMediaFontSymbol[this.symbols.length];
-        for(int i=0;i < this.symbols.length;i++)
+        for (int i = 0; i < this.symbols.length; i++)
             copy.symbols[i] = this.symbols[i].copy();
         copy.useAtlas = this.useAtlas;
         return copy;

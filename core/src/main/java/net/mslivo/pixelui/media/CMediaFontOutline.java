@@ -1,10 +1,11 @@
 package net.mslivo.pixelui.media;
 
 import com.badlogic.gdx.graphics.Color;
+import net.mslivo.pixelui.utils.misc.Copyable;
 
 import java.util.Objects;
 
-public class CMediaFontOutline {
+public class CMediaFontOutline implements Copyable<CMediaFontOutline> {
     public Color color;
     public int directions;
     public boolean outlineSymbols;
@@ -25,6 +26,7 @@ public class CMediaFontOutline {
         this.outlineOnly = outlineOnly;
     }
 
+    @Override
     public CMediaFontOutline copy(){
         CMediaFontOutline copy = new CMediaFontOutline();
         copy.color = new Color(this.color);
@@ -33,7 +35,6 @@ public class CMediaFontOutline {
         copy.outlineOnly = this.outlineOnly;
         return copy;
     }
-
 
     @Override
     public boolean equals(Object o) {

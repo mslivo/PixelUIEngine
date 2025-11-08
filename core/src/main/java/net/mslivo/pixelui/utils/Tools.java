@@ -14,8 +14,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import net.mslivo.pixelui.media.CMedia;
-import net.mslivo.pixelui.media.CMediaFontArraySymbol;
-import net.mslivo.pixelui.media.CMediaFontSingleSymbol;
+import net.mslivo.pixelui.media.CMediaFontSymbolArray;
+import net.mslivo.pixelui.media.CMediaFontSymbolSingle;
 import net.mslivo.pixelui.media.MediaManager;
 
 import javax.swing.*;
@@ -343,20 +343,20 @@ public class Tools {
             return String.format("%.2f%%", percentDecimal * 100f);
         }
 
-        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol, Color color) {
+        public static String fontSymbol(CMediaFontSymbolSingle cMediaFontSymbol, Color color) {
             return fontSymbol(cMediaFontSymbol.id, color);
 
         }
 
-        public static String fontSymbol(CMediaFontSingleSymbol cMediaFontSymbol) {
+        public static String fontSymbol(CMediaFontSymbolSingle cMediaFontSymbol) {
             return fontSymbol(cMediaFontSymbol.id, Color.GRAY);
         }
 
-        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, Color color, int arrayIndex) {
+        public static String fontSymbol(CMediaFontSymbolArray cMediaFontArraySymbol, Color color, int arrayIndex) {
             return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], color);
         }
 
-        public static String fontSymbol(CMediaFontArraySymbol cMediaFontArraySymbol, int arrayIndex) {
+        public static String fontSymbol(CMediaFontSymbolArray cMediaFontArraySymbol, int arrayIndex) {
             return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], Color.GRAY);
         }
 

@@ -1,7 +1,5 @@
 package net.mslivo.pixelui.media;
 
-import com.badlogic.gdx.graphics.Color;
-
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
  */

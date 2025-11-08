@@ -1,8 +1,6 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
-
-public sealed abstract class CMediaSound extends CMedia implements Serializable permits CMediaSoundEffect, CMediaMusic {
+public sealed abstract class CMediaSound extends CMedia permits CMediaSoundEffect, CMediaMusic {
 
     public CMediaSound() {
         super();

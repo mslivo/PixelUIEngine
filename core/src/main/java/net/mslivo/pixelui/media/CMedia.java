@@ -1,12 +1,12 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public abstract sealed class CMedia implements Serializable permits CMediaFont, CMediaSound, CMediaSprite {
+public abstract sealed class CMedia permits CMediaFont, CMediaSound, CMediaSprite {
+
     public String file;
 
-    public CMedia(){
+    public CMedia() {
         super();
         this.file = "";
     }
@@ -16,12 +16,12 @@ public abstract sealed class CMedia implements Serializable permits CMediaFont, 
     }
 
 
-    protected void copyFields(CMedia copyFrom){
+    protected void copyFields(CMedia copyFrom) {
         this.file = copyFrom.file;
     }
 
-    public CMedia copy(){
-        CMedia copy= switch (this){
+    public CMedia copy() {
+        CMedia copy = switch (this) {
             case CMediaFont cMediaFont -> cMediaFont.copy();
             case CMediaSound cMediaSound -> cMediaSound.copy();
             case CMediaSprite cMediaSprite -> cMediaSprite.copy();

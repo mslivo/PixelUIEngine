@@ -1,12 +1,10 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
-
-public sealed abstract class CMediaSprite extends CMedia implements Serializable permits CMediaImage, CMediaArray, CMediaAnimation {
+public sealed abstract class CMediaSprite extends CMedia permits CMediaImage, CMediaArray, CMediaAnimation {
 
     public boolean useAtlas;
 
-    public CMediaSprite(){
+    public CMediaSprite() {
         super();
         this.useAtlas = true;
     }
@@ -17,8 +15,8 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         this.useAtlas = useAtlas;
     }
 
-    public CMediaSprite copy(){
-        CMediaSprite copy = switch (this){
+    public CMediaSprite copy() {
+        CMediaSprite copy = switch (this) {
             case CMediaAnimation cMediaAnimation -> cMediaAnimation.copy();
             case CMediaArray cMediaArray -> cMediaArray.copy();
             case CMediaImage cMediaImage -> cMediaImage.copy();
@@ -26,7 +24,7 @@ public sealed abstract class CMediaSprite extends CMedia implements Serializable
         return copy;
     }
 
-    protected void copyFields(CMediaSprite copyFrom){
+    protected void copyFields(CMediaSprite copyFrom) {
         super.copyFields(copyFrom);
         this.useAtlas = copyFrom.useAtlas;
     }

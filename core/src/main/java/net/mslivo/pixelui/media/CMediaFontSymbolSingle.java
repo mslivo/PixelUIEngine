@@ -1,28 +1,31 @@
 package net.mslivo.pixelui.media;
 
-public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
+import net.mslivo.pixelui.utils.misc.Copyable;
+
+public final class CMediaFontSymbolSingle extends CMediaFontSymbol implements Copyable<CMediaFontSymbolSingle> {
     public int id;
 
-    public CMediaFontSingleSymbol() {
+    public CMediaFontSymbolSingle() {
         super();
         this.id = 0;
     }
 
-    public CMediaFontSingleSymbol(int id, String file) {
+    public CMediaFontSymbolSingle(int id, String file) {
         this(id, file,0,0);
     }
 
-    public CMediaFontSingleSymbol(int id, String file, int y_offset) {
+    public CMediaFontSymbolSingle(int id, String file, int y_offset) {
         this(id, file,y_offset,0);
     }
 
-    public CMediaFontSingleSymbol(int id, String file, int y_offset,int x_advance) {
+    public CMediaFontSymbolSingle(int id, String file, int y_offset, int x_advance) {
         super(file, y_offset, x_advance);
         this.id = id;
     }
 
-    public CMediaFontSingleSymbol copy(){
-        CMediaFontSingleSymbol copy = new CMediaFontSingleSymbol();
+    @Override
+    public CMediaFontSymbolSingle copy(){
+        CMediaFontSymbolSingle copy = new CMediaFontSymbolSingle();
         copy.copyFields(this);
         copy.id = this.id;
         return copy;
@@ -33,7 +36,7 @@ public final class CMediaFontSingleSymbol extends CMediaFontSymbol {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        CMediaFontSingleSymbol that = (CMediaFontSingleSymbol) o;
+        CMediaFontSymbolSingle that = (CMediaFontSymbolSingle) o;
         return id == that.id;
     }
 

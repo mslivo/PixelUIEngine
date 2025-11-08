@@ -1,10 +1,10 @@
 package net.mslivo.pixelui.media;
 
-import java.io.Serializable;
+import net.mslivo.pixelui.utils.misc.Copyable;
 
-public final class CMediaSoundEffect extends CMediaSound implements Serializable {
+public final class CMediaSoundEffect extends CMediaSound implements Copyable<CMediaSoundEffect> {
 
-    public CMediaSoundEffect(){
+    public CMediaSoundEffect() {
         super();
     }
 
@@ -12,7 +12,8 @@ public final class CMediaSoundEffect extends CMediaSound implements Serializable
         super(filename);
     }
 
-    public CMediaSoundEffect copy(){
+    @Override
+    public CMediaSoundEffect copy() {
         CMediaSoundEffect copy = new CMediaSoundEffect();
         copy.copyFields(this);
         return copy;
