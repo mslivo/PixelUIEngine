@@ -39,7 +39,7 @@ public class StringListValueValidator implements ValueValidator {
         this.listSizeMax = listSizeMax;
         this.listEntryLengthMin = listEntryLengthMin;
         this.listEntryLengthMax = listEntryLengthMax;
-        this.allowedValuesSet = new HashSet<>();
+        this.allowedValuesSet = new ObjectSet<>();
         if (allowedValues != null) {
             for (int i = 0; i < allowedValues.length; i++) {
                 if (allowedValues[i] != null) allowedValuesSet.add(allowedValues[i]);
