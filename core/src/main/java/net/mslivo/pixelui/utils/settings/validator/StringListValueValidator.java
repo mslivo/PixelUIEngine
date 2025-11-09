@@ -1,12 +1,13 @@
 package net.mslivo.pixelui.utils.settings.validator;
 
+import com.badlogic.gdx.utils.ObjectSet;
 import net.mslivo.pixelui.utils.settings.SettingsManager;
 import net.mslivo.pixelui.utils.settings.ValueValidator;
 
 import java.util.HashSet;
 
 public class StringListValueValidator implements ValueValidator {
-    private final HashSet<String> allowedValuesSet;
+    private final ObjectSet<String> allowedValuesSet;
 
     public final int listSizeMin, listSizeMax;
 

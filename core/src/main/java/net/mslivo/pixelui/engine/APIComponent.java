@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectSet;
 import net.mslivo.pixelui.engine.actions.*;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
@@ -840,7 +841,7 @@ public final class APIComponent {
             }
             setComponentCommonInitValuesInternal(grid, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             grid.selectedItem = null;
-            grid.selectedItems = new HashSet();
+            grid.selectedItems = new ObjectSet();
             grid.items = items != null ?  new Object[items.length][items[0].length] : new Object[][]{};
             for (int ix = 0; ix < grid.items.length; ix++)
                 for (int iy = 0; iy < grid.items[0].length; iy++)
@@ -1487,7 +1488,7 @@ public final class APIComponent {
             List list = new List();
             setComponentCommonInitValuesInternal(list, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             list.selectedItem = null;
-            list.selectedItems = new HashSet<>();
+            list.selectedItems = new ObjectSet();
             list.items = new Array();
             if (items != null)
                 for (int i = 0; i < items.size; i++)

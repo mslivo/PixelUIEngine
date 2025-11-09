@@ -1,13 +1,12 @@
 package net.mslivo.pixelui.utils.settings.validator;
 
+import com.badlogic.gdx.utils.ObjectSet;
 import net.mslivo.pixelui.utils.settings.SettingsManager;
 import net.mslivo.pixelui.utils.settings.ValueValidator;
 
-import java.util.HashSet;
-
 public class StringValueValidator implements ValueValidator {
 
-    private final HashSet<String> allowedValuesSet;
+    private final ObjectSet<String> allowedValuesSet;
 
     private final int lengthMin, lengthMax;
 
@@ -26,18 +25,18 @@ public class StringValueValidator implements ValueValidator {
     public StringValueValidator(String[] allowedValues, int lengthMin, int lengthMax) {
         this.lengthMin = lengthMin;
         this.lengthMax = lengthMax;
-        this.allowedValuesSet = new HashSet<>();
-        if(allowedValues != null){
-            for(int i=0;i<allowedValues.length;i++){
-                if(allowedValues[i] != null) allowedValuesSet.add(allowedValues[i]);
+        this.allowedValuesSet = new ObjectSet<>();
+        if (allowedValues != null) {
+            for (int i = 0; i < allowedValues.length; i++) {
+                if (allowedValues[i] != null) allowedValuesSet.add(allowedValues[i]);
             }
         }
     }
 
     @Override
     public boolean isValueValid(String value) {
-        if(!SettingsManager.isValidString(value)) return false;
-        if(!this.allowedValuesSet.isEmpty() && !this.allowedValuesSet.contains(value)) return false;
+        if (!SettingsManager.isValidString(value)) return false;
+        if (!this.allowedValuesSet.isEmpty() && !this.allowedValuesSet.contains(value)) return false;
         return value.length() >= lengthMin && value.length() <= lengthMax;
     }
 }

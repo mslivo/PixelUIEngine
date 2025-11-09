@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -22,15 +23,14 @@ import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PixelPerfectViewport;
 import net.mslivo.pixelui.utils.Tools;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 public class UICommonUtils {
     public static final String WND_CLOSE_BUTTON = "wnd_close_btn";
     private static IntSet textFieldControlKeys = new IntSet();
     private static IntSet textFieldRepeatedControlKeys = new IntSet();
-    private static Array<Component> windowComponentsVisibleOrder = new Array<>();
-    private static HashSet<Component> windowComponentsVisibleOrderSet = new HashSet<>();
+    private static ObjectSet<Object> stillPresent = new ObjectSet<>();
 
     static {
         textFieldControlKeys.addAll(KeyCode.Key.LEFT, KeyCode.Key.RIGHT, KeyCode.Key.BACKSPACE, KeyCode.Key.FORWARD_DEL, Input.Keys.HOME, Input.Keys.END, Input.Keys.ENTER);
@@ -88,20 +88,19 @@ public class UICommonUtils {
         int currentIndex = windows.indexOf(window, true);
         if (currentIndex == -1) return; // not found
 
-        int targetIndex = windows.size-1;
+        int targetIndex = windows.size - 1;
 
-        if(!window.alwaysOnTop){
-            for(int i=windows.size-1;i>=0;i--)
-                if(windows.get(i).alwaysOnTop)
+        if (!window.alwaysOnTop) {
+            for (int i = windows.size - 1; i >= 0; i--)
+                if (windows.get(i).alwaysOnTop)
                     targetIndex--;
         }
 
-        if(currentIndex == targetIndex)
+        if (currentIndex == targetIndex)
             return;
 
         windows.swap(currentIndex, targetIndex);
     }
-
 
 
     public void window_setPosition(Window window, int x, int y) {
@@ -491,18 +490,73 @@ public class UICommonUtils {
         return false;
     }
 
-    public void list_setItems(List list, Array items){
-        list.items = new Array();
-        if(items != null)
-            for(int i=0;i<items.size;i++)
+    public void list_setItems(List list, Array items) {
+        list.items.clear();
+        if (items != null)
+            for (int i = 0; i < items.size; i++)
                 list.items.add(items.get(i));
+
+        // Remove objects
+        if (list.selectedItem != null && !items.contains(list.selectedItem, true)) {
+            list.selectedItem = null;
+        }
+        if (list.multiSelect) {
+            ObjectSet.ObjectSetIterator it = list.selectedItems.iterator();
+            while (it.hasNext()) {
+                Object object = it.next();
+                if (!items.contains(object, true))
+                    it.remove();
+            }
+        }
     }
 
     public void grid_setItems(Grid grid, Object[][] items) {
-        grid.items = items != null ?  new Object[items.length][items[0].length] : new Object[][]{};
-        for (int ix = 0; ix < grid.items.length; ix++)
-            for (int iy = 0; iy < grid.items[0].length; iy++)
-                grid.items[ix][iy] = items[ix][iy];
+        if (items == null) {
+            grid.items = new Object[][]{};
+        } else if (grid.items.length != items.length || grid.items[0].length != items[0].length) {
+            // resize
+            grid.items = new Object[items.length][items[0].length];
+        } else {
+            // clear
+            for (int i = 0; i < grid.items.length; i++) {
+                Arrays.fill(grid.items[i], null);
+            }
+        }
+
+        // reset selected items
+        boolean selectedFound = false;
+        stillPresent.clear();
+
+        for (int ix = 0; ix < grid.items.length; ix++) {
+            for (int iy = 0; iy < grid.items[0].length; iy++) {
+                Object newItem = items[ix][iy];
+                grid.items[ix][iy] = newItem;
+
+                if (newItem != null) {
+                    stillPresent.add(newItem);
+                }
+
+                if (grid.selectedItem != null && grid.selectedItem == newItem) {
+                    selectedFound = true;
+                }
+            }
+        }
+
+        if (!selectedFound) {
+            grid.selectedItem = null;
+        }
+
+        if (grid.multiSelect && grid.selectedItems != null) {
+            ObjectSet.ObjectSetIterator<Object> it = grid.selectedItems.iterator();
+            while (it.hasNext) {
+                Object sel = it.next();
+                if (!stillPresent.contains(sel)) {
+                    it.remove();
+                }
+            }
+        }
+
+
         grid_updateSize(grid);
     }
 
@@ -566,7 +620,8 @@ public class UICommonUtils {
         return textFieldRepeatedControlKeys.contains(keyCode);
     }
 
-    public void textField_executeControlKey(TextField textField, int keyCode, boolean shiftPressed) {boolean contentIsMarked = textField_isContentMarked(textField);
+    public void textField_executeControlKey(TextField textField, int keyCode, boolean shiftPressed) {
+        boolean contentIsMarked = textField_isContentMarked(textField);
         int caret = textField.caretPosition;
 
         switch (keyCode) {
