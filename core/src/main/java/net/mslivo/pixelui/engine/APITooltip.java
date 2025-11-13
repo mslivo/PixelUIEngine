@@ -40,6 +40,14 @@ public final class APITooltip {
         }, null);
     }
 
+
+    public Tooltip create(String title, String text) {
+        return create(new TooltipSegment[]{
+                segment.text.create(title,uiEngineConfig.tooltip.defaultCellColor, uiEngineConfig.ui.fontDefaultColor,SEGMENT_ALIGNMENT.CENTER,false, true),
+                segment.text.create(text),
+        }, null);
+    }
+
     public Tooltip create(TooltipSegment[] segments) {
         return create(segments, DEFAULT_TOOLTIP_ACTION, 0, Color.BLACK, Color.BLACK, 2, DIRECTION.RIGHT);
     }
