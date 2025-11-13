@@ -1,6 +1,6 @@
 package net.mslivo.pixelui.engine;
 
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.GridAction;
 
 public final class Grid<T> extends Component {
@@ -8,7 +8,7 @@ public final class Grid<T> extends Component {
     public GridAction<T> gridAction;
     public T selectedItem;
     public boolean multiSelect;
-    public ObjectSet<T> selectedItems;
+    public Array<T> selectedItems;
     public boolean dragEnabled;
     public boolean dragOutEnabled;
     public boolean dragInEnabled;

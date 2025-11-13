@@ -12,7 +12,7 @@ public final class List<T> extends Component {
     public Color fontColor;
     public T selectedItem; // singleselect
     public boolean multiSelect;
-    public ObjectSet<T> selectedItems; // multiselect
+    public Array<T> selectedItems; // multiselect
     public boolean dragEnabled;
     public boolean dragOutEnabled;
     public boolean dragInEnabled;

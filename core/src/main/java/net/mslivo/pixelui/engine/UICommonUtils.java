@@ -501,7 +501,7 @@ public class UICommonUtils {
             list.selectedItem = null;
         }
         if (list.multiSelect) {
-            ObjectSet.ObjectSetIterator it = list.selectedItems.iterator();
+            Array.ArrayIterator it = list.selectedItems.iterator();
             while (it.hasNext()) {
                 Object object = it.next();
                 if (!items.contains(object, true))
@@ -547,8 +547,8 @@ public class UICommonUtils {
         }
 
         if (grid.multiSelect && grid.selectedItems != null) {
-            ObjectSet.ObjectSetIterator<Object> it = grid.selectedItems.iterator();
-            while (it.hasNext) {
+            Array.ArrayIterator<Object> it = grid.selectedItems.iterator();
+            while (it.hasNext()) {
                 Object sel = it.next();
                 if (!stillPresent.contains(sel)) {
                     it.remove();

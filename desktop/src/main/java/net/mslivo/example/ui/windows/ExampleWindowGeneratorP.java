@@ -781,7 +781,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
             @Override
             public Color iconColor(ExampleItem item) {
-                return grid1.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
+                return grid1.selectedItems.contains(item, true) ? Color.LIGHT_GRAY : Color.GRAY;
             }
         };
         api.component.grid.setGridAction(grid1, gridAction1);
@@ -834,7 +834,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
             @Override
             public Color iconColor(ExampleItem item) {
-                return grid2.selectedItems.contains(item) ? Color.LIGHT_GRAY : Color.GRAY;
+                return grid2.selectedItems.contains(item, true) ? Color.LIGHT_GRAY : Color.GRAY;
             }
 
         };
@@ -963,7 +963,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         int rnd;
         rnd = MathUtils.random(5, 8);
         for (int i = 1; i <= rnd; i++)
-            list.add(new ExampleItem(prefix + "Item " + i, switch (MathUtils.random(1, 3)) {
+            list.add(new ExampleItem(prefix + "Item", switch (MathUtils.random(1, 3)) {
                 case 1 -> ExampleBaseMedia.ICON_EXAMPLE_1;
                 case 2 -> ExampleBaseMedia.ICON_EXAMPLE_2;
                 case 3 -> ExampleBaseMedia.ICON_EXAMPLE_3;

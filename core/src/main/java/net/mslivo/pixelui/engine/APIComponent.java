@@ -841,7 +841,7 @@ public final class APIComponent {
             }
             setComponentCommonInitValuesInternal(grid, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             grid.selectedItem = null;
-            grid.selectedItems = new ObjectSet();
+            grid.selectedItems = new Array();
             grid.items = items != null ?  new Object[items.length][items[0].length] : new Object[][]{};
             for (int ix = 0; ix < grid.items.length; ix++)
                 for (int iy = 0; iy < grid.items[0].length; iy++)
@@ -1488,7 +1488,7 @@ public final class APIComponent {
             List list = new List();
             setComponentCommonInitValuesInternal(list, x, y, width, height, uiEngineConfig.component.defaultColor, uiCommonUtils.color_brigther(uiEngineConfig.component.defaultColor));
             list.selectedItem = null;
-            list.selectedItems = new ObjectSet();
+            list.selectedItems = new Array();
             list.items = new Array();
             if (items != null)
                 for (int i = 0; i < items.size; i++)

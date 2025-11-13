@@ -1453,7 +1453,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                         Array selectedNew = new Array();
                                         selectedNew.addAll(grid.selectedItems);
 
-                                        if (grid.selectedItems.contains(uiEngineState.pressedGridItem)) {
+                                        if (grid.selectedItems.contains(uiEngineState.pressedGridItem, true)) {
                                             selectedNew.removeValue(uiEngineState.pressedGridItem, true);
                                         } else {
                                             selectedNew.add(uiEngineState.pressedGridItem);
@@ -1483,7 +1483,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                         Array selectedNew = new Array();
                                         selectedNew.addAll(list.selectedItems);
 
-                                        if (list.selectedItems.contains(uiEngineState.pressedListItem))
+                                        if (list.selectedItems.contains(uiEngineState.pressedListItem, true))
                                             selectedNew.removeValue(uiEngineState.pressedListItem, true);
                                         else selectedNew.add(uiEngineState.pressedListItem);
 
@@ -3014,7 +3014,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                     }
 
-                    boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item) : (list.selectedItem == item));
+                    boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item,true) : (list.selectedItem == item));
 
                     // Cell
                     spriteRenderer.saveState();
@@ -3203,7 +3203,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                         CMediaArray cellGraphic;
                         CMediaArray gridGraphic = grid.bigMode ? UIEngineBaseMedia_8x8.UI_GRID_X2 : UIEngineBaseMedia_8x8.UI_GRID;
-                        boolean selected = grid.multiSelect ? grid.selectedItems.contains(item) : item != null && item == grid.selectedItem;
+                        boolean selected = grid.multiSelect ? grid.selectedItems.contains(item, true) : item != null && item == grid.selectedItem;
                         if (dragEnabled && dragValid && drag_x == ix && drag_y == iy) {
                             cellGraphic = grid.bigMode ? UIEngineBaseMedia_8x8.UI_GRID_DRAGGED_X2 : UIEngineBaseMedia_8x8.UI_GRID_DRAGGED;
                         } else {
