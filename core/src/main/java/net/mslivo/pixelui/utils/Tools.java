@@ -343,21 +343,12 @@ public class Tools {
             return String.format("%.2f%%", percentDecimal * 100f);
         }
 
-        public static String fontSymbol(CMediaFontSymbolSingle cMediaFontSymbol, Color color) {
-            return fontSymbol(cMediaFontSymbol.id, color);
-
+        public static String fontSymbol(int[] ids, int arrayIndex) {
+            return fontSymbol(ids, arrayIndex, Color.GRAY);
         }
 
-        public static String fontSymbol(CMediaFontSymbolSingle cMediaFontSymbol) {
-            return fontSymbol(cMediaFontSymbol.id, Color.GRAY);
-        }
-
-        public static String fontSymbol(CMediaFontSymbolArray cMediaFontArraySymbol, Color color, int arrayIndex) {
-            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], color);
-        }
-
-        public static String fontSymbol(CMediaFontSymbolArray cMediaFontArraySymbol, int arrayIndex) {
-            return fontSymbol(cMediaFontArraySymbol.ids[arrayIndex], Color.GRAY);
+        public static String fontSymbol(int[] ids, int arrayIndex, Color color) {
+            return fontSymbol(ids[arrayIndex], color);
         }
 
         public static String fontSymbol(int id) {
