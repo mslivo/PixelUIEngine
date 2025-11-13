@@ -3,14 +3,14 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import net.mslivo.pixelui.media.CMediaSprite;
-import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.utils.Tools;
-import net.mslivo.pixelui.engine.constants.DIRECTION;
-import net.mslivo.pixelui.engine.constants.SEGMENT_ALIGNMENT;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.engine.actions.ToolTipAction;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
+import net.mslivo.pixelui.engine.constants.DIRECTION;
+import net.mslivo.pixelui.engine.constants.SEGMENT_ALIGNMENT;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.utils.Tools;
 
 public final class APITooltip {
     private final API api;
@@ -43,7 +43,7 @@ public final class APITooltip {
 
     public Tooltip create(String title, String text) {
         return create(new TooltipSegment[]{
-                segment.text.create(title,uiEngineConfig.tooltip.defaultCellColor, uiEngineConfig.ui.fontDefaultColor,SEGMENT_ALIGNMENT.CENTER,false, true),
+                segment.text.create(title, uiEngineConfig.tooltip.defaultCellColor, uiEngineConfig.ui.fontDefaultColor, SEGMENT_ALIGNMENT.CENTER, false, true),
                 segment.text.create(text),
         }, null);
     }
@@ -93,6 +93,11 @@ public final class APITooltip {
         tooltip.toolTipAction = toolTipAction != null ? toolTipAction : DEFAULT_TOOLTIP_ACTION;
         tooltip.direction = direction != null ? direction : DIRECTION.RIGHT;
         return tooltip;
+    }
+
+    public void setDirection(Tooltip tooltip, DIRECTION direction) {
+        if (tooltip == null) return;
+        tooltip.direction = direction != null ? direction : DIRECTION.RIGHT ;
     }
 
     public void setName(Tooltip tooltip, String name) {
@@ -164,7 +169,7 @@ public final class APITooltip {
 
         public void resize(TooltipSegment tooltipSegment, int width, int height) {
             if (tooltipSegment == null) return;
-            uiCommonUtils.tooltip_resizeSegment( tooltipSegment, width, height);
+            uiCommonUtils.tooltip_resizeSegment(tooltipSegment, width, height);
         }
 
         private void setSegmentValues(TooltipSegment tooltipSegment, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
@@ -232,7 +237,7 @@ public final class APITooltip {
 
             public void setImage(TooltipImageSegment tooltipImageSegment, CMediaSprite image) {
                 if (tooltipImageSegment == null) return;
-                uiCommonUtils.tooltip_setImageSegmentImage( tooltipImageSegment, image);
+                uiCommonUtils.tooltip_setImageSegmentImage(tooltipImageSegment, image);
             }
 
             public void setArrayIndex(TooltipImageSegment tooltipImageSegment, int arrayIndex) {
@@ -284,7 +289,7 @@ public final class APITooltip {
 
             public void setText(TooltipTextSegment tooltipTextSegment, String text) {
                 if (tooltipTextSegment == null) return;
-                uiCommonUtils.tooltip_setTextSegmentText( tooltipTextSegment, text);
+                uiCommonUtils.tooltip_setTextSegmentText(tooltipTextSegment, text);
             }
 
         }
