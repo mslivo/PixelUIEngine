@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.function.Consumer;
@@ -335,12 +336,12 @@ public class Tools {
 
 
         public static String formatPercent(float percent) {
-            return String.format("%.0f%%", percent * 100f);
+            return String.format(Locale.ROOT,"%.0f%%", percent * 100f);
 
         }
 
         public static String formatPercentDecimal(float percentDecimal) {
-            return String.format("%.2f%%", percentDecimal * 100f);
+            return String.format(Locale.ROOT,"%.2f%%", percentDecimal * 100f);
         }
 
         public static String fontSymbol(int[] ids, int arrayIndex) {
