@@ -68,10 +68,10 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_CHECKBOX_RADIO = new CMediaArray(DIR_UI_GRAPHICS + "ui/radio.png", TL, TL);
     public static final CMediaImage UI_CHECKBOX_RADIO_CELL = new CMediaImage(DIR_UI_GRAPHICS + "ui/radio_cell.png");
     public static final CMediaArray UI_MOUSETEXTINPUT_BUTTON = new CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_button.png", 12, 12);
-    public static final CMediaArray UI_MOUSETEXTINPUT_CONFIRM = new CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_confirm.png", 12, 12);
-    public static final CMediaArray UI_MOUSETEXTINPUT_DELETE = new CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_delete.png", 12, 12);
-    public static final CMediaArray UI_MOUSETEXTINPUT_LOWERCASE = new CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_lowercase.png", 12, 12);
-    public static final CMediaArray UI_MOUSETEXTINPUT_UPPERCASE = new CMediaArray(DIR_UI_GRAPHICS + "ui/mousetextinput_uppercase.png", 12, 12);
+    public static final CMediaImage UI_MOUSETEXTINPUT_CONFIRM = new CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_confirm.png");
+    public static final CMediaImage UI_MOUSETEXTINPUT_DELETE = new CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_delete.png");
+    public static final CMediaImage UI_MOUSETEXTINPUT_LOWERCASE = new CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_lowercase.png");
+    public static final CMediaImage UI_MOUSETEXTINPUT_UPPERCASE = new CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_uppercase.png");
     public static final CMediaImage UI_MOUSETEXTINPUT_SELECTED = new CMediaImage(DIR_UI_GRAPHICS + "ui/mousetextinput_selected.png");
 
     // Cursors

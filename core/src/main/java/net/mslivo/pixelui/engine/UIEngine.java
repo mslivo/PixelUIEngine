@@ -2258,7 +2258,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         float selY = mouseTextInput.y - selRow * ROW_HEIGHT;
 
         render_setColor(spriteRenderer, color2, textInputAlpha, false);
-        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_SELECTED, selX - 1, selY - 1);
+        spriteRenderer.drawCMediaImage(UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_SELECTED, selX - 2, selY - 2);
         spriteRenderer.setAllReset();
 
     }
@@ -2273,18 +2273,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         switch (c) {
             case M_TEXTINPUT_CHAR_CHANGE_CASE, M_TEXTINPUT_CHAR_BACK_, M_TEXTINPUT_CHAR_ACCEPT -> {
                 render_setColor(spriteRenderer, colorFont, colorFont.a * color1.a * textInputAlpha, false);
-                CMediaArray specialCharacterSprite = switch (c) {
+                CMediaImage specialCharacterSprite = switch (c) {
                     case M_TEXTINPUT_CHAR_CHANGE_CASE ->
                             upperCase ? UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_UPPERCASE : UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_LOWERCASE;
                     case M_TEXTINPUT_CHAR_BACK_ -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_DELETE;
                     case M_TEXTINPUT_CHAR_ACCEPT -> UIEngineBaseMedia_8x8.UI_MOUSETEXTINPUT_CONFIRM;
                     default -> throw new IllegalStateException("Unexpected value: " + c);
                 };
-                spriteRenderer.drawCMediaArray(specialCharacterSprite, pressedIndex, x, y);
+                spriteRenderer.drawCMediaImage(specialCharacterSprite, x, y);
             }
             default -> {
-                int offset = pressed ? 1 : 0;
-                render_drawFont(String.valueOf(c), x + 2 + offset, y + 2 - offset, colorFont, textInputAlpha, false);
+                render_drawFont(String.valueOf(c), x + 2 , y + 2 , colorFont, textInputAlpha, false);
             }
         }
 
