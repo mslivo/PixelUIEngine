@@ -135,7 +135,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             }
         };
 
-        api.config.ui.font = UIEngineBaseMedia_8x8.UI_FONT_SMALL;
+        //api.config.ui.font = UIEngineBaseMedia_8x8.UI_FONT_SMALL;
 
         this.spriteParticleSystem = new SpriteParticleSystem<>(ParticleDataInner.class, particleUpdater);
         this.primitiveParticleSystem = new PrimitiveParticleSystem<>(ParticleDataInner.class, particleUpdater);
