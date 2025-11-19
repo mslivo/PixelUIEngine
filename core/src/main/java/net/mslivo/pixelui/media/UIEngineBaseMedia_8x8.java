@@ -91,7 +91,6 @@ public class UIEngineBaseMedia_8x8 {
 
     // Fonts
     public static final CMediaFont UI_FONT = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font.fnt");
-    public static final CMediaFont UI_FONT_SMALL = new CMediaFont(DIR_UI_GRAPHICS + "fonts/font_small.fnt");
 
     // Misc
     public static final CMediaImage UI_PIXEL = new CMediaImage(DIR_UI_GRAPHICS + "misc/pixel.png");
@@ -176,7 +175,6 @@ public class UIEngineBaseMedia_8x8 {
             UI_MOUSETEXTINPUT_DELETE,
             UI_MOUSETEXTINPUT_SELECTED,
             UI_FONT,
-            UI_FONT_SMALL,
             UI_PIXEL,
             UI_ICON_BACK,
             UI_ICON_FORWARD
