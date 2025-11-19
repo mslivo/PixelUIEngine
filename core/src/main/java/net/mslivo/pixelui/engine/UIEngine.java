@@ -2896,7 +2896,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         switch (component) {
             case Button button -> {
                 CMediaArray buttonGraphic = (button.pressed ? UIEngineBaseMedia_8x8.UI_BUTTON_PRESSED : UIEngineBaseMedia_8x8.UI_BUTTON);
-                int pressed_offset = button.pressed ? 1 : 0;
                 for (int ix = 0; ix < button.width; ix++) {
                     for (int iy = 0; iy < button.height; iy++) {
                         spriteRenderer.drawCMediaArray(buttonGraphic, render_get16TilesCMediaIndex(ix, iy, button.width, button.height), uiCommonUtils.component_getAbsoluteX(button) + TS(ix), uiCommonUtils.component_getAbsoluteY(button) + TS(iy));
@@ -2904,7 +2903,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.text, uiCommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x + pressed_offset, uiCommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y - pressed_offset,
+                        render_drawFont(textButton.text, uiCommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x , uiCommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y ,
                                 textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, -1,
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
                                 textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
@@ -2913,7 +2912,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.saveState();
                     render_setColor(spriteRenderer, imageButton.color2, componentAlpha, componentGrayScale);
                     if (imageButton.image != null)
-                        spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState), uiCommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x + pressed_offset, uiCommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y - pressed_offset);
+                        spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState), uiCommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x , uiCommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y );
                     spriteRenderer.loadState();
                 }
 
