@@ -2903,7 +2903,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
                         render_drawFont(textButton.text, uiCommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x , uiCommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y ,
-                                textButton.fontColor, componentAlpha, componentGrayScale, 1, 1, -1,
+                                textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, -1,
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
                                 textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
                     }
