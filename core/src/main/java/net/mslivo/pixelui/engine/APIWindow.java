@@ -132,11 +132,11 @@ public final class APIWindow {
     }
 
     public int realWidth(Window window) {
-        return api.TS(window.width);
+        return uiEngineState.theme.ts.abs(window.width);
     }
 
     public int realHeight(Window window) {
-        return api.TS(window.height);
+        return uiEngineState.theme.ts.abs(window.height);
     }
 
     public void setColorEverythingInclude(Window window, Color color, Class[] inclusions, boolean setColor1, boolean setColor2, boolean includeWindow) {
@@ -319,7 +319,7 @@ public final class APIWindow {
 
     public void setPositionGrid(Window window, int x, int y) {
         if (window == null) return;
-        setPosition(window, x * api.TS(), y * api.TS());
+        setPosition(window,  uiEngineState.theme.ts.abs(x),  uiEngineState.theme.ts.abs(y));
     }
 
     public void move(Window window, int x, int y) {

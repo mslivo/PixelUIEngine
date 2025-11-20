@@ -15,6 +15,7 @@ import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
+import net.mslivo.pixelui.theme.UIEngineTheme;
 
 public final class UIEngineState {
 
@@ -23,7 +24,7 @@ public final class UIEngineState {
     public int resolutionWidthHalf, resolutionHeightHalf;
     public VIEWPORT_MODE viewportMode;
     public boolean gamePadSupport;
-    public TileSize tileSize;
+    public UIEngineTheme theme;
 
     /* ##################### Config ########################## */
     public UIEngineConfig config;
@@ -44,6 +45,7 @@ public final class UIEngineState {
     public NestedFrameBuffer frameBuffer_composite;
 
     /* #################### Graphics: Screen #################### */
+    public OrthographicCamera camera_screen;
     public int upScaleFactor_screen;
     public NestedFrameBuffer frameBuffer_upScaled_screen;
     public Viewport viewport_screen;

@@ -74,6 +74,7 @@ public class NestedFrameBuffer extends FrameBuffer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+
     @Override
     public void begin() {
         if (isBound) throw new RuntimeException(ERROR_BEGIN_END);

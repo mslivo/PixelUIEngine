@@ -2,6 +2,7 @@ package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.theme.BaseTheme8x8;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.misc.UpdateTimer;
 import net.mslivo.pixelui.utils.misc.ValueWatcher;
@@ -23,6 +24,7 @@ public class ExampleMain extends ApplicationAdapter {
     private UIEngine<ExampleUIEngineAdapter> uiEngine_transition;
     private long timer_debug_info;
     private UpdateTimer updateTimer;
+    private BaseTheme8x8 theme8x8 = new BaseTheme8x8();
 
     public ExampleMain() {
     }
@@ -41,18 +43,21 @@ public class ExampleMain extends ApplicationAdapter {
         this.transitionManager = null;
         // Load Assets
         System.out.println("Loading Assets");
+
+
         this.mediaManager = new MediaManager();
-        this.mediaManager.prepareUIEngineBaseCMedia();
+        this.mediaManager.prepareCMedia(theme8x8.cMedia());
         this.mediaManager.prepareCMedia(ExampleBaseMedia.ALL);
         this.mediaManager.loadAssets();
         System.out.println("Done.");
 
         // Input/Render
         System.out.println("Starting UI");
+
         this.uiEngine = new UIEngine<>(
                 new ExampleUIEngineAdapter(),
-                this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
-                ExampleMainConstants.viewportMode, true);
+                this.mediaManager, theme8x8, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                ExampleMainConstants.viewportMode,true);
         System.out.println("Done.");
 
         this.state = STATE.RUN;
@@ -74,7 +79,7 @@ public class ExampleMain extends ApplicationAdapter {
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
                             new ExampleUIEngineAdapter(),
-                            this.mediaManager, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
+                            this.mediaManager, theme8x8, ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH, ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,
                             ExampleMainConstants.viewportMode);
                     this.uiEngine_transition.update();
                     this.transitionManager = new TransitionManager(this.uiEngine, this.uiEngine_transition, new PixelateTransition());

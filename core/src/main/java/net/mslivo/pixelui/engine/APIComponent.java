@@ -99,8 +99,8 @@ public final class APIComponent {
             AppViewport appViewPort = new AppViewport();
             appViewPort.updateTimer = 0;
             setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY, Color.GRAY);
-            int viewportWidth = appViewPort.width * api.TS();
-            int viewportHeight = appViewPort.height * api.TS();
+            int viewportWidth =  uiEngineState.theme.ts.abs(appViewPort.width);
+            int viewportHeight = uiEngineState.theme.ts.abs(appViewPort.height);
             appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
             Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
             texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -714,7 +714,9 @@ public final class APIComponent {
                 tab.data = null;
                 tab.disabled = false;
                 if (width == 0) {
-                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, tab.title) + (tab.tabAction.icon() != null ? api.TS() : 0) + api.TS()) / api.TSF());
+                    int ts = uiEngineState.theme.ts.TS;
+                    float tsf = uiEngineState.theme.ts.TSF;
+                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, tab.title) + (tab.tabAction.icon() != null ? ts : 0) + ts) / tsf);
                 } else {
                     tab.width = width;
                 }
@@ -1067,7 +1069,7 @@ public final class APIComponent {
 
         public Text create(int x, int y, int width, String text, TextAction textAction) {
             Text textC = new Text();
-            width = text != null && width <= 0 ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiEngineConfig.ui.font, text) / (float) api.TS()), 1) : width; // autowidth
+            width = text != null && width <= 0 ? Math.max(MathUtils.ceil(mediaManager.fontTextWidth(uiEngineConfig.ui.font, text) / uiEngineState.theme.ts.TSF), 1) : width; // autowidth
             setComponentCommonInitValuesInternal(textC, x, y, width, 1);
             textC.fontColor = uiEngineConfig.ui.fontDefaultColor.cpy();
             textC.text = Tools.Text.validString(text);
@@ -1110,8 +1112,8 @@ public final class APIComponent {
 
         public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction, boolean flipX, boolean flipY, boolean stretchToSize) {
             FrameBufferViewport frameBufferViewport = new FrameBufferViewport();
-            int width = nestedFrameBuffer != null ? nestedFrameBuffer.getWidth() / api.TS() : 0;
-            int height = nestedFrameBuffer != null ? nestedFrameBuffer.getHeight() / api.TS() : 0;
+            int width = nestedFrameBuffer != null ? nestedFrameBuffer.getWidth() / uiEngineState.theme.ts.TS : 0;
+            int height = nestedFrameBuffer != null ? nestedFrameBuffer.getHeight() / uiEngineState.theme.ts.TS : 0;
             setComponentCommonInitValuesInternal(frameBufferViewport, x, y, width, height, Color.GRAY, Color.GRAY);
             frameBufferViewport.frameBuffer = nestedFrameBuffer;
             frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction != null ? frameBufferViewportAction : DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION;
@@ -1167,8 +1169,8 @@ public final class APIComponent {
 
         public Image create(int x, int y, CMediaSprite image, int arrayIndex, ImageAction imageAction, boolean flipX, boolean flipY, boolean stretchToSize) {
             Image imageC = new Image();
-            int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / api.TSF()), 1) : 1;
-            int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / api.TSF()), 1) : 1;
+            int width = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteWidth(image) / uiEngineState.theme.ts.TSF), 1) : 1;
+            int height = image != null ? Math.max(MathUtils.ceil(mediaManager.spriteHeight(image) / uiEngineState.theme.ts.TSF), 1) : 1;
             setComponentCommonInitValuesInternal(imageC, x, y, width, height, Color.GRAY, Color.GRAY);
             imageC.image = image;
             imageC.arrayIndex = Math.max(arrayIndex, 0);
@@ -1573,7 +1575,7 @@ public final class APIComponent {
 
     public void setPositionGrid(Component component, int x, int y) {
         if (component == null) return;
-        setPosition(component, x * api.TS(), y * api.TS());
+        setPosition(component, uiEngineState.theme.ts.abs(x) ,  uiEngineState.theme.ts.abs(y) );
     }
 
     public void moveX(Component[] components, int x) {
@@ -1738,12 +1740,12 @@ public final class APIComponent {
 
     public int realWidth(Component component) {
         if (component == null) return 0;
-        return api.TS(component.width);
+        return uiEngineState.theme.ts.abs(component.width);
     }
 
     public int realHeight(Component component) {
         if (component == null) return 0;
-        return api.TS(component.height);
+        return uiEngineState.theme.ts.abs(component.height);
     }
 
     public boolean isAddedToWindow(Component component, Window window) {
@@ -1768,8 +1770,8 @@ public final class APIComponent {
 
     private void setComponentCommonInitValuesInternal(Component component, int x, int y, int width, int height, Color color1, Color color2) {
         // Align to grid per default
-        component.x = (x * api.TS());
-        component.y = (y * api.TS());
+        component.x = uiEngineState.theme.ts.abs(x);
+        component.y = uiEngineState.theme.ts.abs(y);
         component.width = width;
         component.height = height;
         component.color = color1.cpy();

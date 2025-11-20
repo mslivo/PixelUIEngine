@@ -4,6 +4,7 @@ public class TileSize {
 
     public final int TS;
     public final int TS_HALF;
+    public final int TS_1_AND_HALF;
     public final int TS2;
     public final int TS3;
     public final int TS4;
@@ -13,18 +14,18 @@ public class TileSize {
     public final float TSF3;
     public final float TSF4;
 
-    public int TL(int size){
-        return (size* TS);
+    public int abs(int tiles) {
+        return (tiles * TS);
     }
 
-    public float TLF(float size){
-        return (size* TS);
+    public float absF(float tiles) {
+        return (tiles * TS);
     }
 
-    public TileSize() {
-        final int tileSize = 8;
+    public TileSize(int tileSize) {
         this.TS = tileSize;
         this.TS_HALF = tileSize / 2;
+        this.TS_1_AND_HALF = tileSize + (tileSize/2);
         this.TS2 = tileSize * 2;
         this.TS3 = tileSize * 3;
         this.TS4 = tileSize * 4;

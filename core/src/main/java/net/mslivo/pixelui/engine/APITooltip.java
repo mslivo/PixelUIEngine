@@ -223,8 +223,8 @@ public final class APITooltip {
 
                 int width = 0, height = 0;
                 if (sprite != null) {
-                    width = MathUtils.round((mediaManager.spriteWidth(sprite) + api.TS()) / api.TSF());
-                    height = MathUtils.round((mediaManager.spriteHeight(sprite) + api.TS()) / api.TSF());
+                    width = MathUtils.round((mediaManager.spriteWidth(sprite) + uiEngineState.theme.ts.TS) / uiEngineState.theme.ts.TSF);
+                    height = MathUtils.round((mediaManager.spriteHeight(sprite) + uiEngineState.theme.ts.TS) / uiEngineState.theme.ts.TSF);
                 }
 
                 setSegmentValues(tooltipImageSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
@@ -280,7 +280,7 @@ public final class APITooltip {
             public TooltipTextSegment create(String text, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, boolean merge, boolean border, boolean clear) {
                 TooltipTextSegment tooltipTextSegment = new TooltipTextSegment();
                 String segmentText = Tools.Text.validString(text);
-                int width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, segmentText) + api.TS()) / api.TSF());
+                int width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, segmentText) + uiEngineState.theme.ts.TS) / uiEngineState.theme.ts.TSF);
                 int height = 1;
                 setSegmentValues(tooltipTextSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
                 tooltipTextSegment.text = segmentText;

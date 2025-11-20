@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.media.CMediaFont;
 import net.mslivo.pixelui.media.CMediaSprite;
-import net.mslivo.pixelui.media.UIEngineBaseMedia;
+import net.mslivo.pixelui.theme.UIEngineTheme;
 
 public final class UIEngineConfig {
 
@@ -15,14 +15,25 @@ public final class UIEngineConfig {
     public static final int GAMEPAD_MOUSE_BUTTONS = 7;
     public static final int KEYBOARD_MOUSE_BUTTONS = 11;
 
-    public final UIConfig ui = new UIConfig();
-    public final InputConfig input = new InputConfig();
-    public final WindowConfig window = new WindowConfig();
-    public final ComponentConfig component = new ComponentConfig();
-    public final Notification notification = new Notification();
-    public final TooltipConfig tooltip = new TooltipConfig();
-    public final MouseTextInputConfig mouseTextInput = new MouseTextInputConfig();
+    private final UIEngineTheme theme;
+    public final UIConfig ui;
+    public final InputConfig input;
+    public final WindowConfig window;
+    public final ComponentConfig component;
+    public final Notification notification;
+    public final TooltipConfig tooltip;
+    public final MouseTextInputConfig mouseTextInput;
 
+    public UIEngineConfig(UIEngineTheme theme) {
+        this.theme = theme;
+        this.ui = new UIConfig();
+        this.input = new InputConfig();
+        this.window = new WindowConfig();
+        this.component = new ComponentConfig();
+        this.notification = new Notification();
+        this.tooltip = new TooltipConfig();
+        this.mouseTextInput = new MouseTextInputConfig();
+    }
 
     public class InputConfig {
         public boolean hardwareMouseEnabled = true;
@@ -96,12 +107,13 @@ public final class UIEngineConfig {
     }
 
     public class UIConfig {
-        public CMediaFont font = UIEngineBaseMedia.UI_FONT;
+        public CMediaFont font = theme.UI_FONT;
         public Color fontDefaultColor = DEFAULT_COLOR_FONT.cpy();
-        public CMediaSprite cursor = UIEngineBaseMedia.UI_CURSOR_ARROW;
+        public CMediaSprite cursor = theme.UI_CURSOR_ARROW;
         public boolean keyInteractionsDisabled = false;
         public boolean mouseInteractionsDisabled = false;
         public boolean foldWindowsOnDoubleClick = true;
+
         public AnimationTimerFunction animationTimerFunction = new AnimationTimerFunction() {
             final float delta = 1 / 60f;
             float animationTimer = 0;
@@ -153,8 +165,8 @@ public final class UIEngineConfig {
     }
 
     public class MouseTextInputConfig {
-        public char[] defaultLowerCaseCharacters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        public char[] defaultUpperCaseCharacters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',' ', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'};
+        public char[] defaultLowerCaseCharacters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        public char[] defaultUpperCaseCharacters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '!', '?', '.', '+', '-', '=', '&', '%', '*', '$'};
         public Color defaultColor = DEFAULT_COlOR.cpy();
         public int charsPerRow = 8;
     }

@@ -1,10 +1,12 @@
 package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.utils.Array;
+import net.mslivo.pixelui.engine.constants.TileSize;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
+import net.mslivo.pixelui.theme.UIEngineTheme;
 
 import java.util.function.Predicate;
 
@@ -429,52 +431,12 @@ public final class API {
         return uiCommonUtils.ui_getAnimationTimer(uiEngineState);
     }
 
-    public int TS() {
-        return uiEngineState.tileSize.TS;
+    public TileSize tileSize() {
+        return uiEngineState.theme.ts;
     }
 
-    public int TS(int size) {
-        return uiEngineState.tileSize.TL(size);
-    }
-
-    public int TS_HALF() {
-        return uiEngineState.tileSize.TS_HALF;
-    }
-
-    public int TS2() {
-        return uiEngineState.tileSize.TS2;
-    }
-
-    public int TS3() {
-        return uiEngineState.tileSize.TS3;
-    }
-
-    public int TS4() {
-        return uiEngineState.tileSize.TS4;
-    }
-
-    public float TSF() {
-        return uiEngineState.tileSize.TSF;
-    }
-
-    public float TSF(float size) {
-        return uiEngineState.tileSize.TLF(size);
-    }
-
-    public float TSF_HALF() {
-        return uiEngineState.tileSize.TLF_HALF;
-    }
-
-    public float TSF2() {
-        return uiEngineState.tileSize.TSF2;
-    }
-
-    public float TSF3() {
-        return uiEngineState.tileSize.TSF3;
-    }
-
-    public float TSF4() {
-        return uiEngineState.tileSize.TSF4;
+    public UIEngineTheme theme() {
+        return uiEngineState.theme;
     }
 
 }

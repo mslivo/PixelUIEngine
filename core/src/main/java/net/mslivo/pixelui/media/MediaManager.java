@@ -57,9 +57,6 @@ public final class MediaManager implements Disposable {
     }
 
     /* ----- Prepare ----- */
-    public boolean prepareUIEngineBaseCMedia() {
-        return prepareCMedia(UIEngineBaseMedia.ALL);
-    }
 
     public boolean prepareCMedia(CMedia cMedia) {
         if (loaded) return false;
@@ -624,6 +621,8 @@ public final class MediaManager implements Disposable {
     }
 
     public int spriteWidth(CMediaSprite cMediaSprite) {
+
+
         return switch (cMediaSprite) {
             case CMediaImage cMediaImage -> medias_images.get(cMediaImage).getRegionWidth();
             case CMediaArray cMediaArray -> cMediaArray.frameWidth;

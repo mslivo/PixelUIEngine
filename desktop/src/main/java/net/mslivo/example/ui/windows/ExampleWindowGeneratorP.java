@@ -491,9 +491,9 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         int segment_w = 8;
         int segment_h = 3;
 
-        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, api.TS(segment_w), api.TS(segment_h));
-        OrthographicCamera tt_camera = new OrthographicCamera(api.TS(segment_w), api.TS(segment_h));
-        tt_camera.setToOrtho(false, api.TS(segment_w), api.TS(segment_h));
+        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
+        OrthographicCamera tt_camera = new OrthographicCamera(api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
+        tt_camera.setToOrtho(false, api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
         tt_camera.update();
 
         TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer, Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER, segment_w, segment_h);

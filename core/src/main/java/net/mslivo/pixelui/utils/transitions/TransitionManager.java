@@ -59,8 +59,8 @@ public class TransitionManager implements Disposable {
         this.texture_to = new TextureRegion(this.frameBuffer_to.getColorBufferTexture());
         this.texture_to.flip(false, true);
 
-        this.camera_screen = new OrthographicCamera(this.resolutionWidth, this.resolutionHeight);
-        this.camera_screen.setToOrtho(false);
+        this.camera_screen = new OrthographicCamera();
+        this.camera_screen.setToOrtho(false,this.resolutionWidth, this.resolutionHeight);
         this.viewport_screen = createViewport(this.viewportMode, this.camera_screen, this.resolutionWidth, this.resolutionHeight);
 
         this.spriteRenderer_screen = new SpriteRenderer();
