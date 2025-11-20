@@ -77,7 +77,7 @@ public class Base8x8Theme extends UIEngineTheme {
         UI_MOUSETEXTINPUT_SELECTED = new CMediaImage(DIR_THEME + "ui/mousetextinput_selected.png");
 
         // Cursors
-         UI_CURSOR_ARROW = new CMediaImage(DIR_THEME + "cursors/arrow.png");
+        UI_CURSOR_ARROW = new CMediaImage(DIR_THEME + "cursors/arrow.png");
 
         // Icons
         UI_ICON_CLOSE = new CMediaImage(DIR_THEME + "icons/close.icon.png");
@@ -90,13 +90,12 @@ public class Base8x8Theme extends UIEngineTheme {
         UI_ICON_KEY_DELETE = new CMediaImage(DIR_THEME + "icons/key_delete.icon.png");
         UI_ICON_KEY_CASE = new CMediaImage(DIR_THEME + "icons/key_case.icon.png");
 
-
         // Fonts
-         UI_FONT = new CMediaFont(DIR_THEME + "fonts/font.fnt");
+        UI_FONT = new CMediaFont(DIR_THEME + "fonts/font.fnt");
 
         // Misc
-         UI_PIXEL = new CMediaImage(DIR_THEME + "misc/pixel.png");
-         UI_PIXEL_TRANSPARENT = new CMediaImage(DIR_THEME + "misc/pixel_transparent.png");
+        UI_PIXEL = new CMediaImage(DIR_THEME + "misc/pixel.png");
+        UI_PIXEL_TRANSPARENT = new CMediaImage(DIR_THEME + "misc/pixel_transparent.png");
     }
 
 }
