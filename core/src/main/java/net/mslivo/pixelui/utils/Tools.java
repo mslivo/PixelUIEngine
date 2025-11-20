@@ -43,11 +43,6 @@ import java.util.zip.ZipOutputStream;
 public class Tools {
 
     public static class App {
-        private static float skipFrameAccumulator = 0f;
-        private static int maxUpdatesPerSecond = 60;
-        private static float timeStep;
-        private static float timeStepX2;
-        private static float timeBetweenUpdates;
         private static final Path ERROR_LOG_FILE = Path.of("error.log");
 
         private static final int MAX_TASKS = Runtime.getRuntime().availableProcessors();
@@ -193,28 +188,6 @@ public class Tools {
             }
         }
 
-        public static void setTargetUpdates(int updatesPerSecond) {
-            App.maxUpdatesPerSecond = Math.max(updatesPerSecond, 1);
-            timeStep = (1f / (float) App.maxUpdatesPerSecond);
-            timeStepX2 = timeStep * 2f;
-            skipFrameAccumulator = 0;
-            timeBetweenUpdates = 1000f / (updatesPerSecond * 1000f);
-        }
-
-        public static boolean runUpdate() {
-            // Accumulate 2 frames max
-            skipFrameAccumulator = Math.min(skipFrameAccumulator + Gdx.graphics.getDeltaTime(), timeStepX2);
-            if (skipFrameAccumulator < timeStep) {
-                return false;
-            } else {
-                skipFrameAccumulator -= timeStep;
-                return true;
-            }
-        }
-
-        public static float timeBetweenUpdates() {
-            return timeBetweenUpdates;
-        }
 
         public static void launch(ApplicationAdapter applicationAdapter, PixelUILaunchConfig launchConfig) {
             // Determine glEmulation

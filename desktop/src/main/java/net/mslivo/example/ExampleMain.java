@@ -3,6 +3,8 @@ package net.mslivo.example;
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.pixelui.utils.Tools;
+import net.mslivo.pixelui.utils.misc.UpdateTimer;
+import net.mslivo.pixelui.utils.misc.ValueWatcher;
 import net.mslivo.pixelui.utils.transitions.TransitionManager;
 import net.mslivo.pixelui.utils.transitions.basic.PixelateTransition;
 import net.mslivo.pixelui.engine.UIEngine;
@@ -20,6 +22,7 @@ public class ExampleMain extends ApplicationAdapter {
     private UIEngine<ExampleUIEngineAdapter> uiEngine;
     private UIEngine<ExampleUIEngineAdapter> uiEngine_transition;
     private long timer_debug_info;
+    private UpdateTimer updateTimer;
 
     public ExampleMain() {
     }
@@ -32,7 +35,9 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void create() {
-        Tools.App.setTargetUpdates(ExampleMainConstants.UPDATE_RATE);
+        new ValueWatcher.Int();
+
+        this.updateTimer = new UpdateTimer(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = null;
         // Load Assets
         System.out.println("Loading Assets");
@@ -60,7 +65,7 @@ public class ExampleMain extends ApplicationAdapter {
         switch (state) {
 
             case RUN -> {
-                if (Tools.App.runUpdate()) {
+                if (updateTimer.shouldUpdate()) {
                     this.uiEngine.update();
                 }
 
@@ -80,7 +85,7 @@ public class ExampleMain extends ApplicationAdapter {
 
             }
             case TRANSITION -> {
-                if (Tools.App.runUpdate()) {
+                if (updateTimer.shouldUpdate()) {
                     boolean finished = this.transitionManager.update();
                     if (finished) {
                         // Replace with new UIEngine after Reset
