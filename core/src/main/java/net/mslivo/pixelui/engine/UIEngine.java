@@ -2073,6 +2073,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             uiEngineState.frameBufferModal_ui.end();
         }
 
+
         { // Draw Composite Image
             uiEngineState.frameBuffer_composite.begin();
 
@@ -2088,7 +2089,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             uiEngineState.frameBuffer_composite.end();
         }
 
-        {
             // Draw Composite Image to Screen
             if (drawToScreen) {
                 spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
@@ -2116,7 +2116,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                 spriteRenderer.end();
             }
-        }
 
 
     }

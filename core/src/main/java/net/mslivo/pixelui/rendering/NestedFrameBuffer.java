@@ -104,7 +104,6 @@ public class NestedFrameBuffer extends FrameBuffer {
         if (!isBound) throw new RuntimeException(ERROR_END_BEGIN);
         isBound = false;
         Gdx.gl.glBindFramebuffer(GL32.GL_FRAMEBUFFER, previousFBOHandle);
-        Gdx.gl.glViewport(x, y, width, height);
     }
 
     @Override

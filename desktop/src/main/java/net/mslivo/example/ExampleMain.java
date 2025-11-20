@@ -37,7 +37,6 @@ public class ExampleMain extends ApplicationAdapter {
 
     @Override
     public void create() {
-        new ValueWatcher.Int();
 
         this.updateTimer = new UpdateTimer(ExampleMainConstants.UPDATE_RATE);
         this.transitionManager = null;
@@ -70,11 +69,13 @@ public class ExampleMain extends ApplicationAdapter {
         switch (state) {
 
             case RUN -> {
+
                 if (updateTimer.shouldUpdate()) {
                     this.uiEngine.update();
                 }
 
                 this.uiEngine.render();
+
                 // Check for transition + Reset
                 if (this.uiEngine.getAdapter().isResetPressed()) {
                     this.uiEngine_transition = new UIEngine<>(
@@ -87,6 +88,7 @@ public class ExampleMain extends ApplicationAdapter {
                     state = STATE.TRANSITION;
                     return;
                 }
+
 
             }
             case TRANSITION -> {

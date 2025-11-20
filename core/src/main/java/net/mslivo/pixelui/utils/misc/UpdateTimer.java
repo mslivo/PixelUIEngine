@@ -24,7 +24,7 @@ public class UpdateTimer {
     public void setTargetUpdates(int maxUpdatesPerSecond, int maxAccumulatedSteps) {
         maxUpdatesPerSecond = Math.max(maxUpdatesPerSecond, 1);
         maxAccumulatedSteps = Math.max(maxAccumulatedSteps, 1);
-        timeStep = 1f / maxUpdatesPerSecond;
+        timeStep = 1f / (float)maxUpdatesPerSecond;
         maxAccumulated = timeStep * maxAccumulatedSteps;
         accumulator = 0f;
     }

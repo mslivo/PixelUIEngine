@@ -14,5 +14,4 @@ public class ExampleMainConstants {
     public static final int INTERNAL_RESOLUTION_HEIGHT = 480;
     public static final VIEWPORT_MODE viewportMode = VIEWPORT_MODE.PIXEL_PERFECT;
 
-
 }

@@ -211,14 +211,15 @@ public class ShaderParser {
     public enum SHADER_TEMPLATE {
         SPRITE(".sprite.glsl",
                     """
-                    attribute highp vec4 a_position;
+                    
+                    attribute vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
                     attribute vec2 a_texCoord;
 
                     varying vec4 v_color;
                     varying vec4 v_tweak;
-                    varying highp vec2 v_texCoord;
+                    varying vec2 v_texCoord;
 
                     uniform mat4 u_projTrans;
                     
@@ -239,7 +240,7 @@ public class ShaderParser {
                 """
             varying vec4 v_color;
             varying vec4 v_tweak;
-            varying highp vec2 v_texCoord;
+            varying vec2 v_texCoord;
             
             uniform sampler2D u_texture;
             uniform vec2 u_textureSize;
@@ -254,8 +255,8 @@ public class ShaderParser {
             }
             """),
         PRIMITIVE(".primitive.glsl","""
-                    
-                    attribute highp vec4 a_position;
+
+                    attribute vec4 a_position;
                     attribute vec4 a_color;
                     attribute vec4 a_tweak;
                     attribute vec4 a_vertexColor;
@@ -297,9 +298,13 @@ public class ShaderParser {
                 }
             """);
 
-        private static final String COMMON_DECLARATIONS = """
-                   const highp float FLOAT_CORRECTION = (255.0/254.0);
-                   precision mediump float;
+        private static final String COMMON_DECLARATIONS = """             
+                    #ifdef GL_ES
+                        precision highp float;
+                        precision highp int;
+                    #endif
+                   
+                   const float FLOAT_CORRECTION = (255.0/254.0);
             """;
 
         public final String vertexTemplate, fragmentTemplate;
