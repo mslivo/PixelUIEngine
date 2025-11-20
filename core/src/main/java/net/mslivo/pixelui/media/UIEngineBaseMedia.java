@@ -3,7 +3,7 @@ package net.mslivo.pixelui.media;
 /**
  * These Medias need to be loaded on startup for the UI to work no matter what
  */
-public class UIEngineBaseMedia_8x8 {
+public class UIEngineBaseMedia {
     private static final String DIR_UI_GRAPHICS = MediaManager.DIR_GRAPHICS + "pixelui/";
     private static final int TL = 8;
     private static final int TL2 = TL * 2;
@@ -20,13 +20,13 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaImage UI_LIST_CELL = new CMediaImage(DIR_UI_GRAPHICS + "ui/list_cell.png");
     public static final CMediaImage UI_LIST_CELL_SELECTED = new CMediaImage(DIR_UI_GRAPHICS + "ui/list_cell_selected.png");
     public static final CMediaArray UI_LIST_DRAG = new CMediaArray(DIR_UI_GRAPHICS + "ui/list_drag.png", TL, TL * 2);
-    public static final CMediaArray UI_COMBOBOX = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_TOP = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_top.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_OPEN = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_open.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_LIST = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_cell.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_LIST_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell.png", TL, TL);
-    public static final CMediaArray UI_COMBOBOX_LIST_CELL_SELECTED = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell_selected.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_TOP = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_top.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_OPEN = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_open.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_LIST = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_cell.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_LIST_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell.png", TL, TL);
+    public static final CMediaArray UI_COMBO_BOX_LIST_CELL_SELECTED = new CMediaArray(DIR_UI_GRAPHICS + "ui/combobox_list_cell_selected.png", TL, TL);
     public static final CMediaArray UI_TAB_BORDERS = new CMediaArray(DIR_UI_GRAPHICS + "ui/tab_border.png", TL, TL);
     public static final CMediaArray UI_BORDERS = new CMediaArray(DIR_UI_GRAPHICS + "ui/border.png", TL, TL);
     public static final CMediaArray UI_TAB = new CMediaArray(DIR_UI_GRAPHICS + "ui/tab.png", TL, TL);
@@ -48,10 +48,10 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaArray UI_CONTEXT_MENU_TOP = new CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_top.png", TL, TL);
     public static final CMediaArray UI_CONTEXT_MENU_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell.png", TL, TL);
     public static final CMediaArray UI_CONTEXT_MENU_CELL_SELECTED = new CMediaArray(DIR_UI_GRAPHICS + "ui/context_menu_cell_selected.png", TL, TL);
-    public static final CMediaArray UI_TEXTFIELD = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield.png", TL, TL);
-    public static final CMediaArray UI_TEXTFIELD_CELL_VALIDATION = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell_validation.png", TL, TL);
-    public static final CMediaArray UI_TEXTFIELD_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell.png", TL, TL);
-    public static final CMediaAnimation UI_TEXTFIELD_CARET = new CMediaAnimation(DIR_UI_GRAPHICS + "ui/textfield_caret.png", 1, TL, 0.4f);
+    public static final CMediaArray UI_TEXT_FIELD = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield.png", TL, TL);
+    public static final CMediaArray UI_TEXT_FIELD_CELL_VALIDATION = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell_validation.png", TL, TL);
+    public static final CMediaArray UI_TEXT_FIELD_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/textfield_cell.png", TL, TL);
+    public static final CMediaAnimation UI_TEXT_FIELD_CARET = new CMediaAnimation(DIR_UI_GRAPHICS + "ui/textfield_caret.png", 1, TL, 0.4f);
     public static final CMediaArray UI_GRID = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid.png", TL, TL);
     public static final CMediaArray UI_GRID_DRAGGED = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_dragged.png", TL, TL);
     public static final CMediaArray UI_GRID_CELL = new CMediaArray(DIR_UI_GRAPHICS + "ui/grid_cell.png", TL, TL);
@@ -98,7 +98,6 @@ public class UIEngineBaseMedia_8x8 {
     public static final CMediaImage UI_COLOR_PICKER = new CMediaImage(DIR_UI_GRAPHICS + "misc/color_picker_colors.png");
     public static final CMediaImage UI_COLOR_SELECTOR_OVERLAY = new CMediaImage(DIR_UI_GRAPHICS + "misc/colors_overlay.png");
 
-
     public static final CMedia[] ALL = new CMedia[]{
             UI_WINDOW,
             UI_BUTTON,
@@ -111,19 +110,19 @@ public class UIEngineBaseMedia_8x8 {
             UI_LIST_CELL,
             UI_LIST_CELL_SELECTED,
             UI_LIST_DRAG,
-            UI_COMBOBOX,
-            UI_COMBOBOX_TOP,
+            UI_COMBO_BOX,
+            UI_COMBO_BOX_TOP,
             UI_TAB_BORDERS,
             UI_BORDERS,
             UI_TAB,
             UI_TAB_SELECTED,
             UI_TAB_BIGICON,
             UI_TAB_BIGICON_SELECTED,
-            UI_COMBOBOX_OPEN,
-            UI_COMBOBOX_LIST,
-            UI_COMBOBOX_CELL,
-            UI_COMBOBOX_LIST_CELL,
-            UI_COMBOBOX_LIST_CELL_SELECTED,
+            UI_COMBO_BOX_OPEN,
+            UI_COMBO_BOX_LIST,
+            UI_COMBO_BOX_CELL,
+            UI_COMBO_BOX_LIST_CELL,
+            UI_COMBO_BOX_LIST_CELL_SELECTED,
             UI_KNOB_BACKGROUND,
             UI_KNOB,
             UI_KNOB_ENDLESS,
@@ -139,10 +138,10 @@ public class UIEngineBaseMedia_8x8 {
             UI_CONTEXT_MENU_TOP,
             UI_CONTEXT_MENU_CELL,
             UI_CONTEXT_MENU_CELL_SELECTED,
-            UI_TEXTFIELD,
-            UI_TEXTFIELD_CELL_VALIDATION,
-            UI_TEXTFIELD_CELL,
-            UI_TEXTFIELD_CARET,
+            UI_TEXT_FIELD,
+            UI_TEXT_FIELD_CELL_VALIDATION,
+            UI_TEXT_FIELD_CELL,
+            UI_TEXT_FIELD_CARET,
             UI_GRID,
             UI_GRID_DRAGGED,
             UI_GRID_CELL, UI_GRID_CELL_SELECTED,

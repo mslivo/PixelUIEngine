@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.media.CMediaFont;
 import net.mslivo.pixelui.media.CMediaSprite;
-import net.mslivo.pixelui.media.UIEngineBaseMedia_8x8;
+import net.mslivo.pixelui.media.UIEngineBaseMedia;
 
 public final class UIEngineConfig {
 
@@ -96,9 +96,9 @@ public final class UIEngineConfig {
     }
 
     public class UIConfig {
-        public CMediaFont font = UIEngineBaseMedia_8x8.UI_FONT;
+        public CMediaFont font = UIEngineBaseMedia.UI_FONT;
         public Color fontDefaultColor = DEFAULT_COLOR_FONT.cpy();
-        public CMediaSprite cursor = UIEngineBaseMedia_8x8.UI_CURSOR_ARROW;
+        public CMediaSprite cursor = UIEngineBaseMedia.UI_CURSOR_ARROW;
         public boolean keyInteractionsDisabled = false;
         public boolean mouseInteractionsDisabled = false;
         public boolean foldWindowsOnDoubleClick = true;

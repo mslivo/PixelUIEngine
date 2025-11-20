@@ -58,7 +58,7 @@ public final class MediaManager implements Disposable {
 
     /* ----- Prepare ----- */
     public boolean prepareUIEngineBaseCMedia() {
-        return prepareCMedia(UIEngineBaseMedia_8x8.ALL);
+        return prepareCMedia(UIEngineBaseMedia.ALL);
     }
 
     public boolean prepareCMedia(CMedia cMedia) {

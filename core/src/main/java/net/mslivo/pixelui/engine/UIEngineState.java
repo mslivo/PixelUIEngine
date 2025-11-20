@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
-import net.mslivo.pixelui.engine.constants.TILE_SIZE;
+import net.mslivo.pixelui.engine.constants.TileSize;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PrimitiveRenderer;
@@ -23,7 +23,7 @@ public final class UIEngineState {
     public int resolutionWidthHalf, resolutionHeightHalf;
     public VIEWPORT_MODE viewportMode;
     public boolean gamePadSupport;
-    public TILE_SIZE tileSize;
+    public TileSize tileSize;
 
     /* ##################### Config ########################## */
     public UIEngineConfig config;

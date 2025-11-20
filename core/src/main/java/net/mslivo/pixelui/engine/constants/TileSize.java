@@ -1,7 +1,6 @@
 package net.mslivo.pixelui.engine.constants;
 
-public enum TILE_SIZE {
-    MODE_8x8(8);
+public class TileSize {
 
     public final int TS;
     public final int TS_HALF;
@@ -22,7 +21,8 @@ public enum TILE_SIZE {
         return (size* TS);
     }
 
-    TILE_SIZE(int tileSize) {
+    public TileSize() {
+        final int tileSize = 8;
         this.TS = tileSize;
         this.TS_HALF = tileSize / 2;
         this.TS2 = tileSize * 2;

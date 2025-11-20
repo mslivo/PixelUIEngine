@@ -118,9 +118,9 @@ public final class APIWidgets {
 
             int y_controls = pageAbleReadOnlyGridControlsY(y, height, placeButtonTop, doubleSized);
 
-            ImageButton backButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_BACK);
+            ImageButton backButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia.UI_ICON_BACK);
             Text pageText = api.component.text.create(x, y_controls, 2, "");
-            ImageButton forwardButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_FORWARD);
+            ImageButton forwardButton = api.component.button.imageButton.create(0, y_controls, 1, 1, UIEngineBaseMedia.UI_ICON_FORWARD);
 
             PageAbleReadOnlyGrid pageGrid = new PageAbleReadOnlyGrid(grid, backButton, forwardButton, pageText, items, pages, x, y, width, height, doubleSized, placeButtonTop, displayPagesOf);
 
@@ -422,7 +422,7 @@ public final class APIWidgets {
             Array<Component> returnComponents = new Array<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 0 : i == (size - 1) ? 2 : 1;
-                Image image = api.component.image.create(x + i, y, UIEngineBaseMedia_8x8.UI_SEPARATOR_HORIZONTAL, index);
+                Image image = api.component.image.create(x + i, y, UIEngineBaseMedia.UI_SEPARATOR_HORIZONTAL, index);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -432,7 +432,7 @@ public final class APIWidgets {
             Array<Component> returnComponents = new Array<>();
             for (int i = 0; i < size; i++) {
                 int index = i == 0 ? 1 : i == (size - 1) ? 0 : 1;
-                Image image = api.component.image.create(x, y + i, UIEngineBaseMedia_8x8.UI_SEPARATOR_VERTICAL, index);
+                Image image = api.component.image.create(x, y + i, UIEngineBaseMedia.UI_SEPARATOR_VERTICAL, index);
                 returnComponents.add(image);
             }
             return returnComponents;
@@ -449,16 +449,16 @@ public final class APIWidgets {
 
             for (int ix = 0; ix < width; ix++) {
 
-                borders.add(api.component.image.create(x + ix, y, UIEngineBaseMedia_8x8.UI_BORDERS, 2));
+                borders.add(api.component.image.create(x + ix, y, UIEngineBaseMedia.UI_BORDERS, 2));
 
                 if (ix >= gap) {
-                    borders.add(api.component.image.create(x + ix, y + (height - 1), UIEngineBaseMedia_8x8.UI_BORDERS, 3));
+                    borders.add(api.component.image.create(x + ix, y + (height - 1), UIEngineBaseMedia.UI_BORDERS, 3));
                 }
             }
 
             for (int iy = 0; iy < height; iy++) {
-                borders.add(api.component.image.create(x, y + iy, UIEngineBaseMedia_8x8.UI_BORDERS, 0));
-                borders.add(api.component.image.create(x + (width - 1), y + iy, UIEngineBaseMedia_8x8.UI_BORDERS, 1));
+                borders.add(api.component.image.create(x, y + iy, UIEngineBaseMedia.UI_BORDERS, 0));
+                borders.add(api.component.image.create(x + (width - 1), y + iy, UIEngineBaseMedia.UI_BORDERS, 1));
             }
 
             return borders;
@@ -719,7 +719,7 @@ public final class APIWidgets {
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor) {
-            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia_8x8.UI_COLOR_PICKER);
+            return createColorPickerModal(caption, selectColorFunction, initColor, UIEngineBaseMedia.UI_COLOR_PICKER);
         }
 
         public Window createColorPickerModal(String caption, Consumer<Color> selectColorFunction, Color initColor, CMediaImage colors) {
@@ -1034,7 +1034,7 @@ public final class APIWidgets {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8x8.UI_ICON_KEY_CASE, 0,
+                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia.UI_ICON_KEY_CASE, 0,
                         new ButtonAction() {
                             @Override
                             public boolean onToggle(boolean value) {
@@ -1053,7 +1053,7 @@ public final class APIWidgets {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia_8x8.UI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, UIEngineBaseMedia.UI_ICON_KEY_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -1270,7 +1270,7 @@ public final class APIWidgets {
         }
 
         public ImageButton createWindowCloseButton(Window window, Consumer<Window> closeFunction) {
-            ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia_8x8.UI_ICON_CLOSE);
+            ImageButton closeButton = api.component.button.imageButton.create(window.width - 1, window.height - 1, 1, 1, UIEngineBaseMedia.UI_ICON_CLOSE);
             api.component.setName(closeButton, uiCommonUtils.WND_CLOSE_BUTTON);
             api.component.button.setButtonAction(closeButton, new ButtonAction() {
 
@@ -1451,7 +1451,7 @@ public final class APIWidgets {
 
             width = Math.max(width, 1);
             Tabbar tabBar = api.component.tabbar.create(x, y, width, tabs, selectedTab, tabBarAction, border, borderHeight, 2, bigIconMode);
-            ImageButton extendButton = api.component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIEngineBaseMedia_8x8.UI_ICON_EXTEND);
+            ImageButton extendButton = api.component.button.imageButton.create(x, y, 2, bigIconMode ? 2 : 1, UIEngineBaseMedia.UI_ICON_EXTEND);
 
             updateExtendableTabBarButtonInternal(tabBar, extendButton);
 
