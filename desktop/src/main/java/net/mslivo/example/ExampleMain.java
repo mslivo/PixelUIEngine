@@ -2,7 +2,7 @@ package net.mslivo.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.theme.BaseTheme8x8;
+import net.mslivo.pixelui.theme.Base8x8Theme;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.misc.UpdateTimer;
 import net.mslivo.pixelui.utils.misc.ValueWatcher;
@@ -24,7 +24,7 @@ public class ExampleMain extends ApplicationAdapter {
     private UIEngine<ExampleUIEngineAdapter> uiEngine_transition;
     private long timer_debug_info;
     private UpdateTimer updateTimer;
-    private BaseTheme8x8 theme8x8 = new BaseTheme8x8();
+    private Base8x8Theme theme8x8 = new Base8x8Theme();
 
     public ExampleMain() {
     }

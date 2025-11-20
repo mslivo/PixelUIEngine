@@ -2,10 +2,10 @@ package net.mslivo.pixelui.theme;
 
 import net.mslivo.pixelui.media.*;
 
-public class BaseTheme8x8 extends UIEngineTheme {
+public class Base8x8Theme extends UIEngineTheme {
     private static final String DIR_THEME = MediaManager.DIR_GRAPHICS + "pixelui/base8x8/";
 
-    public BaseTheme8x8() {
+    public Base8x8Theme() {
         super(8);
         final int TL = ts.TS;
         final int TL2 = ts.TS2;
