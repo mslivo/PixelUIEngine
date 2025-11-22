@@ -81,21 +81,19 @@ public class Base8x8Theme extends UIEngineTheme {
 
         // Icons
         UI_ICON_CLOSE = new CMediaImage(DIR_THEME + "icons/close.icon.png");
-        UI_ICON_COLOR_PICKER = new CMediaImage(DIR_THEME + "icons/color_picker.icon.png");
         UI_ICON_INFORMATION = new CMediaImage(DIR_THEME + "icons/information.icon.png");
         UI_ICON_QUESTION = new CMediaImage(DIR_THEME + "icons/question.icon.png");
         UI_ICON_EXTEND = new CMediaImage(DIR_THEME + "icons/extend.icon.png");
         UI_ICON_BACK = new CMediaImage(DIR_THEME + "icons/back.icon.png");
         UI_ICON_FORWARD = new CMediaImage(DIR_THEME + "icons/forward.icon.png");
-        UI_ICON_KEY_DELETE = new CMediaImage(DIR_THEME + "icons/key_delete.icon.png");
-        UI_ICON_KEY_CASE = new CMediaImage(DIR_THEME + "icons/key_case.icon.png");
 
         // Fonts
         UI_FONT = new CMediaFont(DIR_THEME + "fonts/font.fnt");
 
         // Misc
-        UI_PIXEL = new CMediaImage(DIR_THEME + "misc/pixel.png");
-        UI_PIXEL_TRANSPARENT = new CMediaImage(DIR_THEME + "misc/pixel_transparent.png");
+        UI_PIXEL = new CMediaImage(DIR_THEME + "pixel.png");
+        UI_PIXEL_TRANSPARENT = new CMediaImage(DIR_THEME + "pixel_transparent.png");
+
     }
 
 }

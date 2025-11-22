@@ -18,11 +18,13 @@ public class ExampleBaseMedia {
     public static final CMediaAnimation EXAMPLE_ANIMATION_3 = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation_2.png",  8*8,  8*8, 0.01f);
     public static final CMediaImage EXAMPLE_TEST = new CMediaImage(DIR_EXAMPLE_GRAPHICS + "test.png", false);
 
+    public static final CMediaFont FONT_SMALL = new CMediaFont( MediaManager.DIR_GRAPHICS+"/pixelui/misc/font_small.fnt");
+
     public static final CMediaAnimation EXAMPLE_ANIMATION = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "example_animation.png", 16, 8, 0.1f);
     public static final CMediaAnimation BACKGROUND = new CMediaAnimation(DIR_EXAMPLE_GRAPHICS + "background.png", 16, 16, 0.2f);
     public static final CMedia[] ALL = new CMedia[]{
             EXAMPLE_ANIMATION,EXAMPLE_ANIMATION_3,EXAMPLE_TEST,
-            BUTTON_ANIM_EXAMPLE_ARRAY,
+            BUTTON_ANIM_EXAMPLE_ARRAY,FONT_SMALL,
             ICON_EXAMPLE_1,
             ICON_EXAMPLE_2,
             ICON_EXAMPLE_3,

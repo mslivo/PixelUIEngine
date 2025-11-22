@@ -5,10 +5,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.actions.*;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
-import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
-import net.mslivo.pixelui.media.*;
-import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
+import net.mslivo.pixelui.engine.constants.INPUT_METHOD;
+import net.mslivo.pixelui.media.CMediaFont;
+import net.mslivo.pixelui.media.CMediaSprite;
+import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.utils.Tools;
 
 import java.awt.*;
 import java.net.URI;
@@ -46,7 +48,7 @@ public final class APIWidgets {
         this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiEngineConfig = uiEngineState.config;
-        
+
         this.list = new APICompositeList();
         this.image = new APICompositeImage();
         this.text = new APICompositeText();
@@ -480,6 +482,7 @@ public final class APIWidgets {
             }
             return ret;
         }
+
         public Array<Component> createScrollAbleText(int x, int y, int width, int height, String[] text) {
             Array<Component> result = new Array<>();
 
@@ -551,7 +554,7 @@ public final class APIWidgets {
             // Create text rows
             final Text[] texts = new Text[height];
             for (int i = 0; i < height; i++) {
-                int text_y = y + ((height-1)-i);
+                int text_y = y + ((height - 1) - i);
                 texts[i] = api.component.text.create(x, text_y, width - 1, null);
                 // Per-row mouse scroll handler: use the provided 'scrolled' delta
                 api.component.text.setTextAction(texts[i], new TextAction() {
@@ -581,7 +584,7 @@ public final class APIWidgets {
                 @Override
                 public void onScrolled(float scrolledPct) {
                     // Convert to "top-aligned" fraction (0 = top, 1 = bottom)
-                    float scrolled = 1f-scrolledPct;
+                    float scrolled = 1f - scrolledPct;
 
                     int extra = Math.max(textConverted.length - height, 0);
                     int scrolledTextIndex = (extra > 0)
@@ -782,6 +785,15 @@ public final class APIWidgets {
 
             Component[] componentsArr = componentsList.toArray(Component[]::new);
             api.component.move(componentsArr, uiEngineState.theme.ts.TS_HALF, uiEngineState.theme.ts.TS_HALF);
+
+
+            api.window.setWindowAction(modal, new WindowAction() {
+                @Override
+                public CMediaSprite icon() {
+                    return uiEngineState.theme.UI_ICON_INFORMATION;
+                }
+            });
+
             api.window.addComponents(modal, componentsArr);
             return modal;
         }
@@ -826,6 +838,14 @@ public final class APIWidgets {
 
             Component[] componentsl = new Component[]{textC, yesC, noC};
             api.component.move(componentsl, uiEngineState.theme.ts.TS_HALF, uiEngineState.theme.ts.TS_HALF);
+
+            api.window.setWindowAction(modal, new WindowAction() {
+                @Override
+                public CMediaSprite icon() {
+                    return uiEngineState.theme.UI_ICON_QUESTION;
+                }
+            });
+
             api.window.addComponents(modal, componentsl);
             return modal;
         }
@@ -923,17 +943,27 @@ public final class APIWidgets {
                 }
 
                 // Add Case Button
-                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, uiEngineState.theme.UI_ICON_KEY_CASE, 0,
-                        new ButtonAction() {
-                            @Override
-                            public boolean onToggle(boolean value) {
-                                for (int i2 = 0; i2 < lowerCaseButtonsList.size; i2++)
-                                    api.component.setVisible(lowerCaseButtonsList.get(i2), !value);
-                                for (int i2 = 0; i2 < upperCaseButtonsList.size; i2++)
-                                    api.component.setVisible(upperCaseButtonsList.get(i2), value);
-                                return true;
-                            }
-                        }, BUTTON_MODE.TOGGLE);
+                ImageButton caseButton = api.component.button.imageButton.create(ix, iy, 2, 2, uiEngineState.theme.UI_MOUSETEXTINPUT_LOWERCASE, 0, null, BUTTON_MODE.TOGGLE);
+                api.component.setColor2(caseButton,Color.BLACK);
+                api.component.button.setButtonAction(caseButton, new ButtonAction() {
+
+                    @Override
+                    public boolean onToggle(boolean value) {
+                        for (int i2 = 0; i2 < lowerCaseButtonsList.size; i2++)
+                            api.component.setVisible(lowerCaseButtonsList.get(i2), !value);
+                        for (int i2 = 0; i2 < upperCaseButtonsList.size; i2++)
+                            api.component.setVisible(upperCaseButtonsList.get(i2), value);
+
+                        if (value) {
+                            api.component.button.imageButton.setImage(caseButton, uiEngineState.theme.UI_MOUSETEXTINPUT_UPPERCASE);
+                        }else{
+                            api.component.button.imageButton.setImage(caseButton, uiEngineState.theme.UI_MOUSETEXTINPUT_LOWERCASE);
+
+                        }
+
+                        return true;
+                    }
+                });
                 api.component.move(caseButton, uiEngineState.theme.ts.TS_HALF, uiEngineState.theme.ts.TS_HALF);
                 componentsList.add(caseButton);
                 ix += 2;
@@ -942,7 +972,7 @@ public final class APIWidgets {
                     iy -= 2;
                 }
                 // Add Delete Button
-                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, uiEngineState.theme.UI_ICON_KEY_DELETE, 0,
+                ImageButton delButton = api.component.button.imageButton.create(ix, iy, 2, 2, uiEngineState.theme.UI_MOUSETEXTINPUT_DELETE, 0,
                         new ButtonAction() {
                             @Override
                             public void onRelease() {
@@ -952,6 +982,7 @@ public final class APIWidgets {
                                 }
                             }
                         }, BUTTON_MODE.DEFAULT);
+                api.component.setColor2(delButton,Color.BLACK);
                 api.component.move(delButton, uiEngineState.theme.ts.TS_HALF, uiEngineState.theme.ts.TS_HALF);
                 componentsList.add(delButton);
 
@@ -995,7 +1026,7 @@ public final class APIWidgets {
                 @Override
                 public void onDisplay() {
                     api.component.textfield.focus(inputTextField);
-                    if(api.input.lastUsedInputMethod() == INPUT_METHOD.GAMEPAD){
+                    if (api.input.lastUsedInputMethod() == INPUT_METHOD.GAMEPAD) {
                         api.openMouseTextInput(api.mouseTextInput.createForTextField(inputTextField));
                     }
                 }
