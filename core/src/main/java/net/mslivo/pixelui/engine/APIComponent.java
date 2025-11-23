@@ -716,7 +716,7 @@ public final class APIComponent {
                 if (width == 0) {
                     int ts = uiEngineState.theme.ts.TS;
                     float tsf = uiEngineState.theme.ts.TSF;
-                    tab.width = MathUtils.round((mediaManager.fontTextWidth(uiEngineConfig.ui.font, tab.title) + (tab.tabAction.icon() != null ? ts : 0) + ts) / tsf);
+                    tab.width = MathUtils.ceil((mediaManager.fontTextWidth(uiEngineConfig.ui.font, tab.title) + (tab.tabAction.icon() != null ? ts : 0) + ts) / tsf);
                 } else {
                     tab.width = width;
                 }
