@@ -42,8 +42,8 @@ public class PrimitiveRenderer extends BaseColorTweakRenderer {
         this(shaderProgram, maxVertexes, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, shaderProgram, printRenderCalls);
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+        super(maxVertexes, defaultShader, printRenderCalls);
         this.indexResets = new IntArray();
         this.vertexColor_reset = colorPackedRGBA(0.5f,0.5f,0.5f,1f);
         this.vertexColor_save = vertexColor_reset;

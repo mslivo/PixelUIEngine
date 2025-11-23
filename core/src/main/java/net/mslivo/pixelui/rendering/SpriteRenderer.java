@@ -65,16 +65,16 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     }
 
 
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram shaderProgram) {
-        this(mediaManager, shaderProgram, MAX_VERTEXES_DEFAULT, false);
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader) {
+        this(mediaManager, defaultShader, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram shaderProgram, final int maxVertexes) {
-        this(mediaManager, shaderProgram, maxVertexes, false);
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes) {
+        this(mediaManager, defaultShader, maxVertexes, false);
     }
 
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram shaderProgram, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, shaderProgram, printRenderCalls);
+    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+        super(maxVertexes, defaultShader, printRenderCalls);
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;
