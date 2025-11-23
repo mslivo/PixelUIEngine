@@ -1,11 +1,10 @@
 package net.mslivo.pixelui.rendering;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL32;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -123,7 +122,6 @@ public class NestedFrameBuffer extends FrameBuffer {
         this.getBoundFBOCache = -1;
     }
 
-
     public TextureRegion getFlippedTextureRegion(){
         if(this.textureRegionFlippedCache == null){
             this.textureRegionFlippedCache = new TextureRegion(this.getColorBufferTexture());
@@ -131,6 +129,86 @@ public class NestedFrameBuffer extends FrameBuffer {
         }
         return this.textureRegionFlippedCache;
     }
+
+
+    public NestedFrameBuffer trimRegionCopy(SpriteRenderer batch,
+                                            int srcX, int srcY,
+                                            int trimW, int trimH) {
+
+        final Pixmap.Format format = this.getColorBufferTexture().getTextureData().getFormat();
+        final Texture.TextureFilter minFilter = this.getColorBufferTexture().getMinFilter();
+        final Texture.TextureFilter magFilter = this.getColorBufferTexture().getMagFilter();
+
+        // Create new trimmed FBO
+        NestedFrameBuffer out = new NestedFrameBuffer(format, trimW, trimH, false, false);
+        out.getColorBufferTexture().setFilter(minFilter, magFilter);
+
+        // Region from original framebuffer texture
+        TextureRegion region = new TextureRegion(
+                this.getColorBufferTexture(),
+                srcX, srcY,
+                trimW, trimH
+        );
+        region.flip(false, true); // FBO textures are Y-flipped in LibGDX
+
+        // Camera for drawing into the new FBO
+        OrthographicCamera cam = new OrthographicCamera(trimW, trimH);
+        cam.setToOrtho(true, trimW, trimH);
+
+        // Draw region into trimmed framebuffer
+        out.beginGlClear();
+        batch.setProjectionMatrix(cam.combined);
+        batch.begin();
+        batch.draw(region, 0, 0, trimW, trimH);
+        batch.end();
+        out.end();
+
+        return out;
+    }
+
+    public NestedFrameBuffer trimAlphaCopy(SpriteRenderer batch, float alphaThreshold) {
+
+        final int w = this.getWidth();
+        final int h = this.getHeight();
+
+        ByteBuffer buf = BufferUtils.newByteBuffer(w * h * 4);
+
+        this.begin();
+        Gdx.gl.glReadPixels(0, 0, w, h, GL32.GL_RGBA, GL32.GL_UNSIGNED_BYTE, buf);
+        this.end();
+
+        int minX = w, minY = h, maxX = -1, maxY = -1;
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int index = (y * w + x) * 4;
+                int a = buf.get(index + 3) & 0xFF;
+
+                if (a > alphaThreshold) {
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        // Nothing visible → return 1×1
+        if (maxX < 0) {
+            return new NestedFrameBuffer(
+                    this.getColorBufferTexture().getTextureData().getFormat(),
+                    1, 1,
+                    false, false
+            );
+        }
+
+        final int trimW = maxX - minX + 1;
+        final int trimH = maxY - minY + 1;
+
+        // Reuse generic trim method:
+        return trimRegionCopy(batch, minX, minY, trimW, trimH);
+    }
+
 
     @Override
     public void dispose() {
