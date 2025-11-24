@@ -12,7 +12,8 @@ import com.badlogic.gdx.utils.Align;
 import net.mslivo.pixelui.media.*;
 
 public class SpriteRenderer extends BaseColorTweakRenderer {
-
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
     public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
@@ -40,7 +41,6 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             // END VERTEX
             
             // BEGIN FRAGMENT
-
             
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);

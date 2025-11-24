@@ -9,7 +9,7 @@ import net.mslivo.pixelui.engine.constants.DIRECTION;
 import net.mslivo.pixelui.engine.constants.SEGMENT_ALIGNMENT;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.utils.Tools;
 
 public final class APITooltip {
@@ -300,40 +300,40 @@ public final class APITooltip {
             }
 
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer) {
                 return create(nestedFrameBuffer, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, SEGMENT_ALIGNMENT.LEFT, 1, 1, false, false, false);
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, SEGMENT_ALIGNMENT alignment) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, SEGMENT_ALIGNMENT alignment) {
                 return create(nestedFrameBuffer, uiEngineConfig.tooltip.defaultCellColor, Color.GRAY, alignment, 1, 1, false, false, false);
 
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment) {
                 return create(nestedFrameBuffer, cellColor, contentColor, alignment, 1, 1, false, false, false);
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height) {
                 return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, false, false, false);
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge) {
                 return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, merge, false, false);
 
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border) {
                 return create(nestedFrameBuffer, cellColor, contentColor, alignment, width, height, merge, border, false);
             }
 
-            public TooltipFramebufferViewportSegment create(NestedFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
+            public TooltipFramebufferViewportSegment create(XWgFrameBuffer nestedFrameBuffer, Color cellColor, Color contentColor, SEGMENT_ALIGNMENT alignment, int width, int height, boolean merge, boolean border, boolean clear) {
                 TooltipFramebufferViewportSegment tooltipFramebufferViewportSegment = new TooltipFramebufferViewportSegment();
                 setSegmentValues(tooltipFramebufferViewportSegment, cellColor, contentColor, alignment, width, height, merge, border, clear);
                 tooltipFramebufferViewportSegment.frameBuffer = nestedFrameBuffer;
                 return tooltipFramebufferViewportSegment;
             }
 
-            public void setFrameBuffer(TooltipFramebufferViewportSegment tooltipFramebufferViewportSegment, NestedFrameBuffer nestedFrameBuffer) {
+            public void setFrameBuffer(TooltipFramebufferViewportSegment tooltipFramebufferViewportSegment, XWgFrameBuffer nestedFrameBuffer) {
                 if (tooltipFramebufferViewportSegment == null)
                     return;
                 tooltipFramebufferViewportSegment.frameBuffer = nestedFrameBuffer;

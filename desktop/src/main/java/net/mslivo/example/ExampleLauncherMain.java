@@ -1,6 +1,8 @@
 package net.mslivo.example;
 
 
+import com.monstrous.gdx.webgpu.backends.desktop.WgDesktopApplication;
+import com.monstrous.gdx.webgpu.backends.desktop.WgDesktopApplicationConfiguration;
 import net.mslivo.pixelui.utils.PixelUILaunchConfig;
 import net.mslivo.pixelui.utils.Tools;
 
@@ -8,10 +10,11 @@ public class ExampleLauncherMain {
 
     static void main(String[] args) {
 
-        PixelUILaunchConfig pixelUILaunchConfig = new PixelUILaunchConfig();
-        pixelUILaunchConfig.appTile = ExampleMainConstants.APP_TITLE;
-        pixelUILaunchConfig.resolutionWidth = ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH;
-        pixelUILaunchConfig.resolutionHeight = ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT;
-        Tools.App.launch(new ExampleMain(), pixelUILaunchConfig);
+        WgDesktopApplicationConfiguration config = new WgDesktopApplicationConfiguration();
+        config.setTitle(ExampleMainConstants.APP_TITLE);
+        config.setWindowSizeLimits(ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH,ExampleMainConstants.INTERNAL_RESOLUTION_HEIGHT,-1,-1);
+        config.useVsync(false);
+
+        new WgDesktopApplication(new ExampleMain(),config);
     }
 }

@@ -1,9 +1,10 @@
 package net.mslivo.pixelui.engine;
 
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import com.monstrous.gdx.webgpu.graphics.utils.WgFrameBuffer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 public final class TooltipFramebufferViewportSegment extends TooltipSegment {
 
-    public NestedFrameBuffer frameBuffer;
+    public XWgFrameBuffer frameBuffer;
 
 }

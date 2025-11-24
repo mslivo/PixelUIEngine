@@ -12,7 +12,12 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
+import com.github.xpenatan.webgpu.WGPUTextureFormat;
+import com.monstrous.gdx.webgpu.graphics.WgTexture;
+import com.monstrous.gdx.webgpu.graphics.g2d.WgBitmapFont;
 import net.mslivo.pixelui.rendering.ExtendedAnimation;
+import net.mslivo.pixelui.rendering.WgPixmapPacker;
+import net.mslivo.pixelui.rendering.XWgTextureAtlas;
 import net.mslivo.pixelui.utils.Tools;
 
 import java.io.*;
@@ -50,7 +55,7 @@ public final class MediaManager implements Disposable {
     private ObjectMap<CMediaAnimation, ExtendedAnimation> medias_animations = null;
     private final Queue<CMedia> loadMediaList = new Queue<>();
     private Array<CMedia> loadedMediaList = new Array<>();
-    private TextureAtlas textureAtlas = null;
+    private XWgTextureAtlas textureAtlas = null;
 
     public MediaManager() {
         unloadAndReset();
@@ -174,11 +179,11 @@ public final class MediaManager implements Disposable {
         return result;
     }
 
-    private CreateFontResult createFont(BitMapFontInformation bitMapFontInformation, CMediaFontSymbol[] symbols, CMediaFontOutline outline) {
+    private CreateFontResult createFont(WgBitMapFontInformation wgBitMapFontInformation, CMediaFontSymbol[] symbols, CMediaFontOutline outline) {
 
 
         // Load Original Texture
-        Pixmap pixmap = createTexturePixmap(bitMapFontInformation.textureFileHandle);
+        Pixmap pixmap = createTexturePixmap(wgBitMapFontInformation.textureFileHandle);
 
         // Load Symbols
         StringBuilder fntFileData = new StringBuilder();
@@ -290,7 +295,7 @@ public final class MediaManager implements Disposable {
                 fntFileData.append(String.format(FONT_FILE_DATA, FONT_CUSTOM_SYMBOL_OFFSET + symbolId,
                         xCurrent, yCurrent, symbolPixmap.getWidth(),
                         symbolPixmap.getHeight(), -1,
-                        ((bitMapFontInformation.lineHeight - 1) - symbolPixmap.getHeight()) - symbols[i].y_offset,
+                        ((wgBitMapFontInformation.lineHeight - 1) - symbolPixmap.getHeight()) - symbols[i].y_offset,
                         (symbolPixmap.getWidth() - 1) + symbols[i].x_advance
                 ));
 
@@ -327,7 +332,7 @@ public final class MediaManager implements Disposable {
 
     public boolean loadAssets(int pageWidth, int pageHeight, LoadProgress loadProgress, Texture.TextureFilter textureFilter) {
         if (loaded) return false;
-        PixmapPacker pixmapPacker = new PixmapPacker(pageWidth, pageHeight, Pixmap.Format.RGBA8888, 4, true);
+        WgPixmapPacker pixmapPacker = new WgPixmapPacker(pageWidth, pageHeight, WGPUTextureFormat.RGBA8Unorm, 4, true);
         Array<CMediaFont> fontCMediaLoadStack = new Array<>();
         Array<CMediaSprite> spriteCMediaLoadStack = new Array<>();
         Array<CMediaSound> soundCMediaLoadStack = new Array<>();
@@ -383,7 +388,7 @@ public final class MediaManager implements Disposable {
         for (int i = 0; i < fontCMediaLoadStack.size; i++) {
             CMediaFont cMediaFont = fontCMediaLoadStack.get(i);
 
-            BitMapFontInformation textureFileHandle = extractBitmapFontInformation(Tools.File.findResource(cMediaFont.file));
+            WgBitMapFontInformation textureFileHandle = extractBitmapFontInformation(Tools.File.findResource(cMediaFont.file));
             String packedFontTextureName = String.format(PACKED_FONT_NAME, cMediaFont.file, fontCount);
             CreateFontResult fontResult = createFont(textureFileHandle, cMediaFont.symbols, cMediaFont.outline);
 
@@ -396,7 +401,7 @@ public final class MediaManager implements Disposable {
                 createFontAtlasPackedName.put(cMediaFont, packedFontTextureName);
             } else {
                 // load
-                createFontFontTexture.put(cMediaFont, new Texture(fontResult.pixmap));
+                createFontFontTexture.put(cMediaFont, new WgTexture(fontResult.pixmap));
             }
 
             fontResult.pixmap.dispose();
@@ -406,7 +411,8 @@ public final class MediaManager implements Disposable {
         }
 
         // Create TextureAtlas
-        this.textureAtlas = new TextureAtlas();
+        this.textureAtlas = new XWgTextureAtlas();
+
         pixmapPacker.updateTextureAtlas(textureAtlas, textureFilter, textureFilter, false);
         pixmapPacker.dispose();
 
@@ -420,7 +426,7 @@ public final class MediaManager implements Disposable {
                         medias_images.put(cMediaImage, new TextureRegion(textureAtlas.findRegion(cMediaImage.file)));
 
                     } else {
-                        medias_images.put(cMediaImage, new TextureRegion(new Texture(Tools.File.findResource(cMediaImage.file))));
+                        medias_images.put(cMediaImage, new TextureRegion(new WgTexture(Tools.File.findResource(cMediaImage.file))));
                     }
                 }
                 case CMediaArray cMediaArray -> {
@@ -428,7 +434,7 @@ public final class MediaManager implements Disposable {
                         medias_arrays.put(cMediaArray, splitFrames(cMediaArray, textureAtlas.findRegion(cMediaArray.file), cMediaArray.frameWidth, cMediaArray.frameHeight,
                                 cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
                     } else {
-                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new Texture(Tools.File.findResource(cMediaArray.file))), cMediaArray.frameWidth, cMediaArray.frameHeight,
+                        medias_arrays.put(cMediaArray, splitFrames(cMediaArray, new TextureRegion(new WgTexture(Tools.File.findResource(cMediaArray.file))), cMediaArray.frameWidth, cMediaArray.frameHeight,
                                 cMediaArray.frameOffset, cMediaArray.frameLength).toArray(TextureRegion[]::new));
                     }
                 }
@@ -441,7 +447,7 @@ public final class MediaManager implements Disposable {
                         );
                     } else {
                         extendedAnimation = new ExtendedAnimation(cMediaAnimation.animationSpeed,
-                                splitFrames(cMediaAnimation, new TextureRegion(new Texture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
+                                splitFrames(cMediaAnimation, new TextureRegion(new WgTexture(Tools.File.findResource(cMediaAnimation.file))), cMediaAnimation.frameWidth, cMediaAnimation.frameHeight, cMediaAnimation.frameOffset, cMediaAnimation.frameLength),
                                 cMediaAnimation.playMode
                         );
                     }
@@ -466,7 +472,7 @@ public final class MediaManager implements Disposable {
                 fontTextureRegion = new TextureRegion(createFontFontTexture.get(cMediaFont));
             }
 
-            BitmapFont bitmapFont = new BitmapFont(
+            BitmapFont bitmapFont = new WgBitmapFont(
                     new FontFileHandle(Tools.File.findResource(cMediaFont.file), createFontFontFile.get(cMediaFont)),
                     fontTextureRegion);
 
@@ -501,7 +507,7 @@ public final class MediaManager implements Disposable {
     }
 
 
-    private BitMapFontInformation extractBitmapFontInformation(FileHandle fontFileHandle) {
+    private WgBitMapFontInformation extractBitmapFontInformation(FileHandle fontFileHandle) {
         boolean fileFound = false, baseFound = false;
         FileHandle textureHandle = null;
         int lineHeight = 0;
@@ -533,7 +539,7 @@ public final class MediaManager implements Disposable {
         if (!baseFound)
             throw new RuntimeException(ERROR_READ_FONT_BASE_DECRIPTOR);
 
-        return new BitMapFontInformation(textureHandle, lineHeight);
+        return new WgBitMapFontInformation(textureHandle, lineHeight);
     }
 
     private Array<TextureRegion> splitFrames(CMediaSprite cMediaSprite, TextureRegion textureRegion, int tile_width, int tile_height, int frameOffset,
@@ -736,11 +742,11 @@ public final class MediaManager implements Disposable {
         return loaded;
     }
 
-    private class BitMapFontInformation {
+    private class WgBitMapFontInformation {
         public final FileHandle textureFileHandle;
         public final int lineHeight;
 
-        public BitMapFontInformation(FileHandle textureFileHandle, int lineHeight) {
+        public WgBitMapFontInformation(FileHandle textureFileHandle, int lineHeight) {
             this.textureFileHandle = textureFileHandle;
             this.lineHeight = lineHeight;
         }

@@ -19,15 +19,6 @@
 			<groupId>com.badlogicgames.gdx</groupId>
 			<artifactId>gdx</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.badlogicgames.gdx</groupId>
-			<artifactId>gdx-backend-lwjgl3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.badlogicgames.gdx</groupId>
-			<artifactId>gdx-platform</artifactId>
-			<classifier>natives-desktop</classifier>
-		</dependency>
 
 		<!-- GDX Controller support -->
 
@@ -40,14 +31,15 @@
 			<artifactId>gdx-controllers-desktop</artifactId>
 		</dependency>
 
-		<!-- Vulkan -->
-
-		<dependency>
-			<groupId>com.github.Dgzt</groupId>
-			<artifactId>gdx-lwjgl3-angle-vulkan</artifactId>
-		</dependency>
-
-
+        <!-- GDX-WebGPU -->
+        <dependency>
+            <groupId>io.github.monstroussoftware.gdx-webgpu</groupId>
+            <artifactId>gdx-webgpu</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.monstroussoftware.gdx-webgpu</groupId>
+            <artifactId>backend-desktop</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>

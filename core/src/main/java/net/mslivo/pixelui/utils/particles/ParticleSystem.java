@@ -11,7 +11,7 @@ import net.mslivo.pixelui.utils.particles.particles.Particle;
 import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
-public sealed abstract class ParticleSystem<T> implements Disposable permits PrimitiveParticleSystem, SpriteParticleSystem  {
+public sealed abstract class ParticleSystem<T> implements Disposable permits  SpriteParticleSystem  {
     protected Class<T> dataClass;
     protected int maxParticles;
     protected int numParticles;

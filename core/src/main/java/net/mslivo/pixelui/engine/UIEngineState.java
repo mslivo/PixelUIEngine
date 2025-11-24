@@ -7,13 +7,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.monstrous.gdx.webgpu.graphics.g2d.WgSpriteBatch;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
-import net.mslivo.pixelui.engine.constants.TileSize;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.rendering.PrimitiveRenderer;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.theme.UIEngineTheme;
 
@@ -32,22 +31,22 @@ public final class UIEngineState {
     /* #################### Graphics: App #################### */
 
     public OrthographicCamera camera_app;
-    public NestedFrameBuffer frameBuffer_app;
+    public XWgFrameBuffer frameBuffer_app;
 
     /* #################### Graphics: GUI #################### */
-    public SpriteRenderer spriteRenderer_ui;
-    public PrimitiveRenderer primitiveRenderer_ui;
+    public WgSpriteRenderer spriteRenderer_ui;
+    //public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
-    public NestedFrameBuffer frameBufferComponent_ui;
-    public NestedFrameBuffer frameBufferModal_ui;
+    public XWgFrameBuffer frameBufferComponent_ui;
+    public XWgFrameBuffer frameBufferModal_ui;
 
     /* #################### Graphics: Composite #################### */
-    public NestedFrameBuffer frameBuffer_composite;
+    public XWgFrameBuffer frameBuffer_composite;
 
     /* #################### Graphics: Screen #################### */
     public OrthographicCamera camera_screen;
     public int upScaleFactor_screen;
-    public NestedFrameBuffer frameBuffer_upScaled_screen;
+    public XWgFrameBuffer frameBuffer_upScaled_screen;
     public Viewport viewport_screen;
 
     /* #################### UI: Added Elements #################### */

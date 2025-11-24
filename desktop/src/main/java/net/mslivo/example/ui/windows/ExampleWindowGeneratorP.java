@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.github.xpenatan.webgpu.WGPUTextureFormat;
 import net.mslivo.pixelui.engine.*;
 import net.mslivo.pixelui.engine.actions.*;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
@@ -16,9 +17,10 @@ import net.mslivo.pixelui.media.CMediaArray;
 import net.mslivo.pixelui.media.CMediaImage;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -410,14 +412,14 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
         });
 
-        NestedFrameBuffer nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, 32, 32);
+        XWgFrameBuffer nestedFrameBuffer = new XWgFrameBuffer( WGPUTextureFormat.RGBA8Unorm,32, 32, false);
         FrameBufferViewport frameBufferViewport = api.component.frameBufferViewport.create(24, 5, nestedFrameBuffer);
         OrthographicCamera camera2 = new OrthographicCamera(32, 32);
         camera2.setToOrtho(false, 32, 32);
         camera2.update();
 
 
-        SpriteRenderer spriteRenderer2 = new SpriteRenderer(mediaManager);
+        WgSpriteRenderer spriteRenderer2 = new WgSpriteRenderer(mediaManager);
         api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
             float deg1 = 0f;
             float deg2 = 0f;
@@ -490,13 +492,13 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         int segment_w = 8;
         int segment_h = 3;
 
-        NestedFrameBuffer tt_nestedFrameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
+        XWgFrameBuffer tt_nestedFrameBuffer = new XWgFrameBuffer(WGPUTextureFormat.RGBA8Unorm, api.tileSize().abs(segment_w), api.tileSize().abs(segment_h), false);
         OrthographicCamera tt_camera = new OrthographicCamera(api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
         tt_camera.setToOrtho(false, api.tileSize().abs(segment_w), api.tileSize().abs(segment_h));
         tt_camera.update();
 
         TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer, Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER, segment_w, segment_h);
-        SpriteRenderer tt_spriteRenderer = new SpriteRenderer(mediaManager);
+        WgSpriteRenderer tt_spriteRenderer = new WgSpriteRenderer(mediaManager);
 
 
         api.component.button.setButtonAction(imageButton4, new ButtonAction() {

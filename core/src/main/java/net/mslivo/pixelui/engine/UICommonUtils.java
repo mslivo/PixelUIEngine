@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -14,12 +13,14 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.xpenatan.webgpu.WGPUTextureFormat;
+import com.monstrous.gdx.webgpu.graphics.utils.WgFrameBuffer;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.rendering.PixelPerfectViewport;
 import net.mslivo.pixelui.utils.Tools;
 
@@ -1284,7 +1285,7 @@ public class UICommonUtils {
         imageC.height = imageC.image != null ? mediaManager.spriteHeight(imageC.image) / uiEngineState.theme.ts.TS : 0;
     }
 
-    public void framebufferViewport_setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
+    public void framebufferViewport_setFrameBuffer(FrameBufferViewport frameBufferViewport, WgFrameBuffer nestedFrameBuffer) {
         frameBufferViewport.frameBuffer = nestedFrameBuffer;
         framebufferViewport_updateSize(frameBufferViewport);
     }
@@ -1353,7 +1354,7 @@ public class UICommonUtils {
         int viewportWidth = uiEngineState.theme.ts.abs(appViewPort.width);
         int viewportHeight = uiEngineState.theme.ts.abs(appViewPort.height);
         // FrameBuffer
-        appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+        appViewPort.frameBuffer = frameBuffer_createFrameBuffer(viewportWidth, viewportHeight);
         // Texture
         Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -1390,7 +1391,7 @@ public class UICommonUtils {
         }
         if (!uiEngineState.viewportMode.upscale && viewportMode.upscale) {
             uiEngineState.upScaleFactor_screen = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-            uiEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth * uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upScaleFactor_screen, false);
+            uiEngineState.frameBuffer_upScaled_screen = frameBuffer_createFrameBuffer(uiEngineState.resolutionWidth * uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upScaleFactor_screen);
             uiEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
 
@@ -1409,8 +1410,8 @@ public class UICommonUtils {
         return camera;
     }
 
-    static NestedFrameBuffer frameBuffer_createFrameBuffer(int width, int height){
-        NestedFrameBuffer frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+    static XWgFrameBuffer frameBuffer_createFrameBuffer(int width, int height){
+        XWgFrameBuffer frameBuffer = new XWgFrameBuffer(WGPUTextureFormat.RGBA8Unorm, width, height, false);
         frameBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         return frameBuffer;
     }

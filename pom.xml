@@ -9,7 +9,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<gdx.version>1.14.0</gdx.version>
-        <lwjgl3-angle-vulkan.version>1.4.0</lwjgl3-angle-vulkan.version>
+        <gdx-webgpu.version>0.7.3</gdx-webgpu.version>
 		<gdx-controllers.version>2.2.3</gdx-controllers.version>
 		<mainClass>net.mslivo.example.ExampleLauncherMain</mainClass>
 	</properties>
@@ -22,19 +22,6 @@
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx</artifactId>
 				<version>${gdx.version}</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx-backend-lwjgl3</artifactId>
-				<version>${gdx.version}</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx-platform</artifactId>
-				<version>${gdx.version}</version>
-				<classifier>natives-desktop</classifier>
 				<scope>compile</scope>
 			</dependency>
 
@@ -54,13 +41,19 @@
 			</dependency>
 
 
-			<!-- Vulkan -->
+			<!-- GDX-WebGPU -->
 
-			<dependency>
-				<groupId>com.github.Dgzt</groupId>
-				<artifactId>gdx-lwjgl3-angle-vulkan</artifactId>
-				<version>${lwjgl3-angle-vulkan.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>io.github.monstroussoftware.gdx-webgpu</groupId>
+                <artifactId>gdx-webgpu</artifactId>
+                <version>${gdx-webgpu.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.monstroussoftware.gdx-webgpu</groupId>
+                <artifactId>backend-desktop</artifactId>
+                <version>${gdx-webgpu.version}</version>
+            </dependency>
 
 		</dependencies>
 	</dependencyManagement>

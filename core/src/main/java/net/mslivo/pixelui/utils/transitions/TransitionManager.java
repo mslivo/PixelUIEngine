@@ -7,18 +7,21 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.xpenatan.webgpu.WGPUTextureFormat;
+import com.monstrous.gdx.webgpu.application.WebGPUApplication;
+import com.monstrous.gdx.webgpu.graphics.utils.WgFrameBuffer;
 import net.mslivo.pixelui.engine.UIEngine;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PixelPerfectViewport;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 public class TransitionManager implements Disposable {
     private static final String ERROR_FROM_TO_NULL = "\"from\" and \"to\" are both null";
 
-    private NestedFrameBuffer frameBuffer_from;
+    private XWgFrameBuffer frameBuffer_from;
     private TextureRegion texture_from;
-    private NestedFrameBuffer frameBuffer_to;
+    private XWgFrameBuffer frameBuffer_to;
     private TextureRegion texture_to;
     private SpriteRenderer spriteRenderer_screen;
     private Viewport viewport_screen;
@@ -49,12 +52,12 @@ public class TransitionManager implements Disposable {
         this.viewportMode = transitionViewPortMode(from, to);
         this.transition = transition;
 
-        this.frameBuffer_from = new NestedFrameBuffer(Pixmap.Format.RGBA8888, this.resolutionWidth, this.resolutionHeight, false);
+        this.frameBuffer_from = new XWgFrameBuffer(WGPUTextureFormat.RGBA8Unorm, this.resolutionWidth, this.resolutionHeight, false);
         this.frameBuffer_from.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.texture_from = new TextureRegion(this.frameBuffer_from.getColorBufferTexture());
         this.texture_from.flip(false, true);
 
-        this.frameBuffer_to = new NestedFrameBuffer(Pixmap.Format.RGBA8888, this.resolutionWidth, this.resolutionHeight, false);
+        this.frameBuffer_to = new XWgFrameBuffer(WGPUTextureFormat.RGBA8Unorm, this.resolutionWidth, this.resolutionHeight, false);
         this.frameBuffer_to.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.texture_to = new TextureRegion(this.frameBuffer_to.getColorBufferTexture());
         this.texture_to.flip(false, true);
@@ -111,7 +114,7 @@ public class TransitionManager implements Disposable {
         return to.getViewportMode();
     }
 
-    private void captureUIEngineFrameBuffer(UIEngine uiEngine, NestedFrameBuffer frameBuffer) {
+    private void captureUIEngineFrameBuffer(UIEngine uiEngine, WgFrameBuffer frameBuffer) {
         if (uiEngine != null) {
             uiEngine.render(true);
         }

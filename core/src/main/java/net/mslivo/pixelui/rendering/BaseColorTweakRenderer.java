@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public abstract class BaseColorTweakRenderer extends BaseRenderer {
-    public static final String COLOR_ATTRIBUTE = "a_color";
-    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+
 
     protected float tweak;
     protected float tweak_save;

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.ObjectSet;
 import net.mslivo.pixelui.engine.actions.*;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
@@ -17,10 +16,9 @@ import net.mslivo.pixelui.engine.constants.SHAPE_ROTATION;
 import net.mslivo.pixelui.engine.constants.SHAPE_TYPE;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.utils.Tools;
 
-import java.util.HashSet;
 import java.util.function.Predicate;
 
 public final class APIComponent {
@@ -101,7 +99,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY, Color.GRAY);
             int viewportWidth =  uiEngineState.theme.ts.abs(appViewPort.width);
             int viewportHeight = uiEngineState.theme.ts.abs(appViewPort.height);
-            appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
+            appViewPort.frameBuffer = uiCommonUtils.frameBuffer_createFrameBuffer(viewportWidth, viewportHeight);
             Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
             texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             appViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);
@@ -1102,15 +1100,15 @@ public final class APIComponent {
         private final FrameBufferViewportAction DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION = new FrameBufferViewportAction() {
         };
 
-        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer) {
+        public FrameBufferViewport create(int x, int y, XWgFrameBuffer nestedFrameBuffer) {
             return create(x, y, nestedFrameBuffer, null, false, false, false);
         }
 
-        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction) {
+        public FrameBufferViewport create(int x, int y, XWgFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction) {
             return create(x, y, nestedFrameBuffer, frameBufferViewportAction, false, false, false);
         }
 
-        public FrameBufferViewport create(int x, int y, NestedFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction, boolean flipX, boolean flipY, boolean stretchToSize) {
+        public FrameBufferViewport create(int x, int y, XWgFrameBuffer nestedFrameBuffer, FrameBufferViewportAction frameBufferViewportAction, boolean flipX, boolean flipY, boolean stretchToSize) {
             FrameBufferViewport frameBufferViewport = new FrameBufferViewport();
             int width = nestedFrameBuffer != null ? nestedFrameBuffer.getWidth() / uiEngineState.theme.ts.TS : 0;
             int height = nestedFrameBuffer != null ? nestedFrameBuffer.getHeight() / uiEngineState.theme.ts.TS : 0;
@@ -1139,7 +1137,7 @@ public final class APIComponent {
             frameBufferViewport.frameBufferViewportAction = frameBufferViewportAction != null ? frameBufferViewportAction : DEFAULT_FRAMEBUFFER_VIEWPORT_ACTION;
         }
 
-        public void setFrameBuffer(FrameBufferViewport frameBufferViewport, NestedFrameBuffer nestedFrameBuffer) {
+        public void setFrameBuffer(FrameBufferViewport frameBufferViewport, XWgFrameBuffer nestedFrameBuffer) {
             if (frameBufferViewport == null) return;
             uiCommonUtils.framebufferViewport_setFrameBuffer(frameBufferViewport, nestedFrameBuffer);
         }
