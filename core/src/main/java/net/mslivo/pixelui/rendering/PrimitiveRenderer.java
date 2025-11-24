@@ -81,24 +81,9 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     public void begin(int primitiveType) {
+        super.begin();
         this.setPrimitiveType(primitiveType);
-        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
         Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        Gdx.gl.glDepthMask(false);
-
-        this.shader.bind();
-
-        setupMatrices();
-
-        // Blending
-        if (this.blendingEnabled) {
-            Gdx.gl.glEnable(GL32.GL_BLEND);
-            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
-        } else {
-            Gdx.gl.glDisable(GL32.GL_BLEND);
-        }
-
-        this.drawing = true;
     }
 
     protected void setPrimitiveType(int primitiveType) {
@@ -109,9 +94,7 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     public void end() {
-        flush();
-        Gdx.gl.glDepthMask(true);
-        this.drawing = false;
+        super.end();
         Gdx.gl.glDisable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
     }
 
@@ -169,6 +152,10 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         idx += count;
     }
 
+    private boolean isVertexBufferLimitReached() {
+        return this.idx >= this.sizeMaxVertexesFloats;
+    }
+
     public void flush() {
         if (idx == 0) return;
 
@@ -208,9 +195,8 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (this.idx >= this.sizeMaxVertexesFloats) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
 
         vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,this.color,this.tweak);
 
@@ -220,9 +206,9 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (this.idx >= this.sizeMaxVertexesFloats) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
+
 
         vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
 
@@ -240,9 +226,9 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (this.idx >= this.sizeMaxVertexesFloats) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
+
 
         vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
 

@@ -146,29 +146,12 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
     }
 
     public void begin() {
-        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
-        Gdx.gl.glDepthMask(false);
-
-        this.shader.bind();
-
-        setupMatrices();
-
-        // Blending
-        if (this.blendingEnabled) {
-            Gdx.gl.glEnable(GL32.GL_BLEND);
-            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
-        } else {
-            Gdx.gl.glDisable(GL32.GL_BLEND);
-        }
-
-        this.drawing = true;
+        super.begin();
     }
 
 
     public void end() {
-        flush();
-        Gdx.gl.glDepthMask(true);
-        this.drawing = false;
+        super.end();
         lastTexture = null;
         this.nextSamplerTextureUnit = 1;
     }
