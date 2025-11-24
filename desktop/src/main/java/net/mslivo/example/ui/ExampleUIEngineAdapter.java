@@ -68,9 +68,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.animation_timer = 0;
         this.spriteRendererDefault = new SpriteRenderer(mediaManager);
         this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
-        this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
-        this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
         api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
@@ -181,9 +179,10 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.end();
 
-        primitiveRenderer.setColorReset();
 
         if (IM_PERFORMANCE_TEST) {
+
+            primitiveRenderer.saveState();
 
             primitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.nanoTime();
@@ -238,7 +237,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(55, 80);
         primitiveRenderer.setVertexColor(Color.GREEN);
         primitiveRenderer.vertex(60, 70);
-        primitiveRenderer.setTweakReset();
+
+        primitiveRenderer.setVertexColor(Color.MAGENTA);
         primitiveRenderer.vertex(50 + 15, 70);
         primitiveRenderer.vertex(55 + 15, 80);
         primitiveRenderer.vertex(60 + 15, 70);
@@ -283,7 +283,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.drawCMediaFont(api.theme().UI_FONT, 4, 280, "Text[#ff00ff]Text2");
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.loadState();
         spriteRenderer.end();
 
 
@@ -307,11 +307,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             spriteRenderer.drawCMediaImage(api.theme().UI_PIXEL, 400, 200, 10, 10);
 
 
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
             spriteRenderer.end();
 
 
-            System.out.println("sprites:"+(amount*(64*64))+", rendercalls:" +spriteRenderer.getRenderCalls()+" - time: "+((System.currentTimeMillis()-time)) + "ms");
+            System.out.println("sprites:"+(amount*(64*64))+", time: "+((System.currentTimeMillis()-time)) + "ms");
 
         }
 
@@ -319,7 +319,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.begin();
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.loadState();
         spriteRenderer.setShader(shaderProgram);
         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
         //spriteRenderer.setShader(shaderProgram);

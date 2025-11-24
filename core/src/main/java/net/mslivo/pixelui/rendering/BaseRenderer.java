@@ -34,7 +34,6 @@ public abstract class BaseRenderer implements Disposable {
     protected final boolean printRenderCalls;
     protected final float[] vertices;
     protected int idx;
-
     protected final FloatBuffer vertexBuffer;
     protected final IntBuffer indexBuffer;
     protected final VertexBufferObjectWithVAO vertexBufferObject;
@@ -71,31 +70,22 @@ public abstract class BaseRenderer implements Disposable {
             throw new IllegalArgumentException("size " + sizeMaxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
         if (sizeMaxVertexes % this.vertexIndicesRatio != 0)
             throw new IllegalArgumentException("size is not multiple of ratio " + vertexIndicesRatio);
-
-
         this.tempColor = new Color(Color.CLEAR);
         this.transformMatrix = new Matrix4();
         this.combinedMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
         this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
         this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
         this.vertexBuffer.limit(this.sizeMaxVertexesFloats);
-
         this.vertices = new float[this.sizeMaxVertexesFloats];
         this.idx = 0;
-
         this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
         this.indexBuffer = this.indexBufferObject.getBuffer(true);
-
         this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
         this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
         this.blend_save = Arrays.copyOf(this.blend_reset, this.blend_reset.length);
-
         this.uniformLocationCache = new ObjectMap<>();
-
         this.defaultShader = defaultShader;
-
         this.drawing = false;
         this.blendingEnabled = true;
         setShader(defaultShader());

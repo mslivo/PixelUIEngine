@@ -8,29 +8,65 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.*;
 import net.mslivo.pixelui.media.*;
 
-public class SpriteRenderer extends BaseColorTweakRenderer {
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 
+public class SpriteRenderer implements Disposable {
+
+    public static final String PROJTRANS_UNIFORM = "u_projTrans";
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
     public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String POSITION_ATTRIBUTE = "a_position";
+
+    private static final String ERROR_END_BEGIN = ".end() must be called before begin.";
+    private static final String ERROR_BEGIN_END = ".begin() must be called before end.";
+
+    private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
     private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int VERTEXES_INDICES_RATIO = 4;
-    private static final int SPRITE_SIZE = VERTEX_SIZE * 4;
-
     public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
+
+    protected float tweak,tweak_save,tweak_reset;
+    protected float color,color_save,color_reset;
+    private int[] blend,blend_save,blend_reset;
+    private boolean blendingEnabled;
+    private final int sizeMaxVertexes;
+    private final int sizeMaxIndices;
+    private final int sizeMaxVertexesFloats;
+    private final float[] vertices;
+    private int idx;
+    private final FloatBuffer vertexBuffer;
+    private final IntBuffer indexBuffer;
+    private final VertexBufferObjectWithVAO vertexBufferObject;
+    private final IntegerIndexBufferObject indexBufferObject;
+    private final Color tempColor;
+    private final Matrix4 projectionMatrix, transformMatrix, combinedMatrix;
+    private final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache;
+    private ShaderProgram shader;
+    private ShaderProgram defaultShader;
+    private boolean drawing;
 
     private Texture lastTexture;
     private float invTexWidth, invTexHeight;
     private MediaManager mediaManager;
     private int nextSamplerTextureUnit;
 
-    @Override
-    protected ShaderProgram provideDefaultShader() {
+
+
+
+    private int primitiveType;
+
+    private ShaderProgram provideDefaultShader() {
         return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.SPRITE,"""
             // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec2 v_texCoord
             // Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec2 v_texCoord | sampler2D u_texture | vec2 u_textureSize
@@ -74,14 +110,48 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     }
 
     public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, defaultShader, printRenderCalls);
+        int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
+        if (maxVertexes > vertexAbsoluteLimit)
+            throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
+        if (maxVertexes % VERTEXES_INDICES_RATIO != 0)
+            throw new IllegalArgumentException("size is not multiple of ratio " + VERTEXES_INDICES_RATIO);
+
+        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0.0f);
+        this.tweak_save = tweak_reset;
+        this.tweak = tweak_reset;
+
+        this.color_reset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+        this.color_save = color_reset;
+        this.color = color_reset;
+
+        this.sizeMaxVertexes = maxVertexes;
+        this.sizeMaxVertexesFloats = this.sizeMaxVertexes * VERTEX_SIZE;
+        this.sizeMaxIndices = this.sizeMaxVertexes / VERTEXES_INDICES_RATIO;
+        this.tempColor = new Color(Color.CLEAR);
+        this.transformMatrix = new Matrix4();
+        this.combinedMatrix = new Matrix4();
+        this.projectionMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
+        this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
+        this.vertexBuffer.limit(this.sizeMaxVertexesFloats);
+        this.vertices = new float[this.sizeMaxVertexesFloats];
+        this.idx = 0;
+        this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
+        this.indexBuffer = this.indexBufferObject.getBuffer(true);
+        this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
+        this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
+        this.blend_save = Arrays.copyOf(this.blend_reset, this.blend_reset.length);
+        this.uniformLocationCache = new ObjectMap<>();
+        this.drawing = false;
+        this.blendingEnabled = true;
+        this.defaultShader = defaultShader != null ? defaultShader : provideDefaultShader();
+        this.shader = this.defaultShader;
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;
     }
 
-    @Override
-    protected IntegerIndexBufferObject createIndexBufferObject(int size) {
+    private IntegerIndexBufferObject createIndexBufferObject(int size) {
         int len = (size / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
         int j = 0;
         int[] indices = new int[len];
@@ -101,8 +171,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     }
 
 
-    @Override
-    protected VertexBufferObjectWithVAO createVertexBufferObject(int size) {
+    private VertexBufferObjectWithVAO createVertexBufferObject(int size) {
         return new VertexBufferObjectWithVAO(true, size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
@@ -110,32 +179,51 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
     }
 
-    @Override
     public void begin() {
-        super.setPrimitiveType(GL32.GL_TRIANGLES);
-        super.begin();
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        Gdx.gl.glDepthMask(false);
+
+        this.shader.bind();
+
+        setupMatrices();
+
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
+
+        this.drawing = true;
     }
 
-    @Override
+    private int uniformLocation(String uniform) {
+        ObjectIntMap uniformMap = uniformLocationCache.get(this.shader);
+        if (uniformMap == null) {
+            uniformMap = new ObjectIntMap<>();
+            uniformLocationCache.put(this.shader, uniformMap);
+        }
+
+        int location = uniformMap.get(uniform, -1);
+        if (location == -1) {
+            location = this.shader.getUniformLocation(uniform);
+            uniformMap.put(uniform, location);
+        }
+        return location;
+    }
+
+
     public void end() {
-        super.end();
+        flush();
+        Gdx.gl.glDepthMask(true);
+        this.drawing = false;
         lastTexture = null;
         this.nextSamplerTextureUnit = 1;
     }
 
-    @Override
-    protected int getVertexSize() {
-        return VERTEX_SIZE;
-    }
-
-    @Override
-    protected int getIndicesSize() {
-        return INDICES_SIZE;
-    }
-
-    @Override
-    protected int getVertexIndicesRatio() {
-        return VERTEXES_INDICES_RATIO;
+    private boolean isVertexBufferLimitReached() {
+        return this.idx >= this.sizeMaxVertexesFloats;
     }
 
     public void draw(final Texture texture, final float x, final float y, final float originX, final float originY, final float width, final float height, final float scaleX,
@@ -247,6 +335,16 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         vertexPush(x3, y3, color, u2, v2, tweak);
         vertexPush(x4, y4, color, u2, v, tweak);
 
+    }
+
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6) {
+        this.vertices[idx] = value1;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        idx += 6;
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final int srcX, final int srcY, final int srcWidth,
@@ -377,13 +475,13 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         count = (count / 5) * 6;
-        final int verticesLength = getSizeMaxVertexes();
+        final int verticesLength = sizeMaxVertexesFloats;
 
         int remainingVertices = verticesLength;
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferIdx();
+            remainingVertices -= this.idx;
             if (remainingVertices == 0) {
                 flush();
                 remainingVertices = verticesLength;
@@ -411,14 +509,14 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     public void drawExactly(final Texture texture, final float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        int remainingVertices = this.getSizeMaxVertexesFloats();
+        int remainingVertices = sizeMaxVertexesFloats;
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferIdx();
+            remainingVertices -= this.idx;
             if (remainingVertices == 0) {
                 flush();
-                remainingVertices = this.getSizeMaxVertexesFloats();
+                remainingVertices = sizeMaxVertexesFloats;
             }
         }
         int copyCount = Math.min(remainingVertices, count);
@@ -428,10 +526,16 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         while (count > 0) {
             offset += copyCount;
             flush();
-            copyCount = Math.min(getSizeMaxVertexes(), count);
+            copyCount = Math.min(sizeMaxVertexes, count);
             vertexPush(spriteVertices, offset, copyCount);
             count -= copyCount;
         }
+    }
+
+
+    public void vertexPush(float[] value, int offset, int count) {
+        System.arraycopy(value, offset, this.vertices, idx, count);
+        idx += count;
     }
 
     public void draw(final TextureRegion region, final float x, final float y) {
@@ -719,17 +823,37 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         vertexPush(x3, y3, color, u2, v2, tweak);
         vertexPush(x4, y4, color, u2, v, tweak);
 
-
     }
 
-    @Override
     public void flush() {
-        if (!isAnyVertexesInBuffer()) return;
+        if (idx == 0) return;
+
         lastTexture.bind();
-        super.flush();
+
+        // Bind Vertices
+        this.vertexBufferObject.setVertices(vertices, 0, idx);
+        this.vertexBufferObject.bind(this.shader);
+
+        // Bind Indices
+        final int verticesCount = (idx / VERTEX_SIZE);
+        final int indicesCount = (verticesCount / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
+
+        this.indexBuffer.position(0);
+        if (this.indexBuffer.limit() != indicesCount) {
+            this.indexBuffer.limit(indicesCount);
+            this.indexBufferObject.getBuffer(true); // Make Dirty
+        }
+        this.indexBufferObject.bind();
+
+        // Draw
+        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, indicesCount, GL32.GL_UNSIGNED_INT, 0);
+
+        // reset
+        this.indexBuffer.limit(this.sizeMaxIndices);
+        this.idx = 0;
     }
 
-    protected void switchTexture(final Texture texture) {
+    private void switchTexture(final Texture texture) {
         flush();
         lastTexture = texture;
         invTexWidth = 1.0f / texture.getWidth();
@@ -738,8 +862,25 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         shader.setUniformf(uniformLocation(TEXTURE_SIZE_UNIFORM), texture.getWidth(), texture.getHeight());
     }
 
+
+    private void setupMatrices() {
+        combinedMatrix.set(projectionMatrix).mul(transformMatrix);
+        shader.setUniformMatrix(uniformLocation(PROJTRANS_UNIFORM), combinedMatrix);
+    }
+
     public void setShader(ShaderProgram shader) {
-        super.setShader(shader);
+        ShaderProgram nextShader = shader != null ? shader : this.defaultShader;
+        if (this.shader == nextShader)
+            return;
+
+        this.shader = nextShader;
+
+        if (drawing) {
+            flush();
+            this.shader.bind();
+            setupMatrices();
+        }
+
         this.nextSamplerTextureUnit = 1;
     }
 
@@ -1020,4 +1161,185 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         this.draw(fontCache.getFont().getRegion().getTexture(), fontVertices, 0, fontCache.getVertexCount(0));
     }
 
+
+    private float colorPackedRGBA(final float red, final float green, final float blue, final float alpha) {
+        return NumberUtils.intBitsToFloat(((int) (alpha * 255) << 24 & 0xFE000000) | ((int) (blue * 255) << 16 & 0xFF0000)
+                | ((int) (green * 255) << 8 & 0xFF00) | ((int) (red * 255) & 0xFF));
+    }
+
+    public void saveState() {
+        this.color_save = this.color;
+        this.tweak_save = this.tweak;
+        System.arraycopy(this.blend, 0, this.blend_save, 0, 4);
+    }
+
+
+    public boolean isDrawing(){
+        return drawing;
+    }
+
+    public void loadState() {
+        setPackedColor(this.color_save);
+        setPackedTweak(this.tweak_save);
+        setBlendFunctionSeparate(this.blend_save[RGB_SRC], this.blend_save[RGB_DST], this.blend_save[ALPHA_SRC], this.blend_save[ALPHA_DST]);
+    }
+
+    public void setColor(Color color) {
+        this.color = colorPackedRGBA(color.r, color.g, color.b, color.a);
+    }
+
+    public void setColor(Color color, float alpha) {
+        this.color = colorPackedRGBA(color.r, color.g, color.b, alpha);
+    }
+
+    public void setColor(final float r, final float g, final float b, final float alpha) {
+        this.color = colorPackedRGBA(r, g, b, alpha);
+    }
+
+    public void setPackedColor(final float color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        Color.abgr8888ToColor(tempColor, color);
+        return tempColor;
+    }
+
+    public void setColorReset() {
+        setPackedColor(color_reset);
+    }
+
+    public float getPackedColor() {
+        return this.color;
+    }
+
+    public void setTweak(final float t1, final float t2, final float t3, final float t4) {
+        tweak = colorPackedRGBA(t1, t2, t3, t4);
+    }
+
+    public void setPackedTweak(final float tweak) {
+        this.tweak = tweak;
+    }
+
+    public float getPackedTweak() {
+        return this.tweak;
+    }
+
+    public Color getTweak() {
+        Color.abgr8888ToColor(tempColor, tweak);
+        return tempColor;
+    }
+
+    public void setTweakReset() {
+        setPackedTweak(tweak_reset);
+    }
+
+    public void setAllReset() {
+        setTweakReset();
+        setColorReset();
+        setBlendFunctionReset();
+    }
+
+    public void setColorResetValues(final float r, final float g, final float b, final float a) {
+        this.color_reset = colorPackedRGBA(r, g, b, a);
+        this.setColorReset();
+    }
+
+    public void setTweakResetValues(final float h, final float s, final float l, final float c) {
+        this.tweak_reset = colorPackedRGBA(h, s, l, c);
+        this.setTweakReset();
+    }
+
+    public void setBlendFunctionResetValuesSeparate(final int blend_rgb_src, final int blend_rgb_dst, final int blend_alpha_src, final int blend_alpha_blend) {
+        this.blend_reset[RGB_SRC] = blend_rgb_src;
+        this.blend_reset[RGB_DST] = blend_rgb_dst;
+        this.blend_reset[ALPHA_SRC] = blend_alpha_src;
+        this.blend_reset[ALPHA_DST] = blend_alpha_blend;
+        this.setBlendFunctionReset();
+    }
+
+    public void setBlendFunctionResetValues(final int blend_src, final int blend_dst) {
+        this.blend_reset[RGB_SRC] = blend_src;
+        this.blend_reset[RGB_DST] = blend_dst;
+        this.blend_reset[ALPHA_SRC] = blend_src;
+        this.blend_reset[ALPHA_DST] = blend_dst;
+        this.setBlendFunctionReset();
+    }
+
+    public void setBlendFunctionLayer() {
+        this.setBlendFunctionSeparate(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public void setBlendFunctionComposite() {
+        this.setBlendFunction(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public void setBlendFunctionReset() {
+        setBlendFunctionSeparate(blend_reset[RGB_SRC], blend_reset[RGB_DST], blend_reset[ALPHA_SRC], blend_reset[ALPHA_DST]);
+    }
+
+    public void setBlendFunction(final int srcFunc, final int dstFunc) {
+        if (this.blend[RGB_SRC] == srcFunc && this.blend[RGB_DST] == dstFunc && this.blend[ALPHA_SRC] == srcFunc && this.blend[ALPHA_DST] == dstFunc)
+            return;
+        this.blend[RGB_SRC] = srcFunc;
+        this.blend[RGB_DST] = dstFunc;
+        this.blend[ALPHA_SRC] = srcFunc;
+        this.blend[ALPHA_DST] = dstFunc;
+        if (drawing) {
+            flush();
+            Gdx.gl.glBlendFunc(srcFunc, dstFunc);
+        }
+    }
+
+    public boolean isBlendingEnabled() {
+        return this.blendingEnabled;
+    }
+
+    public void setBlendingEnabled(boolean enabled) {
+        this.blendingEnabled = enabled;
+    }
+
+    public void setBlendFunctionSeparate(final int srcFuncColor, final int dstFuncColor, final int srcFuncAlpha, final int dstFuncAlpha) {
+        if (this.blend[RGB_SRC] == srcFuncColor && this.blend[RGB_DST] == dstFuncColor && this.blend[ALPHA_SRC] == srcFuncAlpha && this.blend[ALPHA_DST] == dstFuncAlpha)
+            return;
+        this.blend[RGB_SRC] = srcFuncColor;
+        this.blend[RGB_DST] = dstFuncColor;
+        this.blend[ALPHA_SRC] = srcFuncAlpha;
+        this.blend[ALPHA_DST] = dstFuncAlpha;
+        if (drawing) {
+            flush();
+            Gdx.gl.glBlendFuncSeparate(srcFuncColor, dstFuncColor, srcFuncAlpha, dstFuncAlpha);
+        }
+    }
+
+    public int getBlendSrcFunc() {
+        return blend[RGB_SRC];
+    }
+
+    public int getBlendDstFunc() {
+        return blend[RGB_DST];
+    }
+
+    public int getBlendSrcFuncAlpha() {
+        return blend[ALPHA_SRC];
+    }
+
+    public int getBlendDstFuncAlpha() {
+        return blend[ALPHA_DST];
+    }
+
+    public void setProjectionMatrix(Matrix4 projection) {
+        if (Arrays.equals(projectionMatrix.val, projection.val)) return;
+        if (drawing) flush();
+        this.projectionMatrix.set(projection);
+        if (drawing) setupMatrices();
+    }
+
+    @Override
+    public void dispose() {
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
+        if (this.shader == this.defaultShader)
+            this.shader.dispose();
+    }
 }

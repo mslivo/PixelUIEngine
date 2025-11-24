@@ -51,9 +51,10 @@ public class PixelateTransition extends Transition {
     @Override
     public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
         if (this.fadeOut < 1f) {
+            spriteRenderer.saveState();
             spriteRenderer.setTweak(fadeOut,0f,0f,0f);
             spriteRenderer.draw(texture_from, 0, 0);
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
         }
     }
 
@@ -61,9 +62,10 @@ public class PixelateTransition extends Transition {
     public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
         if (this.fadeOut >= 1 && this.fadeIn <= 1f) {
             float color = Math.clamp(fadeIn * 0.5f, 0f, 1f);
+            spriteRenderer.saveState();
             spriteRenderer.setTweak(1f-fadeIn,0f,0f,0f);
             spriteRenderer.draw(texture_to, 0, 0);
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
         }
 
     }
