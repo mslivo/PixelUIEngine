@@ -178,6 +178,11 @@ public abstract class CommonRenderer {
         return this.tweak;
     }
 
+    public Color getColor(){
+        Color.abgr8888ToColor(this.tempColor,getPackedColor());
+        return this.tempColor;
+    }
+
     public void setTweakReset() {
         this.tweak = this.tweak_reset;
     }
