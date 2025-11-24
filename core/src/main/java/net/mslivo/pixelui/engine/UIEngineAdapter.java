@@ -21,7 +21,7 @@ public interface UIEngineAdapter extends Disposable {
             spriteRenderer.setTweak(0.5f,0f,0.45f,0.0f);
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
-            spriteRenderer.setAllReset();
+            spriteRenderer.reset();
         }else{
             spriteRenderer.draw(texture_game, 0, 0, resolutionWidth, resolutionHeight);
             spriteRenderer.draw(texture_uiComponent, 0, 0, resolutionWidth, resolutionHeight);
@@ -29,7 +29,7 @@ public interface UIEngineAdapter extends Disposable {
         spriteRenderer.draw(texture_uiModal, 0, 0, resolutionWidth, resolutionHeight);
 
         spriteRenderer.end();
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
 

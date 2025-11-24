@@ -6,12 +6,10 @@ import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.*;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 public class PrimitiveRenderer extends CommonRenderer implements Disposable {
 
@@ -20,7 +18,7 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
     public static final String POSITION_ATTRIBUTE = "a_position";
 
-    private static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
+    private static final float VERTEX_COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
     private static final int VERTEX_SIZE = 5;
     private static final int INDICES_SIZE = 1;
     private static final int VERTEXES_INDICES_RATIO = 1;
@@ -38,7 +36,7 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     private final VertexBufferObjectWithVAO vertexBufferObject;
     private final IntegerIndexBufferObject indexBufferObject;
     private final IntArray indexResets;
-    private float vertexColor,vertexColor_reset,vertexColor_save;
+    private float vertexColor,vertexColor_save;
     private int primitiveType;
 
     public PrimitiveRenderer() {
@@ -59,7 +57,7 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
             throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
         if (maxVertexes % VERTEXES_INDICES_RATIO != 0)
             throw new IllegalArgumentException("size is not multiple of ratio " + VERTEXES_INDICES_RATIO);
-        super();
+        super(defaultShader);
 
         this.sizeMaxVertexes = maxVertexes;
         this.sizeMaxVertexesFloats = this.sizeMaxVertexes * VERTEX_SIZE;
@@ -71,14 +69,10 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         this.idx = 0;
         this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
         this.indexBuffer = this.indexBufferObject.getBuffer(true);
-        this.blendingEnabled = true;
-        this.defaultShader = defaultShader != null ? defaultShader : provideDefaultShader();
-        this.shader = this.defaultShader;
 
         this.indexResets = new IntArray();
-        this.vertexColor_reset = colorPackedRGBA(0.5f,0.5f,0.5f,1f);
-        this.vertexColor_save = vertexColor_reset;
-        this.vertexColor = vertexColor_reset;
+        this.vertexColor = VERTEX_COLOR_RESET;
+        this.vertexColor_save = this.vertexColor;
         this.primitiveType = GL32.GL_POINTS;
     }
 
@@ -131,6 +125,12 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
         indexBufferObject.setIndices(indices, 0, indices.length);
 
         return indexBufferObject;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.vertexColor = VERTEX_COLOR_RESET;
     }
 
     public void primitiveRestart() {

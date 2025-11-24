@@ -2141,7 +2141,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
 
@@ -2179,9 +2178,9 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        spriteRenderer.setBlendFunctionLayer();
+
         primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        primitiveRenderer.setBlendFunctionLayer();
+
 
         spriteRenderer.begin();
 
@@ -2208,7 +2207,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         spriteRenderer.end();
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_mouseTextInput() {
@@ -2252,7 +2251,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         render_setColor(spriteRenderer, color2, textInputAlpha, false);
         spriteRenderer.drawCMediaImage(uiEngineState.theme.UI_MOUSETEXTINPUT_SELECTED, selX - 2, selY - 2);
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
@@ -2280,7 +2279,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawCursor() {
@@ -2294,7 +2293,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             spriteRenderer.drawCMediaSprite(uiEngineState.cursor, uiEngineState.cursorArrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState),
                     (uiEngineState.mouseUI.x - center_x), (uiEngineState.mouseUI.y - center_y));
         }
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
 
@@ -2445,7 +2444,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             default -> {
             }
         }
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawContextMenu() {
@@ -2495,7 +2494,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private int tooltipWidth(Tooltip tooltip) {
@@ -2586,7 +2585,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
             // Content
-            spriteRenderer.setColorReset();
+            spriteRenderer.reset();
 
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
@@ -2634,7 +2633,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                 segment_x, segment_y,
                                 width, height
                         );
-                        spriteRenderer.setColorReset();
+                        spriteRenderer.reset();
                     }
 
                 }
@@ -2643,7 +2642,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawCursorTooltip() {
@@ -2753,7 +2752,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawTopNotifications() {
@@ -2782,7 +2781,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             y = y + 1;
         }
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
 
     }
@@ -2842,7 +2841,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
@@ -3436,7 +3435,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
@@ -3467,7 +3466,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         }
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private int render_textWidth(String text) {

@@ -45,7 +45,8 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
     private MediaManager mediaManager;
     private int nextSamplerTextureUnit;
 
-    private ShaderProgram provideDefaultShader() {
+    @Override
+    protected ShaderProgram provideDefaultShader() {
         return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.SPRITE,"""
             // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec2 v_texCoord
             // Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec2 v_texCoord | sampler2D u_texture | vec2 u_textureSize
@@ -94,15 +95,12 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
             throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
         if (maxVertexes % VERTEXES_INDICES_RATIO != 0)
             throw new IllegalArgumentException("size is not multiple of ratio " + VERTEXES_INDICES_RATIO);
-        super();
+        super(defaultShader);
 
         this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0.0f);
         this.tweak_save = tweak_reset;
         this.tweak = tweak_reset;
 
-        this.color_reset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
-        this.color_save = color_reset;
-        this.color = color_reset;
 
         this.sizeMaxVertexes = maxVertexes;
         this.sizeMaxVertexesFloats = this.sizeMaxVertexes * VERTEX_SIZE;
@@ -114,13 +112,6 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
         this.idx = 0;
         this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
         this.indexBuffer = this.indexBufferObject.getBuffer(true);
-        this.blend_reset = new int[]{GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA};
-        this.blend = new int[]{this.blend_reset[RGB_SRC], this.blend_reset[RGB_DST], this.blend_reset[ALPHA_SRC], this.blend_reset[ALPHA_DST]};
-        this.blend_save = Arrays.copyOf(this.blend_reset, this.blend_reset.length);
-        this.drawing = false;
-        this.blendingEnabled = true;
-        this.defaultShader = defaultShader != null ? defaultShader : provideDefaultShader();
-        this.shader = this.defaultShader;
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;

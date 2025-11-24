@@ -68,7 +68,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.animation_timer = 0;
         this.spriteRendererDefault = new SpriteRenderer(mediaManager);
         this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
+        this.spriteRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
+        this.primitiveRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
 
         api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
@@ -219,6 +221,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(54, 50);
 
         primitiveRenderer.end();
+
 
 
 

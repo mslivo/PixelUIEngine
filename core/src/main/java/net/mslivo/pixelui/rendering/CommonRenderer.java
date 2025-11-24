@@ -33,10 +33,18 @@ public abstract class CommonRenderer {
 
     protected static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
+    private static final float COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+    private static final int[] BLEND_RESET =  new int[]{
+            GL32.GL_SRC_ALPHA,
+            GL32.GL_ONE_MINUS_SRC_ALPHA,
+            GL32.GL_ONE,
+            GL32.GL_ONE_MINUS_SRC_ALPHA
+    };
+
     // -------- State --------
-    protected float color, color_save, color_reset;
+    protected float color, color_save;
     protected float tweak, tweak_save, tweak_reset;
-    protected int[] blend, blend_save, blend_reset;
+    protected int[] blend, blend_save;
 
     protected boolean blendingEnabled = true;
 
@@ -56,30 +64,26 @@ public abstract class CommonRenderer {
     protected final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache = new ObjectMap<>();
 
     // -------- Constructor --------
-    protected CommonRenderer() {
+    protected CommonRenderer(ShaderProgram defaultShader) {
         this.projectionMatrix.setToOrtho2D(0, 0,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight()
         );
 
-        this.color_reset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
-        this.color = this.color_reset;
-        this.color_save = this.color_reset;
+        this.color = COLOR_RESET;
+        this.color_save = this.color;
 
-        this.tweak_reset = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0f);
         this.tweak = this.tweak_reset;
-        this.tweak_save = this.tweak_reset;
+        this.tweak_save = this.tweak;
 
         this.tempColor = new Color(Color.CLEAR);
 
-        this.blend_reset = new int[]{
-                GL32.GL_SRC_ALPHA,
-                GL32.GL_ONE_MINUS_SRC_ALPHA,
-                GL32.GL_ONE,
-                GL32.GL_ONE_MINUS_SRC_ALPHA
-        };
-        this.blend = Arrays.copyOf(this.blend_reset, 4);
-        this.blend_save = Arrays.copyOf(this.blend_reset, 4);
+        this.blend = Arrays.copyOf(BLEND_RESET, 4);
+        this.blend_save = Arrays.copyOf(BLEND_RESET, 4);
+
+        this.defaultShader = defaultShader != null ? defaultShader : provideDefaultShader();
+        this.shader = this.defaultShader;
     }
 
     // -------- Shader Helpers --------
@@ -96,6 +100,8 @@ public abstract class CommonRenderer {
         }
         return loc;
     }
+
+    protected abstract ShaderProgram provideDefaultShader();
 
     protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
@@ -156,13 +162,9 @@ public abstract class CommonRenderer {
         return this.color;
     }
 
-    public void setColorReset() {
-        this.color = this.color_reset;
-    }
-
-    public void setColorResetValues(float r, float g, float b, float a) {
-        this.color_reset = colorPackedRGBA(r, g, b, a);
-        this.color = this.color_reset;
+    public void setTweakReset(float t1, float t2, float t3, float t4) {
+        this.tweak_reset = colorPackedRGBA(t1, t2, t3, t4);
+        this.tweak = tweak_reset;
     }
 
     // -------- Tweaks --------
@@ -229,43 +231,14 @@ public abstract class CommonRenderer {
         }
     }
 
-    public void setBlendFunctionReset() {
-        setBlendFunctionSeparate(
-                blend_reset[RGB_SRC],
-                blend_reset[RGB_DST],
-                blend_reset[ALPHA_SRC],
-                blend_reset[ALPHA_DST]
-        );
-    }
-
-    public void setBlendFunctionResetValuesSeparate(int srcC, int dstC, int srcA, int dstA) {
-        blend_reset[RGB_SRC] = srcC;
-        blend_reset[RGB_DST] = dstC;
-        blend_reset[ALPHA_SRC] = srcA;
-        blend_reset[ALPHA_DST] = dstA;
-        setBlendFunctionReset();
-    }
-
-    public void setBlendFunctionResetValues(int src, int dst) {
-        blend_reset[RGB_SRC] = src;
-        blend_reset[RGB_DST] = dst;
-        blend_reset[ALPHA_SRC] = src;
-        blend_reset[ALPHA_DST] = dst;
-        setBlendFunctionReset();
-    }
-
-    public void setBlendFunctionLayer() {
-        this.setBlendFunctionSeparate(GL32.GL_SRC_ALPHA, GL32.GL_ONE_MINUS_SRC_ALPHA, GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
-    }
-
     public void setBlendFunctionComposite() {
         this.setBlendFunction(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    public void setAllReset(){
-        this.setColorReset();
-        this.setTweakReset();
-        this.setBlendFunctionReset();
+    public void reset(){
+        this.color = COLOR_RESET;
+        this.tweak = this.tweak_reset;
+        System.arraycopy(BLEND_RESET,0,this.blend,0,this.blend.length);
     }
 
     // -------- Matrices --------
@@ -282,8 +255,7 @@ public abstract class CommonRenderer {
         return drawing;
     }
 
-
-    protected float colorPackedRGBA(float r, float g, float b, float a) {
+    protected static float colorPackedRGBA(float r, float g, float b, float a) {
         return NumberUtils.intBitsToFloat(
                 ((int)(a * 255) << 24 & 0xFE000000) |
                         ((int)(b * 255) << 16 & 0xFF0000) |
