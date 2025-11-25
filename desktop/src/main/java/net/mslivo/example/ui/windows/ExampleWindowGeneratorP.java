@@ -17,6 +17,7 @@ import net.mslivo.pixelui.media.CMediaImage;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 import java.util.function.BiConsumer;
@@ -416,8 +417,10 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         camera2.update();
 
 
+        /*
+         TODO
         WgSpriteRenderer spriteRenderer2 = new WgSpriteRenderer(mediaManager);
-        api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
+             api.component.addUpdateAction(frameBufferViewport, new UpdateAction() {
             float deg1 = 0f;
             float deg2 = 0f;
 
@@ -436,6 +439,8 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
 
             }
         });
+
+         */
 
 
         api.window.addComponents(window, new Component[]{textBtn1, textBtn3, textBtn4, textBtn5, frameBufferViewport});
@@ -495,8 +500,8 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         tt_camera.update();
 
         TooltipFramebufferViewportSegment frameBufferSegment = api.toolTip.segment.framebuffer.create(tt_nestedFrameBuffer, Color.GRAY, Color.GRAY, SEGMENT_ALIGNMENT.CENTER, segment_w, segment_h);
+        /*TODO
         WgSpriteRenderer tt_spriteRenderer = new WgSpriteRenderer(mediaManager);
-
 
         api.component.button.setButtonAction(imageButton4, new ButtonAction() {
             @Override
@@ -539,6 +544,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
             }
         });
 
+*/
 
         Array<Component> border = api.widgets.image.createBorder(10, 4, 4, 4);
         api.window.addComponents(window, border.toArray(Component[]::new));

@@ -2,15 +2,15 @@ package net.mslivo.pixelui.utils.particles;
 
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.pixelui.media.*;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.utils.particles.particles.*;
 
 public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
 
     public interface RenderHook<T> {
-        default void renderBeforeParticle(Particle<T> particle, SpriteRenderer spriteRenderer){};
+        default void renderBeforeParticle(Particle<T> particle, WgSpriteRenderer spriteRenderer){};
 
-        default void renderAfterParticle(Particle<T> particle, SpriteRenderer spriteRenderer){};
+        default void renderAfterParticle(Particle<T> particle, WgSpriteRenderer spriteRenderer){};
 
         default boolean renderParticle(Particle<T> particle){
             return true;
@@ -33,11 +33,11 @@ public final class SpriteParticleSystem<T> extends ParticleSystem<T> {
     }
 
 
-    public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer) {
+    public void render(MediaManager mediaManager, WgSpriteRenderer spriteRenderer) {
         render(mediaManager, spriteRenderer, 0);
     }
 
-    public void render(MediaManager mediaManager, SpriteRenderer spriteRenderer, float animation_timer) {
+    public void render(MediaManager mediaManager, WgSpriteRenderer spriteRenderer, float animation_timer) {
         if (super.numParticles == 0) return;
         spriteRenderer.saveState();
         for (int i = 0; i < particles.size; i++) {

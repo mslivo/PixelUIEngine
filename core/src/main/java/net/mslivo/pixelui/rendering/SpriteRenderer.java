@@ -14,11 +14,12 @@ import net.mslivo.pixelui.media.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+/*
 public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
-    public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
+
     public static final String COLOR_ATTRIBUTE = "a_color";
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
     public static final String POSITION_ATTRIBUTE = "a_position";
@@ -1117,3 +1118,4 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
             this.shader.dispose();
     }
 }
+*/

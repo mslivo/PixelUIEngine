@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.theme.UIEngineTheme;

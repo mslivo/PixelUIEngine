@@ -1,17 +1,6 @@
 package net.mslivo.pixelui.rendering;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL32;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.NumberUtils;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.monstrous.gdx.webgpu.graphics.WgShaderProgram;
-
-import java.util.Arrays;
-
+/*
 public abstract class UIEngineRenderer {
 
     // -------- Common Constants --------
@@ -136,12 +125,14 @@ public abstract class UIEngineRenderer {
         return this.color;
     }
 
+
+    // -------- Tweaks --------
+
     public void setTweakReset(float t1, float t2, float t3, float t4) {
         this.tweak_reset = colorPackedRGBA(t1, t2, t3, t4);
         this.tweak = tweak_reset;
     }
 
-    // -------- Tweaks --------
     public void setTweak(float t1, float t2, float t3, float t4) {
         this.tweak = colorPackedRGBA(t1, t2, t3, t4);
     }
@@ -256,3 +247,4 @@ public abstract class UIEngineRenderer {
     protected abstract WgShaderProgram provideDefaultShader();
 
 }
+*/

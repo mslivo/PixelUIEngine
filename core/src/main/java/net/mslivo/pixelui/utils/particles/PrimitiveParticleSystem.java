@@ -5,7 +5,9 @@ import net.mslivo.pixelui.utils.particles.particles.EmptyParticle;
 import net.mslivo.pixelui.utils.particles.particles.Particle;
 import net.mslivo.pixelui.utils.particles.particles.PrimitiveParticle;
 
-/*public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
+/*
+TODO
+public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
     private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
 

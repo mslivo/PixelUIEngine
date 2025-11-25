@@ -1,10 +1,10 @@
 package net.mslivo.pixelui.utils.transitions.basic;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class ImmediateTransition extends Transition {
 
@@ -18,7 +18,7 @@ public class ImmediateTransition extends Transition {
     }
 
     @Override
-    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(WgSpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
 
     }
 
@@ -28,15 +28,15 @@ public class ImmediateTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(WgSpriteRenderer spriteRenderer, TextureRegion texture_from) {
     }
 
     @Override
-    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(WgSpriteRenderer spriteRenderer, TextureRegion texture_to) {
     }
 
     @Override
-    public void finished(SpriteRenderer spriteRenderer) {
+    public void finished(WgSpriteRenderer spriteRenderer) {
 
     }
 

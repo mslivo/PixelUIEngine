@@ -1,7 +1,7 @@
 package net.mslivo.pixelui.utils.transitions;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 
 public abstract class Transition {
 
@@ -19,14 +19,14 @@ public abstract class Transition {
 
     public abstract TRANSITION_RENDER_MODE getRenderMode();
 
-    public abstract void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight);
+    public abstract void init(WgSpriteRenderer spriteRenderer, int screenWidth, int screenHeight);
 
     public abstract boolean update();
 
-    public abstract void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from);
+    public abstract void renderFrom(WgSpriteRenderer spriteRenderer, TextureRegion texture_from);
 
-    public abstract void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to);
+    public abstract void renderTo(WgSpriteRenderer spriteRenderer, TextureRegion texture_to);
 
-    public abstract void finished(SpriteRenderer spriteRenderer);
+    public abstract void finished(WgSpriteRenderer spriteRenderer);
 
 }

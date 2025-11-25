@@ -3,10 +3,10 @@ package net.mslivo.pixelui.utils.transitions.basic;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class FallInTransition extends Transition {
     private float yTo;
@@ -34,7 +34,7 @@ public class FallInTransition extends Transition {
 
 
     @Override
-    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(WgSpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.yTo = screenHeight;
         this.ySpeed = 0f;
         this.screenHeight = screenHeight;
@@ -57,19 +57,19 @@ public class FallInTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(WgSpriteRenderer spriteRenderer, TextureRegion texture_from) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_from, 0, 0);
     }
 
     @Override
-    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(WgSpriteRenderer spriteRenderer, TextureRegion texture_to) {
         spriteRenderer.setColor(Color.GRAY);
         spriteRenderer.draw(texture_to, 0, MathUtils.round(yTo));
     }
 
     @Override
-    public void finished(SpriteRenderer spriteRenderer) {
+    public void finished(WgSpriteRenderer spriteRenderer) {
 
     }
 

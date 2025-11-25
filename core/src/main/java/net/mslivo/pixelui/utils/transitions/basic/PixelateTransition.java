@@ -2,12 +2,13 @@ package net.mslivo.pixelui.utils.transitions.basic;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.monstrous.gdx.webgpu.graphics.WgShaderProgram;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_RENDER_MODE;
 import net.mslivo.pixelui.utils.transitions.TRANSITION_SPEED;
 import net.mslivo.pixelui.utils.transitions.Transition;
 import net.mslivo.pixelui.rendering.ShaderParser;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 public class PixelateTransition extends Transition {
     private float fadeOut;
@@ -26,10 +27,10 @@ public class PixelateTransition extends Transition {
         return TRANSITION_RENDER_MODE.FROM_FIRST;
     }
 
-    private ShaderProgram pixelationShader = ShaderParser.parse(Tools.File.findResource("shaders/pixelui/pixelation.sprite.glsl"));
+    private WgShaderProgram pixelationShader = new WgShaderProgram(Tools.File.findResource("shaders/pixelui/pixelation.sprite.glsl"));
 
     @Override
-    public void init(SpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
+    public void init(WgSpriteRenderer spriteRenderer, int screenWidth, int screenHeight) {
         this.fadeOut = 0f;
         this.fadeIn = 0f;
         spriteRenderer.setShader(pixelationShader);
@@ -49,7 +50,7 @@ public class PixelateTransition extends Transition {
     }
 
     @Override
-    public void renderFrom(SpriteRenderer spriteRenderer, TextureRegion texture_from) {
+    public void renderFrom(WgSpriteRenderer spriteRenderer, TextureRegion texture_from) {
         if (this.fadeOut < 1f) {
             spriteRenderer.saveState();
             spriteRenderer.setTweak(fadeOut,0f,0f,0f);
@@ -59,7 +60,7 @@ public class PixelateTransition extends Transition {
     }
 
     @Override
-    public void renderTo(SpriteRenderer spriteRenderer, TextureRegion texture_to) {
+    public void renderTo(WgSpriteRenderer spriteRenderer, TextureRegion texture_to) {
         if (this.fadeOut >= 1 && this.fadeIn <= 1f) {
             float color = Math.clamp(fadeIn * 0.5f, 0f, 1f);
             spriteRenderer.saveState();
@@ -71,7 +72,7 @@ public class PixelateTransition extends Transition {
     }
 
     @Override
-    public void finished(SpriteRenderer spriteRenderer) {
+    public void finished(WgSpriteRenderer spriteRenderer) {
         spriteRenderer.setShader(null);
     }
 

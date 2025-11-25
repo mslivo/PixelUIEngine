@@ -3,15 +3,15 @@ package net.mslivo.pixelui.engine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 
 public interface UIEngineAdapter extends Disposable {
     void init(API api, MediaManager mediaManager);
     void update();
     void render(OrthographicCamera camera, AppViewport appViewPort);
 
-    default void renderComposite(OrthographicCamera camera, SpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_uiComponent, TextureRegion texture_uiModal,
+    default void renderComposite(OrthographicCamera camera, WgSpriteRenderer spriteRenderer, TextureRegion texture_game, TextureRegion texture_uiComponent, TextureRegion texture_uiModal,
                                  int resolutionWidth, int resolutionHeight, boolean modalActive) {
         spriteRenderer.setProjectionMatrix(camera.combined);
         spriteRenderer.setBlendFunctionComposite();

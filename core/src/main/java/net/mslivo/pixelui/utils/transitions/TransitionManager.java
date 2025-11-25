@@ -8,12 +8,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.xpenatan.webgpu.WGPUTextureFormat;
-import com.monstrous.gdx.webgpu.application.WebGPUApplication;
 import com.monstrous.gdx.webgpu.graphics.utils.WgFrameBuffer;
 import net.mslivo.pixelui.engine.UIEngine;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.rendering.PixelPerfectViewport;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
+import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 public class TransitionManager implements Disposable {
@@ -23,7 +22,7 @@ public class TransitionManager implements Disposable {
     private TextureRegion texture_from;
     private XWgFrameBuffer frameBuffer_to;
     private TextureRegion texture_to;
-    private SpriteRenderer spriteRenderer_screen;
+    private WgSpriteRenderer spriteRenderer_screen;
     private Viewport viewport_screen;
     private OrthographicCamera camera_screen;
     private Transition transition;
@@ -66,7 +65,7 @@ public class TransitionManager implements Disposable {
         this.camera_screen.setToOrtho(false,this.resolutionWidth, this.resolutionHeight);
         this.viewport_screen = createViewport(this.viewportMode, this.camera_screen, this.resolutionWidth, this.resolutionHeight);
 
-        this.spriteRenderer_screen = new SpriteRenderer();
+        this.spriteRenderer_screen = new WgSpriteRenderer();
         this.spriteRenderer_screen.setColor(Color.GRAY);
         this.viewport_screen.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
