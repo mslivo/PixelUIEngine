@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.SimplePrimitiveRenderer;
+import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.particles.ParticleUpdater;
 import net.mslivo.pixelui.utils.particles.PrimitiveParticleSystem;
@@ -19,7 +19,6 @@ import net.mslivo.pixelui.engine.UIEngineAdapter;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.rendering.ShaderParser;
-import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.ButtonAction;
 import net.mslivo.pixelui.engine.actions.HotKeyAction;
@@ -38,7 +37,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private boolean resetPressed;
     private SpriteRenderer spriteRenderer;
     private PrimitiveRenderer primitiveRenderer;
-    private SimplePrimitiveRenderer simplePrimitiveRenderer;
 
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
@@ -71,9 +69,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
         this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
-        this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
 
-        this.simplePrimitiveRenderer = new SimplePrimitiveRenderer();
 
         api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
@@ -236,7 +232,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         primitiveRenderer.begin(GL32.GL_TRIANGLES);
-        primitiveRenderer.setColor(Color.GRAY);
         primitiveRenderer.setVertexColor(Color.YELLOW);
         primitiveRenderer.vertex(50, 70);
         primitiveRenderer.setVertexColor(Color.BLUE);
@@ -262,7 +257,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.primitiveRestart();
 
         primitiveRenderer.setVertexColor(Color.BLUE);
-        primitiveRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
         primitiveRenderer.vertex(100, 100);
         primitiveRenderer.vertex(130, 120);
         primitiveRenderer.vertex(150, 120);
@@ -337,16 +331,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.end();
 
-        simplePrimitiveRenderer.setProjectionMatrix(camera.combined);
-        simplePrimitiveRenderer.begin(GL32.GL_TRIANGLES);
-        simplePrimitiveRenderer.setVertexColor(Color.BLUE);
-        simplePrimitiveRenderer.vertex(300,300);
-        simplePrimitiveRenderer.setVertexColor(Color.RED);
-        simplePrimitiveRenderer.vertex(380,300);
-        simplePrimitiveRenderer.setVertexColor(Color.YELLOW);
-        simplePrimitiveRenderer.vertex(340,380);
+        primitiveRenderer.setProjectionMatrix(camera.combined);
+        primitiveRenderer.begin(GL32.GL_TRIANGLES);
+        primitiveRenderer.setVertexColor(Color.BLUE);
+        primitiveRenderer.vertex(300,300);
+        primitiveRenderer.setVertexColor(Color.RED);
+        primitiveRenderer.vertex(380,300);
+        primitiveRenderer.setVertexColor(Color.YELLOW);
+        primitiveRenderer.vertex(340,380);
 
-        simplePrimitiveRenderer.end();
+        primitiveRenderer.end();
 
 
 

@@ -1,14 +1,14 @@
 package net.mslivo.pixelui.utils.particles;
 
 import com.badlogic.gdx.math.MathUtils;
+import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.utils.particles.particles.EmptyParticle;
 import net.mslivo.pixelui.utils.particles.particles.Particle;
 import net.mslivo.pixelui.utils.particles.particles.PrimitiveParticle;
-import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 
 public final class PrimitiveParticleSystem<T> extends ParticleSystem<T> {
 
-    private static final int PRIMITIVE_ADD_VERTEXES_MAX = 2;
+    private static final int PRIMITIVE_ADD_VERTEXES_MAX = 8;
 
     public interface RenderHook<T> {
         default void renderBeforeParticle(Particle<T> particle, PrimitiveRenderer primitiveRenderer){};

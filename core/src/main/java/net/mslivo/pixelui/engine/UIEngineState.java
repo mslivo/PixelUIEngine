@@ -9,11 +9,8 @@ import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.engine.constants.MOUSE_CONTROL_MODE;
-import net.mslivo.pixelui.engine.constants.TileSize;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
-import net.mslivo.pixelui.rendering.PrimitiveRenderer;
-import net.mslivo.pixelui.rendering.SimplePrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.theme.UIEngineTheme;
@@ -37,7 +34,6 @@ public final class UIEngineState {
 
     /* #################### Graphics: GUI #################### */
     public SpriteRenderer spriteRenderer_ui;
-    public PrimitiveRenderer primitiveRenderer_ui;
     public OrthographicCamera camera_ui;
     public NestedFrameBuffer frameBufferComponent_ui;
     public NestedFrameBuffer frameBufferModal_ui;

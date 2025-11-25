@@ -257,49 +257,6 @@ public class ShaderParser {
         PRIMITIVE(".primitive.glsl", """
                 
                         attribute vec4 a_position;
-                        attribute vec4 a_color;
-                        attribute vec4 a_tweak;
-                        attribute vec4 a_vertexColor;
-                
-                        varying vec4 v_color;
-                        varying vec4 v_tweak;
-                        varying vec4 v_vertexColor;
-                
-                        uniform mat4 u_projTrans;
-                
-                        #VERTEX_DECLARATIONS
-                
-                        void main() {
-                            gl_PointSize = 1.0;
-                
-                            // Get Attributes
-                            v_color = (a_color*FLOAT_CORRECTION);
-                            v_tweak = (a_tweak*FLOAT_CORRECTION);
-                            v_vertexColor = (a_vertexColor*FLOAT_CORRECTION);
-                
-                            gl_Position = u_projTrans * a_position;
-                
-                            // Custom Code
-                            #VERTEX_MAIN
-                        }
-                """,
-                """
-                        
-                            varying vec4 v_color;
-                            varying vec4 v_tweak;
-                            varying vec4 v_vertexColor;
-                        
-                            #FRAGMENT_DECLARATIONS
-                        
-                            void main() {
-                        
-                               #FRAGMENT_MAIN
-                        
-                            }
-                        """),
-        SIMPLE_PRIMITIVE(".primitive.glsl", """
-                
-                        attribute vec4 a_position;
                         attribute vec4 a_vertexColor;
                 
                         varying vec4 v_vertexColor;

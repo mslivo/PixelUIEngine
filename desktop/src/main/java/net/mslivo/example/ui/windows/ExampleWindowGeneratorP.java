@@ -9,6 +9,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import net.mslivo.pixelui.engine.*;
+import net.mslivo.pixelui.engine.Button;
+import net.mslivo.pixelui.engine.Checkbox;
+import net.mslivo.pixelui.engine.Component;
+import net.mslivo.pixelui.engine.Image;
+import net.mslivo.pixelui.engine.List;
+import net.mslivo.pixelui.engine.Scrollbar;
+import net.mslivo.pixelui.engine.TextField;
+import net.mslivo.pixelui.engine.Window;
 import net.mslivo.pixelui.engine.actions.*;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.engine.constants.*;
@@ -20,6 +28,7 @@ import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
 
+import java.awt.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -149,38 +158,28 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         Knob knobe = api.component.knob.create(4, 5, null, true);
 
         // Shape
-        Shape oval = api.component.shape.create(11, 3, 4, 4, SHAPE_TYPE.OVAL);
-        api.component.setDisabled(oval, false);
-        api.component.setColor(oval, Color.GREEN);
 
-        Shape rect = api.component.shape.create(11, 8, 2, 2, SHAPE_TYPE.RECT);
-        api.component.setColor(rect, Color.YELLOW);
 
-        Shape triangle = api.component.shape.create(14, 8, 2, 2, SHAPE_TYPE.DIAMOND, SHAPE_ROTATION.DEGREE_0);
-        api.component.setColor(triangle, Color.BLUE);
 
         ScrollbarHorizontal scrollBarHorizontalR = api.component.scrollbar.scrollbarHorizontal.create(4, 8, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color.r = scrolled;
             }
-        }, oval.color.r);
+        }, 0);
         api.component.setColor(scrollBarHorizontalR, new Color(1f, 0f, 0f, 1f));
         api.component.setColor2(scrollBarHorizontalR, new Color(0.8f, 0f, 0f, 1f));
         ScrollbarHorizontal scrollBarHorizontalG = api.component.scrollbar.scrollbarHorizontal.create(4, 10, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color.g = scrolled;
             }
-        }, oval.color.g);
+        });
         api.component.setColor(scrollBarHorizontalG, new Color(0f, 1f, 0f, 1f));
         api.component.setColor2(scrollBarHorizontalG, new Color(0f, 0.8f, 0f, 1f));
         ScrollbarHorizontal scrollBarHorizontalB = api.component.scrollbar.scrollbarHorizontal.create(4, 12, 6, new ScrollBarAction() {
             @Override
             public void onScrolled(float scrolled) {
-                oval.color.b = scrolled;
             }
-        }, oval.color.b);
+        });
 
         api.component.setColor(scrollBarHorizontalB, new Color(0f, 0f, 1f, 1f));
         api.component.setColor2(scrollBarHorizontalB, new Color(0f, 0f, 0.8f, 1f));
@@ -326,7 +325,7 @@ public class ExampleWindowGeneratorP implements WindowGenerator.P1<MediaManager>
         Array<Component> components = new Array<>(new Component[]{appViewPort, comboBox, checkBox, checkBox2,
                 modal1, modal2, modal3, modal4, soundBtn,
                 number, progressBar, pgScrollbar, notiBtn, textField, scrollBarVertical, knob, knobe, scrollBarHorizontalR,
-                scrollBarHorizontalG, scrollBarHorizontalB, oval, rect, triangle, osKeyBoardTextInput});
+                scrollBarHorizontalG, scrollBarHorizontalB,  osKeyBoardTextInput});
         api.window.addComponents(window, components.toArray(Component[]::new));
         return components;
     }

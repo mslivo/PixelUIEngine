@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 import java.util.Arrays;
 
-public abstract class UIEngineRenderer {
+abstract class CommonRenderer {
 
     // -------- Common Constants --------
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
@@ -50,7 +50,7 @@ public abstract class UIEngineRenderer {
     protected final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache = new ObjectMap<>();
 
     // -------- Constructor --------
-    protected UIEngineRenderer(ShaderProgram defaultShader) {
+    protected CommonRenderer(ShaderProgram defaultShader) {
         this.projectionMatrix.setToOrtho2D(0, 0,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight()

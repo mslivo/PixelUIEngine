@@ -30,7 +30,6 @@ public final class APIComponent {
     private final MediaManager mediaManager;
     private final UIEngineConfig uiEngineConfig;
 
-    public final APIShape shape;
     public final APIButton button;
     public final APITabbar tabbar;
     public final APIGrid grid;
@@ -52,7 +51,6 @@ public final class APIComponent {
         this.uiCommonUtils = uiCommonUtils;
         this.mediaManager = mediaManager;
         this.uiEngineConfig = uiEngineState.config;
-        this.shape = new APIShape();
         this.button = new APIButton();
         this.tabbar = new APITabbar();
         this.grid = new APIGrid();
@@ -220,38 +218,6 @@ public final class APIComponent {
         public void setProgressBarAction(Progressbar progressBar, ProgressBarAction progressBarAction) {
             if (progressBar == null) return;
             progressBar.progressBarAction = progressBarAction != null ? progressBarAction : DEFAULT_PROGRESSBAR_ACTION;
-        }
-
-    }
-
-    public final class APIShape {
-
-        APIShape() {
-        }
-
-        public final ShapeAction DEFAULT_SHAPE_ACTION = new ShapeAction() {
-        };
-
-        public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType) {
-            return create(x, y, width, height, shapeType, SHAPE_ROTATION.DEGREE_0, DEFAULT_SHAPE_ACTION);
-        }
-
-        public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation) {
-            return create(x, y, width, height, shapeType, shapeRotation, DEFAULT_SHAPE_ACTION);
-        }
-
-        public Shape create(int x, int y, int width, int height, SHAPE_TYPE shapeType, SHAPE_ROTATION shapeRotation, ShapeAction shapeAction) {
-            Shape shape = new Shape();
-            setComponentCommonInitValuesInternal(shape, x, y, width, height, Color.GRAY, Color.GRAY);
-            shape.shapeType = shapeType;
-            shape.shapeRotation = shapeRotation;
-            shape.shapeAction = shapeAction;
-            return shape;
-        }
-
-        public void setShapeType(Shape shape, SHAPE_TYPE shapeType) {
-            if (shape == null) return;
-            shape.shapeType = shapeType;
         }
 
     }

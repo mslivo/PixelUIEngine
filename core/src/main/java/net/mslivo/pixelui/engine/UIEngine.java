@@ -100,8 +100,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         // -----  GUI
         newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")));
         newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
-        newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")));
-        newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
 
 
         newUIEngineState.camera_ui = UICommonUtils.camera_createCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -2026,7 +2024,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case Text text -> text.textAction;
             case TextField textField -> textField.textFieldAction;
             case Progressbar progressbar -> progressbar.progressBarAction;
-            case Shape shape -> shape.shapeAction;
             case Knob knob -> knob.knobAction;
             case null, default -> null;
         };
@@ -2172,11 +2169,9 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void renderUIComponentLayer() {
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
 
-        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
 
 
         spriteRenderer.begin();
@@ -2842,20 +2837,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     }
 
-    private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
-        float saturation, lightness;
-        if (grayScale) {
-            saturation = 0f;
-            lightness = 0.45f;
-        } else {
-            saturation = 0.5f;
-            lightness = 0.5f;
-        }
-
-        primitiveRenderer.setColor(color, alpha);
-        primitiveRenderer.setTweak(0.5f, saturation, lightness, 0f);
-    }
-
     private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
         if (grayScale) {
@@ -2874,7 +2855,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
         final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = componentGrayScale(component);
 
@@ -3282,104 +3262,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     }
                 }
             }
-            case Shape shape -> {
-                if (shape.shapeType != null) {
-                    spriteRenderer.end();
-                    primitiveRenderer.begin(GL32.GL_TRIANGLES);
-                    render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
-                    primitiveRenderer.setVertexColor(shape.color);
-                    final int cx = uiCommonUtils.component_getAbsoluteX(shape);
-                    final int cy = uiCommonUtils.component_getAbsoluteY(shape);
-                    final int cw = TS(shape.width);
-                    final int ch = TS(shape.height);
-                    final int cw2 = cw / 2;
-                    final int ch2 = ch / 2;
-                    final int center_x = cx + cw2;
-                    final int center_y = cy + ch2;
-
-                    switch (shape.shapeType) {
-                        case RECT -> {
-                            primitiveRenderer.vertex(cx, cy);
-                            primitiveRenderer.vertex(cx + cw, cy);
-                            primitiveRenderer.vertex(cx + cw, cy + ch);
-
-                            primitiveRenderer.vertex(cx, cy);
-                            primitiveRenderer.vertex(cx, cy + ch);
-                            primitiveRenderer.vertex(cx + cw, cy + ch);
-                        }
-                        case OVAL -> {
-                            final float RES = MathUtils.PI2 / 45f;
-                            for (float ir = 0; ir <= MathUtils.PI2; ir += RES) {
-                                primitiveRenderer.vertex(center_x, center_y);
-                                primitiveRenderer.vertex(center_x + (MathUtils.cos(ir) * cw2), center_y + MathUtils.sin(ir) * ch2);
-                                primitiveRenderer.vertex(center_x + (MathUtils.cos(ir + RES) * cw2), center_y + MathUtils.sin(ir + RES) * ch2);
-                            }
-                        }
-                        case RIGHT_TRIANGLE -> {
-                            switch (shape.shapeRotation) {
-                                case DEGREE_0 -> {
-                                    primitiveRenderer.vertex(cx, cy);
-                                    primitiveRenderer.vertex(cx, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy);
-                                }
-                                case DEGREE_90 -> {
-                                    primitiveRenderer.vertex(cx, cy);
-                                    primitiveRenderer.vertex(cx, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch);
-                                }
-                                case DEGREE_180 -> {
-                                    primitiveRenderer.vertex(cx, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy);
-                                }
-                                case DEGREE_270 -> {
-                                    primitiveRenderer.vertex(cx, cy);
-                                    primitiveRenderer.vertex(cx + cw, cy);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch);
-                                }
-                            }
-                        }
-                        case ISOSCELES_TRIANGLE -> {
-                            primitiveRenderer.begin(GL32.GL_TRIANGLES);
-                            switch (shape.shapeRotation) {
-                                case DEGREE_0 -> {
-                                    primitiveRenderer.vertex(cx, cy);
-                                    primitiveRenderer.vertex(cx + cw, cy);
-                                    primitiveRenderer.vertex(cx + cw2, cy + ch);
-                                }
-                                case DEGREE_90 -> {
-                                    primitiveRenderer.vertex(cx, cy);
-                                    primitiveRenderer.vertex(cx, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch2);
-                                }
-                                case DEGREE_180 -> {
-                                    primitiveRenderer.vertex(cx + cw2, cy);
-                                    primitiveRenderer.vertex(cx, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch);
-                                }
-                                case DEGREE_270 -> {
-                                    primitiveRenderer.vertex(cx, cy + ch2);
-                                    primitiveRenderer.vertex(cx + cw, cy + ch);
-                                    primitiveRenderer.vertex(cx + cw, cy);
-                                }
-                            }
-                        }
-                        case DIAMOND -> {
-                            primitiveRenderer.vertex(cx + cw2, cy);
-                            primitiveRenderer.vertex(cx, cy + ch2);
-                            primitiveRenderer.vertex(cx + cw, cy + ch2);
-
-                            primitiveRenderer.vertex(cx + cw2, cy + ch);
-                            primitiveRenderer.vertex(cx, cy + ch2);
-                            primitiveRenderer.vertex(cx + cw, cy + ch2);
-                        }
-
-                    }
-
-                    primitiveRenderer.end();
-                    spriteRenderer.begin();
-                }
-            }
             case Progressbar progressBar -> {
                 // Background
                 for (int ix = 0; ix < progressBar.width; ix++) {
@@ -3539,7 +3421,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // Renderers
         uiEngineState.spriteRenderer_ui.dispose();
-        uiEngineState.primitiveRenderer_ui.dispose();
 
         // FrameBuffers
         for (int i = uiEngineState.appViewPorts.size - 1; i >= 0; i--) {

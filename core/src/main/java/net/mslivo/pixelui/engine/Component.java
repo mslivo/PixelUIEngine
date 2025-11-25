@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import net.mslivo.pixelui.engine.actions.common.UpdateActionSupport;
 
 public abstract sealed class Component extends UpdateActionSupport
-        permits AppViewport, Button, Checkbox, ComboBox, FrameBufferViewport, Grid, Image, Knob, List, Progressbar, Scrollbar, Shape, Tabbar, Text, TextField {
+        permits AppViewport, Button, Checkbox, ComboBox, FrameBufferViewport, Grid, Image, Knob, List, Progressbar, Scrollbar, Tabbar, Text, TextField {
     public int x, y, width, height;
     public Color color;
     public Color color2;

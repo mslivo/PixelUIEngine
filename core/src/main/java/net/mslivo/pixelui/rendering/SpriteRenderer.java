@@ -14,7 +14,7 @@ import net.mslivo.pixelui.media.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class SpriteRenderer extends UIEngineRenderer implements Disposable {
+public class SpriteRenderer extends CommonRenderer implements Disposable {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
@@ -28,7 +28,8 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int VERTEXES_INDICES_RATIO = 4;
-    public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
+    private static final int SPRITE_SIZE_VERTEXES=4;
+    public static final int MAX_VERTEXES_DEFAULT = 65532*SPRITE_SIZE_VERTEXES; // 65532 sprites
 
     private final int sizeMaxVertexes;
     private final int sizeMaxIndices;
