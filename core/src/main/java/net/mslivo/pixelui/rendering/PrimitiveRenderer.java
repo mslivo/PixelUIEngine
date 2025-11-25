@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
+/*public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     public static final String COLOR_ATTRIBUTE = "a_color";
@@ -361,3 +361,5 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
             this.shader.dispose();
     }
 }
+
+ */

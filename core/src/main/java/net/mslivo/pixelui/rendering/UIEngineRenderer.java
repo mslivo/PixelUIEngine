@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.monstrous.gdx.webgpu.graphics.WgShaderProgram;
 
 import java.util.Arrays;
 
@@ -44,15 +45,13 @@ public abstract class UIEngineRenderer {
     protected final Matrix4 combinedMatrix = new Matrix4();
 
     // -------- Shader --------
-    protected ShaderProgram shader;
-    protected ShaderProgram defaultShader;
+    protected WgShaderProgram shader;
+    protected WgShaderProgram defaultShader;
 
     protected final Color tempColor;
-    // Uniform caching per shader
-    protected final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache = new ObjectMap<>();
 
     // -------- Constructor --------
-    protected UIEngineRenderer(ShaderProgram defaultShader) {
+    protected UIEngineRenderer(WgShaderProgram specificShader) {
         this.projectionMatrix.setToOrtho2D(0, 0,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight()
@@ -75,19 +74,6 @@ public abstract class UIEngineRenderer {
     }
 
     // -------- Shader Helpers --------
-    protected int uniformLocation(String uniform) {
-        ObjectIntMap<String> map = uniformLocationCache.get(shader);
-        if (map == null) {
-            map = new ObjectIntMap<>();
-            uniformLocationCache.put(shader, map);
-        }
-        int loc = map.get(uniform, -1);
-        if (loc == -1) {
-            loc = shader.getUniformLocation(uniform);
-            map.put(uniform, loc);
-        }
-        return loc;
-    }
 
 
     protected void setupMatrices() {
@@ -267,6 +253,6 @@ public abstract class UIEngineRenderer {
     protected abstract void setBlendFunc(int srcColor, int dstColor);
     protected abstract void saveStateRenderer();
     protected abstract void loadStateRenderer();
-    protected abstract ShaderProgram provideDefaultShader();
+    protected abstract WgShaderProgram provideDefaultShader();
 
 }

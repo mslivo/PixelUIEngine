@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.github.xpenatan.webgpu.WGPUTextureFormat;
@@ -17,9 +16,7 @@ import net.mslivo.pixelui.media.CMediaArray;
 import net.mslivo.pixelui.media.CMediaImage;
 import net.mslivo.pixelui.media.CMediaSprite;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.example.ui.media.ExampleBaseMedia;
-import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 
 import java.util.function.BiConsumer;
