@@ -2,26 +2,21 @@ package net.mslivo.pixelui.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
-import com.badlogic.gdx.graphics.GL32;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Queue;
-import com.monstrous.gdx.webgpu.graphics.WgShaderProgram;
-import com.monstrous.gdx.webgpu.graphics.g2d.WgSpriteBatch;
-import net.mslivo.pixelui.engine.actions.common.CommonActions;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
+import net.mslivo.pixelui.engine.actions.common.CommonActions;
 import net.mslivo.pixelui.engine.constants.*;
-import net.mslivo.pixelui.media.CMediaArray;
-import net.mslivo.pixelui.media.CMediaImage;
-import net.mslivo.pixelui.media.CMediaSprite;
-import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.media.*;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.PrimitiveRenderer;
+import net.mslivo.pixelui.rendering.ShaderParser;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
-import net.mslivo.pixelui.rendering.WgSpriteRenderer;
-import net.mslivo.pixelui.rendering.XWgFrameBuffer;
 import net.mslivo.pixelui.theme.UIEngineTheme;
 import net.mslivo.pixelui.utils.Tools;
 
@@ -72,7 +67,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         this.mediaManager = mediaManager;
 
         // Setup State & State Utils
-        this.uiEngineState = initializeInputState(resolutionWidth, resolutionHeight, viewportMode, theme, gamePadSupport);
+        this.uiEngineState = initializeInputState(resolutionWidth, resolutionHeight, viewportMode,theme, gamePadSupport);
         this.uiCommonUtils = new UICommonUtils(this.uiEngineState, this.mediaManager);
         // Setup API
         this.api = new API(this.uiEngineState, mediaManager);
@@ -102,14 +97,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // -----  App
         newUIEngineState.camera_app = UICommonUtils.camera_createCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.frameBuffer_app = UICommonUtils.frameBuffer_createFrameBuffer(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
+        newUIEngineState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, true);
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
-        newUIEngineState.spriteRenderer_ui = new WgSpriteRenderer(this.mediaManager,8024);
-        //newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
-        //newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")));
-        //newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
+        newUIEngineState.spriteRenderer_ui = new SpriteRenderer(this.mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")));
+        newUIEngineState.spriteRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
+        newUIEngineState.primitiveRenderer_ui = new PrimitiveRenderer(ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")));
+        newUIEngineState.primitiveRenderer_ui.setTweakResetValues(0.5f, 0.5f, 0.5f, 0f);
 
 
         newUIEngineState.camera_ui = UICommonUtils.camera_createCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
@@ -121,10 +116,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         newUIEngineState.frameBuffer_composite = UICommonUtils.frameBuffer_createFrameBuffer(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         // ----- Screen
         newUIEngineState.camera_screen = UICommonUtils.camera_createCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.viewport_screen = UICommonUtils.viewport_createViewport(newUIEngineState.viewportMode, newUIEngineState.camera_screen, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
+        newUIEngineState.viewport_screen = UICommonUtils.viewport_createViewport(newUIEngineState.viewportMode,newUIEngineState.camera_screen, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         if (viewportMode.upscale) {
             newUIEngineState.upScaleFactor_screen = uiCommonUtils.viewport_determineUpscaleFactor(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-            newUIEngineState.frameBuffer_upScaled_screen = UICommonUtils.frameBuffer_createFrameBuffer(newUIEngineState.resolutionWidth * newUIEngineState.upScaleFactor_screen, newUIEngineState.resolutionHeight * newUIEngineState.upScaleFactor_screen);
+            newUIEngineState.frameBuffer_upScaled_screen = UICommonUtils.frameBuffer_createFrameBuffer( newUIEngineState.resolutionWidth * newUIEngineState.upScaleFactor_screen, newUIEngineState.resolutionHeight * newUIEngineState.upScaleFactor_screen);
             newUIEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
 
@@ -316,43 +311,43 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         int mouseScrolled = 0;
 
 
-        if (uiEngineState.currentControlMode.emulated) {
+        if(uiEngineState.currentControlMode.emulated){
             DIRECTION toDirection = DIRECTION.NONE;
             boolean moved = false;
-            if (uiEngineState.emulatedMouseDirection.x >= 1) {
+            if(uiEngineState.emulatedMouseDirection.x >= 1){
                 moved = true;
                 toDirection = DIRECTION.RIGHT;
             }
-            if (uiEngineState.emulatedMouseDirection.x <= -1) {
+            if(uiEngineState.emulatedMouseDirection.x <= -1){
                 moved = true;
                 toDirection = DIRECTION.LEFT;
             }
-            if (uiEngineState.emulatedMouseDirection.y >= 1) {
+            if(uiEngineState.emulatedMouseDirection.y >= 1){
                 moved = true;
                 toDirection = DIRECTION.DOWN;
             }
-            if (uiEngineState.emulatedMouseDirection.y <= -1) {
+            if(uiEngineState.emulatedMouseDirection.y <= -1){
                 toDirection = DIRECTION.UP;
                 moved = true;
             }
 
-            if (moved) {
+            if(moved){
                 uiEngineState.mTextInputScrollTimer++;
-                if (uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime) {
+                if(uiEngineState.mTextInputScrollTimer > uiEngineState.mTextInputScrollTime){
                     scrollDirection = toDirection;
                     uiEngineState.mTextInputScrollTime = 10;
                     uiEngineState.mTextInputScrollTimer = 0;
                 }
 
 
-            } else {
+            }else{
                 uiEngineState.mTextInputScrollTimer = 0;
                 uiEngineState.mTextInputScrollTime = 0;
             }
 
             // keep steady position
-            uiCommonUtils.emulatedMouse_setPosition(mouseTextInput.x, mouseTextInput.y);
-        } else {
+            uiCommonUtils.emulatedMouse_setPosition(mouseTextInput.x,mouseTextInput.y);
+        }else{
             int cursorDeltaX = uiEngineState.mouseUI.x - uiEngineState.mTextInputTempHardwareMousePosition.x;
             int cursorDeltaY = uiEngineState.mouseUI.y - uiEngineState.mTextInputTempHardwareMousePosition.y;
             final int SENSITIVITY = 12;
@@ -1613,7 +1608,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             // emulated: keep mouse position steady
                             amount = (-uiEngineState.emulatedMouseDirection.y * BASE_SENSITIVITY) * uiEngineState.config.component.knobSensitivity;
                             uiCommonUtils.emulatedMouse_setPositionComponent(turnedKnob);
-                        } else {
+                        }else{
                             amount = (uiEngineState.mouseDelta.y * BASE_SENSITIVITY) * uiEngineState.config.component.knobSensitivity;
                         }
                         float newValue = turnedKnob.turned + amount;
@@ -2055,7 +2050,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     public void render(boolean drawToScreen) {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         { // Draw App Layer
             // Draw Main FrameBuffer
@@ -2094,33 +2089,33 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             uiEngineState.frameBuffer_composite.end();
         }
 
-        // Draw Composite Image to Screen
-        if (drawToScreen) {
-            spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-            spriteRenderer.begin();
+            // Draw Composite Image to Screen
+            if (drawToScreen) {
+                spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+                spriteRenderer.begin();
 
-            if (uiEngineState.viewportMode.upscale) {
-                // Upscale Composite
-                uiEngineState.frameBuffer_upScaled_screen.begin();
+                if (uiEngineState.viewportMode.upscale) {
+                    // Upscale Composite
+                    uiEngineState.frameBuffer_upScaled_screen.begin();
+                    render_glClear();
+                    spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    spriteRenderer.flush();
+                    uiEngineState.frameBuffer_upScaled_screen.end();
+                }
+
                 render_glClear();
-                spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-                spriteRenderer.flush();
-                uiEngineState.frameBuffer_upScaled_screen.end();
+                uiEngineState.viewport_screen.apply();
+                spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+
+                switch (uiEngineState.viewportMode) {
+                    case STRETCH, FIT ->
+                            spriteRenderer.draw(uiEngineState.frameBuffer_upScaled_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                    case PIXEL_PERFECT ->
+                            spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
+                }
+
+                spriteRenderer.end();
             }
-
-            render_glClear();
-            uiEngineState.viewport_screen.apply();
-            spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-
-            switch (uiEngineState.viewportMode) {
-                case STRETCH, FIT ->
-                        spriteRenderer.draw(uiEngineState.frameBuffer_upScaled_screen.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-                case PIXEL_PERFECT ->
-                        spriteRenderer.draw(uiEngineState.frameBuffer_composite.getFlippedTextureRegion(), 0, 0, uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-            }
-
-            spriteRenderer.end();
-        }
 
 
     }
@@ -2143,10 +2138,9 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void renderUIModalLayer() {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        spriteRenderer.setBlendFunctionLayer();
 
         spriteRenderer.begin();
 
@@ -2180,13 +2174,13 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void renderUIComponentLayer() {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        //final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
 
         spriteRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        spriteRenderer.setBlendFunctionLayer();
-        //primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
-        //primitiveRenderer.setBlendFunctionLayer();
+
+        primitiveRenderer.setProjectionMatrix(uiEngineState.camera_ui.combined);
+
 
         spriteRenderer.begin();
 
@@ -2213,14 +2207,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         spriteRenderer.end();
 
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_mouseTextInput() {
         if (!uiCommonUtils.mouseTextInput_isOpen())
             return;
 
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final MouseTextInput mouseTextInput = uiEngineState.openMouseTextInput;
         final Color color1 = mouseTextInput.color;
         final Color color2 = mouseTextInput.color2;
@@ -2257,12 +2251,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         render_setColor(spriteRenderer, color2, textInputAlpha, false);
         spriteRenderer.drawCMediaImage(uiEngineState.theme.UI_MOUSETEXTINPUT_SELECTED, selX - 2, selY - 2);
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
     private void render_mouseTextInputCharacter(char c, int x, int y, Color color1, Color colorFont, float textInputAlpha, boolean upperCase, boolean pressed) {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final int pressedIndex = pressed ? 1 : 0;
 
         render_setColor(spriteRenderer, color1, textInputAlpha, false);
@@ -2281,17 +2275,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 spriteRenderer.drawCMediaImage(specialCharacterSprite, x, y);
             }
             default -> {
-                render_drawFont(String.valueOf(c), x + 2, y + 2, colorFont, textInputAlpha, false);
+                render_drawFont(String.valueOf(c), x + 2 , y + 2 , colorFont, textInputAlpha, false);
             }
         }
 
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawCursor() {
         if (uiCommonUtils.mouseTextInput_isOpen())
             return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.cursor != null) {
             int center_x = mediaManager.spriteWidth(uiEngineState.cursor) / 2;
@@ -2299,7 +2293,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             spriteRenderer.drawCMediaSprite(uiEngineState.cursor, uiEngineState.cursorArrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState),
                     (uiEngineState.mouseUI.x - center_x), (uiEngineState.mouseUI.y - center_y));
         }
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
 
@@ -2392,7 +2386,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void render_drawComponentTopLayer(Component component) {
         if (render_isComponentNotRendered(component)) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = componentGrayScale(component);
 
@@ -2422,10 +2416,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                             CMediaArray comboBoxCellGraphic = selected ? uiEngineState.theme.UI_COMBO_BOX_LIST_CELL_SELECTED : uiEngineState.theme.UI_COMBO_BOX_LIST_CELL;
 
                             // Cell
-                            ////spriteRenderer.saveState();
+                            spriteRenderer.saveState();
                             render_setColor(spriteRenderer, comboBoxItem.comboBoxItemAction.cellColor(), componentAlpha, componentGrayScale);
                             spriteRenderer.drawCMediaArray(comboBoxCellGraphic, index, uiCommonUtils.component_getAbsoluteX(comboBox) + TS(ix), uiCommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
-                            ////spriteRenderer.loadState();
+                            spriteRenderer.loadState();
 
                             // Cell - Underline
                             spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_COMBO_BOX_LIST, index, uiCommonUtils.component_getAbsoluteX(comboBox) + TS(ix), uiCommonUtils.component_getAbsoluteY(comboBox) - TS(iy) - TS());
@@ -2450,11 +2444,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             default -> {
             }
         }
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawContextMenu() {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.openContextMenu != null) {
 
@@ -2472,10 +2466,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     CMediaArray contextMenuCellGraphic = selected ? uiEngineState.theme.UI_CONTEXT_MENU_CELL_SELECTED : uiEngineState.theme.UI_CONTEXT_MENU_CELL;
 
                     // Cell
-                    ////spriteRenderer.saveState();
+                    spriteRenderer.saveState();
                     render_setColor(spriteRenderer, contextMenuItem.contextMenuItemAction.cellColor(), contextMenuAlpha, false);
                     spriteRenderer.drawCMediaArray(contextMenuCellGraphic, index, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS());
-                    ////spriteRenderer.loadState();
+                    spriteRenderer.loadState();
 
                     // Cell Underline
                     spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_CONTEXT_MENU, index, contextMenu.x + TS(ix), contextMenu.y - TS(iy) - TS());
@@ -2500,7 +2494,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private int tooltipWidth(Tooltip tooltip) {
@@ -2523,7 +2517,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void render_drawTooltip(int x, int y, Tooltip tooltip, float alpha) {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         // Determine Dimensions
         final int tooltip_width = tooltipWidth(tooltip);
@@ -2591,7 +2585,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
 
             // Content
-            //spriteRenderer.setColorReset();
+            spriteRenderer.reset();
 
             switch (segment) {
                 case TooltipTextSegment textSegment -> {
@@ -2639,7 +2633,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                 segment_x, segment_y,
                                 width, height
                         );
-                        //spriteRenderer.setColorReset();
+                        spriteRenderer.reset();
                     }
 
                 }
@@ -2648,14 +2642,14 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
         }
 
-        ////spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawCursorTooltip() {
         final Tooltip tooltip = uiEngineState.fadeOutTooltip != null ? uiEngineState.fadeOutTooltip : uiEngineState.tooltip;
         if (tooltip == null) return;
         if (tooltip.segments.isEmpty()) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float lineAlpha = tooltip.color_line.a * uiEngineState.tooltip_fadePct;
         final int tooltip_width = tooltipWidth(tooltip);
         if (tooltip_width == 0) return;
@@ -2734,7 +2728,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
     private void render_drawTooltipNotifications() {
         if (uiEngineState.tooltipNotifications.isEmpty()) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         for (int i = 0; i < uiEngineState.tooltipNotifications.size; i++) {
             TooltipNotification tooltipNotification = uiEngineState.tooltipNotifications.get(i);
@@ -2758,12 +2752,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        //spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private void render_drawTopNotifications() {
         if (uiEngineState.notifications.isEmpty()) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         final int width = (uiEngineState.resolutionWidth % TS() == 0) ? (uiEngineState.resolutionWidth / TS()) : ((uiEngineState.resolutionWidth / TS()) + 1);
         int y = 0;
@@ -2776,18 +2770,18 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 float fadeoutProgress = (notification.timer / (float) uiEngineState.config.notification.foldTime);
                 yOffsetSlideFade = yOffsetSlideFade + MathUtils.round(TS() * fadeoutProgress);
             }
-            //spriteRenderer.saveState();
+            spriteRenderer.saveState();
             render_setColor(spriteRenderer, notification.color, notificationAlpha, false);
             for (int ix = 0; ix < width; ix++) {
                 spriteRenderer.drawCMediaImage(uiEngineState.theme.UI_NOTIFICATION_BAR, TS(ix), uiEngineState.resolutionHeight - TS() - TS(y) + yOffsetSlideFade);
             }
-            //spriteRenderer.loadState();
+            spriteRenderer.loadState();
             int xOffset = (TS(width) / 2) - (render_textWidth(notification.text) / 2) - notification.scroll;
             render_drawFont(notification.text, xOffset, (uiEngineState.resolutionHeight - TS() - TS(y)) + 1 + yOffsetSlideFade, notification.fontColor, notificationAlpha, false);
             y = y + 1;
         }
 
-        //spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
 
     }
@@ -2802,7 +2796,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 return;
         }
 
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final float windowAlpha = window.color.a;
 
         render_setColor(spriteRenderer, window.color, windowAlpha, false);
@@ -2847,11 +2841,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        //spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
-    /*private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
+    private void render_setColor(PrimitiveRenderer primitiveRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
         if (grayScale) {
             saturation = 0f;
@@ -2863,9 +2857,9 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         primitiveRenderer.setColor(color, alpha);
         primitiveRenderer.setTweak(0.5f, saturation, lightness, 0f);
-    }*/
+    }
 
-    private void render_setColor(WgSpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
+    private void render_setColor(SpriteRenderer spriteRenderer, Color color, float alpha, boolean grayScale) {
         float saturation, lightness;
         if (grayScale) {
             saturation = 0f;
@@ -2875,15 +2869,15 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             lightness = 0.5f;
         }
 
-        spriteRenderer.setColor(color.r,color.g,color.b, alpha);
-        //spriteRenderer.setTweak(0.5f, saturation, lightness, 0.0f);
+        spriteRenderer.setColor(color, alpha);
+        spriteRenderer.setTweak(0.5f, saturation, lightness, 0.0f);
     }
 
 
     private void render_drawComponent(Component component) {
         if (render_isComponentNotRendered(component)) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        //final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final PrimitiveRenderer primitiveRenderer = uiEngineState.primitiveRenderer_ui;
         final float componentAlpha = componentAlpha(component);
         final boolean componentGrayScale = componentGrayScale(component);
 
@@ -2900,17 +2894,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
                 if (button instanceof TextButton textButton) {
                     if (textButton.text != null) {
-                        render_drawFont(textButton.text, uiCommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x, uiCommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y,
+                        render_drawFont(textButton.text, uiCommonUtils.component_getAbsoluteX(textButton) + textButton.contentOffset_x , uiCommonUtils.component_getAbsoluteY(button) + textButton.contentOffset_y ,
                                 textButton.fontColor, componentAlpha, componentGrayScale, 1, 2, -1,
                                 textButton.buttonAction.icon(), textButton.buttonAction.iconIndex(), textButton.buttonAction.iconColor(),
                                 textButton.buttonAction.iconFlipX(), textButton.buttonAction.iconFlipY());
                     }
                 } else if (button instanceof ImageButton imageButton) {
-                    //spriteRenderer.saveState();
+                    spriteRenderer.saveState();
                     render_setColor(spriteRenderer, imageButton.color2, componentAlpha, componentGrayScale);
                     if (imageButton.image != null)
-                        spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState), uiCommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x, uiCommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y);
-                    //spriteRenderer.loadState();
+                        spriteRenderer.drawCMediaSprite(imageButton.image, imageButton.arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState), uiCommonUtils.component_getAbsoluteX(imageButton) + imageButton.contentOffset_x , uiCommonUtils.component_getAbsoluteY(imageButton) + imageButton.contentOffset_y );
+                    spriteRenderer.loadState();
                 }
 
 
@@ -2958,10 +2952,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_SCROLLBAR_VERTICAL, index, uiCommonUtils.component_getAbsoluteX(scrollBarVertical), uiCommonUtils.component_getAbsoluteY(scrollBarVertical) + TS(i));
                 }
                 int buttonYOffset = MathUtils.round(scrollBarVertical.scrolled * TS(scrollBarVertical.height - 1));
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 render_setColor(spriteRenderer, scrollBarVertical.color2, componentAlpha, componentGrayScale);
                 spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_SCROLLBAR_BUTTON_VERTICAL, (scrollBarVertical.buttonPressed ? 1 : 0), uiCommonUtils.component_getAbsoluteX(scrollBarVertical), uiCommonUtils.component_getAbsoluteY(scrollBarVertical) + buttonYOffset);
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
             }
             case ScrollbarHorizontal scrollBarHorizontal -> {
                 for (int i = 0; i < scrollBarHorizontal.width; i++) {
@@ -2969,10 +2963,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_SCROLLBAR_HORIZONTAL, index, uiCommonUtils.component_getAbsoluteX(scrollBarHorizontal) + TS(i), uiCommonUtils.component_getAbsoluteY(scrollBarHorizontal));
                 }
                 int buttonXOffset = MathUtils.round(scrollBarHorizontal.scrolled * TS(scrollBarHorizontal.width - 1));
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 render_setColor(spriteRenderer, scrollBarHorizontal.color2, componentAlpha, componentGrayScale);
                 spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_SCROLLBAR_BUTTON_HORIZONAL, (scrollBarHorizontal.buttonPressed ? 1 : 0), uiCommonUtils.component_getAbsoluteX(scrollBarHorizontal) + buttonXOffset, uiCommonUtils.component_getAbsoluteY(scrollBarHorizontal));
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
             }
             case List list -> {
 
@@ -3010,17 +3004,17 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                     }
 
-                    boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item, true) : (list.selectedItem == item));
+                    boolean selected = item != null && (list.multiSelect ? list.selectedItems.contains(item,true) : (list.selectedItem == item));
 
                     // Cell
-                    //spriteRenderer.saveState();
+                    spriteRenderer.saveState();
                     Color cellColor = item != null ? list.listAction.cellColor(item) : list.color2;
                     render_setColor(spriteRenderer, cellColor, componentAlpha, listGrayScale);
                     for (int ix = 0; ix < list.width; ix++) {
                         CMediaImage listSelectedGraphic = selected ? uiEngineState.theme.UI_LIST_CELL_SELECTED : uiEngineState.theme.UI_LIST_CELL;
                         spriteRenderer.drawCMediaImage(listSelectedGraphic, uiCommonUtils.component_getAbsoluteX(list) + TS(ix), uiCommonUtils.component_getAbsoluteY(list) + TS(itemOffsetY));
                     }
-                    //spriteRenderer.loadState();
+                    spriteRenderer.loadState();
 
                     // Cell UnderLine
                     for (int ix = 0; ix < list.width; ix++) {
@@ -3048,7 +3042,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             case ComboBox comboBox -> {
 
                 // Cell
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 Color cellColor = comboBox.selectedItem != null ? comboBox.selectedItem.comboBoxItemAction.cellColor() : comboBox.color2;
                 render_setColor(spriteRenderer, cellColor, componentAlpha, componentGrayScale);
                 for (int ix = 0; ix < comboBox.width; ix++) {
@@ -3064,7 +3058,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
 
 
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
                 // Cell Content
                 if (comboBox.selectedItem != null) {
                     render_drawFont(comboBox.selectedItem.text, uiCommonUtils.component_getAbsoluteX(comboBox), uiCommonUtils.component_getAbsoluteY(comboBox),
@@ -3091,7 +3085,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                     spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_TEXT_FIELD, index, uiCommonUtils.component_getAbsoluteX(textField) + TS(ix), uiCommonUtils.component_getAbsoluteY(textField));
                 }
 
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 render_setColor(spriteRenderer, textField.color2, componentAlpha, componentGrayScale);
                 for (int ix = 0; ix < textField.width; ix++) {
                     int index = ix == (textField.width - 1) ? 2 : (ix == 0) ? 0 : 1;
@@ -3105,7 +3099,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         spriteRenderer.drawCMediaArray(uiEngineState.theme.UI_TEXT_FIELD_CELL_VALIDATION, index, uiCommonUtils.component_getAbsoluteX(textField) + TS(ix), uiCommonUtils.component_getAbsoluteY(textField));
                     }
                 }
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
 
                 if (textField.content != null) {
                     //String contentString = textField.content.substring(textField.offset);
@@ -3130,7 +3124,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                         int drawWidth = drawTo - drawFrom;
                         if (drawWidth > 0) {
-                            //spriteRenderer.saveState();
+                            spriteRenderer.saveState();
                             render_setColor(spriteRenderer, textField.markerColor, componentAlpha, false);
 
                             int drawXFrom = uiCommonUtils.component_getAbsoluteX(textField) + drawFrom + 1;
@@ -3143,7 +3137,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                                     drawWidth, 7
                             );
 
-                            //spriteRenderer.loadState();
+                            spriteRenderer.loadState();
                         }
                     }
 
@@ -3212,11 +3206,11 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                         // Cell
                         Color cellColor = item != null ? grid.gridAction.cellColor(item) : grid.color2;
-                        //spriteRenderer.saveState();
+                        spriteRenderer.saveState();
                         render_setColor(spriteRenderer, cellColor, componentAlpha, gridGrayScale);
                         int index = grid.bigMode ? render_get16TilesCMediaIndex(ix, iy, grid.width / 2, grid.height / 2) : render_get16TilesCMediaIndex(ix, iy, grid.width, grid.height);
                         spriteRenderer.drawCMediaArray(cellGraphic, index, uiCommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), uiCommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
-                        //spriteRenderer.loadState();
+                        spriteRenderer.loadState();
 
                         // Draw Grid
                         spriteRenderer.drawCMediaArray(gridGraphic, index, uiCommonUtils.component_getAbsoluteX(grid) + (ix * tileSize), uiCommonUtils.component_getAbsoluteY(grid) + (iy * tileSize));
@@ -3293,7 +3287,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
             }
             case Shape shape -> {
                 if (shape.shapeType != null) {
-                    /*
                     spriteRenderer.end();
                     primitiveRenderer.begin(GL32.GL_TRIANGLES);
                     render_setColor(primitiveRenderer, shape.color, componentAlpha, componentGrayScale);
@@ -3388,8 +3381,6 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
                     primitiveRenderer.end();
                     spriteRenderer.begin();
-
-                     */
                 }
             }
             case Progressbar progressBar -> {
@@ -3400,7 +3391,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 }
 
                 // Bar
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 render_setColor(spriteRenderer, progressBar.color2, componentAlpha, componentGrayScale);
                 int pixels = MathUtils.round(progressBar.progress * TS(progressBar.width));
                 for (int ix = 0; ix < progressBar.width; ix++) {
@@ -3414,7 +3405,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                         }
                     }
                 }
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
 
                 if (progressBar.progressText) {
                     String percentTxt = progressBar.progressText2Decimal ? uiCommonUtils.progressBar_getProgressText2Decimal(progressBar.progress) : uiCommonUtils.progressBar_getProgressText(progressBar.progress);
@@ -3427,10 +3418,10 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
                 CMediaImage checkBoxCellGraphic = checkBox.checkBoxStyle == CHECKBOX_STYLE.CHECKBOX ? uiEngineState.theme.UI_CHECKBOX_CHECKBOX_CELL : uiEngineState.theme.UI_CHECKBOX_RADIO_CELL;
 
 
-                //spriteRenderer.saveState();
+                spriteRenderer.saveState();
                 render_setColor(spriteRenderer, checkBox.color2, componentAlpha, componentGrayScale);
                 spriteRenderer.drawCMediaImage(checkBoxCellGraphic, uiCommonUtils.component_getAbsoluteX(checkBox), uiCommonUtils.component_getAbsoluteY(checkBox));
-                //spriteRenderer.loadState();
+                spriteRenderer.loadState();
 
                 spriteRenderer.drawCMediaArray(checkBoxGraphic, (checkBox.checked ? 1 : 0), uiCommonUtils.component_getAbsoluteX(checkBox), uiCommonUtils.component_getAbsoluteY(checkBox));
 
@@ -3444,12 +3435,12 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         }
 
 
-        //spriteRenderer.setAllReset();
+        spriteRenderer.reset();
 
     }
 
     private void render_drawCursorDragAndDrop() {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
 
         if (uiEngineState.draggedGrid != null) {
             final Grid dragGrid = uiEngineState.draggedGrid;
@@ -3475,7 +3466,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         }
 
-        //spriteRenderer.setAllReset();
+        spriteRenderer.reset();
     }
 
     private int render_textWidth(String text) {
@@ -3508,28 +3499,28 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
     }
 
     private void render_drawFont(String text, int x, int y, Color color, float alpha, boolean iconGrayScale, int textXOffset, int textYOffset, int maxWidth, CMediaSprite icon, int iconIndex, Color iconColor, boolean iconFlipX, boolean iconFlipY, int textOffset, int textLength) {
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
         final BitmapFont font = mediaManager.font(uiEngineState.config.ui.font);
         final boolean withIcon = icon != null;
         if (withIcon) {
             render_drawIcon(icon, x, y, iconColor, alpha, iconGrayScale, iconIndex, false, iconFlipX, iconFlipY);
         }
 
-        //spriteRenderer.saveState();
-        spriteRenderer.setColor(Color.GRAY.r,Color.GRAY.g,Color.GRAY.r,alpha);
+        spriteRenderer.saveState();
+        spriteRenderer.setColor(Color.GRAY, alpha);
         font.setColor(color.r, color.g, color.b, 1f);
 
         if (withIcon) maxWidth -= TS();
         spriteRenderer.drawCMediaFont(uiEngineState.config.ui.font, x + (withIcon ? TS() : 0) + textXOffset, y + textYOffset, text, textOffset, textLength, false, false, maxWidth);
 
 
-        //spriteRenderer.loadState();
+        spriteRenderer.loadState();
     }
 
     private void render_drawIcon(CMediaSprite icon, int x, int y, Color color, float iconAlpha, boolean iconGrayscale, int arrayIndex, boolean bigMode, boolean flipX, boolean flipY) {
         if (icon == null) return;
-        final WgSpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
-        //spriteRenderer.saveState();
+        final SpriteRenderer spriteRenderer = uiEngineState.spriteRenderer_ui;
+        spriteRenderer.saveState();
         render_setColor(spriteRenderer, color, iconAlpha, iconGrayscale);
         int scale = bigMode ? TS2() : TS();
 
@@ -3542,7 +3533,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         spriteRenderer.drawCMediaSprite(icon, arrayIndex, uiCommonUtils.ui_getAnimationTimer(uiEngineState),
                 x + xOffset, y + yOffset, renderWidth, renderHeight, 0, 0, width, height, flipX, flipY);
-        //spriteRenderer.loadState();
+        spriteRenderer.loadState();
     }
 
     @Override
@@ -3551,7 +3542,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // Renderers
         uiEngineState.spriteRenderer_ui.dispose();
-        //uiEngineState.primitiveRenderer_ui.dispose();
+        uiEngineState.primitiveRenderer_ui.dispose();
 
         // FrameBuffers
         for (int i = uiEngineState.appViewPorts.size - 1; i >= 0; i--) {
@@ -3653,19 +3644,19 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
         return uiEngineState.gamePadSupport;
     }
 
-    public XWgFrameBuffer getFrameBufferComposite() {
+    public NestedFrameBuffer getFrameBufferComposite() {
         return uiEngineState.frameBuffer_composite;
     }
 
-    public XWgFrameBuffer getFrameBufferApp() {
+    public NestedFrameBuffer getFrameBufferApp() {
         return uiEngineState.frameBuffer_app;
     }
 
-    public XWgFrameBuffer getFrameBufferUIComponent() {
+    public NestedFrameBuffer getFrameBufferUIComponent() {
         return uiEngineState.frameBufferComponent_ui;
     }
 
-    public XWgFrameBuffer getFrameBufferUIModal() {
+    public NestedFrameBuffer getFrameBufferUIModal() {
         return uiEngineState.frameBufferModal_ui;
     }
 

@@ -8,22 +8,35 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.*;
 import net.mslivo.pixelui.media.*;
 
-public class SpriteRenderer extends BaseColorTweakRenderer {
-    public static final String COLOR_ATTRIBUTE = "a_color";
-    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+public class SpriteRenderer extends UIEngineRenderer implements Disposable {
+
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
     public static final String TEXTURE_SIZE_UNIFORM = "u_textureSize";
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String POSITION_ATTRIBUTE = "a_position";
 
     private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int VERTEXES_INDICES_RATIO = 4;
-    private static final int SPRITE_SIZE = VERTEX_SIZE * 4;
-
     public static final int MAX_VERTEXES_DEFAULT = 65532 * 4; // 65532 sprites
+
+    private final int sizeMaxVertexes;
+    private final int sizeMaxIndices;
+    private final int sizeMaxVertexesFloats;
+    private final float[] vertices;
+    private int idx;
+    private final FloatBuffer vertexBuffer;
+    private final IntBuffer indexBuffer;
+    private final VertexBufferObjectWithVAO vertexBufferObject;
+    private final IntegerIndexBufferObject indexBufferObject;
 
     private Texture lastTexture;
     private float invTexWidth, invTexHeight;
@@ -41,6 +54,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
             // END VERTEX
             
             // BEGIN FRAGMENT
+
             
             vec4 colorTintAdd(vec4 color, vec4 modColor){
                  color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
@@ -74,14 +88,34 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     }
 
     public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, defaultShader, printRenderCalls);
+        int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
+        if (maxVertexes > vertexAbsoluteLimit)
+            throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
+        if (maxVertexes % VERTEXES_INDICES_RATIO != 0)
+            throw new IllegalArgumentException("size is not multiple of ratio " + VERTEXES_INDICES_RATIO);
+        super(defaultShader);
+
+        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0.0f);
+        this.tweak_save = tweak_reset;
+        this.tweak = tweak_reset;
+
+
+        this.sizeMaxVertexes = maxVertexes;
+        this.sizeMaxVertexesFloats = this.sizeMaxVertexes * VERTEX_SIZE;
+        this.sizeMaxIndices = this.sizeMaxVertexes / VERTEXES_INDICES_RATIO;
+        this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
+        this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
+        this.vertexBuffer.limit(this.sizeMaxVertexesFloats);
+        this.vertices = new float[this.sizeMaxVertexesFloats];
+        this.idx = 0;
+        this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
+        this.indexBuffer = this.indexBufferObject.getBuffer(true);
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;
     }
 
-    @Override
-    protected IntegerIndexBufferObject createIndexBufferObject(int size) {
+    private IntegerIndexBufferObject createIndexBufferObject(int size) {
         int len = (size / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
         int j = 0;
         int[] indices = new int[len];
@@ -101,8 +135,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     }
 
 
-    @Override
-    protected VertexBufferObjectWithVAO createVertexBufferObject(int size) {
+    private VertexBufferObjectWithVAO createVertexBufferObject(int size) {
         return new VertexBufferObjectWithVAO(true, size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
@@ -110,32 +143,32 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
                 new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
     }
 
-    @Override
     public void begin() {
-        super.setPrimitiveType(GL32.GL_TRIANGLES);
-        super.begin();
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        Gdx.gl.glDepthMask(false);
+        this.shader.bind();
+        setupMatrices();
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
+        this.drawing = true;
     }
 
-    @Override
+
     public void end() {
-        super.end();
+        flush();
+        Gdx.gl.glDepthMask(true);
+        this.drawing = false;
         lastTexture = null;
         this.nextSamplerTextureUnit = 1;
     }
 
-    @Override
-    protected int getVertexSize() {
-        return VERTEX_SIZE;
-    }
-
-    @Override
-    protected int getIndicesSize() {
-        return INDICES_SIZE;
-    }
-
-    @Override
-    protected int getVertexIndicesRatio() {
-        return VERTEXES_INDICES_RATIO;
+    private boolean isVertexBufferLimitReached() {
+        return this.idx >= this.sizeMaxVertexesFloats;
     }
 
     public void draw(final Texture texture, final float x, final float y, final float originX, final float originY, final float width, final float height, final float scaleX,
@@ -247,6 +280,16 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         vertexPush(x3, y3, color, u2, v2, tweak);
         vertexPush(x4, y4, color, u2, v, tweak);
 
+    }
+
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6) {
+        this.vertices[idx] = value1;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        this.vertices[idx + 5] = value6;
+        idx += 6;
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final int srcX, final int srcY, final int srcWidth,
@@ -377,13 +420,13 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         count = (count / 5) * 6;
-        final int verticesLength = getSizeMaxVertexes();
+        final int verticesLength = sizeMaxVertexesFloats;
 
         int remainingVertices = verticesLength;
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferIdx();
+            remainingVertices -= this.idx;
             if (remainingVertices == 0) {
                 flush();
                 remainingVertices = verticesLength;
@@ -411,14 +454,14 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
     public void drawExactly(final Texture texture, final float[] spriteVertices, int offset, int count) {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        int remainingVertices = this.getSizeMaxVertexesFloats();
+        int remainingVertices = sizeMaxVertexesFloats;
         if (texture != lastTexture)
             switchTexture(texture);
         else {
-            remainingVertices -= vertexBufferIdx();
+            remainingVertices -= this.idx;
             if (remainingVertices == 0) {
                 flush();
-                remainingVertices = this.getSizeMaxVertexesFloats();
+                remainingVertices = sizeMaxVertexesFloats;
             }
         }
         int copyCount = Math.min(remainingVertices, count);
@@ -428,10 +471,16 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         while (count > 0) {
             offset += copyCount;
             flush();
-            copyCount = Math.min(getSizeMaxVertexes(), count);
+            copyCount = Math.min(sizeMaxVertexes, count);
             vertexPush(spriteVertices, offset, copyCount);
             count -= copyCount;
         }
+    }
+
+
+    public void vertexPush(float[] value, int offset, int count) {
+        System.arraycopy(value, offset, this.vertices, idx, count);
+        idx += count;
     }
 
     public void draw(final TextureRegion region, final float x, final float y) {
@@ -719,17 +768,37 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         vertexPush(x3, y3, color, u2, v2, tweak);
         vertexPush(x4, y4, color, u2, v, tweak);
 
-
     }
 
-    @Override
     public void flush() {
-        if (!isAnyVertexesInBuffer()) return;
+        if (idx == 0) return;
+
         lastTexture.bind();
-        super.flush();
+
+        // Bind Vertices
+        this.vertexBufferObject.setVertices(vertices, 0, idx);
+        this.vertexBufferObject.bind(this.shader);
+
+        // Bind Indices
+        final int verticesCount = (idx / VERTEX_SIZE);
+        final int indicesCount = (verticesCount / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
+
+        this.indexBuffer.position(0);
+        if (this.indexBuffer.limit() != indicesCount) {
+            this.indexBuffer.limit(indicesCount);
+            this.indexBufferObject.getBuffer(true); // Make Dirty
+        }
+        this.indexBufferObject.bind();
+
+        // Draw
+        Gdx.gl32.glDrawElements(GL32.GL_TRIANGLES, indicesCount, GL32.GL_UNSIGNED_INT, 0);
+
+        // reset
+        this.indexBuffer.limit(this.sizeMaxIndices);
+        this.idx = 0;
     }
 
-    protected void switchTexture(final Texture texture) {
+    private void switchTexture(final Texture texture) {
         flush();
         lastTexture = texture;
         invTexWidth = 1.0f / texture.getWidth();
@@ -738,6 +807,7 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         shader.setUniformf(uniformLocation(TEXTURE_SIZE_UNIFORM), texture.getWidth(), texture.getHeight());
     }
 
+    @Override
     public void setShader(ShaderProgram shader) {
         super.setShader(shader);
         this.nextSamplerTextureUnit = 1;
@@ -1020,4 +1090,30 @@ public class SpriteRenderer extends BaseColorTweakRenderer {
         this.draw(fontCache.getFont().getRegion().getTexture(), fontVertices, 0, fontCache.getVertexCount(0));
     }
 
+    @Override
+    protected void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
+        Gdx.gl.glBlendFuncSeparate(srcColor, dstColor,srcAlpha,dstAlpha);
+    }
+
+    @Override
+    protected void setBlendFunc(int srcColor, int dstColor) {
+        Gdx.gl.glBlendFunc(srcColor, dstColor);
+    }
+
+    @Override
+    protected void saveStateRenderer() {
+    }
+
+    @Override
+    protected void loadStateRenderer() {
+    }
+
+
+    @Override
+    public void dispose() {
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
+        if (this.shader == this.defaultShader)
+            this.shader.dispose();
+    }
 }

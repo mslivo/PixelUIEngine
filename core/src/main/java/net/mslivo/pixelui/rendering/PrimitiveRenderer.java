@@ -6,29 +6,38 @@ import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.*;
-import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.*;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-/*public class PrimitiveRenderer extends BaseColorTweakRenderer {
+public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
+    public static final String COLOR_ATTRIBUTE = "a_color";
+    public static final String TWEAK_ATTRIBUTE = "a_tweak";
+    public static final String POSITION_ATTRIBUTE = "a_position";
 
+    private static final float VERTEX_COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
     private static final int VERTEX_SIZE = 5;
     private static final int INDICES_SIZE = 1;
     private static final int VERTEXES_INDICES_RATIO = 1;
-
     public static final int MAX_VERTEXES_DEFAULT = 65534;
-
     private static final float[] DUMMY_VERTEX = new float[]{0f, 0f, 0f, 0f, 0f};
-
     private static final int PRIMITIVE_RESTART = -1;
 
+    private final int sizeMaxVertexes;
+    private final int sizeMaxIndices;
+    private final int sizeMaxVertexesFloats;
+    private final float[] vertices;
+    private int idx;
+    private final FloatBuffer vertexBuffer;
+    private final IntBuffer indexBuffer;
+    private final VertexBufferObjectWithVAO vertexBufferObject;
+    private final IntegerIndexBufferObject indexBufferObject;
     private final IntArray indexResets;
-
-    private float vertexColor;
-    private float vertexColor_reset;
-    private float vertexColor_save;
+    private float vertexColor,vertexColor_save;
+    private int primitiveType;
 
     public PrimitiveRenderer() {
         this(null, MAX_VERTEXES_DEFAULT, false);
@@ -43,11 +52,28 @@ import java.nio.IntBuffer;
     }
 
     public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
-        super(maxVertexes, defaultShader, printRenderCalls);
+        int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
+        if (maxVertexes > vertexAbsoluteLimit)
+            throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
+        if (maxVertexes % VERTEXES_INDICES_RATIO != 0)
+            throw new IllegalArgumentException("size is not multiple of ratio " + VERTEXES_INDICES_RATIO);
+        super(defaultShader);
+
+        this.sizeMaxVertexes = maxVertexes;
+        this.sizeMaxVertexesFloats = this.sizeMaxVertexes * VERTEX_SIZE;
+        this.sizeMaxIndices = this.sizeMaxVertexes / VERTEXES_INDICES_RATIO;
+        this.vertexBufferObject = createVertexBufferObject(this.sizeMaxVertexes);
+        this.vertexBuffer = this.vertexBufferObject.getBuffer(true);
+        this.vertexBuffer.limit(this.sizeMaxVertexesFloats);
+        this.vertices = new float[this.sizeMaxVertexesFloats];
+        this.idx = 0;
+        this.indexBufferObject = createIndexBufferObject(this.sizeMaxVertexes);
+        this.indexBuffer = this.indexBufferObject.getBuffer(true);
+
         this.indexResets = new IntArray();
-        this.vertexColor_reset = colorPackedRGBA(0.5f,0.5f,0.5f,1f);
-        this.vertexColor_save = vertexColor_reset;
-        this.vertexColor = vertexColor_reset;
+        this.vertexColor = VERTEX_COLOR_RESET;
+        this.vertexColor_save = this.vertexColor;
+        this.primitiveType = GL32.GL_POINTS;
     }
 
     public void begin() {
@@ -55,33 +81,38 @@ import java.nio.IntBuffer;
     }
 
     public void begin(int primitiveType) {
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        Gdx.gl.glDepthMask(false);
+        this.shader.bind();
+        setupMatrices();
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
         this.setPrimitiveType(primitiveType);
         Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        super.begin();
+        this.drawing = true;
     }
 
-    @Override
+    protected void setPrimitiveType(int primitiveType) {
+        if (primitiveType == this.primitiveType)
+            return;
+        this.flush();
+        this.primitiveType = primitiveType;
+    }
+
     public void end() {
-        super.end();
+        flush();
+        Gdx.gl.glDepthMask(true);
+        this.drawing = false;
         Gdx.gl.glDisable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
     }
 
-    @Override
-    protected int getVertexSize() {
-        return VERTEX_SIZE;
-    }
 
-    @Override
-    protected int getIndicesSize() {
-        return INDICES_SIZE;
-    }
 
-    @Override
-    protected int getVertexIndicesRatio() {
-        return VERTEXES_INDICES_RATIO;
-    }
-
-    @Override
     protected IntegerIndexBufferObject createIndexBufferObject(final int size) {
         final int[] indices = new int[size * INDICES_SIZE];
 
@@ -94,17 +125,22 @@ import java.nio.IntBuffer;
         return indexBufferObject;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        this.vertexColor = VERTEX_COLOR_RESET;
+    }
 
     public void primitiveRestart() {
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
-        if (isVertexBufferLimitReached()) {
+        if (this.idx >= sizeMaxVertexesFloats) {
             flush();
         }
 
         // Insert Restart Index
-        final int currentIndex = vertexBufferIdx() / vertexSize;
-        IntBuffer indicesBuffer = getIndexBuffer().getBuffer(true);
+        final int currentIndex = this.idx / VERTEX_SIZE;
+        IntBuffer indicesBuffer = indexBufferObject.getBuffer(true);
         indicesBuffer.put(currentIndex, PRIMITIVE_RESTART);
 
         // Insert Dummy Vertex
@@ -113,15 +149,57 @@ import java.nio.IntBuffer;
         this.indexResets.add(currentIndex);
     }
 
+    public void vertexPush(float value1, float value2, float value3, float value4, float value5) {
+        this.vertices[idx] = value1;
+        this.vertices[idx + 1] = value2;
+        this.vertices[idx + 2] = value3;
+        this.vertices[idx + 3] = value4;
+        this.vertices[idx + 4] = value5;
+        idx += 5;
+    }
+
+    public boolean isDrawing(){
+        return drawing;
+    }
+
+    public void vertexPush(float[] value, int offset, int count) {
+        System.arraycopy(value, offset, this.vertices, idx, count);
+        idx += count;
+    }
+
+    private boolean isVertexBufferLimitReached() {
+        return this.idx >= this.sizeMaxVertexesFloats;
+    }
 
     public void flush() {
-        if (!isAnyVertexesInBuffer()) return;
-        super.flush();
+        if (idx == 0) return;
+
+        // Bind Vertices
+        this.vertexBufferObject.setVertices(vertices, 0, idx);
+        this.vertexBufferObject.bind(this.shader);
+
+        // Bind Indices
+        final int verticesCount = (idx / VERTEX_SIZE);
+        final int indicesCount = (verticesCount / VERTEXES_INDICES_RATIO) * INDICES_SIZE;
+
+        this.indexBuffer.position(0);
+        if (this.indexBuffer.limit() != indicesCount) {
+            this.indexBuffer.limit(indicesCount);
+            this.indexBufferObject.getBuffer(true); // Make Dirty
+        }
+        this.indexBufferObject.bind();
+
+        // Draw
+        Gdx.gl32.glDrawElements(this.primitiveType, indicesCount, GL32.GL_UNSIGNED_INT, 0);
+
+        // reset
+        this.indexBuffer.limit(this.sizeMaxIndices);
+        this.idx = 0;
 
         if (!indexResets.isEmpty()) {
             for (int i = indexResets.size - 1; i >= 0; i--) {
                 final int resetIndex = indexResets.items[i];
-                getIndexBuffer().getBuffer(true).put(resetIndex, resetIndex);
+                indexBufferObject.getBuffer(true).put(resetIndex, resetIndex);
                 indexResets.removeIndex(i);
             }
         }
@@ -132,11 +210,10 @@ import java.nio.IntBuffer;
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexBufferLimitReached()) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
 
-        vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,super.color,super.tweak);
+        vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,this.color,this.tweak);
 
     }
 
@@ -144,19 +221,19 @@ import java.nio.IntBuffer;
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexBufferLimitReached()) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
 
-        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,super.color,super.tweak);
+
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
 
 
         // Vertex 2
-        if (isVertexBufferLimitReached()) {
+        if (this.idx >= this.sizeMaxVertexesFloats) {
             flush();
         }
 
-        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,super.color,super.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,this.color,this.tweak);
 
     }
 
@@ -164,30 +241,29 @@ import java.nio.IntBuffer;
         if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
 
         // Vertex 1
-        if (isVertexBufferLimitReached()) {
+        if (isVertexBufferLimitReached())
             flush();
-        }
 
-        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,super.color,super.tweak);
+
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
 
 
         // Vertex 2
-        if (isVertexBufferLimitReached()) {
+        if (this.idx >= this.sizeMaxVertexesFloats) {
             flush();
         }
 
-        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,super.color,super.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,this.color,this.tweak);
 
         // Vertex 3
-        if (isVertexBufferLimitReached()) {
+        if (this.idx >= this.sizeMaxVertexesFloats) {
             flush();
         }
 
-        vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor,super.color,super.tweak);
+        vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor,this.color,this.tweak);
 
     }
 
-    @Override
     protected ShaderProgram provideDefaultShader() {
         return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.PRIMITIVE,"""
             // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec4 v_vertexColor
@@ -217,7 +293,6 @@ import java.nio.IntBuffer;
     }
 
 
-    @Override
     protected VertexBufferObjectWithVAO createVertexBufferObject(final int size) {
         return new VertexBufferObjectWithVAO( true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
@@ -252,16 +327,37 @@ import java.nio.IntBuffer;
     }
 
     @Override
-    public void saveState() {
-        super.saveState();
-        this.vertexColor_save = this.vertexColor;
+    protected void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
+        Gdx.gl.glBlendFuncSeparate(srcColor, dstColor,srcAlpha,dstAlpha);
     }
 
     @Override
-    public void loadState() {
-        super.loadState();
-        setPackedVertexColor(this.vertexColor_save);
+    protected void setBlendFunc(int srcColor, int dstColor) {
+        Gdx.gl.glBlendFunc(srcColor, dstColor);
     }
 
+    @Override
+    protected void saveStateRenderer() {
+        this.vertexColor_save = this.vertexColor;
+
+    }
+
+    @Override
+    protected void loadStateRenderer() {
+        setPackedVertexColor(this.vertexColor_save);
+
+    }
+
+
+    public int getPrimitiveType() {
+        return primitiveType;
+    }
+
+    @Override
+    public void dispose() {
+        vertexBufferObject.dispose();
+        indexBufferObject.dispose();
+        if (this.shader == this.defaultShader)
+            this.shader.dispose();
+    }
 }
-*/

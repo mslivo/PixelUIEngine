@@ -49,7 +49,7 @@ public class FadeTransition extends Transition {
             spriteRenderer.setTweak(color,0.5f,0.5f,0.0f);
             spriteRenderer.setColor(color,color,color,1f);
             spriteRenderer.draw(texture_from, 0, 0);
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
         }
     }
 
@@ -60,7 +60,7 @@ public class FadeTransition extends Transition {
             spriteRenderer.setTweak(color,0.5f,0.5f,0.0f);
             spriteRenderer.setColor(color,color,color,1f);
             spriteRenderer.draw(texture_to, 0, 0);
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
         }
 
     }

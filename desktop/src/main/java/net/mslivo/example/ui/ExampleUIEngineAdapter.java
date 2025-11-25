@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.pixelui.media.MediaManager;
-import net.mslivo.pixelui.rendering.WgSpriteRenderer;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.particles.ParticleUpdater;
+import net.mslivo.pixelui.utils.particles.PrimitiveParticleSystem;
 import net.mslivo.pixelui.utils.particles.SpriteParticleSystem;
 import net.mslivo.pixelui.utils.particles.particles.Particle;
 import net.mslivo.pixelui.engine.API;
@@ -18,6 +18,7 @@ import net.mslivo.pixelui.engine.UIEngineAdapter;
 import net.mslivo.pixelui.engine.constants.BUTTON_MODE;
 import net.mslivo.pixelui.engine.constants.KeyCode;
 import net.mslivo.pixelui.rendering.ShaderParser;
+import net.mslivo.pixelui.rendering.PrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.ButtonAction;
 import net.mslivo.pixelui.engine.actions.HotKeyAction;
@@ -34,7 +35,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private MediaManager mediaManager;
     private float animation_timer;
     private boolean resetPressed;
+    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRendererDefault;
+    private PrimitiveRenderer primitiveRenderer;
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
+    private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
 
 
     public static class ParticleDataInner {
@@ -61,9 +66,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        //this.spriteRendererDefault = new SpriteRenderer(mediaManager);
-        //this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/legacy/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
-        //this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
+        this.spriteRendererDefault = new SpriteRenderer(mediaManager);
+        this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
+        this.spriteRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
+        this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
+        this.primitiveRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
 
         api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
@@ -130,7 +137,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         //api.config.ui.font = UIEngineBaseMedia_8x8.UI_FONT_SMALL;
 
         this.spriteParticleSystem = new SpriteParticleSystem<>(ParticleDataInner.class, particleUpdater);
-        //this.primitiveParticleSystem = new PrimitiveParticleSystem<>(ParticleDataInner.class, particleUpdater);
+        this.primitiveParticleSystem = new PrimitiveParticleSystem<>(ParticleDataInner.class, particleUpdater);
     }
 
     @Override
@@ -140,18 +147,16 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         if (Tools.Calc.randomChance(30)) {
             spriteParticleSystem.addImageParticle(api.theme().UI_CURSOR_ARROW, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight());
-            /*primitiveParticleSystem.addPrimitiveParticle(GL32.GL_LINES, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight(),
+            primitiveParticleSystem.addPrimitiveParticle(GL32.GL_LINES, MathUtils.random(0, api.resolutionWidth()), api.resolutionHeight(),
                     MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f,
                     MathUtils.random(-5, 5), 10,
                     MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), MathUtils.random(0f, 1f), 1f
 
             );
-
-             */
         }
 
         spriteParticleSystem.updateParallel();
-        //primitiveParticleSystem.updateParallel();
+        primitiveParticleSystem.updateParallel();
     }
 
 
@@ -160,7 +165,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         animation_timer += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL32.GL_COLOR_BUFFER_BIT);
 
-        /*
         // Draw app based on data
         spriteRenderer.setProjectionMatrix(camera.combined);
 
@@ -177,9 +181,10 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.end();
 
-        primitiveRenderer.setColorReset();
 
         if (IM_PERFORMANCE_TEST) {
+
+            primitiveRenderer.saveState();
 
             primitiveRenderer.setProjectionMatrix(camera.combined);
             long time = System.nanoTime();
@@ -219,6 +224,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
 
+
         primitiveRenderer.begin(GL32.GL_LINES);
         primitiveRenderer.setVertexColor(Color.RED);
         primitiveRenderer.vertex(50, 60);
@@ -234,7 +240,8 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         primitiveRenderer.vertex(55, 80);
         primitiveRenderer.setVertexColor(Color.GREEN);
         primitiveRenderer.vertex(60, 70);
-        primitiveRenderer.setTweakReset();
+
+        primitiveRenderer.setVertexColor(Color.MAGENTA);
         primitiveRenderer.vertex(50 + 15, 70);
         primitiveRenderer.vertex(55 + 15, 80);
         primitiveRenderer.vertex(60 + 15, 70);
@@ -262,7 +269,6 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
 
-
         spriteRenderer.begin();
 
         spriteParticleSystem.render(mediaManager, spriteRenderer);
@@ -273,14 +279,14 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.begin();
 
         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1f);
-        mediaManager.font(api.theme().UI_FONT).setColor(new Color(0.5f, 1f, 0.5f, 1f));
+        mediaManager.font(api.theme().UI_FONT).setColor(new Color(0.5f, 0.5f, 0.5f, 1f));
         spriteRenderer.drawCMediaFont(api.theme().UI_FONT, 4, 310, "SYMBOL: " + Tools.Text.fontSymbol(1));
         spriteRenderer.drawCMediaFont(api.theme().UI_FONT, 4, 300, "Text[#ff00ff]Text2");
         spriteRenderer.drawCMediaFont(api.theme().UI_FONT, 4, 290, "Text[#00ffff]Text2");
         spriteRenderer.drawCMediaFont(api.theme().UI_FONT, 4, 280, "Text[#ff00ff]Text2");
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.loadState();
         spriteRenderer.end();
 
 
@@ -304,11 +310,11 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
             spriteRenderer.drawCMediaImage(api.theme().UI_PIXEL, 400, 200, 10, 10);
 
 
-            spriteRenderer.setAllReset();
+            spriteRenderer.loadState();
             spriteRenderer.end();
 
 
-            System.out.println("sprites:"+(amount*(64*64))+", rendercalls:" +spriteRenderer.getRenderCalls()+" - time: "+((System.currentTimeMillis()-time)) + "ms");
+            System.out.println("sprites:"+(amount*(64*64))+", time: "+((System.currentTimeMillis()-time)) + "ms");
 
         }
 
@@ -316,7 +322,7 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         spriteRenderer.begin();
 
 
-        spriteRenderer.setAllReset();
+        spriteRenderer.loadState();
         spriteRenderer.setShader(shaderProgram);
         spriteRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
         //spriteRenderer.setShader(shaderProgram);
@@ -328,14 +334,14 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
         spriteRenderer.end();
 
-         */
+
     }
 
-    private ShaderProgram shaderProgram = ShaderParser.parse(Tools.File.findResource("shaders/pixelui/legacy/hsl.sprite.glsl"));
+    private ShaderProgram shaderProgram = ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl"));
 
     @Override
     public void dispose() {
-        //spriteRenderer.dispose();
+        spriteRenderer.dispose();
     }
 
 
