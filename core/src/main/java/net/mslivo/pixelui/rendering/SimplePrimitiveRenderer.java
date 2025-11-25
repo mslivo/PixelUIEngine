@@ -5,27 +5,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.glutils.*;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.IntArray;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
+public class SimplePrimitiveRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
-    public static final String COLOR_ATTRIBUTE = "a_color";
-    public static final String TWEAK_ATTRIBUTE = "a_tweak";
     public static final String POSITION_ATTRIBUTE = "a_position";
 
-    private static final float COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
     private static final float VERTEX_COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
 
-    private static final int VERTEX_SIZE = 5;
+    private static final int VERTEX_SIZE = 3;
     private static final int INDICES_SIZE = 1;
     private static final int VERTEXES_INDICES_RATIO = 1;
     public static final int MAX_VERTEXES_DEFAULT = 65534;
-    private static final float[] DUMMY_VERTEX = new float[]{0f, 0f, 0f, 0f, 0f};
+    private static final float[] DUMMY_VERTEX = new float[]{0f, 0f, 0f};
     private static final int PRIMITIVE_RESTART = -1;
 
     private final int sizeMaxVertexes;
@@ -40,22 +39,20 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
     private final IntArray indexResets;
     private float vertexColor,vertexColor_save;
     private int primitiveType;
-    protected float color, color_save;
-    protected float tweak, tweak_save, tweak_reset;
 
-    public PrimitiveRenderer() {
+    public SimplePrimitiveRenderer() {
         this(null, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram shaderProgram) {
+    public SimplePrimitiveRenderer(final ShaderProgram shaderProgram) {
         this(shaderProgram, MAX_VERTEXES_DEFAULT, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes) {
+    public SimplePrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes) {
         this(shaderProgram, maxVertexes, false);
     }
 
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+    public SimplePrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
         int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
         if (maxVertexes > vertexAbsoluteLimit)
             throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
@@ -79,11 +76,6 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
         this.vertexColor_save = this.vertexColor;
         this.primitiveType = GL32.GL_POINTS;
 
-        this.color = COLOR_RESET;
-        this.color_save = this.color;
-        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0f);
-        this.tweak = this.tweak_reset;
-        this.tweak_save = this.tweak;
     }
 
     public void begin() {
@@ -151,16 +143,14 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
         this.indexResets.add(currentIndex);
     }
 
-    public void vertexPush(float x, float y, float vertexColor, float color, float tweak) {
+    private void vertexPush(float x, float y, float vertexColor) {
         this.vertices[idx] = x;
         this.vertices[idx + 1] = y;
         this.vertices[idx + 2] = vertexColor;
-        this.vertices[idx + 3] = color;
-        this.vertices[idx + 4] = tweak;
         idx += VERTEX_SIZE;
     }
 
-    public void vertexPush(float[] value, int offset, int count) {
+    private void vertexPush(float[] value, int offset, int count) {
         System.arraycopy(value, offset, this.vertices, idx, count);
         idx += count;
     }
@@ -211,7 +201,7 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
         if (isVertexBufferLimitReached())
             flush();
 
-        vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x + 0.5f),(y + 0.5f),this.vertexColor);
 
     }
 
@@ -223,7 +213,7 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
             flush();
 
 
-        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor);
 
 
         // Vertex 2
@@ -231,7 +221,7 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
             flush();
         }
 
-        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor);
 
     }
 
@@ -243,7 +233,7 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
             flush();
 
 
-        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x1 + 0.5f),(y1 + 0.5f),this.vertexColor);
 
 
         // Vertex 2
@@ -251,32 +241,22 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
             flush();
         }
 
-        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x2 + 0.5f),(y2 + 0.5f),this.vertexColor);
 
         // Vertex 3
         if (this.idx >= this.sizeMaxVertexesFloats) {
             flush();
         }
 
-        vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor,this.color,this.tweak);
+        vertexPush((x3 + 0.5f),(y3 + 0.5f),this.vertexColor);
 
     }
 
     protected ShaderProgram provideDefaultShader() {
-        return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.PRIMITIVE,"""
-            // Usable Vertex Shader Variables: vec4 a_position | vec4 v_color | vec4 v_tweak | vec4 v_vertexColor
-            // Usable Fragment Shader Variables: vec4 v_color | vec4 v_tweak | vec4 v_vertexColor
-            
+        return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.SIMPLE_PRIMITIVE,"""            
             // BEGIN VERTEX
             
-            vec4 colorTintAdd(vec4 color, vec4 modColor){
-                 color.rgb = clamp(color.rgb+(modColor.rgb-0.5),0.0,1.0);
-                 color.a *= modColor.a;
-                 return color;
-            }
-            
             void main(){
-            	 v_vertexColor = colorTintAdd(v_vertexColor, v_color);
             }
             
             // END VERTEX
@@ -294,9 +274,8 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
     protected VertexBufferObjectWithVAO createVertexBufferObject(final int size) {
         return new VertexBufferObjectWithVAO( true, size * VERTEX_SIZE,
                 new VertexAttribute(VertexAttributes.Usage.Position, 2, POSITION_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, COLOR_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, TWEAK_ATTRIBUTE));
+                new VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, VERTEX_COLOR_ATTRIBUTE)
+        );
     }
 
     public void setVertexColor(Color color) {
@@ -336,73 +315,21 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
 
     @Override
     protected void saveStateImpl() {
-        this.color_save = this.color;
-        this.tweak_save = this.tweak;
         this.vertexColor_save = this.vertexColor;
     }
 
     @Override
     protected void loadStateImpl() {
-        this.color = this.color_save;
-        this.tweak = this.tweak_save;
         this.vertexColor = this.vertexColor_save;
     }
 
     @Override
     protected void resetImpl() {
-        this.color = COLOR_RESET;
-        this.tweak = this.tweak_reset;
         this.vertexColor = VERTEX_COLOR_RESET;
     }
 
     public int getPrimitiveType() {
         return primitiveType;
-    }
-
-    // -------- Colors --------
-
-    public void setColor(float r, float g, float b, float a) {
-        this.color = colorPackedRGBA(r, g, b, a);
-    }
-
-    public void setColor(Color color){
-        this.color = colorPackedRGBA(color.r,color.g,color.b,color.a);
-    }
-
-    public void setColor(Color color, float a){
-        this.color = colorPackedRGBA(color.r,color.g,color.b,a);
-    }
-
-    public void setPackedColor(float packed) {
-        this.color = packed;
-    }
-
-    public float getPackedColor() {
-        return this.color;
-    }
-
-    // -------- Tweaks --------
-
-    public void setTweak(float t1, float t2, float t3, float t4) {
-        this.tweak = colorPackedRGBA(t1, t2, t3, t4);
-    }
-
-    public void setPackedTweak(float packed) {
-        this.tweak = packed;
-    }
-
-    public float getPackedTweak() {
-        return this.tweak;
-    }
-
-    public Color getColor(){
-        Color.abgr8888ToColor(this.tempColor,getPackedColor());
-        return this.tempColor;
-    }
-
-    public void setTweakResetValues(float h, float s, float l, float c) {
-        this.tweak_reset = colorPackedRGBA(h, s, l, c);
-        this.tweak = this.tweak_reset;
     }
 
     @Override

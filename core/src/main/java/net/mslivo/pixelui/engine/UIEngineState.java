@@ -13,6 +13,7 @@ import net.mslivo.pixelui.engine.constants.TileSize;
 import net.mslivo.pixelui.engine.constants.VIEWPORT_MODE;
 import net.mslivo.pixelui.rendering.NestedFrameBuffer;
 import net.mslivo.pixelui.rendering.PrimitiveRenderer;
+import net.mslivo.pixelui.rendering.SimplePrimitiveRenderer;
 import net.mslivo.pixelui.rendering.SpriteRenderer;
 import net.mslivo.pixelui.engine.actions.common.UpdateAction;
 import net.mslivo.pixelui.theme.UIEngineTheme;

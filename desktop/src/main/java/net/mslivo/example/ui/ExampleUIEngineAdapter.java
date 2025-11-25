@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.rendering.SimplePrimitiveRenderer;
 import net.mslivo.pixelui.utils.Tools;
 import net.mslivo.pixelui.utils.particles.ParticleUpdater;
 import net.mslivo.pixelui.utils.particles.PrimitiveParticleSystem;
@@ -36,8 +37,9 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
     private float animation_timer;
     private boolean resetPressed;
     private SpriteRenderer spriteRenderer;
-    private SpriteRenderer spriteRendererDefault;
     private PrimitiveRenderer primitiveRenderer;
+    private SimplePrimitiveRenderer simplePrimitiveRenderer;
+
     private SpriteParticleSystem<ParticleDataInner> spriteParticleSystem;
     private PrimitiveParticleSystem<ParticleDataInner> primitiveParticleSystem;
 
@@ -66,11 +68,12 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
         this.api = api;
         this.mediaManager = mediaManager;
         this.animation_timer = 0;
-        this.spriteRendererDefault = new SpriteRenderer(mediaManager);
         this.spriteRenderer = new SpriteRenderer(mediaManager, ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.sprite.glsl")), SpriteRenderer.MAX_VERTEXES_DEFAULT);
-        this.spriteRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
+        this.spriteRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
         this.primitiveRenderer = new PrimitiveRenderer( ShaderParser.parse(Tools.File.findResource("shaders/pixelui/hsl.primitive.glsl")), PrimitiveRenderer.MAX_VERTEXES_DEFAULT);
-        this.primitiveRenderer.setTweakReset(0.5f,0.5f,0.5f,0f);
+        this.primitiveRenderer.setTweakResetValues(0.5f,0.5f,0.5f,0f);
+
+        this.simplePrimitiveRenderer = new SimplePrimitiveRenderer();
 
         api.config.window.defaultEnforceScreenBounds = false;
         // Example Wnd Button
@@ -333,6 +336,18 @@ public class ExampleUIEngineAdapter implements UIEngineAdapter {
 
 
         spriteRenderer.end();
+
+        simplePrimitiveRenderer.setProjectionMatrix(camera.combined);
+        simplePrimitiveRenderer.begin(GL32.GL_TRIANGLES);
+        simplePrimitiveRenderer.setVertexColor(Color.BLUE);
+        simplePrimitiveRenderer.vertex(300,300);
+        simplePrimitiveRenderer.setVertexColor(Color.RED);
+        simplePrimitiveRenderer.vertex(380,300);
+        simplePrimitiveRenderer.setVertexColor(Color.YELLOW);
+        simplePrimitiveRenderer.vertex(340,380);
+
+        simplePrimitiveRenderer.end();
+
 
 
     }

@@ -23,6 +23,8 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     public static final String TWEAK_ATTRIBUTE = "a_tweak";
     public static final String POSITION_ATTRIBUTE = "a_position";
 
+    private static final float COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
+
     private static final int VERTEX_SIZE = 6;
     private static final int INDICES_SIZE = 6;
     private static final int VERTEXES_INDICES_RATIO = 4;
@@ -42,6 +44,9 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     private float invTexWidth, invTexHeight;
     private MediaManager mediaManager;
     private int nextSamplerTextureUnit;
+
+    protected float color, color_save;
+    protected float tweak, tweak_save, tweak_reset;
 
     @Override
     protected ShaderProgram provideDefaultShader() {
@@ -108,6 +113,12 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
         this.invTexWidth = this.invTexHeight = 0;
         this.nextSamplerTextureUnit = 1;
         this.mediaManager = mediaManager;
+
+        this.color = COLOR_RESET;
+        this.color_save = this.color;
+        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0f);
+        this.tweak = this.tweak_reset;
+        this.tweak_save = this.tweak;
     }
 
     private IntegerIndexBufferObject createIndexBufferObject(int size) {
@@ -139,7 +150,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void begin() {
-        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        if (isDrawing()) throw new IllegalStateException(ERROR_END_BEGIN);
         Gdx.gl.glDepthMask(false);
         this.shader.bind();
         setupMatrices();
@@ -150,14 +161,14 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
         } else {
             Gdx.gl.glDisable(GL32.GL_BLEND);
         }
-        this.drawing = true;
+        setDrawing(true);
     }
 
 
     public void end() {
         flush();
         Gdx.gl.glDepthMask(true);
-        this.drawing = false;
+        setDrawing(false);
         lastTexture = null;
         this.nextSamplerTextureUnit = 1;
     }
@@ -168,7 +179,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public void draw(final Texture texture, final float x, final float y, final float originX, final float originY, final float width, final float height, final float scaleX,
                      final float scaleY, final float rotation, final int srcX, final int srcY, final int srcWidth, final int srcHeight, final boolean flipX, final boolean flipY) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -277,7 +288,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     }
 
-    public void vertexPush(float x, float y, float color, float u, float v, float tweak) {
+    private void vertexPush(float x, float y, float color, float u, float v, float tweak) {
         this.vertices[idx] = x;
         this.vertices[idx + 1] = y;
         this.vertices[idx + 2] = color;
@@ -289,7 +300,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final int srcX, final int srcY, final int srcWidth,
                      final int srcHeight, final boolean flipX, final boolean flipY) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         if (texture != lastTexture)
             switchTexture(texture);
@@ -328,7 +339,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final Texture texture, final float x, final float y, final int srcX, final int srcY, final int srcWidth, final int srcHeight) {
-        if (!drawing) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
+        if (!isDrawing()) throw new IllegalStateException("SpritRenderer.begin must be called before draw.");
 
 
         if (texture != lastTexture)
@@ -356,7 +367,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height, final float u, final float v, final float u2, final float v2) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
 
         if (texture != lastTexture)
@@ -384,7 +395,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final Texture texture, final float x, final float y, final float width, final float height) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
 
         if (texture != lastTexture)
@@ -412,7 +423,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final Texture texture, final float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         count = (count / 5) * 6;
         final int verticesLength = sizeMaxVertexesFloats;
@@ -447,7 +458,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
 
     public void drawExactly(final Texture texture, final float[] spriteVertices, int offset, int count) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         int remainingVertices = sizeMaxVertexesFloats;
         if (texture != lastTexture)
@@ -473,7 +484,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
 
-    public void vertexPush(float[] value, int offset, int count) {
+    private void vertexPush(float[] value, int offset, int count) {
         System.arraycopy(value, offset, this.vertices, idx, count);
         idx += count;
     }
@@ -483,7 +494,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final TextureRegion region, final float x, final float y, final float width, final float height) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
@@ -511,7 +522,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
 
         final Texture texture = region.getTexture();
@@ -613,7 +624,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public void draw(final TextureRegion region, final float x, final float y, final float originX, final float originY, final float width, final float height,
                      float scaleX, final float scaleY, final float rotation, boolean clockwise) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
 
         final Texture texture = region.getTexture();
@@ -731,7 +742,7 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public void draw(final TextureRegion region, final float width, final float height, Affine2 transform) {
-        if (!drawing) throw new IllegalStateException(ERROR_BEGIN_END);
+        if (!isDrawing()) throw new IllegalStateException(ERROR_BEGIN_END);
 
         final Texture texture = region.getTexture();
         if (texture != lastTexture) {
@@ -1086,23 +1097,78 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     @Override
-    protected void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
+    protected void setBlendFuncSeparateImpl(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
         Gdx.gl.glBlendFuncSeparate(srcColor, dstColor,srcAlpha,dstAlpha);
     }
 
     @Override
-    protected void setBlendFunc(int srcColor, int dstColor) {
+    protected void setBlendFuncImpl(int srcColor, int dstColor) {
         Gdx.gl.glBlendFunc(srcColor, dstColor);
     }
 
     @Override
-    protected void saveStateRenderer() {
+    protected void saveStateImpl() {
+        this.color_save = this.color;
+        this.tweak_save = this.tweak;
     }
 
     @Override
-    protected void loadStateRenderer() {
+    protected void loadStateImpl() {
+        this.color = this.color_save;
+        this.tweak = this.tweak_save;
     }
 
+    @Override
+    protected void resetImpl(){
+        this.color = COLOR_RESET;
+        this.tweak = this.tweak_reset;
+    }
+
+    // -------- Colors --------
+
+    public void setColor(float r, float g, float b, float a) {
+        this.color = colorPackedRGBA(r, g, b, a);
+    }
+
+    public void setColor(Color color){
+        this.color = colorPackedRGBA(color.r,color.g,color.b,color.a);
+    }
+
+    public void setColor(Color color, float a){
+        this.color = colorPackedRGBA(color.r,color.g,color.b,a);
+    }
+
+    public void setPackedColor(float packed) {
+        this.color = packed;
+    }
+
+    public float getPackedColor() {
+        return this.color;
+    }
+
+    // -------- Tweaks --------
+
+    public void setTweak(float t1, float t2, float t3, float t4) {
+        this.tweak = colorPackedRGBA(t1, t2, t3, t4);
+    }
+
+    public void setPackedTweak(float packed) {
+        this.tweak = packed;
+    }
+
+    public float getPackedTweak() {
+        return this.tweak;
+    }
+
+    public Color getColor(){
+        Color.abgr8888ToColor(this.tempColor,getPackedColor());
+        return this.tempColor;
+    }
+
+    public void setTweakResetValues(float h, float s, float l, float c) {
+        this.tweak_reset = colorPackedRGBA(h, s, l, c);
+        this.tweak = this.tweak_reset;
+    }
 
     @Override
     public void dispose() {

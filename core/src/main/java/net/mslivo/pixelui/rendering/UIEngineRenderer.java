@@ -21,7 +21,6 @@ public abstract class UIEngineRenderer {
 
     protected static final int RGB_SRC = 0, RGB_DST = 1, ALPHA_SRC = 2, ALPHA_DST = 3;
 
-    private static final float COLOR_RESET = colorPackedRGBA(0.5f, 0.5f, 0.5f, 1f);
     private static final int[] BLEND_RESET =  new int[]{
             GL32.GL_SRC_ALPHA,
             GL32.GL_ONE_MINUS_SRC_ALPHA,
@@ -30,13 +29,12 @@ public abstract class UIEngineRenderer {
     };
 
     // -------- State --------
-    protected float color, color_save;
-    protected float tweak, tweak_save, tweak_reset;
+
     protected int[] blend, blend_save;
 
     protected boolean blendingEnabled = true;
 
-    protected boolean drawing = false;
+    private boolean drawing = false;
 
     // -------- Matrices --------
     protected final Matrix4 projectionMatrix = new Matrix4();
@@ -57,13 +55,6 @@ public abstract class UIEngineRenderer {
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight()
         );
-
-        this.color = COLOR_RESET;
-        this.color_save = this.color;
-
-        this.tweak_reset = colorPackedRGBA(0f, 0f, 0f, 0f);
-        this.tweak = this.tweak_reset;
-        this.tweak_save = this.tweak;
 
         this.tempColor = new Color(Color.CLEAR);
 
@@ -108,79 +99,27 @@ public abstract class UIEngineRenderer {
         }
     }
 
-
     // -------- State Save/Load --------
     public void saveState() {
-        this.color_save = this.color;
-        this.tweak_save = this.tweak;
+
         System.arraycopy(this.blend, 0, this.blend_save, 0, 4);
-        this.saveStateRenderer();
+        this.saveStateImpl();
     }
 
     public void loadState() {
-        this.color = this.color_save;
-        this.tweak = this.tweak_save;
         setBlendFunctionSeparate(
                 blend_save[RGB_SRC],
                 blend_save[RGB_DST],
                 blend_save[ALPHA_SRC],
                 blend_save[ALPHA_DST]
         );
-        this.loadStateRenderer();
+        this.loadStateImpl();
     }
 
-    // -------- Colors --------
-    public void setColor(float r, float g, float b, float a) {
-        this.color = colorPackedRGBA(r, g, b, a);
-    }
 
-    public void setColor(Color color){
-        this.color = colorPackedRGBA(color.r,color.g,color.b,color.a);
-    }
 
-    public void setColor(Color color, float a){
-        this.color = colorPackedRGBA(color.r,color.g,color.b,a);
-    }
 
-    public void setPackedColor(float packed) {
-        this.color = packed;
-    }
 
-    public float getPackedColor() {
-        return this.color;
-    }
-
-    public void setTweakReset(float t1, float t2, float t3, float t4) {
-        this.tweak_reset = colorPackedRGBA(t1, t2, t3, t4);
-        this.tweak = tweak_reset;
-    }
-
-    // -------- Tweaks --------
-    public void setTweak(float t1, float t2, float t3, float t4) {
-        this.tweak = colorPackedRGBA(t1, t2, t3, t4);
-    }
-
-    public void setPackedTweak(float packed) {
-        this.tweak = packed;
-    }
-
-    public float getPackedTweak() {
-        return this.tweak;
-    }
-
-    public Color getColor(){
-        Color.abgr8888ToColor(this.tempColor,getPackedColor());
-        return this.tempColor;
-    }
-
-    public void setTweakReset() {
-        this.tweak = this.tweak_reset;
-    }
-
-    public void setTweakResetValues(float h, float s, float l, float c) {
-        this.tweak_reset = colorPackedRGBA(h, s, l, c);
-        this.tweak = this.tweak_reset;
-    }
 
     // -------- Blending --------
     public void setBlendingEnabled(boolean enabled) {
@@ -203,7 +142,7 @@ public abstract class UIEngineRenderer {
 
         if (drawing) {
             this.flush();
-            this.setBlendFunc(src, dst);
+            this.setBlendFuncImpl(src, dst);
         }
     }
 
@@ -219,22 +158,21 @@ public abstract class UIEngineRenderer {
 
         if (drawing) {
             this.flush();
-            this.setBlendFuncSeparate(srcColor, dstColor, srcAlpha, dstAlpha);
+            this.setBlendFuncSeparateImpl(srcColor, dstColor, srcAlpha, dstAlpha);
         }
     }
 
     public void setBlendFunctionComposite() {
-        this.setBlendFunc(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
+        this.setBlendFuncImpl(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-
     public void reset(){
-        this.color = COLOR_RESET;
-        this.tweak = this.tweak_reset;
         System.arraycopy(BLEND_RESET,0,this.blend,0,this.blend.length);
+        this.resetImpl();
     }
 
     // -------- Matrices --------
+
     public void setProjectionMatrix(Matrix4 projection) {
         if (Arrays.equals(projectionMatrix.val, projection.val)) return;
         if (drawing) flush();
@@ -243,6 +181,7 @@ public abstract class UIEngineRenderer {
     }
 
     // -------- Drawing Status --------
+
     public boolean isDrawing() {
         return drawing;
     }
@@ -263,10 +202,11 @@ public abstract class UIEngineRenderer {
     protected abstract void flush();
     public abstract void begin();
     public abstract void end();
-    protected abstract void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha);
-    protected abstract void setBlendFunc(int srcColor, int dstColor);
-    protected abstract void saveStateRenderer();
-    protected abstract void loadStateRenderer();
+    protected abstract void resetImpl();
+    protected abstract void setBlendFuncSeparateImpl(int srcColor, int dstColor, int srcAlpha, int dstAlpha);
+    protected abstract void setBlendFuncImpl(int srcColor, int dstColor);
+    protected abstract void saveStateImpl();
+    protected abstract void loadStateImpl();
     protected abstract ShaderProgram provideDefaultShader();
 
 }

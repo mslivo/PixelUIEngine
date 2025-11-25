@@ -17,7 +17,7 @@ public class ShaderParser {
     public static ShaderProgram parse(Path shaderFile) {
         try {
             final String fileName = shaderFile.getFileName().toString();
-            return parse(fileName,findTemplate(fileName), Files.readString(shaderFile));
+            return parse(fileName, findTemplate(fileName), Files.readString(shaderFile));
         } catch (Exception e) {
             Tools.App.handleException(e);
         }
@@ -44,16 +44,16 @@ public class ShaderParser {
         final String vertexShader = createVertexShader(template, parseResult.vertexDeclarations, parseResult.vertexMain);
         final String fragmentShader = createFragmentShader(template, parseResult.fragmentDeclarations, parseResult.fragmentMain);
 
-        return compileShader(fileName, vertexShader,fragmentShader);
+        return compileShader(fileName, vertexShader, fragmentShader);
     }
 
-    private static SHADER_TEMPLATE findTemplate(String fileName){
-        for(int i=0;i<SHADER_TEMPLATE_VALUES.length;i++){
-            if(fileName.toLowerCase().endsWith(SHADER_TEMPLATE_VALUES[i].extension)){
+    private static SHADER_TEMPLATE findTemplate(String fileName) {
+        for (int i = 0; i < SHADER_TEMPLATE_VALUES.length; i++) {
+            if (fileName.toLowerCase().endsWith(SHADER_TEMPLATE_VALUES[i].extension)) {
                 return SHADER_TEMPLATE_VALUES[i];
             }
         }
-        throw new RuntimeException("No template found for extension \""+fileName+"\"");
+        throw new RuntimeException("No template found for extension \"" + fileName + "\"");
     }
 
     private static String createVertexShader(SHADER_TEMPLATE template, String vertexDeclarations, String vertexMain) {
@@ -62,7 +62,7 @@ public class ShaderParser {
                 .replace("#VERTEX_MAIN", Tools.Text.validString(vertexMain));
     }
 
-    private static  String createFragmentShader(SHADER_TEMPLATE template, String fragmentDeclarations, String fragmentMain) {
+    private static String createFragmentShader(SHADER_TEMPLATE template, String fragmentDeclarations, String fragmentMain) {
         return template.fragmentTemplate
                 .replace("#FRAGMENT_DECLARATIONS", Tools.Text.validString(fragmentDeclarations))
                 .replace("#FRAGMENT_MAIN", Tools.Text.validString(fragmentMain));
@@ -104,8 +104,8 @@ public class ShaderParser {
                     if (errorIndex != -1) {
                         errorLines.add(line);
                         line += lineErrors.get(errorIndex);
-                        String error = (fileName != null ? "Error in "+shader+" \""+fileName+"\"" : "Error in "+shader);
-                        throw new RuntimeException(error+": "+line);
+                        String error = (fileName != null ? "Error in " + shader + " \"" + fileName + "\"" : "Error in " + shader);
+                        throw new RuntimeException(error + ": " + line);
                     }
 
 
@@ -210,110 +210,148 @@ public class ShaderParser {
 
     public enum SHADER_TEMPLATE {
         SPRITE(".sprite.glsl",
-                    """
-                    
-                    attribute vec4 a_position;
-                    attribute vec4 a_color;
-                    attribute vec4 a_tweak;
-                    attribute vec2 a_texCoord;
-
-                    varying vec4 v_color;
-                    varying vec4 v_tweak;
-                    varying vec2 v_texCoord;
-
-                    uniform mat4 u_projTrans;
-                    
-                    #VERTEX_DECLARATIONS
-
-                    void main()
-                    {
-                       // Get Attributes
-                       v_color = (a_color * FLOAT_CORRECTION);
-                       v_tweak = (a_tweak * FLOAT_CORRECTION);
-                       v_texCoord = a_texCoord;
-                       gl_Position = u_projTrans * a_position;
-                       
-                       // Custom Code
-                       #VERTEX_MAIN
-                    }
-            """,
                 """
-            varying vec4 v_color;
-            varying vec4 v_tweak;
-            varying vec2 v_texCoord;
-            
-            uniform sampler2D u_texture;
-            uniform vec2 u_textureSize;
-            
-            #FRAGMENT_DECLARATIONS
-            
-            void main() {
-            
-                // Custom Code
-                #FRAGMENT_MAIN
+                        
+                                attribute vec4 a_position;
+                                attribute vec4 a_color;
+                                attribute vec4 a_tweak;
+                                attribute vec2 a_texCoord;
+                        
+                                varying vec4 v_color;
+                                varying vec4 v_tweak;
+                                varying vec2 v_texCoord;
+                        
+                                uniform mat4 u_projTrans;
+                        
+                                #VERTEX_DECLARATIONS
+                        
+                                void main()
+                                {
+                                   // Get Attributes
+                                   v_color = (a_color * FLOAT_CORRECTION);
+                                   v_tweak = (a_tweak * FLOAT_CORRECTION);
+                                   v_texCoord = a_texCoord;
+                                   gl_Position = u_projTrans * a_position;
+                        
+                                   // Custom Code
+                                   #VERTEX_MAIN
+                                }
+                        """,
+                """
+                        varying vec4 v_color;
+                        varying vec4 v_tweak;
+                        varying vec2 v_texCoord;
+                        
+                        uniform sampler2D u_texture;
+                        uniform vec2 u_textureSize;
+                        
+                        #FRAGMENT_DECLARATIONS
+                        
+                        void main() {
+                        
+                            // Custom Code
+                            #FRAGMENT_MAIN
+                        
+                        }
+                        """),
+        PRIMITIVE(".primitive.glsl", """
                 
-            }
-            """),
-        PRIMITIVE(".primitive.glsl","""
-
-                    attribute vec4 a_position;
-                    attribute vec4 a_color;
-                    attribute vec4 a_tweak;
-                    attribute vec4 a_vertexColor;
-            
-                    varying vec4 v_color;
-                    varying vec4 v_tweak;
-                    varying vec4 v_vertexColor;
-            
-                    uniform mat4 u_projTrans;
-            
-                    #VERTEX_DECLARATIONS
-            
-                    void main() {
-                        gl_PointSize = 1.0;
-            
-                        // Get Attributes
-                        v_color = (a_color*FLOAT_CORRECTION);
-                        v_tweak = (a_tweak*FLOAT_CORRECTION);
-                        v_vertexColor = (a_vertexColor*FLOAT_CORRECTION);
-            
-                        gl_Position = u_projTrans * a_position;
-            
-                        // Custom Code
-                        #VERTEX_MAIN
-                    }
-            """,
+                        attribute vec4 a_position;
+                        attribute vec4 a_color;
+                        attribute vec4 a_tweak;
+                        attribute vec4 a_vertexColor;
+                
+                        varying vec4 v_color;
+                        varying vec4 v_tweak;
+                        varying vec4 v_vertexColor;
+                
+                        uniform mat4 u_projTrans;
+                
+                        #VERTEX_DECLARATIONS
+                
+                        void main() {
+                            gl_PointSize = 1.0;
+                
+                            // Get Attributes
+                            v_color = (a_color*FLOAT_CORRECTION);
+                            v_tweak = (a_tweak*FLOAT_CORRECTION);
+                            v_vertexColor = (a_vertexColor*FLOAT_CORRECTION);
+                
+                            gl_Position = u_projTrans * a_position;
+                
+                            // Custom Code
+                            #VERTEX_MAIN
+                        }
+                """,
                 """
-            
-                varying vec4 v_color;
-                varying vec4 v_tweak;
-                varying vec4 v_vertexColor;
-            
-                #FRAGMENT_DECLARATIONS
-            
-                void main() {
-            
-                   #FRAGMENT_MAIN
-            
-                }
-            """);
+                        
+                            varying vec4 v_color;
+                            varying vec4 v_tweak;
+                            varying vec4 v_vertexColor;
+                        
+                            #FRAGMENT_DECLARATIONS
+                        
+                            void main() {
+                        
+                               #FRAGMENT_MAIN
+                        
+                            }
+                        """),
+        SIMPLE_PRIMITIVE(".primitive.glsl", """
+                
+                        attribute vec4 a_position;
+                        attribute vec4 a_vertexColor;
+                
+                        varying vec4 v_vertexColor;
+                
+                        uniform mat4 u_projTrans;
+                
+                        #VERTEX_DECLARATIONS
+                
+                        void main() {
+                            gl_PointSize = 1.0;
+                
+                            // Get Attributes
+                            v_vertexColor = (a_vertexColor*FLOAT_CORRECTION);
+                
+                            gl_Position = u_projTrans * a_position;
+                
+                            // Custom Code
+                            #VERTEX_MAIN
+                        }
+                """,
+                """
+                        
+                            varying vec4 v_vertexColor;
+                        
+                            #FRAGMENT_DECLARATIONS
+                        
+                            void main() {
+                        
+                               #FRAGMENT_MAIN
+                        
+                            }
+                        """),
+
+
+        ;
 
         private static final String COMMON_DECLARATIONS = """             
-                    #ifdef GL_ES
-                        precision highp float;
-                        precision highp int;
-                    #endif
-                   
-                   const float FLOAT_CORRECTION = (255.0/254.0);
-            """;
+                        #ifdef GL_ES
+                            precision highp float;
+                            precision highp int;
+                        #endif
+                
+                       const float FLOAT_CORRECTION = (255.0/254.0);
+                """;
 
         public final String vertexTemplate, fragmentTemplate;
         public final String extension;
 
         SHADER_TEMPLATE(String extension, String vertexTemplate, String fragmentTemplate) {
             this.extension = extension;
-            this.vertexTemplate = COMMON_DECLARATIONS +vertexTemplate;
-            this.fragmentTemplate = COMMON_DECLARATIONS +fragmentTemplate;
+            this.vertexTemplate = COMMON_DECLARATIONS + vertexTemplate;
+            this.fragmentTemplate = COMMON_DECLARATIONS + fragmentTemplate;
         }
     }
 }
