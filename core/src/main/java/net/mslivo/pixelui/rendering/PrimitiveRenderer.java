@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
+import net.mslivo.pixelui.utils.Tools;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -253,21 +254,7 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     protected ShaderProgram provideDefaultShader() {
-        return ShaderParser.parse(ShaderParser.SHADER_TEMPLATE.PRIMITIVE,"""            
-            // BEGIN VERTEX
-            
-            void main(){
-            }
-            
-            // END VERTEX
-
-            // BEGIN FRAGMENT
-            
-            void main(){
-            	 gl_FragColor = v_vertexColor;
-            }
-            // END FRAGMENT
-            """);
+        return ShaderParser.parse(Tools.File.findResource("shaders/pixelui/default.primitive.glsl"));
     }
 
 
