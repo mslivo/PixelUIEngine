@@ -71,23 +71,18 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
     }
 
     public SpriteRenderer() {
-        this(null, null, MAX_VERTEXES_DEFAULT, false);
+        this(null, null, MAX_VERTEXES_DEFAULT);
     }
 
     public SpriteRenderer(final MediaManager mediaManager) {
-        this(mediaManager, null, MAX_VERTEXES_DEFAULT, false);
+        this(mediaManager, null, MAX_VERTEXES_DEFAULT);
     }
 
-
     public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader) {
-        this(mediaManager, defaultShader, MAX_VERTEXES_DEFAULT, false);
+        this(mediaManager, defaultShader, MAX_VERTEXES_DEFAULT);
     }
 
     public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes) {
-        this(mediaManager, defaultShader, maxVertexes, false);
-    }
-
-    public SpriteRenderer(final MediaManager mediaManager, final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
         int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
         if (maxVertexes > vertexAbsoluteLimit)
             throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
