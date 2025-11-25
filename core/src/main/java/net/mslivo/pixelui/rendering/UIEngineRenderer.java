@@ -11,19 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 import java.util.Arrays;
 
-/**
- * Contains ONLY the common functionality shared by SpriteRenderer and PrimitiveRenderer.
- * No VBOs, no draw(), no texture logic, no primitive logic.
- * Only:
- * - color
- * - tweak
- * - blend
- * - matrix handling
- * - shader switching
- * - uniform cache
- * - save/load state
- */
-public abstract class CommonRenderer {
+public abstract class UIEngineRenderer {
 
     // -------- Common Constants --------
     public static final String PROJTRANS_UNIFORM = "u_projTrans";
@@ -64,7 +52,7 @@ public abstract class CommonRenderer {
     protected final ObjectMap<ShaderProgram, ObjectIntMap<String>> uniformLocationCache = new ObjectMap<>();
 
     // -------- Constructor --------
-    protected CommonRenderer(ShaderProgram defaultShader) {
+    protected UIEngineRenderer(ShaderProgram defaultShader) {
         this.projectionMatrix.setToOrtho2D(0, 0,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight()
@@ -79,8 +67,8 @@ public abstract class CommonRenderer {
 
         this.tempColor = new Color(Color.CLEAR);
 
-        this.blend = Arrays.copyOf(BLEND_RESET, 4);
-        this.blend_save = Arrays.copyOf(BLEND_RESET, 4);
+        this.blend = Arrays.copyOf(BLEND_RESET, BLEND_RESET.length);
+        this.blend_save = Arrays.copyOf(this.blend, this.blend.length);
 
         this.defaultShader = defaultShader != null ? defaultShader : provideDefaultShader();
         this.shader = this.defaultShader;
@@ -101,7 +89,6 @@ public abstract class CommonRenderer {
         return loc;
     }
 
-    protected abstract ShaderProgram provideDefaultShader();
 
     protected void setupMatrices() {
         combinedMatrix.set(projectionMatrix).mul(transformMatrix);
@@ -121,13 +108,13 @@ public abstract class CommonRenderer {
         }
     }
 
-    protected abstract void flush();
 
     // -------- State Save/Load --------
     public void saveState() {
         this.color_save = this.color;
         this.tweak_save = this.tweak;
         System.arraycopy(this.blend, 0, this.blend_save, 0, 4);
+        this.saveStateRenderer();
     }
 
     public void loadState() {
@@ -139,6 +126,7 @@ public abstract class CommonRenderer {
                 blend_save[ALPHA_SRC],
                 blend_save[ALPHA_DST]
         );
+        this.loadStateRenderer();
     }
 
     // -------- Colors --------
@@ -199,6 +187,10 @@ public abstract class CommonRenderer {
         this.blendingEnabled = enabled;
     }
 
+    public void isBlendingEnabled(boolean enabled) {
+        this.blendingEnabled = enabled;
+    }
+
     public void setBlendFunction(int src, int dst) {
         if (blend[RGB_SRC] == src && blend[RGB_DST] == dst &&
                 blend[ALPHA_SRC] == src && blend[ALPHA_DST] == dst)
@@ -210,8 +202,8 @@ public abstract class CommonRenderer {
         blend[ALPHA_DST] = dst;
 
         if (drawing) {
-            flush();
-            Gdx.gl.glBlendFunc(src, dst);
+            this.flush();
+            this.setBlendFunc(src, dst);
         }
     }
 
@@ -226,14 +218,15 @@ public abstract class CommonRenderer {
         blend[ALPHA_DST] = dstAlpha;
 
         if (drawing) {
-            flush();
-            Gdx.gl.glBlendFuncSeparate(srcColor, dstColor, srcAlpha, dstAlpha);
+            this.flush();
+            this.setBlendFuncSeparate(srcColor, dstColor, srcAlpha, dstAlpha);
         }
     }
 
     public void setBlendFunctionComposite() {
-        this.setBlendFunction(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
+        this.setBlendFunc(GL32.GL_ONE, GL32.GL_ONE_MINUS_SRC_ALPHA);
     }
+
 
     public void reset(){
         this.color = COLOR_RESET;
@@ -244,37 +237,18 @@ public abstract class CommonRenderer {
     // -------- Matrices --------
     public void setProjectionMatrix(Matrix4 projection) {
         if (Arrays.equals(projectionMatrix.val, projection.val)) return;
-
         if (drawing) flush();
         this.projectionMatrix.set(projection);
         if (drawing) setupMatrices();
     }
 
-
-    public void begin(){
-        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
-        Gdx.gl.glDepthMask(false);
-        this.shader.bind();
-        setupMatrices();
-        // Blending
-        if (this.blendingEnabled) {
-            Gdx.gl.glEnable(GL32.GL_BLEND);
-            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
-        } else {
-            Gdx.gl.glDisable(GL32.GL_BLEND);
-        }
-        this.drawing = true;
-    }
-
-    public void end(){
-        flush();
-        Gdx.gl.glDepthMask(true);
-        this.drawing = false;
-    }
-
     // -------- Drawing Status --------
     public boolean isDrawing() {
         return drawing;
+    }
+
+    protected void setDrawing(boolean drawing){
+        this.drawing = drawing;
     }
 
     protected static float colorPackedRGBA(float r, float g, float b, float a) {
@@ -285,4 +259,14 @@ public abstract class CommonRenderer {
                         ((int)(r * 255)       & 0xFF)
         );
     }
+
+    protected abstract void flush();
+    public abstract void begin();
+    public abstract void end();
+    protected abstract void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha);
+    protected abstract void setBlendFunc(int srcColor, int dstColor);
+    protected abstract void saveStateRenderer();
+    protected abstract void loadStateRenderer();
+    protected abstract ShaderProgram provideDefaultShader();
+
 }

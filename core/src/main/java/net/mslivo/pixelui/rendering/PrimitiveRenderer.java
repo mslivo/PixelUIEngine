@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class PrimitiveRenderer extends CommonRenderer implements Disposable {
+public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String VERTEX_COLOR_ATTRIBUTE = "a_vertexColor";
     public static final String COLOR_ATTRIBUTE = "a_color";
@@ -81,9 +81,20 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     public void begin(int primitiveType) {
-        super.begin();
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        Gdx.gl.glDepthMask(false);
+        this.shader.bind();
+        setupMatrices();
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
         this.setPrimitiveType(primitiveType);
         Gdx.gl.glEnable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
+        this.drawing = true;
     }
 
     protected void setPrimitiveType(int primitiveType) {
@@ -94,9 +105,13 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     public void end() {
-        super.end();
+        flush();
+        Gdx.gl.glDepthMask(true);
+        this.drawing = false;
         Gdx.gl.glDisable(GL32.GL_PRIMITIVE_RESTART_FIXED_INDEX);
     }
+
+
 
     protected IntegerIndexBufferObject createIndexBufferObject(final int size) {
         final int[] indices = new int[size * INDICES_SIZE];
@@ -312,16 +327,27 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     }
 
     @Override
-    public void saveState() {
-        super.saveState();
-        this.vertexColor_save = this.vertexColor;
+    protected void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
+        Gdx.gl.glBlendFuncSeparate(srcColor, dstColor,srcAlpha,dstAlpha);
     }
 
     @Override
-    public void loadState() {
-        super.loadState();
-        setPackedVertexColor(this.vertexColor_save);
+    protected void setBlendFunc(int srcColor, int dstColor) {
+        Gdx.gl.glBlendFunc(srcColor, dstColor);
     }
+
+    @Override
+    protected void saveStateRenderer() {
+        this.vertexColor_save = this.vertexColor;
+
+    }
+
+    @Override
+    protected void loadStateRenderer() {
+        setPackedVertexColor(this.vertexColor_save);
+
+    }
+
 
     public int getPrimitiveType() {
         return primitiveType;

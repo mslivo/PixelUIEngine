@@ -8,15 +8,13 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObjectWithVAO;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.*;
 import net.mslivo.pixelui.media.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
-public class SpriteRenderer extends CommonRenderer implements Disposable {
+public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
     public static final String TEXTURE_UNIFORM = "u_texture";
@@ -146,12 +144,25 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
     }
 
     public void begin() {
-        super.begin();
+        if (drawing) throw new IllegalStateException(ERROR_END_BEGIN);
+        Gdx.gl.glDepthMask(false);
+        this.shader.bind();
+        setupMatrices();
+        // Blending
+        if (this.blendingEnabled) {
+            Gdx.gl.glEnable(GL32.GL_BLEND);
+            Gdx.gl.glBlendFuncSeparate(this.blend[RGB_SRC], this.blend[RGB_DST], this.blend[ALPHA_SRC], this.blend[ALPHA_DST]);
+        } else {
+            Gdx.gl.glDisable(GL32.GL_BLEND);
+        }
+        this.drawing = true;
     }
 
 
     public void end() {
-        super.end();
+        flush();
+        Gdx.gl.glDepthMask(true);
+        this.drawing = false;
         lastTexture = null;
         this.nextSamplerTextureUnit = 1;
     }
@@ -1080,14 +1091,23 @@ public class SpriteRenderer extends CommonRenderer implements Disposable {
     }
 
     @Override
-    public void saveState() {
-        super.saveState();
+    protected void setBlendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
+        Gdx.gl.glBlendFuncSeparate(srcColor, dstColor,srcAlpha,dstAlpha);
     }
 
     @Override
-    public void loadState() {
-        super.loadState();
+    protected void setBlendFunc(int srcColor, int dstColor) {
+        Gdx.gl.glBlendFunc(srcColor, dstColor);
     }
+
+    @Override
+    protected void saveStateRenderer() {
+    }
+
+    @Override
+    protected void loadStateRenderer() {
+    }
+
 
     @Override
     public void dispose() {
