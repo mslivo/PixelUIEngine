@@ -149,12 +149,12 @@ public class PrimitiveRenderer extends UIEngineRenderer implements Disposable {
         this.indexResets.add(currentIndex);
     }
 
-    public void vertexPush(float value1, float value2, float value3, float value4, float value5) {
-        this.vertices[idx] = value1;
-        this.vertices[idx + 1] = value2;
-        this.vertices[idx + 2] = value3;
-        this.vertices[idx + 3] = value4;
-        this.vertices[idx + 4] = value5;
+    public void vertexPush(float x, float y, float vertexColor, float color, float tweak) {
+        this.vertices[idx] = x;
+        this.vertices[idx + 1] = y;
+        this.vertices[idx + 2] = vertexColor;
+        this.vertices[idx + 3] = color;
+        this.vertices[idx + 4] = tweak;
         idx += 5;
     }
 

@@ -277,13 +277,13 @@ public class SpriteRenderer extends UIEngineRenderer implements Disposable {
 
     }
 
-    public void vertexPush(float value1, float value2, float value3, float value4, float value5, float value6) {
-        this.vertices[idx] = value1;
-        this.vertices[idx + 1] = value2;
-        this.vertices[idx + 2] = value3;
-        this.vertices[idx + 3] = value4;
-        this.vertices[idx + 4] = value5;
-        this.vertices[idx + 5] = value6;
+    public void vertexPush(float x, float y, float color, float u, float v, float tweak) {
+        this.vertices[idx] = x;
+        this.vertices[idx + 1] = y;
+        this.vertices[idx + 2] = color;
+        this.vertices[idx + 3] = u;
+        this.vertices[idx + 4] = v;
+        this.vertices[idx + 5] = tweak;
         idx += 6;
     }
 
