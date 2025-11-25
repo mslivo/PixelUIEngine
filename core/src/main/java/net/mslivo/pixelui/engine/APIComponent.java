@@ -101,7 +101,7 @@ public final class APIComponent {
             setComponentCommonInitValuesInternal(appViewPort, x, y, width, height, Color.GRAY, Color.GRAY);
             int viewportWidth =  uiEngineState.theme.ts.abs(appViewPort.width);
             int viewportHeight = uiEngineState.theme.ts.abs(appViewPort.height);
-            appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, true);
+            appViewPort.frameBuffer = uiCommonUtils.frameBuffer_createFrameBuffer(viewportWidth, viewportHeight);
             Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
             texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             appViewPort.textureRegion = new TextureRegion(texture, viewportWidth, viewportHeight);

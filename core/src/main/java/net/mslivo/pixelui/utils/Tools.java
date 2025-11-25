@@ -5,18 +5,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.github.dgzt.gdx.lwjgl3.Lwjgl3VulkanApplication;
 import net.mslivo.pixelui.media.CMedia;
-import net.mslivo.pixelui.media.CMediaFontSymbolArray;
-import net.mslivo.pixelui.media.CMediaFontSymbolSingle;
 import net.mslivo.pixelui.media.MediaManager;
+import net.mslivo.pixelui.rendering.NestedFrameBuffer;
+import net.mslivo.pixelui.rendering.SpriteRenderer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +25,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -255,6 +257,85 @@ public class Tools {
 
     }
 
+    public static class Graphics {
+        public static NestedFrameBuffer frameBufferTrimRegionCopy(NestedFrameBuffer frameBuffer, SpriteRenderer batch,
+                                                int srcX, int srcY,
+                                                int trimW, int trimH) {
+
+            final Pixmap.Format format = frameBuffer.getColorBufferTexture().getTextureData().getFormat();
+            final Texture.TextureFilter minFilter = frameBuffer.getColorBufferTexture().getMinFilter();
+            final Texture.TextureFilter magFilter = frameBuffer.getColorBufferTexture().getMagFilter();
+
+            // Create new trimmed FBO
+            NestedFrameBuffer out = new NestedFrameBuffer(format, trimW, trimH, false, false);
+            out.getColorBufferTexture().setFilter(minFilter, magFilter);
+
+            // Region from original framebuffer texture
+            TextureRegion region = new TextureRegion(
+                    frameBuffer.getColorBufferTexture(),
+                    srcX, srcY,
+                    trimW, trimH
+            );
+            region.flip(false, true); // FBO textures are Y-flipped in LibGDX
+
+            // Camera for drawing into the new FBO
+            OrthographicCamera cam = new OrthographicCamera(trimW, trimH);
+            cam.setToOrtho(true, trimW, trimH);
+
+            // Draw region into trimmed framebuffer
+            out.beginGlClear();
+            batch.setProjectionMatrix(cam.combined);
+            batch.begin();
+            batch.draw(region, 0, 0, trimW, trimH);
+            batch.end();
+            out.end();
+
+            return out;
+        }
+
+        public static NestedFrameBuffer frameBufferTrimAlphaCopy(NestedFrameBuffer frameBuffer, SpriteRenderer batch, float alphaThreshold) {
+
+            final int w = frameBuffer.getWidth();
+            final int h = frameBuffer.getHeight();
+
+            ByteBuffer buf = BufferUtils.newByteBuffer(w * h * 4);
+
+            frameBuffer.begin();
+            Gdx.gl.glReadPixels(0, 0, w, h, GL32.GL_RGBA, GL32.GL_UNSIGNED_BYTE, buf);
+            frameBuffer.end();
+
+            int minX = w, minY = h, maxX = -1, maxY = -1;
+
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    int index = (y * w + x) * 4;
+                    int a = buf.get(index + 3) & 0xFF;
+
+                    if (a > alphaThreshold) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+
+            // Nothing visible → return 1×1
+            if (maxX < 0) {
+                return new NestedFrameBuffer(
+                        frameBuffer.getColorBufferTexture().getTextureData().getFormat(),
+                        1, 1,
+                        false, false
+                );
+            }
+
+            final int trimW = maxX - minX + 1;
+            final int trimH = maxY - minY + 1;
+
+            // Reuse generic trim method:
+            return frameBufferTrimRegionCopy(frameBuffer, batch, minX, minY, trimW, trimH);
+        }
+    }
 
     public static class Text {
 
@@ -309,12 +390,12 @@ public class Tools {
 
 
         public static String formatPercent(float percent) {
-            return String.format(Locale.ROOT,"%.0f%%", percent * 100f);
+            return String.format(Locale.ROOT, "%.0f%%", percent * 100f);
 
         }
 
         public static String formatPercentDecimal(float percentDecimal) {
-            return String.format(Locale.ROOT,"%.2f%%", percentDecimal * 100f);
+            return String.format(Locale.ROOT, "%.2f%%", percentDecimal * 100f);
         }
 
         public static String fontSymbol(int[] ids, int arrayIndex) {
@@ -450,8 +531,9 @@ public class Tools {
         }
 
         public static String readTextFromFile(Path file, boolean zipped) {
-            return readTextFromFile(file,zipped,0,Long.MAX_VALUE);
+            return readTextFromFile(file, zipped, 0, Long.MAX_VALUE);
         }
+
         public static String readTextFromFile(Path file, boolean zipped, long skip, long limit) {
             try (FileInputStream fileInputStream = new FileInputStream(file.toFile())) {
                 if (zipped) {
@@ -465,8 +547,7 @@ public class Tools {
                                 inputStreamReader.skip(skip);
                                 while ((ch = inputStreamReader.read()) != -1) {
                                     builder.append((char) ch);
-                                    if(count++ > limit)
-                                        break;
+                                    if (count++ > limit) break;
                                 }
                                 return builder.toString();
                             }
@@ -480,8 +561,7 @@ public class Tools {
                         inputStreamReader.skip(skip);
                         while ((ch = inputStreamReader.read()) != -1) {
                             builder.append((char) ch);
-                            if(count++ > limit)
-                                break;
+                            if (count++ > limit) break;
                         }
                         return builder.toString();
                     }
@@ -633,7 +713,7 @@ public class Tools {
             int sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
-            if (sum <= 0f) return MathUtils.random(0,probabilities.length-1);
+            if (sum <= 0f) return MathUtils.random(0, probabilities.length - 1);
 
             int random = MathUtils.random(0, sum);
             int cumulative = 0;
@@ -650,7 +730,7 @@ public class Tools {
             float sum = 0;
             for (int i = 0; i < probabilities.length; i++) sum += probabilities[i];
 
-            if (sum <= 0f) return MathUtils.random(0,probabilities.length-1);
+            if (sum <= 0f) return MathUtils.random(0, probabilities.length - 1);
 
             float random = MathUtils.random(0f, sum);
             float cumulative = 0f;
@@ -684,11 +764,11 @@ public class Tools {
         }
 
         public static float lerpRange(float[] range, float pct) {
-            return MathUtils.lerp(range[0],range[1],pct);
+            return MathUtils.lerp(range[0], range[1], pct);
         }
 
         public static int lerpRange(int[] range, float pct) {
-            return MathUtils.round(MathUtils.lerp(range[0],range[1],pct));
+            return MathUtils.round(MathUtils.lerp(range[0], range[1], pct));
         }
 
         public static boolean randomChance(long oneIn) {
@@ -710,18 +790,18 @@ public class Tools {
             return array.get(MathUtils.random(0, array.size - 1));
         }
 
-        public static long quadraticGrowth(long baseValue, int times, float divisor){
-            final int timesMinus1 = times-1;
+        public static long quadraticGrowth(long baseValue, int times, float divisor) {
+            final int timesMinus1 = times - 1;
             long factor = timesMinus1 * timesMinus1;
-            long addValue = (long) ((baseValue*factor)/divisor);
-            return baseValue+addValue;
+            long addValue = (long) ((baseValue * factor) / divisor);
+            return baseValue + addValue;
         }
 
-        public static int quadraticGrowth(int baseValue, int times, float divisor){
-            final int timesMinus1 = times-1;
+        public static int quadraticGrowth(int baseValue, int times, float divisor) {
+            final int timesMinus1 = times - 1;
             int factor = timesMinus1 * timesMinus1;
-            int addValue = (int) ((baseValue*factor)/divisor);
-            return baseValue+addValue;
+            int addValue = (int) ((baseValue * factor) / divisor);
+            return baseValue + addValue;
         }
 
         public static int exponentialGrowth(int baseValue, float exp, int times) {
@@ -740,15 +820,15 @@ public class Tools {
         }
 
         public static int exponentialDecay(int baseValue, float exp, int times) {
-            return MathUtils.round(baseValue * (float)Math.exp(-exp * (times-1)));
+            return MathUtils.round(baseValue * (float) Math.exp(-exp * (times - 1)));
         }
 
         public static long exponentialDecay(long baseValue, float exp, int times) {
-            return MathUtils.round(baseValue * (float)Math.exp(-exp * (times-1)));
+            return MathUtils.round(baseValue * (float) Math.exp(-exp * (times - 1)));
         }
 
         public static float exponentialDecay(float baseValue, float exp, int times) {
-            return (baseValue * (float) Math.exp(-exp * (times-1)));
+            return (baseValue * (float) Math.exp(-exp * (times - 1)));
         }
 
         public static int randomCountHits(float baseChance) {
@@ -867,23 +947,19 @@ public class Tools {
         }
 
         public static boolean rectsCollide(int Ax, int Ay, int Aw, int Ah, int Bx, int By, int Bw, int Bh) {
-            return Ax < Bx + Bw && Ax + Aw > Bx &&
-                    Ay < By + Bh && Ay + Ah > By;
+            return Ax < Bx + Bw && Ax + Aw > Bx && Ay < By + Bh && Ay + Ah > By;
         }
 
         public static boolean rectsCollide(float Ax, float Ay, float Aw, float Ah, float Bx, float By, float Bw, float Bh) {
-            return Ax < Bx + Bw && Ax + Aw > Bx &&
-                    Ay < By + Bh && Ay + Ah > By;
+            return Ax < Bx + Bw && Ax + Aw > Bx && Ay < By + Bh && Ay + Ah > By;
         }
 
         public static boolean pointRectsCollide(int pointX, int pointY, int Bx, int By, int Bw, int Bh) {
-            return pointX >= Bx && pointX < Bx + Bw &&
-                    pointY >= By && pointY < By + Bh;
+            return pointX >= Bx && pointX < Bx + Bw && pointY >= By && pointY < By + Bh;
         }
 
         public static boolean pointRectsCollide(float pointX, float pointY, float Bx, float By, float Bw, float Bh) {
-            return pointX >= Bx && pointX < Bx + Bw &&
-                    pointY >= By && pointY < By + Bh;
+            return pointX >= Bx && pointX < Bx + Bw && pointY >= By && pointY < By + Bh;
         }
 
         public static boolean circlesCollide(float x1, float y1, float r1, float x2, float y2, float r2) {

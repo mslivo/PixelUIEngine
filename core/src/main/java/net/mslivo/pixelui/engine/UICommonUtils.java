@@ -1353,7 +1353,7 @@ public class UICommonUtils {
         int viewportWidth = uiEngineState.theme.ts.abs(appViewPort.width);
         int viewportHeight = uiEngineState.theme.ts.abs(appViewPort.height);
         // FrameBuffer
-        appViewPort.frameBuffer = new NestedFrameBuffer(Pixmap.Format.RGB888, viewportWidth, viewportHeight, false);
+        appViewPort.frameBuffer = frameBuffer_createFrameBuffer(viewportWidth, viewportHeight);
         // Texture
         Texture texture = appViewPort.frameBuffer.getColorBufferTexture();
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -1390,7 +1390,7 @@ public class UICommonUtils {
         }
         if (!uiEngineState.viewportMode.upscale && viewportMode.upscale) {
             uiEngineState.upScaleFactor_screen = viewport_determineUpscaleFactor(uiEngineState.resolutionWidth, uiEngineState.resolutionHeight);
-            uiEngineState.frameBuffer_upScaled_screen = new NestedFrameBuffer(Pixmap.Format.RGBA8888, uiEngineState.resolutionWidth * uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upScaleFactor_screen, false);
+            uiEngineState.frameBuffer_upScaled_screen = frameBuffer_createFrameBuffer(uiEngineState.resolutionWidth * uiEngineState.upScaleFactor_screen, uiEngineState.resolutionHeight * uiEngineState.upScaleFactor_screen);
             uiEngineState.frameBuffer_upScaled_screen.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
 

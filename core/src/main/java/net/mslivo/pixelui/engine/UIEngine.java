@@ -97,7 +97,7 @@ public final class UIEngine<T extends UIEngineAdapter> implements Disposable {
 
         // -----  App
         newUIEngineState.camera_app = UICommonUtils.camera_createCamera(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
-        newUIEngineState.frameBuffer_app = new NestedFrameBuffer(Pixmap.Format.RGB888, newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight, true);
+        newUIEngineState.frameBuffer_app = UICommonUtils.frameBuffer_createFrameBuffer(newUIEngineState.resolutionWidth, newUIEngineState.resolutionHeight);
         newUIEngineState.frameBuffer_app.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         // -----  GUI
