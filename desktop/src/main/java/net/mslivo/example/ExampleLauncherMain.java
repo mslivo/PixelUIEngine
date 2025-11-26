@@ -7,7 +7,6 @@ import net.mslivo.pixelui.utils.Tools;
 public class ExampleLauncherMain {
 
     static void main(String[] args) {
-
         PixelUILaunchConfig pixelUILaunchConfig = new PixelUILaunchConfig();
         pixelUILaunchConfig.appTile = ExampleMainConstants.APP_TITLE;
         pixelUILaunchConfig.resolutionWidth = ExampleMainConstants.INTERNAL_RESOLUTION_WIDTH;

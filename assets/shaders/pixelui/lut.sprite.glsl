@@ -3,8 +3,10 @@
 
 // BEGIN VERTEX
 
-// END VERTEX
+void main(){
+}
 
+// END VERTEX
 
 // BEGIN FRAGMENT
 
@@ -38,9 +40,9 @@ vec3 lut(vec3 color, sampler2D lutTexture, vec2 lutTextureSize) {
 void main(){
 
     vec4 color = texture2D(u_texture, v_texCoord);
-    vec4 lutColor = vec4(lut(color.rgb,u_lut, u_lutSize),color.a);
+    vec4 lutColor = vec4(lut(color.rgb, u_lut, u_lutSize), color.a);
 
-    gl_FragColor = mix(color,lutColor,v_tweak.x);
+    gl_FragColor = mix(color, lutColor, v_tweak.x);
 
 }
 

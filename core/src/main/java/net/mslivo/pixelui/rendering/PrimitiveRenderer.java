@@ -42,18 +42,14 @@ public class PrimitiveRenderer extends CommonRenderer implements Disposable {
     private int primitiveType;
 
     public PrimitiveRenderer() {
-        this(null, MAX_VERTEXES_DEFAULT, false);
+        this(null, MAX_VERTEXES_DEFAULT);
     }
 
     public PrimitiveRenderer(final ShaderProgram shaderProgram) {
-        this(shaderProgram, MAX_VERTEXES_DEFAULT, false);
+        this(shaderProgram, MAX_VERTEXES_DEFAULT);
     }
 
-    public PrimitiveRenderer(final ShaderProgram shaderProgram, final int maxVertexes) {
-        this(shaderProgram, maxVertexes, false);
-    }
-
-    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes, final boolean printRenderCalls) {
+    public PrimitiveRenderer(final ShaderProgram defaultShader, final int maxVertexes) {
         int vertexAbsoluteLimit = Integer.MAX_VALUE / (VERTEX_SIZE * 4);
         if (maxVertexes > vertexAbsoluteLimit)
             throw new IllegalArgumentException("size " + maxVertexes + " bigger than mix allowed size " + vertexAbsoluteLimit);
